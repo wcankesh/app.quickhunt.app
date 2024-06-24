@@ -4,7 +4,7 @@ import {Sheet,
     SheetHeader,
 } from "../ui/sheet";
 import {Separator} from "../ui/separator";
-import {Pin} from "lucide-react";
+import {Pin, X} from "lucide-react";
 import {Label} from "../ui/label";
 import {Input} from "../ui/input";
 import {Textarea} from "../ui/textarea";
@@ -53,13 +53,13 @@ const labelItems = [
 
 const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose }) => {
     return (
-
         <Sheet open={isOpen} onOpenChange={isOpen ? onClose : onOpen}>
-                <SheetContent className={"pt-[24px] p-0 max-h-screen overflow-y-auto w-[662px] lg:max-w-[663px]"} >
-                    <SheetHeader >
-                        <div className={"py-[18px] px-8 flex flex-row justify-between items-center"} >
-                            <h5 className={"text-xl font-medium leading-5 text-[#5F5F5F]"}>Create New Announcements</h5>
-                            <Pin color="#5F5F5F" className={"h-4 w-4 mr-6"} />
+                <SheetContent className={"pt-[24px] p-0 overflow-y-auto w-[662px] lg:max-w-[663px] h-full h-screen"} >
+                    <SheetHeader className={"px-8 py-6 flex flex-row justify-between items-center"}>
+                        <h5 className={"text-xl font-medium leading-5"}>Create New Announcements</h5>
+                        <div className={"flex items-center gap-2"}>
+                            <Button variant={"ghost"}><Pin className={"h-4 w-4"}  /></Button>
+                            <Button onClick={onClose} onClick={onClose} variant={"ghost"} ><X className={"h-4 w-4"} /></Button>
                         </div>
                     </SheetHeader>
                     <Separator className={"mb-6"} />
@@ -112,7 +112,7 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose }) => {
                                     htmlFor="picture"
                                     className="flex w-[282px] h-[128px]  py-0 justify-center items-center flex-shrink-0 border-dashed border-[1px] border-gray-300 rounded cursor-pointer"
                                 >
-                                    <span className="text-center text-[#5F5F5F] font-semibold text-[14px]">Upload Image</span>
+                                    <span className="text-center text-muted-foreground font-semibold text-[14px]">Upload Image</span>
                                     <input
                                         id="picture"
                                         type="file"

@@ -150,7 +150,8 @@
 .bodyScreenHeight{height: calc(100vh - 60px);}
 
 .container{width:100%;display: block; max-width: 1120px; padding-right: 12px;padding-left: 12px}
-
+.container-secondary{width:100%;display: block; max-width: 1622px; padding-right: 32px;padding-left: 32px}
 input[type="search"]::-webkit-search-cancel-button {display: none;}
 
 button.absolute.right-4.top-4.rounded-sm.opacity-70.ring-offset-background.transition-opacity.hover\:opacity-100.focus\:outline-none.focus\:ring-2.focus\:ring-ring.focus\:ring-offset-2.disabled\:pointer-events-none.data-\[state\=open\]\:bg-secondary{display: none}
+button.inline-flex.items-center.justify-center.whitespace-nowrap.rounded-md.text-sm.ring-offset-background.transition-colors.focus-visible\:outline-none.focus-visible\:ring-2.focus-visible\:ring-ring.focus-visible\:ring-offset-2.disabled\:pointer-events-none.disabled\:opacity-50.hover\:bg-accent.hover\:text-accent-foreground{margin: 0}

@@ -17,8 +17,11 @@ import {
 import { cn } from "@/lib/utils";
 import {Fragment, useState} from "react";
 
-const ComboBox = ({ items, placeholder, onSelect, value, setValue,classNames }) => {
+const ComboBox = ({ items, placeholder, onSelect, value, setValue,classNames,isSearchBar=true }) => {
     const [open,setOpen]=useState(false);
+    const selectedItem = items.find((item) => item.value === value);
+    // Determine the color to use for the placeholder or selected item
+    const placeholderColor = selectedItem ? selectedItem.color : "";
     return (
         <div>
             <Popover open={open} onOpenChange={setOpen}>
@@ -29,15 +32,21 @@ const ComboBox = ({ items, placeholder, onSelect, value, setValue,classNames }) 
                         aria-expanded={open}
                         className={`flex justify-between h-9 ${classNames}`}
                     >
-                        {value
-                            ? items.find((item) => item.value === value)?.label
-                            : placeholder}
+                        <div className="flex items-center">
+                            <div
+                                className="h-2 w-2 mr-2 rounded-full"
+                                style={{ backgroundColor: placeholderColor }}
+                            ></div>
+                            {value
+                                ? selectedItem?.label
+                                : placeholder}
+                        </div>
                         <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                     </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-[200px] p-0">
                     <Command>
-                        <CommandInput placeholder={`Search ${placeholder.toLowerCase()}...`} className="h-9" />
+                        { isSearchBar && <CommandInput placeholder={`Search ${placeholder.toLowerCase()}...`} className="h-9"/>}
                         <CommandList>
                             <CommandEmpty>No {placeholder.toLowerCase()} found.</CommandEmpty>
                             <CommandGroup>
@@ -51,7 +60,7 @@ const ComboBox = ({ items, placeholder, onSelect, value, setValue,classNames }) 
                                                 setOpen(false);
                                             }}
                                         >
-                                            {item.label}
+                                          <div className={`h-2 w-2 mr-2 rounded-full`} style={{ backgroundColor: item?.color }}></div>  {item.label}
                                             <CheckIcon
                                                 className={cn(
                                                     "ml-auto h-4 w-4",

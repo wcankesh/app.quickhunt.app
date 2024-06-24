@@ -6,7 +6,7 @@ import {Sheet,
 import {Separator} from "../ui/separator";
 import {Icon} from "../../utils/Icon";
 import {Button} from "../ui/button";
-import {ChevronLeft, ChevronRight} from "lucide-react";
+import {ChevronLeft, ChevronRight, ChevronsRight} from "lucide-react";
 
 const reaction ={
     data:[
@@ -26,7 +26,7 @@ const reaction ={
             email:"wc.ankesh112@gmail.com"
         }
     ],
-    previous:0,
+    preview:0,
     next:true,
 }
 
@@ -34,10 +34,10 @@ const SidebarSheet = ({ isOpen, onOpen, onClose }) => {
     return (
             <Sheet open={isOpen} onOpenChange={isOpen ? onClose : onOpen}>
                 <div style={{maxWidth:"none"}}>
-                    <SheetContent className={"pt-[24px] p-0 max-h-screen overflow-y-auto w-[504px] lg:max-w-[504px]"} >
+                    <SheetContent className={"pt-[24px] p-0 max-h-screen overflow-y-auto lg:max-w-[504px]"} >
                     <SheetHeader >
                         <div className={"py-6 px-8"} >
-                            <h5 className={"text-xl font-medium leading-5 text-[#5F5F5F]"}>Welcome To Our Release Notes</h5>
+                            <h5 className={"text-xl font-medium leading-5 text-muted-foreground"}>Welcome To Our Release Notes</h5>
                         </div>
                     </SheetHeader>
                         <Separator />
@@ -69,9 +69,9 @@ const SidebarSheet = ({ isOpen, onOpen, onClose }) => {
                                                     <div className={"flex flex-col gap-1"}>
                                                         <div className={"flex flex-row gap-1 items-center"}>
                                                             <h5 className={"text-sm font-semibold leading-5"}>{x.author}</h5>
-                                                            <p className={"text-[#5F5F5F] text-[10px] leading-5 font-medium"}>Reacted to </p>
+                                                            <p className={"text-muted-foreground text-[10px] leading-5 font-medium"}>Reacted to </p>
                                                         </div>
-                                                       <p className={"text-[#6B6B6B] text-xs font-medium"}>{x.description}</p>
+                                                       <p className={"text-muted-foreground text-xs font-medium"}>{x.description}</p>
                                                     </div>
                                                 </div>
                                                 <div className={"py-4"}>
@@ -83,12 +83,12 @@ const SidebarSheet = ({ isOpen, onOpen, onClose }) => {
                                 }
                             </div>
                             <div className={"flex flex-row justify-end items-center gap-3"}>
-                                <Button variant={"outline hover:none"} className={"h-9 w-9  p-2 p-2"}>
-                                    <ChevronLeft size={20} color={reaction.previous === 0 ? "#D6D6D6" : "#7c3aed"} strokeWidth={1.75} />
+                                <Button className={"bg-white shadow h-[30px] w-[30px] p-1.5 hover:bg-gray-200"}>
+                                    <ChevronLeft  className={`${reaction.preview == 0 ? "stroke-slate-300" : "stroke-primary"}`} />
                                 </Button>
                                 <h5 className={"text-[14px] font-bold"}>01</h5>
-                                <Button variant={"outline hover:none"} className={"h-9 w-9  p-2 p-2"}>
-                                    <ChevronRight size={20} color="#7c3aed" strokeWidth={1.75} />
+                                <Button className={"bg-white shadow h-[30px] w-[30px] p-1.5 hover:bg-gray-200"}>
+                                    <ChevronRight className={"stroke-primary"} />
                                 </Button>
                             </div>
                         </div>
@@ -104,9 +104,9 @@ const SidebarSheet = ({ isOpen, onOpen, onClose }) => {
                                                     <div className={"flex flex-col gap-1"}>
                                                         <div className={"flex flex-row gap-4 items-center"}>
                                                             <h5 className={"text-sm font-semibold leading-5"}>{x.author}</h5>
-                                                            <p className={"text-[#5F5F5F] text-[10px] leading-5 font-medium"}>{x.email}</p>
+                                                            <p className={"text-muted-foreground text-[10px] leading-5 font-medium"}>{x.email}</p>
                                                         </div>
-                                                        <p className={"text-[#6B6B6B] text-xs font-medium"}>{x.description}</p>
+                                                        <p className={"text-muted-foreground text-xs font-medium"}>{x.description}</p>
                                                     </div>
                                                 </div>
                                                 <div className={"py-4"}>
@@ -118,12 +118,12 @@ const SidebarSheet = ({ isOpen, onOpen, onClose }) => {
                                 }
                             </div>
                             <div className={"flex flex-row justify-end items-center gap-3"}>
-                                <Button variant={"outline hover:none"} className={"h-9 w-9  p-2 p-2"}>
-                                    <ChevronLeft size={20} color={reaction.previous === 0 ? "#D6D6D6" : "#7c3aed"} strokeWidth={1.75} />
+                                <Button className={"bg-white shadow h-[30px] w-[30px] p-1.5 hover:bg-gray-200"}>
+                                    <ChevronLeft  className={`${reaction.preview == 0 ? "stroke-slate-300" : "stroke-primary"}`} />
                                 </Button>
                                 <h5 className={"text-[14px] font-bold"}>01</h5>
-                                <Button variant={"outline hover:none"} className={"h-9 w-9  p-2 p-2"}>
-                                    <ChevronRight size={20} color="#7c3aed" strokeWidth={1.75} />
+                                <Button className={"bg-white shadow h-[30px] w-[30px] p-1.5 hover:bg-gray-200"}>
+                                    <ChevronRight className={"stroke-primary"} />
                                 </Button>
                             </div>
                         </div>

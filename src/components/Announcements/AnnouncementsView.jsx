@@ -1,8 +1,6 @@
-import React,{Fragment,useState,useEffect} from 'react';
+import React,{Fragment,useState} from 'react';
 import ComboBox from "../Comman/ComboBox";
-import {Popover, PopoverTrigger} from "@radix-ui/react-popover";
 import {Icon} from "../../utils/Icon";
-import {PopoverContent} from "../ui/popover";
 import {Button} from "../ui/button";
 import {Badge} from "../ui/badge";
 import {
@@ -14,22 +12,12 @@ import {
     ChevronsRight,
     MessageCircleMore
 } from "lucide-react";
-import {Card} from "../ui/card";
+import {Card, CardFooter} from "../ui/card";
 import { DropdownMenu,
     DropdownMenuTrigger,
     DropdownMenuContent,
     DropdownMenuItem,
-    DropdownMenuCheckboxItem,
-    DropdownMenuRadioItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuShortcut,
-    DropdownMenuGroup,
-    DropdownMenuPortal,
-    DropdownMenuSub,
-    DropdownMenuSubContent,
-    DropdownMenuSubTrigger,
-    DropdownMenuRadioGroup,} from "../ui/dropdown-menu"
+  } from "../ui/dropdown-menu"
 import {Separator} from "../ui/separator";
 
 const dummyDetails ={
@@ -81,10 +69,12 @@ const status =[
     {
         value: "publish",
         label: "Publish",
+        color:"#389E0D"
     },
     {
         value: "draft",
         label: "Draft",
+        color:"#CF1322"
     },
 ]
 
@@ -103,11 +93,11 @@ const AnnouncementsView = () => {
                                 <Fragment>
                                         <div className={"flex flex-row gap-4 items-center justify-between px-[31px] mb-[22px]"}>
                                             <div className={"basis-4/5 flex flex-row gap-4 items-center "}>
-                                                <h4 className={"text-base text-[#5F5F5F] font-medium leading-4 capitalize"}>{x.title}</h4>
+                                                <h4 className={"text-base font-medium capitalize"}>{x.title}</h4>
                                                 <div className={"flex flex-row items-center gap-2"}>
-                                                    <h5 className={"text-[14px]  font-medium leading-5"}>{x.author}</h5>
+                                                    <h5 className={"text-base font-medium text-sm"}>{x.author}</h5>
                                                     <div className={"w-1 h-1 rounded-full bg-[#5F5F5F]"}/>
-                                                    <h5 className={"text-sm text-[#5F5F5F] font-normal leading-5"}>{x.date}</h5>
+                                                    <h5 className={"text-sm font-normal flex items-center text-muted-foreground leading-5"}>{x.date}</h5>
                                                 </div>
                                             </div>
                                             <div className={"basis-1/5 flex justify-end"}>
@@ -116,7 +106,7 @@ const AnnouncementsView = () => {
                                         </div>
                                         <div className={"flex flex-row gap-4 justify-between px-[31px] mb-4"}>
                                             <div className={"basis-4/5 flex flex-row gap-4"}>
-                                                <p className={"text-muted-foreground font-normal"}>
+                                                <p className={"text-muted-foreground text-sm"}>
                                                     {isReadMore ? x.description.slice(0, 300) : x.description}
                                                     <span
                                                     onClick={toggleReadMore}
@@ -175,27 +165,29 @@ const AnnouncementsView = () => {
                     }
                     </div>
                     <Separator/>
-                    <div className={"pt-4 pb-4 w-full rounded-b-lg rounded-t-none flex justify-end pe-16 py-15px bg-[#F8F9FC]"}>
-                        <div className={"flex flex-row gap-9 items-center"}>
-                            <div>
-                                <h5 className={"text-[#5F5F5F] text-sm font-semibold leading-[20px]"}>Page {dummyDetails.page} of 10</h5>
-                            </div>
-                            <div className={"flex flex-row gap-2 items-center"}>
-                                <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}>
-                                    <ChevronsLeft  className={""} size={18} color={dummyDetails.preview === 0 ? "#D6D6D6" : "7c3aed" } />
-                                </Button>
-                                <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}>
-                                    <ChevronLeft  className={""} size={18} color={dummyDetails.preview === 0 ? "#D6D6D6" : "7c3aed" }  />
-                                </Button>
-                                <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}>
-                                    <ChevronRight  className={""} size={18} color="#7c3aed"  />
-                                </Button>
-                                <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}>
-                                    <ChevronsRight className={""} size={18} color="#7c3aed" />
-                                </Button>
+                    <CardFooter className={"p-0"}>
+                        <div className={"w-full p-5 bg-muted rounded-b-lg rounded-t-none flex justify-end pe-16 py-15px"}>
+                            <div className={"flex flex-row gap-8 items-center"}>
+                                <div>
+                                    <h5 className={"text-sm font-semibold"}>Page {dummyDetails.page} of 10</h5>
+                                </div>
+                                <div className={"flex flex-row gap-2 items-center"}>
+                                    <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5 hover:none"}>
+                                        <ChevronsLeft  className={`${dummyDetails.preview === 0 ? "stroke-slate-300" : "stroke-primary"}`} />
+                                    </Button>
+                                    <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5 hover:none"}>
+                                        <ChevronLeft  className={`${dummyDetails.preview === 0 ? "stroke-slate-300" : "stroke-primary"}`} />
+                                    </Button>
+                                    <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5 hover:none"}>
+                                        <ChevronRight  className={"stroke-primary"} />
+                                    </Button>
+                                    <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5 hover:none"}>
+                                        <ChevronsRight className={"stroke-primary"} />
+                                    </Button>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    </CardFooter>
             </Card>
 
         </div>
