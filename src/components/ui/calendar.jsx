@@ -13,7 +13,6 @@ function Calendar({
 
   ...props
 }) {
-debugger
   return (
     (<DayPicker
       showOutsideDays={showOutsideDays}

@@ -1,9 +1,6 @@
 import React, {useState} from 'react';
 import {Button} from "../ui/button";
-import {Bell, Home, LineChart, Package, Package2, ShoppingCart, Users} from "lucide-react";
 import {Icon} from "../../utils/Icon";
-import {Badge} from "../ui/badge";
-import AppLogoPurple from "../../img/quickhunt.purple.png";
 import {baseUrl} from "../../utils/constent";
 import {ApiService} from "../../utils/ApiService";
 import {useNavigate} from "react-router-dom";
@@ -110,15 +107,15 @@ const SaidBarDesktop = () => {
     };
 
     return (
-        <div className="hidden md:block  bodyScreenHeight overflow-auto">
+        <div className="hidden md:block bodyScreenHeight overflow-auto">
             <div className="flex h-full max-h-screen flex-col gap-2">
 
                 <div className="flex-1 pt-5">
-                    <nav className="grid items-start px-2 text-sm font-medium lg:px-4 gap-5">
+                    <nav className="grid items-start px-2 lg:px-4 gap-5">
                         {
                             (menuComponent || []).map((x, i) => {
                                 return (
-                                    <div key={i} className={"modules flex flex-col gap-3"}>
+                                    <div key={i} className={`flex flex-col ${x.dashBtn ? "" : "gap-1"}`}>
                                         {
                                             (x.dashBtn || []).map((z, i) => {
                                                 return (
@@ -126,29 +123,29 @@ const SaidBarDesktop = () => {
                                                         key={i}
                                                         variant={"link hover:no-underline"}
                                                         href="#"
-                                                        className={`${isActive(z.selected) ? "flex justify-start gap-4 h-9 rounded-md shadow border" : 'flex items-center gap-4 justify-start'}`}
+                                                        className={`${isActive(z.selected) ? "flex justify-start gap-4 h-9 rounded-md bg-primary/25 transition-none" : 'flex items-center gap-4 justify-start transition-none'}`}
                                                         onClick={() => onRedirect(z.link)}
                                                     >
-                                                        <div className={`${isActive(z.selected) ? "fill-violet-600" : ""}`}>{z.icon}</div>
-                                                        <div className={`${isActive(z.selected) ? "text-violet-600 text-sm font-medium" : "text-sm font-medium"}`}>{z.title}</div>
+                                                        <div className={`${isActive(z.selected) ? "fill-primary" : ""}`}>{z.icon}</div>
+                                                        <div className={`${isActive(z.selected) ? "text-primary text-sm font-medium" : "text-sm font-medium"}`}>{z.title}</div>
                                                     </Button>
                                                 )
                                             })
                                         }
-                                        <div className="text-zinc-600 text-sm font-bold">{x.mainTitle}</div>
-                                        <div className={"flex flex-col gap-2"}>
+                                        <h3 className={"text-sm font-bold py-2 px-4"}>{x.mainTitle}</h3>
+                                        <div className={"flex flex-col gap-1"}>
                                             {
                                                 (x.items || []).map((y, i) => {
                                                     return (
                                                         <Button
                                                             key={i}
-                                                            variant={"link hover:no-underline active:bg-blue-600"}
+                                                            variant={"link hover:no-underline"}
                                                             href="#"
-                                                            className={`${isActive(y.selected) ? "flex justify-start gap-4 h-9 rounded-md shadow border" : 'flex items-center gap-4 justify-start'}`}
+                                                            className={`${isActive(y.selected) ? "flex justify-start gap-4 h-9 rounded-md bg-primary/25 transition-none" : 'flex items-center gap-4 justify-start transition-none'}`}
                                                             onClick={() => onRedirect(y.link)}
                                                         >
                                                             {y.icon}
-                                                            <div className={`${isActive(y.selected) ? "text-violet-600 text-sm font-medium" : "text-sm font-medium"}`}>{y.title}</div>
+                                                            <div className={`${isActive(y.selected) ? "text-primary text-sm font-medium" : "text-sm font-medium"}`}>{y.title}</div>
                                                         </Button>
                                                     )
                                                 })
@@ -161,7 +158,7 @@ const SaidBarDesktop = () => {
                     </nav>
                 </div>
                 <div className="mt-auto p-4">
-                    <nav className="grid gap-2 text-lg font-medium">
+                    <nav className="grid gap-1">
                         {
                             (footerMenuComponent || []).map((x, i) => {
                                 return (
@@ -169,11 +166,11 @@ const SaidBarDesktop = () => {
                                         key={i}
                                         variant={"link hover:no-underline"}
                                         href="#"
-                                        className={`${isActive(x.selected) ? "flex justify-start gap-4 h-9 rounded-md shadow border" : 'flex items-center gap-4 justify-start'}`}
+                                        className={`${isActive(x.selected) ? "flex justify-start gap-4 h-9 rounded-md bg-primary/25 transition-none" : 'flex items-center gap-4 justify-start transition-none'}`}
                                         onClick={() => onRedirect(x.link)}
                                         >
                                         {x.icon}
-                                        <div className={`${isActive(x.selected) ? "text-violet-600 text-sm font-medium" : "text-sm font-medium"}`}>{x.title}</div>
+                                        <div className={`${isActive(x.selected) ? "text-primary text-sm font-medium" : "text-sm font-medium"}`}>{x.title}</div>
                                     </Button>
                                 )
                             })

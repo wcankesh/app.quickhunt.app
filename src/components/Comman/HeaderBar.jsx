@@ -1,23 +1,20 @@
 import React, {useState} from 'react';
-import {Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle, SheetTrigger, SheetClose} from "../ui/sheet";
+import {Sheet, SheetContent, SheetFooter, SheetHeader, SheetTitle, SheetTrigger, SheetClose} from "../ui/sheet";
 import {Button} from "../ui/button";
-import {Bell, CircleUser, Home, LineChart, Menu, Package, Package2, Search, ShoppingCart, Users} from "lucide-react";
-import {Badge} from "../ui/badge";
+import {Menu, X} from "lucide-react";
 import {Input} from "../ui/input";
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger} from "../ui/dropdown-menu";
 import {useTheme} from "../theme-provider";
 import {baseUrl, logout, removeProjectDetails} from "../../utils/constent";
 import {useNavigate} from "react-router-dom";
 import {Icon} from "../../utils/Icon";
-import {DropdownMenuGroup} from "@radix-ui/react-dropdown-menu";
-import {Select, SelectContent, SelectTrigger, SelectValue, SelectGroup, SelectItem, SelectLabel} from "../ui/select";
-import {Avatar, AvatarImage} from "../ui/avatar";
+import {Avatar, AvatarFallback, AvatarImage} from "../ui/avatar";
 import { Moon, Sun } from "lucide-react";
 import AppLogoPurple from "../../img/quickhunt.purple.png";
 import {ApiService} from "../../utils/ApiService";
 import {Popover, PopoverTrigger, PopoverContent} from "../ui/popover";
 import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList} from "../ui/command";
-import { Check, ChevronsUpDown } from "lucide-react";
+import { ChevronsUpDown } from "lucide-react";
 import {Label} from "../ui/label";
 
 const menuComponent = [
@@ -35,12 +32,6 @@ const menuComponent = [
         mainTitle: 'Modules',
         items: [
             {
-                title: 'Changelogs',
-                link: '/changelogs',
-                icon: Icon.analyticsIcon,
-                selected: `${baseUrl}/changelogs`,
-            },
-            {
                 title: 'Ideas',
                 link: '/ideas',
                 icon: Icon.hintIcon,
@@ -51,6 +42,12 @@ const menuComponent = [
                 link: '/roadmap',
                 icon: Icon.roadmapIcon,
                 selected: `${baseUrl}/roadmap`,
+            },
+            {
+                title: 'Announcements',
+                link: '/announcements',
+                icon: Icon.announcement,
+                selected: `${baseUrl}/announcements`,
             },
             {
                 title: 'Customers',
@@ -107,14 +104,29 @@ const footerMenuComponent = [
     }
 ];
 
-const HeaderBar = () => {
+const HeaderBar = ({ showDashboardButton }) => {
     const { setTheme, theme } = useTheme()
     let navigate = useNavigate();
     let apiSerVice = new ApiService()
     const [selectedUrl, setSelectedUrl] = useState("/dashboard");
     const [value, setValue] = useState("")
     const [open, setOpen] = useState(false)
-    const [createProjectSheetOpen, setCreateProjectSheetOpen] = useState(false);
+    const [isSheetOpen, setSheetOpen] = useState(false);
+    const [isSheetOpenMenu, setSheetOpenMenu] = useState(false);
+    const [sheetType, setSheetType] = useState(null);
+
+    const openSheet = () => setSheetOpen(true);
+    const closeSheet = () => setSheetOpen(false);
+    const openSheetMenu = () => setSheetOpenMenu(true);
+    const closeSheetMenu = () => setSheetOpenMenu(false);
+
+    const openSheetCom = (type) => {
+        setSheetType(type);
+    };
+
+    const closeSheetCom = () => {
+        setSheetType(null);
+    };
 
     const onRedirect = (link) => {
         setSelectedUrl(link)
@@ -147,30 +159,26 @@ const HeaderBar = () => {
         },
     ]
 
-    const toggleCreateProjectSheet = () => {
-        setCreateProjectSheetOpen(!createProjectSheetOpen);
-    };
-
-    const toggleCreateProjectSheetClose = () => {
-        setCreateProjectSheetOpen(false);
-    };
-
     return (
         <header className="flex h-14 lg:justify-between md:justify-between items-center sm:justify-between gap-4 px-4 lg:h-[60px] lg:px-6 ">
+
             {/*Mobile said bar start */}
-            <Sheet>
+            <Sheet open={isSheetOpenMenu} onOpenChange={isSheetOpenMenu ? closeSheetMenu : openSheetMenu}>
                 <SheetTrigger asChild>
                     <Button variant="outline" size="icon" className="shrink-0 md:hidden">
                         <Menu className="h-5 w-5"/>
                     </Button>
                 </SheetTrigger>
 
-                <SheetContent side="left" className="flex flex-col">
-                    <nav className="grid gap-2 text-lg font-medium">
+                <SheetContent side="left" className="flex flex-col overflow-auto">
+                    <Button className={"self-end p-0 bg-transparent hover:bg-transparent w-[20px] h-[20px]"}>
+                        <X className={"fill-card-foreground stroke-card-foreground"} onClick={closeSheetMenu} />
+                    </Button>
+                    <nav className="grid gap-2">
                         {
                             (menuComponent || []).map((x, i) => {
                                 return (
-                                    <div key={i} className={"modules flex flex-col gap-3"}>
+                                    <div key={i} className={`flex flex-col ${x.dashBtn ? "" : "gap-1"}`}>
                                         {
                                             (x.dashBtn || []).map((z, i) => {
                                                 return (
@@ -178,29 +186,30 @@ const HeaderBar = () => {
                                                         key={i}
                                                         variant={"link hover:no-underline"}
                                                         href="#"
-                                                        className={`${isActive(z.selected) ? "flex justify-start gap-4 h-9 rounded-md shadow border border-zinc-200" : 'flex items-center gap-4 justify-start'}`}
+                                                        className={`${isActive(z.selected) ? "flex justify-start gap-4 h-9 rounded-md bg-primary/25 transition-none" : 'flex items-center gap-4 justify-start transition-none'}`}
                                                         onClick={() => onRedirect(z.link)}
                                                     >
-                                                        <div className={`${isActive(z.selected) ? "fill-violet-600" : ""}`}>{z.icon}</div>
-                                                        <div className={`${isActive(z.selected) ? "text-violet-600 text-xs font-medium" : "text-zinc-600 text-xs font-medium"}`}>{z.title}</div>
+                                                        <div className={`${isActive(z.selected) ? "fill-primary" : ""}`}>{z.icon}</div>
+                                                        <div className={`${isActive(z.selected) ? "text-primary text-sm font-medium" : "text-sm font-medium"}`}>{z.title}</div>
                                                     </Button>
                                                 )
                                             })
                                         }
-                                        <div className="text-zinc-600 text-sm font-bold">{x.mainTitle}</div>
-                                        <div className={"flex flex-col gap-2"}>
+                                        <div className={"text-sm font-bold py-2 px-4"}>{x.mainTitle}</div>
+                                        <div className={"flex flex-col gap-1"}>
                                             {
                                                 (x.items || []).map((y, i) => {
                                                     return (
                                                         <Button
                                                             key={i}
-                                                            variant={"link hover:no-underline active:bg-blue-600"}
+                                                            // variant={"link hover:no-underline active:bg-blue-600"}
+                                                            variant={"link hover:no-underline"}
                                                             href="#"
-                                                            className={`${isActive(y.selected) ? "flex justify-start gap-4 h-9 rounded-md shadow border border-zinc-200" : 'flex items-center gap-4 justify-start'}`}
+                                                            className={`${isActive(y.selected) ? "flex justify-start gap-4 h-9 rounded-md bg-primary/25 transition-none" : 'flex items-center gap-4 justify-start transition-none'}`}
                                                             onClick={() => onRedirect(y.link)}
                                                         >
                                                             {y.icon}
-                                                            <div className={`${isActive(y.selected) ? "text-violet-600 text-xs font-medium" : "text-zinc-600 text-xs font-medium"}`}>{y.title}</div>
+                                                            <div className={`${isActive(y.selected) ? "text-primary text-sm font-medium" : "text-sm font-medium"}`}>{y.title}</div>
                                                         </Button>
                                                     )
                                                 })
@@ -212,7 +221,7 @@ const HeaderBar = () => {
                         }
                     </nav>
                     <div className="mt-auto">
-                        <nav className="grid gap-2 text-lg font-medium">
+                        <nav className="grid gap-1">
                             {
                                 (footerMenuComponent || []).map((x, i) => {
                                     return (
@@ -220,11 +229,11 @@ const HeaderBar = () => {
                                             key={i}
                                             variant={"link hover:no-underline"}
                                             href="#"
-                                            className={`${isActive(x.selected) ? "flex justify-start gap-4 h-9 rounded-md shadow border border-zinc-200" : 'flex items-center gap-4 justify-start'}`}
+                                            className={`${isActive(x.selected) ? "flex justify-start gap-4 h-9 rounded-md bg-primary/25 transition-none" : 'flex items-center gap-4 justify-start transition-none'}`}
                                             onClick={() => onRedirect(x.link)}
                                         >
                                             {x.icon}
-                                            <div className={`${isActive(x.selected) ? "text-violet-600 text-xs font-medium" : "text-zinc-600 text-xs font-medium"}`}>{x.title}</div>
+                                            <div className={`${isActive(x.selected) ? "text-primary text-sm font-medium" : "text-sm font-medium"}`}>{x.title}</div>
                                         </Button>
                                     )
                                 })
@@ -234,6 +243,7 @@ const HeaderBar = () => {
                 </SheetContent>
             </Sheet>
             {/*Mobile said bar End */}
+
             <div className="flex h-14 items-center lg:h-[60px] ">
                 <div className={"app-logo"}>
                     <img className={"lg:w-full md:w-[195px]"} src={AppLogoPurple} alt={"app-logo"} />
@@ -267,7 +277,7 @@ const HeaderBar = () => {
                                                 <CommandItem
                                                     key={framework.value}
                                                     value={framework.value}
-                                                    onSelect={framework.value === 'createproject' ? toggleCreateProjectSheet : (currentValue) =>  {
+                                                    onSelect={framework.value === 'createproject' ? openSheet : (currentValue) =>  {
                                                         setValue(currentValue === value ? "" : currentValue)
                                                         setOpen(false)
                                                     }}
@@ -281,17 +291,12 @@ const HeaderBar = () => {
                             </PopoverContent>
                         </Popover>
                     </div>
-                    <div className="search-input">
-                        <form>
-                            <div
-                                className="relative ml-auto flex-1 md:grow-0 bg-white rounded-md shadow border-slate-300">
-                                <Input
-                                    type="search"
-                                    placeholder="Search..."
-                                    className="w-full pl-4 pr-14 md:w-[200px] lg:w-[352px] text-slate-400 text-sm font-normal"
-                                />
-                            </div>
-                        </form>
+                    <div className="relative ml-auto flex-1 md:grow-0 rounded-md">
+                        <Input
+                            type="search"
+                            placeholder="Search..."
+                            className="w-full pl-4 pr-14 md:w-[200px] lg:w-[352px] text-sm font-normal"
+                        />
                     </div>
                 </div>
                 <div className={"flex gap-4 items-center"}>
@@ -302,8 +307,10 @@ const HeaderBar = () => {
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button variant="secondary" size="icon" className="rounded-full">
-                                <CircleUser className="h-5 w-5"/>
-                                <span className="sr-only">Toggle user menu</span>
+                                <Avatar>
+                                    <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
+                                    <AvatarFallback >CN</AvatarFallback>
+                                </Avatar>
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className={"w-56 rounded-md shadow border border-slate-100"}>
@@ -324,36 +331,38 @@ const HeaderBar = () => {
                     </DropdownMenu>
                 </div>
             </div>
-            {createProjectSheetOpen && (
-                <Sheet open={createProjectSheetOpen}>
-                    {/*<SheetTrigger asChild>*/}
-                    {/*    <Button variant="outline">Open</Button>*/}
-                    {/*</SheetTrigger>*/}
+
+            {isSheetOpen && (
+                <Sheet open={isSheetOpen} onOpenChange={isSheetOpen ? closeSheet : openSheet}>
                     <SheetContent className={"sm:max-w-[662px] p-0"}>
-                        <SheetHeader className={"px-[32px] py-[24px] border-b border-zinc-200"}>
-                            <SheetTitle className={"text-zinc-600 text-xl font-medium"}>Create new Project</SheetTitle>
+                        <SheetHeader className={"px-[32px] py-[22px] border-b flex"}>
+                            <SheetTitle className={"text-xl font-medium flex justify-between items-center"}>Create new Project
+                                <Button className={"bg-transparent hover:bg-transparent p-0 h-[24px]"}>
+                                    <X className={"stroke-card-foreground"} onClick={closeSheet} />
+                                </Button>
+                            </SheetTitle>
                         </SheetHeader>
                         <div className="grid gap-[24px] px-[32px] pt-[24px] pb-[36px]">
                             <div className="gap-2">
                                 <Label htmlFor="name" className="text-right">Project Name</Label>
-                                <Input id="name" placeholder="Project Name" className={"border-slate-300 placeholder:text-slate-400"} />
+                                <Input id="name" placeholder="Project Name" className={"placeholder:text-muted-foreground/75"} />
                             </div>
                             <div className="gap-2">
                                 <Label htmlFor="website" className="text-right">Project website</Label>
-                                <Input id="website" placeholder="https://yourcompany.com" className={"border-slate-300 placeholder:text-slate-400"} />
+                                <Input id="website" placeholder="https://yourcompany.com" className={"placeholder:text-muted-foreground/75"} />
                             </div>
                             <div className="gap-2 relative">
                                 <Label htmlFor="domain" className="text-right">Project domain</Label>
-                                <Input id="domain" placeholder="https://projectname.quickhunt.io" className={"border-slate-300 placeholder:text-slate-400"} />
-                                <span className={"absolute top-[33px] right-[13px] text-slate-900 text-sm font-medium"}>Project domain</span>
+                                <Input id="domain" placeholder="https://projectname.quickhunt.io" className={"placeholder:text-muted-foreground/75 pr-[115px]"} />
+                                <span className={"absolute top-[33px] right-[13px] text-sm font-medium"}>Project domain</span>
                             </div>
                         </div>
                         <SheetFooter className={"px-[32px] gap-[16px] sm:justify-start"}>
                             <SheetClose asChild>
-                                <Button className={"text-white sm:space-x-0 text-sm font-semibold hover:bg-violet-600 bg-violet-600"} type="submit">Create Project</Button>
+                                <Button className={"text-card sm:space-x-0 text-sm font-semibold hover:bg-primary bg-primary"} type="submit">Create Project</Button>
                             </SheetClose>
-                            <SheetClose asChild onClick={toggleCreateProjectSheetClose}>
-                                <Button className={"text-violet-600 text-sm font-semibold hover:bg-white border border-violet-600 bg-white"} type="submit">Cancel</Button>
+                            <SheetClose asChild onClick={closeSheet}>
+                                <Button className={"text-primary text-sm font-semibold hover:bg-card border border-primary bg-card"} type="submit">Cancel</Button>
                             </SheetClose>
                         </SheetFooter>
                     </SheetContent>

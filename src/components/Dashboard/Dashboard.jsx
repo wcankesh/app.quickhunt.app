@@ -14,6 +14,7 @@ import {Calendar} from "../ui/calendar";
 import {PopoverTrigger, Popover, PopoverContent} from "../ui/popover";
 import { CalendarIcon} from "lucide-react";
 //import { DateRange } from "react-day-picker";
+
 import { addDays, format } from "date-fns"
 
 import { cn } from "../../lib/utils";
@@ -111,20 +112,20 @@ export function Dashboard() {
     };
 
     const [date, setDate] = useState([new Date(),addDays(new Date(), 4)]);
-    console.log(date)
+
     return (
         <Fragment>
                 <div className={"py-8"}>
                     <div className='xl:container xl:max-w-[1200px] lg:container lg:max-w-[992px] md:container md:max-w-[768px] sm:container sm:max-w-[639px] xs:container xs:max-w-[475px]'>
-                        <div className="text-3xl font-medium">Welcome to Quickhunt</div>
+                        <h1 className="text-[32px] font-medium">Welcome to Quickhunt</h1>
                     </div>
 
                 </div>
-                <div className={"border-b-2"} />
+                <div className={"border-b"} />
                 <div className="xl:container xl:max-w-[1200px] lg:container lg:max-w-[992px] md:container md:max-w-[768px] sm:container sm:max-w-[639px] xs:container xs:max-w-[475px]">
                     <div className="program-data">
                         <div className={"analytics-date flex justify-between items-center pb-6 pt-9 md:flex-wrap md:gap-4 sm:flex-wrap sm:gap-2"}>
-                            <div className="text-base font-bold text-card-foreground-subtext">Here's what has happened to your program</div>
+                            <h3 className="text-base font-bold text-card-foreground-subtext">Here's what has happened to your program</h3>
                             <Popover>
                                 <PopoverTrigger asChild>
                                     <Button
@@ -162,10 +163,12 @@ export function Dashboard() {
                                         return (
                                             // <Card className={"basis-1/4 border-zinc-200 shadow"} key={i}>
                                             <Card className={"rounded-lg border bg-card text-card-foreground shadow-sm"} x-chunk={"dashboard-05-chunk-0"} key={i}>
-                                                <CardHeader className={"p-6 gap-1"}>
+                                                <CardHeader className={"p-6 gap-0.5"}>
                                                     <CardTitle className={"text-sm font-medium"}>{x.title}</CardTitle>
-                                                    <CardDescription className={"text-primary text-2xl font-bold"}>{x.total}</CardDescription>
-                                                    <CardDescription className={"text-xs font-medium"}>{x.compare}</CardDescription>
+                                                    <CardContent className={"p-0 flex flex-col gap-2"}>
+                                                        <h3 className={"text-primary text-2xl font-bold"}>{x.total}</h3>
+                                                        <p className={"text-xs font-medium"}>{x.compare}</p>
+                                                    </CardContent>
                                                 </CardHeader>
                                             </Card>
                                         )
@@ -173,7 +176,7 @@ export function Dashboard() {
                                 }
                             </div>
                             <div className={"flex lg:flex-nowrap md:flex-wrap sm:flex-wrap gap-8"}>
-                                <Card className={"lg:basis-2/3 md:basis-full sm:basis-full p-4 divide-y shadow border"}>
+                                <Card className={"lg:basis-2/3 md:basis-full sm:basis-full p-4 pr-8 divide-y shadow border"}>
                                     <CardHeader className={"p-0 pb-4"}>
                                         <CardTitle className={"text-base font-bold"}>New Feedbacks</CardTitle>
                                     </CardHeader>
@@ -182,34 +185,34 @@ export function Dashboard() {
                                             return (
                                                 <CardContent className={"p-2 pl-6 pr-4 flex flex-col gap-2"} key={i}>
                                                     <div className="flex gap-2 items-center">
-                                                        <div className="text-sm font-semibold">{x.name}</div>
-                                                        <div className="text-xs font-medium">{x.email}</div>
+                                                        <h4 className="text-sm font-semibold">{x.name}</h4>
+                                                        <p className="text-xs font-medium text-muted-foreground">{x.email}</p>
                                                     </div>
-                                                    <div className="text-xs font-medium text-muted-foreground">“{x.feed}”</div>
+                                                    <p className="text-xs font-medium text-foreground">“{x.feed}”</p>
                                                 </CardContent>
                                             )
                                         })
                                     }
                                     <CardFooter className={"pt-4 px-0 pb-0 justify-end"}>
-                                        <Button className={"text-primary text-sm font-semibold"} variant={"ghost hover:none"}>View More Feedbacks</Button>
+                                        <Button className={"text-primary p-0 h-[20px] text-sm font-semibold"} variant={"ghost hover:none"}>View More Feedbacks</Button>
                                     </CardFooter>
                                 </Card>
-                                <Card className={"lg:basis-1/3 md:basis-full sm:basis-full p-4 divide-y shadow border"}>
+                                <Card className={"lg:basis-1/3 md:basis-full sm:basis-full p-4 pr-8 divide-y shadow border"}>
                                     <CardHeader className={"p-0 pb-4"}>
                                         <CardTitle className={"text-base font-bold"}>Reaction</CardTitle>
                                     </CardHeader>
                                     {
                                         (reactionFeed || []).map((x, i) => {
                                             return (
-                                                <CardContent className={"p-2 px-0"} key={i}>
+                                                <CardContent className={"py-2.5 px-0"} key={i}>
                                                     <div className={"flex gap-4"}>
                                                         <div>{x.icon}</div>
-                                                        <div className={"flex flex-col gap-2"}>
-                                                            <div className="flex gap-2 items-center">
-                                                                <div className="text-sm font-semibold">{x.name}</div>
-                                                                <div className="text-xs font-medium">{x.reactedTo}</div>
+                                                        <div className={"flex flex-col gap-1"}>
+                                                            <div className="flex gap-1 items-center">
+                                                                <h4 className="text-sm font-semibold">{x.name}</h4>
+                                                                <p className="text-xs font-medium text-muted-foreground">{x.reactedTo}</p>
                                                             </div>
-                                                            <div className="text-xs font-medium text-muted-foreground">"{x.feed}"</div>
+                                                            <p className="text-xs font-medium text-foreground">"{x.feed}"</p>
                                                         </div>
                                                     </div>
                                                 </CardContent>
@@ -217,7 +220,7 @@ export function Dashboard() {
                                         })
                                     }
                                     <CardFooter className={"pt-4 px-0 pb-0 justify-end"}>
-                                        <Button className={"text-violet-600 text-sm font-semibold"} variant={"ghost hover:none"}>View More Reactions</Button>
+                                        <Button className={"text-primary text-sm p-0 h-[20px] font-semibold"} variant={"ghost hover:none"}>View More Reactions</Button>
                                     </CardFooter>
                                 </Card>
                             </div>
