@@ -20,6 +20,8 @@ import {Avatar, AvatarFallback, AvatarImage} from "../ui/avatar";
 import {Textarea} from "../ui/textarea";
 import {Switch} from "../ui/switch";
 import {TabsContent, TabsList, TabsTrigger, Tabs} from "../ui/tabs";
+import SidebarSheet from "../Ideas/SidebarSheet";
+import {useTheme} from "../theme-provider";
 
 const dummyDetails = {
     data:[
@@ -88,32 +90,26 @@ const filterByRoadMapStatus = [
     {name: "Shipped", value: "shipped", fillColor: "#63C8D9", strokeColor: "#63C8D9",},
     {name: "AC", value: "ac", fillColor: "#CEF291", strokeColor: "#CEF291",},
 ]
-
-const ideasSheetStatus = [
-    {id: "r1", name: "Under consideration", value: "underconsideration", fillColor: "red-400", strokeColor: "red-400",},
-    {id: "r2", name: "Planned", value: "planned", fillColor: "blue-400", strokeColor: "blue-400",},
-    {id: "r3", name: "In Development", value: "indevelopment", fillColor: "red-400", strokeColor: "red-400",},
-    {id: "r4", name: "Shipped", value: "shipped", fillColor: "teal-300", strokeColor: "teal-300",},
-    {id: "r5", name: "No Status", value: "underconsideration", fillColor: "red-400", strokeColor: "red-400",},
-]
-
 const Ideas = () => {
+    const { theme } = useTheme()
     const [isSheetOpen, setSheetOpen] = useState(false);
-    const [selectedStatus, setSelectedStatus] = useState('');
+    const [sheetType, setSheetType] = useState('');
 
     const openSheet = () => setSheetOpen(true);
     const closeSheet = () => setSheetOpen(false);
 
-    const handleStatusChange = (event) => {
-        setSelectedStatus(event.target.value);
-    };
+    const onType = (type) => {
+        setSheetType(type)
+        openSheet()
+    }
 
     return (
         <div className={"xl:container xl:max-w-[1200px] lg:container lg:max-w-[992px] md:container md:max-w-[768px] sm:container sm:max-w-[639px] xs:container xs:max-w-[475px] pt-8"}>
-            <div className={"flex flex-row gap-6 items-center"}>
+            <SidebarSheet isOpen={isSheetOpen} onOpen={openSheet} onClose={closeSheet} sheetType={sheetType}/>
+            <div className={"flex flex-row flex-wrap gap-6 items-center"}>
                 <span><h1 className={"text-2xl font-medium"}>Ideas</h1></span>
                 <div className="ml-auto gap-6">
-                    <div className={"flex flex-row gap-6 items-center"}>
+                    <div className={"flex flex-row flex-wrap gap-6 items-center"}>
                         <Select>
                             <SelectTrigger className="w-[173px]">
                                 <SelectValue placeholder="Filter by status" />
@@ -165,7 +161,7 @@ const Ideas = () => {
                     </div>
                 </div>
                 <div className="flex justify-end">
-                    <Button className="gap-2 text-sm font-semibold w-[139px]"><Plus />Create Idea</Button>
+                    <Button className="gap-2 text-sm font-semibold w-[139px]" onClick={() => onType('createNewIdeas')}><Plus />Create Idea</Button>
                 </div>
             </div>
             <div className={"mt-8"}>
@@ -187,7 +183,7 @@ const Ideas = () => {
                                                             <p className={"text-sm font-normal flex items-center text-muted-foreground"}><Dot className={"fill-text-card-foreground stroke-text-card-foreground"} />{x.date}</p>
                                                         </div>
                                                         <p className={"text-sm font-normal text-muted-foreground pt-[11px] pb-[24px]"}>{x.description}<Button onClick={openSheet} variant={"ghost hover:none"} className={"h-0 p-0 text-primary text-sm font-semibold"}>Read more</Button></p>
-                                                        <div className={"flex justify-between items-center"}>
+                                                        <div className={"flex flex-wrap justify-between items-center gap-1"}>
                                                             <div className={"text-sm font-medium"}># Welcome 👋</div>
                                                             <div className={"flex items-center gap-8"}>
                                                                 <Select>
@@ -215,7 +211,7 @@ const Ideas = () => {
                                                                 </Select>
                                                                 <div className={"flex items-center gap-2"}>
                                                                     <span>
-                                                                    <MessageCircleMore className={"stroke-primary w-[16px] h-[16px]"} />
+                                                                        <MessageCircleMore className={"stroke-primary w-[16px] h-[16px]"} />
                                                                     </span>
                                                                     <p className={"text-base font-medium"}>{x.up}</p>
                                                                 </div>
@@ -230,7 +226,7 @@ const Ideas = () => {
                             }
                     </CardContent>
                     <CardFooter className={"p-0"}>
-                        <div className={"w-full p-5 bg-muted rounded-b-lg rounded-t-none flex justify-end pe-16 py-15px"}>
+                        <div className={`w-full p-5 ${theme === "dark"? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end pe-16 py-15px`}>
                             <div className={"flex flex-row gap-8 items-center"}>
                                 <div>
                                     <h5 className={"text-sm font-semibold"}>Page {dummyDetails.page} of 10</h5>
@@ -254,199 +250,6 @@ const Ideas = () => {
                     </CardFooter>
                 </Card>
             </div>
-            {
-                isSheetOpen && (
-                    <Sheet open={isSheetOpen} onOpenChange={isSheetOpen ? closeSheet : openSheet}>
-                        <SheetContent className={"lg:max-w-[1101px] p-0"}>
-                            <SheetHeader className={"px-[32px] py-[22px] border-b"}>
-                                <X />
-                            </SheetHeader>
-                            <div className={"flex h-[100vh]"}>
-                                <div className={"basis-[440px] bg-muted border-r"}>
-                                    <div className={"border-b py-4 pl-8 pr-6 flex flex-col gap-3"}>
-                                        <div className={"flex flex-col gap-1"}>
-                                            <h3 className={"text-sm font-medium"}>Status</h3>
-                                            <p className={"text-muted-foreground text-xs font-normal"}>Apply a status to Manage this idea on roadmap.</p>
-                                        </div>
-                                        <div className={"flex flex-col gap-3"}>
-                                        {
-                                            (ideasSheetStatus || []).map((x, i) => {
-                                                return (
-                                                    <RadioGroup defaultValue={selectedStatus} key={i}>
-                                                        <div className="flex items-center space-x-2">
-                                                            <RadioGroupItem value={x.value} id={x.id} onChange={handleStatusChange} />
-                                                            <Label className={"text-secondary-foreground text-sm font-normal"} htmlFor={x.id}>{x.name}</Label>
-                                                        </div>
-                                                    </RadioGroup>
-                                                )
-                                            })
-                                        }
-                                        </div>
-                                    </div>
-                                    <div className={"border-b"}>
-                                        <div className="py-4 pl-8 pr-6 w-full max-w-sm items-center gap-1.5">
-                                            <Label htmlFor="picture">Featured image</Label>
-                                            <Input id="picture" type="file" className={"border-dashed w-[282px]"}/>
-                                        </div>
-                                    </div>
-                                    <div className={"py-4 pl-8 pr-6 flex flex-col gap-[26px]"}>
-                                        <div className={"flex justify-between"}>
-                                            <div className={"flex flex-col gap-1"}>
-                                                <h4 className={"text-sm font-medium"}>Mark as bug</h4>
-                                                <p className={"text-muted-foreground text-xs font-normal"}>Hides Idea from your users</p>
-                                            </div>
-                                            <Button variant={"outline"} className={"hover:bg-muted w-[132px] border-card-foreground text-sm text-muted-foreground font-semibold"}>Mark as bug</Button>
-                                        </div>
-                                        <div className={"flex justify-between"}>
-                                            <div className={"flex flex-col gap-1"}>
-                                                <h4 className={"text-sm font-medium"}>Archive</h4>
-                                                <p className={"text-muted-foreground text-xs font-normal"}>Remove Idea from Board and Roadmap</p>
-                                            </div>
-                                            <Button variant={"outline"} className={"w-[100px] hover:bg-muted border-card-foreground text-sm text-muted-foreground font-semibold"}>Archive</Button>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className={"basis-[661px]"}>
-                                    <div className={"py-6 px-8"}>
-                                        <div className={"flex flex-col gap-6"}>
-                                            <div className={"flex justify-between items-center"}>
-                                                <div className={"flex items-center gap-2"}>
-                                                    <Button className={"p-[7px] bg-white shadow border hover:bg-white w-[42px] h-[42px]"} variant={"outline"}><ArrowBigUp className={"fill-primary stroke-primary"} /></Button>
-                                                    <p className={"text-2xl font-medium"}>25</p>
-                                                </div>
-                                                <div className={"flex gap-2"}>
-                                                    <Button variant={"outline"} className={"w-[20px] h-[20px] p-1"}><Pencil /></Button>
-                                                    <Button variant={"outline"} className={"w-[20px] h-[20px] p-1"}><Pin /></Button>
-                                                    <Button variant={"outline"} className={"w-[20px] h-[20px] p-1"}><Trash2 /></Button>
-                                                </div>
-                                            </div>
-                                            <div className={"flex flex-col gap-4"}>
-                                                <h2 className={"text-xl font-medium"}>Welcome To Our Release Notes</h2>
-                                                <p className={"text-sm font-normal text-muted-foreground"}>All great things around you were not built in a day, some took weeks, quite a few of them took months and a rare few even decades. As builders, our quest is to reach for that perfect product that solves your problems and adds value to your lives, and we too realise it will be a journey of minor and major improvements made day after day....<Button variant={"ghost hover:none"} className={"h-0 p-0 text-primary text-sm font-semibold"}>Read more</Button></p>
-                                            </div>
-                                            <div className={"flex items-center"}>
-                                                <div className={"flex items-center gap-4"}>
-                                                <div className={"flex items-center gap-2"}>
-                                                    <Avatar className={"w-[20px] h-[20px]"}>
-                                                        <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn"/>
-                                                        <AvatarFallback>CN</AvatarFallback>
-                                                    </Avatar>
-                                                    <div className={"flex items-center"}>
-                                                        <h4 className={"text-sm font-medium"}>Ankesh Ramani</h4>
-                                                        <p className={"text-sm font-normal flex items-center text-muted-foreground"}><Dot className={"fill-text-card-foreground stroke-text-card-foreground"} />17 Jun</p>
-                                                    </div>
-                                                </div>
-                                                    <Select>
-                                                        <SelectTrigger className="w-[234px] h-[24px]">
-                                                            <SelectValue className={"text-xs"} placeholder="Under consideration" />
-                                                        </SelectTrigger>
-                                                        <SelectContent>
-                                                            <SelectGroup>
-                                                                {
-                                                                    (filterByRoadMapStatus || []).map((x, i) => {
-                                                                        return (
-                                                                            <Fragment key={i}>
-                                                                                <SelectItem value={x.value}>
-                                                                                    <div className={"flex items-center gap-2"}>
-                                                                                        <Circle className={`stroke-${x.strokeColor} fill-${x.fillColor} w-[10px] h-[10px]`}/>
-                                                                                        {x.name}
-                                                                                    </div>
-                                                                                </SelectItem>
-                                                                            </Fragment>
-                                                                        )
-                                                                    })
-                                                                }
-                                                            </SelectGroup>
-                                                        </SelectContent>
-                                                    </Select>
-                                                </div>
-                                            </div>
-                                            <div className={"flex flex-col gap-2"}>
-                                                <div className="grid w-full gap-1.5">
-                                                    <Label htmlFor="message">Add comment</Label>
-                                                    <Textarea placeholder="Start writing..." id="message" />
-                                                </div>
-                                                <div className={"flex justify-between gap-1"}>
-                                                <div className="flex items-center space-x-2">
-                                                    <Switch id="airplane-mode" />
-                                                    <Label htmlFor="airplane-mode" className={"text-sm font-medium"}>Private note</Label>
-                                                </div>
-                                                <div className={"flex gap-2 items-center"}>
-                                                    <div className="p-2 w-full max-w-sm relative w-[36px] h-[36px]">
-                                                        <Input id="picture" type="file" className="hidden" />
-                                                        <label htmlFor="picture" className="absolute inset-0 flex items-center justify-center bg-white border border-primary rounded cursor-pointer">
-                                                            <Paperclip className={"stroke-primary"} />
-                                                        </label>
-                                                    </div>
-                                                    <Button className={"w-[128px] h-[36px] text-sm font-semibold"}>Add Comment</Button>
-                                                </div>
-                                                </div>
-                                            </div>
-                                            <div>
-                                                <Tabs defaultValue="comment" className="">
-                                                    <TabsList className="bg-transparent border-b-2 border-b-primary rounded-none">
-                                                        <TabsTrigger value="comment">Comment</TabsTrigger>
-                                                    </TabsList>
-                                                    <TabsContent value="comment">
-                                                        <div className={"flex gap-2"}>
-                                                            <Avatar className={"w-[20px] h-[20px]"}>
-                                                                <AvatarImage src="https://github.com/shadcn.png"
-                                                                             alt="@shadcn"/>
-                                                                <AvatarFallback>CN</AvatarFallback>
-                                                            </Avatar>
-                                                            <div>
-                                                                <div className={"flex justify-between"}>
-                                                                    <div className={"flex items-center"}>
-                                                                        <h4 className={"text-sm font-medium"}>Ankesh Ramani</h4>
-                                                                        <p className={"text-sm font-normal flex items-center text-muted-foreground"}><Dot className={"fill-text-card-foreground stroke-text-card-foreground"}/>2 minutes ago</p>
-                                                                    </div>
-                                                                    <div className={"flex gap-2"}>
-                                                                        <Button variant={"outline"}
-                                                                                className={"w-[20px] h-[20px] p-1"}><Pencil/></Button>
-                                                                        <Button variant={"outline"}
-                                                                                className={"w-[20px] h-[20px] p-1"}><Pin/></Button>
-                                                                        <Button variant={"outline"}
-                                                                                className={"w-[20px] h-[20px] p-1"}><Trash2/></Button>
-                                                                    </div>
-                                                                </div>
-                                                                <div></div>
-                                                                <div></div>
-                                                            </div>
-                                                        </div>
-                                                        <div className={"flex flex-col gap-3"}>
-                                                            <div className={"flex justify-between items-center gap-1"}>
-                                                                <div className={"flex items-center gap-2"}>
-
-                                                                    <div className={""}>
-
-                                                                    </div>
-                                                                </div>
-                                                                <div className={""}>
-
-                                                                </div>
-                                                            </div>
-                                                            <p className={"text-xs font-normal"}>All great things around
-                                                                you were not built in a day, some took weeks, quite a
-                                                                few of them took months and a rare few even decades. As
-                                                                builders, our quest is to reach for that perfect product
-                                                                that solves your problems and adds value to your lives,
-                                                                and we too realise it will be a journey of minor and
-                                                                major improvements made day after day....<span
-                                                                    className={"text-primary text-xs font-semibold"}>Read more</span>
-                                                            </p>
-                                                            <Button variant={"ghost"}>Reply</Button>
-                                                        </div>
-                                                    </TabsContent>
-                                                </Tabs>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </SheetContent>
-                    </Sheet>
-                )
-            }
         </div>
     );
 };
