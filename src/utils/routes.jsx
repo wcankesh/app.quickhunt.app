@@ -9,6 +9,15 @@ import Notification from "../components/Notification/Notification";
 import Settings from "../components/Settings/Settings";
 import PricingPlans from "../components/PricingPlan/PricingPlans";
 import HelpSupport from "../components/HelpSupport/HelpSupport";
+import Profile from "../components/Settings/SettingPage/Profile";
+import Team from "../components/Settings/SettingPage/Team";
+import Project from "../components/Settings/SettingPage/Project";
+import Domain from "../components/Settings/SettingPage/Domain";
+import Labels from "../components/Settings/SettingPage/Labels";
+import Categories from "../components/Settings/SettingPage/Categories";
+import Topics from "../components/Settings/SettingPage/Topics";
+import Statuses from "../components/Settings/SettingPage/Statuses";
+import Social from "../components/Settings/SettingPage/Social";
 
 export const routes = [
      {path: `${baseUrl}/dashboard`, component: <Dashboard/>},
@@ -20,6 +29,15 @@ export const routes = [
      {path: `${baseUrl}/notification`, component: <Notification/>},
      {path: `${baseUrl}/help-support`, component: <HelpSupport/>},
      {path: `${baseUrl}/pricing-plan`, component: <PricingPlans/>},
-     {path: `${baseUrl}/settings`, component: <Settings/>},
+     {path: `${baseUrl}/settings/:type`, component: <Settings/>},
+     // {path: `${baseUrl}/settings/profile`, component: <Profile/>},
+     // {path: `${baseUrl}/settings/team`, component: <Team/>},
+     // {path: `${baseUrl}/settings/project`, component: <Project/>},
+     // {path: `${baseUrl}/settings/domain`, component: <Domain/>},
+     // {path: `${baseUrl}/settings/labels`, component: <Labels/>},
+     // {path: `${baseUrl}/settings/categories`, component: <Categories/>},
+     // {path: `${baseUrl}/settings/topics`, component: <Topics/>},
+     // {path: `${baseUrl}/settings/statuses`, component: <Statuses/>},
+     // {path: `${baseUrl}/settings/social`, component: <Social/>},
 
 ]

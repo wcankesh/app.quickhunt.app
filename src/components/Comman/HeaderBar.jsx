@@ -34,7 +34,7 @@ const menuComponent = [
             {
                 title: 'Ideas',
                 link: '/ideas',
-                icon: Icon.hintIcon,
+                icon: Icon.ideasIcon,
                 selected: `${baseUrl}/ideas`,
             },
             {
@@ -313,20 +313,27 @@ const HeaderBar = ({ showDashboardButton }) => {
                                 </Avatar>
                             </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className={"w-56 rounded-md shadow border border-slate-100"}>
-                            <DropdownMenuLabel className={"text-slate-700 text-sm font-semibold"}>My
-                                Account</DropdownMenuLabel>
+                        <DropdownMenuContent align="end" className={"w-56 rounded-md shadow"}>
+                            <DropdownMenuLabel className={"text-sm font-semibold"}>My Account</DropdownMenuLabel>
                             <DropdownMenuSeparator/>
-                            <DropdownMenuItem
-                                className={"text-slate-700 text-sm font-medium flex gap-2"}>{Icon.accountUserIcon}Profile</DropdownMenuItem>
-                            <DropdownMenuItem
-                                className={"text-slate-700 text-sm font-medium flex gap-2"}>{Icon.bilingIcon}Biling</DropdownMenuItem>
+                            <DropdownMenuItem className={"text-sm font-medium flex gap-2"}>
+                                <span className={`${ theme === "dark" ? "profile-menu-icon" : ""}`}>{Icon.accountUserIcon}</span>
+                                Profile
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className={"text-sm font-medium flex gap-2"}>
+                                <span className={`${ theme === "dark" ? "profile-menu-icon" : ""}`}>{Icon.bilingIcon}</span>
+                                Billing
+                            </DropdownMenuItem>
                             <DropdownMenuSeparator/>
-                            <DropdownMenuItem
-                                className={"text-slate-700 text-sm font-medium flex gap-2"}>{Icon.projectsIcon}Projects</DropdownMenuItem>
+                            <DropdownMenuItem className={"text-sm font-medium flex gap-2"}>
+                                <span className={`${ theme === "dark" ? "profile-menu-icon" : ""}`}>{Icon.projectsIcon}</span>
+                                Projects
+                            </DropdownMenuItem>
                             <DropdownMenuSeparator/>
-                            <DropdownMenuItem onClick={onLogout}
-                                              className={"text-slate-700 text-sm font-medium flex gap-2"}>{Icon.logoutIcon}Logout</DropdownMenuItem>
+                            <DropdownMenuItem onClick={onLogout} className={"text-sm font-medium flex gap-2"}>
+                                <span className={`${ theme === "dark" ? "profile-menu-icon" : ""}`}>{Icon.logoutIcon}</span>
+                                Logout
+                            </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
                 </div>

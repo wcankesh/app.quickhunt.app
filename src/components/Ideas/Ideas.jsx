@@ -103,6 +103,11 @@ const Ideas = () => {
         openSheet()
     }
 
+    const openDetailsSheet = () => {
+        setSheetType('viewDetails');
+        openSheet();
+    };
+
     return (
         <div className={"xl:container xl:max-w-[1200px] lg:container lg:max-w-[992px] md:container md:max-w-[768px] sm:container sm:max-w-[639px] xs:container xs:max-w-[475px] pt-8"}>
             <SidebarSheet isOpen={isSheetOpen} onOpen={openSheet} onClose={closeSheet} sheetType={sheetType}/>
@@ -178,7 +183,7 @@ const Ideas = () => {
                                                     </div>
                                                     <div className={"flex flex-col"}>
                                                         <div className={"flex items-center gap-3"}>
-                                                            <h3 className={"text-base font-medium cursor-pointer"} onClick={openSheet}>{x.title}</h3>
+                                                            <h3 className={"text-base font-medium cursor-pointer"} onClick={openDetailsSheet}>{x.title}</h3>
                                                             <h4 className={"text-sm font-medium"}>{x.author}</h4>
                                                             <p className={"text-sm font-normal flex items-center text-muted-foreground"}><Dot className={"fill-text-card-foreground stroke-text-card-foreground"} />{x.date}</p>
                                                         </div>

@@ -92,13 +92,16 @@ const Roadmap = () => {
         openSheet()
     }
 
+    const openDetailsSheet = () => {
+        setSheetType('viewDetails');
+        openSheet();
+    };
+
     const handleDragStart = (e, sourceStatusId, sourceIndex) => {
         e.dataTransfer.setData("text/plain", JSON.stringify({ sourceStatusId, sourceIndex }));
     };
 
-    const handleDragOver = (e) => {
-        e.preventDefault();
-    };
+    const handleDragOver = (e) => {e.preventDefault();};
 
     const handleDrop = (e, targetStatusId, targetIndex) => {
         e.preventDefault();
@@ -151,7 +154,7 @@ const Roadmap = () => {
                                     onDrop={(e) => handleDrop(e, status.id, index)}
                                     className={"cursor-pointer"}
                                 >
-                                    <Card>
+                                    <Card onClick={openDetailsSheet}>
                                         <CardHeader className={"flex-row gap-2 p-2 pb-3"}>
                                             <Button variant={"outline hover:transparent"} className={"text-sm font-medium border px-[9px] py-1 w-[28px] h-[28px]"}>{child.review}</Button>
                                             <h3 className={"text-sm font-normal"}>{child.ideaTitle}</h3>

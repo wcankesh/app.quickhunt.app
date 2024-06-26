@@ -1,6 +1,7 @@
 import {ApiService} from "./ApiService";
 
 export const baseUrl = '';
+export const urlParams = new URLSearchParams(window.location.search);
 
 const TOKEN_KEY = 'token';
 const PROJECT_KEY = 'currentProject';

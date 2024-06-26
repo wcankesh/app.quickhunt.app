@@ -1,17 +1,17 @@
 import React, {Fragment, useState} from 'react';
-import {SheetContent, Sheet, SheetHeader} from "../ui/sheet";
+import {Sheet, SheetContent, SheetHeader,} from "../ui/sheet";
+import {Button} from "../ui/button";
 import {ArrowBigUp, Circle, Dot, Lock, Paperclip, Pencil, Pin, Trash2, X} from "lucide-react";
 import {RadioGroup, RadioGroupItem} from "../ui/radio-group";
 import {Label} from "../ui/label";
-import {Button} from "../ui/button";
 import {Input} from "../ui/input";
-import {Textarea} from "../ui/textarea";
-import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "../ui/select";
 import {Avatar, AvatarFallback, AvatarImage} from "../ui/avatar";
-import {Card} from "../ui/card";
+import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "../ui/select";
+import {Textarea} from "../ui/textarea";
 import {Switch} from "../ui/switch";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "../ui/tabs";
 import {useTheme} from "../theme-provider";
+import {Card} from "../ui/card";
 
 const filterByRoadMapStatus = [
     {name: "Under consideration", value: "underconsideration", fillColor: "#EB765D", strokeColor: "#EB765D",},
@@ -44,6 +44,25 @@ const RoadMapSidebarSheet = ({ isOpen, onOpen, onClose , sheetType}) => {
     const [selectedFile, setSelectedFile] = useState(null);
     const [imagePreview, setImagePreview] = useState(null);
     const [privateNote, setPrivateNote] = useState(false);
+    const [openTextField, setOpenTextField] = useState(false);
+    const [openReplyTextField, setOpenRreplyTextField] = useState(false);
+    const [openPrivateReplyTextField, setOpenPrivateRreplyTextField] = useState(false);
+    const [textareaValue, setTextareaValue] = useState('');
+    const [isEditing, setIsEditing] = useState(false);
+
+    const [comment, setComment] = useState('');
+    const [commentsList, setCommentsList] = useState([]);
+
+    const handleCommentChange = (e) => {
+        setComment(e.target.value);
+    };
+
+    const handleAddComments = () => {
+        if (comment.trim() !== '') {
+            setCommentsList([...commentsList, comment]);
+            setComment('');
+        }
+    };
 
     const handleFileChange = (event) => {
         const file = event.target.files[0];
@@ -66,19 +85,19 @@ const RoadMapSidebarSheet = ({ isOpen, onOpen, onClose , sheetType}) => {
         setSelectedStatus(event.target.value);
     };
 
-    const handleAddComment = () => {
-        console.log("Comment added:", selectedFile);
-        setSelectedFile(null);
-    };
+    const handlePrivateNote = () => {setPrivateNote(!privateNote)};
 
-    const handleFileChangeTextarea = (event) => {
-        const file = event.target.files[0];
-        if (file) {
-            setSelectedFile(file);
-        }
-    };
+    const handleOpenTextField = () => {setOpenTextField(!openTextField)};
 
-    const handlePrivateNote = () => {setPrivateNote(!privateNote)}
+    const handleOpenReply = () => {setOpenRreplyTextField(!openReplyTextField)};
+
+    const handleOpenPrivateReply = () => {setOpenPrivateRreplyTextField(!openPrivateReplyTextField)};
+
+    const handleSaveText = () => {setOpenTextField(false);};
+
+    const handleTextareaChange = (e) => {setTextareaValue(e.target.value);};
+
+    const handleEdit = () => {setIsEditing(true);};
 
     return (
         <Sheet open={isOpen} onOpenChange={isOpen ? onClose : onOpen}>
@@ -87,7 +106,7 @@ const RoadMapSidebarSheet = ({ isOpen, onOpen, onClose , sheetType}) => {
                     {
                         sheetType === "createNewRoadMapIdeas" ?
                             <div className={"flex justify-between items-center w-full"}>
-                                <h2 className={"text-xl text-muted-foreground font-medium"}>Tell us your Idea!</h2>
+                                <h2 className={"text-xl font-medium"}>Tell us your Idea!</h2>
                                 <X onClick={onClose} className={"cursor-pointer"}/>
                             </div>
                             : <X onClick={onClose} className={"cursor-pointer"}/>
@@ -268,8 +287,6 @@ const RoadMapSidebarSheet = ({ isOpen, onOpen, onClose , sheetType}) => {
                                                                     className={"rounded-tl-none rounded-tr-none"}
                                                                     placeholder="Private Start writing..."
                                                                     id="message"
-                                                                    // value={selectedFile ? `Selected file: ${selectedFile.name}` : ''}
-                                                                    // readOnly
                                                                 />
                                                             </Card>
                                                             :
@@ -277,8 +294,8 @@ const RoadMapSidebarSheet = ({ isOpen, onOpen, onClose , sheetType}) => {
                                                                 className={""}
                                                                 placeholder="Start writing..."
                                                                 id="message"
-                                                                // value={selectedFile ? `Selected file: ${selectedFile.name}` : ''}
-                                                                // readOnly
+                                                                value={comment}
+                                                                onChange={handleCommentChange}
                                                             />
                                                     }
                                                 </div>
@@ -289,15 +306,13 @@ const RoadMapSidebarSheet = ({ isOpen, onOpen, onClose , sheetType}) => {
                                                     </div>
                                                     <div className={"flex gap-2 items-center"}>
                                                         <div className="p-2 max-w-sm relative w-[36px] h-[36px]">
-                                                            <Input id="commentFileInput" type="file" className="hidden" /*onChange={handleFileChangeTextarea}*/ />
+                                                            <Input id="commentFileInput" type="file" className="hidden" />
                                                             <label htmlFor="commentFileInput" className="absolute inset-0 flex items-center justify-center bg-white border border-primary rounded cursor-pointer">
                                                                 <Paperclip className={"stroke-primary"} />
                                                             </label>
                                                         </div>
                                                         <Button
-                                                            className={"w-[128px] h-[36px] text-sm font-semibold"}
-                                                            // onClick={handleAddComment}
-                                                            // disabled={!selectedFile}
+                                                            className={"w-[128px] h-[36px] text-sm font-semibold"} onClick={handleAddComments}
                                                         >Add Comment</Button>
                                                     </div>
                                                 </div>
@@ -311,6 +326,11 @@ const RoadMapSidebarSheet = ({ isOpen, onOpen, onClose , sheetType}) => {
                                                     <TabsTrigger value="comment">Comment</TabsTrigger>
                                                 </TabsList>
                                             </div>
+
+                                            {commentsList.map((comment, index) => (
+                                                <div key={index}>{comment}</div>
+                                            ))}
+
                                             {
                                                 privateNote ?
                                                     <TabsContent value="comment" className={`${theme === "dark" ? "" : "bg-orange-100"}`}>
@@ -344,20 +364,38 @@ const RoadMapSidebarSheet = ({ isOpen, onOpen, onClose , sheetType}) => {
                                                                     </p>
                                                                 </div>
                                                                 <div className={"flex justify-between"}>
-                                                                    <Button variant={"ghost hover:bg-none"} className={"p-0 h-[25px] text-primary font-semibold text-sm"}>Reply</Button>
+                                                                    <Button variant={"ghost hover:bg-none"} onClick={handleOpenPrivateReply} className={"p-0 h-[25px] text-primary font-semibold text-sm"}>Reply</Button>
                                                                     <Button variant={"ghost hover:bg-none"} className={"p-0 h-[25px] font-normal text-sm flex gap-1"}><Lock className={"w-[16px] h-[16px]"} />Private note</Button>
                                                                 </div>
+                                                                {
+                                                                    openPrivateReplyTextField && (
+                                                                        <div className={"flex flex-col gap-2"}>
+                                                                            <Textarea
+                                                                                className={""}
+                                                                                placeholder="Start writing..."
+                                                                            />
+                                                                            <div className={"flex gap-2 items-center"}>
+                                                                                <Button className={"w-[70px] h-[30px] text-sm font-semibold"}>Reply</Button>
+                                                                                <div className="p-2 max-w-sm relative w-[36px] h-[30px]">
+                                                                                    <Input id="commentFileInput" type="file" className="hidden" /*onChange={handleFileChangeTextarea}*/ />
+                                                                                    <label htmlFor="commentFileInput" className="absolute inset-0 flex items-center justify-center bg-white border border-primary rounded cursor-pointer">
+                                                                                        <Paperclip className={"stroke-primary"} />
+                                                                                    </label>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    )
+                                                                }
                                                             </div>
                                                         </div>
                                                     </TabsContent>
                                                     :
                                                     ""
                                             }
-                                            <TabsContent value="comment" >
+                                            <TabsContent value="comment" className={`${theme === "dark" ? "" : "bg-muted"}`}>
                                                 <div className={"flex gap-2 p-[32px]"}>
                                                     <Avatar className={"w-[20px] h-[20px]"}>
-                                                        <AvatarImage src="https://github.com/shadcn.png"
-                                                                     alt="@shadcn"/>
+                                                        <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn"/>
                                                         <AvatarFallback>CN</AvatarFallback>
                                                     </Avatar>
                                                     <div className={"w-full flex flex-col gap-3"}>
@@ -367,25 +405,67 @@ const RoadMapSidebarSheet = ({ isOpen, onOpen, onClose , sheetType}) => {
                                                                 <p className={"text-sm font-normal flex items-center text-muted-foreground"}><Dot className={"fill-text-card-foreground stroke-text-card-foreground"}/>2 minutes ago</p>
                                                             </div>
                                                             <div className={"flex gap-2"}>
-                                                                <Button variant={"outline"} className={"w-[30px] h-[30px] p-1"}><Pencil className={"w-[16px] h-[16px]"} /></Button>
+                                                                <Button variant={"outline"} className={"w-[30px] h-[30px] p-1"} onClick={handleOpenTextField}><Pencil className={"w-[16px] h-[16px]"} /></Button>
                                                                 <Button variant={"outline"} className={"w-[30px] h-[30px] p-1"}><Pin className={"w-[16px] h-[16px]"} /></Button>
                                                                 <Button variant={"outline"} className={"w-[30px] h-[30px] p-1"}><Trash2 className={"w-[16px] h-[16px]"} /></Button>
                                                             </div>
                                                         </div>
                                                         <div>
-                                                            <p className={"text-sm font-normal text-muted-foreground"}>All great things around
-                                                                you were not built in a day, some took weeks, quite a
-                                                                few of them took months and a rare few even decades. As
-                                                                builders, our quest is to reach for that perfect product
-                                                                that solves your problems and adds value to your lives,
-                                                                and we too realise it will be a journey of minor and
-                                                                major improvements made day after day....<span
-                                                                    className={"text-primary text-sm font-semibold"}>Read more</span>
-                                                            </p>
+                                                            {
+                                                                openTextField ?
+                                                                    <div className={"flex flex-col gap-2"}>
+                                                                        <Textarea
+                                                                            className={""}
+                                                                            placeholder="Start writing..."
+                                                                            value={textareaValue}
+                                                                            onChange={handleTextareaChange}
+                                                                        />
+                                                                        <div className={"flex gap-2 items-center"}>
+                                                                            <Button className={"w-[70px] h-[30px] text-sm font-semibold"} onClick={handleSaveText}>Save</Button>
+                                                                            <Button variant={"outline hover:transparent"} className={`border ${theme === "dark" ? "" : "border-primary"} w-[90px] h-[30px] text-sm font-semibold`} onClick={() => setIsEditing(false)}>Cancel</Button>
+                                                                            <div className="p-2 max-w-sm relative w-[36px] h-[30px]">
+                                                                                <Input id="commentFileInput" type="file" className="hidden" /*onChange={handleFileChangeTextarea}*/ />
+                                                                                <label htmlFor="commentFileInput" className="absolute inset-0 flex items-center justify-center bg-white border border-primary rounded cursor-pointer">
+                                                                                    <Paperclip className={"stroke-primary"} />
+                                                                                </label>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    : <p className={"text-sm font-normal text-muted-foreground"}>
+                                                                        {textareaValue || (
+                                                                            <>
+                                                                                All great things around you were not built in a day, some took weeks, quite a few of them
+                                                                                took months and a rare few even decades. As builders, our quest is to reach for that
+                                                                                perfect product that solves your problems and adds value to your lives, and we too realize
+                                                                                it will be a journey of minor and major improvements made day after day....
+                                                                                <span className="text-primary text-sm font-semibold">Read more</span>
+                                                                            </>
+                                                                        )}
+                                                                    </p>
+                                                            }
                                                         </div>
-                                                        <div className={""}>
-                                                            <Button variant={"ghost hover:bg-none"} className={"p-0 h-[25px] text-primary font-semibold text-sm"}>Reply</Button>
+                                                        <div>
+                                                            <Button variant={"ghost hover:bg-none"} onClick={handleOpenReply} className={"p-0 h-[25px] text-primary font-semibold text-sm"}>Reply</Button>
                                                         </div>
+                                                        {
+                                                            openReplyTextField && (
+                                                                <div className={"flex flex-col gap-2"}>
+                                                                    <Textarea
+                                                                        className={""}
+                                                                        placeholder="Start writing..."
+                                                                    />
+                                                                    <div className={"flex gap-2 items-center"}>
+                                                                        <Button className={"w-[70px] h-[30px] text-sm font-semibold"}>Reply</Button>
+                                                                        <div className="p-2 max-w-sm relative w-[36px] h-[30px]">
+                                                                            <Input id="commentFileInput" type="file" className="hidden" /*onChange={handleFileChangeTextarea}*/ />
+                                                                            <label htmlFor="commentFileInput" className="absolute inset-0 flex items-center justify-center bg-white border border-primary rounded cursor-pointer">
+                                                                                <Paperclip className={"stroke-primary"} />
+                                                                            </label>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            )
+                                                        }
                                                     </div>
                                                 </div>
                                             </TabsContent>

@@ -149,6 +149,36 @@
 
 .bodyScreenHeight{height: calc(100vh - 60px);}
 
+.active-menu svg {
+  fill: hsl(var(--primary));
+}
+.active-menu svg path {
+  fill: hsl(var(--primary));
+}
+
+.setting-active-menu svg {
+  stroke: hsl(var(--primary));
+}
+.setting-active-menu svg path {
+  stroke: hsl(var(--primary));
+}
+
+.menu-icon svg {
+  fill: hsl(var(--muted-foreground));
+}
+.menu-icon svg path {
+  fill: hsl(var(--muted-foreground));
+}
+
+.profile-menu-icon svg {
+  stroke: hsl(var(--muted-foreground));
+}
+.profile-menu-icon svg path {
+  stroke: hsl(var(--muted-foreground));
+}
+
+p {margin: 0 !important;}
+
 .container{width:100%;display: block; max-width: 1120px; padding-right: 12px;padding-left: 12px}
 .container-secondary{width:100%;display: block; max-width: 1622px; padding-right: 32px;padding-left: 32px}
 input[type="search"]::-webkit-search-cancel-button {display: none;}
