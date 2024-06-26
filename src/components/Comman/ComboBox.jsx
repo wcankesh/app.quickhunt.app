@@ -19,8 +19,7 @@ import {Fragment, useState} from "react";
 
 const ComboBox = ({ items, placeholder, onSelect, value, setValue,classNames,isSearchBar=true }) => {
     const [open,setOpen]=useState(false);
-    const selectedItem = items.find((item) => item.value === value);
-    // Determine the color to use for the placeholder or selected item
+    const selectedItem = items.find((x) => x.value === value);
     const placeholderColor = selectedItem ? selectedItem.color : "";
     return (
         <div>
@@ -34,7 +33,7 @@ const ComboBox = ({ items, placeholder, onSelect, value, setValue,classNames,isS
                     >
                         <div className="flex items-center">
                             <div
-                                className="h-2 w-2 mr-2 rounded-full"
+                                className={`h-2 w-2 mr-2 rounded-full ${placeholder == "Publish" ? "bg-[#389E0D]" : placeholder == "Draft" ? "bg-[#CF1322]" : ""}`}
                                 style={{ backgroundColor: placeholderColor }}
                             ></div>
                             {value

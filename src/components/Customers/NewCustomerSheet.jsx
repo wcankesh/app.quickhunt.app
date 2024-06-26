@@ -16,7 +16,7 @@ const NewCustomerSheet = ({isOpen,onOpen,onClose}) => {
              <SheetContent className={"pt-[24px] p-0 max-h-screen overflow-y-auto w-[661px] lg:max-w-[662px]"} >
                  <SheetHeader className={"px-8 py-6 flex flex-row justify-between items-center"}>
                      <h5 className={"text-xl font-medium leading-5"}>Add New Customer</h5>
-                     <Button onClick={onClose} variant={"ghost"} size={24}><X/></Button>
+                     <Button className={"h-5 w-5 p-0"} onClick={onClose} variant={"ghost"}><X className={"h-4 w-4"} size={18}/></Button>
                  </SheetHeader>
                  <Separator className={"text-muted-foreground"}/>
                  <div className={"px-8 py-6"}>

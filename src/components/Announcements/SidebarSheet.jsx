@@ -6,7 +6,7 @@ import {Sheet,
 import {Separator} from "../ui/separator";
 import {Icon} from "../../utils/Icon";
 import {Button} from "../ui/button";
-import {ChevronLeft, ChevronRight, ChevronsRight} from "lucide-react";
+import {ChevronLeft, ChevronRight, ChevronsRight, Pin, X} from "lucide-react";
 
 const reaction ={
     data:[
@@ -35,12 +35,11 @@ const SidebarSheet = ({ isOpen, onOpen, onClose }) => {
             <Sheet open={isOpen} onOpenChange={isOpen ? onClose : onOpen}>
                 <div style={{maxWidth:"none"}}>
                     <SheetContent className={"pt-[24px] p-0 max-h-screen overflow-y-auto lg:max-w-[504px]"} >
-                    <SheetHeader >
-                        <div className={"py-6 px-8"} >
-                            <h5 className={"text-xl font-medium leading-5 text-muted-foreground"}>Welcome To Our Release Notes</h5>
-                        </div>
-                    </SheetHeader>
-                        <Separator />
+                        <SheetHeader className={"px-8 py-6 flex flex-row justify-between items-center"}>
+                            <h5 className={"text-xl font-medium leading-5"}>Welcome To Our Release Notes</h5>
+                            <Button className={"h-5 w-5 p-0"} variant={"ghost"} onClick={onClose} onClick={onClose}><X className={"h-4 w-4"} size={18} /></Button>
+                        </SheetHeader>
+                        <Separator className={"mb-6"} />
                         <div className={"pt-6 px-8 pb-4 pr-16 flex flex-row justify-between"}>
                             <div className={"flex flex-col gap-2"}>
                                 <h5 className={" text-base font-semibold leading-5"}>Total Views</h5>
@@ -83,11 +82,11 @@ const SidebarSheet = ({ isOpen, onOpen, onClose }) => {
                                 }
                             </div>
                             <div className={"flex flex-row justify-end items-center gap-3"}>
-                                <Button className={"bg-white shadow h-[30px] w-[30px] p-1.5 hover:bg-gray-200"}>
+                                <Button variant={"outline"}  className={" h-[30px] w-[30px] p-1.5"}>
                                     <ChevronLeft  className={`${reaction.preview == 0 ? "stroke-slate-300" : "stroke-primary"}`} />
                                 </Button>
                                 <h5 className={"text-[14px] font-bold"}>01</h5>
-                                <Button className={"bg-white shadow h-[30px] w-[30px] p-1.5 hover:bg-gray-200"}>
+                                <Button variant={"outline"} className={" h-[30px] w-[30px] p-1.5"}>
                                     <ChevronRight className={"stroke-primary"} />
                                 </Button>
                             </div>
@@ -118,11 +117,11 @@ const SidebarSheet = ({ isOpen, onOpen, onClose }) => {
                                 }
                             </div>
                             <div className={"flex flex-row justify-end items-center gap-3"}>
-                                <Button className={"bg-white shadow h-[30px] w-[30px] p-1.5 hover:bg-gray-200"}>
+                                <Button variant={"outline"}  className={" h-[30px] w-[30px] p-1.5"}>
                                     <ChevronLeft  className={`${reaction.preview == 0 ? "stroke-slate-300" : "stroke-primary"}`} />
                                 </Button>
                                 <h5 className={"text-[14px] font-bold"}>01</h5>
-                                <Button className={"bg-white shadow h-[30px] w-[30px] p-1.5 hover:bg-gray-200"}>
+                                <Button variant={"outline"}  className={" h-[30px] w-[30px] p-1.5"}>
                                     <ChevronRight className={"stroke-primary"} />
                                 </Button>
                             </div>

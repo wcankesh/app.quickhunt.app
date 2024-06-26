@@ -9,7 +9,7 @@ import {
     ChevronLeft,
     ChevronRight,
     ChevronsLeft,
-    ChevronsRight,
+    ChevronsRight, Circle, Ellipsis,
     MessageCircleMore
 } from "lucide-react";
 import {Card, CardFooter} from "../ui/card";
@@ -19,6 +19,8 @@ import { DropdownMenu,
     DropdownMenuItem,
   } from "../ui/dropdown-menu"
 import {Separator} from "../ui/separator";
+import CreateAnnouncementsLogSheet from "./CreateAnnouncementsLogSheet";
+import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "../ui/select";
 
 const dummyDetails ={
     data:[
@@ -65,26 +67,26 @@ const dummyDetails ={
     preview:0,
 }
 
-const status =[
-    {
-        value: "publish",
-        label: "Publish",
-        color:"#389E0D"
-    },
-    {
-        value: "draft",
-        label: "Draft",
-        color:"#CF1322"
-    },
+const status = [
+    {name: "Public", value: "public", fillColor: "#389E0D", strokeColor: "#389E0D",},
+    {name: "Draft", value: "draft", fillColor: "#CF1322", strokeColor: "#CF1322",},
 ]
 
 const AnnouncementsView = () => {
     const [isReadMore, setIsReadMore] = useState(true);
-    const toggleReadMore = () => {
-        setIsReadMore(!isReadMore);
+    const [isSheetOpen, setSheetOpen] = useState(false);
+    const [selectedData, setSelectedData] = useState(null);
+
+
+    const openSheet = (object) => {
+        setSheetOpen(true);
+        setSelectedData(object);
     };
+    const closeSheet = () => setSheetOpen(false);
+
     return (
         <div className={"mt-9"}>
+            <CreateAnnouncementsLogSheet isOpen={isSheetOpen} onOpen={openSheet} onClose={closeSheet} data={selectedData}/>
                 <Card className="pt-[38px]">
                     <div className={"flex flex-col px-[33px] pb-[32px] "}>
                     {
@@ -92,7 +94,7 @@ const AnnouncementsView = () => {
                             return(
                                 <Fragment>
                                         <div className={"flex flex-row gap-4 items-center justify-between px-[31px] mb-[22px]"}>
-                                            <div className={"basis-4/5 flex flex-row gap-4 items-center "}>
+                                            <div className={"basis-4/5 flex flex-row gap-4 items-center"}>
                                                 <h4 className={"text-base font-medium capitalize"}>{x.title}</h4>
                                                 <div className={"flex flex-row items-center gap-2"}>
                                                     <h5 className={"text-base font-medium text-sm"}>{x.author}</h5>
@@ -101,7 +103,29 @@ const AnnouncementsView = () => {
                                                 </div>
                                             </div>
                                             <div className={"basis-1/5 flex justify-end"}>
-                                                <ComboBox classNames={"custom-shadow w-[106px] h-7"} items={status} placeholder={x.status === 0 ? "Publish" : "Draft"} isSearchBox={false} isCommandItemBullet={true} />
+                                                <Select>
+                                                    <SelectTrigger className="w-[106px] h-7">
+                                                        <SelectValue placeholder="Publish" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectGroup>
+                                                            {
+                                                                (status || []).map((x, i) => {
+                                                                    return (
+                                                                        <Fragment key={i}>
+                                                                            <SelectItem value={x.value}>
+                                                                                <div className={"flex items-center gap-2"}>
+                                                                                    <Circle fill={x.fillColor} stroke={x.strokeColor} className={` w-[10px] h-[10px]`}/>
+                                                                                    {x.name}
+                                                                                </div>
+                                                                            </SelectItem>
+                                                                        </Fragment>
+                                                                    )
+                                                                })
+                                                            }
+                                                        </SelectGroup>
+                                                    </SelectContent>
+                                                </Select>
                                             </div>
                                         </div>
                                         <div className={"flex flex-row gap-4 justify-between px-[31px] mb-4"}>
@@ -109,16 +133,16 @@ const AnnouncementsView = () => {
                                                 <p className={"text-muted-foreground text-sm"}>
                                                     {isReadMore ? x.description.slice(0, 300) : x.description}
                                                     <span
-                                                    onClick={toggleReadMore}
-                                                    className="text-violet-600 font-semibold text-sm"
+                                                    className="text-violet-600 font-semibold text-sm cursor-pointer"
+                                                    onClick={()=>openSheet(x)}
                                                     >
-                                                        {isReadMore ? "...Read more" : "Show less"}
+                                                        {isReadMore ? "...Read more" : ""}
                                                     </span>
                                                 </p>
                                             </div>
                                             <div className={""}>
                                                 <DropdownMenu>
-                                                    <DropdownMenuTrigger><Button variant={"outline"} className={"p-2 h-9 w-9"}>{Icon.threeDots}</Button></DropdownMenuTrigger>
+                                                    <DropdownMenuTrigger><Button variant={"outline"} className={"p-2 h-9 w-9"}><Ellipsis size={18} /></Button></DropdownMenuTrigger>
                                                     <DropdownMenuContent>
                                                         <DropdownMenuItem>Analytics</DropdownMenuItem>
                                                         <DropdownMenuItem>Edit</DropdownMenuItem>

@@ -72,9 +72,9 @@ const Customers = () => {
     const closeSheet = () => setSheetOpen(false);
 
     return (
-        <div className={"container-secondary pt-8"}>
+        <div className={"pt-8"}>
             <NewCustomerSheet isOpen={isSheetOpen} onOpen={openSheet} onClose={closeSheet}/>
-            <div className={"xl:container xl:max-w-[1200px] lg:container lg:max-w-[992px] md:container md:max-w-[768px] sm:container sm:max-w-[639px] xs:container xs:max-w-[475px]"}>
+            <div className={"xl:container xl:max-w-[1622px] lg:container lg:max-w-[992px] md:container md:max-w-[768px] sm:container sm:max-w-[639px] xs:container xs:max-w-[475px]"}>
                 <div className={"flex flex-row justify-between items-center"}>
                     <div>
                         <h4 className={"font-medium text-2xl leading-8"}>Customers</h4>
@@ -124,7 +124,7 @@ const Customers = () => {
                             </Table>
                         </CardContent>
                         {dummyTable.data.length > 0 ? <CardFooter className={"p-0"}>
-                            <div className={"w-full p-5 bg-muted rounded-b-lg rounded-t-none flex justify-end pe-16 py-15px"}>
+                            <div className={"w-full p-5 bg-muted rounded-b-sm rounded-t-none flex justify-end pe-16 py-15px"}>
                                 <div className={"flex flex-row gap-8 items-center"}>
                                     <div>
                                         <h5 className={"text-sm font-semibold"}>Page {dummyTable.page} of 10</h5>

@@ -1,10 +1,19 @@
-import React, {useState} from 'react';
+import React, {useState,Fragment} from 'react';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "../ui/table";
 import {Badge} from "../ui/badge";
 import ComboBox from "../Comman/ComboBox";
 import {Button} from "../ui/button";
 import {Icon} from "../../utils/Icon";
-import {BarChartBig, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Eye} from "lucide-react";
+import {
+    BarChart,
+    BarChartBig,
+    ChevronLeft,
+    ChevronRight,
+    ChevronsLeft,
+    ChevronsRight, Circle,
+    Ellipsis,
+    Eye
+} from "lucide-react";
 
 import SidebarSheet from "./SidebarSheet";
 import {Card, CardContent, CardFooter} from "../ui/card";
@@ -12,6 +21,8 @@ import {DropdownMenu, DropdownMenuTrigger} from "@radix-ui/react-dropdown-menu";
 import {DropdownMenuContent, DropdownMenuItem} from "../ui/dropdown-menu";
 import {Separator} from "../ui/separator";
 import NewCustomerSheet from "../Customers/NewCustomerSheet";
+import CreateAnnouncementsLogSheet from "./CreateAnnouncementsLogSheet";
+import {Select, SelectItem, SelectGroup, SelectContent, SelectTrigger, SelectValue} from "../ui/select";
 
 const items = [
     {
@@ -54,17 +65,9 @@ const dummyTable = {
     preview:0
 };
 
-const status =[
-    {
-        value: "publish",
-        label: "Publish",
-        color:"#389E0D"
-    },
-    {
-        value: "draft",
-        label: "Draft",
-        color:"#CF1322"
-    },
+const status = [
+    {name: "Public", value: "public", fillColor: "#389E0D", strokeColor: "#389E0D",},
+    {name: "Draft", value: "draft", fillColor: "#CF1322", strokeColor: "#CF1322",},
 ]
 
 const AnnouncementsTable = () => {
@@ -72,21 +75,24 @@ const AnnouncementsTable = () => {
 
     const openSheet = () => setSheetOpen(true);
     const closeSheet = () => setSheetOpen(false);
+
+
+
     return (
         <div className={"mt-9"}>
             <SidebarSheet isOpen={isSheetOpen} onOpen={openSheet} onClose={closeSheet}/>
             <Card>
                 <CardContent className={"p-0 rounded-md"}>
                     <Table className={""}>
-                        <TableHeader className={"py-8 px-5 bg-muted"}>
+                        <TableHeader className={"py-8 px-5"}>
                             <TableRow className={""}>
-                                <TableHead className={"text-base font-semibold py-5"}>Title</TableHead>
-                                <TableHead className={"text-base font-semibold py-5"}>Last Updated</TableHead>
-                                <TableHead className={"text-base font-semibold py-5"}>Published At</TableHead>
-                                <TableHead  className={"text-base font-semibold py-5"}>Status</TableHead>
-                                <TableHead  className={"text-base font-semibold "}></TableHead>
-                                <TableHead  className={"text-base font-semibold "}></TableHead>
-                                <TableHead  className={"text-base font-semibold "}></TableHead>
+                                <TableHead className={"text-base font-semibold py-5 bg-muted rounded-tl-sm"}>Title</TableHead>
+                                <TableHead className={"text-base font-semibold py-5 bg-muted"}>Last Updated</TableHead>
+                                <TableHead className={"text-base font-semibold py-5 bg-muted"}>Published At</TableHead>
+                                <TableHead  className={"text-base font-semibold py-5 bg-muted"}>Status</TableHead>
+                                <TableHead  className={"text-base font-semibold bg-muted"}></TableHead>
+                                <TableHead  className={"text-base font-semibold bg-muted"}></TableHead>
+                                <TableHead  className={"text-base font-semibold bg-muted rounded-tr-sm"}></TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -100,17 +106,39 @@ const AnnouncementsTable = () => {
                                             <TableCell>{x.updated_at ? x.updated_at : "-"}</TableCell>
                                             <TableCell>{x.published_at ? x.published_at : "-"}</TableCell>
                                             <TableCell>
-                                                <ComboBox isSearchBar={false} classNames={"w-[106px] h-7"} items={status} placeholder={x.status == 0 ? "Publish" : "Draft"} isSearchBox={false} isCommandItemBullet={true} />
+                                                <Select>
+                                                    <SelectTrigger className="w-[106px] h-7">
+                                                        <SelectValue placeholder="Publish" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectGroup>
+                                                            {
+                                                                (status || []).map((x, i) => {
+                                                                    return (
+                                                                        <Fragment key={i}>
+                                                                            <SelectItem value={x.value}>
+                                                                                <div className={"flex items-center gap-2"}>
+                                                                                    <Circle fill={x.fillColor} stroke={x.strokeColor} className={` w-[10px] h-[10px]`}/>
+                                                                                    {x.name}
+                                                                                </div>
+                                                                            </SelectItem>
+                                                                        </Fragment>
+                                                                    )
+                                                                })
+                                                            }
+                                                        </SelectGroup>
+                                                    </SelectContent>
+                                                </Select>
                                             </TableCell>
                                             <TableCell>
                                                 <Button onClick={openSheet} variant={"ghost"}><Eye size={18} /></Button>
                                             </TableCell>
                                             <TableCell>
-                                                <Button variant={"ghost"} ><BarChartBig size={18} /></Button>
+                                                <Button variant={"ghost"} ><BarChart size={18} /></Button>
                                             </TableCell>
                                             <TableCell>
                                                 <DropdownMenu>
-                                                    <DropdownMenuTrigger><Button variant={"outline hover:none"} className={"p-2 h-9 w-9 "}>{Icon.threeDots}</Button></DropdownMenuTrigger>
+                                                    <DropdownMenuTrigger><Button variant={"ghost"} ><Ellipsis size={18} /></Button></DropdownMenuTrigger>
                                                     <DropdownMenuContent>
                                                         <DropdownMenuItem>Edit</DropdownMenuItem>
                                                         <DropdownMenuItem>Delete</DropdownMenuItem>
@@ -126,7 +154,7 @@ const AnnouncementsTable = () => {
                 </CardContent>
                 <Separator/>
                 <CardFooter className={"p-0"}>
-                    <div className={"w-full p-5 bg-muted rounded-b-lg rounded-t-none flex justify-end pe-16 py-15px"}>
+                    <div className={"w-full p-5 bg-muted rounded-b-sm rounded-t-none flex justify-end pe-16 py-15px"}>
                         <div className={"flex flex-row gap-8 items-center"}>
                             <div>
                                 <h5 className={"text-sm font-semibold"}>Page {dummyTable.page} of 10</h5>

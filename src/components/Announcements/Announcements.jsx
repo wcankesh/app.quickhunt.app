@@ -6,6 +6,7 @@ import AnnouncementsView from "./AnnouncementsView";
 import AnnouncementsTable from "./AnnouncementsTable";
 import {LayoutList, Plus, Text} from "lucide-react";
 import CreateAnnouncementsLogSheet from "./CreateAnnouncementsLogSheet";
+import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "../ui/select";
 
 
 const items = [
@@ -40,6 +41,21 @@ const items2 =[
         label: "Important",
         color:"#63C8D9"
     },
+];
+
+const status =[
+    {
+        label:"All",
+        value:0
+    },
+    {
+        label:"Draft",
+        value:1
+    },
+    {
+        label:"Published",
+        value:2
+    }
 ]
 
 const Announcements = () => {
@@ -57,13 +73,28 @@ const Announcements = () => {
     return (
         <div className={"xl:container xl:max-w-[1200px] lg:container lg:max-w-[992px] md:container md:max-w-[768px] sm:container sm:max-w-[639px] xs:container xs:max-w-[475px] pt-8 "}>
             <CreateAnnouncementsLogSheet isOpen={isSheetOpen} onOpen={openSheet} onClose={closeSheet}/>
-            <div className={"flex flex-row gap-6 items-center "}>
+            <div className={"flex flex-row gap-6 items-center xl:flex-nowrap md:flex-wrap sm:flex-wrap"}>
                 <div className="basis-1/4">
-                    <h3 className={"text-2xl font-medium leading-8 text-[#0F172A]"}>testingapp</h3>
+                    <h3 className={"text-2xl font-medium leading-8"}>testingapp</h3>
                 </div>
                 <div className="basis-2/4 gap-6">
                     <div className={"flex flex-row gap-6 items-center"}>
-                        <ComboBox isSearchBar={false} className={"h-8"} classNames={"w-[106px] custom-shadow"} items={items}  value={selected} setValue={setSelected} onSelect={''} placeholder={"All"}/>
+                        <Select>
+                            <SelectTrigger className="h-9">
+                                <SelectValue placeholder="All"/>
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectGroup>
+                                    {
+                                        (status || []).map((x, index) => {
+                                            return (
+                                                <SelectItem key={index} value={x.value}>{x.label}</SelectItem>
+                                            )
+                                        })
+                                    }
+                                </SelectGroup>
+                            </SelectContent>
+                        </Select>
                         <ComboBox items={items2} isSearchBox={true}  classNames={"w-[165px] custom-shadow"} value={selected} setValue={setSelected} onSelect={handleSelect} placeholder={"All Updates"}/>
                         <form>
                             <div
