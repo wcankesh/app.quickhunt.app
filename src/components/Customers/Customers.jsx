@@ -5,6 +5,8 @@ import {Card, CardContent, CardFooter} from "../ui/card";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "../ui/table";
 import NoDataThumbnail from "../../img/Frame.png"
 import NewCustomerSheet from "./NewCustomerSheet";
+import {useTheme} from "../theme-provider";
+import {Separator} from "../ui/separator";
 
 const tableHeadings = [
     {label:"Name"},
@@ -70,6 +72,7 @@ const Customers = () => {
     const [isSheetOpen, setSheetOpen] = useState(false);
     const openSheet = () => setSheetOpen(true);
     const closeSheet = () => setSheetOpen(false);
+    const {theme} =useTheme();
 
     return (
         <div className={"pt-8"}>
@@ -91,30 +94,30 @@ const Customers = () => {
                                         {
                                             (tableHeadings || []).map((x,i)=>{
                                                 return(
-                                                    <TableHead className={`text-base font-semibold py-5 bg-muted ${i == 0 ? "rounded-tl-lg" : i == 9 ? "rounded-tr-lg" : ""}`} key={x.label}>{x.label}</TableHead>
+                                                    <TableHead className={`text-base font-semibold py-5 ${theme === "dark"? "text-[]" : "bg-muted"} ${i == 0 ? "rounded-tl-lg" : i == 9 ? "rounded-tr-lg" : ""}`} key={x.label}>{x.label}</TableHead>
                                                 )
                                             })
                                         }
                                     </TableRow>
                                 </TableHeader>
-                                 <TableBody className={"px-5"}>
+                                 <TableBody className={""}>
                                         {
                                             (dummyTable.data || []).map((x)=>{
                                                 return(
-                                                    <TableRow className={"text-muted-foreground font-medium"}>
-                                                        <TableCell className={"py-3"}>{x.name ? x.name : "-"}</TableCell>
-                                                        <TableCell className={"py-3"}>{x.name ? x.name : "-"}</TableCell>
-                                                        <TableCell className={"py-3 flex flex-row gap-2"}>
+                                                    <TableRow className={"font-medium"}>
+                                                        <TableCell className={`py-3 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.name ? x.name : "-"}</TableCell>
+                                                        <TableCell className={`py-3 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.name ? x.name : "-"}</TableCell>
+                                                        <TableCell className={`py-3 flex flex-row gap-2 ${theme === "dark" ? "" : "text-muted-foreground"}`}>
                                                             <img className={"rounded-full mr-2"} src={x.avatar} alt={"not_found"}/>
                                                             <p>{x.company}</p>
                                                         </TableCell>
-                                                        <TableCell>{x.added_via ? x.added_via : "-"}</TableCell>
-                                                        <TableCell>{x.segment ? x.segment : "-"}</TableCell>
-                                                        <TableCell>{x.designation ? x.designation : "-"}</TableCell>
-                                                        <TableCell>{x.tags ? x.tags : "-"}</TableCell>
-                                                        <TableCell>{x.country ? x.country : "-"}</TableCell>
-                                                        <TableCell>{x.browser ? x.browser : "-"}</TableCell>
-                                                        <TableCell>{x.os ? x.os : "-"}</TableCell>
+                                                        <TableCell className={`py-3 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.added_via ? x.added_via : "-"}</TableCell>
+                                                        <TableCell className={`py-3 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.segment ? x.segment : "-"}</TableCell>
+                                                        <TableCell className={`py-3 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.designation ? x.designation : "-"}</TableCell>
+                                                        <TableCell className={`py-3 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.tags ? x.tags : "-"}</TableCell>
+                                                        <TableCell className={`py-3 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.country ? x.country : "-"}</TableCell>
+                                                        <TableCell className={`py-3 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.browser ? x.browser : "-"}</TableCell>
+                                                        <TableCell className={`py-3 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.os ? x.os : "-"}</TableCell>
                                                     </TableRow>
                                                 )
                                             })
@@ -123,8 +126,9 @@ const Customers = () => {
                                     </TableBody>
                             </Table>
                         </CardContent>
+                        <Separator/>
                         {dummyTable.data.length > 0 ? <CardFooter className={"p-0"}>
-                            <div className={"w-full p-5 bg-muted rounded-b-sm rounded-t-none flex justify-end pe-16 py-15px"}>
+                            <div className={`w-full p-5 rounded-b-sm rounded-t-none flex justify-end pe-16 py-15px ${theme === "dark"? "" : "bg-muted"}`}>
                                 <div className={"flex flex-row gap-8 items-center"}>
                                     <div>
                                         <h5 className={"text-sm font-semibold"}>Page {dummyTable.page} of 10</h5>
@@ -149,7 +153,7 @@ const Customers = () => {
                             <div className={"flex flex-row justify-center py-[45px]"}>
                                 <div className={"flex flex-col items-center gap-2"}>
                                     <img src={NoDataThumbnail} className={"flex items-center"}/>
-                                    <h5 className={"text-center text-2xl font-medium leading-8 text-[#A4BBDB]"}>No Data</h5>
+                                    <h5 className={`text-center text-2xl font-medium leading-8 ${theme === "dark" ? "" : "text-[#A4BBDB]"}`}>No Data</h5>
                                 </div>
                             </div>}
                     </Card>

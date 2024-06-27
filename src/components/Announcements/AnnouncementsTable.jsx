@@ -14,6 +14,7 @@ import {
     Ellipsis,
     Eye
 } from "lucide-react";
+import {useTheme} from "../theme-provider"
 
 import SidebarSheet from "./SidebarSheet";
 import {Card, CardContent, CardFooter} from "../ui/card";
@@ -75,6 +76,7 @@ const AnnouncementsTable = () => {
 
     const openSheet = () => setSheetOpen(true);
     const closeSheet = () => setSheetOpen(false);
+    const { theme }= useTheme();
 
 
 
@@ -86,25 +88,25 @@ const AnnouncementsTable = () => {
                     <Table className={""}>
                         <TableHeader className={"py-8 px-5"}>
                             <TableRow className={""}>
-                                <TableHead className={"text-base font-semibold py-5 bg-muted rounded-tl-sm"}>Title</TableHead>
-                                <TableHead className={"text-base font-semibold py-5 bg-muted"}>Last Updated</TableHead>
-                                <TableHead className={"text-base font-semibold py-5 bg-muted"}>Published At</TableHead>
-                                <TableHead  className={"text-base font-semibold py-5 bg-muted"}>Status</TableHead>
-                                <TableHead  className={"text-base font-semibold bg-muted"}></TableHead>
-                                <TableHead  className={"text-base font-semibold bg-muted"}></TableHead>
-                                <TableHead  className={"text-base font-semibold bg-muted rounded-tr-sm"}></TableHead>
+                                <TableHead className={`text-base font-semibold py-5 rounded-tl-sm ${theme === "dark"? "text-[]" : "bg-muted"}`}>Title</TableHead>
+                                <TableHead className={`text-base font-semibold py-5 ${theme === "dark"? "text-[]" : "bg-muted"}`}>Last Updated</TableHead>
+                                <TableHead className={`text-base font-semibold py-5 ${theme === "dark"? "text-[]" : "bg-muted"}`}>Published At</TableHead>
+                                <TableHead  className={`text-base font-semibold py-5 ${theme === "dark"? "text-[]" : "bg-muted"}`}>Status</TableHead>
+                                <TableHead  className={`text-base font-semibold py-5 ${theme === "dark"? "" : "bg-muted"}`}></TableHead>
+                                <TableHead  className={`text-base font-semibold py-5 ${theme === "dark"? "" : "bg-muted"}`}></TableHead>
+                                <TableHead  className={`text-base font-semibold py-5 rounded-tr-sm ${theme === "dark"? "" : "bg-muted"}`}></TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {
                                 (dummyTable.data || []).map((x,index)=>{
                                     return(
-                                        <TableRow>
-                                            <TableCell className={""}>{x.title}
+                                        <TableRow className={"font-medium"}>
+                                            <TableCell className={`py-3 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.title}
                                                 <Badge variant={"outline"} className={"ml-4 h-[20px] py-0 px-2 text-xs rounded-[5px] shadow-[0px_1px_4px_0px_rgba(0,0,0,0.09)] font-medium text-blue-500 border-blue-500"}>New</Badge>
                                             </TableCell>
-                                            <TableCell>{x.updated_at ? x.updated_at : "-"}</TableCell>
-                                            <TableCell>{x.published_at ? x.published_at : "-"}</TableCell>
+                                            <TableCell className={`${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.updated_at ? x.updated_at : "-"}</TableCell>
+                                            <TableCell className={`${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.published_at ? x.published_at : "-"}</TableCell>
                                             <TableCell>
                                                 <Select>
                                                     <SelectTrigger className="w-[106px] h-7">
@@ -118,7 +120,7 @@ const AnnouncementsTable = () => {
                                                                         <Fragment key={i}>
                                                                             <SelectItem value={x.value}>
                                                                                 <div className={"flex items-center gap-2"}>
-                                                                                    <Circle fill={x.fillColor} stroke={x.strokeColor} className={` w-[10px] h-[10px]`}/>
+                                                                                    <Circle fill={x.fillColor} stroke={x.strokeColor} className={`${theme === "dark" ? "" : "text-muted-foreground"} w-[10px] h-[10px]`}/>
                                                                                     {x.name}
                                                                                 </div>
                                                                             </SelectItem>
@@ -131,14 +133,14 @@ const AnnouncementsTable = () => {
                                                 </Select>
                                             </TableCell>
                                             <TableCell>
-                                                <Button onClick={openSheet} variant={"ghost"}><Eye size={18} /></Button>
+                                                <Button onClick={openSheet} variant={"ghost"}><Eye size={18} className={`${theme === "dark" ? "" : "text-muted-foreground"}`} /></Button>
                                             </TableCell>
                                             <TableCell>
-                                                <Button variant={"ghost"} ><BarChart size={18} /></Button>
+                                                <Button variant={"ghost"} ><BarChart size={18} className={`${theme === "dark" ? "" : "text-muted-foreground"}`} /></Button>
                                             </TableCell>
                                             <TableCell>
                                                 <DropdownMenu>
-                                                    <DropdownMenuTrigger><Button variant={"ghost"} ><Ellipsis size={18} /></Button></DropdownMenuTrigger>
+                                                    <DropdownMenuTrigger><Button variant={"ghost"} ><Ellipsis className={`${theme === "dark" ? "" : "text-muted-foreground"}`} size={18} /></Button></DropdownMenuTrigger>
                                                     <DropdownMenuContent>
                                                         <DropdownMenuItem>Edit</DropdownMenuItem>
                                                         <DropdownMenuItem>Delete</DropdownMenuItem>
@@ -154,7 +156,7 @@ const AnnouncementsTable = () => {
                 </CardContent>
                 <Separator/>
                 <CardFooter className={"p-0"}>
-                    <div className={"w-full p-5 bg-muted rounded-b-sm rounded-t-none flex justify-end pe-16 py-15px"}>
+                    <div className={`w-full p-5  rounded-b-sm ${theme === "dark"? "" : "bg-muted"} rounded-t-none flex justify-end pe-16 py-15px`}>
                         <div className={"flex flex-row gap-8 items-center"}>
                             <div>
                                 <h5 className={"text-sm font-semibold"}>Page {dummyTable.page} of 10</h5>

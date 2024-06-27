@@ -7,6 +7,8 @@ import AnnouncementsTable from "./AnnouncementsTable";
 import {LayoutList, Plus, Text} from "lucide-react";
 import CreateAnnouncementsLogSheet from "./CreateAnnouncementsLogSheet";
 import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "../ui/select";
+import {useTheme} from "../theme-provider";
+
 
 
 const items = [
@@ -62,6 +64,7 @@ const Announcements = () => {
     const [selected, setSelected] = useState("");
     const [isSheetOpen, setSheetOpen] = useState(false);
     const [tab,setTab]=useState(0);
+    const {theme}=useTheme();
 
     const handleSelect = (value) => {
         setSelected(value);
