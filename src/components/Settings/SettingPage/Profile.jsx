@@ -110,14 +110,14 @@ const Profile = () => {
             <Card>
                 <CardHeader className={"gap-1 border-b"}>
                     <CardTitle className={"text-2xl font-medium"}>Edit Profile</CardTitle>
-                    <CardDescription className={"text-sm font-muted-foreground p-0"}>Manage your personal account settings.</CardDescription>
+                    <CardDescription className={"text-sm text-muted-foreground p-0"}>Manage your personal account settings.</CardDescription>
                 </CardHeader>
                 <CardContent className={"py-6 px-4 border-b"}>
-                    <div className={"flex gap-4"}>
-                        <span><img src={SettingProfile} alt={"setting-profile"} /></span>
-                        <div className={"w-full flex flex-col gap-4"}>
-                            <div className={"flex gap-4"}>
-                                <div className={"basis-1/2"}>
+                    <div className={"flex gap-4 lg:flex-nowrap md:flex-wrap"}>
+                        <span><img className={"h-auto"} src={SettingProfile} alt={"setting-profile"} /></span>
+                        <div className={"w-full flex flex-col gap-4 max-w-[574px]"}>
+                            <div className={"flex gap-4 lg:flex-nowrap md:flex-wrap"}>
+                                <div className={"basis-1/2 md:basis-full"}>
                                     <Label htmlFor="email" className={"font-medium"}>First Name</Label>
                                     <Input
                                         id="user_first_name"
@@ -126,6 +126,7 @@ const Profile = () => {
                                         name={'user_first_name'}
                                         onChange={onChange}
                                         onBlur={onBlur}
+                                        className={"bg-card"}
                                     />
                                     <div className="grid gap-2">
                                         {
@@ -134,7 +135,7 @@ const Profile = () => {
                                         }
                                     </div>
                                 </div>
-                                <div className={"basis-1/2"}>
+                                <div className={"basis-1/2 md:basis-full"}>
                                     <Label htmlFor="email" className={"font-medium"}>Last Name</Label>
                                     <Input
                                         id="user_last_name"
@@ -143,6 +144,7 @@ const Profile = () => {
                                         name={'user_last_name'}
                                         onChange={onChange}
                                         onBlur={onBlur}
+                                        className={"bg-card"}
                                     />
                                     <div className="grid gap-2">
                                         {
@@ -152,21 +154,41 @@ const Profile = () => {
                                     </div>
                                 </div>
                             </div>
-                            <div className={"max-w-[289px]"}>
-                                <Label htmlFor="email" className={"font-medium"}>Email</Label>
-                                <Input
-                                    id="email"
-                                    type="email"
-                                    placeholder="wc.ankesh@gmail.com"
-                                    value={companyDetails.user_email_id}
-                                    name={'user_email_id'}
-                                    onChange={onChange}
-                                    onBlur={onBlur}
-                                />
-                                {
-                                    formError.user_email_id &&
-                                    <span className="text-red-500 text-sm">{formError.user_email_id}</span>
-                                }
+                            <div className={"flex gap-4 lg:flex-nowrap md:flex-wrap"}>
+                                <div className={"lg:w-[279px] md:w-full sm:w-full"}>
+                                    <Label htmlFor="email" className={"font-medium"}>Email</Label>
+                                    <Input
+                                        id="email"
+                                        type="email"
+                                        placeholder="wc.ankesh@gmail.com"
+                                        value={companyDetails.user_email_id}
+                                        name={'user_email_id'}
+                                        onChange={onChange}
+                                        onBlur={onBlur}
+                                        className={"bg-card"}
+                                    />
+                                    {
+                                        formError.user_email_id &&
+                                        <span className="text-red-500 text-sm">{formError.user_email_id}</span>
+                                    }
+                                </div>
+                                <div className={"w-[279px] hidden"}>
+                                    <Label htmlFor="email" className={"font-medium"}>Email</Label>
+                                    <Input
+                                        id="email"
+                                        type="email"
+                                        placeholder="wc.ankesh@gmail.com"
+                                        value={companyDetails.user_email_id}
+                                        name={'user_email_id'}
+                                        onChange={onChange}
+                                        onBlur={onBlur}
+                                        className={"bg-card"}
+                                    />
+                                    {
+                                        formError.user_email_id &&
+                                        <span className="text-destructive text-sm">{formError.user_email_id}</span>
+                                    }
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -192,6 +214,7 @@ const Profile = () => {
                                 name={'user_current_password'}
                                 onChange={onChange}
                                 onBlur={onBlur}
+                                className={"bg-card"}
                             />
                             <Button variant={"ghost hover:none"} onClick={() => togglePasswordVisibility('user_current_password')}
                                     className={"absolute top-0 right-0"}>
@@ -210,6 +233,7 @@ const Profile = () => {
                                 name={'user_password'}
                                 onChange={onChange}
                                 onBlur={onBlur}
+                                className={"bg-card"}
                             />
                             <Button variant={"ghost hover:none"} onClick={() => togglePasswordVisibility('user_password')}
                                     className={"absolute top-0 right-0"}>
@@ -228,6 +252,7 @@ const Profile = () => {
                                 name={'user_confirm_password'}
                                 onChange={onChange}
                                 onBlur={onBlur}
+                                className={"bg-card"}
                             />
                             <Button variant={"ghost hover:none"} onClick={() => togglePasswordVisibility('user_confirm_password')}
                                     className={"absolute top-0 right-0"}>

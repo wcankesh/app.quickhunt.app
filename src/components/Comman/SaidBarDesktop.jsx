@@ -102,7 +102,7 @@ const SaidBarDesktop = () => {
     ];
 
     const isActive = (link) => {
-        return location.pathname === link;
+        return location.pathname.includes(link);
     };
 
     return (
@@ -121,7 +121,7 @@ const SaidBarDesktop = () => {
                                                     <Button
                                                         key={i}
                                                         variant={"link hover:no-underline"}
-                                                        className={`${isActive(z.selected) ? "flex justify-start gap-4 h-9 rounded-md bg-primary/25 transition-none" : 'flex items-center gap-4 h-9 justify-start transition-none'}`}
+                                                        className={`${isActive(z.selected) ? "flex justify-start gap-4 h-9 rounded-md bg-primary/15 transition-none" : 'flex items-center gap-4 h-9 justify-start transition-none'}`}
                                                         onClick={() => onRedirect(z.link)}
                                                     >
                                                         <div className={`${isActive(z.selected) ? "active-menu" : "menu-icon"}`}>{z.icon}</div>
@@ -138,8 +138,7 @@ const SaidBarDesktop = () => {
                                                         <Button
                                                             key={i}
                                                             variant={"link hover:no-underline"}
-
-                                                            className={`${isActive(y.selected) ? "flex justify-start gap-4 h-9 rounded-md bg-primary/25 transition-none" : 'flex items-center gap-4 h-9 justify-start transition-none'}`}
+                                                            className={`${isActive(y.selected) ? "flex justify-start gap-4 h-9 rounded-md bg-primary/15 transition-none" : 'flex items-center gap-4 h-9 justify-start transition-none'}`}
                                                             onClick={() => onRedirect(y.link)}
                                                         >
                                                             <div className={`${isActive(y.selected) ? "active-menu" : "menu-icon"}`}>{y.icon}</div>
@@ -163,8 +162,7 @@ const SaidBarDesktop = () => {
                                     <Button
                                         key={i}
                                         variant={"link hover:no-underline"}
-                                        href="#"
-                                        className={`${isActive(x.selected) ? "flex justify-start gap-4 h-9 rounded-md bg-primary/25 transition-none" : 'flex items-center gap-4 h-9 justify-start transition-none'}`}
+                                        className={`${isActive(x.selected) ? "flex justify-start gap-4 h-9 rounded-md bg-primary/15 transition-none" : 'flex items-center gap-4 h-9 justify-start transition-none'}`}
                                         onClick={() => onRedirect(x.link)}
                                         >
                                         <div className={`${isActive(x.selected) ? "active-menu" : "menu-icon"}`}>{x.icon}</div>

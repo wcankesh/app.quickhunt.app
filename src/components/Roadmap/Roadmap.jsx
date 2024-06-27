@@ -130,11 +130,10 @@ const Roadmap = () => {
 
 
     return (
-        // <div className={"xl:container xl:max-w-[1200px] lg:container lg:max-w-[992px] md:container md:max-w-[768px] sm:container sm:max-w-[639px] xs:container xs:max-w-[475px]"}>
-        <div className={"p-8"}>
+        <div className={"height-inherit h-svh overflow-scroll overflow-y-auto xl:container-secondary xl:max-w-[1605px] lg:container lg:max-w-[992px] md:container md:max-w-[768px] sm:container sm:max-w-[639px] xs:container xs:max-w-[475px] p-8"}>
             <RoadMapSidebarSheet isOpen={isSheetOpen} onOpen={openSheet} onClose={closeSheet} sheetType={sheetType}/>
             <div className={"pb-4"}><h1 className={"text-2xl font-medium"}>Roadmap</h1></div>
-            <div className={"flex gap-[18px]"}>
+            <div className={"flex gap-[18px] items-start width-fit-content"}>
 
                 {(statusCard || []).map(status => (
                     <Card key={status.id} className={"w-[342px]"}>
@@ -144,7 +143,7 @@ const Roadmap = () => {
                                 {status.statusTitle}
                             </CardTitle>
                         </CardHeader>
-                        <CardContent className={"px-[9px] pb-3 border-b"}>
+                        <CardContent className={"px-[9px] pb-3 border-b gap-3 flex flex-col"}>
                             {status.children.map((child, index) => (
                                 <div
                                     key={child.id}

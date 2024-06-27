@@ -1,10 +1,113 @@
 import React from 'react';
+import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "../../ui/card";
+import {Button} from "../../ui/button";
+import {Tabs, TabsContent, TabsList, TabsTrigger} from "../../ui/tabs";
+import {Label} from "../../ui/label";
+import {Input} from "../../ui/input";
+import {Avatar, AvatarFallback, AvatarImage} from "../../ui/avatar";
+import {Select, SelectContent, SelectItem, SelectLabel, SelectTrigger, SelectValue} from "../../ui/select";
+import {SelectGroup} from "@radix-ui/react-select";
+import {Table, TableBody, TableCaption, TableCell, TableFooter, TableHead, TableHeader, TableRow} from "../../ui/table";
+import {Trash2} from "lucide-react";
+import {useTheme} from "../../theme-provider";
+
+const invoices = [
+    {
+        email: "wc.darshan2003@gmail.com",
+        status: "Expires in 6 days",
+        invited: "Invited about A few seconds ago",
+    },
+    {
+        email: "wc.darshan2003@gmail.com",
+        status: "Expires in 6 days",
+        invited: "Invited about A few seconds ago",
+    },
+    {
+        email: "wc.darshan2003@gmail.com",
+        status: "Expires in 6 days",
+        invited: "Invited about A few seconds ago",
+    },
+]
 
 const Team = () => {
+    const { theme } = useTheme();
     return (
-        <div>
-            Team
-        </div>
+        <Card>
+            <CardHeader className={"flex flex-row justify-between items-center"}>
+                <div>
+                    <CardTitle className={"text-2xl font-medium"}>Invite Team</CardTitle>
+                    <CardDescription className={"text-sm text-muted-foreground p-0"}>Add members to your company to help manage ideas.</CardDescription>
+                </div>
+                <div className={"m-0"}>
+                    <Button className={"text-sm font-semibold"}>Invite Team</Button>
+                </div>
+            </CardHeader>
+            <CardContent className={"p-0"}>
+                <Tabs defaultValue="users" className="space-y-6">
+                    <div className={"px-6"}>
+                    <TabsList className="grid w-[141px] grid-cols-2 bg-card border">
+                        <TabsTrigger value="users" className={"team-tab-active team-tab-text-active"}>Users</TabsTrigger>
+                        <TabsTrigger value="invites" className={"team-tab-active team-tab-text-active"}>Invites</TabsTrigger>
+                    </TabsList>
+                    </div>
+                    <TabsContent value="users">
+                        <div className={"px-6 pb-2 flex justify-between border-b"}>
+                            <h3 className={"text-sm font-medium"}>Team</h3>
+                            <h3 className={"text-sm font-medium"}>Role</h3>
+                        </div>
+                        <div className={"flex gap-2 px-6 py-2"}>
+                            <div>
+                                <Avatar className={"w-[30px] h-[30px]"}>
+                                    <AvatarFallback className={"bg-primary/10 border-primary border text-sm text-primary font-semibold"}>D</AvatarFallback>
+                                </Avatar>
+                            </div>
+                            <div className={"flex justify-between w-full"}>
+                                <div>
+                                    <h3 className={"text-sm font-medium"}>Darshan Jiyani</h3>
+                                    <p className={"text-xs font-normal text-muted-foreground"}>wc.darshan2003@gmail.com</p>
+                                </div>
+                                <div>
+                                    <Select>
+                                        <SelectTrigger className="w-[140px] bg-card">
+                                            <SelectValue placeholder="Admin" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectGroup>
+                                                <SelectItem value="admin">Admin</SelectItem>
+                                            </SelectGroup>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            </div>
+                        </div>
+                    </TabsContent>
+                    <TabsContent value="invites">
+                        <div>
+                            <Table>
+                                <TableHeader className={"p-0"}>
+                                    <TableRow className={""}>
+                                        <TableHead className={`h-[22px] pl-6 pb-2 text-sm font-medium ${theme === "dark" ? "" : "text-card-foreground"}`}>Email</TableHead>
+                                        <TableHead className={`h-[22px] pb-2 ${theme === "dark" ? "" : "text-card-foreground"}`}>Status</TableHead>
+                                        <TableHead className={`h-[22px] pb-2 ${theme === "dark" ? "" : "text-card-foreground"}`}>Invited</TableHead>
+                                        <TableHead className={`text-right h-[22px] pr-6 pb-2 ${theme === "dark" ? "" : "text-card-foreground"}`}>Action</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {invoices.map((invoice,i) => (
+                                        <TableRow key={i}>
+                                            <TableCell className="font-medium pl-6">{invoice.email}</TableCell>
+                                            <TableCell>{invoice.status}</TableCell>
+                                            <TableCell>{invoice.invited}</TableCell>
+                                            <TableCell className="pr-6"><Button variant={"outline hover:bg-transparent"} className={"p-1 border w-[30px] h-[30px]"}><Trash2 size={16} /></Button></TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </div>
+                    </TabsContent>
+                </Tabs>
+            </CardContent>
+        </Card>
     );
 };
 

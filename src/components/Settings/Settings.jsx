@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { Button } from "../ui/button";
-import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle,} from "../ui/card";
+import {Card, CardContent, CardHeader, CardTitle,} from "../ui/card";
 import {Icon} from "../../utils/Icon";
 import {baseUrl, } from "../../utils/constent";
 import {useNavigate, useParams} from "react-router-dom";
@@ -119,9 +119,9 @@ const Settings = () => {
                 <h1 className="text-2xl font-medium">Settings</h1>
             </div>
             {/*<div className="mx-auto grid w-full max-w-6xl items-start gap-6 md:grid-cols-[180px_1fr] lg:grid-cols-[250px_1fr]">*/}
-            <div className="w-full flex items-start gap-6 pt-6 pb-[58px]">
-                <div className="basis-[320px]">
-                <Card>
+            <div className="w-full flex md:flex-row sm:flex-col items-start gap-6 pt-6 pb-[58px]">
+                <div className="basis-[320px] sm:w-full">
+                    <Card>
                     <CardHeader className={"p-4 pb-0"}>
                         <CardTitle className={"text-base font-medium"}>General Settings</CardTitle>
                     </CardHeader>
@@ -132,11 +132,11 @@ const Settings = () => {
                                     <Button
                                         key={i}
                                         variant={"link hover:no-underline"}
-                                        className={`${isActive(x.link) ? "flex justify-start gap-4 h-9 rounded-md bg-primary/25 transition-none" : 'flex items-center gap-4 h-9 justify-start transition-none'}`}
+                                        className={`${isActive(x.link) ? "flex justify-start gap-4 h-9 rounded-md bg-primary/15 transition-none" : 'flex items-center gap-4 h-9 justify-start transition-none'}`}
                                         onClick={() => onRedirect(x.link)}
                                     >
                                         <div className={`${isActive(x.link) ? "setting-active-menu" : "profile-menu-icon"}`}>{x.icon}</div>
-                                        <div className={`${isActive(x.link) ? "text-primary text-sm font-medium" : "text-sm font-medium flex justify-between w-full"}`}>
+                                        <div className={`flex justify-between w-full ${isActive(x.link) ? "text-primary text-sm font-medium" : "text-sm font-medium"}`}>
                                             {x.title}
                                             <div>{x.useFor}</div>
                                         </div>
@@ -147,7 +147,7 @@ const Settings = () => {
                     </CardContent>
                 </Card>
                 </div>
-                <div className="gap-6 basis-[754px]">
+                <div className="basis-[754px] sm:w-full">
                     {renderMenu(type ?? "profile")}
                 </div>
             </div>

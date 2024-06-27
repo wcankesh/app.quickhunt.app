@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {Sheet, SheetContent, SheetFooter, SheetHeader, SheetTitle, SheetTrigger, SheetClose} from "../ui/sheet";
 import {Button} from "../ui/button";
-import {Menu, X} from "lucide-react";
+import {Menu, Plus, X} from "lucide-react";
 import {Input} from "../ui/input";
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger} from "../ui/dropdown-menu";
 import {useTheme} from "../theme-provider";
@@ -87,7 +87,7 @@ const footerMenuComponent = [
     {
         title: 'Help & Support',
         link: '/help-support',
-        icon: Icon.helpIcon,
+        icon: Icon.helpSupportIcon,
         selected: `${baseUrl}/help-support`,
     },
     {
@@ -155,7 +155,7 @@ const HeaderBar = ({ showDashboardButton }) => {
         {
             value: "createproject",
             label: "Create Project",
-            icon: Icon.plusIcon,
+            icon: <Plus size={16} />,
         },
     ]
 
@@ -185,11 +185,10 @@ const HeaderBar = ({ showDashboardButton }) => {
                                                     <Button
                                                         key={i}
                                                         variant={"link hover:no-underline"}
-                                                        href="#"
                                                         className={`${isActive(z.selected) ? "flex justify-start gap-4 h-9 rounded-md bg-primary/25 transition-none" : 'flex items-center gap-4 justify-start transition-none'}`}
                                                         onClick={() => onRedirect(z.link)}
                                                     >
-                                                        <div className={`${isActive(z.selected) ? "fill-primary" : ""}`}>{z.icon}</div>
+                                                        <div className={`${isActive(z.selected) ? "active-menu" : "menu-icon"}`}>{z.icon}</div>
                                                         <div className={`${isActive(z.selected) ? "text-primary text-sm font-medium" : "text-sm font-medium"}`}>{z.title}</div>
                                                     </Button>
                                                 )
@@ -202,13 +201,11 @@ const HeaderBar = ({ showDashboardButton }) => {
                                                     return (
                                                         <Button
                                                             key={i}
-                                                            // variant={"link hover:no-underline active:bg-blue-600"}
                                                             variant={"link hover:no-underline"}
-                                                            href="#"
                                                             className={`${isActive(y.selected) ? "flex justify-start gap-4 h-9 rounded-md bg-primary/25 transition-none" : 'flex items-center gap-4 justify-start transition-none'}`}
                                                             onClick={() => onRedirect(y.link)}
                                                         >
-                                                            {y.icon}
+                                                            <div className={`${isActive(y.selected) ? "active-menu" : "menu-icon"}`}>{y.icon}</div>
                                                             <div className={`${isActive(y.selected) ? "text-primary text-sm font-medium" : "text-sm font-medium"}`}>{y.title}</div>
                                                         </Button>
                                                     )
@@ -228,11 +225,10 @@ const HeaderBar = ({ showDashboardButton }) => {
                                         <Button
                                             key={i}
                                             variant={"link hover:no-underline"}
-                                            href="#"
                                             className={`${isActive(x.selected) ? "flex justify-start gap-4 h-9 rounded-md bg-primary/25 transition-none" : 'flex items-center gap-4 justify-start transition-none'}`}
                                             onClick={() => onRedirect(x.link)}
                                         >
-                                            {x.icon}
+                                            <div className={`${isActive(x.selected) ? "active-menu" : "menu-icon"}`}>{x.icon}</div>
                                             <div className={`${isActive(x.selected) ? "text-primary text-sm font-medium" : "text-sm font-medium"}`}>{x.title}</div>
                                         </Button>
                                     )
@@ -259,7 +255,7 @@ const HeaderBar = ({ showDashboardButton }) => {
                                     variant="outline"
                                     role="combobox"
                                     aria-expanded={open}
-                                    className="w-[200px] justify-between"
+                                    className="w-[200px] justify-between bg-card"
                                 >
                                     {value
                                         ? frameworks.find((framework) => framework.value === value)?.label
@@ -282,7 +278,10 @@ const HeaderBar = ({ showDashboardButton }) => {
                                                         setOpen(false)
                                                     }}
                                                 >
-                                                    {framework.icon}{framework.label}
+                                                    <div className={"flex gap-1 items-center"}>
+                                                        <div>{framework.icon}</div>
+                                                        <div className={"text-sm font-medium"}>{framework.label}</div>
+                                                    </div>
                                                 </CommandItem>
                                             ))}
                                         </CommandGroup>
@@ -295,7 +294,7 @@ const HeaderBar = ({ showDashboardButton }) => {
                         <Input
                             type="search"
                             placeholder="Search..."
-                            className="w-full pl-4 pr-14 md:w-[200px] lg:w-[352px] text-sm font-normal"
+                            className="w-full pl-4 pr-14 md:w-[200px] lg:w-[352px] text-sm font-normal bg-card"
                         />
                     </div>
                 </div>
@@ -341,7 +340,7 @@ const HeaderBar = ({ showDashboardButton }) => {
 
             {isSheetOpen && (
                 <Sheet open={isSheetOpen} onOpenChange={isSheetOpen ? closeSheet : openSheet}>
-                    <SheetContent className={"sm:max-w-[662px] p-0"}>
+                    <SheetContent className={"sm:max-w-[662px] sm:overflow-auto p-0"}>
                         <SheetHeader className={"px-[32px] py-[22px] border-b flex"}>
                             <SheetTitle className={"text-xl font-medium flex justify-between items-center"}>Create new Project
                                 <Button className={"bg-transparent hover:bg-transparent p-0 h-[24px]"}>
@@ -352,21 +351,21 @@ const HeaderBar = ({ showDashboardButton }) => {
                         <div className="grid gap-[24px] px-[32px] pt-[24px] pb-[36px]">
                             <div className="gap-2">
                                 <Label htmlFor="name" className="text-right">Project Name</Label>
-                                <Input id="name" placeholder="Project Name" className={"placeholder:text-muted-foreground/75"} />
+                                <Input id="name" placeholder="Project Name" className={`${theme === "dark" ? "" : "placeholder:text-muted-foreground/75"}`} />
                             </div>
                             <div className="gap-2">
                                 <Label htmlFor="website" className="text-right">Project website</Label>
-                                <Input id="website" placeholder="https://yourcompany.com" className={"placeholder:text-muted-foreground/75"} />
+                                <Input id="website" placeholder="https://yourcompany.com" className={`${theme === "dark" ? "" : "placeholder:text-muted-foreground/75"}`} />
                             </div>
                             <div className="gap-2 relative">
                                 <Label htmlFor="domain" className="text-right">Project domain</Label>
-                                <Input id="domain" placeholder="https://projectname.quickhunt.io" className={"placeholder:text-muted-foreground/75 pr-[115px]"} />
+                                <Input id="domain" placeholder="https://projectname.quickhunt.io" className={`${theme === "dark" ? "" : "placeholder:text-muted-foreground/75 pr-[115px]"}`} />
                                 <span className={"absolute top-[33px] right-[13px] text-sm font-medium"}>Project domain</span>
                             </div>
                         </div>
                         <SheetFooter className={"px-[32px] gap-[16px] sm:justify-start"}>
                             <SheetClose asChild>
-                                <Button className={"text-card sm:space-x-0 text-sm font-semibold hover:bg-primary bg-primary"} type="submit">Create Project</Button>
+                                <Button className={"text-card text-sm font-semibold hover:bg-primary bg-primary"} type="submit">Create Project</Button>
                             </SheetClose>
                             <SheetClose asChild onClick={closeSheet}>
                                 <Button className={"text-primary text-sm font-semibold hover:bg-card border border-primary bg-card"} type="submit">Cancel</Button>
