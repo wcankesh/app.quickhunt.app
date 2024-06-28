@@ -120,14 +120,6 @@ const HeaderBar = ({ showDashboardButton }) => {
     const openSheetMenu = () => setSheetOpenMenu(true);
     const closeSheetMenu = () => setSheetOpenMenu(false);
 
-    const openSheetCom = (type) => {
-        setSheetType(type);
-    };
-
-    const closeSheetCom = () => {
-        setSheetType(null);
-    };
-
     const onRedirect = (link) => {
         setSelectedUrl(link)
         navigate(`${baseUrl}${link}`);
@@ -315,16 +307,16 @@ const HeaderBar = ({ showDashboardButton }) => {
                         <DropdownMenuContent align="end" className={"w-56 rounded-md shadow"}>
                             <DropdownMenuLabel className={"text-sm font-semibold"}>My Account</DropdownMenuLabel>
                             <DropdownMenuSeparator/>
-                            <DropdownMenuItem className={"text-sm font-medium flex gap-2"}>
+                            <DropdownMenuItem className={"text-sm font-medium flex gap-2"} onClick={() => navigate(`${baseUrl}/settings/profile`)}>
                                 <span className={`${ theme === "dark" ? "profile-menu-icon" : ""}`}>{Icon.accountUserIcon}</span>
                                 Profile
                             </DropdownMenuItem>
-                            <DropdownMenuItem className={"text-sm font-medium flex gap-2"}>
+                            <DropdownMenuItem className={"text-sm font-medium flex gap-2"} onClick={() => navigate(`${baseUrl}/pricing-plan`)}>
                                 <span className={`${ theme === "dark" ? "profile-menu-icon" : ""}`}>{Icon.bilingIcon}</span>
                                 Billing
                             </DropdownMenuItem>
                             <DropdownMenuSeparator/>
-                            <DropdownMenuItem className={"text-sm font-medium flex gap-2"}>
+                            <DropdownMenuItem className={"text-sm font-medium flex gap-2"} onClick={openSheet}>
                                 <span className={`${ theme === "dark" ? "profile-menu-icon" : ""}`}>{Icon.projectsIcon}</span>
                                 Projects
                             </DropdownMenuItem>
@@ -355,7 +347,7 @@ const HeaderBar = ({ showDashboardButton }) => {
                             </div>
                             <div className="gap-2">
                                 <Label htmlFor="website" className="text-right">Project website</Label>
-                                <Input id="website" placeholder="https://yourcompany.com" className={`${theme === "dark" ? "" : "placeholder:text-muted-foreground/75"}`} />
+                                <Input id="website" placeholder="https://yourcompany.com" className={`${theme === "dark" ? "placeholder:text-card-foreground/80" : "placeholder:text-muted-foreground/75"}`} />
                             </div>
                             <div className="gap-2 relative">
                                 <Label htmlFor="domain" className="text-right">Project domain</Label>

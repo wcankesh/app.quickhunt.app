@@ -116,7 +116,7 @@ const Ideas = () => {
                 <div className="ml-auto gap-6">
                     <div className={"flex flex-row flex-wrap gap-6 items-center"}>
                         <Select>
-                            <SelectTrigger className="w-[173px]">
+                            <SelectTrigger className="w-[173px] bg-card">
                                 <SelectValue placeholder="Filter by status" />
                             </SelectTrigger>
                             <SelectContent>
@@ -132,7 +132,7 @@ const Ideas = () => {
                             </SelectContent>
                         </Select>
                         <Select>
-                            <SelectTrigger className="w-[193px]">
+                            <SelectTrigger className="w-[193px] bg-card">
                                 <SelectValue placeholder="Filter by topic" />
                             </SelectTrigger>
                             <SelectContent>
@@ -148,7 +148,7 @@ const Ideas = () => {
                             </SelectContent>
                         </Select>
                         <Select>
-                            <SelectTrigger className="w-[262px]">
+                            <SelectTrigger className="w-[262px] bg-card">
                                 <SelectValue placeholder="Filter by roadmap status" />
                             </SelectTrigger>
                             <SelectContent>
@@ -192,7 +192,7 @@ const Ideas = () => {
                                                             <div className={"text-sm font-medium"}># Welcome 👋</div>
                                                             <div className={"flex items-center gap-8"}>
                                                                 <Select>
-                                                                    <SelectTrigger className="w-[291px]">
+                                                                    <SelectTrigger className="w-[291px] bg-card">
                                                                         <SelectValue placeholder="Under consideration" />
                                                                     </SelectTrigger>
                                                                     <SelectContent>

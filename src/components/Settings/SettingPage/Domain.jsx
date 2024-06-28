@@ -3,6 +3,7 @@ import {Card, CardContent, CardHeader, CardTitle, CardFooter, CardDescription} f
 import {Label} from "../../ui/label";
 import {Input} from "../../ui/input";
 import {useTheme} from "../../theme-provider";
+import {Button} from "../../ui/button";
 
 const Domain = () => {
     const {theme} = useTheme();
@@ -12,7 +13,7 @@ const Domain = () => {
                 <CardTitle className={"text-2xl font-medium"}>Domain Setting</CardTitle>
                 <CardDescription className={"text-sm text-muted-foreground p-0"}>Personalise your Quickhunt page with a custom domain.</CardDescription>
             </CardHeader>
-            <CardContent className={"p-6 flex flex-col gap-6"}>
+            <CardContent className={"p-6 flex flex-col gap-6 border-b"}>
                 <div className="gap-2 relative">
                     <Label htmlFor="domain" className="text-right">Subdomain</Label>
                     <Input id="domain" placeholder="https://" className={"pr-[115px] bg-card mt-1"} />
@@ -29,6 +30,9 @@ const Domain = () => {
                     <span className={"font-bold"}> DNS</span> and point it at the domain
                     <span className={"font-bold"}> "cname.quickhunt.io"</span>.</p>
             </CardContent>
+            <CardFooter className={"pt-[20px] justify-end"}>
+                <Button className={"text-sm font-semibold"}>Update Domain </Button>
+            </CardFooter>
         </Card>
     );
 };

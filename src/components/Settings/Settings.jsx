@@ -119,8 +119,8 @@ const Settings = () => {
                 <h1 className="text-2xl font-medium">Settings</h1>
             </div>
             {/*<div className="mx-auto grid w-full max-w-6xl items-start gap-6 md:grid-cols-[180px_1fr] lg:grid-cols-[250px_1fr]">*/}
-            <div className="w-full flex md:flex-row sm:flex-col items-start gap-6 pt-6 pb-[58px]">
-                <div className="basis-[320px] sm:w-full">
+            <div className="w-full flex lg:flex-nowrap md:flex-wrap sm:flex-wrap items-start gap-6 pt-6 pb-[58px]">
+                <div className="lg:w-[320px] md:w-full sm:w-full">
                     <Card>
                     <CardHeader className={"p-4 pb-0"}>
                         <CardTitle className={"text-base font-medium"}>General Settings</CardTitle>
@@ -147,7 +147,7 @@ const Settings = () => {
                     </CardContent>
                 </Card>
                 </div>
-                <div className="basis-[754px] sm:w-full">
+                <div className="lg:w-[754px] md:w-full sm:w-full">
                     {renderMenu(type ?? "profile")}
                 </div>
             </div>

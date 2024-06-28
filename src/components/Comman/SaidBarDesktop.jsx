@@ -3,12 +3,13 @@ import {Button} from "../ui/button";
 import {Icon} from "../../utils/Icon";
 import {baseUrl} from "../../utils/constent";
 import {ApiService} from "../../utils/ApiService";
-import {useNavigate, useLocation} from "react-router-dom";
+import {useNavigate, useLocation, useParams} from "react-router-dom";
 
 const SaidBarDesktop = () => {
     let apiSerVice = new ApiService()
     let navigate = useNavigate();
     let location = useLocation();
+    const {type} = useParams();
 
     const onRedirect = (link) => {
         navigate(`${baseUrl}${link}`);
@@ -67,42 +68,42 @@ const SaidBarDesktop = () => {
             title: '14 days trial left',
             link: '/pricing-plan',
             icon: Icon.trialPlanIcon,
-            selected: `${baseUrl}/pricing-plan`,
+            selected: `/pricing-plan`,
         },
         {
             title: 'What’s New',
             link: '/notification',
             icon: Icon.notificationIcon,
-            selected: `${baseUrl}/notification`,
+            selected: `/notification`,
         },
         {
             title: 'Invite Team',
-            link: '/invite-team',
+            link: '/settings/team',
             icon: Icon.inviteTeamIcon,
-            selected: `${baseUrl}/invite-team`,
+            selected: `team`,
         },
         {
             title: 'Help & Support',
             link: '/help-support',
             icon: Icon.helpSupportIcon,
-            selected: `${baseUrl}/help-support`,
+            selected: `/help-support`,
         },
         {
             title: "Pricing & Plan",
             link: '/pricing-plan',
             icon: Icon.pricingIcon,
-            selected: `${baseUrl}/pricing-plan`,
+            selected: `/pricing-plan`,
         },
         {
             title: 'Settings',
-            link: '/settings/profile',
+            link: `/settings/${type??"profile"}`,
             icon: Icon.settingIcon,
-            selected: `${baseUrl}/profile`,
+            selected: `/settings/${type??"profile"}`,
         }
     ];
 
     const isActive = (link) => {
-        return location.pathname.includes(link);
+        return link === 'team' ? false : location.pathname === link;
     };
 
     return (
@@ -162,7 +163,7 @@ const SaidBarDesktop = () => {
                                     <Button
                                         key={i}
                                         variant={"link hover:no-underline"}
-                                        className={`${isActive(x.selected) ? "flex justify-start gap-4 h-9 rounded-md bg-primary/15 transition-none" : 'flex items-center gap-4 h-9 justify-start transition-none'}`}
+                                        className={`${isActive(x.selected)  ? "flex justify-start gap-4 h-9 rounded-md bg-primary/15 transition-none" : 'flex items-center gap-4 h-9 justify-start transition-none'}`}
                                         onClick={() => onRedirect(x.link)}
                                         >
                                         <div className={`${isActive(x.selected) ? "active-menu" : "menu-icon"}`}>{x.icon}</div>

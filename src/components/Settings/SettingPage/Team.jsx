@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {Fragment, useState} from 'react';
 import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "../../ui/card";
 import {Button} from "../../ui/button";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "../../ui/tabs";
@@ -8,8 +8,9 @@ import {Avatar, AvatarFallback, AvatarImage} from "../../ui/avatar";
 import {Select, SelectContent, SelectItem, SelectLabel, SelectTrigger, SelectValue} from "../../ui/select";
 import {SelectGroup} from "@radix-ui/react-select";
 import {Table, TableBody, TableCaption, TableCell, TableFooter, TableHead, TableHeader, TableRow} from "../../ui/table";
-import {Trash2} from "lucide-react";
+import {Trash2, X} from "lucide-react";
 import {useTheme} from "../../theme-provider";
+import {Sheet, SheetClose, SheetContent, SheetFooter, SheetHeader, SheetTitle} from "../../ui/sheet";
 
 const invoices = [
     {
@@ -31,7 +32,13 @@ const invoices = [
 
 const Team = () => {
     const { theme } = useTheme();
+    const [isSheetOpen, setSheetOpen] = useState(false);
+
+    const openSheet = () => setSheetOpen(true);
+    const closeSheet = () => setSheetOpen(false);
+
     return (
+        <Fragment>
         <Card>
             <CardHeader className={"flex flex-row justify-between items-center"}>
                 <div>
@@ -39,15 +46,15 @@ const Team = () => {
                     <CardDescription className={"text-sm text-muted-foreground p-0"}>Add members to your company to help manage ideas.</CardDescription>
                 </div>
                 <div className={"m-0"}>
-                    <Button className={"text-sm font-semibold"}>Invite Team</Button>
+                    <Button className={"text-sm font-semibold"} onClick={openSheet}>Invite Team</Button>
                 </div>
             </CardHeader>
             <CardContent className={"p-0"}>
                 <Tabs defaultValue="users" className="space-y-6">
                     <div className={"px-6"}>
                     <TabsList className="grid w-[141px] grid-cols-2 bg-card border">
-                        <TabsTrigger value="users" className={"team-tab-active team-tab-text-active"}>Users</TabsTrigger>
-                        <TabsTrigger value="invites" className={"team-tab-active team-tab-text-active"}>Invites</TabsTrigger>
+                        <TabsTrigger value="users" className={`text-sm font-medium team-tab-active team-tab-text-active ${theme === "dark" ? "text-card-foreground" : ""}`}>Users</TabsTrigger>
+                        <TabsTrigger value="invites" className={`text-sm font-medium team-tab-active team-tab-text-active ${theme === "dark" ? "text-card-foreground" : ""}`}>Invites</TabsTrigger>
                     </TabsList>
                     </div>
                     <TabsContent value="users">
@@ -108,6 +115,34 @@ const Team = () => {
                 </Tabs>
             </CardContent>
         </Card>
+            {isSheetOpen && (
+                <Sheet open={isSheetOpen} onOpenChange={isSheetOpen ? closeSheet : openSheet}>
+                    <SheetContent className={"sm:max-w-[662px] sm:overflow-auto p-0"}>
+                        <SheetHeader className={"px-[32px] py-[22px] border-b flex"}>
+                            <SheetTitle className={"text-xl font-medium flex justify-between items-center"}>Invite Users
+                                <Button className={"bg-transparent hover:bg-transparent p-0 h-[24px]"}>
+                                    <X className={"stroke-card-foreground"} onClick={closeSheet} />
+                                </Button>
+                            </SheetTitle>
+                        </SheetHeader>
+                        <div className="grid gap-[24px] px-[32px] pt-[24px] pb-[36px]">
+                            <div className="gap-2">
+                                <Label htmlFor="name" className="text-right">Add emails of users you want to invite to test, and click on Invite</Label>
+                                <Input id="name" placeholder="user1@gmail.com" className={`${theme === "dark" ? "" : "placeholder:text-muted-foreground/75"}`} />
+                            </div>
+                        </div>
+                        <SheetFooter className={"px-[32px] gap-[16px] sm:justify-start"}>
+                            <SheetClose asChild>
+                                <Button className={"text-card text-sm font-semibold hover:bg-primary bg-primary"} type="submit">Invite</Button>
+                            </SheetClose>
+                            <SheetClose asChild onClick={closeSheet}>
+                                <Button className={"text-primary text-sm font-semibold hover:bg-card border border-primary bg-card ml-0 m-inline-0"} type="submit">Cancel</Button>
+                            </SheetClose>
+                        </SheetFooter>
+                    </SheetContent>
+                </Sheet>
+            )}
+        </Fragment>
     );
 };
 
