@@ -19,7 +19,7 @@ const dummyPlan =
             {
                 name: "Startup",
                 price: 19,
-                description: "Perfect for owners of small & medium businessess",
+                description: "Perfect for owners of small & medium businesses",
                 features: ["Example Feature Number 1", "Example Feature Number 1", "Example Feature Number 1"],
                 id: 2
             },
@@ -215,16 +215,16 @@ const PricingPlans = () => {
                 {
                     (dummyPlan.plans || []).map((x,index)=>{
                         return(
-                            <div className={`basis-1/3 border-[1px] px-6 pt-6 pb-8 rounded-[10px] ${index === 1 ? "border-violet-600 relative" : ""}`}>
-                                {index === 1 && <div className={"absolute right-[112px] top-[-14px] bg-violet-600 rounded-[10px] text-[#F9FAFB] text-sm h-7 w-[131px] py-1 flex justify-center text-center"}><p>Most popular</p></div>}
+                            <div key={index} className={`basis-1/3 border-[1px] px-6 pt-6 pb-8 rounded-[10px] ${index === 1 ? "border-violet-600 relative" : ""}`}>
+                                {index === 1 && <div className={"top-[-14px] bg-violet-600 rounded-[10px] text-[#F9FAFB] text-sm h-7 w-[131px] py-1 flex justify-center text-center absolute left-[30%] right-[30%] sm:left-[17%] lg:left-[23%] xl:left-[30%]"}><p>Most popular</p></div>}
                                 <h3 className={"text-2xl font-medium leading-8 mb-4"}>{x.name}</h3>
                                 <h3 className={"text-[32px] font-bold pb-6 leading-8"}>${x.price}<span className={`text-xl ${theme === "dark" ? "" : "text-muted-foreground"}`}>/month</span></h3>
-                                <p className={`capitalize text-sm font-medium mb-[34px] h-[32px] leading-4 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.description}</p>
-                                <div className={`flex flex-col gap-4 pb-[34px]`}>
+                                <p className={`capitalize text-sm font-medium h-[32px] leading-4 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.description}</p>
+                                <div className={`flex flex-col gap-4 pb-[34px] mt-[34px]`}>
                                     {
                                         (x.features || []).map((y)=>{
                                             return(
-                                                <div key={x.id} className={`text-sm font-medium leading-4 ${theme === "dark" ? "" : "text-muted-foreground"}`}><div className={"flex gap-4"}> <Check size={18} /> <span>{y}</span></div></div>
+                                                <div  key={x.id} className={`text-sm font-medium leading-4 ${theme === "dark" ? "" : "text-muted-foreground"}`}><div className={"flex gap-4"}> <Check size={18} /> <span>{y}</span></div></div>
                                             )
                                         })
                                     }
@@ -246,35 +246,33 @@ const PricingPlans = () => {
             </div>
             <Card className={"pt-6 mb-16"}>
                 <div className={""}>
-                    <Table className={"border-collapse "}>
-                        <TableBody className={"divide-x"}>
-                            <TableCell className={"pl-[32px] pr-[45px]"}>
-                                <div className={"flex flex-col gap-2 justify-start"}>
-                                    <h5 className={`font-medium text-base tracking-[-0.16px] leading-5 ${theme === "dark" ? "" : "text-muted-foreground"}`}>Current Plan: {dummyPlan.activatedPlan}</h5>
-                                    <h5 className={`font-medium text-base tracking-[-0.16px] leading-5 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{dummyPlan.duration}</h5>
-                                    <h5 className={`font-medium text-base tracking-[-0.16px] leading-5 ${theme === "dark" ? "" : "text-muted-foreground"}`}>Review requests sent</h5>
-                                    <div className={`mt-4 w-full h-[2px] ${theme === "dark" ? "bg-[#F8FAFC]" : "bg-muted-foreground"}`}/>
+                            <div className={"divide-x flex  w-full hover:none"}>
+                                <div className={"pl-[32px] pr-[32px] w-1/4 align-top xl:w-1/4 lg:1/4"}>
+                                    <div className={"flex flex-col gap-2 py-2"}>
+                                        <h5 className={`font-medium text-base tracking-[-0.16px] leading-5 ${theme === "dark" ? "" : "text-muted-foreground"}`}>Current Plan: {dummyPlan.activatedPlan}</h5>
+                                        <h5 className={`font-medium text-base tracking-[-0.16px] leading-5 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{dummyPlan.duration}</h5>
+                                        <h5 className={`font-medium text-base tracking-[-0.16px] leading-5 ${theme === "dark" ? "" : "text-muted-foreground"}`}>Review requests sent</h5>
+                                        <div className={`mt-4 max-w-[199px] h-[2px] ${theme === "dark" ? "bg-[#F8FAFC]" : "bg-muted-foreground"}`}/>
+                                    </div>
                                 </div>
-                            </TableCell>
-                            {
-                                (dummyPlan.plans || []).map((x,index)=>{
-                                    return(
-                                        <TableCell className={"w-1/4 px-[22px]"}>
-                                            <div>
-                                                <h3 className={"text-2xl font-medium leading-8 mb-4"}>{x.name}</h3>
-                                                <h3 className={"text-[32px] font-bold leading-8 mb-8"}>${x.price}<span className={`text-xl ${theme === "dark" ? "" : "text-muted-foreground"}`}>/month</span></h3>
-                                                {
-                                                    x.name === dummyPlan.activatedPlan ? <Button variant={"outline"} className={`mb-4 w-full font-semibold ${theme === "dark" ? "" : "text-muted-foreground"} ${index == 1 ? "bg-violet-600" : ""}`}>Downgrade</Button>
-                                                        : <Button variant={"outline hover:none"} className={`mb-4 w-full rounded-md h-10 border border-violet-600 text-violet-600 text-[14px] font-semibold font-semibold ${index == 1 ? "bg-violet-600 text-[#F9FAFB] hover:bg-violet-600" : ""}`}>Downgrade</Button>
-                                                }
+                                {
+                                    (dummyPlan.plans || []).map((x,index) => {
+                                        return(
+                                            <div key={index} className={"w-1/4 p-2 px-[22px]  xl:w-1/4"}>
+                                                <div>
+                                                    <h3 className={"text-2xl font-medium leading-8 mb-4"}>{x.name}</h3>
+                                                    <h3 className={"text-[32px] font-bold leading-8  mb-8"}>${x.price}<span className={`text-wrap text-xl ${theme === "dark" ? "" : "text-muted-foreground"}`}>/month</span></h3>
+                                                    {
+                                                        x.name === dummyPlan.activatedPlan ? <Button variant={"outline"} style={{marginBottom:"16px"}} className={`mb-4 w-full font-semibold ${theme === "dark" ? "" : "text-muted-foreground"} ${index == 1 ? "bg-violet-600" : ""}`}>Downgrade</Button>
+                                                            : <Button variant={"outline hover:none"} className={`mb-4 w-full rounded-md h-10 border border-violet-600 text-violet-600 text-[14px] font-semibold font-semibold ${index == 1 ? "bg-violet-600 text-[#F9FAFB] hover:bg-violet-600" : ""}`}>Downgrade</Button>
+                                                    }
+                                                </div>
                                             </div>
-                                        </TableCell>
-                                    )
-                                })
-                            }
-                        </TableBody>
-                    </Table>
-                    <Table className={"border-collapse "}>
+                                        )
+                                    })
+                                }
+                            </div>
+                    <Table className={"border-collapse table-fixed"}>
                         <TableHeader className={""}>
                             <TableRow className={""}>
                                 <TableHead className={`border text-xl py-4 pl-8  ${theme === "dark" ? "text-[#f8fafc]" : "text-[#020817] bg-muted border-[#e2e8f0]"}` }>
@@ -287,9 +285,9 @@ const PricingPlans = () => {
                         </TableHeader>
                         <TableBody>
                             {
-                                (features || []).map((x)=>{
+                                (features || []).map((x,index)=>{
                                     return(
-                                        <TableRow className={""}>
+                                        <TableRow key={index} className={""}>
                                             <TableCell className={`border pl-8 w-1/4 ${theme === "dark" ? "" : "text-muted-foreground border-[#e2e8f0]" }`}>{x.name}</TableCell>
                                             <TableCell className={`border text-center w-1/4 ${theme === "dark" ? "" : "text-muted-foreground border-[#e2e8f0]"}`}>{x.isIcon === 1 ? (x.free == "1" ? <div className={"flex justify-center"}><Check size={20} /></div> :<div className={"flex justify-center"}> <X size={20} /></div>) :x.free}</TableCell>
                                             <TableCell className={`border text-center w-1/4 ${theme === "dark" ? "" : "text-muted-foreground border-[#e2e8f0]"}`}>{x.isIcon === 1 ? (x.startup == "1" ? <div className={"flex justify-center"}><Check size={20} /></div> : <div className={"flex justify-center"}> <X size={20} /></div>) :x.startup}</TableCell>
