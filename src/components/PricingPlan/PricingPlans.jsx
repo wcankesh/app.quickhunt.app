@@ -194,6 +194,7 @@ const features =[
 const PricingPlans = () => {
     const { theme } =useTheme();
     const [tab,setTab]=useState(0);
+    const [showComparePlan,setShowComparePlan]=useState(false);
 
     return (
         <div className={"xl:container-2 xl:max-w-[1130px] lg:container-2 lg:max-w-[992px] md:container md:max-w-[768px] sm:container sm:max-w-[639px] xs:container xs:max-w-[475px] "}>
@@ -239,59 +240,84 @@ const PricingPlans = () => {
                 }
             </div>
             <div className={"pt-12 pb-16 flex justify-center"}>
-                <div className={"flex gap-4 items-center leading-4"}>
+                <div onClick={() => setShowComparePlan(true)} className={"cursor-pointer flex gap-4 items-center leading-4"}>
                     <h5 className={`text-sm font-semibold leading-4 ${theme === "dark" ? "" : "text-violet-600"}`}>Compare Plans </h5>
                     <ArrowDown className={`${theme === "dark" ? "" : "text-violet-600"}`} size={16} />
                 </div>
             </div>
-            <Card className={"pt-6 mb-16"}>
+            {showComparePlan && <Card className={"pt-6 mb-16"}>
                 <div className={""}>
-                            <div className={"divide-x flex  w-full hover:none"}>
-                                <div className={"pl-[32px] pr-[32px] w-1/4 align-top xl:w-1/4 lg:1/4"}>
-                                    <div className={"flex flex-col gap-2 py-2"}>
-                                        <h5 className={`font-medium text-base tracking-[-0.16px] leading-5 ${theme === "dark" ? "" : "text-muted-foreground"}`}>Current Plan: {dummyPlan.activatedPlan}</h5>
-                                        <h5 className={`font-medium text-base tracking-[-0.16px] leading-5 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{dummyPlan.duration}</h5>
-                                        <h5 className={`font-medium text-base tracking-[-0.16px] leading-5 ${theme === "dark" ? "" : "text-muted-foreground"}`}>Review requests sent</h5>
-                                        <div className={`mt-4 max-w-[199px] h-[2px] ${theme === "dark" ? "bg-[#F8FAFC]" : "bg-muted-foreground"}`}/>
-                                    </div>
-                                </div>
-                                {
-                                    (dummyPlan.plans || []).map((x,index) => {
-                                        return(
-                                            <div key={index} className={"w-1/4 p-2 px-[22px]  xl:w-1/4"}>
-                                                <div>
-                                                    <h3 className={"text-2xl font-medium leading-8 mb-4"}>{x.name}</h3>
-                                                    <h3 className={"text-[32px] font-bold leading-8  mb-8"}>${x.price}<span className={`text-wrap text-xl ${theme === "dark" ? "" : "text-muted-foreground"}`}>/month</span></h3>
-                                                    {
-                                                        x.name === dummyPlan.activatedPlan ? <Button variant={"outline"} style={{marginBottom:"16px"}} className={`mb-4 w-full font-semibold ${theme === "dark" ? "" : "text-muted-foreground"} ${index == 1 ? "bg-violet-600" : ""}`}>Downgrade</Button>
-                                                            : <Button variant={"outline hover:none"} className={`mb-4 w-full rounded-md h-10 border border-violet-600 text-violet-600 text-[14px] font-semibold font-semibold ${index == 1 ? "bg-violet-600 text-[#F9FAFB] hover:bg-violet-600" : ""}`}>Downgrade</Button>
-                                                    }
-                                                </div>
-                                            </div>
-                                        )
-                                    })
-                                }
+                    <div className={"divide-x flex  w-full hover:none"}>
+                        <div className={"pl-[32px] pr-[32px] w-1/4 align-top xl:w-1/4 lg:1/4"}>
+                            <div className={"flex flex-col gap-2 py-2"}>
+                                <h5 className={`font-medium text-base tracking-[-0.16px] leading-5 ${theme === "dark" ? "" : "text-muted-foreground"}`}>Current
+                                    Plan: {dummyPlan.activatedPlan}</h5>
+                                <h5 className={`font-medium text-base tracking-[-0.16px] leading-5 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{dummyPlan.duration}</h5>
+                                <h5 className={`font-medium text-base tracking-[-0.16px] leading-5 ${theme === "dark" ? "" : "text-muted-foreground"}`}>Review
+                                    requests sent</h5>
+                                <div
+                                    className={`mt-4 max-w-[199px] h-[2px] ${theme === "dark" ? "bg-[#F8FAFC]" : "bg-muted-foreground"}`}/>
                             </div>
+                        </div>
+                        {
+                            (dummyPlan.plans || []).map((x, index) => {
+                                return (
+                                    <div key={index} className={"w-1/4 p-2 px-[22px]  xl:w-1/4"}>
+                                        <div>
+                                            <h3 className={"text-2xl font-medium leading-8 mb-4"}>{x.name}</h3>
+                                            <h3 className={"text-[32px] font-bold leading-8  mb-8"}>${x.price}<span
+                                                className={`text-wrap text-xl ${theme === "dark" ? "" : "text-muted-foreground"}`}>/month</span>
+                                            </h3>
+                                            {
+                                                x.name === dummyPlan.activatedPlan ?
+                                                    <Button variant={"outline"} style={{marginBottom: "16px"}}
+                                                            className={`mb-4 w-full font-semibold ${theme === "dark" ? "" : "text-muted-foreground"} ${index == 1 ? "bg-violet-600" : ""}`}>Downgrade</Button>
+                                                    : <Button variant={"outline hover:none"}
+                                                              className={`mb-4 w-full rounded-md h-10 border border-violet-600 text-violet-600 text-[14px] font-semibold font-semibold ${index == 1 ? "bg-violet-600 text-[#F9FAFB] hover:bg-violet-600" : ""}`}>Downgrade</Button>
+                                            }
+                                        </div>
+                                    </div>
+                                )
+                            })
+                        }
+                    </div>
                     <Table className={"border-collapse table-fixed"}>
                         <TableHeader className={""}>
                             <TableRow className={""}>
-                                <TableHead className={`border text-xl py-4 pl-8  ${theme === "dark" ? "text-[#f8fafc]" : "text-[#020817] bg-muted border-[#e2e8f0]"}` }>
+                                <TableHead
+                                    className={`border text-xl py-4 pl-8  ${theme === "dark" ? "text-[#f8fafc]" : "text-[#020817] bg-muted border-[#e2e8f0]"}`}>
                                     Core Features
                                 </TableHead>
-                                <TableHead className={`border ${theme === "dark" ? "" : "bg-muted border-[#e2e8f0]"}`}></TableHead>
-                                <TableHead className={`border ${theme === "dark" ? "" : "bg-muted border-[#e2e8f0]"}`}></TableHead>
-                                <TableHead className={`border ${theme === "dark" ? "" : "bg-muted border-[#e2e8f0]"}`}></TableHead>
+                                <TableHead
+                                    className={`border ${theme === "dark" ? "" : "bg-muted border-[#e2e8f0]"}`}></TableHead>
+                                <TableHead
+                                    className={`border ${theme === "dark" ? "" : "bg-muted border-[#e2e8f0]"}`}></TableHead>
+                                <TableHead
+                                    className={`border ${theme === "dark" ? "" : "bg-muted border-[#e2e8f0]"}`}></TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {
-                                (features || []).map((x,index)=>{
-                                    return(
+                                (features || []).map((x, index) => {
+                                    return (
                                         <TableRow key={index} className={""}>
-                                            <TableCell className={`border pl-8 w-1/4 ${theme === "dark" ? "" : "text-muted-foreground border-[#e2e8f0]" }`}>{x.name}</TableCell>
-                                            <TableCell className={`border text-center w-1/4 ${theme === "dark" ? "" : "text-muted-foreground border-[#e2e8f0]"}`}>{x.isIcon === 1 ? (x.free == "1" ? <div className={"flex justify-center"}><Check size={20} /></div> :<div className={"flex justify-center"}> <X size={20} /></div>) :x.free}</TableCell>
-                                            <TableCell className={`border text-center w-1/4 ${theme === "dark" ? "" : "text-muted-foreground border-[#e2e8f0]"}`}>{x.isIcon === 1 ? (x.startup == "1" ? <div className={"flex justify-center"}><Check size={20} /></div> : <div className={"flex justify-center"}> <X size={20} /></div>) :x.startup}</TableCell>
-                                            <TableCell className={`border text-center w-1/4 ${theme === "dark" ? "" : "text-muted-foreground border-[#e2e8f0]"}`}>{x.isIcon === 1 ? (x.growth == "1" ? <div className={"flex justify-center"}><Check size={20} /></div> : <div className={"flex justify-center"}> <X size={20} /></div>) :x.growth}</TableCell>
+                                            <TableCell
+                                                className={`border pl-8 w-1/4 ${theme === "dark" ? "" : "text-muted-foreground border-[#e2e8f0]"}`}>{x.name}</TableCell>
+                                            <TableCell
+                                                className={`border text-center w-1/4 ${theme === "dark" ? "" : "text-muted-foreground border-[#e2e8f0]"}`}>{x.isIcon === 1 ? (x.free == "1" ?
+                                                <div className={"flex justify-center"}><Check size={20}/></div> :
+                                                <div className={"flex justify-center"}><X size={20}/>
+                                                </div>) : x.free}</TableCell>
+                                            <TableCell
+                                                className={`border text-center w-1/4 ${theme === "dark" ? "" : "text-muted-foreground border-[#e2e8f0]"}`}>{x.isIcon === 1 ? (x.startup == "1" ?
+                                                <div className={"flex justify-center"}><Check size={20}/></div> :
+                                                <div className={"flex justify-center"}><X size={20}/>
+                                                </div>) : x.startup}</TableCell>
+                                            <TableCell
+                                                className={`border text-center w-1/4 ${theme === "dark" ? "" : "text-muted-foreground border-[#e2e8f0]"}`}>{x.isIcon === 1 ? (x.growth == "1" ?
+                                                <div className={"flex justify-center"}><Check size={20}/></div> :
+                                                <div className={"flex justify-center"}><X size={20}/>
+                                                </div>) : x.growth}</TableCell>
                                         </TableRow>
                                     )
                                 })
@@ -299,7 +325,7 @@ const PricingPlans = () => {
                         </TableBody>
                     </Table>
                 </div>
-            </Card>
+            </Card>}
         </div>
     );
 };
