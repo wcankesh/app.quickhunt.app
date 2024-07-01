@@ -79,12 +79,12 @@ const Categories = () => {
                             (categories || []).map((x,index)=>{
                                 return(
                                     <TableRow key={x.id}>
-                                        <TableCell className={` leading-normal ${theme === "dark" ? "" : "text-muted-foreground"}`}><Menu size={18} className={"cursor-grab"} /></TableCell>
+                                        <TableCell className={` leading-normal ${theme === "dark" ? "" : "text-muted-foreground"}`}><Menu size={16} className={"cursor-grab"} /></TableCell>
                                         {isEdit === index ? <TableCell className={"py-[8.5px] pl-0 py-[11px]"}><Input className={"h-9"} value={x.label}/></TableCell>
-                                            : <TableCell className={`py-[8.5px] pl-0 ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                            : <TableCell className={`font-medium text-xs py-[8.5px] pl-0 ${theme === "dark" ? "" : "text-muted-foreground"}`}>
                                                 {x.label}
                                             </TableCell> }
-                                        <TableCell className={`leading-normal text-center ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.last_updated}</TableCell>
+                                        <TableCell className={`font-medium text-xs leading-normal text-center ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.last_updated}</TableCell>
                                         <TableCell className={"flex justify-end"}>
                                             <div className="pr-0">
                                                 { isEdit === index ? <Button onClick={updateRow} variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px] ${theme === "dark" ? "" : "text-muted-foreground"}`}><Check  size={16}/></Button>

@@ -86,15 +86,15 @@ const Topics = () => {
                             (topics || []).map((x,index)=>{
                                 return(
                                     <TableRow key={x.id}>
-                                        <TableCell className={`${theme === "dark" ? "" : "text-muted-foreground"}`}><Menu size={18} /></TableCell>
+                                        <TableCell className={`${theme === "dark" ? "" : "text-muted-foreground"}`}><Menu className={"cursor-grab"} size={16} /></TableCell>
                                         { isEdit === index ? <TableCell className={"pl-0 py-[11px]"}>
                                                                 <Input className={"w-full h-9"} value={x.label}/>
                                                              </TableCell>
-                                            : <TableCell className={`pl-0 ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                            : <TableCell className={`font-medium text-xs pl-0 ${theme === "dark" ? "" : "text-muted-foreground"}`}>
                                                 {x.label}
                                               </TableCell>
                                         }
-                                        <TableCell className={`text-center ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.last_updated}</TableCell>
+                                        <TableCell className={`font-medium text-xs text-center ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.last_updated}</TableCell>
                                         <TableCell className={"flex justify-end "}>
                                             <div className="pr-0">
                                                 { isEdit === index ? <Button onClick={updateRow} variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px] ${theme === "dark" ? "" : "text-muted-foreground"}`}><Check  size={16}/></Button>
