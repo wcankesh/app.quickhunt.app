@@ -150,6 +150,12 @@ const Register = () => {
         });
     };
 
+    const handleKeyDown = (event) => {
+        if (event.key === 'Enter') {
+            onRegister();
+        }
+    };
+
     return (
         <div className="w-full lg:grid lg:min-h-[600px] lg:grid-cols-2 xl:min-h-[100vh]">
         {/*<div className="w-full flex justify-center h-[100vh]">*/}
@@ -296,6 +302,7 @@ const Register = () => {
                                         name={'user_confirm_password'}
                                         onChange={onChange}
                                         onBlur={onBlur}
+                                        onKeyDown={handleKeyDown}
                                         className={"border-slate-300 placeholder:text-slate-400"}
                                     />
                                     <Button variant={"ghost hover:none"}

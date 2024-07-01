@@ -12,7 +12,7 @@ import {Trash2, X} from "lucide-react";
 import {useTheme} from "../../theme-provider";
 import {Sheet, SheetClose, SheetContent, SheetFooter, SheetHeader, SheetTitle} from "../../ui/sheet";
 
-const invoices = [
+const initialStateTeam = [
     {
         email: "wc.darshan2003@gmail.com",
         status: "Expires in 6 days",
@@ -33,9 +33,74 @@ const invoices = [
 const Team = () => {
     const { theme } = useTheme();
     const [isSheetOpen, setSheetOpen] = useState(false);
+    const [inviteEmail, setInviteEmail] = useState('');
+    const [emailError, setEmailError] = useState('');
+    const [invitedUsers, setInvitedUsers] = useState(initialStateTeam);
 
     const openSheet = () => setSheetOpen(true);
-    const closeSheet = () => setSheetOpen(false);
+    const closeSheet = () => {
+        setSheetOpen(false);
+        setInviteEmail('');
+        setEmailError('');
+    };
+
+    const handleChange = (event) => {
+        const { value } = event.target;
+        setInviteEmail(value);
+        setEmailError(formValidate(value));
+        // setInviteEmail({...inviteEmail, [event.target.name]: event.target.value})
+        // // setEmailError(formError => ({
+        // //     ...formError,
+        // //     [event.target.name]: formValidate(event.target.name, event.target.value)
+        // // }));
+    };
+
+    const formValidate = (name, value) => {
+        switch (name) {
+            case "email":
+                if (!value || value.trim() === "") {
+                    return "Email is required";
+                } else if (!value.match(/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/)) {
+                    return "Enter a valid email address";
+                } else {
+                    return "";
+                }
+
+            default: {
+                return "";
+            }
+        }
+    };
+
+    const handleSubmitInvite = () => {
+        const error = formValidate(inviteEmail);
+
+        if (error) {
+            setEmailError(error);
+            return;
+        }
+
+        const newInvite = {
+            email: inviteEmail,
+            status: "Pending",
+            invited: "Just now",
+        };
+
+        setInvitedUsers([...invitedUsers, newInvite]);
+        closeSheet();
+    };
+
+    const handleRemoveInvite = (index) => {
+        const updatedInvites = [...invitedUsers];
+        updatedInvites.splice(index, 1);
+        setInvitedUsers(updatedInvites);
+    };
+
+    const handleKeyDown = (event) => {
+        if (event.key === 'Enter') {
+            handleSubmitInvite();
+        }
+    };
 
     return (
         <Fragment>
@@ -100,12 +165,19 @@ const Team = () => {
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {invoices.map((invoice,i) => (
+                                    {invitedUsers.map((invite, i) => (
                                         <TableRow key={i}>
-                                            <TableCell className="font-medium pl-6">{invoice.email}</TableCell>
-                                            <TableCell>{invoice.status}</TableCell>
-                                            <TableCell>{invoice.invited}</TableCell>
-                                            <TableCell className="pr-6"><Button variant={"outline hover:bg-transparent"} className={"p-1 border w-[30px] h-[30px]"}><Trash2 size={16} /></Button></TableCell>
+                                            <TableCell className="font-medium pl-6">{invite.email}</TableCell>
+                                            <TableCell>{invite.status}</TableCell>
+                                            <TableCell>{invite.invited}</TableCell>
+                                            <TableCell className="pr-6 text-right">
+                                                <Button
+                                                    variant={"outline hover:bg-transparent"}
+                                                    className={"p-1 border w-[30px] h-[30px]"}
+                                                    onClick={() => handleRemoveInvite(i)}
+                                                >
+                                                    <Trash2 size={16} />
+                                                </Button></TableCell>
                                         </TableRow>
                                     ))}
                                 </TableBody>
@@ -128,12 +200,21 @@ const Team = () => {
                         <div className="grid gap-[24px] px-[32px] pt-[24px] pb-[36px]">
                             <div className="gap-2">
                                 <Label htmlFor="name" className="text-right">Add emails of users you want to invite to test, and click on Invite</Label>
-                                <Input id="name" placeholder="user1@gmail.com" className={`${theme === "dark" ? "" : "placeholder:text-muted-foreground/75"}`} />
+                                <Input
+                                    type={"email"}
+                                    id="inviteEmail"
+                                    placeholder="user1@gmail.com"
+                                    className={`${theme === "dark" ? "" : "placeholder:text-muted-foreground/75"}`}
+                                    value={inviteEmail}
+                                    onKeyDown={handleKeyDown}
+                                    onChange={handleChange}
+                                />
+                                {emailError && <p className="text-red-500 text-xs mt-1">{emailError}</p>}
                             </div>
                         </div>
                         <SheetFooter className={"px-[32px] gap-[16px] sm:justify-start"}>
                             <SheetClose asChild>
-                                <Button className={"text-card text-sm font-semibold hover:bg-primary bg-primary"} type="submit">Invite</Button>
+                                <Button className={"text-card text-sm font-semibold hover:bg-primary bg-primary"} type="submit" onClick={handleSubmitInvite}>Invite</Button>
                             </SheetClose>
                             <SheetClose asChild onClick={closeSheet}>
                                 <Button className={"text-primary text-sm font-semibold hover:bg-card border border-primary bg-card ml-0 m-inline-0"} type="submit">Cancel</Button>

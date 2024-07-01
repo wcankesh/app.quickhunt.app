@@ -105,6 +105,12 @@ const Login = () => {
         }
     }
 
+    const handleKeyDown = (event) => {
+        if (event.key === 'Enter') {
+            onLogin();
+        }
+    };
+
     const onFailure = (response) => {
         console.log(response)
     }
@@ -135,11 +141,7 @@ const Login = () => {
                     <CarouselContent>
                         {Array.from({ length: 3 }).map((_, index) => (
                             <CarouselItem key={index}>
-                                {/*<Card className={"border-0"}>*/}
-                                {/*    <CardContent className="p-0">*/}
-                                        <img className={"w-[806px]"} src={widget_01} alt= '' />
-                                {/*    </CardContent>*/}
-                                {/*</Card>*/}
+                                <img className={"w-[806px]"} src={widget_01} alt= '' />
                             </CarouselItem>
                         ))}
                     </CarouselContent>
@@ -204,6 +206,7 @@ const Login = () => {
                                     name={'user_password'}
                                     onChange={onChange}
                                     onBlur={onBlur}
+                                    onKeyDown={handleKeyDown}
                                     className={"border-slate-300 placeholder:text-slate-400"}
                                 />
                                 <Button variant={"ghost hover:none"} onClick={togglePasswordVisibility} className={"absolute top-0 right-0"}>

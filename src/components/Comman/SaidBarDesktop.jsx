@@ -103,7 +103,7 @@ const SaidBarDesktop = () => {
     ];
 
     const isActive = (link) => {
-        return link === 'team' ? false : location.pathname === link;
+        return location.pathname === link;
     };
 
     return (

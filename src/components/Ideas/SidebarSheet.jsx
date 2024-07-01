@@ -142,7 +142,11 @@ const SidebarSheet = ({ isOpen, onOpen, onClose , sheetType}) => {
                                     {selectedFile ? (
                                         <>
                                             <img src={imagePreview} alt="Preview" className="w-full h-full object-cover rounded" />
-                                            <Button variant="outline" onClick={handleRemoveImage} className="w-[129px] px-4 py-2 absolute top-[50%] left-[50%] origin-center translate-x-[-50%] translate-y-[-50%] border-0 flex justify-center items-center bg-primary hover:bg-primary text-card hover:text-card text-sm font-semibold">
+                                            <Button
+                                                variant="outline"
+                                                onClick={handleRemoveImage}
+                                                className={`${theme === "light" ? "text-card" : ""} w-[129px] px-4 py-2 absolute top-[50%] left-[50%] origin-center translate-x-[-50%] translate-y-[-50%] border-0 flex justify-center items-center bg-primary hover:bg-primary hover:text-card text-sm font-semibold`}
+                                            >
                                                 Change image
                                             </Button>
                                         </>

@@ -13,25 +13,14 @@ const initialNewLabel = {
 
 const Statuses = () => {
     const [labelColors, setLabelColors] = useState([
-        {
-            labelName: "Under consideration",
-            name: "clr",
-            value: "#EB765D",
-        },
-        {
-            labelName: "Planned",
-            name: "clr",
-            value: "#6392D9",
-        },
-        {
-            labelName: "In Development",
-            name: "clr",
-            value: "#D96363",
-        },
+        {labelName: "BUG FIX", name: "clr", value: "#ff3c3c",},
+        {labelName: "NEW", name: "clr", value: "#3b82f6",},
+        {labelName: "IMPORTANT", name: "clr", value: "#63c8d9",},
     ]);
     const [showColorInput, setShowColorInput] = useState(false);
     const [newLabel, setNewLabel] = useState({...initialNewLabel });
     const [labelError, setLabelError] = useState(initialNewLabel);
+    const [isEdit,setIsEdit]= useState(null);
 
     const onChangeColorColor = (newColor, index) => {
         const updatedColors = [...labelColors];
@@ -77,6 +66,14 @@ const Statuses = () => {
         setShowColorInput(false);
     };
 
+    const onBlur = (event) => {
+        const {name, value} = event.target;
+        setLabelError({
+            ...labelError,
+            [name]: validation(name, value)
+        });
+    };
+
     const validation = (name, value) => {
         switch (name) {
             case "labelName":
@@ -93,25 +90,34 @@ const Statuses = () => {
 
     const handleEditLabel = (index) => {
         const updatedColors = [...labelColors];
-        updatedColors[index] = { ...updatedColors[index], editing: true };
+        updatedColors[index] = { ...updatedColors[index]};
         setLabelColors(updatedColors);
+        setIsEdit(index);
     };
 
     const handleSaveLabel = (index) => {
         const updatedColors = [...labelColors];
-        updatedColors[index] = { ...updatedColors[index], editing: false };
+        updatedColors[index] = { ...updatedColors[index]};
         setLabelColors(updatedColors);
+        setIsEdit(null);
     };
 
     const handleCancelEdit = (index) => {
         const updatedColors = [...labelColors];
-        updatedColors[index] = { ...updatedColors[index], editing: false };
+        updatedColors[index] = { ...updatedColors[index],};
         setLabelColors(updatedColors);
+        setIsEdit(null);
     };
 
     const handleDeleteLabel = (index) => {
         const updatedColors = [...labelColors];
         updatedColors.splice(index, 1);
+        setLabelColors(updatedColors);
+    };
+
+    const handleLabelNameChange = (event, index) => {
+        const updatedColors = [...labelColors];
+        updatedColors[index] = { ...updatedColors[index], labelName: event.target.value };
         setLabelColors(updatedColors);
     };
 
@@ -139,41 +145,38 @@ const Statuses = () => {
                 <Table>
                     <TableHeader className="p-0">
                         <TableRow>
-                            <TableHead className="text-sm pl-[48px]">Status Name</TableHead>
-                            <TableHead className="">Status Color</TableHead>
+                            <TableHead className={"w-[48px]"}/>
+                            <TableHead className="">Label Name</TableHead>
+                            <TableHead className="">Label Color</TableHead>
                             <TableHead className="text-right pr-[35px]">Action</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {labelColors.map((x, i) => (
                             <TableRow key={i}>
-                                <TableCell className="text-xs font-medium flex items-center gap-4">
-                                    <Menu size={16} />
-                                    {x.editing ? (
-                                        <Input
-                                            type="text"
-                                            value={x.labelName}
-                                            // onChange={(e) => onChangeColorColor({ clr: e.target.value }, i)}
-                                            onChange={(e) => {
-                                                const updatedColors = [...labelColors];
-                                                updatedColors[i] = { ...updatedColors[i], labelName: e.target.value };
-                                                setLabelColors(updatedColors);
-                                            }}
-                                        />
-                                    ) : (
-                                        x.labelName
-                                    )}
-                                </TableCell>
-                                <TableCell>
-                                    {x.editing ?
-                                        <div className={"py-2 px-3 border border-border rounded-lg overflow-hidden"}>
-                                            <ColorInput name={x.name} value={x.value} onChange={(color) => onChangeColorColor(color, i)} />
-                                        </div> :
+                                <TableCell><Menu className={"cursor-grab"} size={16} /></TableCell>
+                                {
+                                    isEdit === i ?
+                                        <TableCell className={"text-xs font-medium"}>
+                                            <Input
+                                                className={"bg-card"}
+                                                type="text"
+                                                value={x.labelName}
+                                                onBlur={onBlur}
+                                                onChange={(e) => handleLabelNameChange(e, i)}
+                                            />
+                                        </TableCell>
+                                        : <TableCell>{x.labelName}</TableCell>
+                                }
+                                {isEdit === i ?
+                                    <TableCell><div className={"py-2 px-3 bg-card border border-border rounded-lg overflow-hidden"}>
                                         <ColorInput name={x.name} value={x.value} onChange={(color) => onChangeColorColor(color, i)} />
-                                    }
-                                </TableCell>
+                                    </div></TableCell> :
+                                    <TableCell><ColorInput name={x.name} value={x.value} /*onChange={(color) => onChangeColorColor(color, i)}*/ />
+                                    </TableCell>
+                                }
                                 <TableCell className="flex justify-end gap-2 pr-6">
-                                    {x.editing ? (
+                                    {isEdit === i ? (
                                         <Fragment>
                                             <Button
                                                 variant="outline hover:bg-transparent"
@@ -223,6 +226,7 @@ const Statuses = () => {
                                             value={newLabel.labelName}
                                             onChange={handleInputChange}
                                             placeholder="Enter Label Name"
+                                            onBlur={onBlur}
                                         />
                                     </div>
                                     <div className="grid gap-2">
