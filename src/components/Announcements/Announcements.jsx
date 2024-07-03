@@ -74,9 +74,9 @@ const Announcements = () => {
     const closeSheet = () => setSheetOpen(false);
 
     return (
-        <div className={"xl:container xl:max-w-[1200px] lg:container lg:max-w-[992px] md:container md:max-w-[768px] sm:container sm:max-w-[639px] xs:container xs:max-w-[475px] pt-8 "}>
+        <div className={"pt-8 xl:container xl:max-w-[1200px] lg:container lg:max-w-[992px] md:container md:max-w-[530px] sm:container sm:max-w-[639px] xs:container xs:max-w-[475px] max-[639px]:container max-[639px]:max-w-[507px]"}>
             <CreateAnnouncementsLogSheet isOpen={isSheetOpen} onOpen={openSheet} onClose={closeSheet}/>
-            <div className={"flex flex-row gap-6 items-center xl:flex-nowrap md:flex-wrap sm:flex-wrap"}>
+            <div className={"flex flex-row gap-6 items-center xl:flex-nowrap md:flex-wrap sm:flex-wrap min-[320px]:flex-wrap max-[639px]:flex-wrap max-[639px]:gap-3"}>
                 <div className="basis-1/4">
                     <h3 className={"text-2xl font-medium leading-8"}>testingapp</h3>
                 </div>
@@ -121,7 +121,7 @@ const Announcements = () => {
                             <LayoutList className={"w-5 h-5"} color={`${tab === 1 ? "#FFFFFF": "#5F5F5F"}`} />
                         </Button>
                         <Button onClick={openSheet} className={"hover:bg-violet-600"}>
-                          <Plus className={"mr-4"} size={18} /> New Changelog
+                          <Plus className={"mr-4"} size={18} /> New Announcement
                         </Button>
                     </div>
                 </div>

@@ -54,7 +54,7 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose}) => {
     };
     return (
         <Sheet open={isOpen} onOpenChange={isOpen ? onClose : onOpen}>
-            <SheetContent className={"pt-[24px] p-0 overflow-y-auto w-[662px] lg:max-w-[663px] h-full h-screen"}>
+            <SheetContent className={"pt-[24px] p-0 overflow-y-scroll lg:max-w-[663px] md:max-w-[720px] sm:max-w-[520px]"}>
                 <SheetHeader className={"px-8 py-6 flex flex-row justify-between items-center"}>
                     <h5 className={"text-xl font-medium leading-5"}>Create New Announcements</h5>
                     <div className={"flex items-center gap-6"}>
@@ -158,12 +158,12 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose}) => {
                     <div className={"flex flex-row flex-wrap gap-4"}>
                         <div className="flex items-center justify-center">
                                 <label
-                                    htmlFor="picture"
+                                    htmlFor="upload_image"
                                     className="flex w-[282px] h-[128px] py-0 justify-center items-center flex-shrink-0 border-dashed border-[1px] border-gray-300 rounded cursor-pointer"
                                 >
                                   {previewImage ? <img className={"h-[70px] w-[70px] rounded-md object-cover"} src={previewImage} alt={"not_found"} /> : <span className="text-center text-muted-foreground font-semibold text-[14px]">Upload Image</span>}
                                   <input
-                                        id="picture"
+                                        id="upload_image"
                                         type="file"
                                         className="hidden"
                                         onChange={handleFileChange}

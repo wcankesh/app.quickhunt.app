@@ -21,6 +21,7 @@ import { DropdownMenu,
 import {Separator} from "../ui/separator";
 import CreateAnnouncementsLogSheet from "./CreateAnnouncementsLogSheet";
 import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "../ui/select";
+import {useTheme} from "../theme-provider";
 
 const dummyDetails ={
     data:[
@@ -61,7 +62,6 @@ const dummyDetails ={
             status:1,
             value:1,
         },
-
     ],
     page:1,
     preview:0,
@@ -76,7 +76,7 @@ const AnnouncementsView = () => {
     const [isReadMore, setIsReadMore] = useState(true);
     const [isSheetOpen, setSheetOpen] = useState(false);
     const [selectedData, setSelectedData] = useState(null);
-
+    const {theme} =useTheme();
 
     const openSheet = (object) => {
         setSheetOpen(true);
@@ -94,7 +94,7 @@ const AnnouncementsView = () => {
                             return(
                                 <Fragment>
                                         <div className={"flex flex-row gap-4 items-center justify-between px-[31px] mb-[22px]"}>
-                                            <div className={"basis-4/5 flex flex-row gap-4 items-center"}>
+                                            <div className={"basis-4/5 flex flex-row gap-4 items-center flex-wrap"}>
                                                 <h4 className={"text-base font-medium capitalize"}>{x.title}</h4>
                                                 <div className={"flex flex-row items-center gap-2"}>
                                                     <h5 className={"text-base font-medium text-sm"}>{x.author}</h5>
@@ -190,7 +190,7 @@ const AnnouncementsView = () => {
                     </div>
                     <Separator/>
                     <CardFooter className={"p-0"}>
-                        <div className={"w-full p-5 bg-muted rounded-b-lg rounded-t-none flex justify-end pe-16 py-15px"}>
+                        <div className={`w-full p-5 ${theme === "dark" ? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end pe-16 py-15px`}>
                             <div className={"flex flex-row gap-8 items-center"}>
                                 <div>
                                     <h5 className={"text-sm font-semibold"}>Page {dummyDetails.page} of 10</h5>
@@ -213,7 +213,6 @@ const AnnouncementsView = () => {
                         </div>
                     </CardFooter>
             </Card>
-
         </div>
     );
 };

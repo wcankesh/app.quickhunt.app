@@ -75,9 +75,9 @@ const Customers = () => {
     const {theme} =useTheme();
 
     return (
-        <div className={"pt-8"}>
+        <div className={"pt-8  xl:container xl:max-w-[1622px] lg:container lg:max-w-[796px] md:container md:max-w-[530px] sm:container sm:max-w-[639px] max-[639px]:container max-[639px]:max-w-[639px] xs:container xs:max-w-[475px] "}>
             <NewCustomerSheet isOpen={isSheetOpen} onOpen={openSheet} onClose={closeSheet}/>
-            <div className={"xl:container xl:max-w-[1622px] lg:container lg:max-w-[992px] md:container md:max-w-[768px] sm:container sm:max-w-[639px] xs:container xs:max-w-[475px]"}>
+            <div className={""}>
                 <div className={"flex flex-row justify-between items-center"}>
                     <div>
                         <h4 className={"font-medium text-2xl leading-8"}>Customers</h4>

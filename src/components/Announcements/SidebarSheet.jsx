@@ -33,7 +33,7 @@ const reaction ={
 const SidebarSheet = ({ isOpen, onOpen, onClose }) => {
     return (
             <Sheet open={isOpen} onOpenChange={isOpen ? onClose : onOpen}>
-                <div style={{maxWidth:"none"}}>
+                <div>
                     <SheetContent className={"pt-[24px] p-0 max-h-screen overflow-y-auto lg:max-w-[504px]"} >
                         <SheetHeader className={"px-8 py-6 flex flex-row justify-between items-center"}>
                             <h5 className={"text-xl font-medium leading-5"}>Welcome To Our Release Notes</h5>
