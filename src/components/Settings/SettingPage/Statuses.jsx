@@ -13,9 +13,9 @@ const initialNewLabel = {
 
 const Statuses = () => {
     const [labelColors, setLabelColors] = useState([
-        {labelName: "BUG FIX", name: "clr", value: "#ff3c3c",},
-        {labelName: "NEW", name: "clr", value: "#3b82f6",},
-        {labelName: "IMPORTANT", name: "clr", value: "#63c8d9",},
+        {labelName: "Under consideration", name: "clr", value: "#ff3c3c",},
+        {labelName: "Planned", name: "clr", value: "#3b82f6",},
+        {labelName: "In Development", name: "clr", value: "#63c8d9",},
     ]);
     const [showColorInput, setShowColorInput] = useState(false);
     const [newLabel, setNewLabel] = useState({...initialNewLabel });
@@ -32,11 +32,18 @@ const Statuses = () => {
         setShowColorInput(true);
     };
 
-    const handleInputChange = (event) => {
-        setNewLabel({...newLabel, [event.target.name]: event.target.value});
+    const handleInputChange = (event, index) => {
+        const { name, value } = event.target;
+        if (index !== undefined) {
+            const updatedColors = [...labelColors];
+            updatedColors[index] = { ...updatedColors[index], [name]: value };
+            setLabelColors(updatedColors);
+        } else {
+            setNewLabel({ ...newLabel, [name]: value });
+        }
         setLabelError(labelError => ({
             ...labelError,
-            [event.target.name]: ""
+            [name]: ""
         }));
     };
 
@@ -115,12 +122,6 @@ const Statuses = () => {
         setLabelColors(updatedColors);
     };
 
-    const handleLabelNameChange = (event, index) => {
-        const updatedColors = [...labelColors];
-        updatedColors[index] = { ...updatedColors[index], labelName: event.target.value };
-        setLabelColors(updatedColors);
-    };
-
     return (
         <Card>
             <CardHeader className="flex flex-row justify-between items-center border-b">
@@ -135,10 +136,7 @@ const Statuses = () => {
                     className="flex gap-1 items-center text-sm font-semibold m-0"
                     onClick={handleShowInput}
                 >
-                    <div>
-                        <Plus size={20} />
-                    </div>
-                    New Label
+                    <div><Plus size={20} /></div>New Label
                 </Button>
             </CardHeader>
             <CardContent className="p-0">
@@ -146,9 +144,9 @@ const Statuses = () => {
                     <TableHeader className="p-0">
                         <TableRow>
                             <TableHead className={"w-[48px]"}/>
-                            <TableHead className="">Label Name</TableHead>
-                            <TableHead className="">Label Color</TableHead>
-                            <TableHead className="text-right pr-[35px]">Action</TableHead>
+                            <TableHead className="p-0">Label Name</TableHead>
+                            <TableHead className="p-0 text-end">Label Color</TableHead>
+                            <TableHead className="text-right pr-[35px] pl-0">Action</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -157,22 +155,29 @@ const Statuses = () => {
                                 <TableCell><Menu className={"cursor-grab"} size={16} /></TableCell>
                                 {
                                     isEdit === i ?
-                                        <TableCell className={"text-xs font-medium"}>
+                                        <TableCell className={"text-xs font-medium p-0 pr-4"}>
                                             <Input
                                                 className={"bg-card"}
                                                 type="text"
                                                 value={x.labelName}
+                                                name={"labelName"}
                                                 onBlur={onBlur}
-                                                onChange={(e) => handleLabelNameChange(e, i)}
+                                                onChange={(e) => handleInputChange(e, i)}
                                             />
+                                            <div className="grid gap-2">
+                                                {
+                                                    labelError.labelName &&
+                                                    <span className="text-red-500 text-sm">{labelError.labelName}</span>
+                                                }
+                                            </div>
                                         </TableCell>
-                                        : <TableCell>{x.labelName}</TableCell>
+                                        : <TableCell className={"p-0"}>{x.labelName}</TableCell>
                                 }
                                 {isEdit === i ?
-                                    <TableCell><div className={"py-2 px-3 bg-card border border-border rounded-lg overflow-hidden"}>
+                                    <TableCell className={"p-0"}><div className={"py-2 px-3 bg-card border border-border rounded-lg overflow-hidden"}>
                                         <ColorInput name={x.name} value={x.value} onChange={(color) => onChangeColorColor(color, i)} />
                                     </div></TableCell> :
-                                    <TableCell><ColorInput name={x.name} value={x.value} /*onChange={(color) => onChangeColorColor(color, i)}*/ />
+                                    <TableCell className={"p-0"}><ColorInput name={x.name} value={x.value} /*onChange={(color) => onChangeColorColor(color, i)}*/ />
                                     </TableCell>
                                 }
                                 <TableCell className="flex justify-end gap-2 pr-6">
@@ -216,19 +221,20 @@ const Statuses = () => {
                         ))}
                         {showColorInput && (
                             <TableRow>
-                                <TableCell>
-                                    <div className="">
-                                        <Input
-                                            className={"bg-card"}
-                                            type="text"
-                                            id="labelName"
-                                            name="labelName"
-                                            value={newLabel.labelName}
-                                            onChange={handleInputChange}
-                                            placeholder="Enter Label Name"
-                                            onBlur={onBlur}
-                                        />
-                                    </div>
+                                <TableCell className={`${labelError ? "align-top" : ""}`}>
+                                    <Button variant={"ghost hover:bg-transparent"} className={"p-0 cursor-grab"}><Menu size={16} /></Button>
+                                </TableCell>
+                                <TableCell className={"p-0 py-4 pr-4"}>
+                                    <Input
+                                        className={"bg-card"}
+                                        type="text"
+                                        id="labelName"
+                                        name="labelName"
+                                        value={newLabel.labelName}
+                                        onChange={handleInputChange}
+                                        placeholder="Enter Label Name"
+                                        onBlur={onBlur}
+                                    />
                                     <div className="grid gap-2">
                                         {
                                             labelError.labelName &&
@@ -236,7 +242,7 @@ const Statuses = () => {
                                         }
                                     </div>
                                 </TableCell>
-                                <TableCell className={"align-top"}>
+                                <TableCell className={`${labelError ? "align-top" : ""} p-0 py-4`}>
                                     <div className={"py-2 px-3 border border-border rounded-lg overflow-hidden"}>
                                         <ColorInput
                                             name="newLabelColor"

@@ -1,13 +1,13 @@
 import React, {Fragment, useState} from 'react';
-import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "../../ui/card";
+import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "../../ui/card";
 import {Button} from "../../ui/button";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "../../ui/tabs";
 import {Label} from "../../ui/label";
 import {Input} from "../../ui/input";
-import {Avatar, AvatarFallback, AvatarImage} from "../../ui/avatar";
+import {Avatar, AvatarFallback} from "../../ui/avatar";
 import {Select, SelectContent, SelectItem, SelectLabel, SelectTrigger, SelectValue} from "../../ui/select";
 import {SelectGroup} from "@radix-ui/react-select";
-import {Table, TableBody, TableCaption, TableCell, TableFooter, TableHead, TableHeader, TableRow} from "../../ui/table";
+import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "../../ui/table";
 import {Trash2, X} from "lucide-react";
 import {useTheme} from "../../theme-provider";
 import {Sheet, SheetClose, SheetContent, SheetFooter, SheetHeader, SheetTitle} from "../../ui/sheet";
@@ -38,6 +38,7 @@ const Team = () => {
     const [invitedUsers, setInvitedUsers] = useState(initialStateTeam);
 
     const openSheet = () => setSheetOpen(true);
+
     const closeSheet = () => {
         setSheetOpen(false);
         setInviteEmail('');
@@ -45,15 +46,9 @@ const Team = () => {
     };
 
     const handleChange = (event) => {
-        const { value } = event.target;
+        const {value} = event.target;
         setInviteEmail(value);
-        setEmailError(formValidate(value));
-        // setInviteEmail({...inviteEmail, [event.target.name]: event.target.value})
-        // // setEmailError(formError => ({
-        // //     ...formError,
-        // //     [event.target.name]: formValidate(event.target.name, event.target.value)
-        // // }));
-    };
+    }
 
     const formValidate = (name, value) => {
         switch (name) {
@@ -65,7 +60,6 @@ const Team = () => {
                 } else {
                     return "";
                 }
-
             default: {
                 return "";
             }
@@ -73,21 +67,22 @@ const Team = () => {
     };
 
     const handleSubmitInvite = () => {
-        const error = formValidate(inviteEmail);
 
-        if (error) {
-            setEmailError(error);
-            return;
+        if (!inviteEmail || inviteEmail.trim() === "") {
+            setEmailError("Email is required")
+            return ;
+        } else if (!inviteEmail.match(/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/)) {
+            setEmailError("Enter a valid email address")
+            return ;
+        } else {
+            const newInvite = {
+                email: inviteEmail,
+                status: "Pending",
+                invited: "Just now",
+            };
+            setInvitedUsers([...invitedUsers, newInvite]);
+            closeSheet();
         }
-
-        const newInvite = {
-            email: inviteEmail,
-            status: "Pending",
-            invited: "Just now",
-        };
-
-        setInvitedUsers([...invitedUsers, newInvite]);
-        closeSheet();
     };
 
     const handleRemoveInvite = (index) => {
@@ -198,24 +193,24 @@ const Team = () => {
                             </SheetTitle>
                         </SheetHeader>
                         <div className="grid gap-[24px] px-[32px] pt-[24px] pb-[36px]">
-                            <div className="gap-2">
-                                <Label htmlFor="name" className="text-right">Add emails of users you want to invite to test, and click on Invite</Label>
-                                <Input
-                                    type={"email"}
-                                    id="inviteEmail"
-                                    placeholder="user1@gmail.com"
-                                    className={`${theme === "dark" ? "" : "placeholder:text-muted-foreground/75"}`}
-                                    value={inviteEmail}
-                                    onKeyDown={handleKeyDown}
-                                    onChange={handleChange}
-                                />
-                                {emailError && <p className="text-red-500 text-xs mt-1">{emailError}</p>}
+                            <div className="flex flex-col gap-2">
+                                <div>
+                                    <Label htmlFor="name" className="text-right">Add emails of users you want to invite to test, and click on Invite</Label>
+                                    <Input
+                                        type={"email"}
+                                        id="inviteEmail"
+                                        placeholder="user1@gmail.com"
+                                        className={`${theme === "dark" ? "" : "placeholder:text-muted-foreground/75"}`}
+                                        value={inviteEmail}
+                                        onKeyDown={handleKeyDown}
+                                        onChange={handleChange}
+                                    />
+                                </div>
+                                {emailError !== '' && <p className="text-red-500 text-xs mt-1">{emailError}</p>}
                             </div>
                         </div>
                         <SheetFooter className={"px-[32px] gap-[16px] sm:justify-start"}>
-                            <SheetClose asChild>
                                 <Button className={"text-card text-sm font-semibold hover:bg-primary bg-primary"} type="submit" onClick={handleSubmitInvite}>Invite</Button>
-                            </SheetClose>
                             <SheetClose asChild onClick={closeSheet}>
                                 <Button className={"text-primary text-sm font-semibold hover:bg-card border border-primary bg-card ml-0 m-inline-0"} type="submit">Cancel</Button>
                             </SheetClose>

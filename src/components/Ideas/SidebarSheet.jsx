@@ -81,9 +81,7 @@ const SidebarSheet = ({ isOpen, onOpen, onClose , sheetType}) => {
         setImagePreview(null);
     };
 
-    const handleStatusChange = (event) => {
-        setSelectedStatus(event.target.value);
-    };
+    const handleStatusChange = (event) => {setSelectedStatus(event.target.value);};
 
     const handlePrivateNote = () => {setPrivateNote(!privateNote)};
 

@@ -1,41 +1,42 @@
-import React,{Fragment, useState} from "react"
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-    CardFooter
-} from "../ui/card"
+import React, {Fragment, useEffect, useState} from "react"
+import {Card, CardContent, CardHeader, CardTitle, CardFooter} from "../ui/card"
 import {useTheme} from "../theme-provider";
 import {Button} from "../ui/button";
 import {Icon} from "../../utils/Icon";
 import {Calendar} from "../ui/calendar";
 import {PopoverTrigger, Popover, PopoverContent} from "../ui/popover";
 import { CalendarIcon} from "lucide-react";
+import moment from "moment";
 //import { DateRange } from "react-day-picker";
-
 import { addDays, format } from "date-fns"
-
 import { cn } from "../../lib/utils";
+import {useNavigate} from "react-router-dom";
+import {ApiService} from "../../utils/ApiService";
+import {useSelector} from "react-redux";
+import Highcharts from 'highcharts'
+import HighchartsReact from 'highcharts-react-official'
 
 const programAnalytics = [
     {
+        id: 1,
         title: "Total Views",
         total: 245,
         compare: "+20.1% from last month",
     },
     {
+        id: 2,
         title: "Unique Views",
         total: 54,
         compare: "+180.1% from last month",
     },
     {
+        id: 3,
         title: "Feedback",
         total: 83,
         compare: "+19% from last month",
     },
     {
+        id: 4,
         title: "Total Reaction",
         total: 245,
         compare: "+201 since last hour",
@@ -105,6 +106,81 @@ const reactionFeed = [
 
 export function Dashboard() {
     const { setTheme } = useTheme()
+    let navigate = useNavigate();
+    let apiSerVice = new ApiService();
+    const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
+    const [state, setState] = useState({startDate: moment().subtract(29, 'days'), endDate: moment(),});
+    const [chartList, setChartList] = useState({
+        reactionAnalytic: [],
+        guest: [],
+        idea: [],
+        totalViewCount: 0,
+        uniqueViewCount: 0,
+        feedbackCount: 0,
+        reactionCount: 0,
+        most_view_post: [],
+        feedbackAnalytics: [],
+        uniqueViewList: [],
+        totalViewViewList: []
+    });
+
+    // useEffect(() => {
+    //     const query = new URLSearchParams(window.location.search);
+    //     if (query.get("success")) {
+    //         message.success(" Yay! Order placed! 🛒 You will receive an email confirmation confirming your order.");
+    //         history.push({pathname: `${baseUrl}/`, search: ''})
+    //     }
+    //     if (query.get("canceled")) {
+    //         message.error("Order canceled -- please try again.");
+    //         history.push({
+    //             pathname: `${baseUrl}/`,
+    //             search: ''
+    //         })
+    //     }
+    //
+    // }, []);
+
+    useEffect(() => {
+        dashboardData()
+    },[projectDetailsReducer.id])
+
+    const dashboardData = async () => {
+        const payload = {
+            project_id:projectDetailsReducer.id,
+            start_date: state.startDate,
+            end_date: state.endDate,
+        }
+        const data = await apiSerVice.dashboardData(payload)
+        if(data.status === 200){
+            const uniqueViewList = [];
+            const totalViewViewList = [];
+            const feedbackAnalytics = [];
+            data.data.viewsAnalytic.map((j, i) => {
+                let obj = {
+                    x: new Date(j.x),
+                    y: parseInt(j.uniqueView)
+                }
+                let obj1 = {
+                    x: new Date(j.x),
+                    y: parseInt(j.totalView)
+                }
+                uniqueViewList.push(obj)
+                totalViewViewList.push(obj1)
+            })
+            data.data.feedbackAnalytics.map((j, i) => {
+                let obj = {
+                    x: new Date(j.x),
+                    y: parseInt(j.y)
+                }
+
+                feedbackAnalytics.push(obj)
+            })
+            setChartList({...data.data,uniqueViewList:uniqueViewList,totalViewViewList: totalViewViewList, feedbackAnalytics:feedbackAnalytics})
+        } else {
+
+        }
+    }
+
   //  const dates = DateRange()
     const initialRange = {
         from: new Date(),
@@ -112,6 +188,76 @@ export function Dashboard() {
     };
 
     const [date, setDate] = useState([new Date(),addDays(new Date(), 4)]);
+
+    const options = {
+        chart: {
+            borderWidth: 0,
+            type: 'line',
+        },
+        tooltip: {
+            formatter: function () {
+                return '<div>' + moment(this.x).format("ll") + ' </div><br/><br/>' +
+                    '<b>'+this.series.name+':</b> ' + this.y + ''
+            }
+        },
+        title: "",
+        yAxis: {
+            type: 'logarithmic',
+            // max: data ? Math.max.apply(Math, data.map((o) => {
+            //     return o.y;
+            // })) : 0,
+            tickInterval: 1,
+            title: {
+                text: ''
+            }
+        },
+        xAxis: {
+            type: 'datetime',
+            //tickInterval: 24 * 25200 * 1000,
+        },
+        credits: {
+            enabled: false
+        },
+        series: [{
+            name: "Unique View",
+            data: chartList.uniqueViewList,
+            color: "#7D95C9"
+        },{
+            name: "Total View",
+            data: chartList.totalViewViewList,
+            color: "#352F6C"
+        },{
+            name: "Total Feedback",
+            data: chartList.feedbackAnalytics,
+            color: "#FFD255"
+        },],
+        plotOptions: {
+            line: {
+                dataLabels: {
+                    enabled: false
+                },
+                enableMouseTracking: true
+            },
+            /*series: {
+                animation: true,
+                marker: {
+                    radius: 4,
+                    fillColor: '#008060',
+                    states: {
+                        hover: {
+                            backgroundColor: '#008060',
+                            radius: 4,
+                            fillColor: '#008060',
+                        }
+                    }
+                },
+                fillColor: '#e0f5f5',
+                lineColor: '#008060',
+                fillOpacity: 0.25
+            },*/
+        }
+
+    };
 
     return (
         <Fragment>
@@ -156,18 +302,25 @@ export function Dashboard() {
                             </Popover>
                         </div>
                         <div className={"flex flex-col gap-8"}>
-                            {/*<div className={"flex lg:flex-nowrap md:flex-wrap sm:flex-wrap gap-5"}>*/}
                             <div className={"grid lg:grid-cols-4 lg:gap-8 md:grid-cols-2 md:gap-4 sm:gap-2 xs:gap-2"}>
                                 {
                                     (programAnalytics || []).map((x, i) => {
                                         return (
-                                            // <Card className={"basis-1/4 border-zinc-200 shadow"} key={i}>
                                             <Card className={"rounded-lg border bg-card text-card-foreground shadow-sm"} x-chunk={"dashboard-05-chunk-0"} key={i}>
                                                 <CardHeader className={"p-6 gap-0.5"}>
-                                                    <CardTitle className={"text-sm font-medium"}>{x.title}</CardTitle>
+                                                    <CardTitle className={"text-sm font-medium"}>
+                                                        {x.title}
+                                                     </CardTitle>
                                                     <CardContent className={"p-0 flex flex-col gap-2"}>
-                                                        <h3 className={"text-primary text-2xl font-bold"}>{x.total}</h3>
-                                                        <p className={"text-xs font-medium"}>{x.compare}</p>
+                                                        <h3 className={"text-primary text-2xl font-bold"}>
+                                                            {x.title === "Total Views" ? chartList.totalViewCount :
+                                                                x.title === "Unique Views" ? chartList.uniqueViewCount :
+                                                                    x.title === "Feedback" ? chartList.feedbackCount :
+                                                                        x.title === "Total Reaction" ? chartList.reactionCount : ""}
+                                                        </h3>
+                                                        <p className={"text-xs font-medium"}>
+                                                            {x.compare}
+                                                        </p>
                                                     </CardContent>
                                                 </CardHeader>
                                             </Card>
@@ -228,6 +381,9 @@ export function Dashboard() {
                                 <Card className={"p-4 shadow border"}>
                                     <CardHeader className={"p-0 pb-4"}>
                                         <CardTitle className={"text-base font-bold"}>Overview</CardTitle>
+                                        <CardContent>
+                                            <HighchartsReact highcharts={Highcharts} options={options}/>
+                                        </CardContent>
                                     </CardHeader>
                                 </Card>
                             </div>

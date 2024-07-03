@@ -3,9 +3,8 @@ import {Button} from "../ui/button"
 import {Input} from "../ui/input"
 import {Label} from "../ui/label"
 import {useNavigate} from "react-router-dom"
-import {Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious} from "../ui/carousel";
+import {Carousel, CarouselContent, CarouselItem} from "../ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
-import {Card, CardContent} from "../ui/card";
 import widget_01 from "../../img/widget.png";
 import {Icon} from "../../utils/Icon";
 import {ApiService} from "../../utils/ApiService";
@@ -48,7 +47,6 @@ const Register = () => {
         setFormError(formError => ({
             ...formError,
             [event.target.name]: ""
-            // [event.target.name]: formValidate(event.target.name, event.target.value)
         }));
     };
 
@@ -100,6 +98,17 @@ const Register = () => {
                 return "";
             }
         }
+    };
+
+    const onRedirect = (link) => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get('token');
+        if(token){
+            navigate(`${baseUrl}/${link}?token=${token}`);
+        } else {
+            navigate(`${baseUrl}/${link}`);
+        }
+        return;
     };
 
     const onRegister = async () => {
@@ -196,7 +205,7 @@ const Register = () => {
                         <Button
                             variant={"link"}
                             className="p-0 h-auto hover:no-underline"
-                            onClick={() => navigate(`${baseUrl}/login`)}
+                            onClick={() => onRedirect('login')}
                         >
                             <span className={"font-bold text-violet-600"}>Login</span>
                         </Button>

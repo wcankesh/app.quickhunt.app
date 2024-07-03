@@ -113,11 +113,11 @@ const Profile = () => {
                     <CardDescription className={"text-sm text-muted-foreground p-0"}>Manage your personal account settings.</CardDescription>
                 </CardHeader>
                 <CardContent className={"py-6 px-4 border-b"}>
-                    <div className={"flex gap-4 lg:flex-nowrap md:flex-wrap"}>
+                    <div className={"flex gap-4 lg:flex-nowrap md:flex-wrap sm:flex-wrap"}>
                         <span><img className={"h-auto"} src={SettingProfile} alt={"setting-profile"} /></span>
-                        <div className={"w-full flex flex-col gap-4 max-w-[574px]"}>
-                            <div className={"flex gap-4 lg:flex-nowrap md:flex-wrap"}>
-                                <div className={"basis-1/2 md:basis-full"}>
+                        <div className={"flex flex-col gap-4 md:w-full sm:w-full"}>
+                            <div className={"flex gap-4 lg:flex-nowrap md:flex-wrap sm:flex-wrap"}>
+                                <div className={"basis-1/2 md:basis-full sm:basis-full"}>
                                     <Label htmlFor="email" className={"font-medium"}>First Name</Label>
                                     <Input
                                         id="user_first_name"
@@ -135,7 +135,7 @@ const Profile = () => {
                                         }
                                     </div>
                                 </div>
-                                <div className={"basis-1/2 md:basis-full"}>
+                                <div className={"basis-1/2 md:basis-full sm:basis-full"}>
                                     <Label htmlFor="email" className={"font-medium"}>Last Name</Label>
                                     <Input
                                         id="user_last_name"
@@ -155,7 +155,7 @@ const Profile = () => {
                                 </div>
                             </div>
                             <div className={"flex gap-4 lg:flex-nowrap md:flex-wrap"}>
-                                <div className={"lg:w-[279px] md:w-full sm:w-full"}>
+                                <div className={"lg:w-[289px] md:w-full sm:w-full"}>
                                     <Label htmlFor="email" className={"font-medium"}>Email</Label>
                                     <Input
                                         id="email"
@@ -209,7 +209,7 @@ const Profile = () => {
                             <Input
                                 id="password"
                                 type={passwordVisibility.user_current_password ? "text" : "password"}
-                                placeholder={"Password"}
+                                placeholder={"Current Password"}
                                 value={companyDetails.user_current_password}
                                 name={'user_current_password'}
                                 onChange={onChange}
@@ -222,6 +222,10 @@ const Profile = () => {
                             </Button>
                         </div>
                         </div>
+                        {
+                            formError.user_current_password &&
+                            <span className="text-destructive text-sm">{formError.user_current_password}</span>
+                        }
                         <div>
                         <Label htmlFor="email">Password</Label>
                         <div className={"relative"}>
@@ -241,13 +245,17 @@ const Profile = () => {
                             </Button>
                         </div>
                         </div>
+                        {
+                            formError.user_password &&
+                            <span className="text-destructive text-sm">{formError.user_password}</span>
+                        }
                         <div>
                         <Label htmlFor="email">Password confirmation</Label>
                         <div className={"relative"}>
                             <Input
                                 id="password"
                                 type={passwordVisibility.user_confirm_password ? "text" : "password"}
-                                placeholder={"Password"}
+                                placeholder={"Confirm Password"}
                                 value={companyDetails.user_confirm_password}
                                 name={'user_confirm_password'}
                                 onChange={onChange}
@@ -260,6 +268,10 @@ const Profile = () => {
                             </Button>
                         </div>
                         </div>
+                        {
+                            formError.user_confirm_password &&
+                            <span className="text-destructive text-sm">{formError.user_confirm_password}</span>
+                        }
                     </div>
                 </CardContent>
                 <CardFooter className={"p-6 pt-0 justify-end"}>

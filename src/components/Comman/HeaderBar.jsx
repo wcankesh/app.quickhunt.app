@@ -1,21 +1,58 @@
-import React, {useState} from 'react';
+import React, {Fragment, useEffect, useState} from 'react';
 import {Sheet, SheetContent, SheetFooter, SheetHeader, SheetTitle, SheetTrigger, SheetClose} from "../ui/sheet";
 import {Button} from "../ui/button";
-import {Menu, Plus, X} from "lucide-react";
+import {Menu, Plus, X, Moon, Sun, Loader2, ChevronsUpDown} from "lucide-react";
 import {Input} from "../ui/input";
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger} from "../ui/dropdown-menu";
 import {useTheme} from "../theme-provider";
-import {baseUrl, logout, removeProjectDetails} from "../../utils/constent";
+import {apiService, baseUrl, logout, removeProjectDetails, setProjectDetails} from "../../utils/constent";
 import {useNavigate} from "react-router-dom";
 import {Icon} from "../../utils/Icon";
 import {Avatar, AvatarFallback, AvatarImage} from "../ui/avatar";
-import { Moon, Sun } from "lucide-react";
 import AppLogoPurple from "../../img/quickhunt.purple.png";
 import {ApiService} from "../../utils/ApiService";
 import {Popover, PopoverTrigger, PopoverContent} from "../ui/popover";
 import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList} from "../ui/command";
-import { ChevronsUpDown } from "lucide-react";
 import {Label} from "../ui/label";
+import {useDispatch, useSelector} from "react-redux";
+import {useToast} from "../ui/use-toast";
+import {projectDetailsAction} from "../../redux/action/ProjectDetailsAction";
+import {allProjectAction} from "../../redux/action/AllProjectAction";
+import {getProjectDetails} from "../../utils/constent";
+import {userDetailsAction} from "../../redux/action/UserDetailAction";
+import {allStatusAndTypesAction} from "../../redux/action/AllStatusAndTypesAction";
+
+const initialState = {
+    id: "",
+    user_browser: null,
+    user_created_date: "",
+    user_email_id: "",
+    user_first_name: "",
+    user_ip_address: null,
+    user_job_title: "",
+    user_last_name: "",
+    user_photo: "",
+    user_status: "",
+    user_updated_date: "",
+}
+
+const initialStateProject = {
+    project_name: '',
+    project_website: "",
+    project_language_id: '3',
+    project_timezone_id: '90',
+    project_logo: '',
+    project_favicon: '',
+    project_api_key: '',
+    project_status: '',
+    project_browser: '',
+    project_ip_address: '',
+    domain: ''
+}
+
+const initialStateErrorProject = {
+    project_name: '',
+}
 
 const menuComponent = [
     {
@@ -104,21 +141,99 @@ const footerMenuComponent = [
     }
 ];
 
-const HeaderBar = ({ showDashboardButton }) => {
-    const { setTheme, theme } = useTheme()
+const HeaderBar = ({showDashboardButton}) => {
+    const {setTheme, theme} = useTheme()
     let navigate = useNavigate();
-    let apiSerVice = new ApiService()
+    let apiSerVice = new ApiService();
+    const userDetailsReducer = useSelector(state => state.userDetailsReducer);
+    const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
+    const [userDetails, setUserDetails] = useState(initialState)
     const [selectedUrl, setSelectedUrl] = useState("/dashboard");
     const [value, setValue] = useState("")
     const [open, setOpen] = useState(false)
     const [isSheetOpen, setSheetOpen] = useState(false);
     const [isSheetOpenMenu, setSheetOpenMenu] = useState(false);
-    const [sheetType, setSheetType] = useState(null);
+    const [createProjectDetails, setCreateProjectDetails] = useState(initialStateProject);
+    const [formError, setFormError] = useState(initialStateErrorProject);
+    const [isSaveProject, setIsSaveProject] = useState(false);
+    const [projectList, setProjectList] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const dispatch = useDispatch();
+    const {toast} = useToast()
 
     const openSheet = () => setSheetOpen(true);
     const closeSheet = () => setSheetOpen(false);
     const openSheetMenu = () => setSheetOpenMenu(true);
     const closeSheetMenu = () => setSheetOpenMenu(false);
+
+    useEffect(() => {
+        setUserDetails(userDetailsReducer)
+    }, [userDetailsReducer])
+
+    useEffect(() => {
+        getAllProjects()
+        loginUserDetails()
+
+    }, [projectDetailsReducer.id]);
+
+    useEffect(() => {
+        setSelectedUrl(navigate)
+    },[navigate])
+
+    useEffect(() => {
+        getAllStatusAndTypes()
+
+    },[projectDetailsReducer.id])
+
+    const getAllStatusAndTypes = async () => {
+        if(projectDetailsReducer.id){
+            const data = await apiSerVice.getAllStatusAndTypes(projectDetailsReducer.id)
+            if(data.status === 200){
+                dispatch(allStatusAndTypesAction({...data.data}));
+                setIsLoading(false)
+            }
+        }
+    }
+
+    const loginUserDetails = async () =>{
+        const data = await apiSerVice.getLoginUserDetails()
+        if(data.status === 200){
+            dispatch(userDetailsAction({...data.data}))
+        }
+    }
+
+    const getAllProjects = async () => {
+        const data = await apiSerVice.getAllProjects()
+        if (data.status === 200) {
+            if(data && data.data && data.data.length){
+                const array = [];
+                let responseObj = data.data[0];
+                if (!getProjectDetails('id')) {
+                    setProjectDetails(responseObj);
+                    dispatch(projectDetailsAction(responseObj))
+                } else{
+                    dispatch(projectDetailsAction(getProjectDetails('')))
+                }
+
+                dispatch(allProjectAction({projectList: data.data}));
+                (data.data || []).map((x) => {
+                    let obj = {
+                        ...x,
+                        Title: x.project_name,
+                        Link: 'onProject',
+                        icon: '',
+                        selected: false
+                    };
+                    array.push(obj);
+                })
+                setProjectList(array)
+            } else {
+                // setSheetOpen(true)
+            }
+
+            setIsLoading(false)
+        }
+    }
 
     const onRedirect = (link) => {
         setSelectedUrl(link)
@@ -132,27 +247,91 @@ const HeaderBar = ({ showDashboardButton }) => {
     }
 
     const toggleTheme = () => {
-        setTheme( theme === 'light' ? 'dark' : 'light');
+        setTheme(theme === 'light' ? 'dark' : 'light');
     };
 
     const isActive = (link) => {
         return selectedUrl === link;
     };
 
-    const frameworks = [
-        {
-            value: "testingapp",
-            label: "Testingapp",
-        },
-        {
-            value: "createproject",
-            label: "Create Project",
-            icon: <Plus size={16} />,
-        },
-    ]
+    const onChangeText = (event) => {
+        setCreateProjectDetails({...createProjectDetails, [event.target.name]: event.target.value})
+        setFormError(formError => ({
+            ...formError,
+            [event.target.name]: ""
+        }));
+    }
+
+    const formValidate = (name, value) => {
+        switch (name) {
+            case "project_name":
+                if (!value || value.trim() === "") {
+                    return "Project name is required";
+                } else {
+                    return "";
+                }
+            default: {
+                return "";
+            }
+        }
+    };
+
+    const onCreateProject = async () => {
+        let validationErrors = {};
+        Object.keys(createProjectDetails).forEach(name => {
+            const error = formValidate(name, createProjectDetails[name]);
+            if (error && error.length > 0) {
+                validationErrors[name] = error;
+            }
+        });
+        if (Object.keys(validationErrors).length > 0) {
+            setFormError(validationErrors);
+            return;
+        }
+        setIsSaveProject(true)
+        const payload = {
+            ...createProjectDetails,
+            domain: createProjectDetails.domain ? `${createProjectDetails.domain}.quickhunt.app` : `${createProjectDetails.project_name.replace(' ', '-')}.quickhunt.app`
+        }
+        const data = await apiSerVice.createProjects(payload)
+        if (data.status === 200) {
+            const clone = [...projectList];
+            let obj = {
+                ...data.data,
+                Title: data.data.project_name,
+                Link: 'onProject',
+                icon: '',
+                selected: false
+            };
+            clone.push(obj);
+            setProjectList(clone)
+            setProjectDetails(obj);
+            dispatch(projectDetailsAction(obj))
+            toast({description: "Project create successfully"})
+            // setSheetOpen(false)
+            setCreateProjectDetails(initialStateProject)
+            navigate(`${baseUrl}/dashboard`);
+            setIsSaveProject(false)
+        } else {
+            toast({description: data.message})
+            setIsSaveProject(false)
+        }
+    }
+
+    const onChangeProject = (value) => {
+        let responseObj = projectList.find((x) =>x.id === value)
+        setProjectDetails(responseObj);
+        dispatch(projectDetailsAction(responseObj))
+        navigate(`${baseUrl}/dashboard`);
+    }
+
+    if(isLoading){
+        return <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+    }
 
     return (
-        <header className="flex h-14 lg:justify-between md:justify-between items-center sm:justify-between gap-4 px-4 lg:h-[60px] lg:px-6 ">
+        <header
+            className="flex h-14 lg:justify-between md:justify-between items-center sm:justify-between gap-4 px-4 lg:h-[60px] lg:px-6 ">
 
             {/*Mobile said bar start */}
             <Sheet open={isSheetOpenMenu} onOpenChange={isSheetOpenMenu ? closeSheetMenu : openSheetMenu}>
@@ -164,7 +343,7 @@ const HeaderBar = ({ showDashboardButton }) => {
 
                 <SheetContent side="left" className="flex flex-col overflow-auto">
                     <Button className={"self-end p-0 bg-transparent hover:bg-transparent w-[20px] h-[20px]"}>
-                        <X className={"fill-card-foreground stroke-card-foreground"} onClick={closeSheetMenu} />
+                        <X className={"fill-card-foreground stroke-card-foreground"} onClick={closeSheetMenu}/>
                     </Button>
                     <nav className="grid gap-2">
                         {
@@ -180,8 +359,10 @@ const HeaderBar = ({ showDashboardButton }) => {
                                                         className={`${isActive(z.selected) ? "flex justify-start gap-4 h-9 rounded-md bg-primary/25 transition-none" : 'flex items-center gap-4 justify-start transition-none'}`}
                                                         onClick={() => onRedirect(z.link)}
                                                     >
-                                                        <div className={`${isActive(z.selected) ? "active-menu" : "menu-icon"}`}>{z.icon}</div>
-                                                        <div className={`${isActive(z.selected) ? "text-primary text-sm font-medium" : "text-sm font-medium"}`}>{z.title}</div>
+                                                        <div
+                                                            className={`${isActive(z.selected) ? "active-menu" : "menu-icon"}`}>{z.icon}</div>
+                                                        <div
+                                                            className={`${isActive(z.selected) ? "text-primary text-sm font-medium" : "text-sm font-medium"}`}>{z.title}</div>
                                                     </Button>
                                                 )
                                             })
@@ -197,8 +378,10 @@ const HeaderBar = ({ showDashboardButton }) => {
                                                             className={`${isActive(y.selected) ? "flex justify-start gap-4 h-9 rounded-md bg-primary/25 transition-none" : 'flex items-center gap-4 justify-start transition-none'}`}
                                                             onClick={() => onRedirect(y.link)}
                                                         >
-                                                            <div className={`${isActive(y.selected) ? "active-menu" : "menu-icon"}`}>{y.icon}</div>
-                                                            <div className={`${isActive(y.selected) ? "text-primary text-sm font-medium" : "text-sm font-medium"}`}>{y.title}</div>
+                                                            <div
+                                                                className={`${isActive(y.selected) ? "active-menu" : "menu-icon"}`}>{y.icon}</div>
+                                                            <div
+                                                                className={`${isActive(y.selected) ? "text-primary text-sm font-medium" : "text-sm font-medium"}`}>{y.title}</div>
                                                         </Button>
                                                     )
                                                 })
@@ -220,8 +403,10 @@ const HeaderBar = ({ showDashboardButton }) => {
                                             className={`${isActive(x.selected) ? "flex justify-start gap-4 h-9 rounded-md bg-primary/25 transition-none" : 'flex items-center gap-4 justify-start transition-none'}`}
                                             onClick={() => onRedirect(x.link)}
                                         >
-                                            <div className={`${isActive(x.selected) ? "active-menu" : "menu-icon"}`}>{x.icon}</div>
-                                            <div className={`${isActive(x.selected) ? "text-primary text-sm font-medium" : "text-sm font-medium"}`}>{x.title}</div>
+                                            <div
+                                                className={`${isActive(x.selected) ? "active-menu" : "menu-icon"}`}>{x.icon}</div>
+                                            <div
+                                                className={`${isActive(x.selected) ? "text-primary text-sm font-medium" : "text-sm font-medium"}`}>{x.title}</div>
                                         </Button>
                                     )
                                 })
@@ -234,7 +419,7 @@ const HeaderBar = ({ showDashboardButton }) => {
 
             <div className="flex h-14 items-center lg:h-[60px] ">
                 <div className={"app-logo"}>
-                    <img className={"lg:w-full md:w-[195px]"} src={AppLogoPurple} alt={"app-logo"} />
+                    <img className={"lg:w-full md:w-[195px]"} src={AppLogoPurple} alt={"app-logo"}/>
                 </div>
             </div>
             <div className={"flex gap-8"}>
@@ -249,32 +434,45 @@ const HeaderBar = ({ showDashboardButton }) => {
                                     aria-expanded={open}
                                     className="w-[200px] justify-between bg-card"
                                 >
-                                    {value
-                                        ? frameworks.find((framework) => framework.value === value)?.label
+                                    {console.log("projectDetailsReducer", projectDetailsReducer)}
+
+                                    {projectDetailsReducer.id
+                                        ? projectDetailsReducer.project_name
                                         : "Select framework..."}
-                                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+
+                                    {/*{Array.isArray(projectDetailsReducer) && projectDetailsReducer.length > 0*/}
+                                    {/*    ? projectDetailsReducer.find((x) => x.value === projectDetailsReducer.id)?.label*/}
+                                    {/*    : "Select framework..."}*/}
+
+                                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50"/>
                                 </Button>
                             </PopoverTrigger>
                             <PopoverContent className="w-[200px] p-0">
                                 <Command>
-                                    <CommandInput placeholder="Search framework..." />
+                                    <CommandInput placeholder="Search framework..."/>
                                     <CommandList>
                                         <CommandEmpty>No framework found.</CommandEmpty>
                                         <CommandGroup>
-                                            {frameworks.map((framework) => (
+                                            {(projectList || []).map((x, i) => (
+                                                <Fragment>
                                                 <CommandItem
-                                                    key={framework.value}
-                                                    value={framework.value}
-                                                    onSelect={framework.value === 'createproject' ? openSheet : (currentValue) =>  {
+                                                    className={"bg-card"}
+                                                    key={i}
+                                                    value={x.id}
+                                                    onSelect={(currentValue) => {
                                                         setValue(currentValue === value ? "" : currentValue)
                                                         setOpen(false)
                                                     }}
                                                 >
-                                                    <div className={"flex gap-1 items-center"}>
-                                                        <div>{framework.icon}</div>
-                                                        <div className={"text-sm font-medium"}>{framework.label}</div>
+                                                    <div className={"flex flex-col w-full gap-1"}>
+                                                        <span className={"text-sm font-medium cursor-pointer py-[6px] px-3"}>{x.project_name}</span>
                                                     </div>
                                                 </CommandItem>
+                                                <div className={"flex gap-2 items-center cursor-pointer py-[6px] px-3"} onClick={openSheet}>
+                                                    <Plus size={16}/>
+                                                    <h4 className={"text-sm font-medium"}>Create Project</h4>
+                                                </div>
+                                                </Fragment>
                                             ))}
                                         </CommandGroup>
                                     </CommandList>
@@ -299,30 +497,41 @@ const HeaderBar = ({ showDashboardButton }) => {
                         <DropdownMenuTrigger asChild>
                             <Button variant="secondary" size="icon" className="rounded-full">
                                 <Avatar>
-                                    <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-                                    <AvatarFallback >CN</AvatarFallback>
+                                    {
+                                        userDetails.user_photo ?
+                                            <AvatarImage src={userDetails.user_photo} alt="@shadcn"/> :
+                                            <AvatarFallback>{userDetails.user_first_name.substring(0, 1)}{userDetails.user_last_name.substring(0, 1)}</AvatarFallback>
+                                    }
+                                    {/*<AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />*/}
+                                    {/*<AvatarFallback >CN</AvatarFallback>*/}
                                 </Avatar>
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className={"w-56 rounded-md shadow"}>
                             <DropdownMenuLabel className={"text-sm font-semibold"}>My Account</DropdownMenuLabel>
                             <DropdownMenuSeparator/>
-                            <DropdownMenuItem className={"text-sm font-medium flex gap-2"} onClick={() => navigate(`${baseUrl}/settings/profile`)}>
-                                <span className={`${ theme === "dark" ? "profile-menu-icon" : ""}`}>{Icon.accountUserIcon}</span>
+                            <DropdownMenuItem className={"text-sm font-medium flex gap-2"}
+                                              onClick={() => navigate(`${baseUrl}/settings/profile`)}>
+                                <span
+                                    className={`${theme === "dark" ? "profile-menu-icon" : ""}`}>{Icon.accountUserIcon}</span>
                                 Profile
                             </DropdownMenuItem>
-                            <DropdownMenuItem className={"text-sm font-medium flex gap-2"} onClick={() => navigate(`${baseUrl}/pricing-plan`)}>
-                                <span className={`${ theme === "dark" ? "profile-menu-icon" : ""}`}>{Icon.bilingIcon}</span>
+                            <DropdownMenuItem className={"text-sm font-medium flex gap-2"}
+                                              onClick={() => navigate(`${baseUrl}/pricing-plan`)}>
+                                <span
+                                    className={`${theme === "dark" ? "profile-menu-icon" : ""}`}>{Icon.bilingIcon}</span>
                                 Billing
                             </DropdownMenuItem>
                             <DropdownMenuSeparator/>
                             <DropdownMenuItem className={"text-sm font-medium flex gap-2"} onClick={openSheet}>
-                                <span className={`${ theme === "dark" ? "profile-menu-icon" : ""}`}>{Icon.projectsIcon}</span>
+                                <span
+                                    className={`${theme === "dark" ? "profile-menu-icon" : ""}`}>{Icon.projectsIcon}</span>
                                 Projects
                             </DropdownMenuItem>
                             <DropdownMenuSeparator/>
                             <DropdownMenuItem onClick={onLogout} className={"text-sm font-medium flex gap-2"}>
-                                <span className={`${ theme === "dark" ? "profile-menu-icon" : ""}`}>{Icon.logoutIcon}</span>
+                                <span
+                                    className={`${theme === "dark" ? "profile-menu-icon" : ""}`}>{Icon.logoutIcon}</span>
                                 Logout
                             </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -334,33 +543,60 @@ const HeaderBar = ({ showDashboardButton }) => {
                 <Sheet open={isSheetOpen} onOpenChange={isSheetOpen ? closeSheet : openSheet}>
                     <SheetContent className={"sm:max-w-[662px] sm:overflow-auto p-0"}>
                         <SheetHeader className={"px-[32px] py-[22px] border-b flex"}>
-                            <SheetTitle className={"text-xl font-medium flex justify-between items-center"}>Create new Project
+                            <SheetTitle className={"text-xl font-medium flex justify-between items-center"}>Create new
+                                Project
                                 <Button className={"bg-transparent hover:bg-transparent p-0 h-[24px]"}>
-                                    <X className={"stroke-card-foreground"} onClick={closeSheet} />
+                                    <X className={"stroke-card-foreground"} onClick={closeSheet}/>
                                 </Button>
                             </SheetTitle>
                         </SheetHeader>
                         <div className="grid gap-[24px] px-[32px] pt-[24px] pb-[36px]">
                             <div className="gap-2">
                                 <Label htmlFor="name" className="text-right">Project Name</Label>
-                                <Input id="name" placeholder="Project Name" className={`${theme === "dark" ? "" : "placeholder:text-muted-foreground/75"}`} />
+                                <Input
+                                    id="project_name"
+                                    placeholder="Project Name"
+                                    className={`${theme === "dark" ? "" : "placeholder:text-muted-foreground/75"}`}
+                                    value={createProjectDetails.project_name}
+                                    name="project_name"
+                                    onChange={onChangeText}
+                                />
+                                {
+                                    formError.project_name &&
+                                    <span className="text-red-500 text-sm">{formError.project_name}</span>
+                                }
                             </div>
                             <div className="gap-2">
                                 <Label htmlFor="website" className="text-right">Project website</Label>
-                                <Input id="website" placeholder="https://yourcompany.com" className={`${theme === "dark" ? "placeholder:text-card-foreground/80" : "placeholder:text-muted-foreground/75"}`} />
+                                <Input
+                                    id="project_website"
+                                    placeholder="https://yourcompany.com"
+                                    className={`${theme === "dark" ? "placeholder:text-card-foreground/80" : "placeholder:text-muted-foreground/75"}`}
+                                    value={createProjectDetails.project_website}
+                                    name="project_website"
+                                    onChange={onChangeText}
+                                />
                             </div>
                             <div className="gap-2 relative">
                                 <Label htmlFor="domain" className="text-right">Project domain</Label>
-                                <Input id="domain" placeholder="https://projectname.quickhunt.io" className={`${theme === "dark" ? "" : "placeholder:text-muted-foreground/75 pr-[115px]"}`} />
+                                <Input
+                                    id="domain"
+                                    placeholder="https://projectname.quickhunt.io"
+                                    className={`${theme === "dark" ? "" : "placeholder:text-muted-foreground/75 pr-[115px]"}`}
+                                    value={createProjectDetails.domain}
+                                    name="domain"
+                                    onChange={onChangeText}
+                                />
                                 <span className={"absolute top-[33px] right-[13px] text-sm font-medium"}>Project domain</span>
                             </div>
                         </div>
                         <SheetFooter className={"px-[32px] gap-[16px] sm:justify-start"}>
-                            <SheetClose asChild>
-                                <Button className={"text-card text-sm font-semibold hover:bg-primary bg-primary"} type="submit">Create Project</Button>
-                            </SheetClose>
+                                <Button className={"text-card text-sm font-semibold hover:bg-primary bg-primary"}
+                                        onClick={onCreateProject} type="submit">Create Project</Button>
                             <SheetClose asChild onClick={closeSheet}>
-                                <Button className={"text-primary text-sm font-semibold hover:bg-card border border-primary bg-card"} type="submit">Cancel</Button>
+                                <Button
+                                    className={"text-primary text-sm font-semibold hover:bg-card border border-primary bg-card"}
+                                    type="submit">Cancel</Button>
                             </SheetClose>
                         </SheetFooter>
                     </SheetContent>

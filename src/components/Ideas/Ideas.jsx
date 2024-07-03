@@ -1,25 +1,8 @@
 import React, {Fragment, useState} from 'react';
 import {Button} from "../ui/button";
-import {
-    ArrowBigUp,
-    ChevronLeft,
-    ChevronRight,
-    ChevronsLeft,
-    ChevronsRight, Circle, CircleChevronDown,
-    Dot,
-    MessageCircleMore, Paperclip, Pencil, Pin,
-    Plus, Trash2, X
-} from "lucide-react";
-import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "../ui/card";
+import {ArrowBigUp, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Circle, Dot, MessageCircleMore, Plus,} from "lucide-react";
+import {Card, CardContent, CardFooter} from "../ui/card";
 import {Select, SelectItem, SelectGroup, SelectContent, SelectTrigger, SelectValue} from "../ui/select";
-import {Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle, SheetTrigger, SheetClose} from "../ui/sheet";
-import {RadioGroup, RadioGroupItem} from "../ui/radio-group";
-import {Label} from "../ui/label";
-import {Input} from "../ui/input";
-import {Avatar, AvatarFallback, AvatarImage} from "../ui/avatar";
-import {Textarea} from "../ui/textarea";
-import {Switch} from "../ui/switch";
-import {TabsContent, TabsList, TabsTrigger, Tabs} from "../ui/tabs";
 import SidebarSheet from "../Ideas/SidebarSheet";
 import {useTheme} from "../theme-provider";
 
@@ -94,6 +77,7 @@ const Ideas = () => {
     const { theme } = useTheme()
     const [isSheetOpen, setSheetOpen] = useState(false);
     const [sheetType, setSheetType] = useState('');
+    const [addedNewIdeas, setAddedNewIdeas] = useState('');
 
     const openSheet = () => setSheetOpen(true);
     const closeSheet = () => setSheetOpen(false);

@@ -1,21 +1,22 @@
 import React, {useState, useEffect} from 'react';
 import {Icon} from "../../utils/Icon";
-import {apiService} from "../../utils/constent";
 import {Label} from "../ui/label";
 import {Input} from "../ui/input";
 import {Card, CardContent} from "../ui/card";
 import {Button} from "../ui/button";
 import {Loader2} from "lucide-react";
 import {useToast} from "../ui/use-toast";
+import {ApiService} from "../../utils/ApiService";
 
 const Forgot = () => {
+    let apiSerVice = new ApiService();
     const [formError, setFormError] = useState({email:""});
     const [forgotPasswordDetails, setForgotPasswordDetails] = useState({email:""});
     const [isLoading, setIsLoading] = useState(false);
     const { toast } = useToast()
 
     const getForgetDetail = async () => {
-        const getDetail = await apiService.forgotPassword();
+        const getDetail = await apiSerVice.forgotPassword();
         if(getDetail.status === 200) {
             console.log('getDetail', getDetail)
         }
@@ -70,7 +71,7 @@ const Forgot = () => {
             return;
         }
         setIsLoading(true)
-        const data  = await apiService.forgotPassword({email: forgotPasswordDetails.email})
+        const data  = await apiSerVice.forgotPassword({email: forgotPasswordDetails.email})
         if(data.status === 200){
             setForgotPasswordDetails({email: ""})
             toast({

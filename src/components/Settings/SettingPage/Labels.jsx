@@ -144,9 +144,9 @@ const Labels = () => {
                     <TableHeader className="p-0">
                         <TableRow>
                             <TableHead className={"w-[48px]"}/>
-                            <TableHead className="">Label Name</TableHead>
-                            <TableHead className="">Label Color</TableHead>
-                            <TableHead className="text-right pr-[35px]">Action</TableHead>
+                            <TableHead className="p-0">Label Name</TableHead>
+                            <TableHead className="p-0 text-end">Label Color</TableHead>
+                            <TableHead className="text-right pr-[35px] pl-0">Action</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -155,7 +155,7 @@ const Labels = () => {
                                 <TableCell><Menu className={"cursor-grab"} size={16} /></TableCell>
                                 {
                                     isEdit === i ?
-                                    <TableCell className={"text-xs font-medium"}>
+                                    <TableCell className={"text-xs font-medium p-0 pr-4"}>
                                         <Input
                                             className={"bg-card"}
                                             type="text"
@@ -171,13 +171,13 @@ const Labels = () => {
                                             }
                                         </div>
                                     </TableCell>
-                                    : <TableCell>{x.labelName}</TableCell>
+                                    : <TableCell className={"p-0"}>{x.labelName}</TableCell>
                                 }
                                     {isEdit === i ?
-                                        <TableCell><div className={"py-2 px-3 bg-card border border-border rounded-lg overflow-hidden"}>
+                                        <TableCell className={"p-0"}><div className={"py-2 px-3 bg-card border border-border rounded-lg overflow-hidden"}>
                                             <ColorInput name={x.name} value={x.value} onChange={(color) => onChangeColorColor(color, i)} />
                                         </div></TableCell> :
-                                        <TableCell><ColorInput name={x.name} value={x.value} /*onChange={(color) => onChangeColorColor(color, i)}*/ />
+                                        <TableCell className={"p-0"}><ColorInput name={x.name} value={x.value} /*onChange={(color) => onChangeColorColor(color, i)}*/ />
                                         </TableCell>
                                     }
                                 <TableCell className="flex justify-end gap-2 pr-6">
@@ -224,8 +224,7 @@ const Labels = () => {
                                 <TableCell className={`${labelError ? "align-top" : ""}`}>
                                     <Button variant={"ghost hover:bg-transparent"} className={"p-0 cursor-grab"}><Menu size={16} /></Button>
                                 </TableCell>
-                                <TableCell>
-                                    <div className="">
+                                <TableCell className={"p-0 py-4 pr-4"}>
                                         <Input
                                             className={"bg-card"}
                                             type="text"
@@ -236,7 +235,6 @@ const Labels = () => {
                                             placeholder="Enter Label Name"
                                             onBlur={onBlur}
                                         />
-                                    </div>
                                     <div className="grid gap-2">
                                         {
                                             labelError.labelName &&
@@ -244,7 +242,7 @@ const Labels = () => {
                                         }
                                     </div>
                                 </TableCell>
-                                <TableCell className={`${labelError ? "align-top" : ""}`}>
+                                <TableCell className={`${labelError ? "align-top" : ""} p-0 py-4`}>
                                     <div className={"py-2 px-3 border border-border rounded-lg overflow-hidden"}>
                                     <ColorInput
                                         name="newLabelColor"
