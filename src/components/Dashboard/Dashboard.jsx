@@ -1,6 +1,5 @@
 import React, {Fragment, useEffect, useState} from "react"
 import {Card, CardContent, CardHeader, CardTitle, CardFooter} from "../ui/card"
-import {useTheme} from "../theme-provider";
 import {Button} from "../ui/button";
 import {Icon} from "../../utils/Icon";
 import {Calendar} from "../ui/calendar";
@@ -10,103 +9,44 @@ import moment from "moment";
 //import { DateRange } from "react-day-picker";
 import { addDays, format } from "date-fns"
 import { cn } from "../../lib/utils";
-import {useNavigate} from "react-router-dom";
 import {ApiService} from "../../utils/ApiService";
 import {useSelector} from "react-redux";
 import Highcharts from 'highcharts'
 import HighchartsReact from 'highcharts-react-official'
+import {useTheme} from "../theme-provider";
 
 const programAnalytics = [
     {
         id: 1,
         title: "Total Views",
-        total: 245,
-        compare: "+20.1% from last month",
+        compareText: "from last month",
     },
     {
         id: 2,
         title: "Unique Views",
-        total: 54,
-        compare: "+180.1% from last month",
+        compareText: "from last month",
     },
     {
         id: 3,
         title: "Feedback",
-        total: 83,
-        compare: "+19% from last month",
+        compareText: "from last month",
     },
     {
         id: 4,
         title: "Total Reaction",
-        total: 245,
-        compare: "+201 since last hour",
+        compareText: "since last hour",
     },
 ]
 
-const newFeedbacks = [
-    {
-        name: "Ankesh",
-        email: "wc.ankesh112@gmail.com",
-        feed: "This  library has saved me countless hours of work and helped me deliver  stunning designs to my clients faster than ever before.",
-    },
-    {
-        name: "Ankesh",
-        email: "wc.ankesh112@gmail.com",
-        feed: "This  library has saved me countless hours of work and helped me deliver  stunning designs to my clients faster than ever before.",
-    },
-    {
-        name: "Ankesh",
-        email: "wc.ankesh112@gmail.com",
-        feed: "This  library has saved me countless hours of work and helped me deliver  stunning designs to my clients faster than ever before.",
-    },
-    {
-        name: "Ankesh",
-        email: "wc.ankesh112@gmail.com",
-        feed: "This  library has saved me countless hours of work and helped me deliver  stunning designs to my clients faster than ever before.",
-    },
-    {
-        name: "Ankesh",
-        email: "wc.ankesh112@gmail.com",
-        feed: "This  library has saved me countless hours of work and helped me deliver  stunning designs to my clients faster than ever before.",
-    },
-]
-
-const reactionFeed = [
-    {
-        icon: Icon.emojiLaugh,
-        name: "Ankesh",
-        reactedTo: "Reacted to ",
-        feed: "This  library has saved me countless hours of work and helped me deliver  stunning designs",
-    },
-    {
-        icon: Icon.emojiSad,
-        name: "Ankesh",
-        reactedTo: "Reacted to ",
-        feed: "This  library has saved me countless hours of work and helped me deliver  stunning designs",
-    },
-    {
-        icon: Icon.emojiSmile,
-        name: "Ankesh",
-        reactedTo: "Reacted to ",
-        feed: "This  library has saved me countless hours of work and helped me deliver  stunning designs",
-    },
-    {
-        icon: Icon.emojiLaugh,
-        name: "Ankesh",
-        reactedTo: "Reacted to ",
-        feed: "This  library has saved me countless hours of work and helped me deliver  stunning designs",
-    },
-    {
-        icon: Icon.emojiSmile,
-        name: "Ankesh",
-        reactedTo: "Reacted to ",
-        feed: "This  library has saved me countless hours of work and helped me deliver  stunning designs",
-    },
-]
+const emoji = {
+    "1" : Icon.emojiLaugh,
+    "2" : Icon.emojiSad,
+    "3" : Icon.emojiSmile,
+    "4" : Icon.emojiLaugh,
+}
 
 export function Dashboard() {
-    const { setTheme } = useTheme()
-    let navigate = useNavigate();
+    const {theme} = useTheme();
     let apiSerVice = new ApiService();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const [state, setState] = useState({startDate: moment().subtract(29, 'days'), endDate: moment(),});
@@ -115,30 +55,35 @@ export function Dashboard() {
         guest: [],
         idea: [],
         totalViewCount: 0,
+        totalViewCountDiff: 0,
         uniqueViewCount: 0,
+        uniqueViewDiff: 0,
         feedbackCount: 0,
+        feedbackCountDiff: 0,
         reactionCount: 0,
+        reactionCountDiff: 0,
         most_view_post: [],
         feedbackAnalytics: [],
         uniqueViewList: [],
-        totalViewViewList: []
+        totalViewViewList: [],
+        feedbacks: [
+            {
+                id: "",
+                feedback: "",
+                customer_email_id: "",
+                customer_name: "",
+                created_at: "",
+            }
+        ],
+        reactions: [
+            {
+                created_at: "",
+                customer_name: "",
+                post_title: "",
+                reaction_id: "",
+            }
+        ]
     });
-
-    // useEffect(() => {
-    //     const query = new URLSearchParams(window.location.search);
-    //     if (query.get("success")) {
-    //         message.success(" Yay! Order placed! 🛒 You will receive an email confirmation confirming your order.");
-    //         history.push({pathname: `${baseUrl}/`, search: ''})
-    //     }
-    //     if (query.get("canceled")) {
-    //         message.error("Order canceled -- please try again.");
-    //         history.push({
-    //             pathname: `${baseUrl}/`,
-    //             search: ''
-    //         })
-    //     }
-    //
-    // }, []);
 
     useEffect(() => {
         dashboardData()
@@ -192,7 +137,7 @@ export function Dashboard() {
     const options = {
         chart: {
             borderWidth: 0,
-            type: 'line',
+            type: 'column',
         },
         tooltip: {
             formatter: function () {
@@ -221,15 +166,11 @@ export function Dashboard() {
         series: [{
             name: "Unique View",
             data: chartList.uniqueViewList,
-            color: "#7D95C9"
+            color: "#7c3aed"
         },{
             name: "Total View",
             data: chartList.totalViewViewList,
-            color: "#352F6C"
-        },{
-            name: "Total Feedback",
-            data: chartList.feedbackAnalytics,
-            color: "#FFD255"
+            color: "#7c3bed80"
         },],
         plotOptions: {
             line: {
@@ -268,7 +209,7 @@ export function Dashboard() {
 
                 </div>
                 <div className={"border-b"} />
-                <div className="xl:container xl:max-w-[1200px] lg:container lg:max-w-[992px] md:container md:max-w-[768px] sm:container sm:max-w-[639px] xs:container xs:max-w-[475px]">
+                <div className="xl:container xl:max-w-[1200px] lg:container lg:max-w-[992px] md:container md:max-w-[768px] sm:container sm:max-w-[639px] xs:container xs:max-w-[475px] pb-5">
                     <div className="program-data">
                         <div className={"analytics-date flex justify-between items-center pb-6 pt-9 md:flex-wrap md:gap-4 sm:flex-wrap sm:gap-2"}>
                             <h3 className="text-base font-bold text-card-foreground-subtext">Here's what has happened to your program</h3>
@@ -319,7 +260,10 @@ export function Dashboard() {
                                                                         x.title === "Total Reaction" ? chartList.reactionCount : ""}
                                                         </h3>
                                                         <p className={"text-xs font-medium"}>
-                                                            {x.compare}
+                                                            {x.title === "Total Views" ? <>{chartList.totalViewCountDiff} {x.compareText}</> :
+                                                                x.title === "Unique Views" ? <>{chartList.uniqueViewDiff} {x.compareText}</> :
+                                                                    x.title === "Feedback" ? <>{chartList.feedbackCountDiff} {x.compareText}</> :
+                                                                        x.title === "Total Reaction" ? <>{chartList.reactionCountDiff} {x.compareText}</> : ""}
                                                         </p>
                                                     </CardContent>
                                                 </CardHeader>
@@ -334,17 +278,21 @@ export function Dashboard() {
                                         <CardTitle className={"text-base font-bold"}>New Feedbacks</CardTitle>
                                     </CardHeader>
                                     {
-                                        (newFeedbacks || []).map((x, i) => {
-                                            return (
+                                        (chartList.feedbacks && chartList.feedbacks.length > 0) ? (
+                                            (chartList.feedbacks || []).map((x, i) => (
                                                 <CardContent className={"p-2 pl-6 pr-4 flex flex-col gap-2"} key={i}>
                                                     <div className="flex gap-2 items-center">
-                                                        <h4 className="text-sm font-semibold">{x.name}</h4>
-                                                        <p className="text-xs font-medium text-muted-foreground">{x.email}</p>
+                                                        <h4 className="text-sm font-semibold">{x.customer_name}</h4>
+                                                        <p className="text-xs font-medium text-muted-foreground">{x.customer_email_id}</p>
                                                     </div>
-                                                    <p className="text-xs font-medium text-foreground">“{x.feed}”</p>
+                                                    <p className="text-xs font-medium text-foreground">“{x.feedback}”</p>
                                                 </CardContent>
-                                            )
-                                        })
+                                            ))
+                                        ) : (
+                                            <CardContent className={"pt-6 flex justify-center"}>
+                                                {Icon.emptyData}
+                                            </CardContent>
+                                        )
                                     }
                                     <CardFooter className={"pt-4 px-0 pb-0 justify-end"}>
                                         <Button className={"text-primary p-0 h-[20px] text-sm font-semibold"} variant={"ghost hover:none"}>View More Feedbacks</Button>
@@ -355,22 +303,27 @@ export function Dashboard() {
                                         <CardTitle className={"text-base font-bold"}>Reaction</CardTitle>
                                     </CardHeader>
                                     {
-                                        (reactionFeed || []).map((x, i) => {
-                                            return (
-                                                <CardContent className={"py-2.5 px-0"} key={i}>
-                                                    <div className={"flex gap-4"}>
-                                                        <div>{x.icon}</div>
-                                                        <div className={"flex flex-col gap-1"}>
-                                                            <div className="flex gap-1 items-center">
-                                                                <h4 className="text-sm font-semibold">{x.name}</h4>
-                                                                <p className="text-xs font-medium text-muted-foreground">{x.reactedTo}</p>
+                                        (chartList.reactions && chartList.reactions.length > 0) ? (
+                                                (chartList.reactions || []).map((x, i) => (
+                                                    <CardContent className={"py-2.5 px-0"} key={i}>
+                                                        <div className={"flex gap-4"}>
+                                                            <div>{emoji[x.reaction_id]}</div>
+                                                            <div className={"flex flex-col gap-1"}>
+                                                                <div className="flex gap-1 items-center">
+                                                                    <h4 className="text-sm font-semibold">{x.customer_name}</h4>
+                                                                    <p className="text-xs font-medium text-muted-foreground">Reacted To</p>
+                                                                </div>
+                                                                <p className="text-xs font-medium text-foreground">"{x.post_title}"</p>
                                                             </div>
-                                                            <p className="text-xs font-medium text-foreground">"{x.feed}"</p>
                                                         </div>
-                                                    </div>
+                                                    </CardContent>
+                                                ))
+                                            ) :
+                                            (
+                                                <CardContent className={"pt-6 flex justify-center"}>
+                                                    {Icon.emptyData}
                                                 </CardContent>
                                             )
-                                        })
                                     }
                                     <CardFooter className={"pt-4 px-0 pb-0 justify-end"}>
                                         <Button className={"text-primary text-sm p-0 h-[20px] font-semibold"} variant={"ghost hover:none"}>View More Reactions</Button>
@@ -378,13 +331,13 @@ export function Dashboard() {
                                 </Card>
                             </div>
                             <div>
-                                <Card className={"p-4 shadow border"}>
-                                    <CardHeader className={"p-0 pb-4"}>
+                                <Card className={"shadow border"}>
+                                    <CardHeader className={"px-[28px] pb-0"}>
                                         <CardTitle className={"text-base font-bold"}>Overview</CardTitle>
-                                        <CardContent>
+                                    </CardHeader>
+                                        <CardContent className={"pb-10 px-[28px] pt-8 m-0"}>
                                             <HighchartsReact highcharts={Highcharts} options={options}/>
                                         </CardContent>
-                                    </CardHeader>
                                 </Card>
                             </div>
                         </div>

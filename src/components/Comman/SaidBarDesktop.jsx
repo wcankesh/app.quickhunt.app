@@ -1,12 +1,10 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {Button} from "../ui/button";
 import {Icon} from "../../utils/Icon";
 import {baseUrl} from "../../utils/constent";
-import {ApiService} from "../../utils/ApiService";
 import {useNavigate, useLocation, useParams} from "react-router-dom";
 
 const SaidBarDesktop = () => {
-    let apiSerVice = new ApiService()
     let navigate = useNavigate();
     let location = useLocation();
     const {type} = useParams();

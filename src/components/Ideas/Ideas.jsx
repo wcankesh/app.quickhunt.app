@@ -1,55 +1,26 @@
-import React, {Fragment, useState} from 'react';
+import React, {Fragment, useEffect, useState} from 'react';
 import {Button} from "../ui/button";
-import {ArrowBigUp, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Circle, Dot, MessageCircleMore, Plus,} from "lucide-react";
+import {
+    ArrowBigDown,
+    ArrowBigUp,
+    ChevronLeft,
+    ChevronRight,
+    ChevronsLeft,
+    ChevronsRight,
+    Circle,
+    Dot,
+    MessageCircleMore,
+    Plus,
+} from "lucide-react";
 import {Card, CardContent, CardFooter} from "../ui/card";
 import {Select, SelectItem, SelectGroup, SelectContent, SelectTrigger, SelectValue} from "../ui/select";
 import SidebarSheet from "../Ideas/SidebarSheet";
 import {useTheme} from "../theme-provider";
-
-const dummyDetails = {
-    data:[
-        {
-            title:"Welcome To Our Release Notes",
-            description:"All great things around you were not built in a day, some took weeks, quite a few of them took months and a rare few even decades. As builders, our quest is to reach for that perfect product that solves your problems and adds value to your lives, and we too realise it will be a journey of minor and major improvements made day after day...",
-            isNew:0,
-            isImp:0,
-            author:"testingapp",
-            date:"17 Jun",
-            msg:25,
-            up:25,
-            status:0,
-            value:0,
-        },
-        {
-            title:"Welcome To Our Release Notes",
-            description:"All great things around you were not built in a day, some took weeks, quite a few of them took months and a rare few even decades. As builders, our quest is to reach for that perfect product that solves your problems and adds value to your lives, and we too realise it will be a journey of minor and major improvements made day after day...",
-            isNew:0,
-            isImp:1,
-            author:"testingapp",
-            date:"17 Jun",
-            msg:25,
-            up:25,
-            status:0,
-            value:1,
-
-        },
-        {
-            title:"Welcome To Our Release Notes",
-            description:"All great things around you were not built in a day, some took weeks, quite a few of them took months and a rare few even decades. As builders, our quest is to reach for that perfect product that solves your problems and adds value to your lives, and we too realise it will be a journey of minor and major improvements made day after day...",
-            isNew:0,
-            isImp:0,
-            author:"testingapp",
-            date:"17 Jun",
-            msg:25,
-            up:25,
-            status:1,
-            value:1,
-        },
-
-    ],
-    page:1,
-    preview:0,
-}
+import {ApiService} from "../../utils/ApiService";
+import {useNavigate} from "react-router";
+import {useDispatch, useSelector} from "react-redux";
+import {baseUrl, urlParams} from "../../utils/constent";
+import moment from "moment";
 
 const filterByStatus= [
     {name: "Archived", value: "archived",},
@@ -73,14 +44,94 @@ const filterByRoadMapStatus = [
     {name: "Shipped", value: "shipped", fillColor: "#63C8D9", strokeColor: "#63C8D9",},
     {name: "AC", value: "ac", fillColor: "#CEF291", strokeColor: "#CEF291",},
 ]
+
+const perPageLimit = 15
+
+const initialStateFilter = {
+    archive: "",
+    bug: "",
+    no_status: "",
+    roadmap: [],
+    topic: [],
+    status: [],
+};
+
 const Ideas = () => {
     const { theme } = useTheme()
+    const navigate = useNavigate();
+    let apiSerVice = new ApiService();
     const [isSheetOpen, setSheetOpen] = useState(false);
     const [sheetType, setSheetType] = useState('');
-    const [addedNewIdeas, setAddedNewIdeas] = useState('');
+    const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
+    const [ideasList, setIdeasList] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [isCreateIdea, setIsCreateIdea] = useState(false);
+    const [selectedIdea, setSelectedIdea] = useState({});
+    const [isUpdateIdea, setIsUpdateIdea] = useState(false);
+    const [showFullDescription, setShowFullDescription] = useState(false);
+    const [topicLists, setTopicLists] = useState([]);
+    const [pageNo, setPageNo] = useState(1);
+    const [totalRecord, setTotalRecord] = useState(0);
+    const [roadmapStatus, setRoadmapStatus] = useState([]);
+    const [filter, setFilter] = useState(initialStateFilter);
+    const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
 
     const openSheet = () => setSheetOpen(true);
     const closeSheet = () => setSheetOpen(false);
+
+    useEffect(() => {
+        if(filter.topic.length || filter.roadmap.length || filter.bug || filter.archive || filter.no_status){
+            let payload = {...filter, project_id:projectDetailsReducer.id, page:pageNo, limit: perPageLimit}
+            ideaSearch(payload)
+
+        } else {
+            getAllIdea()
+        }
+
+        setTopicLists(allStatusAndTypes.topics)
+        setRoadmapStatus(allStatusAndTypes.roadmap_status)
+    }, [projectDetailsReducer.id, pageNo, allStatusAndTypes])
+
+    const getAllIdea = async () => {
+        setIsLoading(true)
+        const data = await apiSerVice.getAllIdea({project_id: projectDetailsReducer.id,page: pageNo,limit: perPageLimit})
+        if (data.status === 200) {
+            setIdeasList(data.data)
+            setTotalRecord(data.total)
+            const id = urlParams.get('id') || "";
+            if(id){
+                getSingleIdea()
+            }
+            setIsLoading(false)
+        } else {
+            setIsLoading(false)
+        }
+    }
+
+    const getSingleIdea = async () => {
+        const id = urlParams.get('id') || "";
+        const data = await apiSerVice.getSingleIdea(id);
+        if(data.status === 200){
+            setSelectedIdea(data.data)
+            setIsUpdateIdea(true)
+            history.replace(`${baseUrl}/ideas`)
+        }
+    }
+
+    const ideaSearch = async (payload) => {
+        setIsLoading(true)
+        const data = await apiSerVice.ideaSearch(payload)
+        if (data.status === 200) {
+            setIdeasList(data.data)
+            setTotalRecord(data.total)
+            setIsLoading(false)
+            setPageNo(payload.page)
+        } else {
+            setIsLoading(false)
+        }
+    }
+
+    const handleExpandDescription = () => {setShowFullDescription(!showFullDescription)}
 
     const onType = (type) => {
         setSheetType(type)
@@ -90,6 +141,10 @@ const Ideas = () => {
     const openDetailsSheet = () => {
         setSheetType('viewDetails');
         openSheet();
+    };
+
+    const onchangePage = (pagination) => {
+        setPageNo(pagination);
     };
 
     return (
@@ -157,44 +212,78 @@ const Ideas = () => {
                 <Card>
                     <CardContent className={"p-0"}>
                             {
-                                (dummyDetails.data || []).map((x, i) => {
+                                (ideasList || []).map((x, i) => {
                                     return (
                                         <Fragment key={i}>
                                             <div className={"flex gap-8 py-6 px-16"}>
                                                     <div className={"flex gap-2"}>
-                                                        <Button className={"p-[7px] bg-white shadow border hover:bg-white w-[30px] h-[30px]"} variant={"outline"}><ArrowBigUp className={"fill-primary stroke-primary"} /></Button>
-                                                        <p className={"text-xl font-medium"}>{x.up}</p>
+                                                        <div>
+                                                        <Button className={"p-[7px] bg-white shadow border hover:bg-white w-[30px] h-[30px]"} variant={"outline"}>
+                                                            <ArrowBigUp className={"fill-primary stroke-primary"} />
+                                                        </Button>
+                                                        <Button className={"p-[7px] bg-white shadow border hover:bg-white w-[30px] h-[30px]"} variant={"outline"}>
+                                                            <ArrowBigDown className={"stroke-primary"} />
+                                                        </Button>
+                                                        </div>
+                                                        <p className={"text-xl font-medium"}>{x.vote}</p>
                                                     </div>
                                                     <div className={"flex flex-col"}>
                                                         <div className={"flex items-center gap-3"}>
                                                             <h3 className={"text-base font-medium cursor-pointer"} onClick={openDetailsSheet}>{x.title}</h3>
-                                                            <h4 className={"text-sm font-medium"}>{x.author}</h4>
-                                                            <p className={"text-sm font-normal flex items-center text-muted-foreground"}><Dot className={"fill-text-card-foreground stroke-text-card-foreground"} />{x.date}</p>
+                                                            <h4 className={"text-sm font-medium"}>{x.name}</h4>
+                                                            <p className={"text-sm font-normal flex items-center text-muted-foreground"}><Dot className={"fill-text-card-foreground stroke-text-card-foreground"} />
+                                                                {moment(x.created_at).format('D MMM')}
+                                                            </p>
                                                         </div>
-                                                        <p className={"text-sm font-normal text-muted-foreground pt-[11px] pb-[24px]"}>{x.description}<Button onClick={openSheet} variant={"ghost hover:none"} className={"h-0 p-0 text-primary text-sm font-semibold"}>Read more</Button></p>
+                                                        {/*<div>*/}
+                                                        {/*<p className={"text-sm font-normal text-muted-foreground pt-[11px] pb-[24px]"} dangerouslySetInnerHTML={{__html: x.description}}/>*/}
+                                                        {/*<Button onClick={openSheet} variant={"ghost hover:none"} className={"h-0 p-0 text-primary text-sm font-semibold"}>Read more</Button>*/}
+                                                        {/*</div>*/}
+                                                        <div className={"description-container"}>
+                                                            <p className={"text-sm font-normal text-muted-foreground truncate-overflow"} dangerouslySetInnerHTML={{__html: x.description}}/>
+                                                            {x.description.length > 10 && (
+                                                                <Button onClick={() => handleExpandDescription(i)} variant={"ghost hover:none"} className={"h-0 p-0 text-primary text-sm font-semibold"}>
+                                                                    {showFullDescription ? "Read less" : "Read more"}
+                                                                </Button>
+                                                            )}
+                                                        </div>
                                                         <div className={"flex flex-wrap justify-between items-center gap-1"}>
-                                                            <div className={"text-sm font-medium"}># Welcome 👋</div>
+                                                            <div className={"flex gap-2"}>
+                                                            {
+                                                                (x.topic || []).map((y, i) => {
+                                                                    return (
+                                                                        <div className={"text-sm font-medium"} key={i}> {y.title}</div>
+                                                                    )
+                                                                })
+                                                            }
+                                                            </div>
                                                             <div className={"flex items-center gap-8"}>
                                                                 <Select>
                                                                     <SelectTrigger className="w-[291px] bg-card">
-                                                                        <SelectValue placeholder="Under consideration" />
+                                                                        <SelectValue/>
                                                                     </SelectTrigger>
                                                                     <SelectContent>
                                                                         <SelectGroup>
-                                                                            {
-                                                                                (filterByRoadMapStatus || []).map((x, i) => {
-                                                                                    return (
-                                                                                        <Fragment key={i}>
+                                                                            {/*{*/}
+                                                                            {/*    (x.roadmapStatus || []).map((z, i) => {*/}
+                                                                            {/*        return (*/}
+                                                                            {/*            <Fragment key={i}>*/}
                                                                                             <SelectItem value={x.value}>
                                                                                                 <div className={"flex items-center gap-2"}>
-                                                                                                <Circle fill={x.fillColor} stroke={x.strokeColor} className={` w-[10px] h-[10px]`}/>
-                                                                                                {x.name}
+                                                                                                <Circle fill={x.roadmap_color} stroke={x.roadmap_color} className={` w-[10px] h-[10px]`}/>
+                                                                                                {x.roadmap_title ? x.roadmap_title : "No status"}
                                                                                                 </div>
                                                                                             </SelectItem>
-                                                                                        </Fragment>
-                                                                                    )
-                                                                                })
-                                                                            }
+                                                                            {/*            </Fragment>*/}
+                                                                            {/*        )*/}
+                                                                            {/*    })*/}
+                                                                            {/*}*/}
+                                                                            {/*<SelectItem value={x.value}>*/}
+                                                                            {/*    <div className={"flex items-center gap-2"}>*/}
+                                                                            {/*        <Circle fill={x.fillColor} stroke={x.strokeColor} className={` w-[10px] h-[10px]`}/>*/}
+                                                                            {/*        {x.roadmap_title}*/}
+                                                                            {/*    </div>*/}
+                                                                            {/*</SelectItem>*/}
                                                                         </SelectGroup>
                                                                     </SelectContent>
                                                                 </Select>
@@ -218,14 +307,14 @@ const Ideas = () => {
                         <div className={`w-full p-5 ${theme === "dark"? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end pe-16 py-15px`}>
                             <div className={"flex flex-row gap-8 items-center"}>
                                 <div>
-                                    <h5 className={"text-sm font-semibold"}>Page {dummyDetails.page} of 10</h5>
+                                    <h5 className={"text-sm font-semibold"}>Page {ideasList.page} of 10</h5>
                                 </div>
                                 <div className={"flex flex-row gap-2 items-center"}>
                                     <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}>
-                                        <ChevronsLeft  className={dummyDetails.preview === 0 ? "stroke-slate-300" : "stroke-primary"} />
+                                        <ChevronsLeft  className={ideasList.preview === 0 ? "stroke-slate-300" : "stroke-primary"} />
                                     </Button>
                                     <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5 "}>
-                                        <ChevronLeft  className={dummyDetails.preview === 0 ? "stroke-slate-300" : "stroke-primary"} />
+                                        <ChevronLeft  className={ideasList.preview === 0 ? "stroke-slate-300" : "stroke-primary"} />
                                     </Button>
                                     <Button variant={"outline"} className={" h-[30px] w-[30px] p-1.5"}>
                                         <ChevronRight  className={"text-primary"} />

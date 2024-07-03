@@ -21,6 +21,7 @@ import {allProjectAction} from "../../redux/action/AllProjectAction";
 import {getProjectDetails} from "../../utils/constent";
 import {userDetailsAction} from "../../redux/action/UserDetailAction";
 import {allStatusAndTypesAction} from "../../redux/action/AllStatusAndTypesAction";
+import {useLocation} from "react-router";
 
 const initialState = {
     id: "",
@@ -141,15 +142,18 @@ const footerMenuComponent = [
     }
 ];
 
-const HeaderBar = ({showDashboardButton}) => {
+const HeaderBar = () => {
     const {setTheme, theme} = useTheme()
     let navigate = useNavigate();
+    let location = useLocation();
     let apiSerVice = new ApiService();
+    let url = location.pathname;
+    const newUrl = url.replace(/[0-9]/g, '');
+
     const userDetailsReducer = useSelector(state => state.userDetailsReducer);
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const [userDetails, setUserDetails] = useState(initialState)
-    const [selectedUrl, setSelectedUrl] = useState("/dashboard");
-    const [value, setValue] = useState("")
+    const [selectedUrl, setSelectedUrl] = useState(newUrl === "/" ? "/dashboard": newUrl);
     const [open, setOpen] = useState(false)
     const [isSheetOpen, setSheetOpen] = useState(false);
     const [isSheetOpenMenu, setSheetOpenMenu] = useState(false);
@@ -176,9 +180,9 @@ const HeaderBar = ({showDashboardButton}) => {
 
     }, [projectDetailsReducer.id]);
 
-    useEffect(() => {
-        setSelectedUrl(navigate)
-    },[navigate])
+    // useEffect(() => {
+    //     setSelectedUrl(newUrl)
+    // },[newUrl])
 
     useEffect(() => {
         getAllStatusAndTypes()
@@ -325,10 +329,6 @@ const HeaderBar = ({showDashboardButton}) => {
         navigate(`${baseUrl}/dashboard`);
     }
 
-    if(isLoading){
-        return <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-    }
-
     return (
         <header
             className="flex h-14 lg:justify-between md:justify-between items-center sm:justify-between gap-4 px-4 lg:h-[60px] lg:px-6 ">
@@ -434,15 +434,10 @@ const HeaderBar = ({showDashboardButton}) => {
                                     aria-expanded={open}
                                     className="w-[200px] justify-between bg-card"
                                 >
-                                    {console.log("projectDetailsReducer", projectDetailsReducer)}
-
                                     {projectDetailsReducer.id
                                         ? projectDetailsReducer.project_name
                                         : "Select framework..."}
 
-                                    {/*{Array.isArray(projectDetailsReducer) && projectDetailsReducer.length > 0*/}
-                                    {/*    ? projectDetailsReducer.find((x) => x.value === projectDetailsReducer.id)?.label*/}
-                                    {/*    : "Select framework..."}*/}
 
                                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50"/>
                                 </Button>
@@ -454,26 +449,23 @@ const HeaderBar = ({showDashboardButton}) => {
                                         <CommandEmpty>No framework found.</CommandEmpty>
                                         <CommandGroup>
                                             {(projectList || []).map((x, i) => (
-                                                <Fragment>
-                                                <CommandItem
-                                                    className={"bg-card"}
-                                                    key={i}
-                                                    value={x.id}
-                                                    onSelect={(currentValue) => {
-                                                        setValue(currentValue === value ? "" : currentValue)
-                                                        setOpen(false)
-                                                    }}
-                                                >
-                                                    <div className={"flex flex-col w-full gap-1"}>
-                                                        <span className={"text-sm font-medium cursor-pointer py-[6px] px-3"}>{x.project_name}</span>
-                                                    </div>
-                                                </CommandItem>
+                                                <Fragment key={i}>
+                                                    <CommandItem
+                                                        className={`${projectDetailsReducer.id === x.id ? `${theme === "dark" ? "text-card-foreground" : "text-card"} bg-primary` : 'bg-card'}`}
+                                                        value={x.id}
+                                                        onSelect={() => {
+                                                            onChangeProject(x.id);
+                                                            setOpen(false)
+                                                        }}
+                                                    >
+                                                        <span className={"text-sm font-medium cursor-pointer"}>{x.project_name}</span>
+                                                    </CommandItem>
+                                                </Fragment>
+                                            ))}
                                                 <div className={"flex gap-2 items-center cursor-pointer py-[6px] px-3"} onClick={openSheet}>
                                                     <Plus size={16}/>
                                                     <h4 className={"text-sm font-medium"}>Create Project</h4>
                                                 </div>
-                                                </Fragment>
-                                            ))}
                                         </CommandGroup>
                                     </CommandList>
                                 </Command>
@@ -502,8 +494,6 @@ const HeaderBar = ({showDashboardButton}) => {
                                             <AvatarImage src={userDetails.user_photo} alt="@shadcn"/> :
                                             <AvatarFallback>{userDetails.user_first_name.substring(0, 1)}{userDetails.user_last_name.substring(0, 1)}</AvatarFallback>
                                     }
-                                    {/*<AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />*/}
-                                    {/*<AvatarFallback >CN</AvatarFallback>*/}
                                 </Avatar>
                             </Button>
                         </DropdownMenuTrigger>
