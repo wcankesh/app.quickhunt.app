@@ -1,15 +1,20 @@
-import React,{useState} from 'react';
+import React,{Fragment,useState,useEffect,} from 'react';
 import {Button} from "../ui/button";
 import ComboBox from "../Comman/ComboBox";
 import {Input} from "../ui/input";
 import AnnouncementsView from "./AnnouncementsView";
 import AnnouncementsTable from "./AnnouncementsTable";
-import {LayoutList, Plus, Text} from "lucide-react";
+import {Circle, LayoutList, Plus, Text} from "lucide-react";
 import CreateAnnouncementsLogSheet from "./CreateAnnouncementsLogSheet";
 import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "../ui/select";
 import {useTheme} from "../theme-provider";
-
-
+import {useSelector} from "react-redux";
+import {ApiService} from "../../utils/ApiService";
+const initialStateFilter = {
+    l : "",
+    s: ""
+}
+const perPageLimit = 15;
 
 const items = [
     {
@@ -61,17 +66,58 @@ const status =[
 ]
 
 const Announcements = () => {
-    const [selected, setSelected] = useState("");
     const [isSheetOpen, setSheetOpen] = useState(false);
     const [tab,setTab]=useState(0);
     const {theme}=useTheme();
-
-    const handleSelect = (value) => {
-        setSelected(value);
-    };
+    const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
+    const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
+    const [announcementList, setAnnouncementList] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [labelList, setLabelList] = useState([]);
+    const [filter, setFilter] = useState(initialStateFilter);
+    const [pageNo, setPageNo] = useState(1);
+    const [totalRecord, setTotalRecord] = useState(0);
+    const apiService = new ApiService();
 
     const openSheet = () => setSheetOpen(true);
     const closeSheet = () => setSheetOpen(false);
+
+    useEffect(() => {
+        getAllPosts()
+        setLabelList(allStatusAndTypes.labels)
+    }, [projectDetailsReducer.id, allStatusAndTypes, pageNo]);
+
+
+    const getAllPosts = async () => {
+        setIsLoading(true)
+        const data  = await apiService.getAllPosts({project_id: projectDetailsReducer.id,page: pageNo,limit: perPageLimit})
+        if(data.status === 200){
+            setIsLoading(false)
+            setAnnouncementList(data.data)
+            setTotalRecord(data.total)
+        } else {
+            setIsLoading(false)
+        }
+    }
+
+    const filterPosts = async (event) => {
+        setIsLoading(true)
+        const payload = {
+            ...filter,
+            [event.name]: event.value,
+            project_id: projectDetailsReducer.id,
+            q: ""
+        }
+        setFilter({...filter,[event.name]: event.value,})
+        const data = await apiService.filterPost(payload)
+        if(data.status === 200){
+            console.log(data.data)
+            setIsLoading(false)
+            setAnnouncementList(data.data)
+        } else {
+            setIsLoading(false)
+        }
+    }
 
     return (
         <div className={"pt-8 xl:container xl:max-w-[1200px] lg:container lg:max-w-[992px] md:container md:max-w-[530px] sm:container sm:max-w-[639px] xs:container xs:max-w-[475px] max-[639px]:container max-[639px]:max-w-[507px]"}>
@@ -82,8 +128,8 @@ const Announcements = () => {
                 </div>
                 <div className="basis-2/4 gap-6">
                     <div className={"flex flex-row gap-6 items-center"}>
-                        <Select>
-                            <SelectTrigger className="h-9">
+                        <Select value={filter.s} onValueChange={(select) => filterPosts({name: "s", value: select})}>
+                            <SelectTrigger  className="h-9 w-[115px]">
                                 <SelectValue placeholder="All"/>
                             </SelectTrigger>
                             <SelectContent>
@@ -91,14 +137,40 @@ const Announcements = () => {
                                     {
                                         (status || []).map((x, index) => {
                                             return (
-                                                <SelectItem key={index} value={x.value}>{x.label}</SelectItem>
+                                                <SelectItem key={x.label} value={x.value}>{x.label}</SelectItem>
                                             )
                                         })
                                     }
                                 </SelectGroup>
                             </SelectContent>
                         </Select>
-                        <ComboBox items={items2} isSearchBox={true}  classNames={"w-[165px] custom-shadow"} value={selected} setValue={setSelected} onSelect={handleSelect} placeholder={"All Updates"}/>
+                        {/*<ComboBox items={items2} isSearchBox={true}  classNames={"w-[165px] custom-shadow"} value={selected} setValue={setSelected} onSelect={handleSelect} placeholder={"All Updates"}/>*/}
+                        <Select value={filter.l} placeholder="Publish" onValueChange={(select) => filterPosts({name: "l", value: select})} className={""}>
+                            <SelectTrigger className="w-[165px] h-9">
+                                <SelectValue placeholder="Publish" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectGroup>
+                                    <SelectItem>All Updates</SelectItem>
+                                </SelectGroup>
+                                <SelectGroup>
+                                    {
+                                        (allStatusAndTypes.labels || []).map((x, i) => {
+                                            return (
+                                                <Fragment key={x.id}>
+                                                    <SelectItem value={x.id}>
+                                                        <div className={"flex items-center gap-2"}>
+                                                            <Circle fill={x.label_color_code} stroke={x.label_color_code} className={`${theme === "dark" ? "" : "text-muted-foreground"} w-[10px] h-[10px]`}/>
+                                                            {x.label_name}
+                                                        </div>
+                                                    </SelectItem>
+                                                </Fragment>
+                                            )
+                                        })
+                                    }
+                                </SelectGroup>
+                            </SelectContent>
+                        </Select>
                         <form>
                             <div
                                 className="relative ml-auto flex-1 md:grow-0">
@@ -127,7 +199,7 @@ const Announcements = () => {
                 </div>
             </div>
             {
-                tab === 0 ? <AnnouncementsTable/> : <AnnouncementsView/>
+                tab === 0 ? <AnnouncementsTable data={announcementList}/> : <AnnouncementsView/>
             }
         </div>
     );

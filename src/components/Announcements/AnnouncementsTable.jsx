@@ -1,76 +1,33 @@
-import React, {useState,Fragment} from 'react';
+import React, {useState, Fragment, useEffect} from 'react';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "../ui/table";
 import {Badge} from "../ui/badge";
-import ComboBox from "../Comman/ComboBox";
 import {Button} from "../ui/button";
-import {Icon} from "../../utils/Icon";
 import {
-    ArrowBigDown,
-    ArrowBigUp,
     BarChart,
-    BarChartBig,
     ChevronLeft,
     ChevronRight,
     ChevronsLeft,
     ChevronsRight, Circle,
     Ellipsis,
-    Eye, MessageCircleMore
+    Eye,
 } from "lucide-react";
 import {useTheme} from "../theme-provider"
-
 import SidebarSheet from "./SidebarSheet";
 import {Card, CardContent, CardFooter} from "../ui/card";
 import {DropdownMenu, DropdownMenuTrigger} from "@radix-ui/react-dropdown-menu";
 import {DropdownMenuContent, DropdownMenuItem} from "../ui/dropdown-menu";
 import {Separator} from "../ui/separator";
-import NewCustomerSheet from "../Customers/NewCustomerSheet";
-import CreateAnnouncementsLogSheet from "./CreateAnnouncementsLogSheet";
 import {Select, SelectItem, SelectGroup, SelectContent, SelectTrigger, SelectValue} from "../ui/select";
-
-const items = [
-    {
-        value: "all",
-        label: "All",
-    },
-    {
-        value: "none",
-        label: "None",
-    },
-
-];
-
-const dummyTable = {
-    data: [{
-        title: "Welcome To Our Release Notes",
-        updated_at: "11 hour ago",
-        published_at: "2 hours ago",
-        status: 0,
-        id: 1,
-        isNew: 1,
-    },
-    {
-        title: "Welcome To Our Release Notes",
-        updated_at: "",
-        published_at: "",
-        status: 0,
-        id: 1,
-        isNew: 0
-    },
-    {
-        title: "Welcome To Our Release Notes",
-        updated_at: "",
-        published_at: "2 hours ago",
-        status: 1,
-        id: 1,
-        isNew: 0
-    }],
-    page:1,
-    preview:0
-};
+import moment from "moment";
+import NoDataThumbnail from "../../img/Frame.png"
+import CreateAnnouncementsLogSheet from "./CreateAnnouncementsLogSheet";
+import {apiService} from "../../utils/constent";
+import {Toaster} from "../ui/toaster";
+import {toast} from "../ui/use-toast";
 
 const status = [
-    {name: "Public", value: "public", fillColor: "#389E0D", strokeColor: "#389E0D",},
-    {name: "Draft", value: "draft", fillColor: "#CF1322", strokeColor: "#CF1322",},
+    {name: "Public", value: 0, fillColor: "#389E0D", strokeColor: "#389E0D",},
+    {name: "Draft", value: 1, fillColor: "#CF1322", strokeColor: "#CF1322",},
 ]
 
 const dummyDetails ={
@@ -119,15 +76,81 @@ const dummyDetails ={
 }
 
 
-const AnnouncementsTable = () => {
+const AnnouncementsTable = ({data}) => {
+    const [announcementData,setAnnouncementData]=useState(data);
     const [isSheetOpen, setSheetOpen] = useState(false);
-    const openSheet = () => setSheetOpen(true);
-    const closeSheet = () => setSheetOpen(false);
+    const [isCreateSheetOpen,setIsCreateSheetOpen]=useState(false);
+    const [isViewAnalytics, setIsViewAnalytics] = useState(false);
+    const [isEditAnalysis,setIsEditAnalysis] =useState(false);
+    const [editTitle,setEditTitle]=useState("");
+    const [selectedViewAnalyticsRecord, setSelectedViewAnalyticsRecord] = useState({id: ""});
+
+    useEffect(()=>{
+        setAnnouncementData(data);
+    },[data])
+
+    const openSheet = (x) => {
+        setSheetOpen(true);
+        setSelectedViewAnalyticsRecord(x);
+        setIsViewAnalytics(true);
+    };
+    const closeSheet = () => {
+        setSelectedViewAnalyticsRecord({id: ''});
+        setSheetOpen(false);
+        setIsViewAnalytics(false);
+    };
     const { theme }= useTheme();
+
+    const rgb2hex = (rgb, alpha) => {
+        if(rgb){
+            let r = parseInt(rgb.slice(1, 3), 16),
+                g = parseInt(rgb.slice(3, 5), 16),
+                b = parseInt(rgb.slice(5, 7), 16);
+            if (alpha) {
+                return "rgba(" + r + ", " + g + ", " + b + ", " + alpha + ")";
+            } else {
+                return "rgb(" + r + ", " + g + ", " + b + ")";
+            }
+        }
+    }
+
+    const handleStatusChange = async (object, value) => {
+        setAnnouncementData(announcementData.map(x => x.id === object.id ? { ...x, post_save_as_draft: value } : x));
+        const payload = {...object,post_save_as_draft:value}
+        const data = await apiService.updatePosts(payload,object.id);
+        if(data.status === 200){
+            toast({
+                title: data.success,
+            });
+        } else {
+            toast({
+                title: data.success,
+                variant: "destructive",
+            });
+        }
+    };
+
+    const onEdit =(title)=>{
+        setIsCreateSheetOpen(true);
+        setIsEditAnalysis(true);
+        setEditTitle(title);
+    };
+
+    const closeCreateSheet = () =>{
+        setIsCreateSheetOpen(false);
+        setIsEditAnalysis(false);
+    }
+
+    const shareFeedback = (slug)=>{
+        window.open(`/${slug}`,'_blank')
+    }
+
 
     return (
         <div className={"mt-9"}>
-            <SidebarSheet isOpen={isSheetOpen} onOpen={openSheet} onClose={closeSheet}/>
+            <Toaster/>
+            {isViewAnalytics && <SidebarSheet selectedViewAnalyticsRecord={selectedViewAnalyticsRecord} isOpen={isSheetOpen} onOpen={openSheet} onClose={closeSheet}/>}
+            {isEditAnalysis && <CreateAnnouncementsLogSheet editTitle={editTitle} isOpen={isCreateSheetOpen} onOpen={onEdit} onClose={closeCreateSheet}/>}
                 <Card>
                     <CardContent className={"p-0 rounded-md"}>
                         <Table className={""}>
@@ -144,28 +167,28 @@ const AnnouncementsTable = () => {
                             </TableHeader>
                             <TableBody>
                                 {
-                                    (dummyDetails.data || []).map((x,index)=>{
+                                    (announcementData || []).map((x,index)=>{
                                         return(
-                                            <TableRow className={"font-medium"}>
-                                                <TableCell className={`py-3 ${theme === "dark" ? "" : "text-muted-foreground"}`}><span className={"mr-4"}> {x.title}</span>
+                                            <TableRow key={x?.id} className={"font-medium"}>
+                                                <TableCell className={`py-3 ${theme === "dark" ? "" : "text-muted-foreground"}`}><span className={"mr-4"}> {x?.post_title}</span>
                                                     <Badge variant={"outline"} className={"h-[20px] py-0 px-2 text-xs rounded-[5px] shadow-[0px_1px_4px_0px_rgba(0,0,0,0.09)] font-medium text-blue-500 border-blue-500"}>New</Badge>
                                                 </TableCell>
-                                                <TableCell className={`${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.updated_at ? x.updated_at : "-"}</TableCell>
-                                                <TableCell className={`${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.published_at ? x.published_at : "-"}</TableCell>
+                                                <TableCell className={`${theme === "dark" ? "" : "text-muted-foreground"}`}>{x?.post_modified_date ? moment.utc(x.post_modified_date).local().startOf('seconds').fromNow() : "-"}</TableCell>
+                                                <TableCell className={`${theme === "dark" ? "" : "text-muted-foreground"}`}>{x?.post_published_at ? moment.utc(x.post_published_at).local().startOf('seconds').fromNow() : "-"}</TableCell>
                                                 <TableCell>
-                                                    <Select>
-                                                        <SelectTrigger className="w-[106px] h-7">
+                                                    <Select value={x.post_save_as_draft} onValueChange={(value) => handleStatusChange(x,value)}>
+                                                        <SelectTrigger className="w-[111px] h-7">
                                                             <SelectValue placeholder="Publish" />
                                                         </SelectTrigger>
                                                         <SelectContent>
                                                             <SelectGroup>
                                                                 {
-                                                                    (status || []).map((x, i) => {
+                                                                    (   status || []).map((x, i) => {
                                                                         return (
                                                                             <Fragment key={i}>
                                                                                 <SelectItem value={x.value}>
                                                                                     <div className={"flex items-center gap-2"}>
-                                                                                        <Circle fill={x.fillColor} stroke={x.strokeColor} className={`${theme === "dark" ? "" : "text-muted-foreground"} w-[10px] h-[10px]`}/>
+                                                                                        <Circle fill={x.fillColor} stroke={x.strokeColor} className={`${theme === "dark" ? "" : "text-muted-foreground"} w-2 h-2`}/>
                                                                                         {x.name}
                                                                                     </div>
                                                                                 </SelectItem>
@@ -178,16 +201,16 @@ const AnnouncementsTable = () => {
                                                     </Select>
                                                 </TableCell>
                                                 <TableCell>
-                                                    <Button onClick={openSheet} variant={"ghost"}><Eye size={18} className={`${theme === "dark" ? "" : "text-muted-foreground"}`} /></Button>
+                                                    <Button  variant={"ghost"} onClick={()=> shareFeedback (x.post_slug_url)}><Eye size={18} className={`${theme === "dark" ? "" : "text-muted-foreground"}`} /></Button>
                                                 </TableCell>
                                                 <TableCell>
-                                                    <Button variant={"ghost"} ><BarChart size={18} className={`${theme === "dark" ? "" : "text-muted-foreground"}`} /></Button>
+                                                    <Button onClick={ ()=> openSheet(x)} variant={"ghost"} ><BarChart size={18} className={`${theme === "dark" ? "" : "text-muted-foreground"}`} /></Button>
                                                 </TableCell>
                                                 <TableCell>
                                                     <DropdownMenu>
                                                         <DropdownMenuTrigger><Button variant={"ghost"} ><Ellipsis className={`${theme === "dark" ? "" : "text-muted-foreground"}`} size={18} /></Button></DropdownMenuTrigger>
                                                         <DropdownMenuContent>
-                                                            <DropdownMenuItem>Edit</DropdownMenuItem>
+                                                            <DropdownMenuItem onClick={()=>onEdit(x.post_slug_url)}>Edit</DropdownMenuItem>
                                                             <DropdownMenuItem>Delete</DropdownMenuItem>
                                                         </DropdownMenuContent>
                                                     </DropdownMenu>
@@ -199,8 +222,8 @@ const AnnouncementsTable = () => {
                             </TableBody>
                         </Table>
                     </CardContent>
-                    {dummyDetails.data.length > 0 &&  <Separator/>}
-                    {dummyDetails.data.length > 0 ? <CardFooter className={"p-0"}>
+                    {announcementData.length > 0 &&  <Separator/>}
+                    {announcementData?.length > 0 ? <CardFooter className={"p-0"}>
                         <div
                             className={`w-full p-5 ${theme === "dark" ? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end pe-16 py-15px`}>
                             <div className={"flex flex-row gap-8 items-center"}>
@@ -220,12 +243,17 @@ const AnnouncementsTable = () => {
                                         <ChevronRight className={"stroke-primary"}/>
                                     </Button>
                                     <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5 hover:none"}>
-                                        <ChevronsRight className={"stroke-primary"}/>
+                                        <ChevronsRight disabled={""} className={"stroke-primary"}/>
                                     </Button>
                                 </div>
                             </div>
                         </div>
-                    </CardFooter> : "d"}
+                    </CardFooter> :  <div className={"flex flex-row justify-center py-[45px]"}>
+                        <div className={"flex flex-col items-center gap-2"}>
+                            <img src={NoDataThumbnail} className={"flex items-center"}/>
+                            <h5 className={`text-center text-2xl font-medium leading-8 ${theme === "dark" ? "" : "text-[#A4BBDB]"}`}>No Data</h5>
+                        </div>
+                    </div>}
                 </Card>
         </div>
     );

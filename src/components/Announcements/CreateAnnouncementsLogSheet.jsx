@@ -1,36 +1,22 @@
-import React, {Fragment, useState} from 'react';
+import React, {Fragment, useEffect, useRef, useState} from 'react';
 import {Sheet, SheetContent, SheetHeader,} from "../ui/sheet";
 import {Separator} from "../ui/separator";
-import {Circle, Pin, X} from "lucide-react";
+import {CalendarIcon, Circle, Pin, X} from "lucide-react";
 import {Label} from "../ui/label";
 import {Input} from "../ui/input";
 import {Textarea} from "../ui/textarea";
 import {Switch} from "../ui/switch";
 import {Button} from "../ui/button";
-// import {Select, SelectValue} from "@radix-ui/react-select";
 import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue,} from "../ui/select";
+import moment from "moment";
+import {ApiService} from "../../utils/ApiService";
+import {useSelector} from "react-redux";
+import {useTheme} from "../theme-provider";
+import {Popover, PopoverContent, PopoverTrigger} from "../ui/popover";
+import {cn} from "../../lib/utils";
+import {format} from "date-fns";
+import {Calendar} from "../ui/calendar";
 
-const reaction = {
-    data: [
-        {
-            author: "Ankesh",
-            description: "“This  library has saved me countless hours of work and helped me deliver  stunning designs....”",
-            email: "wc.ankesh112@gmail.com"
-        },
-        {
-            author: "Ankesh",
-            description: "“This  library has saved me countless hours of work and helped me deliver  stunning designs....”",
-            email: "wc.ankesh112@gmail.com"
-        },
-        {
-            author: "Ankesh",
-            description: "“This  library has saved me countless hours of work and helped me deliver stunning designs....”",
-            email: "wc.ankesh112@gmail.com"
-        }
-    ],
-    previous: 0,
-    next: true,
-}
 
 const label = [
     {name: "Bug Fix", value: "bug_fix", fillColor: "#FF3C3C", strokeColor: "#FF3C3C"},
@@ -43,20 +29,242 @@ const category = [
     {name: "iOS App", value: "3"},
     {name: "Android App", value: "4"},
     {name: "Web App", value: "5"},
+];
 
-]
+const initialState = {
+    post_description:'',
+    post_slug_url:'',
+    post_title: '',
+    post_save_as_draft: 0,
+    post_published_at: moment(new Date()),
+    post_assign_to: [],
+    post_pin_to_top: 0,
+    post_override_url_boolean: 0,
+    post_override_url: '',
+    post_expired_boolean: 0,
+    post_expired_datetime: undefined,
+    post_override_thumbnail_boolean: 0,
+    post_override_thumbnail: '',
+    post_nodify_customer: 0,
+    post_browser: '',
+    post_ip_address: '',
+    category_id: '',
+    labels: [],
+    image:'',
 
-const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose}) => {
+
+};
+const initialStateError = {
+    post_title: "",
+    post_description: "",
+
+}
+
+const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,editTitle}) => {
     const [previewImage,setPreviewImage] = useState("");
+    // let history = useHistory();
+    const editor = useRef(null);
+    let apiService = new ApiService();
+    const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
+    const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
+    const userDetailsReducer = useSelector(state => state.userDetailsReducer);
+    const [changeLogDetails, setChangeLogDetails] = useState(initialState);
+    const [labelList, setLabelList] = useState([]);
+    const [convertedContent, setConvertedContent] = useState(null);
+    const [memberList, setMemberList] = useState([])
+    const [categoriesList, setCategoriesList] = useState([])
+    const [isSave, setIsSave] = useState(false)
+    const [isProModal, setIsProModal] = useState(false);
+    const [formError, setFormError] = useState(initialStateError);
+    const {theme}=useTheme();
 
-    const handleFileChange = (event) => {
-        setPreviewImage(URL.createObjectURL(event.target.files[0]));
+    useEffect(()=>{
+        if(editTitle){
+            getSinglePosts();
+        }
+        setLabelList(allStatusAndTypes.labels);
+        setMemberList(allStatusAndTypes.members);
+        setCategoriesList(allStatusAndTypes.categories);
+    },[])
+
+    const getSinglePosts = async () => {
+        const data = await apiService.getSinglePosts(editTitle)
+        if(data.status === 200){
+            setChangeLogDetails({
+                ...data.data,
+                image: data.data.feature_image,
+                post_assign_to: data.data.post_assign_to !== null ? data.data.post_assign_to.split(',') : [],
+                post_published_at: data.data.post_published_at ? moment(data.data.post_published_at).format('YYYY-MM-DD') : moment(new Date()),
+                post_expired_datetime: data.data.post_expired_datetime ? moment(data.data.post_expired_datetime).format('YYYY-MM-DD') : undefined,
+                category_id: data.data.category_id == "0" ? "" : data.data.category_id,
+            })
+            setConvertedContent(data.data.post_description)
+        } else {
+
+        }
+    }
+
+    const handleFileChange = (file) => {
+        setChangeLogDetails({...changeLogDetails, image : file})
+
     };
+
+    const formValidate = (name, value) => {
+        switch (name) {
+            case "post_title":
+                if (!value || value.trim() === "") {
+                    return "Title is required";
+                } else {
+                    return "";
+                }
+            /*  case "post_description":
+                  if (!value || value.trim() === "") {
+                      return "Description is required";
+                  } else {
+                      return "";
+                  }*/
+            default: {
+                return "";
+            }
+        }
+    };
+
+    const onChangeText = (event) => {
+        if(event.target.name === "post_title"){
+            setChangeLogDetails({...changeLogDetails, [event.target.name]: event.target.value, post_slug_url: event.target.value.replace(/ /g,"-").replace(/\?/g, "-")})
+        } else if(event.target.name === "post_slug_url"){
+
+            setChangeLogDetails({...changeLogDetails, post_slug_url: event.target.value.replace(/ /g,"-").replace(/\?/g, "-")})
+        }else {
+            setChangeLogDetails({...changeLogDetails, [event.target.name]: event.target.value})
+        }
+
+        setFormError(formError => ({
+            ...formError,
+            [event.target.name]: formValidate(event.target.name, event.target.value)
+        }));
+    }
+    const onChangeLabel = (selectedItems ) =>{
+        setChangeLogDetails({...changeLogDetails, labels: selectedItems})
+    }
+    const onchangeAssignTo = (selectedItems ) =>{
+        setChangeLogDetails({...changeLogDetails, post_assign_to: selectedItems})
+    }
+    const onChangeCategory = (selectedItems ) =>{
+        setChangeLogDetails({...changeLogDetails, category_id: selectedItems})
+    }
+
+    const [date, setDate] = useState(new Date());
+    const onDateChange = (selectedDate) => {
+        setDate(selectedDate);
+        setChangeLogDetails({...changeLogDetails, post_published_at: moment(selectedDate,'YYYY-MM-DD')});
+    };
+
+    const createPosts = async () => {
+        let validationErrors = {};
+        Object.keys(changeLogDetails).forEach(name => {
+            const error = formValidate(name, changeLogDetails[name]);
+            if (error && error.length > 0) {
+                validationErrors[name] = error;
+            }
+        });
+        if (Object.keys(validationErrors).length > 0) {
+            setFormError(validationErrors);
+            return;
+        }
+        setIsSave(true)
+        let formData = new FormData();
+        formData.append("post_project_id",projectDetailsReducer.id);
+        formData.append("post_title",changeLogDetails.post_title);
+        formData.append("post_assign_to",changeLogDetails.post_assign_to.join());
+        formData.append("post_slug_url",changeLogDetails.post_slug_url ? changeLogDetails.post_slug_url : changeLogDetails.post_title.replace(/ /g,"-").replace(/\?/g, "-"));
+        formData.append("post_published_at",moment(changeLogDetails.post_published_at).format("YYYY-MM-DD"));
+        formData.append("post_save_as_draft",changeLogDetails.post_save_as_draft );
+        formData.append("post_pin_to_top",changeLogDetails.post_pin_to_top );
+        formData.append("post_override_url_boolean",changeLogDetails.post_override_url_boolean );
+        formData.append("post_override_url",changeLogDetails.post_override_url );
+        formData.append("post_expired_boolean",changeLogDetails.post_expired_boolean );
+        formData.append("post_expired_datetime",changeLogDetails.post_expired_boolean === 1 ? moment(changeLogDetails.post_expired_datetime).format("YYYY-MM-DD") : "" );
+        formData.append("post_override_thumbnail_boolean",changeLogDetails.post_override_thumbnail_boolean);
+        formData.append("post_override_thumbnail",changeLogDetails.post_override_thumbnail );
+        formData.append("post_nodify_customer",changeLogDetails.post_nodify_customer );
+        formData.append("post_browser",changeLogDetails.post_browser );
+        formData.append("post_ip_address",changeLogDetails.post_ip_address );
+        formData.append("category_id",changeLogDetails.category_id);
+        for (var i = 0; i < changeLogDetails.labels.length; i++) {
+            formData.append('labels[]', changeLogDetails.labels[i]);
+        }
+        formData.append("post_description", convertedContent);
+        formData.append("image", changeLogDetails.image);
+        const data = await apiService.createPosts(formData);
+        if(data.status === 200){
+            message.success("Post create successfully")
+            setChangeLogDetails(initialState)
+            setConvertedContent(null)
+            setIsSave(false)
+            history.push(`${baseUrl}/changelogs?${urlParams}`);
+        } else {
+            setIsSave(false)
+            message.error(data.error)
+        }
+
+    }
+
+    const updatePost = async () => {
+        let validationErrors = {};
+        Object.keys(changeLogDetails).forEach(name => {
+            const error = formValidate(name, changeLogDetails[name]);
+            if (error && error.length > 0) {
+                validationErrors[name] = error;
+            }
+        });
+        if (Object.keys(validationErrors).length > 0) {
+            setFormError(validationErrors);
+            return;
+        }
+        setIsSave(true)
+        let formData = new FormData();
+        formData.append("post_project_id",projectDetailsReducer.id);
+        formData.append("post_title",changeLogDetails.post_title);
+        formData.append("post_assign_to",changeLogDetails.post_assign_to.join());
+        formData.append("post_slug_url",changeLogDetails.post_slug_url ? changeLogDetails.post_slug_url : changeLogDetails.post_title.replace(/ /g,"-").replace(/\?/g, "-"));
+        formData.append("post_published_at",moment(changeLogDetails.post_published_at).format("YYYY-MM-DD") );
+        formData.append("post_save_as_draft",changeLogDetails.post_save_as_draft );
+        formData.append("post_pin_to_top",changeLogDetails.post_pin_to_top);
+        formData.append("post_override_url_boolean",changeLogDetails.post_override_url_boolean);
+        formData.append("post_override_url",changeLogDetails.post_override_url);
+        formData.append("post_expired_boolean",changeLogDetails.post_expired_boolean);
+        formData.append("post_expired_datetime",changeLogDetails.post_expired_boolean === 1 ? moment(changeLogDetails.post_expired_datetime).format("YYYY-MM-DD") : "");
+        formData.append("post_override_thumbnail_boolean",changeLogDetails.post_override_thumbnail_boolean);
+        formData.append("post_override_thumbnail",changeLogDetails.post_override_thumbnail);
+        formData.append("post_nodify_customer",changeLogDetails.post_nodify_customer);
+        formData.append("post_browser",changeLogDetails.post_browser);
+        formData.append("post_ip_address",changeLogDetails.post_ip_address)
+        formData.append("category_id",changeLogDetails.category_id)
+        for (var i = 0; i < changeLogDetails.labels.length; i++) {
+            formData.append('labels[]', changeLogDetails.labels[i]);
+        }
+        formData.append("post_description", convertedContent);
+        formData.append("image", changeLogDetails.image);
+        const data = await apiService.updatePosts(formData, changeLogDetails.id)
+        if(data.status === 200){
+            message.success("Post update successfully")
+            setChangeLogDetails(initialState)
+            setConvertedContent(null)
+            setIsSave(false)
+            history.push(`${baseUrl}/changelogs?${urlParams}`);
+
+        } else {
+            setIsSave(false)
+            message.error(data.error)
+        }
+    }
+
     return (
         <Sheet open={isOpen} onOpenChange={isOpen ? onClose : onOpen}>
             <SheetContent className={"pt-[24px] p-0 overflow-y-scroll lg:max-w-[663px] md:max-w-[720px] sm:max-w-[520px]"}>
                 <SheetHeader className={"px-8 py-6 flex flex-row justify-between items-center"}>
-                    <h5 className={"text-xl font-medium leading-5"}>Create New Announcements</h5>
+                    <h5 className={"text-xl font-medium leading-5"}>{ editTitle ? "Update Announcement" :"Create New Announcements"}</h5>
                     <div className={"flex items-center gap-6"}>
                         <Button className={"h-5 w-5 p-0"} variant={"ghost"}><Pin className={"h-4 w-4"} size={18}/></Button>
                         <Button className={"h-5 w-5 p-0"} onClick={onClose} onClick={onClose} variant={"ghost"}><X size={18} className={"h-5 w-5"}/></Button>
@@ -67,18 +275,17 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose}) => {
                     <div className={"flex flex-col gap-6"}>
                         <div className="grid w-full gap-2">
                             <Label htmlFor="title">Title</Label>
-                            <Input type="text" id="title" className={"h-9"}/>
+                            <Input type="text" id="title" className={"h-9"} name={"post_title"} value={changeLogDetails.post_title} onChange={onChangeText}/>
                         </div>
                         <div className="grid w-full gap-2">
                             <Label className={"text-[14px] text=[#0F172A]"} htmlFor="link">Permalink / Slug</Label>
-                            <Input type="text" className={"h-9"} id="link"/>
+                            <Input type="text" className={"h-9"} id="link" name={"post_slug_url"} value={changeLogDetails.post_slug_url} onChange={onChangeText}/>
                             <p className={"text-[14px] font-normal leading-5"}>This release will be available at <span
                                 className={"text-violet-600 text-[14px]"}>https://testingapp.quickhunt.app/</span></p>
                         </div>
                         <div className="grid w-full gap-2">
                             <Label htmlFor="description">Description</Label>
-                            <Textarea className={"min-h-[100px]"} type="text" id="description"
-                                      placeholder={"Start writing..."}/>
+                            <Textarea className={"min-h-[100px]"} type="text" id="description" placeholder={"Start writing..."} name={"post_description"} value={changeLogDetails.post_description} onChange={onChangeText}/>
                         </div>
                     </div>
                 </div>
@@ -87,21 +294,20 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose}) => {
                     <div className={"px-8 flex flex-row gap-4 items-start"}>
                         <div className="grid w-full gap-2 basis-1/2">
                             <Label htmlFor="label">Label</Label>
-                            <Select>
+                            <Select   value={changeLogDetails.labels} onValueChange={onChangeLabel}>
                                 <SelectTrigger className="h-9">
                                     <SelectValue placeholder="Nothing Selected"/>
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectGroup>
                                         {
-                                            (label || []).map((x, i) => {
+                                            (labelList || []).map((x, i) => {
                                                 return (
                                                     <Fragment key={i}>
-                                                        <SelectItem value={x.value}>
+                                                        <SelectItem value={x.id}>
                                                             <div className={"flex items-center gap-2"}>
-                                                                <Circle className={`w-[10px] h-[10px]`}
-                                                                        fill={x.fillColor} stroke={x.strokeColor}/>
-                                                                {x.name}
+                                                                <Circle fill={x.label_color_code} stroke={x.label_color_code} className={`${theme === "dark" ? "" : "text-muted-foreground"} w-[10px] h-[10px]`}/>
+                                                                {x.label_name}
                                                             </div>
                                                         </SelectItem>
                                                     </Fragment>
@@ -114,13 +320,21 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose}) => {
                         </div>
                         <div className="grid w-full gap-2 basis-1/2">
                             <Label htmlFor="label">Assign to</Label>
-                            <Select>
+                            <Select  value={changeLogDetails.post_assign_to} onValueChange={onchangeAssignTo}>
                                 <SelectTrigger className={"h-9"}>
                                     <SelectValue className={"text-muted-foreground text-sm"} placeholder="Assign to"/>
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectGroup>
-                                        <SelectItem value="ankesh_ramani">Ankesh Ramani</SelectItem>
+                                        {
+                                            (memberList || []).map((x, i) => {
+                                                return (
+                                                        <SelectItem key={i} value={x.user_id.toString()} >
+                                                            {x.user_first_name ? x.user_first_name: ''} {x.user_last_name ? x.user_last_name: ''}
+                                                        </SelectItem>
+                                                )
+                                            })
+                                        }
                                     </SelectGroup>
                                 </SelectContent>
                             </Select>
@@ -129,16 +343,16 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose}) => {
                     <div className={"px-8 flex flex-row gap-4 items-start"}>
                         <div className={"grid w-full gap-2 basis-1/2"}>
                             <Label htmlFor="label">Category</Label>
-                            <Select>
+                            <Select value={changeLogDetails && changeLogDetails.category_id && changeLogDetails.category_id.toString()} onValueChange={onChangeCategory}>
                                 <SelectTrigger className="h-9">
                                     <SelectValue placeholder="Category"/>
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectGroup>
                                         {
-                                            (category || []).map((x, i) => {
+                                            (categoriesList || []).map((x, i) => {
                                                 return (
-                                                    <SelectItem key={i} value={x.value}>{x.name}</SelectItem>
+                                                    <SelectItem key={i} value={x.id.toString()}>{x.name}</SelectItem>
                                                 )
                                             })
                                         }
@@ -148,7 +362,26 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose}) => {
                         </div>
                         <div className="grid w-full gap-2 basis-1/2">
                             <Label htmlFor="date">Published at</Label>
-                            <Input className={"h-9"} id={"date"} type={"date"}/>
+                            <Popover>
+                                <PopoverTrigger asChild>
+                                    <Button
+                                        id="date"
+                                        variant={"outline"}
+                                        className={cn("justify-start text-left font-normal", "text-muted-foreground")}
+                                    >
+                                        <CalendarIcon className="mr-2 h-4 w-4" />
+
+                                    </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-auto p-0" align="start">
+                                    <Calendar
+                                        mode="single"
+                                        selected={date}
+                                        onSelect={onDateChange}
+
+                                    />
+                                </PopoverContent>
+                            </Popover>
                         </div>
                     </div>
                 </div>
@@ -173,11 +406,11 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose}) => {
                         </div>
                         <div className={"flex flex-col gap-[18px]"}>
                             <div className={"flex gap-6"}>
-                                <Switch/>
+                                <Switch disabled={userDetailsReducer.plan == 0} checked={changeLogDetails.post_nodify_customer ===  1} onCheckedChange={(checked)=>onChangeText({target:{name: "post_nodify_customer", value: checked === true ? 1 : 0}})} />
                                 <p className={"text-[14px] non-italic font-medium"}>Notify Customers</p>
                             </div>
                             <div className={"flex gap-6"}>
-                                <Switch/>
+                                <Switch disabled={userDetailsReducer.plan == 0} checked={changeLogDetails.post_expired_boolean ===  1} onCheckedChange={(checked)=>onChangeText({target:{name: "post_expired_boolean", value: checked === true ? 1 : 0}})} />
                                 <p className={"text-[14px] non-italic font-medium"}>Expire At</p>
                             </div>
                         </div>
@@ -185,7 +418,7 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose}) => {
                 </div>
                 <Separator className={"my-6"}/>
                 <div className={"pt-2 pb-8 px-8 flex flex-row gap-4 flex-wrap"}>
-                    <Button variant={"outline "} className={"bg-violet-600 text-[#fff]"}>Publish Post</Button>
+                    <Button variant={"outline "} onClick={editTitle ? updatePost : createPosts} className={"bg-violet-600 text-[#fff]"}>{editTitle ? "Update Post" : "Publish Post"}</Button>
                     <Button variant={"outline "}
                             className={"rounded-md border border-violet-600 text-violet-600 text-[14px] font-semibold"}>Save as Draft</Button>
                     <Button variant={"outline "}
