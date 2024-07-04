@@ -11,8 +11,6 @@ import {ApiService} from "../../utils/ApiService";
 import {baseUrl} from "../../utils/constent";
 import {Eye, EyeOff, Loader2} from "lucide-react";
 import {useToast} from "../ui/use-toast";
-import AppLogoWhite from "../../img/quickhunt.white.png";
-import AppLogoPurple from "../../img/quickhunt.purple.png";
 
 const initialState = {
     user_first_name: '',
@@ -172,7 +170,7 @@ const Register = () => {
             <div className="hidden lg:block p-16 lg:flex bg-purple-400 justify-center pb-[90px]">
                 <div className={"grid gap-6"}>
                 <div className={"app-logo"}>
-                    <img src={AppLogoWhite} alt={"app-logo"}/>
+                    {Icon.whiteLogo}
                 </div>
                 <Carousel
                     plugins={[plugin.current]}
@@ -214,7 +212,7 @@ const Register = () => {
                 {/*<div className="mx-auto grid w-[384px] gap-8">*/}
                 <div className="mx-auto grid w-[392px] gap-8 lg:pt-[76px] sm:pt-[100px] xs:pt-[50px]">
                 <div className="gap-2 flex flex-col items-center">
-                            <img src={AppLogoPurple} alt={""}/>
+                    {Icon.blackLogo}
                         <h1 className="text-3xl font-medium text-slate-900">Let's Set Up Your Account</h1>
                         <h6 className="font-normal text-sm text-zinc-500">Enhance customer experience now.</h6>
                     </div>

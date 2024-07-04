@@ -6,7 +6,7 @@ import {Button} from "../ui/button";
 import {Loader2} from "lucide-react";
 import {useToast} from "../ui/use-toast";
 import {ApiService} from "../../utils/ApiService";
-import AppLogoPurple from "../../img/quickhunt.purple.png";
+import {Icon} from "../../utils/Icon";
 
 const Forgot = () => {
     let apiSerVice = new ApiService();
@@ -87,7 +87,7 @@ const Forgot = () => {
         <div className={"w-full flex flex-col items-center justify-center"}>
             <div className={"max-w-2xl m-auto"}>
                 <div className={"flex items-center justify-center mt-24"}>
-                    <img className={""} src={AppLogoPurple} alt={"app-logo"}/>
+                    {Icon.blackLogo}
                 </div>
                 <h1 className="scroll-m-20 text-3xl font-semibold tracking-tight lg:text-3xl mb-3.5 mt-6">
                     Forgot Password

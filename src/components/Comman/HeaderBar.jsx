@@ -9,7 +9,6 @@ import {apiService, baseUrl, logout, removeProjectDetails, setProjectDetails} fr
 import {useNavigate} from "react-router-dom";
 import {Icon} from "../../utils/Icon";
 import {Avatar, AvatarFallback, AvatarImage} from "../ui/avatar";
-import AppLogoPurple from "../../img/quickhunt.purple.png";
 import {ApiService} from "../../utils/ApiService";
 import {Popover, PopoverTrigger, PopoverContent} from "../ui/popover";
 import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList} from "../ui/command";
@@ -330,8 +329,7 @@ const HeaderBar = () => {
     }
 
     return (
-        <header
-            className="flex h-14 lg:justify-between md:justify-between items-center sm:justify-between gap-4 px-4 lg:h-[60px] lg:px-6 ">
+        <header className="flex h-14 lg:justify-between md:justify-between items-center sm:justify-between gap-4 px-4 lg:h-[60px] lg:px-6 ">
 
             {/*Mobile said bar start */}
             <Sheet open={isSheetOpenMenu} onOpenChange={isSheetOpenMenu ? closeSheetMenu : openSheetMenu}>
@@ -419,7 +417,9 @@ const HeaderBar = () => {
 
             <div className="flex h-14 items-center lg:h-[60px] ">
                 <div className={"app-logo"}>
-                    <img className={"lg:w-full md:w-[195px]"} src={AppLogoPurple} alt={"app-logo"}/>
+                    {
+                        theme === "dark" ? Icon.whiteLogo : Icon.blackLogo
+                    }
                 </div>
             </div>
             <div className={"flex gap-8"}>

@@ -60,6 +60,7 @@
     "react-day-picker": "^8.10.1",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.51.5",
+    "react-lines-ellipsis": "^0.15.4",
     "react-redux": "^9.1.2",
     "react-resizable-panels": "^2.0.19",
     "react-router": "^6.23.1",

@@ -11,8 +11,6 @@ import {ApiService} from "../../utils/ApiService";
 import {baseUrl} from "../../utils/constent";
 import {Eye, EyeOff, Loader2} from "lucide-react";
 import {useToast} from "../ui/use-toast";
-import AppLogoWhite from "../../img/quickhunt.white.png";
-import AppLogoPurple from "../../img/quickhunt.purple.png";
 
 const initialState ={
     user_email_id:'',
@@ -140,7 +138,7 @@ const Login = () => {
             <div className="hidden lg:block p-16 lg:flex bg-purple-400 justify-center pb-[90px]">
                 <div className={"grid gap-6"}>
                 <div className={"app-logo"}>
-                    <img src={AppLogoWhite} alt={"app-logo"} />
+                    {Icon.whiteLogo}
                 </div>
                 <Carousel
                     plugins={[plugin.current]}
@@ -180,7 +178,7 @@ const Login = () => {
                 <div className="mx-auto grid w-[384px] gap-8 lg:pt-[142px] sm:pt-[100px] xs:pt-[50px]">
                     <div className="gap-2 flex flex-col items-center">
                     {/*<div className="grid gap-2 text-center">*/}
-                            <img src={AppLogoPurple} alt={""}/>
+                        {Icon.blackLogo}
                         <h1 className="text-3xl font-medium text-slate-900">Login to Your Account</h1>
                         <h6 className="font-normal text-sm text-zinc-500">Enter your email below to create your account</h6>
                     </div>

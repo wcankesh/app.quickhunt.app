@@ -14,6 +14,7 @@ import {useSelector} from "react-redux";
 import Highcharts from 'highcharts'
 import HighchartsReact from 'highcharts-react-official'
 import {useTheme} from "../theme-provider";
+import EmptyData from "../Comman/EmptyData";
 
 const programAnalytics = [
     {
@@ -85,6 +86,19 @@ export function Dashboard() {
         ]
     });
 
+    const [dataAvailable, setDataAvailable] = useState(true);
+
+    // useEffect(() => {
+    //     if (
+    //         chartList.uniqueViewList.length === 0 &&
+    //         chartList.totalViewViewList.length === 0
+    //     ) {
+    //         setDataAvailable(false);
+    //     } else {
+    //         setDataAvailable(true);
+    //     }
+    // }, [chartList.uniqueViewList, chartList.totalViewViewList]);
+
     useEffect(() => {
         dashboardData()
     },[projectDetailsReducer.id])
@@ -121,6 +135,14 @@ export function Dashboard() {
                 feedbackAnalytics.push(obj)
             })
             setChartList({...data.data,uniqueViewList:uniqueViewList,totalViewViewList: totalViewViewList, feedbackAnalytics:feedbackAnalytics})
+            if (
+                uniqueViewList.length === 0 &&
+                totalViewViewList.length === 0
+            ) {
+                setDataAvailable(false);
+            } else {
+                setDataAvailable(true);
+            }
         } else {
 
         }
@@ -289,9 +311,7 @@ export function Dashboard() {
                                                 </CardContent>
                                             ))
                                         ) : (
-                                            <CardContent className={"pt-6 flex justify-center"}>
-                                                {Icon.emptyData}
-                                            </CardContent>
+                                            <EmptyData />
                                         )
                                     }
                                     <CardFooter className={"pt-4 px-0 pb-0 justify-end"}>
@@ -320,9 +340,7 @@ export function Dashboard() {
                                                 ))
                                             ) :
                                             (
-                                                <CardContent className={"pt-6 flex justify-center"}>
-                                                    {Icon.emptyData}
-                                                </CardContent>
+                                                <EmptyData />
                                             )
                                     }
                                     <CardFooter className={"pt-4 px-0 pb-0 justify-end"}>
@@ -335,9 +353,13 @@ export function Dashboard() {
                                     <CardHeader className={"px-[28px] pb-0"}>
                                         <CardTitle className={"text-base font-bold"}>Overview</CardTitle>
                                     </CardHeader>
+                                    {dataAvailable ? (
                                         <CardContent className={"pb-10 px-[28px] pt-8 m-0"}>
                                             <HighchartsReact highcharts={Highcharts} options={options}/>
                                         </CardContent>
+                                    ) : (
+                                        <EmptyData/>
+                                    )}
                                 </Card>
                             </div>
                         </div>
