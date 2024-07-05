@@ -205,7 +205,7 @@ export class ApiService{
         return await this.deleteData(`${baseUrlApi}/projects/${id}`)
     }
     async getAllCustomers (id){
-        return await this.getData(`${baseUrlApi}/customers?project_id=${id}`)
+        return await this.getData(`${baseUrlApi}/customers?${qs.stringify(id)}`)
     }
     async getSingleCustomers (id){
         return await this.getData(`${baseUrlApi}/customers/${id}?is_history=1`)

@@ -1,4 +1,4 @@
-import React, {Fragment, useEffect, useRef, useState} from 'react';
+import React, { useEffect, useState} from 'react';
 import {Sheet, SheetContent, SheetHeader,} from "../ui/sheet";
 import {Separator} from "../ui/separator";
 import {CalendarIcon, Check, Circle, Pin, X} from "lucide-react";
@@ -14,22 +14,8 @@ import {useSelector} from "react-redux";
 import {useTheme} from "../theme-provider";
 import {Popover, PopoverContent, PopoverTrigger} from "../ui/popover";
 import {cn} from "../../lib/utils";
-import {format} from "date-fns";
 import {Calendar} from "../ui/calendar";
-
-
-const label = [
-    {name: "Bug Fix", value: "bug_fix", fillColor: "#FF3C3C", strokeColor: "#FF3C3C"},
-    {name: "New", value: "new", fillColor: "#3B82F6", strokeColor: "#3B82F6"},
-    {name: "Important", value: "important", fillColor: "#63C8D9", strokeColor: "#63C8D9"},
-]
-const category = [
-    {name: "Website", value: "1"},
-    {name: "Public Api", value: "2"},
-    {name: "iOS App", value: "3"},
-    {name: "Android App", value: "4"},
-    {name: "Web App", value: "5"},
-];
+import {toast} from "../ui/use-toast";
 
 const initialState = {
     post_description:'',
@@ -51,20 +37,14 @@ const initialState = {
     category_id: '',
     labels: [],
     image:'',
-
-
 };
 const initialStateError = {
     post_title: "",
     post_description: "",
-
 }
 
 const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,editTitle,callBack}) => {
     const [previewImage,setPreviewImage] = useState("");
-    // let history = useHistory();
-    const editor = useRef(null);
-    let apiService = new ApiService();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
     const userDetailsReducer = useSelector(state => state.userDetailsReducer);
@@ -74,11 +54,11 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,editTitle,callBack
     const [memberList, setMemberList] = useState([])
     const [categoriesList, setCategoriesList] = useState([])
     const [isSave, setIsSave] = useState(false)
-    const [isProModal, setIsProModal] = useState(false);
     const [formError, setFormError] = useState(initialStateError);
-    const {theme}=useTheme();
     const [selectedValues, setSelectedValues] = useState([]);
     const [selectedLabels, setSelectedLabels] = useState([]);
+    const {theme}=useTheme();
+    let apiService = new ApiService();
 
     useEffect(()=>{
         if(editTitle){
@@ -116,16 +96,16 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,editTitle,callBack
         switch (name) {
             case "post_title":
                 if (!value || value.trim() === "") {
-                    return "Title is required";
+                    return "Title is required.";
                 } else {
                     return "";
                 }
-            /*  case "post_description":
+              case "post_description":
                   if (!value || value.trim() === "") {
-                      return "Description is required";
+                      return "Description is required.";
                   } else {
                       return "";
-                  }*/
+                  }
             default: {
                 return "";
             }
@@ -202,7 +182,9 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,editTitle,callBack
             setChangeLogDetails(initialState)
             setConvertedContent(null)
             setIsSave(false)
-            // history.push(`${baseUrl}/changelogs?${urlParams}`);
+            toast({
+                title: "Announcement created successfully",
+            });
         } else {
             setIsSave(false)
         }
@@ -252,20 +234,24 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,editTitle,callBack
             setChangeLogDetails(initialState)
             setConvertedContent(null)
             setIsSave(false)
-            // history.push(`${baseUrl}/changelogs?${urlParams}`);
+            toast({
+                title: "Announcement updated successfully",
+            });
 
         } else {
             setIsSave(false)
-            // message.error(data.error)
+            toast({
+                title: "Uh oh! Something went wrong.",
+                variant: "destructive"
+            });
         }
-        // callBack();
+        callBack();
         onClose();
     }
 
     const saveAsDraft = async () => {
         console.log("save as draft");
     };
-
 
     const handleValueChange = (value) => {
         const clone = [...changeLogDetails.post_assign_to]
@@ -278,8 +264,6 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,editTitle,callBack
         setChangeLogDetails({...changeLogDetails,post_assign_to: clone});
     };
 
-
-
     const onChangeLabel = (value) => {
         const clone = [...changeLogDetails.labels]
         const index = clone.indexOf(value);
@@ -291,8 +275,10 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,editTitle,callBack
         setChangeLogDetails({...changeLogDetails,labels: clone});
     }
 
-
-
+    const deleteAssignTo = (e,index)=> {
+        e.stopPropagation();
+        console.log("delete",index);
+    }
 
     return (
         <Sheet open={isOpen} onOpenChange={isOpen ? onClose : onOpen}>
@@ -310,6 +296,7 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,editTitle,callBack
                         <div className="grid w-full gap-2">
                             <Label htmlFor="title">Title</Label>
                             <Input type="text" id="title" className={"h-9"} name={"post_title"} value={changeLogDetails.post_title} onChange={onChangeText}/>
+                            {formError.post_title && <span className="text-sm text-red-500">{formError.post_title}</span>}
                         </div>
                         <div className="grid w-full gap-2">
                             <Label className={"text-[14px] text=[#0F172A]"} htmlFor="link">Permalink / Slug</Label>
@@ -319,7 +306,8 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,editTitle,callBack
                         </div>
                         <div className="grid w-full gap-2">
                             <Label htmlFor="description">Description</Label>
-                            <Textarea className={"min-h-[100px]"} type="text" id="description" placeholder={"Start writing..."} name={"post_description"} value={changeLogDetails.post_description} onChange={onChangeText}/>
+                            <Textarea className={`min-h-[100px]`} type="text" id="description" placeholder={"Start writing..."} name={"post_description"} value={changeLogDetails.post_description} onChange={onChangeText}/>
+                            {formError.post_description && <span className="text-sm text-red-500">{formError.post_description}</span>}
                         </div>
                     </div>
                 </div>
@@ -331,7 +319,19 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,editTitle,callBack
                             <Select   value={selectedLabels} onValueChange={onChangeLabel}>
                                 <SelectTrigger className="h-9">
                                     <SelectValue className={"text-muted-foreground text-sm"} placeholder="Nothing selected">
-                                        { changeLogDetails.labels ? changeLogDetails.labels.join(', ') : "Nothing selected"}
+                                        <div className={"flex gap-[2px]"}>
+                                            {
+                                                (changeLogDetails.labels || []).slice(0,2).map((x)=>{
+                                                    const findObj = labelList.find((y) => y.id == x);
+                                                    return(
+                                                        <div className={"text-sm flex gap-[2px] bg-slate-300 items-center rounded py-0 px-[2px]"} >
+                                                            <Circle fill={findObj.label_color_code} size={6} stroke={findObj.label_color_code}/>  {findObj.label_name}
+                                                        </div>
+                                                    )
+                                                })
+                                            }
+                                            {(changeLogDetails.labels || []).length > 2 && <div>...</div>}
+                                        </div>
                                     </SelectValue>
                                 </SelectTrigger>
                                 <SelectContent>
@@ -362,7 +362,19 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,editTitle,callBack
                             <Select value={selectedValues} onValueChange={handleValueChange}>
                                 <SelectTrigger className={"h-9"}>
                                     <SelectValue className={"text-muted-foreground text-sm"} placeholder="Assign to">
-                                        { changeLogDetails.post_assign_to ? changeLogDetails.post_assign_to.join(', ') : "Assign to"}
+                                        <div className={"flex gap-[2px]"}>
+                                            {
+                                                (changeLogDetails.post_assign_to || []).slice(0,2).map((x,index)=>{
+                                                    const findObj = memberList.find((y,) => y.user_id == x);
+                                                    return(
+                                                        <div key={index} className={"text-sm flex gap-[2px] bg-slate-300 items-center rounded py-0 px-[2px]"} onClick={(e)=>deleteAssignTo(e,index)}>
+                                                            {findObj.user_first_name ? findObj.user_first_name : ''}
+                                                        </div>
+                                                    )
+                                                })
+                                            }
+                                            {(changeLogDetails.post_assign_to || []).length > 2 && <div>...</div>}
+                                        </div>
                                     </SelectValue>
                                 </SelectTrigger>
                                 <SelectContent>

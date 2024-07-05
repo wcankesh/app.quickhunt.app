@@ -1,55 +1,21 @@
 import React,{Fragment,useState,useEffect,} from 'react';
 import {Button} from "../ui/button";
-import ComboBox from "../Comman/ComboBox";
 import {Input} from "../ui/input";
 import AnnouncementsView from "./AnnouncementsView";
 import AnnouncementsTable from "./AnnouncementsTable";
-import {Circle, LayoutList, Plus, Text} from "lucide-react";
+import {ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Circle, LayoutList, Plus, Text} from "lucide-react";
 import CreateAnnouncementsLogSheet from "./CreateAnnouncementsLogSheet";
 import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "../ui/select";
 import {useTheme} from "../theme-provider";
 import {useSelector} from "react-redux";
 import {ApiService} from "../../utils/ApiService";
 import {getProjectDetails} from "../../utils/constent";
+import {Card} from "../ui/card";
 const initialStateFilter = {
     l : "",
     s: ""
 }
 const perPageLimit = 15;
-
-const items = [
-    {
-        value: "all",
-        label: "All",
-    },
-    {
-        value: "draft",
-        label: "Draft",
-    },
-    {
-        value: "published",
-        label: "Published",
-    },
-
-];
-
-const items2 =[
-    {
-        value: "bug_fix",
-        label: "Bug Fix",
-        color:"#FF3C3C"
-    },
-    {
-        value: "new",
-        label: "New",
-        color:"#3B82F6"
-    },
-    {
-        value: "important",
-        label: "Important",
-        color:"#63C8D9"
-    },
-];
 
 const status =[
     {
@@ -64,11 +30,11 @@ const status =[
         label:"Published",
         value:2
     }
-]
+];
 
 const Announcements = () => {
     const [isSheetOpen, setSheetOpen] = useState(false);
-    const [tab,setTab]=useState(0);
+    const [tab,setTab]=useState(null);
     const {theme}=useTheme();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
@@ -84,13 +50,14 @@ const Announcements = () => {
     const openSheet = () => {
         setSheetOpen(true);
         setIsNewAnnouncemnt(true);
-
     };
     const closeSheet = () => setSheetOpen(false);
 
     useEffect(() => {
         getAllPosts()
-        setLabelList(allStatusAndTypes.labels)
+        setLabelList(allStatusAndTypes.labels);
+        const tabIndex = localStorage.getItem("tabIndex" || 0);
+        setTab(tabIndex);
     }, [projectDetailsReducer.id, allStatusAndTypes, pageNo,]);
 
     const getAllPosts = async () => {
@@ -106,14 +73,11 @@ const Announcements = () => {
     }
 
     const callBackForProps = async () => {
-        // setIsLoading(true)
         const data  = await apiService.getAllPosts({project_id: projectDetailsReducer.id,page: pageNo,limit: perPageLimit})
         if(data.status === 200){
             setIsLoading(false)
             setAnnouncementList(data.data)
             setTotalRecord(data.total)
-        } else {
-            // setIsLoading(false)
         }
     }
 
@@ -136,10 +100,22 @@ const Announcements = () => {
         }
     }
 
+    const handleTab = (tabIndex) => {
+        setTab(tabIndex);
+        localStorage.setItem("tabIndex",tabIndex);
+    }
+
+    const totalPages = Math.ceil(totalRecord / perPageLimit);
+
+    const handlePaginationClick = (newPage) => {
+        if (newPage >= 1 && newPage <= totalPages) {
+            setPageNo(newPage);
+        }
+    };
+
     return (
         <div className={"pt-8 xl:container xl:max-w-[1200px] lg:container lg:max-w-[992px] md:container md:max-w-[530px] sm:container sm:max-w-[639px] xs:container xs:max-w-[475px] max-[639px]:container max-[639px]:max-w-[507px]"}>
-            {isNewAnnouncemnet && <CreateAnnouncementsLogSheet isOpen={isSheetOpen} onOpen={openSheet} onClose={closeSheet}
-                                          callBack={callBackForProps}/>}
+            {isNewAnnouncemnet && <CreateAnnouncementsLogSheet isOpen={isSheetOpen} onOpen={openSheet} onClose={closeSheet} callBack={callBackForProps}/>}
             <div className={"flex flex-row gap-6 items-center xl:flex-nowrap md:flex-wrap sm:flex-wrap min-[320px]:flex-wrap max-[639px]:flex-wrap max-[639px]:gap-3"}>
                 <div className="basis-1/4">
                     <h3 className={"text-2xl font-medium leading-8"}>{getProjectDetails('project_name')}</h3>
@@ -204,11 +180,11 @@ const Announcements = () => {
                 </div>
                 <div className="basis-1/4">
                     <div className={"flex flex-grow gap-2 items-center"}>
-                        <Button onClick={()=>setTab(0)} variant={"outline"} className={`h-9 w-9 p-2 ${tab === 0 ? "bg-violet-600" : ""} ${tab === 0 ? "hover:bg-[#7C3AED]" : ""}`} >
-                            <Text className={"w-5 h-5"} color={`${tab === 0 ? "#FFFFFF": "#5F5F5F"}`} />
+                        <Button onClick={()=>handleTab(0)} variant={"outline"} className={`h-9 w-9 p-2 ${tab == 0 ? "bg-violet-600" : ""} ${tab == 0 ? "hover:bg-[#7C3AED]" : ""}`} >
+                            <Text className={"w-5 h-5"} color={`${tab == 0 ? "#FFFFFF": "#5F5F5F"}`} />
                         </Button>
-                        <Button onClick={ () =>setTab(1)} variant={"outline"} className={`h-9 w-9 p-2 ${tab === 1 ? "bg-violet-600" : ""} ${tab === 1 ? "hover:bg-[#7C3AED]" : ""}`}>
-                            <LayoutList className={"w-5 h-5"} color={`${tab === 1 ? "#FFFFFF": "#5F5F5F"}`} />
+                        <Button onClick={ () =>handleTab(1)} variant={"outline"} className={`h-9 w-9 p-2 ${tab == 1 ? "bg-violet-600" : ""} ${tab == 1 ? "hover:bg-[#7C3AED]" : ""}`}>
+                            <LayoutList className={"w-5 h-5"} color={`${tab == 1 ? "#FFFFFF": "#5F5F5F"}`} />
                         </Button>
                         <Button onClick={openSheet} className={"hover:bg-violet-600"}>
                           <Plus className={"mr-4"} size={18} /> New Announcement
@@ -217,10 +193,53 @@ const Announcements = () => {
                 </div>
             </div>
             {
-                tab === 0 ? <AnnouncementsTable data={announcementList} isLoading={isLoading} callBack={callBackForProps}/> : <AnnouncementsView data={announcementList} callBack={callBackForProps}/>
+                tab == 0 ? <Card className={"my-9"}> <AnnouncementsTable data={announcementList} isLoading={isLoading} callBack={callBackForProps}/>  <div
+                    className={`w-full p-5 ${theme === "dark" ? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end pe-16 py-15px`}>
+                    <div className={"flex flex-row gap-8 items-center"}>
+                        <div>
+                            <h5 className={"text-sm font-semibold"}>Page {pageNo} of {totalPages}</h5>
+                        </div>
+                        <div className={"flex flex-row gap-2 items-center"}>
+                            <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"} onClick={() => handlePaginationClick(1)} disabled={pageNo === 1}>
+                                <ChevronsLeft className={pageNo === 1 ? "stroke-muted-foreground" : "stroke-primary"}/>
+                            </Button>
+                            <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"} onClick={() => handlePaginationClick(pageNo - 1)} disabled={pageNo === 1}>
+                                <ChevronLeft className={pageNo === 1 ? "stroke-muted-foreground" : "stroke-primary"}/>
+                            </Button>
+                            <Button variant={"outline"} className={" h-[30px] w-[30px] p-1.5"} onClick={() => handlePaginationClick(pageNo + 1)} disabled={pageNo === totalPages}>
+                                <ChevronRight className={pageNo === totalPages ? "stroke-muted-foreground" : "stroke-primary"}/>
+                            </Button>
+                            <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"} onClick={() => handlePaginationClick(totalPages)} disabled={pageNo === totalPages}>
+                                <ChevronsRight className={pageNo === totalPages ? "stroke-muted-foreground" : "stroke-primary"}/>
+                            </Button>
+                        </div>
+                    </div>
+                </div>  </Card>: <Card className={"my-9"}> <AnnouncementsView isLoading={isLoading}  data={announcementList} callBack={callBackForProps}/> <div
+                    className={`w-full p-5 ${theme === "dark" ? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end pe-16 py-15px`}>
+                    <div className={"flex flex-row gap-8 items-center"}>
+                        <div>
+                            <h5 className={"text-sm font-semibold"}>Page {pageNo} of {totalPages}</h5>
+                        </div>
+                        <div className={"flex flex-row gap-2 items-center"}>
+                            <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"} onClick={() => handlePaginationClick(1)} disabled={pageNo === 1}>
+                                <ChevronsLeft className={pageNo === 1 ? "stroke-muted-foreground" : "stroke-primary"}/>
+                            </Button>
+                            <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"} onClick={() => handlePaginationClick(pageNo - 1)} disabled={pageNo === 1}>
+                                <ChevronLeft className={pageNo === 1 ? "stroke-muted-foreground" : "stroke-primary"}/>
+                            </Button>
+                            <Button variant={"outline"} className={" h-[30px] w-[30px] p-1.5"} onClick={() => handlePaginationClick(pageNo + 1)} disabled={pageNo === totalPages}>
+                                <ChevronRight className={pageNo === totalPages ? "stroke-muted-foreground" : "stroke-primary"}/>
+                            </Button>
+                            <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"} onClick={() => handlePaginationClick(totalPages)} disabled={pageNo === totalPages}>
+                                <ChevronsRight className={pageNo === totalPages ? "stroke-muted-foreground" : "stroke-primary"}/>
+                            </Button>
+                        </div>
+                    </div>
+                </div> </Card>
             }
+
         </div>
     );
 }
 
-export default Announcements;
+export default Announcements

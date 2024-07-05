@@ -1,4 +1,4 @@
-import React, {Fragment, useState} from 'react';
+import React, {Fragment, useEffect, useState} from 'react';
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "../../ui/card";
 import {Button} from "../../ui/button";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "../../ui/tabs";
@@ -11,6 +11,9 @@ import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "../
 import {Trash2, X} from "lucide-react";
 import {useTheme} from "../../theme-provider";
 import {Sheet, SheetClose, SheetContent, SheetFooter, SheetHeader, SheetTitle} from "../../ui/sheet";
+import {ApiService} from "../../../utils/ApiService";
+import {useSelector} from "react-redux";
+import {Badge} from "../../ui/badge";
 
 const initialStateTeam = [
     {
@@ -28,14 +31,66 @@ const initialStateTeam = [
         status: "Expires in 6 days",
         invited: "Invited about A few seconds ago",
     },
-]
+];
+
+const initialState = {
+    email: "",
+}
+const initialStateError = {
+    email: "",
+}
 
 const Team = () => {
+    const apiSerVice = new ApiService();
     const { theme } = useTheme();
     const [isSheetOpen, setSheetOpen] = useState(false);
     const [inviteEmail, setInviteEmail] = useState('');
     const [emailError, setEmailError] = useState('');
     const [invitedUsers, setInvitedUsers] = useState(initialStateTeam);
+    const [isModalOpenMember, setIsModalOpenMember] = useState(false)
+    const [inviteTeamDetails, setInviteTeamDetails] = useState(initialState)
+    const [formError, setFormError] = useState(initialStateError);
+    const [memberList, setMemberList] = useState([])
+    const [invitationList, setInvitationList] = useState([])
+    const [isLoading, setIsLoading] = useState(false)
+    const [isAdmin, setIsAdmin] = useState(false)
+    const [isSave, setIsSave] = useState(false)
+    const [isProModal, setIsProModal] = useState(false);
+
+    const userDetailsReducer = useSelector(state => state.userDetailsReducer);
+
+    const apiService = new ApiService();
+
+
+    const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
+
+    useEffect(() => {
+        getMember()
+        getInvitations(true)
+    }, [projectDetailsReducer.id]);
+
+    const getMember = async () => {
+        setIsLoading(true)
+        const data = await apiService.getMember({project_id: projectDetailsReducer.id})
+        if (data.status === 200) {
+            setMemberList(data.data)
+            setIsAdmin(data.is_admin)
+            setIsLoading(false)
+        } else {
+            setIsLoading(false)
+        }
+    }
+
+    const getInvitations = async (loading) => {
+        setIsLoading(loading)
+        const data = await apiService.getInvitation({project_id: projectDetailsReducer.id})
+        if (data.status === 200) {
+            setInvitationList(data.data)
+            setIsLoading(false)
+        } else {
+            setIsLoading(false)
+        }
+    }
 
     const openSheet = () => setSheetOpen(true);
 
@@ -122,31 +177,51 @@ const Team = () => {
                             <h3 className={"text-sm font-medium"}>Team</h3>
                             <h3 className={"text-sm font-medium"}>Role</h3>
                         </div>
-                        <div className={"flex gap-2 px-6 py-2"}>
-                            <div>
-                                <Avatar className={"w-[30px] h-[30px]"}>
-                                    <AvatarFallback className={"bg-primary/10 border-primary border text-sm text-primary font-semibold"}>D</AvatarFallback>
-                                </Avatar>
-                            </div>
-                            <div className={"flex justify-between w-full"}>
-                                <div>
-                                    <h3 className={"text-sm font-medium"}>Darshan Jiyani</h3>
-                                    <p className={"text-xs font-normal text-muted-foreground"}>wc.darshan2003@gmail.com</p>
-                                </div>
-                                <div>
-                                    <Select>
-                                        <SelectTrigger className="w-[140px] bg-card">
-                                            <SelectValue placeholder="Admin" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectGroup>
-                                                <SelectItem value="admin">Admin</SelectItem>
-                                            </SelectGroup>
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                            </div>
+                        <div>
+                            <Table>
+                                <TableBody>
+                                    {
+                                        (memberList || []).map((x)=>{
+                                            return(
+                                                <TableRow key={x.id}>
+                                                    <TableCell className={"py-[10px]"}>
+                                                        <div className={"flex gap-2 items-center"}>
+                                                            <Avatar className={"w-[30px] h-[30px]"}>
+                                                                <AvatarFallback className={"bg-primary/10 border-primary border text-sm text-primary font-semibold"}>{x.user_first_name.substring(0,1)}</AvatarFallback>
+                                                            </Avatar>
+                                                            <div>
+                                                                <h3 className={"text-sm font-medium"}>{x.user_first_name} {x.user_last_name}</h3>
+                                                                <p className={"text-xs font-normal text-muted-foreground"}>{x.user_email_id}</p>
+                                                            </div>
+                                                        </div>
+                                                    </TableCell>
+                                                    <TableCell className={"flex justify-end items-center py-[10px] py-[17px]"}>
+                                                        <Badge variant={"outline"} className={`${x.role === 1 ? "text-[#63c8d9] h-[20px] py-0 px-2 text-xs rounded-[5px] shadow-[0px_1px_4px_0px_#63c8d9]" :""}`}>{x?.role === 1 ? "Admin" : "Member" }</Badge>
+                                                    </TableCell>
+                                                </TableRow>
+                                            )
+                                        })
+                                    }
+
+                                </TableBody>
+                            </Table>
                         </div>
+                        {/*<div className={"flex gap-2 px-6 py-2"}>*/}
+                        {/*    <div>*/}
+                        {/*        <Avatar className={"w-[30px] h-[30px]"}>*/}
+                        {/*            <AvatarFallback className={"bg-primary/10 border-primary border text-sm text-primary font-semibold"}>D</AvatarFallback>*/}
+                        {/*        </Avatar>*/}
+                        {/*    </div>*/}
+                        {/*    <div className={"flex justify-between w-full"}>*/}
+                        {/*        <div>*/}
+                        {/*            <h3 className={"text-sm font-medium"}>Darshan Jiyani</h3>*/}
+                        {/*            <p className={"text-xs font-normal text-muted-foreground"}>wc.darshan2003@gmail.com</p>*/}
+                        {/*        </div>*/}
+                        {/*        <div>*/}
+
+                        {/*        </div>*/}
+                        {/*    </div>*/}
+                        {/*</div>*/}
                     </TabsContent>
                     <TabsContent value="invites">
                         <div>

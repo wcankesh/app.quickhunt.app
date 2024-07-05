@@ -74,11 +74,6 @@ const SidebarSheet = ({ isOpen, onOpen, onClose ,selectedViewAnalyticsRecord,}) 
         }
     }
 
-    const onchangePage = (pagination) => {
-        setPageNo(pagination);
-    };
-
-
     return (
             <Sheet open={isOpen} onOpenChange={isOpen ? onClose : onOpen}>
                 <div>

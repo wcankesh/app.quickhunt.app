@@ -10,7 +10,7 @@ import {
     ChevronsRight, Circle, Ellipsis,
     MessageCircleMore
 } from "lucide-react";
-import {Card, CardFooter} from "../ui/card";
+import {Card, CardContent, CardFooter} from "../ui/card";
 import { DropdownMenu,
     DropdownMenuTrigger,
     DropdownMenuContent,
@@ -26,6 +26,7 @@ import {toast} from "../ui/use-toast";
 import ReadMoreText from "../Comman/ReadMoreText";
 import SidebarSheet from "./SidebarSheet";
 import {Toaster} from "../ui/toaster";
+import {CommSkel} from "../Comman/CommSkel";
 
 
 const dummyDetails ={
@@ -77,33 +78,19 @@ const status = [
     {name: "Draft", value: 1, fillColor: "#CF1322", strokeColor: "#CF1322",},
 ]
 
-const AnnouncementsView = ({data,callBack}) => {
+const AnnouncementsView = ({data,callBack,isLoading}) => {
     const [announcementList,setAnnouncementList]=useState([]);
-    const [isReadMore, setIsReadMore] = useState(true);
-    const [isSheetOpen, setSheetOpen] = useState(false);
     const [isSidebarSheetOpen, setSidebarSheetOpen] = useState(false);
-    const [selectedData, setSelectedData] = useState(null);
     const [isViewAnalytics, setIsViewAnalytics] = useState(false);
     const [selectedViewAnalyticsRecord, setSelectedViewAnalyticsRecord] = useState({id: ""});
     const [isCreateSheetOpen,setIsCreateSheetOpen]=useState(false);
     const [isEditAnalysis,setIsEditAnalysis] =useState(false);
     const [editTitle,setEditTitle]=useState("");
-
     const {theme} =useTheme();
 
     useEffect(()=>{
         setAnnouncementList(data);
     },[data]);
-
-    const toggleReadMore = () => {
-        setIsReadMore(!isReadMore);
-    };
-
-    const openSheet = (object) => {
-        setSheetOpen(true);
-        setSelectedData(object);
-    };
-    const closeSheet = () => setSheetOpen(false);
 
     const handleStatusChange = async (object, value) => {
         setAnnouncementList(announcementList.map(x => x.id === object.id ? { ...x, post_save_as_draft: value } : x));
@@ -126,7 +113,6 @@ const AnnouncementsView = ({data,callBack}) => {
         setSidebarSheetOpen(true);
         setSelectedViewAnalyticsRecord(x);
         setIsViewAnalytics(true);
-
     }
     const closeSheetSideBar = () => {
         setSidebarSheetOpen(false);
@@ -145,16 +131,17 @@ const AnnouncementsView = ({data,callBack}) => {
     }
 
     return (
-        <div className={"mt-9"}>
+        <div className={""}>
             <Toaster/>
             {isEditAnalysis && <CreateAnnouncementsLogSheet editTitle={editTitle} isOpen={isCreateSheetOpen} onOpen={onEdit} onClose={closeCreateSheet}/>}
             {isViewAnalytics && <SidebarSheet selectedViewAnalyticsRecord={selectedViewAnalyticsRecord} isOpen={isSidebarSheetOpen} onOpen={openSheetSidebar} onClose={closeSheetSideBar}/>}
-                <Card className="pt-[38px]">
+            {
+                isLoading ? <Card><CardContent className={"p-0"}><CommSkel count={4}/></CardContent></Card> : <div className="pt-[38px]">
                     <div className={"flex flex-col px-[33px] pb-[32px] "}>
-                    {
-                        (announcementList || []).map((x,index)=>{
-                            return(
-                                <Fragment>
+                        {
+                            (announcementList || []).map((x,index)=>{
+                                return(
+                                    <Fragment>
                                         <div className={"flex flex-row gap-4 items-center justify-between px-[31px] mb-[22px]"}>
                                             <div className={"basis-4/5 flex flex-row gap-4 items-center flex-wrap"}>
                                                 <h4 className={"text-base font-medium capitalize"}>{x.post_title}</h4>
@@ -203,16 +190,6 @@ const AnnouncementsView = ({data,callBack}) => {
                                                         <DropdownMenuItem>Delete</DropdownMenuItem>
                                                     </DropdownMenuContent>
                                                 </DropdownMenu>
-                                                {/*<Popover>*/}
-                                                {/*    <PopoverTrigger><Button variant={"outline"} className={"p-2 h-9 w-9 "}>{Icon.threeDots}</Button></PopoverTrigger>*/}
-                                                {/*    <PopoverContent className={"w-22 p-1"}>*/}
-                                                {/*        <div className={"flex flex-col gap-1"}>*/}
-                                                {/*            <Button variant={"outline"} className={"text-sm font-medium text-slate-700 text-start"}>Analytics</Button>*/}
-                                                {/*            <Button variant={"outline"} className={"text-sm font-medium text-slate-700 text-start"}>Edit</Button>*/}
-                                                {/*            <Button variant={"outline"} className={"text-sm font-medium text-slate-700 text-start"}>Delete</Button>*/}
-                                                {/*        </div>*/}
-                                                {/*    </PopoverContent>*/}
-                                                {/*</Popover>*/}
                                             </div>
                                         </div>
                                         <div className={"flex flex-row gap-4 justify-between px-[31px]"}>
@@ -233,9 +210,9 @@ const AnnouncementsView = ({data,callBack}) => {
                                             </div>
                                             <div className={"flex flex-wrap gap-1"}>
                                                 {
-                                                    (x.labels || []).map((y) => {
+                                                    (x.labels || []).map((y,index) => {
                                                         return (
-                                                            <Badge variant={"outline"} style={{
+                                                            <Badge key={index} variant={"outline"} style={{
                                                                 color: y.label_color_code,
                                                                 borderColor: y.label_color_code,
                                                                 textTransform: "capitalize"
@@ -246,37 +223,42 @@ const AnnouncementsView = ({data,callBack}) => {
                                                 }
                                             </div>
                                         </div>
-                                    {index != announcementList.length - 1  && <hr className={"bg-[#E4E4E7] h-[1px] my-6"}/>}
-                                </Fragment>
-                            )
-                        })
-                    }
+                                        {index != announcementList.length - 1  && <hr className={"bg-[#E4E4E7] h-[1px] my-6"}/>}
+                                    </Fragment>
+                                )
+                            })
+                        }
                     </div>
                     <Separator/>
-                    <CardFooter className={"p-0"}>
-                        <div className={`w-full p-5 ${theme === "dark" ? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end pe-16 py-15px`}>
-                            <div className={"flex flex-row gap-8 items-center"}>
-                                <div>
-                                    <h5 className={"text-sm font-semibold"}>Page {dummyDetails.page} of 10</h5>
-                                </div>
-                                <div className={"flex flex-row gap-2 items-center"}>
-                                    <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5 hover:none"}>
-                                        <ChevronsLeft  className={`${dummyDetails.preview === 0 ? "stroke-slate-300" : "stroke-primary"}`} />
-                                    </Button>
-                                    <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5 hover:none"}>
-                                        <ChevronLeft  className={`${dummyDetails.preview === 0 ? "stroke-slate-300" : "stroke-primary"}`} />
-                                    </Button>
-                                    <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5 hover:none"}>
-                                        <ChevronRight  className={"stroke-primary"} />
-                                    </Button>
-                                    <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5 hover:none"}>
-                                        <ChevronsRight className={"stroke-primary"} />
-                                    </Button>
+                    {
+                      isLoading == true !=   <CardFooter className={"p-0"}>
+                            <div className={`w-full p-5 ${theme === "dark" ? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end pe-16 py-15px`}>
+                                <div className={"flex flex-row gap-8 items-center"}>
+                                    <div>
+                                        <h5 className={"text-sm font-semibold"}>Page {dummyDetails.page} of 10</h5>
+                                    </div>
+                                    <div className={"flex flex-row gap-2 items-center"}>
+                                        <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5 hover:none"}>
+                                            <ChevronsLeft  className={`${dummyDetails.preview === 0 ? "stroke-slate-300" : "stroke-primary"}`} />
+                                        </Button>
+                                        <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5 hover:none"}>
+                                            <ChevronLeft  className={`${dummyDetails.preview === 0 ? "stroke-slate-300" : "stroke-primary"}`} />
+                                        </Button>
+                                        <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5 hover:none"}>
+                                            <ChevronRight  className={"stroke-primary"} />
+                                        </Button>
+                                        <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5 hover:none"}>
+                                            <ChevronsRight className={"stroke-primary"} />
+                                        </Button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </CardFooter>
-            </Card>
+                        </CardFooter>
+                    }
+
+                </div>
+            }
+
         </div>
     );
 };
