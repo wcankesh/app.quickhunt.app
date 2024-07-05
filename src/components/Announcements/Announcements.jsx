@@ -10,6 +10,7 @@ import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVal
 import {useTheme} from "../theme-provider";
 import {useSelector} from "react-redux";
 import {ApiService} from "../../utils/ApiService";
+import {getProjectDetails} from "../../utils/constent";
 const initialStateFilter = {
     l : "",
     s: ""
@@ -77,16 +78,20 @@ const Announcements = () => {
     const [filter, setFilter] = useState(initialStateFilter);
     const [pageNo, setPageNo] = useState(1);
     const [totalRecord, setTotalRecord] = useState(0);
+    const [isNewAnnouncemnet,setIsNewAnnouncemnt]= useState(false);
     const apiService = new ApiService();
 
-    const openSheet = () => setSheetOpen(true);
+    const openSheet = () => {
+        setSheetOpen(true);
+        setIsNewAnnouncemnt(true);
+
+    };
     const closeSheet = () => setSheetOpen(false);
 
     useEffect(() => {
         getAllPosts()
         setLabelList(allStatusAndTypes.labels)
-    }, [projectDetailsReducer.id, allStatusAndTypes, pageNo]);
-
+    }, [projectDetailsReducer.id, allStatusAndTypes, pageNo,]);
 
     const getAllPosts = async () => {
         setIsLoading(true)
@@ -97,6 +102,18 @@ const Announcements = () => {
             setTotalRecord(data.total)
         } else {
             setIsLoading(false)
+        }
+    }
+
+    const callBackForProps = async () => {
+        // setIsLoading(true)
+        const data  = await apiService.getAllPosts({project_id: projectDetailsReducer.id,page: pageNo,limit: perPageLimit})
+        if(data.status === 200){
+            setIsLoading(false)
+            setAnnouncementList(data.data)
+            setTotalRecord(data.total)
+        } else {
+            // setIsLoading(false)
         }
     }
 
@@ -121,10 +138,11 @@ const Announcements = () => {
 
     return (
         <div className={"pt-8 xl:container xl:max-w-[1200px] lg:container lg:max-w-[992px] md:container md:max-w-[530px] sm:container sm:max-w-[639px] xs:container xs:max-w-[475px] max-[639px]:container max-[639px]:max-w-[507px]"}>
-            <CreateAnnouncementsLogSheet isOpen={isSheetOpen} onOpen={openSheet} onClose={closeSheet}/>
+            {isNewAnnouncemnet && <CreateAnnouncementsLogSheet isOpen={isSheetOpen} onOpen={openSheet} onClose={closeSheet}
+                                          callBack={callBackForProps}/>}
             <div className={"flex flex-row gap-6 items-center xl:flex-nowrap md:flex-wrap sm:flex-wrap min-[320px]:flex-wrap max-[639px]:flex-wrap max-[639px]:gap-3"}>
                 <div className="basis-1/4">
-                    <h3 className={"text-2xl font-medium leading-8"}>testingapp</h3>
+                    <h3 className={"text-2xl font-medium leading-8"}>{getProjectDetails('project_name')}</h3>
                 </div>
                 <div className="basis-2/4 gap-6">
                     <div className={"flex flex-row gap-6 items-center"}>
@@ -199,7 +217,7 @@ const Announcements = () => {
                 </div>
             </div>
             {
-                tab === 0 ? <AnnouncementsTable data={announcementList}/> : <AnnouncementsView/>
+                tab === 0 ? <AnnouncementsTable data={announcementList} isLoading={isLoading} callBack={callBackForProps}/> : <AnnouncementsView data={announcementList} callBack={callBackForProps}/>
             }
         </div>
     );

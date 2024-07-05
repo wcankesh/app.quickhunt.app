@@ -1,6 +1,4 @@
-import React,{Fragment,useState} from 'react';
-import ComboBox from "../Comman/ComboBox";
-import {Icon} from "../../utils/Icon";
+import React, {Fragment, useEffect, useState} from 'react';
 import {Button} from "../ui/button";
 import {Badge} from "../ui/badge";
 import {
@@ -22,6 +20,13 @@ import {Separator} from "../ui/separator";
 import CreateAnnouncementsLogSheet from "./CreateAnnouncementsLogSheet";
 import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "../ui/select";
 import {useTheme} from "../theme-provider";
+import {apiService, getProjectDetails} from "../../utils/constent";
+import moment from "moment";
+import {toast} from "../ui/use-toast";
+import ReadMoreText from "../Comman/ReadMoreText";
+import SidebarSheet from "./SidebarSheet";
+import {Toaster} from "../ui/toaster";
+
 
 const dummyDetails ={
     data:[
@@ -68,15 +73,31 @@ const dummyDetails ={
 }
 
 const status = [
-    {name: "Public", value: "public", fillColor: "#389E0D", strokeColor: "#389E0D",},
-    {name: "Draft", value: "draft", fillColor: "#CF1322", strokeColor: "#CF1322",},
+    {name: "Publish", value: 0, fillColor: "#389E0D", strokeColor: "#389E0D",},
+    {name: "Draft", value: 1, fillColor: "#CF1322", strokeColor: "#CF1322",},
 ]
 
-const AnnouncementsView = () => {
+const AnnouncementsView = ({data,callBack}) => {
+    const [announcementList,setAnnouncementList]=useState([]);
     const [isReadMore, setIsReadMore] = useState(true);
     const [isSheetOpen, setSheetOpen] = useState(false);
+    const [isSidebarSheetOpen, setSidebarSheetOpen] = useState(false);
     const [selectedData, setSelectedData] = useState(null);
+    const [isViewAnalytics, setIsViewAnalytics] = useState(false);
+    const [selectedViewAnalyticsRecord, setSelectedViewAnalyticsRecord] = useState({id: ""});
+    const [isCreateSheetOpen,setIsCreateSheetOpen]=useState(false);
+    const [isEditAnalysis,setIsEditAnalysis] =useState(false);
+    const [editTitle,setEditTitle]=useState("");
+
     const {theme} =useTheme();
+
+    useEffect(()=>{
+        setAnnouncementList(data);
+    },[data]);
+
+    const toggleReadMore = () => {
+        setIsReadMore(!isReadMore);
+    };
 
     const openSheet = (object) => {
         setSheetOpen(true);
@@ -84,38 +105,79 @@ const AnnouncementsView = () => {
     };
     const closeSheet = () => setSheetOpen(false);
 
+    const handleStatusChange = async (object, value) => {
+        setAnnouncementList(announcementList.map(x => x.id === object.id ? { ...x, post_save_as_draft: value } : x));
+        const payload = {...object,post_save_as_draft:value}
+        const data = await apiService.updatePosts(payload,object.id);
+        if(data.status === 200){
+            toast({
+                title: data.success,
+            });
+            callBack();
+        } else {
+            toast({
+                title: data.success,
+                variant: "destructive",
+            });
+        }
+    };
+
+    const openSheetSidebar = (x) => {
+        setSidebarSheetOpen(true);
+        setSelectedViewAnalyticsRecord(x);
+        setIsViewAnalytics(true);
+
+    }
+    const closeSheetSideBar = () => {
+        setSidebarSheetOpen(false);
+        setSelectedViewAnalyticsRecord({id: ''});
+        setIsViewAnalytics(false);
+    }
+
+    const onEdit =(title)=>{
+        setIsCreateSheetOpen(true);
+        setIsEditAnalysis(true);
+        setEditTitle(title);
+    };
+    const closeCreateSheet = () =>{
+        setIsCreateSheetOpen(false);
+        setIsEditAnalysis(false);
+    }
+
     return (
         <div className={"mt-9"}>
-            <CreateAnnouncementsLogSheet isOpen={isSheetOpen} onOpen={openSheet} onClose={closeSheet} data={selectedData}/>
+            <Toaster/>
+            {isEditAnalysis && <CreateAnnouncementsLogSheet editTitle={editTitle} isOpen={isCreateSheetOpen} onOpen={onEdit} onClose={closeCreateSheet}/>}
+            {isViewAnalytics && <SidebarSheet selectedViewAnalyticsRecord={selectedViewAnalyticsRecord} isOpen={isSidebarSheetOpen} onOpen={openSheetSidebar} onClose={closeSheetSideBar}/>}
                 <Card className="pt-[38px]">
                     <div className={"flex flex-col px-[33px] pb-[32px] "}>
                     {
-                        (dummyDetails.data || []).map((x,index)=>{
+                        (announcementList || []).map((x,index)=>{
                             return(
                                 <Fragment>
                                         <div className={"flex flex-row gap-4 items-center justify-between px-[31px] mb-[22px]"}>
                                             <div className={"basis-4/5 flex flex-row gap-4 items-center flex-wrap"}>
-                                                <h4 className={"text-base font-medium capitalize"}>{x.title}</h4>
+                                                <h4 className={"text-base font-medium capitalize"}>{x.post_title}</h4>
                                                 <div className={"flex flex-row items-center gap-2"}>
-                                                    <h5 className={"text-base font-medium text-sm"}>{x.author}</h5>
+                                                    <h5 className={"text-base font-medium text-sm"}>{getProjectDetails('project_name')}</h5>
                                                     <div className={"w-1 h-1 rounded-full bg-[#5F5F5F]"}/>
-                                                    <h5 className={"text-sm font-normal flex items-center text-muted-foreground leading-5"}>{x.date}</h5>
+                                                    <h5 className={"text-sm font-normal flex items-center text-muted-foreground leading-5"}>{moment.utc(x.post_modified_date).local().startOf('seconds').fromNow()}</h5>
                                                 </div>
                                             </div>
                                             <div className={"basis-1/5 flex justify-end"}>
-                                                <Select>
-                                                    <SelectTrigger className="w-[106px] h-7">
+                                                <Select value={x.post_save_as_draft} onValueChange={(value) => handleStatusChange(x,value)}>
+                                                    <SelectTrigger className="w-[114px] h-7">
                                                         <SelectValue placeholder="Publish" />
                                                     </SelectTrigger>
                                                     <SelectContent>
                                                         <SelectGroup>
                                                             {
-                                                                (status || []).map((x, i) => {
+                                                                (   status || []).map((x, i) => {
                                                                     return (
                                                                         <Fragment key={i}>
                                                                             <SelectItem value={x.value}>
                                                                                 <div className={"flex items-center gap-2"}>
-                                                                                    <Circle fill={x.fillColor} stroke={x.strokeColor} className={` w-[10px] h-[10px]`}/>
+                                                                                    <Circle fill={x.fillColor} stroke={x.strokeColor} className={`${theme === "dark" ? "" : "text-muted-foreground"} w-2 h-2`}/>
                                                                                     {x.name}
                                                                                 </div>
                                                                             </SelectItem>
@@ -130,22 +192,14 @@ const AnnouncementsView = () => {
                                         </div>
                                         <div className={"flex flex-row gap-4 justify-between px-[31px] mb-4"}>
                                             <div className={"basis-4/5 flex flex-row gap-4"}>
-                                                <p className={"text-muted-foreground text-sm"}>
-                                                    {isReadMore ? x.description.slice(0, 300) : x.description}
-                                                    <span
-                                                    className="text-violet-600 font-semibold text-sm cursor-pointer"
-                                                    onClick={()=>openSheet(x)}
-                                                    >
-                                                        {isReadMore ? "...Read more" : ""}
-                                                    </span>
-                                                </p>
+                                                <ReadMoreText html={x.post_description}/>
                                             </div>
                                             <div className={""}>
                                                 <DropdownMenu>
                                                     <DropdownMenuTrigger><Button variant={"outline"} className={"p-2 h-9 w-9"}><Ellipsis size={18} /></Button></DropdownMenuTrigger>
                                                     <DropdownMenuContent>
-                                                        <DropdownMenuItem>Analytics</DropdownMenuItem>
-                                                        <DropdownMenuItem>Edit</DropdownMenuItem>
+                                                        <DropdownMenuItem onClick={() => openSheetSidebar(x)}>Analytics</DropdownMenuItem>
+                                                        <DropdownMenuItem onClick={() => onEdit(x.post_slug_url)}>Edit</DropdownMenuItem>
                                                         <DropdownMenuItem>Delete</DropdownMenuItem>
                                                     </DropdownMenuContent>
                                                 </DropdownMenu>
@@ -177,12 +231,22 @@ const AnnouncementsView = () => {
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div className={"flex flex-row gap-2"}>
-                                                <Badge variant={"outline"} className={"h-5 py-0 px-2  text-xs rounded-[5px] shadow-[0px_1px_4px_0px_rgba(0,0,0,0.09)] font-medium text-[#63C8D9] border-[#63C8D9]"}>Important</Badge>
-                                                <Badge variant={"outline"} className={"h-[20px] py-0 px-2 text-xs rounded-[5px] shadow-[0px_1px_4px_0px_rgba(0,0,0,0.09)] text-blue-500 border-blue-500 font-medium"}>New</Badge>
+                                            <div className={"flex flex-wrap gap-1"}>
+                                                {
+                                                    (x.labels || []).map((y) => {
+                                                        return (
+                                                            <Badge variant={"outline"} style={{
+                                                                color: y.label_color_code,
+                                                                borderColor: y.label_color_code,
+                                                                textTransform: "capitalize"
+                                                            }}
+                                                                   className={`h-[20px] py-0 px-2 text-xs rounded-[5px] shadow-[0px_1px_4px_0px_${y.label_color_code}] font-medium text-[${y.label_color_code}] border-[${y.label_color_code}] capitalize`}>{y.label_name}</Badge>
+                                                        )
+                                                    })
+                                                }
                                             </div>
                                         </div>
-                                    {index != dummyDetails.data.length - 1  && <hr className={"bg-[#E4E4E7] h-[1px] my-6"}/>}
+                                    {index != announcementList.length - 1  && <hr className={"bg-[#E4E4E7] h-[1px] my-6"}/>}
                                 </Fragment>
                             )
                         })

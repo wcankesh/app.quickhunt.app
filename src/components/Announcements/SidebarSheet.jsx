@@ -91,53 +91,60 @@ const SidebarSheet = ({ isOpen, onOpen, onClose ,selectedViewAnalyticsRecord,}) 
                         <div className={"pt-6 px-8 pb-4 pr-16 flex flex-row justify-between"}>
                             <div className={"flex flex-col gap-2"}>
                                 <h5 className={" text-base font-semibold leading-5"}>Total Views</h5>
-                                { isLoadingReaction ? <Skeleton className={"w-4"} /> :<h5 className={" text-2xl font-bold"}>{views && views[0] && views[0].totalView ? views[0].totalView : 0}</h5>}
+                                { isLoadingReaction ? <Skeleton className={"w-full h-6 rounded-md"} /> :<h5 className={" text-2xl font-bold"}>{views && views[0] && views[0].totalView ? views[0].totalView : 0}</h5>}
                             </div>
                             <div className={"flex flex-col gap-2"}>
                                 <h5 className={"text-base font-semibold leading-5"}>Unique Views</h5>
-                                <h5 className={"text-2xl font-bold"}>{views && views[0] && views[0].uniqueView ? views[0].uniqueView : 0}</h5>
+                                {isLoadingReaction ? <Skeleton className={"w-full h-6 rounded-md"} /> : <h5
+                                    className={"text-2xl font-bold"}>{views && views[0] && views[0].uniqueView ? views[0].uniqueView : 0}</h5>}
                             </div>
                             <div className={"flex flex-col gap-2"}>
                                 <h5 className={"text-base font-semibold leading-5"}>Feedback</h5>
-                                <h5 className={"text-2xl font-bold"}>{totalFeedback}</h5>
+                                {isLoadingReaction ? <Skeleton className={"w-full h-6 rounded-md"} /> :<h5 className={"text-2xl font-bold"}>{totalFeedback}</h5>}
                             </div>
                         </div>
                         <Separator />
                         <div className={"py-6 px-8 flex flex-col gap-2"}>
                             <h5 className={"text-base font-semibold leading-5"}>Reaction</h5>
-                            <Separator className={"mb-2"}/>
+                            {feedbackList.length == 0 != <Separator className={"mb-2"}/>}
                             <div className={""}>
                                 {
-                                    (reaction.data || []).map((x,index)=>{
-                                        return(
-                                            <div className={"flex flex-col"}>
-                                                <div className={"flex flex-row gap-4"}>
-                                                    <div>{Icon.smileEmoji2}</div>
-                                                    <div className={"flex flex-col gap-1"}>
-                                                        <div className={"flex flex-row gap-1 items-center"}>
-                                                            <h5 className={"text-sm font-semibold leading-5"}>{x.author}</h5>
-                                                            <p className={"text-muted-foreground text-[10px] leading-5 font-medium"}>Reacted to </p>
+                                    feedbackList.length == 0  ? <p className={"text-muted-foreground text-xs font-medium"}>No reaction received for this announcement yet</p> :<Fragment>
+                                        {
+                                            (reactionList || []).map((x,index)=>{
+                                                return(
+                                                    <div className={"flex flex-col"}>
+                                                        <div className={"flex flex-row gap-4"}>
+                                                            <div>{Icon.smileEmoji2}</div>
+                                                            <div className={"flex flex-col gap-1"}>
+                                                                <div className={"flex flex-row gap-1 items-center"}>
+                                                                    <h5 className={"text-sm font-semibold leading-5"}>{x.author}</h5>
+                                                                    <p className={"text-muted-foreground text-[10px] leading-5 font-medium"}>Reacted to </p>
+                                                                </div>
+                                                                <p className={"text-muted-foreground text-xs font-medium"}>{x.description}</p>
+                                                            </div>
                                                         </div>
-                                                       <p className={"text-muted-foreground text-xs font-medium"}>{x.description}</p>
+                                                        <div className={"py-4"}>
+                                                            <Separator/>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                <div className={"py-4"}>
-                                                    <Separator/>
-                                                </div>
-                                            </div>
-                                        )
-                                    })
+                                                )
+                                            })
+                                        }
+                                    </Fragment>
                                 }
+
                             </div>
-                            <div className={"flex flex-row justify-end items-center gap-3"}>
-                                <Button variant={"outline"}  className={" h-[30px] w-[30px] p-1.5"}>
-                                    <ChevronLeft  className={`${reaction.preview == 0 ? "stroke-slate-300" : "stroke-primary"}`} />
+                            {feedbackList.length == 0 != <div className={"flex flex-row justify-end items-center gap-3"}>
+                                <Button variant={"outline"} className={" h-[30px] w-[30px] p-1.5"}>
+                                    <ChevronLeft
+                                        className={`${reaction.preview == 0 ? "stroke-slate-300" : "stroke-primary"}`}/>
                                 </Button>
                                 <h5 className={"text-[14px] font-bold"}>01</h5>
                                 <Button variant={"outline"} className={" h-[30px] w-[30px] p-1.5"}>
-                                    <ChevronRight className={"stroke-primary"} />
+                                    <ChevronRight className={"stroke-primary"}/>
                                 </Button>
-                            </div>
+                            </div>}
                         </div>
                         <Separator className={"p-0 m-0"}/>
                         <div className={"py-6 px-8 flex flex-col gap-2"}>

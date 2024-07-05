@@ -1,7 +1,7 @@
 import React, {Fragment, useEffect, useRef, useState} from 'react';
 import {Sheet, SheetContent, SheetHeader,} from "../ui/sheet";
 import {Separator} from "../ui/separator";
-import {CalendarIcon, Circle, Pin, X} from "lucide-react";
+import {CalendarIcon, Check, Circle, Pin, X} from "lucide-react";
 import {Label} from "../ui/label";
 import {Input} from "../ui/input";
 import {Textarea} from "../ui/textarea";
@@ -60,7 +60,7 @@ const initialStateError = {
 
 }
 
-const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,editTitle}) => {
+const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,editTitle,callBack}) => {
     const [previewImage,setPreviewImage] = useState("");
     // let history = useHistory();
     const editor = useRef(null);
@@ -77,6 +77,8 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,editTitle}) => {
     const [isProModal, setIsProModal] = useState(false);
     const [formError, setFormError] = useState(initialStateError);
     const {theme}=useTheme();
+    const [selectedValues, setSelectedValues] = useState([]);
+    const [selectedLabels, setSelectedLabels] = useState([]);
 
     useEffect(()=>{
         if(editTitle){
@@ -98,15 +100,16 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,editTitle}) => {
                 post_expired_datetime: data.data.post_expired_datetime ? moment(data.data.post_expired_datetime).format('YYYY-MM-DD') : undefined,
                 category_id: data.data.category_id == "0" ? "" : data.data.category_id,
             })
-            setConvertedContent(data.data.post_description)
+            setConvertedContent(data.data.post_description);
+            setPreviewImage(data.data.feature_image);
         } else {
 
         }
     }
 
     const handleFileChange = (file) => {
-        setChangeLogDetails({...changeLogDetails, image : file})
-
+        setChangeLogDetails({...changeLogDetails, image : file.target.files[0]});
+        setPreviewImage(URL.createObjectURL(file.target.files[0]));
     };
 
     const formValidate = (name, value) => {
@@ -144,9 +147,7 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,editTitle}) => {
             [event.target.name]: formValidate(event.target.name, event.target.value)
         }));
     }
-    const onChangeLabel = (selectedItems ) =>{
-        setChangeLogDetails({...changeLogDetails, labels: selectedItems})
-    }
+
     const onchangeAssignTo = (selectedItems ) =>{
         setChangeLogDetails({...changeLogDetails, post_assign_to: selectedItems})
     }
@@ -154,10 +155,10 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,editTitle}) => {
         setChangeLogDetails({...changeLogDetails, category_id: selectedItems})
     }
 
-    const [date, setDate] = useState(new Date());
-    const onDateChange = (selectedDate) => {
-        setDate(selectedDate);
-        setChangeLogDetails({...changeLogDetails, post_published_at: moment(selectedDate,'YYYY-MM-DD')});
+    const onDateChange = (date) => {
+        if (date) {
+            setChangeLogDetails({...changeLogDetails,post_published_at: moment(date)});
+        }
     };
 
     const createPosts = async () => {
@@ -194,20 +195,19 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,editTitle}) => {
         for (var i = 0; i < changeLogDetails.labels.length; i++) {
             formData.append('labels[]', changeLogDetails.labels[i]);
         }
-        formData.append("post_description", convertedContent);
+        formData.append("post_description", changeLogDetails.post_description);
         formData.append("image", changeLogDetails.image);
         const data = await apiService.createPosts(formData);
         if(data.status === 200){
-            message.success("Post create successfully")
             setChangeLogDetails(initialState)
             setConvertedContent(null)
             setIsSave(false)
-            history.push(`${baseUrl}/changelogs?${urlParams}`);
+            // history.push(`${baseUrl}/changelogs?${urlParams}`);
         } else {
             setIsSave(false)
-            message.error(data.error)
         }
-
+        callBack();
+        onClose();
     }
 
     const updatePost = async () => {
@@ -244,21 +244,55 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,editTitle}) => {
         for (var i = 0; i < changeLogDetails.labels.length; i++) {
             formData.append('labels[]', changeLogDetails.labels[i]);
         }
-        formData.append("post_description", convertedContent);
+        formData.append("post_description", changeLogDetails.post_description);
         formData.append("image", changeLogDetails.image);
         const data = await apiService.updatePosts(formData, changeLogDetails.id)
         if(data.status === 200){
-            message.success("Post update successfully")
+          //  message.success("Post update successfully")
             setChangeLogDetails(initialState)
             setConvertedContent(null)
             setIsSave(false)
-            history.push(`${baseUrl}/changelogs?${urlParams}`);
+            // history.push(`${baseUrl}/changelogs?${urlParams}`);
 
         } else {
             setIsSave(false)
-            message.error(data.error)
+            // message.error(data.error)
         }
+        // callBack();
+        onClose();
     }
+
+    const saveAsDraft = async () => {
+        console.log("save as draft");
+    };
+
+
+    const handleValueChange = (value) => {
+        const clone = [...changeLogDetails.post_assign_to]
+        const index = clone.indexOf(value);
+        if (index > -1) {
+            clone.splice(index, 1);
+        } else {
+            clone.push(value);
+        }
+        setChangeLogDetails({...changeLogDetails,post_assign_to: clone});
+    };
+
+
+
+    const onChangeLabel = (value) => {
+        const clone = [...changeLogDetails.labels]
+        const index = clone.indexOf(value);
+        if (index > -1) {
+            clone.splice(index, 1);
+        } else {
+            clone.push(value);
+        }
+        setChangeLogDetails({...changeLogDetails,labels: clone});
+    }
+
+
+
 
     return (
         <Sheet open={isOpen} onOpenChange={isOpen ? onClose : onOpen}>
@@ -267,7 +301,7 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,editTitle}) => {
                     <h5 className={"text-xl font-medium leading-5"}>{ editTitle ? "Update Announcement" :"Create New Announcements"}</h5>
                     <div className={"flex items-center gap-6"}>
                         <Button className={"h-5 w-5 p-0"} variant={"ghost"}><Pin className={"h-4 w-4"} size={18}/></Button>
-                        <Button className={"h-5 w-5 p-0"} onClick={onClose} onClick={onClose} variant={"ghost"}><X size={18} className={"h-5 w-5"}/></Button>
+                        <Button className={"h-5 w-5 p-0"} onClick={onClose}  variant={"ghost"}><X size={18} className={"h-5 w-5"}/></Button>
                     </div>
                 </SheetHeader>
                 <Separator className={"mb-6"}/>
@@ -294,23 +328,28 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,editTitle}) => {
                     <div className={"px-8 flex flex-row gap-4 items-start"}>
                         <div className="grid w-full gap-2 basis-1/2">
                             <Label htmlFor="label">Label</Label>
-                            <Select   value={changeLogDetails.labels} onValueChange={onChangeLabel}>
+                            <Select   value={selectedLabels} onValueChange={onChangeLabel}>
                                 <SelectTrigger className="h-9">
-                                    <SelectValue placeholder="Nothing Selected"/>
+                                    <SelectValue className={"text-muted-foreground text-sm"} placeholder="Nothing selected">
+                                        { changeLogDetails.labels ? changeLogDetails.labels.join(', ') : "Nothing selected"}
+                                    </SelectValue>
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectGroup>
                                         {
                                             (labelList || []).map((x, i) => {
                                                 return (
-                                                    <Fragment key={i}>
-                                                        <SelectItem value={x.id}>
-                                                            <div className={"flex items-center gap-2"}>
-                                                                <Circle fill={x.label_color_code} stroke={x.label_color_code} className={`${theme === "dark" ? "" : "text-muted-foreground"} w-[10px] h-[10px]`}/>
-                                                                {x.label_name}
+                                                        <SelectItem key={i} value={x.id.toString()}>
+                                                            <div className={"flex gap-1"}>
+                                                                <div onClick={() => onChangeLabel(x.id.toString())} className="checkbox-icon">
+                                                                    {changeLogDetails.labels.includes(x.id.toString()) ? <Check size={18} />: <div className={"h-[18px] w-[18px]"}></div>}
+                                                                </div>
+                                                                <div className={"flex items-center gap-2"}>
+                                                                    <Circle fill={x.label_color_code} stroke={x.label_color_code} className={`${theme === "dark" ? "" : "text-muted-foreground"} w-[10px] h-[10px]`}/>
+                                                                    {x.label_name}
+                                                                </div>
                                                             </div>
                                                         </SelectItem>
-                                                    </Fragment>
                                                 )
                                             })
                                         }
@@ -320,21 +359,24 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,editTitle}) => {
                         </div>
                         <div className="grid w-full gap-2 basis-1/2">
                             <Label htmlFor="label">Assign to</Label>
-                            <Select  value={changeLogDetails.post_assign_to} onValueChange={onchangeAssignTo}>
+                            <Select value={selectedValues} onValueChange={handleValueChange}>
                                 <SelectTrigger className={"h-9"}>
-                                    <SelectValue className={"text-muted-foreground text-sm"} placeholder="Assign to"/>
+                                    <SelectValue className={"text-muted-foreground text-sm"} placeholder="Assign to">
+                                        { changeLogDetails.post_assign_to ? changeLogDetails.post_assign_to.join(', ') : "Assign to"}
+                                    </SelectValue>
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectGroup>
-                                        {
-                                            (memberList || []).map((x, i) => {
-                                                return (
-                                                        <SelectItem key={i} value={x.user_id.toString()} >
-                                                            {x.user_first_name ? x.user_first_name: ''} {x.user_last_name ? x.user_last_name: ''}
-                                                        </SelectItem>
-                                                )
-                                            })
-                                        }
+                                        {(memberList || []).map((x, i) => (
+                                            <SelectItem className={""} key={i} value={x.user_id.toString()}>
+                                                <div className={"flex gap-2"}>
+                                                    <div onClick={() => handleValueChange(x.user_id.toString())} className="checkbox-icon">
+                                                        {changeLogDetails.post_assign_to.includes(x.user_id.toString()) ? <Check size={18} />: <div className={"h-[18px] w-[18px]"}></div>}
+                                                    </div>
+                                                    <span>{x.user_first_name ? x.user_first_name : ''} {x.user_last_name ? x.user_last_name : ''}</span>
+                                                </div>
+                                            </SelectItem>
+                                        ))}
                                     </SelectGroup>
                                 </SelectContent>
                             </Select>
@@ -370,15 +412,13 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,editTitle}) => {
                                         className={cn("justify-start text-left font-normal", "text-muted-foreground")}
                                     >
                                         <CalendarIcon className="mr-2 h-4 w-4" />
-
                                     </Button>
                                 </PopoverTrigger>
                                 <PopoverContent className="w-auto p-0" align="start">
                                     <Calendar
                                         mode="single"
-                                        selected={date}
+                                        selected={changeLogDetails.post_published_at}
                                         onSelect={onDateChange}
-
                                     />
                                 </PopoverContent>
                             </Popover>
@@ -419,9 +459,9 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,editTitle}) => {
                 <Separator className={"my-6"}/>
                 <div className={"pt-2 pb-8 px-8 flex flex-row gap-4 flex-wrap"}>
                     <Button variant={"outline "} onClick={editTitle ? updatePost : createPosts} className={"bg-violet-600 text-[#fff]"}>{editTitle ? "Update Post" : "Publish Post"}</Button>
-                    <Button variant={"outline "}
+                    <Button onClick={saveAsDraft} variant={"outline "}
                             className={"rounded-md border border-violet-600 text-violet-600 text-[14px] font-semibold"}>Save as Draft</Button>
-                    <Button variant={"outline "}
+                    <Button onClick={onClose} variant={"outline "}
                             className={"rounded-md border border-violet-600 text-violet-600 text-[14px] font-semibold"}>Cancel</Button>
                 </div>
             </SheetContent>
