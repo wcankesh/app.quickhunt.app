@@ -25,7 +25,8 @@ import {useToast} from "../ui/use-toast";
 import ReadMoreText from "../Comman/ReadMoreText";
 import {CommSkel} from "../Comman/CommSkel";
 import EmptyData from "../Comman/EmptyData";
-// import CreateIdea from "./CreateIdea";
+import CreateIdea from "./CreateIdea";
+import {record} from "zod";
 
 const filterByStatus = [
     {name: "Archived", value: "archived",},
@@ -36,6 +37,7 @@ const filterByStatus = [
 const perPageLimit = 2
 
 const initialStateFilter = {
+    all: "",
     archive: "",
     bug: "",
     no_status: "",
@@ -63,6 +65,7 @@ const Ideas = () => {
     const [roadmapStatus, setRoadmapStatus] = useState([]);
     const [filter, setFilter] = useState(initialStateFilter);
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
+    const [isCreateIdea, setIsCreateIdea] = useState(false);
 
     const openSheet = () => setSheetOpen(true);
     const closeSheet = () => setSheetOpen(false);
@@ -71,7 +74,7 @@ const Ideas = () => {
     const closeCreateIdea = () => setSheetOpenCreate(false);
 
     useEffect(() => {
-        if (filter.topic.length || filter.roadmap.length || filter.bug || filter.archive || filter.no_status) {
+        if (filter.topic.length || filter.roadmap.length || filter.bug || filter.archive || filter.no_status || filter.all) {
             let payload = {...filter, project_id: projectDetailsReducer.id, page: pageNo, limit: perPageLimit}
             ideaSearch(payload)
 
@@ -131,8 +134,9 @@ const Ideas = () => {
         openSheet()
     }
 
-    const openDetailsSheet = () => {
+    const openDetailsSheet = (record) => {
         setSheetType('viewDetails');
+        setSelectedIdea(record)
         openSheet();
     };
 
@@ -224,8 +228,34 @@ const Ideas = () => {
         <Fragment>
             <div
                 className={"xl:container xl:max-w-[1200px] lg:container lg:max-w-[992px] md:container md:max-w-[768px] sm:container sm:max-w-[639px] xs:container xs:max-w-[475px] pt-8 pb-5"}>
-                <SidebarSheet isOpen={isSheetOpen} onOpen={openSheet} onClose={closeSheet} sheetType={sheetType}/>
-                <CreateIdea isOpen={isSheetOpenCreate} onOpen={openCreateIdea} onClose={closeCreateIdea} />
+                <SidebarSheet
+                    isOpen={isSheetOpen}
+                    onOpen={openSheet}
+                    onClose={closeSheet}
+                    sheetType={sheetType}
+
+                    isRoadmap={false}
+                    isUpdateIdea={isUpdateIdea}
+                    setIsUpdateIdea={setIsUpdateIdea}
+                    setIdeasList={setIdeasList}
+                    ideasList={ideasList}
+                    selectedIdea={selectedIdea}
+                    setSelectedIdea={setSelectedIdea}
+                    onUpdateIdeaClose={onUpdateIdeaClose}
+                    isNoStatus={false}
+                />
+                <CreateIdea
+                    isOpen={isSheetOpenCreate}
+                    onOpen={openCreateIdea}
+                    onClose={closeCreateIdea}
+
+                    isRoadmap={false}
+                    isCreateIdea={isCreateIdea}
+                    setIsCreateIdea={setIsCreateIdea}
+                    setIdeasList={setIdeasList}
+                    ideasList={ideasList}
+                    isNoStatus={false}
+                />
                 <div className={"flex flex-row flex-wrap gap-6 items-center"}>
                     <span><h1 className={"text-2xl font-medium"}>Ideas</h1></span>
                     <div className="ml-auto gap-6">
@@ -248,14 +278,14 @@ const Ideas = () => {
                                     </SelectGroup>
                                 </SelectContent>
                             </Select>
-                            <Select
-                                onValueChange={(selectedItems ) => handleChange({name: "topic", value: selectedItems})}
+                            <Select onValueChange={(selectedItems ) => handleChange({name: "topic", value: selectedItems})}
                             >
                                 <SelectTrigger className="w-[193px] bg-card">
-                                    <SelectValue placeholder="Filter by topic"/>
+                                    <SelectValue placeholder={"Filter by topic"}/>
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectGroup>
+                                        {/*<SelectItem value="">All</SelectItem>*/}
                                         {
                                             (topicLists || []).map((x, i) => {
                                                 return (
@@ -334,16 +364,15 @@ const Ideas = () => {
                                                         </div>
                                                         <div className={"flex flex-col w-full gap-6"}>
                                                             <div className={"flex flex-col gap-[11px]"}>
-                                                                <div className={"flex items-center gap-3 cursor-pointer"} onClick={openDetailsSheet}>
+                                                                <div className={"flex items-center gap-3 cursor-pointer"} onClick={() => openDetailsSheet(x)}>
                                                                     <h3 className={"text-base font-medium"}>{x.title}</h3>
                                                                     <h4 className={"text-sm font-medium"}>{x.name}</h4>
-                                                                    <p className={"text-sm font-normal flex items-center text-muted-foreground"}>
-                                                                        <Dot
-                                                                            className={"fill-text-card-foreground stroke-text-card-foreground"}/>
+                                                                    <p className={"text-xs font-normal flex items-center text-muted-foreground"}>
+                                                                        <Dot className={"fill-text-card-foreground stroke-text-card-foreground"}/>
                                                                         {moment(x.created_at).format('D MMM')}
                                                                     </p>
                                                                 </div>
-                                                                <div className={"description-container"}>
+                                                                <div className={"description-container text-sm text-muted-foreground"}>
                                                                     <ReadMoreText html={x.description}/>
                                                                 </div>
                                                             </div>
