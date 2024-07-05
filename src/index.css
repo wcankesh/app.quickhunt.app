@@ -225,3 +225,46 @@ button.inline-flex.items-center.justify-center.whitespace-nowrap.rounded-md.text
 .sketch-picker {position: absolute; z-index: 999; top: 36px}
 .LinesEllipsis-ellipsis{color: #7C3AED;font-family: "Geist";font-weight: 600;}
 
+/*span LinesEllipsis-ellipsis*/
+span.LinesEllipsis-ellipsis {
+  color: hsl(var(--primary)) !important;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/*description bg color*/
+@layer components {
+  .description-container div p span {
+    /*background-color: #000000; !* Default background color *!*/
+    /*color: #ffffff; !* Default text color *!*/
+  }
+
+  .dark .description-container div p span {
+    background-color: hsl(var(--card)) !important; /* Dark theme background color */
+    color: hsl(var(--primary-foreground)) !important; /* Dark theme text color */
+  }
+
+  .dark .description-container div p span.LinesEllipsis-ellipsis {
+    background-color: hsl(var(--card)) !important; /* Dark theme background color */
+    color: hsl(var(--primary)) !important; /* Dark theme text color */
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .dark .description-container div p span LinesEllipsis-unit {
+    background-color: hsl(var(--card)) !important; /* Dark theme background color */
+    color: hsl(var(--primary-foreground)) !important; /* Dark theme text color */
+  }
+
+  .dark .description-container div p strong {
+    background-color: hsl(var(--card)) !important; /* Dark theme background color */
+    color: hsl(var(--primary-foreground)) !important; /* Dark theme text color */
+  }
+
+  span.LinesEllipsis-ellipsis {
+    background-color: #000000; /* Default background color */
+    color: #ffffff; /* Default text color */
+  }
+}
+
+

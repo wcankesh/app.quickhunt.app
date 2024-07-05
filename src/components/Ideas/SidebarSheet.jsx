@@ -29,16 +29,7 @@ const ideasSheetStatus = [
     {id: "r5", name: "No Status", value: "nostatus", fillColor: "#64676B", strokeColor: "#64676B",},
 ]
 
-const filterByTopic = [
-    {name: "Welcome 👋  ", value: "welcome",},
-    {name: "Improvement 👍 ", value: "improvement",},
-    {name: "Integrations 🔗 ", value: "integrations",},
-    {name: "Mics 🤷‍♀️", value: "mics",},
-    {name: "Deal Breaker 💔 ", value: "dealbreaker",},
-    {name: "Bug 🐛", value: "bug",},
-]
-
-const SidebarSheet = ({ isOpen, onOpen, onClose , sheetType}) => {
+const SidebarSheet = ({ isOpen, onOpen, onClose }) => {
     const { theme } = useTheme()
     const [selectedStatus, setSelectedStatus] = useState('');
     const [selectedFile, setSelectedFile] = useState(null);
@@ -101,14 +92,7 @@ const SidebarSheet = ({ isOpen, onOpen, onClose , sheetType}) => {
         <Sheet open={isOpen} onOpenChange={isOpen ? onClose : onOpen}>
             <SheetContent className={"lg:max-w-[1101px] md:max-w-[720px] sm:max-w-[520px] p-0"}>
                 <SheetHeader className={"px-[32px] py-[22px] border-b"}>
-                    {
-                        sheetType === "createNewIdeas" ?
-                            <div className={"flex justify-between items-center w-full"}>
-                                <h2 className={"text-xl font-medium"}>Tell us your Idea!</h2>
-                                <X onClick={onClose} className={"cursor-pointer"}/>
-                            </div>
-                            : <X onClick={onClose} className={"cursor-pointer"}/>
-                    }
+                  <X onClick={onClose} className={"cursor-pointer"}/>
                 </SheetHeader>
                 <div className={"lg:flex md:block overflow-auto h-[100vh]"}>
                     <div className={`basis-[440px] ${theme === "dark" ? "" : "bg-muted"} border-r overflow-auto pb-[100px]`}>
@@ -185,44 +169,7 @@ const SidebarSheet = ({ isOpen, onOpen, onClose , sheetType}) => {
                         </div>
                     </div>
                     <div className={"basis-[661px] overflow-auto"}>
-                        {
-                            sheetType === "createNewIdeas" ?
-                                <div className={"pb-100px"}>
-                                    <div className={"py-6 px-8 flex flex-col gap-6 border-b"}>
-                                        <div className="items-center gap-1.5">
-                                            <Label htmlFor="text">Title</Label>
-                                            <Input type="text" id="text" placeholder="" />
-                                        </div>
-                                        <div className="gap-1.5">
-                                            <Label htmlFor="message">Description</Label>
-                                            <Textarea placeholder="Start writing..." id="message" />
-                                        </div>
-                                    </div>
-                                    <div className={"py-6 px-8 border-b"}>
-                                        <Label>Choose Topics for this Idea (optional)</Label>
-                                        <Select>
-                                            <SelectTrigger className="">
-                                                <SelectValue placeholder="Select topic" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectGroup>
-                                                    {
-                                                        (filterByTopic || []).map((x, i) => {
-                                                            return (
-                                                                <SelectItem key={i} value={x.value}>{x.name}</SelectItem>
-                                                            )
-                                                        })
-                                                    }
-                                                </SelectGroup>
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-                                    <div className={"p-8 flex gap-6"}>
-                                        <Button className={"py-2 px-6 text-sm font-semibold"}>Create Idea</Button>
-                                        <Button variant={"outline hover:bg-transparent"} className={"border border-primary py-2 px-6 text-sm font-semibold"} onClick={onClose}>Cancel</Button>
-                                    </div>
-                                </div>
-                                :
+
                               <Fragment>
                                   <div className={"py-6 px-8"}>
                                       <div className={"flex flex-col gap-6"}>
@@ -474,7 +421,6 @@ const SidebarSheet = ({ isOpen, onOpen, onClose , sheetType}) => {
                                       </Tabs>
                                   </div>
                               </Fragment>
-                        }
                     </div>
                 </div>
             </SheetContent>

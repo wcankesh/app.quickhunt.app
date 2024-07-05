@@ -1,17 +1,22 @@
-import React,{useState} from 'react';
+import React, {useState} from "react";
 import HTMLEllipsis from 'react-lines-ellipsis/lib/html'
 import {Button} from "../ui/button";
-
 
 const ReadMoreText = ({html}) => {
     const [isExpanded, setIsExpanded] = useState(false);
 
-    return (
+    return(
         <React.Fragment>
             {isExpanded ? (
-                <React.Fragment className={"flex flex-col"}>
+                <React.Fragment>
                     <div dangerouslySetInnerHTML={{__html:html}}></div>
-                    {/*<p className="p-0" onClick={() => setIsExpanded(!isExpanded)}>Read less</p>*/}
+                    <Button
+                        variant={"ghost hover:bg-none"}
+                        className={"p-0 h-0 text-primary font-semibold"}
+                        onClick={() => setIsExpanded(!isExpanded)}
+                    >
+                        Read less
+                    </Button>
                 </React.Fragment>
             ) : (
                 <div onClick={() => setIsExpanded(!isExpanded)}>
@@ -22,11 +27,11 @@ const ReadMoreText = ({html}) => {
                         ellipsis="...Read more"
                         basedOn='letters'
                     />
+
                 </div>
             )}
 
         </React.Fragment>
-    );
-};
-
-export default ReadMoreText;
+    )
+}
+export default ReadMoreText
