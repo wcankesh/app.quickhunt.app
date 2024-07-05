@@ -16,6 +16,7 @@ import {Popover, PopoverContent, PopoverTrigger} from "../ui/popover";
 import {cn} from "../../lib/utils";
 import {Calendar} from "../ui/calendar";
 import {toast} from "../ui/use-toast";
+import {Badge} from "../ui/badge";
 
 const initialState = {
     post_description:'',
@@ -324,9 +325,12 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,editTitle,callBack
                                                 (changeLogDetails.labels || []).slice(0,2).map((x)=>{
                                                     const findObj = labelList.find((y) => y.id == x);
                                                     return(
-                                                        <div className={"text-sm flex gap-[2px] bg-slate-300 items-center rounded py-0 px-[2px]"} >
-                                                            <Circle fill={findObj.label_color_code} size={6} stroke={findObj.label_color_code}/>  {findObj.label_name}
-                                                        </div>
+                                                        <Badge variant={"outline"} style={{
+                                                            color: findObj.label_color_code,
+                                                            borderColor: findObj.label_color_code,
+                                                            textTransform: "capitalize"
+                                                        }}
+                                                               className={`h-[20px] py-0 px-2 text-xs rounded-[5px]  font-medium text-[${findObj.label_color_code}] border-[${findObj.label_color_code}] capitalize`}>{findObj.label_name}</Badge>
                                                     )
                                                 })
                                             }
@@ -367,7 +371,7 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,editTitle,callBack
                                                 (changeLogDetails.post_assign_to || []).slice(0,2).map((x,index)=>{
                                                     const findObj = memberList.find((y,) => y.user_id == x);
                                                     return(
-                                                        <div key={index} className={"text-sm flex gap-[2px] bg-slate-300 items-center rounded py-0 px-[2px]"} onClick={(e)=>deleteAssignTo(e,index)}>
+                                                        <div key={index} className={"text-sm flex gap-[2px] bg-slate-300 items-center rounded py-0 px-2"} onClick={(e)=>deleteAssignTo(e,index)}>
                                                             {findObj.user_first_name ? findObj.user_first_name : ''}
                                                         </div>
                                                     )

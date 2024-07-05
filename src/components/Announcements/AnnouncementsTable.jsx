@@ -82,8 +82,8 @@ const AnnouncementsTable = ({data,isLoading ,callBack}) => {
         setIsEditAnalysis(false);
     }
 
-    const shareFeedback = (slug)=>{
-        window.open(`/${slug}`,'_blank')
+    const shareFeedback = (domain,slug)=>{
+        window.open(`https://${domain}/${slug}`, "_blank")
     }
 
     return (
@@ -184,7 +184,7 @@ const AnnouncementsTable = ({data,isLoading ,callBack}) => {
                                                                                 borderColor: y.label_color_code,
                                                                                 textTransform: "capitalize"
                                                                             }}
-                                                                                   className={`h-[20px] py-0 px-2 text-xs rounded-[5px] shadow-[0px_1px_4px_0px_${y.label_color_code}] font-medium text-[${y.label_color_code}] border-[${y.label_color_code}] capitalize`}>{y.label_name}</Badge>
+                                                                                   className={`h-[20px] py-0 px-2 text-xs rounded-[5px]  font-medium text-[${y.label_color_code}] border-[${y.label_color_code}] capitalize`}>{y.label_name}</Badge>
                                                                         )
                                                                     })
                                                                 }
@@ -225,7 +225,7 @@ const AnnouncementsTable = ({data,isLoading ,callBack}) => {
                                                         </TableCell>
                                                         <TableCell>
                                                             <Button variant={"ghost"}
-                                                                    onClick={() => shareFeedback(x.post_slug_url)}><Eye
+                                                                    onClick={() => shareFeedback(x.domain,x.post_slug_url)}><Eye
                                                                 size={18}
                                                                 className={`${theme === "dark" ? "" : "text-muted-foreground"}`}/></Button>
                                                         </TableCell>

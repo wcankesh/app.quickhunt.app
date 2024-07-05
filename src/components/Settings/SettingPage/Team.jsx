@@ -8,12 +8,17 @@ import {Avatar, AvatarFallback} from "../../ui/avatar";
 import {Select, SelectContent, SelectItem, SelectLabel, SelectTrigger, SelectValue} from "../../ui/select";
 import {SelectGroup} from "@radix-ui/react-select";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "../../ui/table";
-import {Trash2, X} from "lucide-react";
+import {Ellipsis, Trash2, X} from "lucide-react";
 import {useTheme} from "../../theme-provider";
 import {Sheet, SheetClose, SheetContent, SheetFooter, SheetHeader, SheetTitle} from "../../ui/sheet";
 import {ApiService} from "../../../utils/ApiService";
 import {useSelector} from "react-redux";
 import {Badge} from "../../ui/badge";
+import moment from "moment";
+import {DropdownMenu, DropdownMenuTrigger} from "@radix-ui/react-dropdown-menu";
+import {DropdownMenuContent, DropdownMenuItem} from "../../ui/dropdown-menu";
+import {toast} from "../../ui/use-toast";
+
 
 const initialStateTeam = [
     {
@@ -152,6 +157,22 @@ const Team = () => {
         }
     };
 
+    const onResendUser = async (x) => {
+        const payload = {
+            project_id: x.project_id,
+            email: x.member_email,
+            type: '2'
+        }
+        const data = await apiService.inviteUser(payload)
+        if (data.status === 200) {
+           toast({
+               title:"Resend invitation successfully"
+           })
+        } else {
+
+        }
+    }
+
     return (
         <Fragment>
         <Card>
@@ -196,7 +217,7 @@ const Team = () => {
                                                         </div>
                                                     </TableCell>
                                                     <TableCell className={"flex justify-end items-center py-[10px] py-[17px]"}>
-                                                        <Badge variant={"outline"} className={`${x.role === 1 ? "text-[#63c8d9] h-[20px] py-0 px-2 text-xs rounded-[5px] shadow-[0px_1px_4px_0px_#63c8d9]" :""}`}>{x?.role === 1 ? "Admin" : "Member" }</Badge>
+                                                        <Badge variant={"outline"} className={`h-[20px] py-0 px-2 text-xs rounded-[5px] ${x.role === 1 ? "text-[#63c8d9] border-[#63c8d9]" :"text-[#694949] border-[#694949]"}`}>{x?.role === 1 ? "Admin" : "Member" }</Badge>
                                                     </TableCell>
                                                 </TableRow>
                                             )
@@ -235,19 +256,20 @@ const Team = () => {
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {invitedUsers.map((invite, i) => (
+                                    {(invitationList || []).map((x, i) => (
                                         <TableRow key={i}>
-                                            <TableCell className="font-medium pl-6">{invite.email}</TableCell>
-                                            <TableCell>{invite.status}</TableCell>
-                                            <TableCell>{invite.invited}</TableCell>
+                                            <TableCell className="font-medium pl-6">{x.member_email}</TableCell>
+                                            <TableCell>Expires in {moment(x.expire_at).diff(moment(new Date()), 'days')} days</TableCell>
+                                            <TableCell>Invited about {moment.utc(x.created_at).local().startOf('seconds').fromNow()}</TableCell>
                                             <TableCell className="pr-6 text-right">
-                                                <Button
-                                                    variant={"outline hover:bg-transparent"}
-                                                    className={"p-1 border w-[30px] h-[30px]"}
-                                                    onClick={() => handleRemoveInvite(i)}
-                                                >
-                                                    <Trash2 size={16} />
-                                                </Button></TableCell>
+                                                <DropdownMenu>
+                                                    <DropdownMenuTrigger><Ellipsis className={`${theme === "dark" ? "" : "text-muted-foreground"}`} size={18}/></DropdownMenuTrigger>
+                                                    <DropdownMenuContent className={"hover:none"}>
+                                                        <DropdownMenuItem onClick={() =>onResendUser(x)}>Resend Invitation</DropdownMenuItem>
+                                                        <DropdownMenuItem className={""}>Revoke Invitation</DropdownMenuItem>
+                                                    </DropdownMenuContent>
+                                                </DropdownMenu>
+                                            </TableCell>
                                         </TableRow>
                                     ))}
                                 </TableBody>

@@ -25,7 +25,7 @@ import {useToast} from "../ui/use-toast";
 import ReadMoreText from "../Comman/ReadMoreText";
 import {CommSkel} from "../Comman/CommSkel";
 import EmptyData from "../Comman/EmptyData";
-import CreateIdea from "./CreateIdea";
+// import CreateIdea from "./CreateIdea";
 
 const filterByStatus = [
     {name: "Archived", value: "archived",},
