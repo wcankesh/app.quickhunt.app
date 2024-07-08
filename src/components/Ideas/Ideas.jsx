@@ -9,7 +9,7 @@ import {
     ChevronsRight,
     Circle,
     Dot,
-    MessageCircleMore,
+    MessageCircleMore, Pin,
     Plus,
 } from "lucide-react";
 import {Card, CardContent, CardFooter} from "../ui/card";
@@ -34,7 +34,7 @@ const filterByStatus = [
     {name: "No Status", value: "nostatus",},
 ]
 
-const perPageLimit = 2
+const perPageLimit = 10
 
 const initialStateFilter = {
     all: "",
@@ -53,7 +53,6 @@ const Ideas = () => {
     const {toast} = useToast()
     const [isSheetOpen, setSheetOpen] = useState(false);
     const [isSheetOpenCreate, setSheetOpenCreate] = useState(false);
-    const [sheetType, setSheetType] = useState('');
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
     const [ideasList, setIdeasList] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -129,13 +128,7 @@ const Ideas = () => {
         }
     }
 
-    const onType = (type) => {
-        setSheetType(type)
-        openSheet()
-    }
-
     const openDetailsSheet = (record) => {
-        setSheetType('viewDetails');
         setSelectedIdea(record)
         openSheet();
     };
@@ -162,7 +155,15 @@ const Ideas = () => {
             page: 1,
             limit: perPageLimit
         }
-        let payload = {...filter, [e.name]: e.value, project_id: projectDetailsReducer.id, page: 1, limit: perPageLimit, roadmap : [e.value], topic : [e.value], status : [e.value]}
+        let payload = {
+            ...filter,
+            [e.name]: e.value,
+            project_id: projectDetailsReducer.id,
+            page: 1,
+            limit: perPageLimit,
+            roadmap : [e.value],
+            topic : [e.value],
+            status : [e.value]}
         ideaSearch(e.name === "status" ? payload1 : payload)
     }
 
@@ -232,7 +233,6 @@ const Ideas = () => {
                     isOpen={isSheetOpen}
                     onOpen={openSheet}
                     onClose={closeSheet}
-                    sheetType={sheetType}
 
                     isRoadmap={false}
                     isUpdateIdea={isUpdateIdea}
@@ -250,8 +250,7 @@ const Ideas = () => {
                     onClose={closeCreateIdea}
 
                     isRoadmap={false}
-                    isCreateIdea={isCreateIdea}
-                    setIsCreateIdea={setIsCreateIdea}
+                    closeCreateIdea={closeCreateIdea}
                     setIdeasList={setIdeasList}
                     ideasList={ideasList}
                     isNoStatus={false}
@@ -268,6 +267,11 @@ const Ideas = () => {
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectGroup>
+                                        <SelectItem value={null}>
+                                            <div className={"flex items-center gap-2"}>
+                                                All Status
+                                            </div>
+                                        </SelectItem>
                                         {
                                             (filterByStatus || []).map((x, i) => {
                                                 return (
@@ -278,14 +282,17 @@ const Ideas = () => {
                                     </SelectGroup>
                                 </SelectContent>
                             </Select>
-                            <Select onValueChange={(selectedItems ) => handleChange({name: "topic", value: selectedItems})}
-                            >
+                            <Select onValueChange={(selectedItems ) => handleChange({name: "topic", value: selectedItems})}>
                                 <SelectTrigger className="w-[193px] bg-card">
                                     <SelectValue placeholder={"Filter by topic"}/>
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectGroup>
-                                        {/*<SelectItem value="">All</SelectItem>*/}
+                                        <SelectItem value={null}>
+                                            <div className={"flex items-center gap-2"}>
+                                                All Topics
+                                            </div>
+                                        </SelectItem>
                                         {
                                             (topicLists || []).map((x, i) => {
                                                 return (
@@ -302,6 +309,11 @@ const Ideas = () => {
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectGroup>
+                                        <SelectItem value={null}>
+                                            <div className={"flex items-center gap-2"}>
+                                                All Roadmap
+                                            </div>
+                                        </SelectItem>
                                         {
                                             (roadmapStatus || []).map((x, i) => {
                                                 return (
@@ -326,16 +338,9 @@ const Ideas = () => {
                     </div>
                 </div>
                 <div className={"mt-8"}>
-                    {
-                        isLoading ? <Card><CardContent className={"p-0"}><CommSkel count={4}/></CardContent></Card> :
-                            ideasList.length === 0 ? (
-                                    <Card>
-                                        <CardContent className={"p-0"}>
-                                            <EmptyData/>
-                                        </CardContent>
-                                    </Card>
-                                ) :
-                            <Card>
+                    <Card>
+                        {
+                            isLoading ? CommSkel.commonParagraphFourIdea : ideasList.length === 0 ?  <EmptyData/> :
                                 <CardContent className={"p-0"}>
                                     {
                                         (ideasList || []).map((x, i) => {
@@ -365,6 +370,7 @@ const Ideas = () => {
                                                         <div className={"flex flex-col w-full gap-6"}>
                                                             <div className={"flex flex-col gap-[11px]"}>
                                                                 <div className={"flex items-center gap-3 cursor-pointer"} onClick={() => openDetailsSheet(x)}>
+                                                                    {x.pin_to_top === 1 && <Pin className={"w-[16px] h-[16px]"} />}
                                                                     <h3 className={"text-base font-medium"}>{x.title}</h3>
                                                                     <h4 className={"text-sm font-medium"}>{x.name}</h4>
                                                                     <p className={"text-xs font-normal flex items-center text-muted-foreground"}>
@@ -395,25 +401,46 @@ const Ideas = () => {
                                                                         </SelectTrigger>
                                                                         <SelectContent>
                                                                             <SelectGroup>
-                                                                                <SelectItem value={x.value}>
-                                                                                    <div
-                                                                                        className={"flex items-center gap-2"}>
-                                                                                        <Circle fill={x.roadmap_color}
-                                                                                                stroke={x.roadmap_color}
-                                                                                                className={` w-[10px] h-[10px]`}/>
-                                                                                        {x.roadmap_title ? x.roadmap_title : "No status"}
+                                                                                <SelectItem value={null}>
+                                                                                    <div className={"flex items-center gap-2"}>
+                                                                                        No status
                                                                                     </div>
                                                                                 </SelectItem>
+                                                                                {console.log(x.roadmap_status)}
+                                                                                    {
+                                                                                        (allStatusAndTypes.roadmap_status || []).map((x, i) => {
+                                                                                            return (
+                                                                                                <SelectItem key={i} value={x.id}>
+                                                                                                    <div
+                                                                                                        className={"flex items-center gap-2"}>
+                                                                                                        <Circle fill={x.color_code}
+                                                                                                                stroke={x.color_code}
+                                                                                                                className={` w-[10px] h-[10px]`}/>
+                                                                                                        {x.title ? x.title : "No status"}
+                                                                                                    </div>
+                                                                                                </SelectItem>
+                                                                                            )
+                                                                                        })
+                                                                                    }
+                                                                                {/*<SelectItem value={x.value}>*/}
+                                                                                {/*    <div className={"flex items-center gap-2"}>*/}
+                                                                                {/*        <Circle fill={x.roadmap_color}*/}
+                                                                                {/*                stroke={x.roadmap_color}*/}
+                                                                                {/*                className={` w-[10px] h-[10px]`}/>*/}
+                                                                                {/*        {x.roadmap_title ? x.roadmap_title : "No status"}*/}
+                                                                                {/*    </div>*/}
+                                                                                {/*</SelectItem>*/}
                                                                             </SelectGroup>
                                                                         </SelectContent>
                                                                     </Select>
                                                                     <div
                                                                         className={"flex items-center gap-2 cursor-pointer"}
-                                                                        onClick={openDetailsSheet}>
-                                                    <span>
-                                                        <MessageCircleMore
-                                                            className={"stroke-primary w-[16px] h-[16px]"}/>
-                                                    </span>
+                                                                        onClick={openDetailsSheet}
+                                                                    >
+                                                                <span>
+                                                                    <MessageCircleMore
+                                                                        className={"stroke-primary w-[16px] h-[16px]"}/>
+                                                                </span>
                                                                         <p className={"text-base font-medium"}>
                                                                             {x && x.comments && x.comments.length ? x.comments.length : 0}
                                                                         </p>
@@ -428,32 +455,33 @@ const Ideas = () => {
                                         })
                                     }
                                 </CardContent>
-                                <CardFooter className={"p-0"}>
-                                    <div
-                                        className={`w-full p-5 ${theme === "dark" ? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end pe-16 py-15px`}>
-                                        <div className={"flex flex-row gap-8 items-center"}>
-                                            <div>
-                                                <h5 className={"text-sm font-semibold"}>Page {pageNo} of {totalPages}</h5>
-                                            </div>
-                                            <div className={"flex flex-row gap-2 items-center"}>
-                                                <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"} onClick={() => handlePaginationClick(1)} disabled={pageNo === 1}>
-                                                    <ChevronsLeft className={pageNo === 1 ? "stroke-muted-foreground" : "stroke-primary"}/>
-                                                </Button>
-                                                <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"} onClick={() => handlePaginationClick(pageNo - 1)} disabled={pageNo === 1}>
-                                                    <ChevronLeft className={pageNo === 1 ? "stroke-muted-foreground" : "stroke-primary"}/>
-                                                </Button>
-                                                <Button variant={"outline"} className={" h-[30px] w-[30px] p-1.5"} onClick={() => handlePaginationClick(pageNo + 1)} disabled={pageNo === totalPages}>
-                                                    <ChevronRight className={pageNo === totalPages ? "stroke-muted-foreground" : "stroke-primary"}/>
-                                                </Button>
-                                                <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"} onClick={() => handlePaginationClick(totalPages)} disabled={pageNo === totalPages}>
-                                                    <ChevronsRight className={pageNo === totalPages ? "stroke-muted-foreground" : "stroke-primary"}/>
-                                                </Button>
-                                            </div>
-                                        </div>
+                        }
+
+                        <CardFooter className={"p-0"}>
+                            <div
+                                className={`w-full p-5 ${theme === "dark" ? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end pe-16 py-15px`}>
+                                <div className={"flex flex-row gap-8 items-center"}>
+                                    <div>
+                                        <h5 className={"text-sm font-semibold"}>Page {pageNo} of {totalPages}</h5>
                                     </div>
-                                </CardFooter>
-                            </Card>
-                    }
+                                    <div className={"flex flex-row gap-2 items-center"}>
+                                        <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"} onClick={() => handlePaginationClick(1)} disabled={pageNo === 1}>
+                                            <ChevronsLeft className={pageNo === 1 ? "stroke-muted-foreground" : "stroke-primary"}/>
+                                        </Button>
+                                        <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"} onClick={() => handlePaginationClick(pageNo - 1)} disabled={pageNo === 1}>
+                                            <ChevronLeft className={pageNo === 1 ? "stroke-muted-foreground" : "stroke-primary"}/>
+                                        </Button>
+                                        <Button variant={"outline"} className={" h-[30px] w-[30px] p-1.5"} onClick={() => handlePaginationClick(pageNo + 1)} disabled={pageNo === totalPages}>
+                                            <ChevronRight className={pageNo === totalPages ? "stroke-muted-foreground" : "stroke-primary"}/>
+                                        </Button>
+                                        <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"} onClick={() => handlePaginationClick(totalPages)} disabled={pageNo === totalPages}>
+                                            <ChevronsRight className={pageNo === totalPages ? "stroke-muted-foreground" : "stroke-primary"}/>
+                                        </Button>
+                                    </div>
+                                </div>
+                            </div>
+                        </CardFooter>
+                    </Card>
                 </div>
             </div>
         </Fragment>

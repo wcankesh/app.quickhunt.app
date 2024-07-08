@@ -1,7 +1,7 @@
 import React, { Fragment, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../../ui/card";
 import { Button } from "../../ui/button";
-import {Check, Menu, Pencil, Plus, Trash2, X} from "lucide-react";
+import {Check, Menu, Pencil, Plus, Square, Trash2, X} from "lucide-react";
 import { Table, TableHeader, TableHead, TableRow, TableBody, TableCell } from "../../ui/table";
 import ColorInput from "../../Comman/ColorPicker";
 import {Input} from "../../ui/input";
@@ -157,7 +157,7 @@ const Labels = () => {
                                     isEdit === i ?
                                     <TableCell className={"text-xs font-medium p-0 pr-4"}>
                                         <Input
-                                            className={"bg-card"}
+                                            className={"bg-card w-[100px]"}
                                             type="text"
                                             value={x.labelName}
                                             name={"labelName"}
@@ -174,10 +174,16 @@ const Labels = () => {
                                     : <TableCell className={"p-0"}>{x.labelName}</TableCell>
                                 }
                                     {isEdit === i ?
-                                        <TableCell className={"p-0"}><div className={"py-2 px-3 bg-card border border-border rounded-lg overflow-hidden"}>
+                                        <TableCell className={"p-0"}> <div className={"flex justify-end"}>
                                             <ColorInput name={x.name} value={x.value} onChange={(color) => onChangeColorColor(color, i)} />
                                         </div></TableCell> :
-                                        <TableCell className={"p-0"}><ColorInput name={x.name} value={x.value} /*onChange={(color) => onChangeColorColor(color, i)}*/ />
+                                        <TableCell className={"p-0 "}>
+                                            <div className={"flex justify-end items-center gap-1"}>
+                                                <span>
+                                                <Square size={16} strokeWidth={1} fill={x.value} stroke={x.value}/>
+                                                </span>
+                                                <p>{x.value}</p>
+                                            </div>
                                         </TableCell>
                                     }
                                 <TableCell className="flex justify-end gap-2 pr-6">
