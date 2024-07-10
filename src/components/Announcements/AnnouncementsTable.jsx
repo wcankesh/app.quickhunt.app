@@ -9,7 +9,6 @@ import {
     Eye,
 } from "lucide-react";
 import {useTheme} from "../theme-provider"
-import SidebarSheet from "./SidebarSheet";
 import { CardContent} from "../ui/card";
 import {DropdownMenu, DropdownMenuTrigger} from "@radix-ui/react-dropdown-menu";
 import {DropdownMenuContent, DropdownMenuItem} from "../ui/dropdown-menu";
@@ -17,35 +16,44 @@ import {Separator} from "../ui/separator";
 import {Select, SelectItem, SelectGroup, SelectContent, SelectTrigger, SelectValue} from "../ui/select";
 import moment from "moment";
 import NoDataThumbnail from "../../img/Frame.png"
-import CreateAnnouncementsLogSheet from "./CreateAnnouncementsLogSheet";
 import {apiService} from "../../utils/constent";
 import {Toaster} from "../ui/toaster";
 import {toast} from "../ui/use-toast";
 import {Skeleton} from "../ui/skeleton";
+import {AlertDialog,
+    AlertDialogContent,
+    AlertDialogHeader,
+    AlertDialogFooter,
+    AlertDialogTitle,
+    AlertDialogDescription,
+    AlertDialogAction,
+    AlertDialogCancel,} from "../ui/alert-dialog";
 
 const status = [
     {name: "Publish", value: 0, fillColor: "#389E0D", strokeColor: "#389E0D",},
     {name: "Draft", value: 1, fillColor: "#CF1322", strokeColor: "#CF1322",},
 ]
 
-const AnnouncementsTable = ({data,isLoading ,callBack}) => {
+const AnnouncementsTable = ({data,isLoading ,setSelectedRecord,setEditIndex ,handleDelete,handleAnalyticRow,setAnalyticsObj,analyticsObj}) => {
     const [announcementData,setAnnouncementData]=useState(data);
     const [isSheetOpen, setSheetOpen] = useState(false);
-    const [isCreateSheetOpen,setIsCreateSheetOpen]=useState(false);
     const [isViewAnalytics, setIsViewAnalytics] = useState(false);
-    const [isEditAnalysis,setIsEditAnalysis] =useState(false);
-    const [editTitle,setEditTitle]=useState("");
     const [selectedViewAnalyticsRecord, setSelectedViewAnalyticsRecord] = useState({id: ""});
+    const [isOpenDeleteAlert,setIsOpenDeleteAlert]= useState(false);
+    const [idToDelete,setIdToDelete]=useState(null);
     const { theme }= useTheme();
 
     useEffect(()=>{
         setAnnouncementData(data);
-    },[data])
+    },[data]);
 
     const openSheet = (x) => {
+        setAnalyticsObj(x);
         setSheetOpen(true);
         setSelectedViewAnalyticsRecord(x);
         setIsViewAnalytics(true);
+        handleAnalyticRow(x);
+
     };
     const closeSheet = () => {
         setSelectedViewAnalyticsRecord({id: ''});
@@ -58,7 +66,6 @@ const AnnouncementsTable = ({data,isLoading ,callBack}) => {
         const payload = {...object,post_save_as_draft:value}
         const data = await apiService.updatePosts(payload,object.id);
         if(data.status === 200){
-            callBack();
             toast({
                 title: "Status updated successfully",
             });
@@ -71,27 +78,45 @@ const AnnouncementsTable = ({data,isLoading ,callBack}) => {
 
     };
 
-    const onEdit =(title)=>{
-        setIsCreateSheetOpen(true);
-        setIsEditAnalysis(true);
-        setEditTitle(title);
-    };
+    const onEdit = (record,index)=> {
+       setSelectedRecord(record);
+        setEditIndex(index);
 
-    const closeCreateSheet = () =>{
-        setIsCreateSheetOpen(false);
-        setIsEditAnalysis(false);
-    }
+    };
 
     const shareFeedback = (domain,slug)=>{
         window.open(`https://${domain}/${slug}`, "_blank")
     }
 
+    const deleteRow =(id)=>{
+        setIsOpenDeleteAlert(true);
+        setIdToDelete(id);
+    }
+
+    const deleteParticularRow = ()=>{
+        handleDelete(idToDelete);
+    }
+
+
     return (
         <div className={""}>
             <Toaster/>
-            {isViewAnalytics && <SidebarSheet selectedViewAnalyticsRecord={selectedViewAnalyticsRecord} isOpen={isSheetOpen} onOpen={openSheet} onClose={closeSheet}/>}
-            {isEditAnalysis && <CreateAnnouncementsLogSheet editTitle={editTitle} isOpen={isCreateSheetOpen} onOpen={onEdit} onClose={closeCreateSheet}/>}
-                <div>
+            <AlertDialog open={isOpenDeleteAlert} onOpenChange={setIsOpenDeleteAlert}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>You really want delete this announcement?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            This action can't be undone.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction className={"bg-red-600 hover:bg-red-600"} onClick={deleteParticularRow}>Delete</AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+
+            <div>
                     <CardContent className={"p-0 rounded-md"}>
                         {isLoading ? <Table>
                                         <TableHeader className={"py-8 px-5"}>
@@ -177,9 +202,9 @@ const AnnouncementsTable = ({data,isLoading ,callBack}) => {
                                                             <span className={"mr-4"}>{x?.post_title}</span>
                                                             <div className={"flex flex-wrap gap-1"}>
                                                                 {
-                                                                    (x.labels || []).map((y) => {
+                                                                    (x.labels || []).map((y,index) => {
                                                                         return (
-                                                                            <Badge variant={"outline"} style={{
+                                                                            <Badge variant={"outline"} key={index} style={{
                                                                                 color: y.label_color_code,
                                                                                 borderColor: y.label_color_code,
                                                                                 textTransform: "capitalize"
@@ -224,7 +249,7 @@ const AnnouncementsTable = ({data,isLoading ,callBack}) => {
                                                             </Select>
                                                         </TableCell>
                                                         <TableCell>
-                                                            <Button variant={"ghost"}
+                                                            <Button disabled={x.post_save_as_draft == 1 ? true : false} variant={"ghost"}
                                                                     onClick={() => shareFeedback(x.domain,x.post_slug_url)}><Eye
                                                                 size={18}
                                                                 className={`${theme === "dark" ? "" : "text-muted-foreground"}`}/></Button>
@@ -241,8 +266,8 @@ const AnnouncementsTable = ({data,isLoading ,callBack}) => {
                                                                     size={18}/></Button></DropdownMenuTrigger>
                                                                 <DropdownMenuContent>
                                                                     <DropdownMenuItem
-                                                                        onClick={() => onEdit(x.post_slug_url)}>Edit</DropdownMenuItem>
-                                                                    <DropdownMenuItem>Delete</DropdownMenuItem>
+                                                                        onClick={() => onEdit(x,index)}>Edit</DropdownMenuItem>
+                                                                    <DropdownMenuItem onClick={()=>deleteRow(x.id)}>Delete</DropdownMenuItem>
                                                                 </DropdownMenuContent>
                                                             </DropdownMenu>
                                                         </TableCell>

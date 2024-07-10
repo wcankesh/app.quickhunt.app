@@ -17,16 +17,24 @@ import { DropdownMenu,
     DropdownMenuItem,
   } from "../ui/dropdown-menu"
 import {Separator} from "../ui/separator";
-import CreateAnnouncementsLogSheet from "./CreateAnnouncementsLogSheet";
 import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "../ui/select";
 import {useTheme} from "../theme-provider";
 import {apiService, getProjectDetails} from "../../utils/constent";
 import moment from "moment";
 import {toast} from "../ui/use-toast";
 import ReadMoreText from "../Comman/ReadMoreText";
-import SidebarSheet from "./SidebarSheet";
 import {Toaster} from "../ui/toaster";
 import {CommSkel} from "../Comman/CommSkel";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle
+} from "../ui/alert-dialog";
 
 
 const dummyDetails ={
@@ -78,14 +86,13 @@ const status = [
     {name: "Draft", value: 1, fillColor: "#CF1322", strokeColor: "#CF1322",},
 ]
 
-const AnnouncementsView = ({data,callBack,isLoading}) => {
+const AnnouncementsView = ({data,isLoading,setSelectedRecord,handleDelete,setAnalyticsObj}) => {
     const [announcementList,setAnnouncementList]=useState([]);
     const [isSidebarSheetOpen, setSidebarSheetOpen] = useState(false);
     const [isViewAnalytics, setIsViewAnalytics] = useState(false);
     const [selectedViewAnalyticsRecord, setSelectedViewAnalyticsRecord] = useState({id: ""});
-    const [isCreateSheetOpen,setIsCreateSheetOpen]=useState(false);
-    const [isEditAnalysis,setIsEditAnalysis] =useState(false);
-    const [editTitle,setEditTitle]=useState("");
+    const [isOpenDeleteAlert,setIsOpenDeleteAlert]= useState(false);
+    const [idToDelete,setIdToDelete]=useState(null);
     const {theme} =useTheme();
 
     useEffect(()=>{
@@ -100,7 +107,6 @@ const AnnouncementsView = ({data,callBack,isLoading}) => {
             toast({
                 title: data.success,
             });
-            callBack();
         } else {
             toast({
                 title: data.success,
@@ -113,6 +119,7 @@ const AnnouncementsView = ({data,callBack,isLoading}) => {
         setSidebarSheetOpen(true);
         setSelectedViewAnalyticsRecord(x);
         setIsViewAnalytics(true);
+        setAnalyticsObj(x)
     }
     const closeSheetSideBar = () => {
         setSidebarSheetOpen(false);
@@ -120,21 +127,36 @@ const AnnouncementsView = ({data,callBack,isLoading}) => {
         setIsViewAnalytics(false);
     }
 
-    const onEdit =(title)=>{
-        setIsCreateSheetOpen(true);
-        setIsEditAnalysis(true);
-        setEditTitle(title);
+    const onEdit =(record)=>{
+        setSelectedRecord(record);
     };
-    const closeCreateSheet = () =>{
-        setIsCreateSheetOpen(false);
-        setIsEditAnalysis(false);
+
+    const deleteRow =(id)=>{
+        setIsOpenDeleteAlert(true);
+        setIdToDelete(id);
+    }
+
+    const deleteParticularRow = ()=>{
+        handleDelete(idToDelete);
     }
 
     return (
         <div className={""}>
             <Toaster/>
-            {isEditAnalysis && <CreateAnnouncementsLogSheet editTitle={editTitle} isOpen={isCreateSheetOpen} onOpen={onEdit} onClose={closeCreateSheet}/>}
-            {isViewAnalytics && <SidebarSheet selectedViewAnalyticsRecord={selectedViewAnalyticsRecord} isOpen={isSidebarSheetOpen} onOpen={openSheetSidebar} onClose={closeSheetSideBar}/>}
+            <AlertDialog open={isOpenDeleteAlert} onOpenChange={setIsOpenDeleteAlert}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>You really want delete this announcement?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            This action can't be undone.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction className={"bg-red-600 hover:bg-red-600"} onClick={deleteParticularRow}>Delete</AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
             {
                 isLoading ? <Card><CardContent className={"p-0"}><CommSkel count={4}/></CardContent></Card> : <div className="pt-[38px]">
                     <div className={"flex flex-col px-[33px] pb-[32px] "}>
@@ -186,8 +208,8 @@ const AnnouncementsView = ({data,callBack,isLoading}) => {
                                                     <DropdownMenuTrigger><Button variant={"outline"} className={"p-2 h-9 w-9"}><Ellipsis size={18} /></Button></DropdownMenuTrigger>
                                                     <DropdownMenuContent>
                                                         <DropdownMenuItem onClick={() => openSheetSidebar(x)}>Analytics</DropdownMenuItem>
-                                                        <DropdownMenuItem onClick={() => onEdit(x.post_slug_url)}>Edit</DropdownMenuItem>
-                                                        <DropdownMenuItem>Delete</DropdownMenuItem>
+                                                        <DropdownMenuItem onClick={() => onEdit(x)}>Edit</DropdownMenuItem>
+                                                        <DropdownMenuItem onClick={()=>deleteRow(x.id)}>Delete</DropdownMenuItem>
                                                     </DropdownMenuContent>
                                                 </DropdownMenu>
                                             </div>
