@@ -8,11 +8,9 @@ import {
     CircleX,
     Dot,
     Loader2,
-    Lock,
     Paperclip,
     Pencil,
     Pin,
-    PinOff,
     Trash2,
     X
 } from "lucide-react";
@@ -20,7 +18,7 @@ import {RadioGroup, RadioGroupItem} from "../ui/radio-group";
 import {Label} from "../ui/label";
 import {Input} from "../ui/input";
 import {Avatar, AvatarFallback, AvatarImage} from "../ui/avatar";
-import {DialogTrigger, Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogClose, DialogOverlay, DialogTitle, DialogPortal} from "../ui/dialog";
+import {DialogTrigger, Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader,DialogTitle} from "../ui/dialog";
 import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "../ui/select";
 import {Popover, PopoverTrigger, PopoverContent} from "../ui/popover";
 import {Textarea} from "../ui/textarea";
@@ -40,7 +38,6 @@ const initialStateTopic = {topic: []}
 const initialStateError = {
     title: "",
     description: null,
-
 }
 
 const SidebarSheet = ({
@@ -77,11 +74,10 @@ const SidebarSheet = ({
     const [isLoadingArchive, setIsLoadingArchive] = useState(false);
     const [isLoadingSidebar, setIsLoadingSidebar] = useState('');
     const [topicLists, setTopicLists] = useState([]);
-    const [description, setDescription] = useState(null);
+    const [description, setDescription] = useState("");
     const [commentFiles, setCommentFiles] = useState([])
     const [subCommentFiles, setSubCommentFiles] = useState([])
     const [deletedCommentImage, setDeletedCommentImage] = useState([])
-    const [deletedIdeaImage, setDeletedIdeaImage] = useState([])
     const [deletedSubCommentImage, setDeletedSubCommentImage] = useState([])
     const [commentText, setCommentText] = useState("")
     const [subCommentText, setSubCommentText] = useState("")
@@ -98,11 +94,6 @@ const SidebarSheet = ({
     const [roadmapStatus, setRoadmapStatus] = useState([]);
     const [formError, setFormError] = useState(initialStateError);
 
-    const [comment, setComment] = useState('');
-    const [commentsList, setCommentsList] = useState([]);
-    const [selectedTopic, setSelectedTopic] = useState(initialStateTopic);
-    const [selectedValues, setSelectedValues] = useState([]);
-
     useEffect(() => {
         setTopicLists(allStatusAndTypes.topics)
         setDescription(selectedIdea.description)
@@ -110,14 +101,17 @@ const SidebarSheet = ({
     }, [projectDetailsReducer.id, allStatusAndTypes]);
 
     const handleChangeTopic = (id) => {
-        const clone = [...selectedTopic.topic];
-        const index = clone.indexOf(id);
-        if (index > -1) {
+        const clone = [...selectedIdea.topic];
+        const index = clone.findIndex(item => item.id === id);
+        if (index !== -1) {
             clone.splice(index, 1);
         } else {
-            clone.push(id);
+            const topicToAdd = topicLists.find(item => item.id === id);
+            if (topicToAdd) {
+                clone.push(topicToAdd);
+            }
         }
-        setSelectedTopic({ ...selectedTopic, topic: clone });
+        setSelectedIdea({ ...selectedIdea, topic: clone });
     };
 
     const giveVote = async (type) => {
@@ -640,11 +634,12 @@ const SidebarSheet = ({
     }
 
     const handleUpdate = (event) => {
-        setDescription(event);
-        setSelectedIdea(selectedIdea => ({...selectedIdea, description: event}))
+        const { value } = event.target;
+        setDescription(value);
+        setSelectedIdea(selectedIdea => ({ ...selectedIdea, description: value }));
         setFormError(formError => ({
             ...formError,
-            description: formValidate("description", event)
+            description: formValidate("description", value)
         }));
     };
 
@@ -674,16 +669,17 @@ const SidebarSheet = ({
         }
         let formData = new FormData();
         let topics = [];
+
         (selectedIdea.topic || []).map((x) => {
             topics.push(x.id)
         })
         formData.append('title', selectedIdea.title);
-        formData.append('description', description);
-        formData.append('topic', topics.join());
+        formData.append('slug_url', selectedIdea.title ? selectedIdea.title.replace(/ /g,"-").replace(/\?/g, "-") :"");
+        formData.append('description', selectedIdea.description?.trim() === '' ? "" : selectedIdea.description );
+        formData.append('topic', topics.join(","));
         const data = await apiSerVice.updateIdea(formData, selectedIdea.id)
         if (data.status === 200) {
-            let clone = [...ideasList];
-            setIdeasList(clone);
+            setSelectedIdea({...data.data})
             setIsEditIdea(false)
             setIsLoadingCreateIdea(false)
             toast({description: "Idea Update successfully"})
@@ -691,6 +687,7 @@ const SidebarSheet = ({
             setIsLoadingCreateIdea(false)
             toast({description: data.error})
         }
+        console.log("selectedIdea", selectedIdea)
     }
 
     const onDeleteIdea = async () => {
@@ -728,6 +725,8 @@ const SidebarSheet = ({
             }
 
             setIsUpdateIdea(false);
+            setOpenDelete(false)
+            onClose()
             toast({description: "Idea delete successfully"})
             setIsLoadingSidebar("")
         } else {
@@ -761,20 +760,19 @@ const SidebarSheet = ({
                         <DialogContent className="sm:max-w-[425px]">
                             <DialogHeader className={"flex flex-col gap-2"}>
                                 <DialogTitle>You really want delete this idea?</DialogTitle>
-                                <DialogDescription>
-                                    This action can't be undone.
-                                </DialogDescription>
+                                <DialogDescription>This action can't be undone.</DialogDescription>
                             </DialogHeader>
                             <DialogFooter>
-                                <Button type="submit" variant={"outline"}
-                                        className={"text-sm font-semibold"}>Cancel</Button>
+                                <Button variant={"outline hover:none"}
+                                        className={"text-sm font-semibold border"} onClick={() => setOpenDelete(false)}>Cancel</Button>
                                 <Button
-                                    type="submit"
                                     variant={"hover:bg-destructive"}
-                                    className={`text-sm ${theme === "dark" ? "text-card-foreground" : "text-card"} font-semibold bg-destructive`}
+                                    className={`${theme === "dark" ? "text-card-foreground" : "text-card"} ${isSaveUpdateComment === true ? "py-2 px-6" : "w-[76px] py-2 px-6"} text-sm font-semibold bg-destructive`}
                                     onClick={onDeleteIdea}
                                 >
-                                    Delete
+                                    {
+                                        isLoadingSidebar ? <Loader2 size={16} className={"animate-spin"}/> : "Delete"
+                                    }
                                 </Button>
                             </DialogFooter>
                         </DialogContent>
@@ -860,7 +858,7 @@ const SidebarSheet = ({
                                     </div>
                                     <Button
                                         variant={"outline"}
-                                        className={`hover:bg-muted w-[132px] ${theme === "dark" ? "" : "border-card-foreground text-muted-foreground"} text-sm font-semibold`}
+                                        className={`hover:bg-muted w-[132px] ${theme === "dark" ? "" : "border-muted-foreground text-muted-foreground"} text-sm font-semibold`}
                                         onClick={() => onChangeStatus(
                                             "is_active",
                                             selectedIdea.is_active === 1 ? 0 : 1
@@ -881,7 +879,7 @@ const SidebarSheet = ({
                                     </div>
                                     <Button
                                         variant={"outline"}
-                                        className={`w-[100px] hover:bg-muted ${theme === "dark" ? "" : "border-card-foreground text-muted-foreground"} text-sm font-semibold`}
+                                        className={`w-[100px] hover:bg-muted ${theme === "dark" ? "" : "border-muted-foreground text-muted-foreground"} text-sm font-semibold`}
                                         onClick={() => onChangeStatus(
                                             "is_archive",
                                             selectedIdea.is_archive === 1 ? 0 : 1
@@ -913,7 +911,7 @@ const SidebarSheet = ({
                                             <div className="gap-1.5">
                                                 <Label htmlFor="message">Description</Label>
                                                 <Textarea placeholder="Start writing..." id="message"
-                                                          value={description}
+                                                          value={selectedIdea.description}
                                                           onChange={handleUpdate}
                                                 />
                                                 {formError.description &&
@@ -922,24 +920,19 @@ const SidebarSheet = ({
                                         </div>
                                         <div className={"py-6 px-8 border-b"}>
                                             <Label>Choose Topics for this Idea (optional)</Label>
-                                            <Select onValueChange={handleChangeTopic} value={selectedValues}>
-                                                <SelectTrigger className="">
+                                            <Select onValueChange={handleChangeTopic} value={selectedIdea.topic.map(x => x.id)}>
+                                                <SelectTrigger>
                                                     <SelectValue className={"text-muted-foreground text-sm"} placeholder="Assign to">
                                                         <div className={"flex gap-[2px]"}>
-                                                            {
-                                                                (selectedTopic.topic || []).map((x,index)=>{
-                                                                    const findObj = topicLists.find((y) => y.id === x);
-                                                                    return(
-                                                                        <>
-                                                                            <div key={index} className={"text-sm flex gap-[2px] bg-slate-300 items-center rounded py-0 px-2"} >
-                                                                                {findObj?.title}
-                                                                            </div>
-                                                                        </>
-
-                                                                    )
-                                                                })
-                                                            }
-                                                            {(selectedTopic.topic || []).length > 2 && <div>...</div>}
+                                                            {(selectedIdea.topic || []).map((x, index) => {
+                                                                const findObj = (topicLists || []).find((y) => y.id === x?.id );
+                                                                return (
+                                                                    <div key={index} className={"text-sm flex gap-[2px] bg-slate-300 items-center rounded py-0 px-2"}>
+                                                                        {findObj?.title}
+                                                                    </div>
+                                                                );
+                                                            })}
+                                                            {(selectedIdea.topic || []).length > 2 && <div>...</div>}
                                                         </div>
                                                     </SelectValue>
                                                 </SelectTrigger>
@@ -950,8 +943,8 @@ const SidebarSheet = ({
                                                                 return (
                                                                     <SelectItem className={""} key={i} value={x.id}>
                                                                         <div className={"flex gap-2"}>
-                                                                            <div onClick={() => handleChange(x.id)} className="checkbox-icon">
-                                                                                {selectedTopic.topic.includes(x.id) ? <Check size={18} />: <div className={"h-[18px] w-[18px]"}></div>}
+                                                                            <div onClick={() => handleChangeTopic(x.id)} className="checkbox-icon">
+                                                                                {(selectedIdea.topic.map((x) => x.id) || []).includes(x.id) ? <Check size={18} /> : <div className={"h-[18px] w-[18px]"}></div>}
                                                                             </div>
                                                                             <span>{x.title ? x.title : ""}</span>
                                                                         </div>
@@ -965,7 +958,7 @@ const SidebarSheet = ({
                                         </div>
                                         <div className={"p-8 flex gap-6"}>
                                             <Button
-                                                className={"py-2 px-6 text-sm font-semibold"}
+                                                className={`${isLoadingCreateIdea === true ? "w-[81px] py-2 px-6" : "py-2 px-6"} text-sm font-semibold`}
                                                 onClick={onCreateIdea}
                                             >
                                                 {
@@ -991,19 +984,12 @@ const SidebarSheet = ({
                                                         <Button
                                                             className={"p-[7px] bg-white shadow border hover:bg-white w-[30px] h-[30px]"}
                                                             variant={"outline"}
-                                                            onClick={() => giveVote(selectedIdea, 1)}
+                                                            onClick={() => giveVote(1)}
                                                         >
                                                             <ArrowBigUp
                                                                 className={"fill-primary stroke-primary"}/>
                                                         </Button>
                                                         <p className={"text-xl font-medium"}>{selectedIdea.vote}</p>
-                                                        <Button
-                                                            className={"p-[7px] bg-white shadow border hover:bg-white w-[30px] h-[30px]"}
-                                                            variant={"outline"}
-                                                            onClick={() => giveVote(selectedIdea, 0)}
-                                                        >
-                                                            <ArrowBigDown className={"stroke-primary"}/>
-                                                        </Button>
                                                     </div>
                                                     <div className={"flex gap-2"}>
                                                         {
@@ -1076,23 +1062,20 @@ const SidebarSheet = ({
                                                                                     (selectedIdea.vote_list || []).map((x, i) => {
                                                                                         return (
                                                                                             <div className={"flex"}>
-                                                                                                <div
-                                                                                                    className={"relative"}>
-                                                                                                    <div
-                                                                                                        className={"update-idea text-sm rounded-full border text-center"}>
-                                                                                                        {
-                                                                                                            i < 2 ? x.user_photo ?
-                                                                                                                <Avatar
-                                                                                                                    src={x.user_photo}/> :
-                                                                                                                <Avatar>
-                                                                                                                    {x && x.name && x.name.substring(0, 1)}
-                                                                                                                </Avatar> : ""
-                                                                                                        }
+                                                                                                <div className={"relative"}>
+                                                                                                    <div className={"update-idea text-sm rounded-full border text-center"}>
+                                                                                                        <Avatar>
+                                                                                                            {
+                                                                                                                i < 2 ? x.user_photo ?
+                                                                                                                <AvatarImage src={x.user_photo} alt={x && x.name && x.name.substring(0, 1)} /> :
+                                                                                                                <AvatarFallback>{x && x.name && x.name.substring(0, 1)}</AvatarFallback> : ""
+                                                                                                            }
+                                                                                                        </Avatar>
                                                                                                     </div>
                                                                                                 </div>
                                                                                                 <div
                                                                                                     className={"update-idea  text-sm rounded-full border text-center ml-[-5px]"}>
-                                                                                                    <Avatar>+{selectedIdea.vote_list.length - 2}</Avatar>
+                                                                                                    <Avatar><AvatarFallback>+{selectedIdea.vote_list.length - 2}</AvatarFallback></Avatar>
                                                                                                 </div>
                                                                                             </div>
                                                                                         )
@@ -1102,26 +1085,33 @@ const SidebarSheet = ({
                                                                         </PopoverTrigger>
                                                                         <PopoverContent className="p-0">
                                                                             <div className="">
-                                                                                <div
-                                                                                    className="space-y-2 px-4 py-[5px]">
+                                                                                <div className="space-y-2 px-4 py-[5px]">
                                                                                     <h4 className="font-medium leading-none text-sm">{`Voters (${selectedIdea.vote})`}</h4>
                                                                                 </div>
-                                                                                <div className="border-t px-4 py-3">
+                                                                                <div className="border-t px-4 py-3 space-y-2">
                                                                                     {
                                                                                         (selectedIdea.vote_list || []).map((x, i) => {
                                                                                             return (
                                                                                                 <div
                                                                                                     className={"flex gap-2"}>
-                                                                                                    <div
-                                                                                                        className={"update-idea text-sm rounded-full border text-center"}>
-                                                                                                        {
-                                                                                                            x.user_photo ?
-                                                                                                                <Avatar
-                                                                                                                    src={x.user_photo}/> :
-                                                                                                                <Avatar>
-                                                                                                                    {x && x.name && x.name.substring(0, 1)}
-                                                                                                                </Avatar>
-                                                                                                        }
+                                                                                                    <div className={"update-idea text-sm rounded-full border text-center"}>
+                                                                                                        {/*{*/}
+                                                                                                        {/*    x.user_photo ?*/}
+                                                                                                        {/*        <Avatar src={x.user_photo}/> :*/}
+                                                                                                        {/*        <Avatar>*/}
+                                                                                                        {/*            {x && x.name && x.name.substring(0, 1)}*/}
+                                                                                                        {/*        </Avatar>*/}
+                                                                                                        {/*}*/}
+
+                                                                                                        <Avatar className={"w-[20px] h-[20px]"}>
+                                                                                                            {
+                                                                                                                selectedIdea.user_photo ?
+                                                                                                                    <AvatarImage src={selectedIdea.user_photo}
+                                                                                                                                 alt="@shadcn"/>
+                                                                                                                    :
+                                                                                                                    <AvatarFallback>{selectedIdea && selectedIdea.name && selectedIdea.name.substring(0, 1)}</AvatarFallback>
+                                                                                                            }
+                                                                                                        </Avatar>
                                                                                                     </div>
                                                                                                     <h4 className={"text-sm font-normal"}>{x.name}</h4>
                                                                                                 </div>
@@ -1320,14 +1310,15 @@ const SidebarSheet = ({
                                                                         <div className={"flex gap-2 p-[32px]"}>
                                                                             <div className={""}>
                                                                                 <div className={"update-idea text-sm rounded-full border text-center"}>
-                                                                                    {
-                                                                                        x.user_photo ?
-                                                                                            <AvatarImage
-                                                                                                src={x.user_photo}/> :
-                                                                                            <Avatar>
-                                                                                                {x && x.name && x.name.substring(0, 1)}
-                                                                                            </Avatar>
-                                                                                    }
+                                                                                    <Avatar className={"w-[20px] h-[20px]"}>
+                                                                                        {
+                                                                                            x.user_photo ?
+                                                                                                <AvatarImage src={x.user_photo}
+                                                                                                             alt="@shadcn"/>
+                                                                                                :
+                                                                                                <AvatarFallback>{x && x.name && x.name.substring(0, 1)}</AvatarFallback>
+                                                                                        }
+                                                                                    </Avatar>
                                                                                 </div>
                                                                             </div>
                                                                             <div className={"w-full flex flex-col gap-3"}>
@@ -1386,7 +1377,6 @@ const SidebarSheet = ({
                                                                                                                                         <div
                                                                                                                                             className="img-delete">
                                                                                                                                             <Button
-                                                                                                                                                shape="circle"
                                                                                                                                                 onClick={() => onDeleteCommentImage(i, true)}>
                                                                                                                                                 <CircleX/>
                                                                                                                                             </Button>
@@ -1400,7 +1390,6 @@ const SidebarSheet = ({
                                                                                                                                         <div
                                                                                                                                             className="img-delete">
                                                                                                                                             <Button
-                                                                                                                                                shape="circle"
                                                                                                                                                 onClick={() => onDeleteCommentImage(i, false)}>
                                                                                                                                                 <CircleX/>
                                                                                                                                             </Button>
@@ -1417,11 +1406,11 @@ const SidebarSheet = ({
                                                                                                         </div> : ""
                                                                                                 }
                                                                                                 <div className={"flex gap-2"}>
-                                                                                                    <Button className={"px-3 py-2 text-sm font-semibold"}
+                                                                                                    <Button className={`${isSaveUpdateComment === true ? "py-2 px-6" : "w-[81px] py-2 px-6"} text-sm font-semibold`}
                                                                                                         onClick={onUpdateComment}
                                                                                                         disabled={selectedComment.comment.trim() === "" || selectedComment.comment === ""}>
                                                                                                         {
-                                                                                                            isSaveUpdateComment ? <Loader2 className="h-4 w-4 animate-spin"/> : "Save"
+                                                                                                            isSaveUpdateComment ? <Loader2 size={16} className="animate-spin"/> : "Save"
                                                                                                         }
                                                                                                     </Button>
                                                                                                     <Button className={"px-3 py-2 text-sm font-semibold text-primary border border-primary"} variant={"outline hover:none"}
@@ -1443,7 +1432,7 @@ const SidebarSheet = ({
                                                                                                 </div>
                                                                                             </div>
                                                                                             : <div>
-                                                                                                <p className="mb-1">{x.comment}</p>
+                                                                                                <p className={"text-sm"}>{x.comment}</p>
                                                                                                 {
                                                                                                     ((x && x.images) || []).map((img, ind) => {
                                                                                                         return (
@@ -1480,7 +1469,7 @@ const SidebarSheet = ({
                                                                                                             <div className={"flex gap-2"}>
                                                                                                                 <div>
                                                                                                                 <div className={"update-idea text-sm rounded-full border text-center"}>
-                                                                                                                    <Avatar>{y.name.substring(0, 1)}</Avatar>
+                                                                                                                    <Avatar><AvatarFallback>{y.name.substring(0, 1)}</AvatarFallback></Avatar>
                                                                                                                 </div>
                                                                                                                 </div>
                                                                                                                 <div className={"w-full space-y-2"}>
@@ -1557,12 +1546,11 @@ const SidebarSheet = ({
                                                                                                                                             </div> : ""
                                                                                                                                     }
                                                                                                                                     <div className={"flex gap-2"}>
-                                                                                                                                        <Button className={"px-3 py-2 text-sm font-semibold"}
-                                                                                                                                            loading={isSaveUpdateSubComment}
+                                                                                                                                        <Button className={`${isSaveUpdateSubComment === true ? "py-2 px-6" : "w-[81px] py-2 px-6"} text-sm font-semibold`}
                                                                                                                                             onClick={onUpdateSubComment}
                                                                                                                                             disabled={selectedSubComment.comment.trim() === "" || selectedSubComment.comment === ""}>
                                                                                                                                             {
-                                                                                                                                                isSaveUpdateSubComment ? <Loader2 className="h-4 w-4 animate-spin"/> : "Save"
+                                                                                                                                                isSaveUpdateSubComment ? <Loader2 size={16} className="animate-spin"/> : "Save"
                                                                                                                                             }
                                                                                                                                         </Button>
                                                                                                                                         <Button
@@ -1643,12 +1631,12 @@ const SidebarSheet = ({
                                                                                                             </div> : ""
                                                                                                     }
                                                                                                     <div className={"flex gap-2"}>
-                                                                                                        <Button className={"px-3 py-2 text-sm font-semibold"}
+                                                                                                        <Button className={`${isSaveSubComment === true ? "py-2 px-6" : "w-[86px] py-2 px-6"} text-sm font-semibold`}
                                                                                                             disabled={subCommentText.trim() === "" || subCommentText === ""}
-                                                                                                            loading={isSaveSubComment} onClick={() => onCreateSubComment(x, i)}
+                                                                                                            onClick={() => onCreateSubComment(x, i)}
                                                                                                         >
                                                                                                             {
-                                                                                                                isSaveSubComment ? <Loader2 className="h-4 w-4 animate-spin"/> : "Reply"
+                                                                                                                isSaveSubComment ? <Loader2 size={16} className="animate-spin"/> : "Reply"
                                                                                                             }
                                                                                                         </Button>
                                                                                                         <div

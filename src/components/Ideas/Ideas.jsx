@@ -8,7 +8,7 @@ import {
     ChevronsLeft,
     ChevronsRight,
     Circle,
-    Dot,
+    Dot, Ellipsis, Loader2,
     MessageCircleMore, Pin,
     Plus,
 } from "lucide-react";
@@ -26,7 +26,9 @@ import ReadMoreText from "../Comman/ReadMoreText";
 import {CommSkel} from "../Comman/CommSkel";
 import EmptyData from "../Comman/EmptyData";
 import CreateIdea from "./CreateIdea";
-import {record} from "zod";
+import {DropdownMenu, DropdownMenuTrigger} from "@radix-ui/react-dropdown-menu";
+import {DropdownMenuContent, DropdownMenuItem} from "../ui/dropdown-menu";
+import {Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "../ui/dialog";
 
 const filterByStatus = [
     {name: "Archived", value: "archived",},
@@ -64,7 +66,7 @@ const Ideas = () => {
     const [roadmapStatus, setRoadmapStatus] = useState([]);
     const [filter, setFilter] = useState(initialStateFilter);
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
-    const [isCreateIdea, setIsCreateIdea] = useState(false);
+    const [openDelete, setOpenDelete] = useState(false);
 
     const openSheet = () => setSheetOpen(true);
     const closeSheet = () => setSheetOpen(false);
@@ -134,38 +136,25 @@ const Ideas = () => {
     };
 
     const handleChange = async (e) => {
-        let obj = {...filter, [e.name]: e.value}
-
-        let indexArchived = obj.status.findIndex((x) => x === "Archived");
-        let indexBugs = obj.status.findIndex((x) => x === "Bugs");
-        let indexNoStatus = obj.status.findIndex((x) => x === "NoStatus");
-
-        setFilter({
-            ...obj,
-            archive: indexArchived !== -1 ? 1 : "",
-            bug: indexBugs !== -1 ? 1 : "",
-            no_status: indexNoStatus !== -1 ? 1 : "",
-        })
-        let payload1 = {
-            ...filter,
-            archive: indexArchived !== -1 ? 1 : "",
-            bug: indexBugs !== -1 ? 1 : "",
-            no_status: indexNoStatus !== -1 ? 1 : "",
-            project_id: projectDetailsReducer.id,
-            page: 1,
-            limit: perPageLimit
-        }
         let payload = {
             ...filter,
-            [e.name]: e.value,
+            [e.name]: [e.value],
             project_id: projectDetailsReducer.id,
             page: 1,
             limit: perPageLimit,
-            roadmap : [e.value],
-            topic : [e.value],
-            status : [e.value]}
-        ideaSearch(e.name === "status" ? payload1 : payload)
-    }
+        };
+
+        if (e.value === null) {
+            if (e.name === "status") {
+                payload.status = [];
+            } else if (e.name === "topic") {
+                payload.topic = [];
+            } else if (e.name === "roadmap") {
+                payload.roadmap = [];
+            }
+        }
+        ideaSearch(payload);
+    };
 
     const giveVote = async (record, type) => {
         if (record.is_edit !== 1) {
@@ -207,11 +196,6 @@ const Ideas = () => {
         }
     }
 
-    const onUpdateIdea = (record) => {
-        setIsUpdateIdea(true);
-        setSelectedIdea(record)
-    }
-
     const onUpdateIdeaClose = () => {
         setIsUpdateIdea(false);
         setSelectedIdea({})
@@ -225,8 +209,67 @@ const Ideas = () => {
         }
     };
 
+    const handleRoadmapUpdate = async (name, value, index, record) => {
+        let formData = new FormData();
+        formData.append(name, value);
+        const data = await apiSerVice.updateIdea(formData, record.id);
+        if (data.status === 200) {
+            let clone = [...ideasList]
+            clone[index].roadmap_id = value
+            setIdeasList(clone);
+            toast({description: "Roadmap status updated successfully"});
+        } else {
+            toast({variant: "destructive", description: "Failed to update roadmap status"});
+        }
+    };
+
+    const onDeleteIdea = async (record) => {
+        setIsLoading(true)
+        const data = await apiSerVice.onDeleteIdea(record.id);
+        if (data.status === 200) {
+            const filteredIdeas = ideasList.filter((idea) => idea.id !== record.id);
+            setIdeasList(filteredIdeas);
+            setOpenDelete(false)
+            setIsLoading(false)
+            toast({ description: "Idea deleted successfully" });
+        } else {
+            toast({ variant: "destructive", description: "Failed to delete idea" });
+        }
+    };
+
+    const deleteIdea = () => {
+        setOpenDelete(!openDelete)
+    }
+
+
     return (
         <Fragment>
+            {
+                openDelete &&
+                <Fragment>
+                    <Dialog open onOpenChange={deleteIdea}>
+                        <DialogContent className="sm:max-w-[425px]">
+                            <DialogHeader className={"flex flex-col gap-2"}>
+                                <DialogTitle>You really want delete this idea?</DialogTitle>
+                                <DialogDescription>This action can't be undone.</DialogDescription>
+                            </DialogHeader>
+                            <DialogFooter>
+                                <Button variant={"outline hover:none"}
+                                        className={"text-sm font-semibold border"} onClick={() => setOpenDelete(false)}>Cancel</Button>
+                                <Button
+                                    variant={"hover:bg-destructive"}
+                                    className={`${theme === "dark" ? "text-card-foreground" : "text-card"} ${isLoading === true ? "py-2 px-6" : "w-[76px] py-2 px-6"} text-sm font-semibold bg-destructive`}
+                                    // onClick={onDeleteIdea}
+                                >
+                                    {
+                                        isLoading ? <Loader2 size={16} className={"animate-spin"}/> : "Delete"
+                                    }
+                                </Button>
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
+                </Fragment>
+            }
             <div
                 className={"xl:container xl:max-w-[1200px] lg:container lg:max-w-[992px] md:container md:max-w-[768px] sm:container sm:max-w-[639px] xs:container xs:max-w-[475px] pt-8 pb-5"}>
                 <SidebarSheet
@@ -259,9 +302,7 @@ const Ideas = () => {
                     <span><h1 className={"text-2xl font-medium"}>Ideas</h1></span>
                     <div className="ml-auto gap-6">
                         <div className={"flex flex-row flex-wrap gap-6 items-center"}>
-                            <Select
-                                onValueChange={(selectedItems ) => handleChange({name: "status", value: selectedItems})}
-                            >
+                            <Select onValueChange={(selectedItems ) => handleChange({name: "status", value: selectedItems})}>
                                 <SelectTrigger className="w-[173px] bg-card">
                                     <SelectValue placeholder="Filter by status"/>
                                 </SelectTrigger>
@@ -344,33 +385,24 @@ const Ideas = () => {
                                 <CardContent className={"p-0"}>
                                     {
                                         (ideasList || []).map((x, i) => {
+
                                             return (
                                                 <Fragment key={i}>
                                                     <div className={"flex gap-8 py-6 px-16"}>
                                                         <div className={"flex gap-2"}>
-                                                            <div className={"flex flex-col gap-2"}>
-                                                                <Button
-                                                                    className={"p-[7px] bg-white shadow border hover:bg-white w-[30px] h-[30px]"}
-                                                                    variant={"outline"}
-                                                                    onClick={() => giveVote(x, 1)}
-                                                                >
-                                                                    <ArrowBigUp
-                                                                        className={"fill-primary stroke-primary"}/>
-                                                                </Button>
-                                                                <Button
-                                                                    className={"p-[7px] bg-white shadow border hover:bg-white w-[30px] h-[30px]"}
-                                                                    variant={"outline"}
-                                                                    onClick={() => giveVote(x, 0)}
-                                                                >
-                                                                    <ArrowBigDown className={"stroke-primary"}/>
-                                                                </Button>
-                                                            </div>
+                                                            <Button
+                                                                className={"p-[7px] bg-white shadow border hover:bg-white w-[30px] h-[30px]"}
+                                                                variant={"outline"}
+                                                                onClick={() => giveVote(x, 1)}
+                                                            >
+                                                                <ArrowBigUp className={"fill-primary stroke-primary"}/>
+                                                            </Button>
                                                             <p className={"text-xl font-medium"}>{x.vote}</p>
                                                         </div>
                                                         <div className={"flex flex-col w-full gap-6"}>
                                                             <div className={"flex flex-col gap-[11px]"}>
+                                                                <div className={"flex items-center justify-between"}>
                                                                 <div className={"flex items-center gap-3 cursor-pointer"} onClick={() => openDetailsSheet(x)}>
-                                                                    {x.pin_to_top === 1 && <Pin className={"w-[16px] h-[16px]"} />}
                                                                     <h3 className={"text-base font-medium"}>{x.title}</h3>
                                                                     <h4 className={"text-sm font-medium"}>{x.name}</h4>
                                                                     <p className={"text-xs font-normal flex items-center text-muted-foreground"}>
@@ -378,13 +410,25 @@ const Ideas = () => {
                                                                         {moment(x.created_at).format('D MMM')}
                                                                     </p>
                                                                 </div>
+                                                                    <div className={"flex gap-2 items-center"}>
+                                                                        {x.pin_to_top === 1 && <Pin size={16} fill={"bg-card-foreground"} />}
+                                                                        <DropdownMenu>
+                                                                            <DropdownMenuTrigger>
+                                                                                <Ellipsis size={16} />
+                                                                            </DropdownMenuTrigger>
+                                                                            <DropdownMenuContent>
+                                                                                <DropdownMenuItem>Edit</DropdownMenuItem>
+                                                                                <DropdownMenuItem onClick={deleteIdea}>Delete</DropdownMenuItem>
+                                                                            </DropdownMenuContent>
+                                                                        </DropdownMenu>
+                                                                    </div>
+                                                                </div>
                                                                 <div className={"description-container text-sm text-muted-foreground"}>
                                                                     <ReadMoreText html={x.description}/>
                                                                 </div>
                                                             </div>
-                                                            <div
-                                                                className={"flex flex-wrap justify-between items-center gap-1"}>
-                                                                <div className={"flex gap-2"}>
+                                                            <div className={"flex justify-between items-center gap-1"}>
+                                                                <div className={"flex flex-wrap gap-2"}>
                                                                     {
                                                                         (x.topic || []).map((y, i) => {
                                                                             return (
@@ -395,7 +439,7 @@ const Ideas = () => {
                                                                     }
                                                                 </div>
                                                                 <div className={"flex items-center gap-8"}>
-                                                                    <Select>
+                                                                    <Select onValueChange={(value) => handleRoadmapUpdate("roadmap_id", value, i, x)} value={x.roadmap_id}>
                                                                         <SelectTrigger className="w-[291px] bg-card">
                                                                             <SelectValue/>
                                                                         </SelectTrigger>
@@ -406,7 +450,6 @@ const Ideas = () => {
                                                                                         No status
                                                                                     </div>
                                                                                 </SelectItem>
-                                                                                {console.log(x.roadmap_status)}
                                                                                     {
                                                                                         (allStatusAndTypes.roadmap_status || []).map((x, i) => {
                                                                                             return (
@@ -416,26 +459,18 @@ const Ideas = () => {
                                                                                                         <Circle fill={x.color_code}
                                                                                                                 stroke={x.color_code}
                                                                                                                 className={` w-[10px] h-[10px]`}/>
-                                                                                                        {x.title ? x.title : "No status"}
+                                                                                                        {x.title || "No status"}
                                                                                                     </div>
                                                                                                 </SelectItem>
                                                                                             )
                                                                                         })
                                                                                     }
-                                                                                {/*<SelectItem value={x.value}>*/}
-                                                                                {/*    <div className={"flex items-center gap-2"}>*/}
-                                                                                {/*        <Circle fill={x.roadmap_color}*/}
-                                                                                {/*                stroke={x.roadmap_color}*/}
-                                                                                {/*                className={` w-[10px] h-[10px]`}/>*/}
-                                                                                {/*        {x.roadmap_title ? x.roadmap_title : "No status"}*/}
-                                                                                {/*    </div>*/}
-                                                                                {/*</SelectItem>*/}
                                                                             </SelectGroup>
                                                                         </SelectContent>
                                                                     </Select>
                                                                     <div
                                                                         className={"flex items-center gap-2 cursor-pointer"}
-                                                                        onClick={openDetailsSheet}
+                                                                        onClick={() => openDetailsSheet(x)}
                                                                     >
                                                                 <span>
                                                                     <MessageCircleMore

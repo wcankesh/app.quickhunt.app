@@ -27,10 +27,7 @@ export const CommSkel = {
             Array.from(Array(4)).map((_, r) => {
                 return (
                     <div className={"flex gap-8 py-6 px-16 border-b"} key={r}>
-                        <div className={"space-y-2"}>
                             <Skeleton className="h-[30px] w-[30px] rounded-full"/>
-                            <Skeleton className="h-[30px] w-[30px] rounded-full"/>
-                        </div>
                         <div className="space-y-2 w-full">
                             <Skeleton className="h-4"/>
                             <Skeleton className="h-4"/>

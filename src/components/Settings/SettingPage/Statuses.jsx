@@ -1,10 +1,11 @@
 import React, { Fragment, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../../ui/card";
 import { Button } from "../../ui/button";
-import {Check, Menu, Pencil, Plus, Trash2, X} from "lucide-react";
+import {Check, Menu, Pencil, Plus, Square, Trash2, X} from "lucide-react";
 import { Table, TableHeader, TableHead, TableRow, TableBody, TableCell } from "../../ui/table";
 import ColorInput from "../../Comman/ColorPicker";
 import {Input} from "../../ui/input";
+import {useTheme} from "../../theme-provider";
 
 const initialNewLabel = {
     labelName: '',
@@ -12,6 +13,7 @@ const initialNewLabel = {
 };
 
 const Statuses = () => {
+    const {theme} = useTheme();
     const [labelColors, setLabelColors] = useState([
         {labelName: "Under consideration", name: "clr", value: "#ff3c3c",},
         {labelName: "Planned", name: "clr", value: "#3b82f6",},
@@ -104,7 +106,21 @@ const Statuses = () => {
 
     const handleSaveLabel = (index) => {
         const updatedColors = [...labelColors];
-        updatedColors[index] = { ...updatedColors[index]};
+        const labelToSave = updatedColors[index];
+
+        if (!labelToSave.labelName || labelToSave.labelName.trim() === "") {
+            setLabelError({
+                ...labelError,
+                labelName: "Label name is required."
+            });
+            return;
+        }
+        setLabelError({
+            ...labelError,
+            labelName: ""
+        });
+
+        updatedColors[index] = { ...labelToSave };
         setLabelColors(updatedColors);
         setIsEdit(null);
     };
@@ -144,9 +160,9 @@ const Statuses = () => {
                     <TableHeader className="p-0">
                         <TableRow>
                             <TableHead className={"w-[48px]"}/>
-                            <TableHead className="p-0">Label Name</TableHead>
-                            <TableHead className="p-0 text-end">Label Color</TableHead>
-                            <TableHead className="text-right pr-[35px] pl-0">Action</TableHead>
+                            <TableHead className={`w-2/5 pl-0 ${theme === "dark" ? "" : "text-card-foreground"}`}>Label Name</TableHead>
+                            <TableHead className={`text-center ${theme === "dark" ? "" : "text-card-foreground"}`}>Label Color</TableHead>
+                            <TableHead className={`pr-[39px] text-end ${theme === "dark" ? "" : "text-card-foreground"}`}>Action</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -155,9 +171,9 @@ const Statuses = () => {
                                 <TableCell><Menu className={"cursor-grab"} size={16} /></TableCell>
                                 {
                                     isEdit === i ?
-                                        <TableCell className={"text-xs font-medium p-0 pr-4"}>
+                                        <TableCell className={"py-[8.5px] pl-0 py-[11px]"}>
                                             <Input
-                                                className={"bg-card"}
+                                                className={"bg-card h-9"}
                                                 type="text"
                                                 value={x.labelName}
                                                 name={"labelName"}
@@ -171,13 +187,19 @@ const Statuses = () => {
                                                 }
                                             </div>
                                         </TableCell>
-                                        : <TableCell className={"p-0"}>{x.labelName}</TableCell>
+                                        : <TableCell className={`font-medium text-xs py-[8.5px] pl-0 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.labelName}</TableCell>
                                 }
                                 {isEdit === i ?
-                                    <TableCell className={"p-0"}><div className={"py-2 px-3 bg-card border border-border rounded-lg overflow-hidden"}>
-                                        <ColorInput name={x.name} value={x.value} onChange={(color) => onChangeColorColor(color, i)} />
-                                    </div></TableCell> :
-                                    <TableCell className={"p-0"}><ColorInput name={x.name} value={x.value} /*onChange={(color) => onChangeColorColor(color, i)}*/ />
+                                    <TableCell className={`font-medium text-xs ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                        <div className={"flex justify-center items-center"}>
+                                            <ColorInput name={x.name} value={x.value} onChange={(color) => onChangeColorColor(color, i)} />
+                                        </div>
+                                    </TableCell> :
+                                    <TableCell className={`font-medium text-xs ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                        <div className={"flex justify-center items-center gap-1"}>
+                                            <Square size={16} strokeWidth={1} fill={x.value} stroke={x.value}/>
+                                            <p>{x.value}</p>
+                                        </div>
                                     </TableCell>
                                 }
                                 <TableCell className="flex justify-end gap-2 pr-6">

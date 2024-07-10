@@ -132,6 +132,8 @@ const CreateIdea = ({
                 }
             }
             setIsLoading(false)
+            setIdeaDetail(initialState)
+            setDescription("")
             closeCreateIdea()
             if(isNoStatus) {
                 setIsNoStatus(false)
