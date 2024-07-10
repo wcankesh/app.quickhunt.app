@@ -58,7 +58,9 @@ const SidebarSheet = ({
                           setRoadmapList,
                           isNoStatus,
                           setIsNoStatus,
-                          setNoStatus
+                          setNoStatus,
+                          setOldSelectedIdea,
+                          oldSelectedIdea
                       }) => {
     const {theme} = useTheme()
     let apiSerVice = new ApiService();
@@ -269,7 +271,6 @@ const SidebarSheet = ({
     }
 
     const handleFileChange = (event, name) => {
-        debugger
         if (name === "uploadPin") {
             const clone = [];
             event.target.files.map((x) => {
@@ -365,7 +366,7 @@ const SidebarSheet = ({
                     }
                 }
             }
-            setSelectedIdea({...data.data,})
+            setSelectedIdea({...data.data, roadmap_color: data.data.roadmap_color, roadmap_id: data.data.roadmap_id, roadmap_title: data.data.roadmap_title })
             setIdeasList(clone);
             setIsLoading(false)
             setIsLoadingArchive(false)
@@ -680,6 +681,7 @@ const SidebarSheet = ({
         const data = await apiSerVice.updateIdea(formData, selectedIdea.id)
         if (data.status === 200) {
             setSelectedIdea({...data.data})
+            setOldSelectedIdea({...data.data})
             setIsEditIdea(false)
             setIsLoadingCreateIdea(false)
             toast({description: "Idea Update successfully"})
@@ -687,57 +689,61 @@ const SidebarSheet = ({
             setIsLoadingCreateIdea(false)
             toast({description: data.error})
         }
-        console.log("selectedIdea", selectedIdea)
     }
 
-    const onDeleteIdea = async () => {
-        setIsLoadingSidebar("delete")
-        const data = await apiSerVice.onDeleteIdea(selectedIdea.id)
-        if (data.status === 200) {
-            if (isRoadmap) {
-                if (isNoStatus) {
-                    let clone = [...ideasList];
-                    let ideaIndex = clone.findIndex((x) => x.id === selectedIdea.id);
-                    clone.splice(ideaIndex, 1)
-                    setSelectedIdea({})
-                    setNoStatus(clone);
-                    setIsNoStatus(false)
-                } else {
-                    const cloneRoadmap = [...roadmapList]
-                    const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap.id);
-                    const cloneRoadmapIdeas = [...cloneRoadmap[roadmapIndex].ideas]
-                    let ideaIndex = cloneRoadmapIdeas.findIndex((x) => x.id === selectedIdea.id);
-                    cloneRoadmapIdeas.splice(ideaIndex, 1);
-                    cloneRoadmap[roadmapIndex].ideas = cloneRoadmapIdeas
-                    setRoadmapList(cloneRoadmap)
-                    setSelectedIdea({})
-                    setSelectedRoadmap({})
-                }
-
-            } else {
-                const clone = [...ideasList];
-                const index = clone.findIndex((x) => x.id === selectedIdea.id)
-                if (index !== -1) {
-                    clone.splice(index, 1)
-                    setIdeasList(clone)
-                    setSelectedIdea({})
-                }
-            }
-
-            setIsUpdateIdea(false);
-            setOpenDelete(false)
-            onClose()
-            toast({description: "Idea delete successfully"})
-            setIsLoadingSidebar("")
-        } else {
-            setIsLoadingSidebar("")
-            toast({description: data.error})
-        }
+    const handleOnCreateCancel = () => {
+        setSelectedIdea(oldSelectedIdea);
+        setIsEditIdea(false);
     }
 
-    const deleteIdea = () => {
-        setOpenDelete(!openDelete)
-    }
+    // const onDeleteIdea = async () => {
+    //     setIsLoadingSidebar("delete")
+    //     const data = await apiSerVice.onDeleteIdea(selectedIdea.id)
+    //     if (data.status === 200) {
+    //         if (isRoadmap) {
+    //             if (isNoStatus) {
+    //                 let clone = [...ideasList];
+    //                 let ideaIndex = clone.findIndex((x) => x.id === selectedIdea.id);
+    //                 clone.splice(ideaIndex, 1)
+    //                 setSelectedIdea({})
+    //                 setNoStatus(clone);
+    //                 setIsNoStatus(false)
+    //             } else {
+    //                 const cloneRoadmap = [...roadmapList]
+    //                 const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap.id);
+    //                 const cloneRoadmapIdeas = [...cloneRoadmap[roadmapIndex].ideas]
+    //                 let ideaIndex = cloneRoadmapIdeas.findIndex((x) => x.id === selectedIdea.id);
+    //                 cloneRoadmapIdeas.splice(ideaIndex, 1);
+    //                 cloneRoadmap[roadmapIndex].ideas = cloneRoadmapIdeas
+    //                 setRoadmapList(cloneRoadmap)
+    //                 setSelectedIdea({})
+    //                 setSelectedRoadmap({})
+    //             }
+    //
+    //         } else {
+    //             const clone = [...ideasList];
+    //             const index = clone.findIndex((x) => x.id === selectedIdea.id)
+    //             if (index !== -1) {
+    //                 clone.splice(index, 1)
+    //                 setIdeasList(clone)
+    //                 setSelectedIdea({})
+    //             }
+    //         }
+    //
+    //         setIsUpdateIdea(false);
+    //         setOpenDelete(false)
+    //         onClose()
+    //         toast({description: "Idea delete successfully"})
+    //         setIsLoadingSidebar("")
+    //     } else {
+    //         setIsLoadingSidebar("")
+    //         toast({description: data.error})
+    //     }
+    // }
+
+    // const deleteIdea = () => {
+    //     setOpenDelete(!openDelete)
+    // }
 
     const onDeleteImageComment = (index) => {
         const clone = [...commentFiles];
@@ -751,38 +757,43 @@ const SidebarSheet = ({
         setSubCommentFiles(clone)
     }
 
+    const onCloseBoth = () => {
+        onClose()
+        setIsEditIdea(false)
+    }
+
     return (
         <Fragment>
-            {
-                openDelete &&
-                <Fragment>
-                    <Dialog open onOpenChange={deleteIdea}>
-                        <DialogContent className="sm:max-w-[425px]">
-                            <DialogHeader className={"flex flex-col gap-2"}>
-                                <DialogTitle>You really want delete this idea?</DialogTitle>
-                                <DialogDescription>This action can't be undone.</DialogDescription>
-                            </DialogHeader>
-                            <DialogFooter>
-                                <Button variant={"outline hover:none"}
-                                        className={"text-sm font-semibold border"} onClick={() => setOpenDelete(false)}>Cancel</Button>
-                                <Button
-                                    variant={"hover:bg-destructive"}
-                                    className={`${theme === "dark" ? "text-card-foreground" : "text-card"} ${isSaveUpdateComment === true ? "py-2 px-6" : "w-[76px] py-2 px-6"} text-sm font-semibold bg-destructive`}
-                                    onClick={onDeleteIdea}
-                                >
-                                    {
-                                        isLoadingSidebar ? <Loader2 size={16} className={"animate-spin"}/> : "Delete"
-                                    }
-                                </Button>
-                            </DialogFooter>
-                        </DialogContent>
-                    </Dialog>
-                </Fragment>
-            }
-            <Sheet open={isOpen} onOpenChange={isOpen ? onClose : onOpen}>
+            {/*{*/}
+            {/*    openDelete &&*/}
+            {/*    <Fragment>*/}
+            {/*        <Dialog open onOpenChange={deleteIdea}>*/}
+            {/*            <DialogContent className="sm:max-w-[425px]">*/}
+            {/*                <DialogHeader className={"flex flex-col gap-2"}>*/}
+            {/*                    <DialogTitle>You really want delete this idea?</DialogTitle>*/}
+            {/*                    <DialogDescription>This action can't be undone.</DialogDescription>*/}
+            {/*                </DialogHeader>*/}
+            {/*                <DialogFooter>*/}
+            {/*                    <Button variant={"outline hover:none"}*/}
+            {/*                            className={"text-sm font-semibold border"} onClick={() => setOpenDelete(false)}>Cancel</Button>*/}
+            {/*                    <Button*/}
+            {/*                        variant={"hover:bg-destructive"}*/}
+            {/*                        className={`${theme === "dark" ? "text-card-foreground" : "text-card"} ${isSaveUpdateComment === true ? "py-2 px-6" : "w-[76px] py-2 px-6"} text-sm font-semibold bg-destructive`}*/}
+            {/*                        onClick={onDeleteIdea}*/}
+            {/*                    >*/}
+            {/*                        {*/}
+            {/*                            isLoadingSidebar ? <Loader2 size={16} className={"animate-spin"}/> : "Delete"*/}
+            {/*                        }*/}
+            {/*                    </Button>*/}
+            {/*                </DialogFooter>*/}
+            {/*            </DialogContent>*/}
+            {/*        </Dialog>*/}
+            {/*    </Fragment>*/}
+            {/*}*/}
+            <Sheet open={isOpen} onOpenChange={isOpen ? onCloseBoth : onOpen}>
                 <SheetContent className={"lg:max-w-[1101px] md:max-w-[720px] sm:max-w-[520px] p-0"}>
                     <SheetHeader className={"px-[32px] py-[22px] border-b"}>
-                        <X onClick={onClose} className={"cursor-pointer"}/>
+                        <X onClick={onCloseBoth} className={"cursor-pointer"}/>
                     </SheetHeader>
                     <div className={"lg:flex md:block overflow-auto h-[100vh]"}>
                         <div
@@ -823,13 +834,10 @@ const SidebarSheet = ({
                                             <>
                                                 <img src={imagePreview} alt="Preview"
                                                      className="w-full h-full object-cover rounded"/>
-                                                <Button
-                                                    variant="outline"
-                                                    onClick={handleRemoveImage}
-                                                    className={`${theme === "light" ? "text-card" : ""} w-[129px] px-4 py-2 absolute top-[50%] left-[50%] origin-center translate-x-[-50%] translate-y-[-50%] border-0 flex justify-center items-center bg-primary hover:bg-primary hover:text-card text-sm font-semibold`}
-                                                >
-                                                    Change image
-                                                </Button>
+                                                   <CircleX
+                                                       className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%]`}
+                                                       onClick={handleRemoveImage}
+                                                   />
                                             </>
                                         ) : (
                                             <>
@@ -923,11 +931,11 @@ const SidebarSheet = ({
                                             <Select onValueChange={handleChangeTopic} value={selectedIdea.topic.map(x => x.id)}>
                                                 <SelectTrigger>
                                                     <SelectValue className={"text-muted-foreground text-sm"} placeholder="Assign to">
-                                                        <div className={"flex gap-[2px]"}>
+                                                        <div className={"flex flex-wrap gap-[2px]"}>
                                                             {(selectedIdea.topic || []).map((x, index) => {
                                                                 const findObj = (topicLists || []).find((y) => y.id === x?.id );
                                                                 return (
-                                                                    <div key={index} className={"text-sm flex gap-[2px] bg-slate-300 items-center rounded py-0 px-2"}>
+                                                                    <div key={index} className={"text-xs flex gap-[2px] bg-slate-300 items-center rounded py-0 px-2"}>
                                                                         {findObj?.title}
                                                                     </div>
                                                                 );
@@ -956,7 +964,7 @@ const SidebarSheet = ({
                                                 </SelectContent>
                                             </Select>
                                         </div>
-                                        <div className={"p-8 flex gap-6"}>
+                                        <div className={"p-8 flex gap-3"}>
                                             <Button
                                                 className={`${isLoadingCreateIdea === true ? "w-[81px] py-2 px-6" : "py-2 px-6"} text-sm font-semibold`}
                                                 onClick={onCreateIdea}
@@ -969,7 +977,8 @@ const SidebarSheet = ({
                                             <Button
                                                 variant={"outline hover:bg-transparent"}
                                                 className={"border border-primary py-2 px-6 text-sm font-semibold"}
-                                                onClick={() => setIsEditIdea(false)}
+                                                // onClick={handleOnCreateCancel}
+                                                onClick={handleOnCreateCancel}
                                             >
                                                 Cancel
                                             </Button>
@@ -1013,14 +1022,14 @@ const SidebarSheet = ({
                                                                 <Pin fill={"bg-card-foreground"}
                                                                      className={"w-[16px] h-[16px]"}/>}
                                                         </Button>
-                                                        <Button
-                                                            variant={"outline"}
-                                                            className={"w-[30px] h-[30px] p-1"}
-                                                            onClick={deleteIdea}
-                                                            loading={isLoadingSidebar === "delete"}
-                                                        >
-                                                            <Trash2 className={"w-[16px] h-[16px]"}/>
-                                                        </Button>
+                                                        {/*<Button*/}
+                                                        {/*    variant={"outline"}*/}
+                                                        {/*    className={"w-[30px] h-[30px] p-1"}*/}
+                                                        {/*    onClick={deleteIdea}*/}
+                                                        {/*    loading={isLoadingSidebar === "delete"}*/}
+                                                        {/*>*/}
+                                                        {/*    <Trash2 className={"w-[16px] h-[16px]"}/>*/}
+                                                        {/*</Button>*/}
                                                     </div>
                                                 </div>
                                                 <div className={"flex flex-col gap-4"}>
@@ -1221,8 +1230,7 @@ const SidebarSheet = ({
                                                                                                     x && x.name ?
                                                                                                         <div
                                                                                                             className='bgTransparent image_fix_height bgTransparent-border'>
-                                                                                                            <div
-                                                                                                                className="img-delete">
+                                                                                                            <div>
                                                                                                                 <Button
                                                                                                                     onClick={() => onDeleteImageComment(i, false)}>
                                                                                                                     <CircleX/>
@@ -1234,8 +1242,7 @@ const SidebarSheet = ({
                                                                                                         </div> : x ?
                                                                                                         <div
                                                                                                             className='bgTransparent image_fix_height bgTransparent-border'>
-                                                                                                            <div
-                                                                                                                className="img-delete">
+                                                                                                            <div>
                                                                                                                 <Button
                                                                                                                     onClick={() => onDeleteImageComment(i, false)}>
                                                                                                                     <CircleX/>
@@ -1374,8 +1381,7 @@ const SidebarSheet = ({
                                                                                                                                 x && x.name ?
                                                                                                                                     <div
                                                                                                                                         className=''>
-                                                                                                                                        <div
-                                                                                                                                            className="img-delete">
+                                                                                                                                        <div>
                                                                                                                                             <Button
                                                                                                                                                 onClick={() => onDeleteCommentImage(i, true)}>
                                                                                                                                                 <CircleX/>
@@ -1387,8 +1393,7 @@ const SidebarSheet = ({
                                                                                                                                     </div> : x ?
                                                                                                                                     <div
                                                                                                                                         className=''>
-                                                                                                                                        <div
-                                                                                                                                            className="img-delete">
+                                                                                                                                        <div>
                                                                                                                                             <Button
                                                                                                                                                 onClick={() => onDeleteCommentImage(i, false)}>
                                                                                                                                                 <CircleX/>
@@ -1432,7 +1437,8 @@ const SidebarSheet = ({
                                                                                                 </div>
                                                                                             </div>
                                                                                             : <div>
-                                                                                                <p className={"text-sm"}>{x.comment}</p>
+                                                                                                {/*<p className={"text-sm"}>{x.comment}</p>*/}
+                                                                                                <ReadMoreText html={x.comment}/>
                                                                                                 {
                                                                                                     ((x && x.images) || []).map((img, ind) => {
                                                                                                         return (
@@ -1518,8 +1524,7 @@ const SidebarSheet = ({
                                                                                                                                                                     x && x.name ?
                                                                                                                                                                         <div
                                                                                                                                                                             className='bgTransparent image_fix_height bgTransparent-border'>
-                                                                                                                                                                            <div
-                                                                                                                                                                                className="img-delete">
+                                                                                                                                                                            <div>
                                                                                                                                                                                 <Button
                                                                                                                                                                                     onClick={() => onDeleteSubCommentImage(ind, true)}><CircleX/></Button>
                                                                                                                                                                             </div>
@@ -1529,8 +1534,7 @@ const SidebarSheet = ({
                                                                                                                                                                         </div> : x ?
                                                                                                                                                                         <div
                                                                                                                                                                             className='bgTransparent image_fix_height bgTransparent-border'>
-                                                                                                                                                                            <div
-                                                                                                                                                                                className="img-delete">
+                                                                                                                                                                            <div>
                                                                                                                                                                                 <Button
                                                                                                                                                                                     onClick={() => onDeleteSubCommentImage(ind, false)}><CircleX/></Button>
                                                                                                                                                                             </div>
@@ -1612,13 +1616,13 @@ const SidebarSheet = ({
                                                                                                                                 {
                                                                                                                                     z && z.name ?
                                                                                                                                         <div className=''>
-                                                                                                                                            <div className="img-delete">
+                                                                                                                                            <div>
                                                                                                                                                 <Button onClick={() => onDeleteSubCommentImageOld(i, false)}><CircleX/></Button>
                                                                                                                                             </div>
                                                                                                                                             <img src={z && z.name ? URL.createObjectURL(z) : z}/>
                                                                                                                                         </div> : z ?
                                                                                                                                         <div className=''>
-                                                                                                                                            <div className="img-delete">
+                                                                                                                                            <div>
                                                                                                                                                 <Button onClick={() => onDeleteSubCommentImageOld(i, false)}><CircleX/></Button>
                                                                                                                                             </div>
                                                                                                                                             <img src={z} alt={z}/>
