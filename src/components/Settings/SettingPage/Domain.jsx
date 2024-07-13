@@ -87,7 +87,7 @@ const Domain = () => {
                 <div className="gap-2 relative">
                     <Label htmlFor="domain" className="text-right">Subdomain</Label>
                     <Input disabled  value={settingData.domain.replace('.quickhunt.io', '')} id="domain" placeholder="https://" className={"pr-[115px] bg-card mt-1"} />
-                    <span className={"absolute top-[38px] right-[13px] text-sm font-medium"}>.quickhunt.io</span>
+                    <span className={"absolute top-[38px] right-[13px] text-sm font-medium"}>.quickhunt.app</span>
                 </div>
                 <div className="">
                     <Label htmlFor="text">Custom Domain</Label>
@@ -98,7 +98,7 @@ const Domain = () => {
                     <span className={"font-bold"}> CNAME</span> record for the subdomain you decided on
                     <span className={"font-bold"}> (eg feedback in the example above)</span> to your
                     <span className={"font-bold"}> DNS</span> and point it at the domain
-                    <span className={"font-bold"}> "cname.quickhunt.io"</span>.</p>
+                    <span className={"font-bold"}> "cname.quickhunt.app"</span>.</p>
             </CardContent>
             <CardFooter className={"pt-[20px] justify-end"}>
                 <Button className={"text-sm font-semibold"} onClick={onUpdatePortal}>{isSave ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Update Domain"} </Button>

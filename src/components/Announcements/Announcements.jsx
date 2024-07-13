@@ -50,6 +50,8 @@ const Announcements = () => {
     const [analyticsObj,setAnalyticsObj]=useState({})
     const apiService = new ApiService();
 
+    console.log(allStatusAndTypes)
+
     const openSheet = () => {
         setSelectedRecord({id:"new"})
     };
