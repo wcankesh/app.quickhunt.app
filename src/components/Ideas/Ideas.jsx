@@ -59,6 +59,7 @@ const Ideas = () => {
     const [ideasList, setIdeasList] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [selectedIdea, setSelectedIdea] = useState({}); // update idea
+    const [oldSelectedIdea, setOldSelectedIdea] = useState({});
     const [isUpdateIdea, setIsUpdateIdea] = useState(false); // update idea close
     const [topicLists, setTopicLists] = useState([]);
     const [pageNo, setPageNo] = useState(1);
@@ -67,6 +68,7 @@ const Ideas = () => {
     const [filter, setFilter] = useState(initialStateFilter);
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const [openDelete, setOpenDelete] = useState(false);
+    const [deleteRecord, setDeleteRecord] = useState(null);
 
     const openSheet = () => setSheetOpen(true);
     const closeSheet = () => setSheetOpen(false);
@@ -112,6 +114,7 @@ const Ideas = () => {
         const data = await apiSerVice.getSingleIdea(id);
         if (data.status === 200) {
             setSelectedIdea(data.data)
+            setOldSelectedIdea(data.data)
             setIsUpdateIdea(true)
             navigate(`${baseUrl}/ideas`)
         }
@@ -132,13 +135,14 @@ const Ideas = () => {
 
     const openDetailsSheet = (record) => {
         setSelectedIdea(record)
+        setOldSelectedIdea(record)
         openSheet();
     };
 
     const handleChange = async (e) => {
         let payload = {
             ...filter,
-            [e.name]: [e.value],
+            [e.name]: e.value !== null ? [e.value] : [],
             project_id: projectDetailsReducer.id,
             page: 1,
             limit: perPageLimit,
@@ -154,6 +158,7 @@ const Ideas = () => {
             }
         }
         ideaSearch(payload);
+        setFilter(payload);
     };
 
     const giveVote = async (record, type) => {
@@ -223,24 +228,27 @@ const Ideas = () => {
         }
     };
 
-    const onDeleteIdea = async (record) => {
-        setIsLoading(true)
-        const data = await apiSerVice.onDeleteIdea(record.id);
-        if (data.status === 200) {
-            const filteredIdeas = ideasList.filter((idea) => idea.id !== record.id);
-            setIdeasList(filteredIdeas);
-            setOpenDelete(false)
-            setIsLoading(false)
-            toast({ description: "Idea deleted successfully" });
-        } else {
-            toast({ variant: "destructive", description: "Failed to delete idea" });
+    const onDeleteIdea = async (id) => {
+        if(id){
+            setIsLoading(true)
+            const data = await apiSerVice.onDeleteIdea(id);
+            if (data.status === 200) {
+                const filteredIdeas = ideasList.filter((idea) => idea.id !== id);
+                setIdeasList(filteredIdeas);
+                setOpenDelete(false)
+                setIsLoading(false)
+                setDeleteRecord(null)
+                toast({ description: "Idea deleted successfully" });
+            } else {
+                toast({ variant: "destructive", description: "Failed to delete idea" });
+            }
         }
     };
 
-    const deleteIdea = () => {
+    const deleteIdea = (record) => {
+        setDeleteRecord(record.id)
         setOpenDelete(!openDelete)
     }
-
 
     return (
         <Fragment>
@@ -256,14 +264,27 @@ const Ideas = () => {
                             <DialogFooter>
                                 <Button variant={"outline hover:none"}
                                         className={"text-sm font-semibold border"} onClick={() => setOpenDelete(false)}>Cancel</Button>
+                                {/*{*/}
+                                {/*    (ideasList || []).map((x, i) => {*/}
+                                {/*        return (*/}
+                                {/*            <div key={x.id}>*/}
+                                {/*                <Button*/}
+                                {/*                    variant={"hover:bg-destructive"}*/}
+                                {/*                    className={`${theme === "dark" ? "text-card-foreground" : "text-card"} ${isLoading === true ? "py-2 px-6" : "w-[76px] py-2 px-6"} text-sm font-semibold bg-destructive`}*/}
+                                {/*                    onClick={() => onDeleteIdea(x)}*/}
+                                {/*                >*/}
+                                {/*                    {isLoading ? <Loader2 size={16} className={"animate-spin"} /> : "Delete"}*/}
+                                {/*                </Button>*/}
+                                {/*            </div>*/}
+                                {/*        )*/}
+                                {/*    })*/}
+                                {/*}*/}
                                 <Button
                                     variant={"hover:bg-destructive"}
                                     className={`${theme === "dark" ? "text-card-foreground" : "text-card"} ${isLoading === true ? "py-2 px-6" : "w-[76px] py-2 px-6"} text-sm font-semibold bg-destructive`}
-                                    // onClick={onDeleteIdea}
+                                    onClick={() => onDeleteIdea(deleteRecord)}
                                 >
-                                    {
-                                        isLoading ? <Loader2 size={16} className={"animate-spin"}/> : "Delete"
-                                    }
+                                    {isLoading ? <Loader2 size={16} className={"animate-spin"} /> : "Delete"}
                                 </Button>
                             </DialogFooter>
                         </DialogContent>
@@ -284,6 +305,8 @@ const Ideas = () => {
                     ideasList={ideasList}
                     selectedIdea={selectedIdea}
                     setSelectedIdea={setSelectedIdea}
+                    oldSelectedIdea={oldSelectedIdea}
+                    setOldSelectedIdea={setOldSelectedIdea}
                     onUpdateIdeaClose={onUpdateIdeaClose}
                     isNoStatus={false}
                 />
@@ -302,7 +325,7 @@ const Ideas = () => {
                     <span><h1 className={"text-2xl font-medium"}>Ideas</h1></span>
                     <div className="ml-auto gap-6">
                         <div className={"flex flex-row flex-wrap gap-6 items-center"}>
-                            <Select onValueChange={(selectedItems ) => handleChange({name: "status", value: selectedItems})}>
+                            <Select onValueChange={(selectedItems ) =>  handleChange({name: "status", value: selectedItems})}>
                                 <SelectTrigger className="w-[173px] bg-card">
                                     <SelectValue placeholder="Filter by status"/>
                                 </SelectTrigger>
@@ -418,7 +441,7 @@ const Ideas = () => {
                                                                             </DropdownMenuTrigger>
                                                                             <DropdownMenuContent>
                                                                                 <DropdownMenuItem>Edit</DropdownMenuItem>
-                                                                                <DropdownMenuItem onClick={deleteIdea}>Delete</DropdownMenuItem>
+                                                                                <DropdownMenuItem onClick={() => deleteIdea(x)}>Delete</DropdownMenuItem>
                                                                             </DropdownMenuContent>
                                                                         </DropdownMenu>
                                                                     </div>
