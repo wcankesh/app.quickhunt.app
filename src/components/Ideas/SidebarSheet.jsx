@@ -7,7 +7,7 @@ import {
     Circle,
     CircleX,
     Dot,
-    Loader2,
+    Loader2, MessageCircleMore,
     Paperclip,
     Pencil,
     Pin,
@@ -44,30 +44,27 @@ const SidebarSheet = ({
                           isOpen,
                           onOpen,
                           onClose,
-                          setIsUpdateIdea,
                           selectedIdea,
                           setSelectedIdea,
-                          isUpdateIdea,
                           ideasList,
                           setIdeasList,
-                          onUpdateIdeaClose,
                           isRoadmap,
                           selectedRoadmap,
-                          setSelectedRoadmap,
                           roadmapList,
                           setRoadmapList,
                           isNoStatus,
-                          setIsNoStatus,
                           setNoStatus,
                           setOldSelectedIdea,
-                          oldSelectedIdea
+                          oldSelectedIdea,
                       }) => {
     const {theme} = useTheme()
     let apiSerVice = new ApiService();
     const {toast} = useToast()
-    const [selectedFile, setSelectedFile] = useState(null);
-    const [imagePreview, setImagePreview] = useState(null);
-    const [openDelete, setOpenDelete] = useState(false);
+    // const [selectedFile, setSelectedFile] = useState(null);
+    // const [imagePreview, setImagePreview] = useState(null)
+
+    const [selectedFiles, setSelectedFiles] = useState([]);
+    const [imagePreviews, setImagePreviews] = useState([]);
 
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
@@ -113,7 +110,7 @@ const SidebarSheet = ({
                 clone.push(topicToAdd);
             }
         }
-        setSelectedIdea({ ...selectedIdea, topic: clone });
+        setSelectedIdea({...selectedIdea, topic: clone});
     };
 
     const giveVote = async (type) => {
@@ -270,40 +267,60 @@ const SidebarSheet = ({
         }
     }
 
-    const handleFileChange = (event, name) => {
-        if (name === "uploadPin") {
-            const clone = [];
-            event.target.files.map((x) => {
-                clone.push(x)
-            })
-            setCommentFiles(clone);
-        }
-        const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                if (name === "uploadPin") {
-                    const clone = [];
-                    event.target.files.map((x) => {
-                        clone.push(x)
-                    })
-                    setCommentFiles(clone);
-                    setImagePreview(reader.result);
-                } else {
-                    setSelectedFile(file);
-                    setImagePreview(reader.result);
-                    onChangeStatus("cover_image", file)
-                }
-
-            };
-            reader.readAsDataURL(file);
+    const handleFeatureImgUpload = async (event) => {
+        const file = event.target?.files[0];
+        setSelectedIdea({...selectedIdea, cover_image: file})
+        let formData = new FormData();
+        formData.append("cover_image", file);
+        const data = await apiSerVice.updateIdea(formData, selectedIdea.id)
+        if (data.status === 200) {
+            setSelectedIdea({...data.data})
+            // setIdeasList(clone);
+            setIsLoading(false)
+            setIsEditIdea(false)
+            toast({description: "Idea Update successfully"})
+        } else {
+            setIsLoading(false)
+            toast({variant: "destructive", description: data.error})
         }
     };
 
-    const handleRemoveImage = () => {
-        setSelectedFile(null);
-        setImagePreview(null);
+    const handleAddCommentImg = (event) => {
+        const files = event.target.files;
+
+        if (selectedComment && selectedComment.id) {
+            const clone = [...selectedComment.images, ...files];
+            let old = selectedComment.newImage && selectedComment.newImage.length ? [...selectedComment.newImage] : [];
+            const newImageClone = [...old, ...files];
+
+            setSelectedComment({
+                ...selectedComment,
+                images: clone,
+                newImage: newImageClone
+            });
+        } else {
+            setCommentFiles([...commentFiles, ...files]);
+        }
     };
+
+    const handleSubCommentUploadImg = (event) => {
+        const files = event.target.files;
+        if (selectedSubComment && selectedSubComment.id && selectedComment && selectedComment.id) {
+            const clone = [...selectedSubComment.images, ...files,]
+            let old = selectedSubComment && selectedSubComment.newImage && selectedSubComment.newImage.length ? [...selectedSubComment.newImage] : [];
+            const newImageClone = [...old, ...files,];
+            let selectedSubCommentObj = {...selectedSubComment, images: clone, newImage: newImageClone}
+            setSelectedSubComment(selectedSubCommentObj);
+            let index = ((selectedComment && selectedComment.reply) || []).findIndex((x) => x.id === selectedSubComment.id)
+            if (index !== -1) {
+                const cloneReplay = [...selectedComment.reply];
+                cloneReplay[index] = selectedSubCommentObj;
+                setSelectedComment({...selectedComment, reply: cloneReplay})
+            }
+        } else {
+            setSubCommentFiles([...subCommentFiles, ...files])
+        }
+    }
 
     const onChangeStatus = async (name, value) => {
         if (name === "is_active") {
@@ -326,47 +343,13 @@ const SidebarSheet = ({
                 } else {
                     clone[index] = {...data.data,};
                 }
-                if (isRoadmap) {
-                    const cloneRoadmap = [...roadmapList]
-                    const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap.id);
-                    if (name === "roadmap_id") {
-                        if (isNoStatus) {
-                            let ideaIndex = clone.findIndex((x) => x.id === selectedIdea.id);
-                            if (ideaIndex !== -1) {
-                                let ideaObj = clone[ideaIndex]
-                                const roadmapIndexChange = cloneRoadmap.findIndex((x) => x.id == value);
-                                const cloneRoadmapIdeas = [...cloneRoadmap[roadmapIndexChange].ideas]
-                                cloneRoadmapIdeas.push(ideaObj)
-                                cloneRoadmap[roadmapIndexChange].ideas = cloneRoadmapIdeas
-                                clone.splice(ideaIndex, 1)
-                                setRoadmapList(cloneRoadmap);
-                                setNoStatus(clone);
-                            }
-                        } else {
-                            if (roadmapIndex !== -1) {
-                                let cloneIdea = [...cloneRoadmap[roadmapIndex].ideas];
-                                let ideaIndex = cloneIdea.findIndex((x) => x.id === selectedIdea.id);
-                                if (ideaIndex !== -1) {
-                                    let ideaObj = cloneIdea[ideaIndex]
-                                    const roadmapIndexChange = cloneRoadmap.findIndex((x) => x.id == value);
-                                    const cloneRoadmapIdeas = [...cloneRoadmap[roadmapIndexChange].ideas]
-                                    cloneRoadmapIdeas.push(ideaObj);
-                                    cloneIdea.splice(ideaIndex, 1);
-                                    cloneRoadmap[roadmapIndexChange].ideas = cloneRoadmapIdeas
-                                    cloneRoadmap[roadmapIndex].ideas = cloneIdea
-                                    setRoadmapList(cloneRoadmap);
-                                }
-                            }
-                        }
-                    } else {
-                        if (roadmapIndex !== -1) {
-                            cloneRoadmap[roadmapIndex].ideas = clone
-                            setRoadmapList(cloneRoadmap);
-                        }
-                    }
-                }
             }
-            setSelectedIdea({...data.data, roadmap_color: data.data.roadmap_color, roadmap_id: data.data.roadmap_id, roadmap_title: data.data.roadmap_title })
+            setSelectedIdea({
+                ...data.data,
+                roadmap_color: data.data.roadmap_color,
+                roadmap_id: data.data.roadmap_id,
+                roadmap_title: data.data.roadmap_title
+            })
             setIdeasList(clone);
             setIsLoading(false)
             setIsLoadingArchive(false)
@@ -635,9 +618,9 @@ const SidebarSheet = ({
     }
 
     const handleUpdate = (event) => {
-        const { value } = event.target;
+        const {value} = event.target;
         setDescription(value);
-        setSelectedIdea(selectedIdea => ({ ...selectedIdea, description: value }));
+        setSelectedIdea(selectedIdea => ({...selectedIdea, description: value}));
         setFormError(formError => ({
             ...formError,
             description: formValidate("description", value)
@@ -675,8 +658,8 @@ const SidebarSheet = ({
             topics.push(x.id)
         })
         formData.append('title', selectedIdea.title);
-        formData.append('slug_url', selectedIdea.title ? selectedIdea.title.replace(/ /g,"-").replace(/\?/g, "-") :"");
-        formData.append('description', selectedIdea.description?.trim() === '' ? "" : selectedIdea.description );
+        formData.append('slug_url', selectedIdea.title ? selectedIdea.title.replace(/ /g, "-").replace(/\?/g, "-") : "");
+        formData.append('description', selectedIdea.description?.trim() === '' ? "" : selectedIdea.description);
         formData.append('topic', topics.join(","));
         const data = await apiSerVice.updateIdea(formData, selectedIdea.id)
         if (data.status === 200) {
@@ -695,55 +678,6 @@ const SidebarSheet = ({
         setSelectedIdea(oldSelectedIdea);
         setIsEditIdea(false);
     }
-
-    // const onDeleteIdea = async () => {
-    //     setIsLoadingSidebar("delete")
-    //     const data = await apiSerVice.onDeleteIdea(selectedIdea.id)
-    //     if (data.status === 200) {
-    //         if (isRoadmap) {
-    //             if (isNoStatus) {
-    //                 let clone = [...ideasList];
-    //                 let ideaIndex = clone.findIndex((x) => x.id === selectedIdea.id);
-    //                 clone.splice(ideaIndex, 1)
-    //                 setSelectedIdea({})
-    //                 setNoStatus(clone);
-    //                 setIsNoStatus(false)
-    //             } else {
-    //                 const cloneRoadmap = [...roadmapList]
-    //                 const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap.id);
-    //                 const cloneRoadmapIdeas = [...cloneRoadmap[roadmapIndex].ideas]
-    //                 let ideaIndex = cloneRoadmapIdeas.findIndex((x) => x.id === selectedIdea.id);
-    //                 cloneRoadmapIdeas.splice(ideaIndex, 1);
-    //                 cloneRoadmap[roadmapIndex].ideas = cloneRoadmapIdeas
-    //                 setRoadmapList(cloneRoadmap)
-    //                 setSelectedIdea({})
-    //                 setSelectedRoadmap({})
-    //             }
-    //
-    //         } else {
-    //             const clone = [...ideasList];
-    //             const index = clone.findIndex((x) => x.id === selectedIdea.id)
-    //             if (index !== -1) {
-    //                 clone.splice(index, 1)
-    //                 setIdeasList(clone)
-    //                 setSelectedIdea({})
-    //             }
-    //         }
-    //
-    //         setIsUpdateIdea(false);
-    //         setOpenDelete(false)
-    //         onClose()
-    //         toast({description: "Idea delete successfully"})
-    //         setIsLoadingSidebar("")
-    //     } else {
-    //         setIsLoadingSidebar("")
-    //         toast({description: data.error})
-    //     }
-    // }
-
-    // const deleteIdea = () => {
-    //     setOpenDelete(!openDelete)
-    // }
 
     const onDeleteImageComment = (index) => {
         const clone = [...commentFiles];
@@ -764,32 +698,6 @@ const SidebarSheet = ({
 
     return (
         <Fragment>
-            {/*{*/}
-            {/*    openDelete &&*/}
-            {/*    <Fragment>*/}
-            {/*        <Dialog open onOpenChange={deleteIdea}>*/}
-            {/*            <DialogContent className="sm:max-w-[425px]">*/}
-            {/*                <DialogHeader className={"flex flex-col gap-2"}>*/}
-            {/*                    <DialogTitle>You really want delete this idea?</DialogTitle>*/}
-            {/*                    <DialogDescription>This action can't be undone.</DialogDescription>*/}
-            {/*                </DialogHeader>*/}
-            {/*                <DialogFooter>*/}
-            {/*                    <Button variant={"outline hover:none"}*/}
-            {/*                            className={"text-sm font-semibold border"} onClick={() => setOpenDelete(false)}>Cancel</Button>*/}
-            {/*                    <Button*/}
-            {/*                        variant={"hover:bg-destructive"}*/}
-            {/*                        className={`${theme === "dark" ? "text-card-foreground" : "text-card"} ${isSaveUpdateComment === true ? "py-2 px-6" : "w-[76px] py-2 px-6"} text-sm font-semibold bg-destructive`}*/}
-            {/*                        onClick={onDeleteIdea}*/}
-            {/*                    >*/}
-            {/*                        {*/}
-            {/*                            isLoadingSidebar ? <Loader2 size={16} className={"animate-spin"}/> : "Delete"*/}
-            {/*                        }*/}
-            {/*                    </Button>*/}
-            {/*                </DialogFooter>*/}
-            {/*            </DialogContent>*/}
-            {/*        </Dialog>*/}
-            {/*    </Fragment>*/}
-            {/*}*/}
             <Sheet open={isOpen} onOpenChange={isOpen ? onCloseBoth : onOpen}>
                 <SheetContent className={"lg:max-w-[1101px] md:max-w-[720px] sm:max-w-[520px] p-0"}>
                     <SheetHeader className={"px-[32px] py-[22px] border-b"}>
@@ -828,33 +736,56 @@ const SidebarSheet = ({
                             <div className={"border-b"}>
                                 <div className="py-4 pl-8 pr-6 w-full items-center gap-1.5">
                                     <Label htmlFor="picture">Featured image</Label>
-                                    <div className="w-[282px] h-[128px] relative">
+                                    <div className="w-[282px] h-[128px] flex gap-1">
 
-                                        {selectedFile ? (
-                                            <>
-                                                <img src={imagePreview} alt="Preview"
-                                                     className="w-full h-full object-cover rounded"/>
-                                                   <CircleX
-                                                       className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%]`}
-                                                       onClick={handleRemoveImage}
-                                                   />
-                                            </>
-                                        ) : (
-                                            <>
+                                        {
+                                            selectedIdea.cover_image ?
+                                                <div>
+                                                    {selectedIdea && selectedIdea.cover_image && selectedIdea.cover_image.name ?
+                                                        <div className={"w-[282px] h-[128px] relative border p-[5px]"}>
+                                                            <img
+                                                                className={"upload-img"}
+                                                                src={selectedIdea && selectedIdea.cover_image && selectedIdea.cover_image.name ? URL.createObjectURL(selectedIdea.cover_image) : selectedIdea.cover_image}
+                                                                alt=""/>
+                                                            <CircleX
+                                                                size={20}
+                                                                className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
+                                                                onClick={() => onChangeStatus({
+                                                                    name: 'cover_image',
+                                                                    value: ""
+                                                                })}
+                                                            />
+                                                        </div> : selectedIdea.cover_image ?
+                                                            <div className={"w-[282px] h-[128px] relative border p-[5px]"}>
+                                                                <img className={"upload-img"} src={selectedIdea.cover_image} alt=""/>
+                                                                <CircleX
+                                                                    size={20}
+                                                                    className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
+                                                                    onClick={() => onChangeStatus({
+                                                                        name: 'cover_image',
+                                                                        value: ""
+                                                                    })}
+                                                                />
+                                                            </div>
+                                                            : ''}
+                                                </div> :
+<div>
+
                                                 <input
                                                     id="pictureInput"
                                                     type="file"
                                                     className="hidden"
-                                                    onChange={handleFileChange}
+                                                    multiple
+                                                    onChange={handleFeatureImgUpload}
                                                 />
-                                                <label
-                                                    htmlFor="pictureInput"
-                                                    className="border-dashed w-full h-full py-[52px] inset-0 flex items-center justify-center bg-muted border border-muted-foreground rounded cursor-pointer"
-                                                >
-                                                    <h4 className={"text-sm font-semibold"}>Upload Image</h4>
-                                                </label>
-                                            </>
-                                        )}
+                                            <label
+                                            htmlFor="pictureInput"
+                                            className="border-dashed w-[282px] h-[128px] py-[52px] flex items-center justify-center bg-muted border border-muted-foreground rounded cursor-pointer"
+                                            >
+                                            <h4 className="text-xs font-semibold">Upload</h4>
+                                            </label>
+                                                </div>
+                                        }
                                     </div>
                                 </div>
                             </div>
@@ -862,7 +793,8 @@ const SidebarSheet = ({
                                 <div className={"flex flex-wrap gap-1 justify-between"}>
                                     <div className={"flex flex-col gap-1"}>
                                         <h4 className={"text-sm font-medium"}>Mark as bug</h4>
-                                        <p className={"text-muted-foreground text-xs font-normal"}>Hides Idea from your users</p>
+                                        <p className={"text-muted-foreground text-xs font-normal"}>Hides Idea from your
+                                            users</p>
                                     </div>
                                     <Button
                                         variant={"outline"}
@@ -928,14 +860,17 @@ const SidebarSheet = ({
                                         </div>
                                         <div className={"py-6 px-8 border-b"}>
                                             <Label>Choose Topics for this Idea (optional)</Label>
-                                            <Select onValueChange={handleChangeTopic} value={selectedIdea.topic.map(x => x.id)}>
+                                            <Select onValueChange={handleChangeTopic}
+                                                    value={selectedIdea.topic.map(x => x.id)}>
                                                 <SelectTrigger>
-                                                    <SelectValue className={"text-muted-foreground text-sm"} placeholder="Assign to">
+                                                    <SelectValue className={"text-muted-foreground text-sm"}
+                                                                 placeholder="Assign to">
                                                         <div className={"flex flex-wrap gap-[2px]"}>
                                                             {(selectedIdea.topic || []).map((x, index) => {
-                                                                const findObj = (topicLists || []).find((y) => y.id === x?.id );
+                                                                const findObj = (topicLists || []).find((y) => y.id === x?.id);
                                                                 return (
-                                                                    <div key={index} className={"text-xs flex gap-[2px] bg-slate-300 items-center rounded py-0 px-2"}>
+                                                                    <div key={index}
+                                                                         className={"text-xs flex gap-[2px] bg-slate-300 items-center rounded py-0 px-2"}>
                                                                         {findObj?.title}
                                                                     </div>
                                                                 );
@@ -951,8 +886,11 @@ const SidebarSheet = ({
                                                                 return (
                                                                     <SelectItem className={""} key={i} value={x.id}>
                                                                         <div className={"flex gap-2"}>
-                                                                            <div onClick={() => handleChangeTopic(x.id)} className="checkbox-icon">
-                                                                                {(selectedIdea.topic.map((x) => x.id) || []).includes(x.id) ? <Check size={18} /> : <div className={"h-[18px] w-[18px]"}></div>}
+                                                                            <div onClick={() => handleChangeTopic(x.id)}
+                                                                                 className="checkbox-icon">
+                                                                                {(selectedIdea.topic.map((x) => x.id) || []).includes(x.id) ?
+                                                                                    <Check size={18}/> : <div
+                                                                                        className={"h-[18px] w-[18px]"}></div>}
                                                                             </div>
                                                                             <span>{x.title ? x.title : ""}</span>
                                                                         </div>
@@ -1022,14 +960,6 @@ const SidebarSheet = ({
                                                                 <Pin fill={"bg-card-foreground"}
                                                                      className={"w-[16px] h-[16px]"}/>}
                                                         </Button>
-                                                        {/*<Button*/}
-                                                        {/*    variant={"outline"}*/}
-                                                        {/*    className={"w-[30px] h-[30px] p-1"}*/}
-                                                        {/*    onClick={deleteIdea}*/}
-                                                        {/*    loading={isLoadingSidebar === "delete"}*/}
-                                                        {/*>*/}
-                                                        {/*    <Trash2 className={"w-[16px] h-[16px]"}/>*/}
-                                                        {/*</Button>*/}
                                                     </div>
                                                 </div>
                                                 <div className={"flex flex-col gap-4"}>
@@ -1071,13 +1001,17 @@ const SidebarSheet = ({
                                                                                     (selectedIdea.vote_list || []).map((x, i) => {
                                                                                         return (
                                                                                             <div className={"flex"}>
-                                                                                                <div className={"relative"}>
-                                                                                                    <div className={"update-idea text-sm rounded-full border text-center"}>
+                                                                                                <div
+                                                                                                    className={"relative"}>
+                                                                                                    <div
+                                                                                                        className={"update-idea text-sm rounded-full border text-center"}>
                                                                                                         <Avatar>
                                                                                                             {
                                                                                                                 i < 2 ? x.user_photo ?
-                                                                                                                <AvatarImage src={x.user_photo} alt={x && x.name && x.name.substring(0, 1)} /> :
-                                                                                                                <AvatarFallback>{x && x.name && x.name.substring(0, 1)}</AvatarFallback> : ""
+                                                                                                                    <AvatarImage
+                                                                                                                        src={x.user_photo}
+                                                                                                                        alt={x && x.name && x.name.substring(0, 1)}/> :
+                                                                                                                    <AvatarFallback>{x && x.name && x.name.substring(0, 1)}</AvatarFallback> : ""
                                                                                                             }
                                                                                                         </Avatar>
                                                                                                     </div>
@@ -1094,29 +1028,26 @@ const SidebarSheet = ({
                                                                         </PopoverTrigger>
                                                                         <PopoverContent className="p-0">
                                                                             <div className="">
-                                                                                <div className="space-y-2 px-4 py-[5px]">
+                                                                                <div
+                                                                                    className="space-y-2 px-4 py-[5px]">
                                                                                     <h4 className="font-medium leading-none text-sm">{`Voters (${selectedIdea.vote})`}</h4>
                                                                                 </div>
-                                                                                <div className="border-t px-4 py-3 space-y-2">
+                                                                                <div
+                                                                                    className="border-t px-4 py-3 space-y-2">
                                                                                     {
                                                                                         (selectedIdea.vote_list || []).map((x, i) => {
                                                                                             return (
                                                                                                 <div
                                                                                                     className={"flex gap-2"}>
-                                                                                                    <div className={"update-idea text-sm rounded-full border text-center"}>
-                                                                                                        {/*{*/}
-                                                                                                        {/*    x.user_photo ?*/}
-                                                                                                        {/*        <Avatar src={x.user_photo}/> :*/}
-                                                                                                        {/*        <Avatar>*/}
-                                                                                                        {/*            {x && x.name && x.name.substring(0, 1)}*/}
-                                                                                                        {/*        </Avatar>*/}
-                                                                                                        {/*}*/}
-
-                                                                                                        <Avatar className={"w-[20px] h-[20px]"}>
+                                                                                                    <div
+                                                                                                        className={"update-idea text-sm rounded-full border text-center"}>
+                                                                                                        <Avatar
+                                                                                                            className={"w-[20px] h-[20px]"}>
                                                                                                             {
                                                                                                                 selectedIdea.user_photo ?
-                                                                                                                    <AvatarImage src={selectedIdea.user_photo}
-                                                                                                                                 alt="@shadcn"/>
+                                                                                                                    <AvatarImage
+                                                                                                                        src={selectedIdea.user_photo}
+                                                                                                                        alt="@shadcn"/>
                                                                                                                     :
                                                                                                                     <AvatarFallback>{selectedIdea && selectedIdea.name && selectedIdea.name.substring(0, 1)}</AvatarFallback>
                                                                                                             }
@@ -1177,13 +1108,16 @@ const SidebarSheet = ({
                                                                             <Fragment>
                                                                                 {
                                                                                     x && x.name ?
-                                                                                        <div className="w-[93px]">
-                                                                                            <img
-                                                                                                src={x && x.name ? URL.createObjectURL(x) : x}
-                                                                                                alt=""/>
+                                                                                        <div
+                                                                                            className="w-[93px] border p-2 relative">
+                                                                                            <img className={"upload-img"}
+                                                                                                 src={x && x.name ? URL.createObjectURL(x) : x}
+                                                                                                 alt=""/>
                                                                                         </div> : x ?
-                                                                                        <div className="w-[93px]">
-                                                                                            <img src={x} alt=""/>
+                                                                                        <div
+                                                                                            className="w-[93px] border p-2 rounded-md relative">
+                                                                                            <img className={"upload-img"}
+                                                                                                 src={x} alt=""/>
                                                                                         </div> : ""
                                                                                 }
                                                                             </Fragment>
@@ -1193,7 +1127,7 @@ const SidebarSheet = ({
                                                         </div> : ""
                                                 }
                                                 <div className={"flex flex-col gap-2"}>
-                                                    <div className="grid w-full gap-1.5">
+                                                    <div className="w-full flex flex-col gap-2">
                                                         <Label htmlFor="message">Add comment</Label>
                                                         {/*{*/}
                                                         {/*    privateNote ?*/}
@@ -1212,54 +1146,55 @@ const SidebarSheet = ({
                                                         {/*            />*/}
                                                         {/*        </Card>*/}
                                                         {/*        :*/}
-                                                                <>
-                                                                    <Textarea
-                                                                        placeholder="Start writing..."
-                                                                        id="message"
-                                                                        value={commentText}
-                                                                        onChange={(e) => setCommentText(e.target.value)}
-                                                                    />
-                                                                    {
-                                                                        commentFiles && commentFiles.length ?
-                                                                            <div>
-                                                                                {
-                                                                                    (commentFiles || []).map((x, i) => {
-                                                                                        return (
-                                                                                            <div>
-                                                                                                {
-                                                                                                    x && x.name ?
-                                                                                                        <div
-                                                                                                            className='bgTransparent image_fix_height bgTransparent-border'>
-                                                                                                            <div>
-                                                                                                                <Button
-                                                                                                                    onClick={() => onDeleteImageComment(i, false)}>
-                                                                                                                    <CircleX/>
-                                                                                                                </Button>
-                                                                                                            </div>
-                                                                                                            <img
-                                                                                                                src={x && x.name ? URL.createObjectURL(x) : x}
-                                                                                                                alt=""/>
-                                                                                                        </div> : x ?
-                                                                                                        <div
-                                                                                                            className='bgTransparent image_fix_height bgTransparent-border'>
-                                                                                                            <div>
-                                                                                                                <Button
-                                                                                                                    onClick={() => onDeleteImageComment(i, false)}>
-                                                                                                                    <CircleX/>
-                                                                                                                </Button>
-                                                                                                            </div>
-                                                                                                            <img src={x}
-                                                                                                                 alt={x}/>
-                                                                                                        </div> : ''
-                                                                                                }
-                                                                                            </div>
-                                                                                        )
-                                                                                    })
-                                                                                }
-                                                                            </div>
-                                                                            : ""
-                                                                    }
-                                                                </>
+                                                        <>
+                                                            <Textarea
+                                                                placeholder="Start writing..."
+                                                                id="message"
+                                                                value={commentText}
+                                                                onChange={(e) => setCommentText(e.target.value)}
+                                                            />
+                                                            {
+                                                                commentFiles && commentFiles.length ?
+                                                                    <div className={"flex flex-wrap gap-3 mt-1"}>
+                                                                        {
+                                                                            (commentFiles || []).map((x, i) => {
+                                                                                return (
+                                                                                    <Fragment>
+                                                                                        {
+                                                                                            x && x.name ?
+                                                                                                <div
+                                                                                                    className={"w-[100px] h-[100px] relative border p-[5px]"}>
+                                                                                                    <img
+                                                                                                        className={"upload-img"}
+                                                                                                        src={x && x.name ? URL.createObjectURL(x) : x}
+                                                                                                        alt=""/>
+                                                                                                    <CircleX
+                                                                                                        size={20}
+                                                                                                        className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
+                                                                                                        onClick={() => onDeleteImageComment(i, false)}
+                                                                                                    />
+                                                                                                </div> : x ?
+                                                                                                <div
+                                                                                                    className={"w-[100px] h-[100px] relative border p-[5px]"}>
+                                                                                                    <img
+                                                                                                        className={"upload-img"}
+                                                                                                        src={x}
+                                                                                                        alt={x}/>
+                                                                                                    <CircleX
+                                                                                                        size={20}
+                                                                                                        className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
+                                                                                                        onClick={() => onDeleteImageComment(i, false)}
+                                                                                                    />
+                                                                                                </div> : ''
+                                                                                        }
+                                                                                    </Fragment>
+                                                                                )
+                                                                            })
+                                                                        }
+                                                                    </div>
+                                                                    : ""
+                                                            }
+                                                        </>
                                                         {/*}*/}
                                                     </div>
                                                     <div className={"flex justify-between gap-1"}>
@@ -1272,16 +1207,19 @@ const SidebarSheet = ({
                                                         </div>
                                                         <div className={"flex gap-2 items-center"}>
                                                             <div className="p-2 max-w-sm relative w-[36px] h-[36px]">
-                                                                <Input id="commentFileInput" type="file"
-                                                                       className="hidden"
-                                                                    // name={"uploadPin"}
-                                                                       onChange={(e) => handleFileChange(e, "uploadPin")}
+
+                                                                <input
+                                                                    id="commentFile"
+                                                                    type="file"
+                                                                    className="hidden"
+                                                                    onChange={handleAddCommentImg}
                                                                 />
-                                                                <label htmlFor="commentFileInput"
+                                                                <label htmlFor="commentFile"
                                                                        className="absolute inset-0 flex items-center justify-center bg-white border border-primary rounded cursor-pointer"
                                                                 >
                                                                     <Paperclip size={16} className={"stroke-primary"}/>
                                                                 </label>
+
                                                             </div>
                                                             <Button
                                                                 className={"w-[128px] h-[36px] text-sm font-semibold"}
@@ -1289,7 +1227,8 @@ const SidebarSheet = ({
                                                                 disabled={commentText.trim() === "" || commentText === ""}
                                                             >
                                                                 {
-                                                                    isSaveComment ? <Loader2 className="h-4 w-4 animate-spin"/> : "Add Comment"
+                                                                    isSaveComment ? <Loader2
+                                                                        className="h-4 w-4 animate-spin"/> : "Add Comment"
                                                                 }
                                                             </Button>
                                                         </div>
@@ -1314,26 +1253,33 @@ const SidebarSheet = ({
                                                             (selectedIdea.comments || []).map((x, i) => {
                                                                 return (
                                                                     <Fragment>
-                                                                        <div className={"flex gap-2 p-[32px]"}>
+                                                                        <div
+                                                                            className={"flex gap-2 p-[32px] pb-0 pt-3"}>
                                                                             <div className={""}>
-                                                                                <div className={"update-idea text-sm rounded-full border text-center"}>
-                                                                                    <Avatar className={"w-[20px] h-[20px]"}>
+                                                                                <div
+                                                                                    className={"update-idea text-sm rounded-full border text-center"}>
+                                                                                    <Avatar
+                                                                                        className={"w-[20px] h-[20px]"}>
                                                                                         {
                                                                                             x.user_photo ?
-                                                                                                <AvatarImage src={x.user_photo}
-                                                                                                             alt="@shadcn"/>
+                                                                                                <AvatarImage
+                                                                                                    src={x.user_photo}
+                                                                                                    alt="@shadcn"/>
                                                                                                 :
                                                                                                 <AvatarFallback>{x && x.name && x.name.substring(0, 1)}</AvatarFallback>
                                                                                         }
                                                                                     </Avatar>
                                                                                 </div>
                                                                             </div>
-                                                                            <div className={"w-full flex flex-col gap-3"}>
+                                                                            <div
+                                                                                className={"w-full flex flex-col gap-3"}>
                                                                                 <div className={"flex justify-between"}>
-                                                                                    <div className={"flex items-center"}>
+                                                                                    <div
+                                                                                        className={"flex items-center"}>
                                                                                         <h4 className={"text-sm font-medium"}>{x.name}</h4>
                                                                                         <p className={"text-sm font-normal flex items-center text-muted-foreground"}>
-                                                                                            <Dot className={"fill-text-card-foreground stroke-text-card-foreground"}/>
+                                                                                            <Dot
+                                                                                                className={"fill-text-card-foreground stroke-text-card-foreground"}/>
                                                                                             {moment.utc(x.created_at).local().startOf('seconds').fromNow()}
                                                                                         </p>
                                                                                     </div>
@@ -1346,7 +1292,8 @@ const SidebarSheet = ({
                                                                                                         className={"w-[30px] h-[30px] p-1"}
                                                                                                         onClick={() => onEditComment(x, i)}
                                                                                                     >
-                                                                                                        <Pencil className={"w-[16px] h-[16px]"}/>
+                                                                                                        <Pencil
+                                                                                                            className={"w-[16px] h-[16px]"}/>
                                                                                                     </Button>
                                                                                                         <Button
                                                                                                             variant={"outline"}
@@ -1362,7 +1309,8 @@ const SidebarSheet = ({
                                                                                 <div>
                                                                                     {
                                                                                         selectedCommentIndex === i && isEditComment ?
-                                                                                            <div className={"space-y-2"}>
+                                                                                            <div
+                                                                                                className={"space-y-2"}>
                                                                                                 <Textarea
                                                                                                     value={selectedComment.comment}
                                                                                                     onChange={(e) => setSelectedComment({
@@ -1372,7 +1320,7 @@ const SidebarSheet = ({
                                                                                                 />
                                                                                                 {
                                                                                                     selectedComment && selectedComment.images && selectedComment.images.length ?
-                                                                                                        <div>
+                                                                                                        <div className={"flex gap-2"}>
                                                                                                             {
                                                                                                                 (selectedComment.images || []).map((x, i) => {
                                                                                                                     return (
@@ -1380,28 +1328,26 @@ const SidebarSheet = ({
                                                                                                                             {
                                                                                                                                 x && x.name ?
                                                                                                                                     <div
-                                                                                                                                        className=''>
-                                                                                                                                        <div>
-                                                                                                                                            <Button
-                                                                                                                                                onClick={() => onDeleteCommentImage(i, true)}>
-                                                                                                                                                <CircleX/>
-                                                                                                                                            </Button>
-                                                                                                                                        </div>
+                                                                                                                                        className={"w-[100px] h-[100px] relative border p-[5px]"}>
                                                                                                                                         <img
+                                                                                                                                            className={"upload-img"}
                                                                                                                                             src={x && x.name ? URL.createObjectURL(x) : x}
                                                                                                                                             alt=""/>
+                                                                                                                                        <CircleX
+                                                                                                                                            size={20}
+                                                                                                                                            className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
+                                                                                                                                            onClick={() => onDeleteCommentImage(i, true)}/>
                                                                                                                                     </div> : x ?
                                                                                                                                     <div
-                                                                                                                                        className=''>
-                                                                                                                                        <div>
-                                                                                                                                            <Button
-                                                                                                                                                onClick={() => onDeleteCommentImage(i, false)}>
-                                                                                                                                                <CircleX/>
-                                                                                                                                            </Button>
-                                                                                                                                        </div>
+                                                                                                                                        className={"w-[100px] h-[100px] relative border p-[5px]"}>
                                                                                                                                         <img
+                                                                                                                                            className={"upload-img"}
                                                                                                                                             src={x}
                                                                                                                                             alt={x}/>
+                                                                                                                                        <CircleX
+                                                                                                                                            size={20}
+                                                                                                                                            className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
+                                                                                                                                            onClick={() => onDeleteCommentImage(i, false)}/>
                                                                                                                                     </div> : ''
                                                                                                                             }
                                                                                                                         </Fragment>
@@ -1410,199 +1356,246 @@ const SidebarSheet = ({
                                                                                                             }
                                                                                                         </div> : ""
                                                                                                 }
-                                                                                                <div className={"flex gap-2"}>
-                                                                                                    <Button className={`${isSaveUpdateComment === true ? "py-2 px-6" : "w-[81px] py-2 px-6"} text-sm font-semibold`}
+                                                                                                <div
+                                                                                                    className={"flex gap-2"}>
+                                                                                                    <Button
+                                                                                                        className={`${isSaveUpdateComment === true ? "py-2 px-6" : "py-2 px-6"} w-[81px] h-[30px] text-sm font-semibold`}
                                                                                                         onClick={onUpdateComment}
                                                                                                         disabled={selectedComment.comment.trim() === "" || selectedComment.comment === ""}>
                                                                                                         {
-                                                                                                            isSaveUpdateComment ? <Loader2 size={16} className="animate-spin"/> : "Save"
+                                                                                                            isSaveUpdateComment ?
+                                                                                                                <Loader2
+                                                                                                                    size={16}
+                                                                                                                    className="animate-spin"/> : "Save"
                                                                                                         }
                                                                                                     </Button>
-                                                                                                    <Button className={"px-3 py-2 text-sm font-semibold text-primary border border-primary"} variant={"outline hover:none"}
+                                                                                                    <Button
+                                                                                                        className={"px-3 py-2 h-[30px] text-sm font-semibold text-primary border border-primary"}
+                                                                                                        variant={"outline hover:none"}
                                                                                                         onClick={onCancelComment}>
                                                                                                         Cancel
                                                                                                     </Button>
                                                                                                     <div
                                                                                                         className="p-2 max-w-sm relative w-[36px]">
-                                                                                                        <Input id="commentFileInput"
-                                                                                                               type="file"
-                                                                                                               className="hidden" /*onChange={handleFileChangeTextarea}*/ />
+                                                                                                        <Input
+                                                                                                            id="selectedCommentImg"
+                                                                                                            type="file"
+                                                                                                            className="hidden"
+                                                                                                            onChange={handleAddCommentImg}
+                                                                                                        />
                                                                                                         <label
-                                                                                                            htmlFor="commentFileInput"
+                                                                                                            htmlFor="selectedCommentImg"
                                                                                                             className="absolute inset-0 flex items-center justify-center bg-white border border-primary rounded cursor-pointer">
-                                                                                                            <Paperclip size={16}
+                                                                                                            <Paperclip
+                                                                                                                size={16}
                                                                                                                 className={"stroke-primary"}/>
                                                                                                         </label>
                                                                                                     </div>
                                                                                                 </div>
                                                                                             </div>
-                                                                                            : <div>
-                                                                                                {/*<p className={"text-sm"}>{x.comment}</p>*/}
-                                                                                                <ReadMoreText html={x.comment}/>
-                                                                                                {
-                                                                                                    ((x && x.images) || []).map((img, ind) => {
-                                                                                                        return (
-                                                                                                            <div key={ind}>
-                                                                                                                <div
-                                                                                                                    className=''>
-                                                                                                                    <img
-                                                                                                                        src={img}
-                                                                                                                        alt={img}/>
+                                                                                            : <div className={"space-y-2"}>
+                                                                                                <p className={"text-xs"}>
+                                                                                                    <ReadMoreText className={"text-xs"} html={x.comment}/>
+                                                                                                </p>
+                                                                                                <div className={"flex gap-2"}>
+                                                                                                    {
+                                                                                                        ((x && x.images) || []).map((img, ind) => {
+                                                                                                            return (
+                                                                                                                <div key={ind} className={"w-[100px] h-[100px] border p-[5px]"}>
+                                                                                                                    <img className={"upload-img"} src={img} alt={img}/>
                                                                                                                 </div>
-                                                                                                            </div>
-                                                                                                        )
-                                                                                                    })
-                                                                                                }
+                                                                                                            )
+                                                                                                        })
+                                                                                                    }
+                                                                                                </div>
                                                                                             </div>
                                                                                     }
                                                                                 </div>
-                                                                                <div>
-                                                                                {
-                                                                                    selectedCommentIndex === i ? "" :
-                                                                                        <Button className="p-0 text-sm font-semibold text-primary" variant={"ghost hover-none"}
-                                                                                                onClick={() => onShowSubComment(i)}
-                                                                                                key={`comment-nested-reply-to-${i}`}>Reply</Button>
-                                                                                }
-                                                                                </div>
+
+                                                                                    {
+                                                                                        selectedCommentIndex === i ? "" :
+                                                                                            <div className={"flex justify-between"}>
+                                                                                                <Button
+                                                                                                    className="p-0 text-sm font-semibold text-primary"
+                                                                                                    variant={"ghost hover-none"}
+                                                                                                    onClick={() => onShowSubComment(i)}
+                                                                                                    key={`comment-nested-reply-to-${i}`}
+                                                                                                >
+                                                                                                    Reply
+                                                                                                </Button>
+                                                                                                <div className={"flex items-center gap-2 cursor-pointer"}>
+                                                                                                    <span>
+                                                                                                        <MessageCircleMore
+                                                                                                            className={"stroke-primary w-[16px] h-[16px]"}/>
+                                                                                                    </span>
+                                                                                                    <p className={"text-base font-medium"}>
+                                                                                                        {x.reply.length}
+                                                                                                    </p>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                    }
                                                                                 <div>
                                                                                     {
                                                                                         x.show_reply ?
-                                                                                            <div className={"space-y-2"}>
+                                                                                            <div
+                                                                                                className={"space-y-2"}>
                                                                                                 {
                                                                                                     (x.reply || []).map((y, j) => {
                                                                                                         return (
                                                                                                             <Fragment>
-                                                                                                            <div className={"flex gap-2"}>
-                                                                                                                <div>
-                                                                                                                <div className={"update-idea text-sm rounded-full border text-center"}>
-                                                                                                                    <Avatar><AvatarFallback>{y.name.substring(0, 1)}</AvatarFallback></Avatar>
-                                                                                                                </div>
-                                                                                                                </div>
-                                                                                                                <div className={"w-full space-y-2"}>
-                                                                                                                    <div className={"flex justify-between items-center"}>
-                                                                                                                    <div className={"flex gap-2"}>
-                                                                                                                        <h4 className={"text-sm font-medium"}>{y.name}</h4>
-                                                                                                                        <p className={"text-sm font-normal text-muted-foreground"}>
-                                                                                                                            {moment.utc(y.created_at).local().startOf('seconds').fromNow()}
-                                                                                                                        </p>
-                                                                                                                    </div>
-                                                                                                                    {
-                                                                                                                        selectedCommentIndex === i && selectedSubCommentIndex === j ? "" :
-                                                                                                                            y.is_edit === 1 ?
-                                                                                                                                <div className="flex gap-2">
-                                                                                                                                    <Button
-                                                                                                                                        variant={"outline"}
-                                                                                                                                        className={"w-[30px] h-[30px] p-1"}
-                                                                                                                                        onClick={() => onEditSubComment(x, y, i, j)}>
-                                                                                                                                        <Pencil className={"w-[16px] h-[16px]"}/>
-                                                                                                                                    </Button>
-                                                                                                                                    <Button
-                                                                                                                                        variant={"outline"}
-                                                                                                                                        className={"w-[30px] h-[30px] p-1"}
-                                                                                                                                        onClick={() => deleteSubComment(y.id, x, i, j)}>
-                                                                                                                                        <Trash2 className={"w-[16px] h-[16px]"}/>
-                                                                                                                                    </Button>
-                                                                                                                                </div> : ''
-                                                                                                                    }
-                                                                                                                    </div>
+                                                                                                                <div
+                                                                                                                    className={"flex gap-2"}>
                                                                                                                     <div>
-                                                                                                                        {
-                                                                                                                            selectedCommentIndex === i && selectedSubCommentIndex === j ?
-                                                                                                                                <div className={"space-y-2"}>
-                                                                                                                                    <Textarea
-                                                                                                                                        value={selectedSubComment.comment}
-                                                                                                                                        onChange={(e) => onChangeTextSubComment(e)}
-                                                                                                                                    />
-                                                                                                                                    {
-                                                                                                                                        selectedSubComment && selectedSubComment.images && selectedSubComment.images.length ?
-                                                                                                                                            <div>
-                                                                                                                                                {
-                                                                                                                                                    (selectedSubComment.images || []).map((x, ind) => {
-                                                                                                                                                        return (
-                                                                                                                                                            <div>
-                                                                                                                                                                {
-                                                                                                                                                                    x && x.name ?
-                                                                                                                                                                        <div
-                                                                                                                                                                            className='bgTransparent image_fix_height bgTransparent-border'>
-                                                                                                                                                                            <div>
-                                                                                                                                                                                <Button
-                                                                                                                                                                                    onClick={() => onDeleteSubCommentImage(ind, true)}><CircleX/></Button>
-                                                                                                                                                                            </div>
-                                                                                                                                                                            <img
-                                                                                                                                                                                src={x && x.name ? URL.createObjectURL(x) : x}
-                                                                                                                                                                                alt=""/>
-                                                                                                                                                                        </div> : x ?
-                                                                                                                                                                        <div
-                                                                                                                                                                            className='bgTransparent image_fix_height bgTransparent-border'>
-                                                                                                                                                                            <div>
-                                                                                                                                                                                <Button
-                                                                                                                                                                                    onClick={() => onDeleteSubCommentImage(ind, false)}><CircleX/></Button>
-                                                                                                                                                                            </div>
-                                                                                                                                                                            <img
-                                                                                                                                                                                src={x}
-                                                                                                                                                                                alt={x}/>
-                                                                                                                                                                        </div> : ''
-                                                                                                                                                                }
-                                                                                                                                                            </div>
-                                                                                                                                                        )
-                                                                                                                                                    })
-                                                                                                                                                }
-                                                                                                                                            </div> : ""
-                                                                                                                                    }
-                                                                                                                                    <div className={"flex gap-2"}>
-                                                                                                                                        <Button className={`${isSaveUpdateSubComment === true ? "py-2 px-6" : "w-[81px] py-2 px-6"} text-sm font-semibold`}
-                                                                                                                                            onClick={onUpdateSubComment}
-                                                                                                                                            disabled={selectedSubComment.comment.trim() === "" || selectedSubComment.comment === ""}>
-                                                                                                                                            {
-                                                                                                                                                isSaveUpdateSubComment ? <Loader2 size={16} className="animate-spin"/> : "Save"
-                                                                                                                                            }
-                                                                                                                                        </Button>
-                                                                                                                                        <Button
-                                                                                                                                            className={"px-3 py-2 text-sm font-semibold text-primary border border-primary"} variant={"outline hover:none"}
-                                                                                                                                            onClick={onCancelSubComment}>Cancel</Button>
+                                                                                                                        <div
+                                                                                                                            className={"update-idea text-sm rounded-full border text-center"}>
+                                                                                                                            <Avatar><AvatarFallback>{y.name.substring(0, 1)}</AvatarFallback></Avatar>
+                                                                                                                        </div>
+                                                                                                                    </div>
+                                                                                                                    <div
+                                                                                                                        className={"w-full space-y-2"}>
+                                                                                                                        <div
+                                                                                                                            className={"flex justify-between items-center"}>
+                                                                                                                            <div
+                                                                                                                                className={"flex gap-2"}>
+                                                                                                                                <h4 className={"text-sm font-medium"}>{y.name}</h4>
+                                                                                                                                <p className={"text-sm font-normal text-muted-foreground"}>
+                                                                                                                                    {moment.utc(y.created_at).local().startOf('seconds').fromNow()}
+                                                                                                                                </p>
+                                                                                                                            </div>
+                                                                                                                            {
+                                                                                                                                selectedCommentIndex === i && selectedSubCommentIndex === j ? "" :
+                                                                                                                                    y.is_edit === 1 ?
                                                                                                                                         <div
-                                                                                                                                            className="p-2 max-w-sm relative w-[36px]">
-                                                                                                                                            <Input id="commentFileInput"
-                                                                                                                                                   type="file"
-                                                                                                                                                   className="hidden" /*onChange={handleFileChangeTextarea}*/ />
-                                                                                                                                            <label
-                                                                                                                                                htmlFor="commentFileInput"
-                                                                                                                                                className="absolute inset-0 flex items-center justify-center bg-white border border-primary rounded cursor-pointer">
-                                                                                                                                                <Paperclip size={16}
-                                                                                                                                                           className={"stroke-primary"}/>
-                                                                                                                                            </label>
-                                                                                                                                        </div>
-                                                                                                                                    </div>
-                                                                                                                                </div> :
-                                                                                                                                <div>
-                                                                                                                                    <p>{y.comment}</p>
-                                                                                                                                    {
-                                                                                                                                        y && y.images && y.images.length ?
-                                                                                                                                            <div>
+                                                                                                                                            className="flex gap-2">
+                                                                                                                                            <Button
+                                                                                                                                                variant={"outline"}
+                                                                                                                                                className={"w-[30px] h-[30px] p-1"}
+                                                                                                                                                onClick={() => onEditSubComment(x, y, i, j)}>
+                                                                                                                                                <Pencil
+                                                                                                                                                    className={"w-[16px] h-[16px]"}/>
+                                                                                                                                            </Button>
+                                                                                                                                            <Button
+                                                                                                                                                variant={"outline"}
+                                                                                                                                                className={"w-[30px] h-[30px] p-1"}
+                                                                                                                                                onClick={() => deleteSubComment(y.id, x, i, j)}>
+                                                                                                                                                <Trash2
+                                                                                                                                                    className={"w-[16px] h-[16px]"}/>
+                                                                                                                                            </Button>
+                                                                                                                                        </div> : ''
+                                                                                                                            }
+                                                                                                                        </div>
+                                                                                                                        <div>
+                                                                                                                            {
+                                                                                                                                selectedCommentIndex === i && selectedSubCommentIndex === j ?
+                                                                                                                                    <div
+                                                                                                                                        className={"space-y-2"}>
+                                                                                                                                        <Textarea
+                                                                                                                                            value={selectedSubComment.comment}
+                                                                                                                                            onChange={(e) => onChangeTextSubComment(e)}
+                                                                                                                                        />
+                                                                                                                                        {
+                                                                                                                                            selectedSubComment && selectedSubComment.images && selectedSubComment.images.length ?
+                                                                                                                                                <div
+                                                                                                                                                    className={"flex gap-2"}>
+                                                                                                                                                    {
+                                                                                                                                                        (selectedSubComment.images || []).map((x, ind) => {
+                                                                                                                                                            return (
+                                                                                                                                                                <Fragment>
+                                                                                                                                                                    {
+                                                                                                                                                                        x && x.name ?
+                                                                                                                                                                            <div
+                                                                                                                                                                                className={"w-[100px] relative border p-[5px]"}>
+                                                                                                                                                                                <img
+                                                                                                                                                                                    src={x && x.name ? URL.createObjectURL(x) : x}
+                                                                                                                                                                                    alt=""/>
+                                                                                                                                                                                <CircleX
+                                                                                                                                                                                    size={20}
+                                                                                                                                                                                    className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
+                                                                                                                                                                                    onClick={() => onDeleteSubCommentImage(ind, true)}
+                                                                                                                                                                                />
+                                                                                                                                                                            </div> : x ?
+                                                                                                                                                                            <div
+                                                                                                                                                                                className={"w-[100px] relative border p-[5px]"}>
+                                                                                                                                                                                <img
+                                                                                                                                                                                    src={x}
+                                                                                                                                                                                    alt={x}/>
+                                                                                                                                                                                <CircleX
+                                                                                                                                                                                    size={20}
+                                                                                                                                                                                    className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
+                                                                                                                                                                                    onClick={() => onDeleteSubCommentImage(ind, false)}
+                                                                                                                                                                                />
+                                                                                                                                                                            </div> : ''
+                                                                                                                                                                    }
+                                                                                                                                                                </Fragment>
+                                                                                                                                                            )
+                                                                                                                                                        })
+                                                                                                                                                    }
+                                                                                                                                                </div> : ""
+                                                                                                                                        }
+                                                                                                                                        <div
+                                                                                                                                            className={"flex gap-2"}>
+                                                                                                                                            <Button
+                                                                                                                                                className={`${isSaveUpdateSubComment === true ? "py-2 px-6" : "py-2 px-6"} w-[81px] h-[30px] text-sm font-semibold`}
+                                                                                                                                                onClick={onUpdateSubComment}
+                                                                                                                                                disabled={selectedSubComment.comment.trim() === "" || selectedSubComment.comment === ""}>
                                                                                                                                                 {
-                                                                                                                                                    (y.images || []).map((z, i) => {
-                                                                                                                                                        return (
-                                                                                                                                                            <div
-                                                                                                                                                                className=''>
+                                                                                                                                                    isSaveUpdateSubComment ?
+                                                                                                                                                        <Loader2
+                                                                                                                                                            size={16}
+                                                                                                                                                            className="animate-spin"/> : "Save"
+                                                                                                                                                }
+                                                                                                                                            </Button>
+                                                                                                                                            <Button
+                                                                                                                                                className={"px-3 py-2 h-[30px] text-sm font-semibold text-primary border border-primary"}
+                                                                                                                                                variant={"outline hover:none"}
+                                                                                                                                                onClick={onCancelSubComment}>Cancel</Button>
+                                                                                                                                            <div
+                                                                                                                                                className="p-2 max-w-sm relative w-[36px]">
+                                                                                                                                                <Input
+                                                                                                                                                    id="commentFileInput"
+                                                                                                                                                    type="file"
+                                                                                                                                                    className="hidden"
+                                                                                                                                                    onChange={handleSubCommentUploadImg}
+                                                                                                                                                />
+                                                                                                                                                <label
+                                                                                                                                                    htmlFor="commentFileInput"
+                                                                                                                                                    className="absolute inset-0 flex items-center justify-center bg-white border border-primary rounded cursor-pointer">
+                                                                                                                                                    <Paperclip
+                                                                                                                                                        size={16}
+                                                                                                                                                        className={"stroke-primary"}/>
+                                                                                                                                                </label>
+                                                                                                                                            </div>
+                                                                                                                                        </div>
+                                                                                                                                    </div> :
+                                                                                                                                    <div
+                                                                                                                                        className={"space-y-2"}>
+                                                                                                                                        <p className={"text-xs"}>{y.comment}</p>
+                                                                                                                                        {
+                                                                                                                                            y && y.images && y.images.length ?
+                                                                                                                                                <div
+                                                                                                                                                    className={"w-[100px] border p-[5px]"}>
+                                                                                                                                                    {
+                                                                                                                                                        (y.images || []).map((z, i) => {
+                                                                                                                                                            return (
                                                                                                                                                                 <img
                                                                                                                                                                     src={z}
                                                                                                                                                                     alt={z}/>
-                                                                                                                                                            </div>
-                                                                                                                                                        )
-                                                                                                                                                    })
-                                                                                                                                                }
-                                                                                                                                            </div> : ''
-                                                                                                                                    }
-                                                                                                                                </div>
-                                                                                                                        }
+                                                                                                                                                            )
+                                                                                                                                                        })
+                                                                                                                                                    }
+                                                                                                                                                </div> : ''
+                                                                                                                                        }
+                                                                                                                                    </div>
+                                                                                                                            }
+                                                                                                                        </div>
                                                                                                                     </div>
-                                                                                                                </div>
                                                                                                                 </div>
                                                                                                             </Fragment>
                                                                                                         )
                                                                                                     })
                                                                                                 }
-                                                                                                <div className={"space-y-2"}>
+                                                                                                <div
+                                                                                                    className={"space-y-2"}>
                                                                                                     <Textarea
                                                                                                         value={subCommentText}
                                                                                                         onChange={(e) => setSubCommentText(e.target.value)}/>
@@ -1615,17 +1608,24 @@ const SidebarSheet = ({
                                                                                                                             <div>
                                                                                                                                 {
                                                                                                                                     z && z.name ?
-                                                                                                                                        <div className=''>
+                                                                                                                                        <div
+                                                                                                                                            className=''>
                                                                                                                                             <div>
-                                                                                                                                                <Button onClick={() => onDeleteSubCommentImageOld(i, false)}><CircleX/></Button>
+                                                                                                                                                <Button
+                                                                                                                                                    onClick={() => onDeleteSubCommentImageOld(i, false)}><CircleX/></Button>
                                                                                                                                             </div>
-                                                                                                                                            <img src={z && z.name ? URL.createObjectURL(z) : z}/>
+                                                                                                                                            <img
+                                                                                                                                                src={z && z.name ? URL.createObjectURL(z) : z}/>
                                                                                                                                         </div> : z ?
-                                                                                                                                        <div className=''>
+                                                                                                                                        <div
+                                                                                                                                            className=''>
                                                                                                                                             <div>
-                                                                                                                                                <Button onClick={() => onDeleteSubCommentImageOld(i, false)}><CircleX/></Button>
+                                                                                                                                                <Button
+                                                                                                                                                    onClick={() => onDeleteSubCommentImageOld(i, false)}><CircleX/></Button>
                                                                                                                                             </div>
-                                                                                                                                            <img src={z} alt={z}/>
+                                                                                                                                            <img
+                                                                                                                                                src={z}
+                                                                                                                                                alt={z}/>
                                                                                                                                         </div> : ''
                                                                                                                                 }
                                                                                                                             </div>
@@ -1634,25 +1634,33 @@ const SidebarSheet = ({
                                                                                                                 }
                                                                                                             </div> : ""
                                                                                                     }
-                                                                                                    <div className={"flex gap-2"}>
-                                                                                                        <Button className={`${isSaveSubComment === true ? "py-2 px-6" : "w-[86px] py-2 px-6"} text-sm font-semibold`}
+                                                                                                    <div
+                                                                                                        className={"flex gap-2"}>
+                                                                                                        <Button
+                                                                                                            className={`${isSaveSubComment === true ? "py-2 px-6" : "w-[86px] py-2 px-6"} h-[30px] text-sm font-semibold`}
                                                                                                             disabled={subCommentText.trim() === "" || subCommentText === ""}
                                                                                                             onClick={() => onCreateSubComment(x, i)}
                                                                                                         >
                                                                                                             {
-                                                                                                                isSaveSubComment ? <Loader2 size={16} className="animate-spin"/> : "Reply"
+                                                                                                                isSaveSubComment ?
+                                                                                                                    <Loader2
+                                                                                                                        size={16}
+                                                                                                                        className="animate-spin"/> : "Reply"
                                                                                                             }
                                                                                                         </Button>
                                                                                                         <div
                                                                                                             className="p-2 max-w-sm relative w-[36px]">
-                                                                                                            <Input id="commentFileInput"
-                                                                                                                   type="file"
-                                                                                                                   className="hidden" /*onChange={handleFileChangeTextarea}*/ />
+                                                                                                            <Input
+                                                                                                                id="commentFileInput"
+                                                                                                                type="file"
+                                                                                                                className="hidden"
+                                                                                                                onChange={handleSubCommentUploadImg} />
                                                                                                             <label
                                                                                                                 htmlFor="commentFileInput"
                                                                                                                 className="absolute inset-0 flex items-center justify-center bg-white border border-primary rounded cursor-pointer">
-                                                                                                                <Paperclip size={16}
-                                                                                                                           className={"stroke-primary"}/>
+                                                                                                                <Paperclip
+                                                                                                                    size={16}
+                                                                                                                    className={"stroke-primary"}/>
                                                                                                             </label>
                                                                                                         </div>
                                                                                                     </div>

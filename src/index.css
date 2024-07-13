@@ -273,4 +273,14 @@ span.LinesEllipsis-ellipsis {
   height: 22px; width: 24px; justify-content: center;
 }
 
+.upload-img {
+  width: 100%;
+  height: 100%;
+  /*position: absolute;*/
+  left: 0;
+  top: 0;
+  object-fit: contain;
+  object-position: center;
+}
+
 
