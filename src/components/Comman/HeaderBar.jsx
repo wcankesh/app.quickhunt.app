@@ -176,8 +176,7 @@ const HeaderBar = () => {
     useEffect(() => {
         getAllProjects()
         loginUserDetails()
-
-    }, [projectDetailsReducer.id]);
+    }, []);
 
     // useEffect(() => {
     //     setSelectedUrl(newUrl)
@@ -416,7 +415,7 @@ const HeaderBar = () => {
             {/*Mobile said bar End */}
 
             <div className="flex h-14 items-center lg:h-[60px] ">
-                <div className={"app-logo"}>
+                <div className={"app-logo cursor-pointer"}  onClick={() => onRedirect("/dashboard")}>
                     {
                         theme === "dark" ? Icon.whiteLogo : Icon.blackLogo
                     }

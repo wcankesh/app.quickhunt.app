@@ -1,14 +1,10 @@
 import React, {useState} from 'react';
 import {useTheme} from "../theme-provider";
 import {Button} from "../ui/button";
-import {ArrowDown, Check,X} from "lucide-react";
-import {Card} from "../ui/card";
-import {Separator} from "../ui/separator";
-import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "../ui/table";
+import {Check} from "lucide-react";
 
 
-const dummyPlan =
-    {
+const dummyPlan = {
         plans: [{
                 name: "Free",
                 price: 0,
@@ -208,7 +204,7 @@ const PricingPlans = () => {
                 <div className={"flex justify-center pt-6"}>
                     <div className={"flex px-[5px] py-1 border rounded-md gap-1"}>
                         <Button onClick={()=>setTab(0)} variant={"ghost hover:none"} className={`font-medium w-[78px] h-8 ${tab === 0 ? "bg-[#EEE4FF] text-[#7C3AED]" : ""}`}>Monthly</Button>
-                        <Button onClick={()=>setTab(1)} variant={"ghost hover:none"} className={"w-[66px] h-8"} className={`font-medium w-[78px] h-8 ${tab === 1 ? "bg-[#EEE4FF] text-[#7C3AED]" : ""}`}>Yearly</Button>
+                        <Button onClick={()=>setTab(1)} variant={"ghost hover:none"} className={`font-medium w-[78px] h-8 ${tab === 1 ? "bg-[#EEE4FF] text-[#7C3AED]" : ""}`}>Yearly</Button>
                     </div>
                 </div>
             </div>
