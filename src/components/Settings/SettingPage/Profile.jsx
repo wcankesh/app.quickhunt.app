@@ -4,7 +4,7 @@ import SettingProfile from "../../../img/settingprofile.png";
 import {Label} from "../../ui/label";
 import {Input} from "../../ui/input";
 import {Button} from "../../ui/button";
-import {Eye, EyeOff} from "lucide-react";
+import {Eye, EyeOff, Loader2} from "lucide-react";
 import {useSelector,useDispatch} from "react-redux";
 import {ApiService} from "../../../utils/ApiService";
 import {userDetailsAction} from "../../../redux/action/UserDetailAction";
@@ -55,14 +55,12 @@ const Profile = () => {
     const dispatch = useDispatch();
     const apiSerVice = new ApiService();
     const [previewImage,setPreviewImage] = useState("");
-
-
+    const [isSave,setIsSave]=useState(false);
 
     useEffect(() => {
         setUserDetails({...userDetailsReducer});
         setPreviewImage(userDetailsReducer.user_photo)
     },[userDetailsReducer]);
-    console.log(userDetails);
 
     const onChange = (event) => {
         setUserDetails({...userDetails, [event.target.name] : event.target.value})
@@ -314,7 +312,7 @@ const Profile = () => {
                     </div>
                 </CardContent>
                 <CardFooter className={"p-6 justify-end"}>
-                    <Button onClick={onUpdateUser} className={"text-sm font-semibold"}>Save Changes</Button>
+                    <Button onClick={onUpdateUser} className={"text-sm font-semibold"}>{isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Save Changes"}</Button>
                 </CardFooter>
             </Card>
             <Card>
@@ -395,7 +393,7 @@ const Profile = () => {
                     </div>
                 </CardContent>
                 <CardFooter className={"p-6 pt-0 justify-end"}>
-                    <Button className={"text-sm font-semibold"} onClick={changePassword}>Update Password</Button>
+                    <Button className={"text-sm font-semibold"} onClick={changePassword}>{isLoadingPass ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Update Password"}</Button>
                 </CardFooter>
             </Card>
         </div>

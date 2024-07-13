@@ -5,7 +5,7 @@ import {Sheet,
 } from "../ui/sheet";
 import {Separator} from "../ui/separator";
 import {Button} from "../ui/button";
-import {X} from "lucide-react";
+import {Loader2, X} from "lucide-react";
 import {Label} from "../ui/label";
 import {Input} from "../ui/input";
 import {Switch} from "../ui/switch";
@@ -26,6 +26,7 @@ const initialState = {
 
 const NewCustomerSheet = ({isOpen,onOpen,onClose,callback}) => {
     const [customerDetails, setCustomerDetails] = useState(initialState);
+    const [isSave,setIsSave]=useState(false);
     const apiService = new ApiService();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const onChangeText = (event) => {
@@ -33,22 +34,23 @@ const NewCustomerSheet = ({isOpen,onOpen,onClose,callback}) => {
     }
 
     const createCustomers = async () => {
+        setIsSave(true);
         const payload = {
             ...customerDetails,
             project_id: projectDetailsReducer.id,
             customer_first_seen: new Date(),
             customer_last_seen: new Date(),
-
         }
         console.log(payload);
         const data = await apiService.createCustomers(payload)
         if(data.status === 200) {
+            setIsSave(false);
             setCustomerDetails(initialState);
             toast({
                 title: "Customer created successfully",
             });
         } else {
-
+            setIsSave(false);
         }
         callback();
         onClose();
@@ -80,7 +82,7 @@ const NewCustomerSheet = ({isOpen,onOpen,onClose,callback}) => {
                  </div>
                  <Separator className={"mb-8 text-muted-foreground"}/>
                  <div className={"px-8"}>
-                     <Button onClick={createCustomers}>Add Customer</Button>
+                     <Button onClick={createCustomers}>{isSave ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Add Customer"}</Button>
                  </div>
              </SheetContent>
         </Sheet>

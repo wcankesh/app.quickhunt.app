@@ -11,6 +11,8 @@ import {useSelector} from "react-redux";
 import {ApiService} from "../../utils/ApiService";
 import {getProjectDetails} from "../../utils/constent";
 import {Card} from "../ui/card";
+import SidebarSheet from "./SidebarSheet";
+import {toast} from "../ui/use-toast";
 const initialStateFilter = {
     l : "",
     s: ""
@@ -33,29 +35,66 @@ const status =[
 ];
 
 const Announcements = () => {
-    const [isSheetOpen, setSheetOpen] = useState(false);
     const [tab,setTab]=useState(null);
     const {theme}=useTheme();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
     const [announcementList, setAnnouncementList] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
-    const [labelList, setLabelList] = useState([]);
     const [filter, setFilter] = useState(initialStateFilter);
     const [pageNo, setPageNo] = useState(1);
     const [totalRecord, setTotalRecord] = useState(0);
-    const [isNewAnnouncemnet,setIsNewAnnouncemnt]= useState(false);
+    const [selectedRecord,setSelectedRecord]=useState({})
+    const [selectedRecordAnalytics,setSelectedRecordAnalytics]=useState({})
+    const [editIndex,setEditIndex]=useState(null);
+    const [analyticsObj,setAnalyticsObj]=useState({})
     const apiService = new ApiService();
 
+    console.log(allStatusAndTypes)
+
     const openSheet = () => {
-        setSheetOpen(true);
-        setIsNewAnnouncemnt(true);
+        setSelectedRecord({id:"new"})
     };
-    const closeSheet = () => setSheetOpen(false);
+    const openAnalyticsSheet = (record) =>{
+        setSelectedRecordAnalytics(record)
+    }
+    const onCloseAnalyticsSheet = ()=>{
+        setAnalyticsObj({})
+    }
+    const closeSheet = (record) => {
+        if(record){
+            const updatedItems = announcementList.map((x) => x.id === record.id ? { ...x, ...record } : x);
+            setAnnouncementList(updatedItems);
+            setSelectedRecord({});
+        }
+        else{
+            setSelectedRecord({});
+        }
+
+    };
+
+    const handleDelete = async (id) => {
+        const data = await apiService.deletePosts(id, pageNo)
+        if(data.status === 200){
+            const clone = [...announcementList];
+            const index = clone.findIndex((x) => x.id === id)
+            if(index !== -1){
+                clone.splice(index, 1)
+                setAnnouncementList(clone);
+            }
+            toast({
+                title: data.success,
+            })
+        } else {
+            toast({
+                title: "Something went wrong.",
+                variant: "destructive"
+            })
+        }
+    }
 
     useEffect(() => {
         getAllPosts()
-        setLabelList(allStatusAndTypes.labels);
         const tabIndex = localStorage.getItem("tabIndex" || 0);
         setTab(tabIndex);
     }, [projectDetailsReducer.id, allStatusAndTypes, pageNo,]);
@@ -113,9 +152,13 @@ const Announcements = () => {
         }
     };
 
+
+
     return (
         <div className={"pt-8 xl:container xl:max-w-[1200px] lg:container lg:max-w-[992px] md:container md:max-w-[530px] sm:container sm:max-w-[639px] xs:container xs:max-w-[475px] max-[639px]:container max-[639px]:max-w-[507px]"}>
-            {isNewAnnouncemnet && <CreateAnnouncementsLogSheet isOpen={isSheetOpen} onOpen={openSheet} onClose={closeSheet} callBack={callBackForProps}/>}
+                {selectedRecord.id && <CreateAnnouncementsLogSheet  isOpen={selectedRecord.id} selectedRecord={selectedRecord} setSelectedRecord={setSelectedRecord} onOpen={openSheet} onClose={closeSheet} callBack={callBackForProps}/>}
+                {analyticsObj.id && <SidebarSheet selectedViewAnalyticsRecord={analyticsObj} analyticsObj={analyticsObj} isOpen={analyticsObj.id} onOpen={openAnalyticsSheet} onClose={onCloseAnalyticsSheet}/>}
+                <SidebarSheet/>
             <div className={"flex flex-row gap-6 items-center xl:flex-nowrap md:flex-wrap sm:flex-wrap min-[320px]:flex-wrap max-[639px]:flex-wrap max-[639px]:gap-3"}>
                 <div className="basis-1/4">
                     <h3 className={"text-2xl font-medium leading-8"}>{getProjectDetails('project_name')}</h3>
@@ -193,7 +236,7 @@ const Announcements = () => {
                 </div>
             </div>
             {
-                tab == 0 ? <Card className={"my-9"}> <AnnouncementsTable data={announcementList} isLoading={isLoading} callBack={callBackForProps}/>  <div
+                tab == 0 ? <Card className={"my-9"}> <AnnouncementsTable setAnalyticsObj={setAnalyticsObj} analyticsObj={analyticsObj} handleDelete={handleDelete}  editIndex={editIndex} setEditIndex={setEditIndex} data={announcementList}  selectedRecord={selectedRecord} setSelectedRecord={setSelectedRecord} isLoading={isLoading} callBack={callBackForProps}/>  <div
                     className={`w-full p-5 ${theme === "dark" ? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end pe-16 py-15px`}>
                     <div className={"flex flex-row gap-8 items-center"}>
                         <div>
@@ -214,7 +257,7 @@ const Announcements = () => {
                             </Button>
                         </div>
                     </div>
-                </div>  </Card>: <Card className={"my-9"}> <AnnouncementsView isLoading={isLoading}  data={announcementList} callBack={callBackForProps}/> <div
+                </div>  </Card>: <Card className={"my-9"}> <AnnouncementsView  setAnalyticsObj={setAnalyticsObj} analyticsObj={analyticsObj} handleDelete={handleDelete} isLoading={isLoading} selectedRecord={selectedRecord} setSelectedRecord={setSelectedRecord}  data={announcementList} callBack={callBackForProps}/> <div
                     className={`w-full p-5 ${theme === "dark" ? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end pe-16 py-15px`}>
                     <div className={"flex flex-row gap-8 items-center"}>
                         <div>

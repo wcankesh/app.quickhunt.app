@@ -15,6 +15,7 @@ import Highcharts from 'highcharts'
 import HighchartsReact from 'highcharts-react-official'
 import {useTheme} from "../theme-provider";
 import EmptyData from "../Comman/EmptyData";
+import {CommSkel} from "../Comman/CommSkel";
 
 const programAnalytics = [
     {
@@ -50,6 +51,7 @@ export function Dashboard() {
     const {theme} = useTheme();
     let apiSerVice = new ApiService();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
+    const [isLoading, setIsLoading] = useState(false);
     const [state, setState] = useState({startDate: moment().subtract(29, 'days'), endDate: moment(),});
     const [chartList, setChartList] = useState({
         reactionAnalytic: [],
@@ -104,6 +106,7 @@ export function Dashboard() {
     },[projectDetailsReducer.id])
 
     const dashboardData = async () => {
+        setIsLoading(true)
         const payload = {
             project_id:projectDetailsReducer.id,
             start_date: state.startDate,
@@ -135,6 +138,7 @@ export function Dashboard() {
                 feedbackAnalytics.push(obj)
             })
             setChartList({...data.data,uniqueViewList:uniqueViewList,totalViewViewList: totalViewViewList, feedbackAnalytics:feedbackAnalytics})
+            setIsLoading(false)
             if (
                 uniqueViewList.length === 0 &&
                 totalViewViewList.length === 0
@@ -269,27 +273,32 @@ export function Dashboard() {
                                 {
                                     (programAnalytics || []).map((x, i) => {
                                         return (
-                                            <Card className={"rounded-lg border bg-card text-card-foreground shadow-sm"} x-chunk={"dashboard-05-chunk-0"} key={i}>
-                                                <CardHeader className={"p-6 gap-0.5"}>
-                                                    <CardTitle className={"text-sm font-medium"}>
-                                                        {x.title}
-                                                     </CardTitle>
-                                                    <CardContent className={"p-0 flex flex-col gap-2"}>
-                                                        <h3 className={"text-primary text-2xl font-bold"}>
-                                                            {x.title === "Total Views" ? chartList.totalViewCount :
-                                                                x.title === "Unique Views" ? chartList.uniqueViewCount :
-                                                                    x.title === "Feedback" ? chartList.feedbackCount :
-                                                                        x.title === "Total Reaction" ? chartList.reactionCount : ""}
-                                                        </h3>
-                                                        <p className={"text-xs font-medium"}>
-                                                            {x.title === "Total Views" ? <>{chartList.totalViewCountDiff} {x.compareText}</> :
-                                                                x.title === "Unique Views" ? <>{chartList.uniqueViewDiff} {x.compareText}</> :
-                                                                    x.title === "Feedback" ? <>{chartList.feedbackCountDiff} {x.compareText}</> :
-                                                                        x.title === "Total Reaction" ? <>{chartList.reactionCountDiff} {x.compareText}</> : ""}
-                                                        </p>
-                                                    </CardContent>
-                                                </CardHeader>
-                                            </Card>
+                                            <Fragment>
+                                                {
+                                                    isLoading ? <Card><CardContent className={"p-0"}> {CommSkel.commonParagraphThree} </CardContent></Card> :
+                                                        <Card className={"rounded-lg border bg-card text-card-foreground shadow-sm"} x-chunk={"dashboard-05-chunk-0"} key={i}>
+                                                            <CardHeader className={"p-6 gap-0.5"}>
+                                                                <CardTitle className={"text-sm font-medium"}>
+                                                                    {x.title}
+                                                                </CardTitle>
+                                                                <CardContent className={"p-0 flex flex-col gap-2"}>
+                                                                    <h3 className={"text-primary text-2xl font-bold"}>
+                                                                        {x.title === "Total Views" ? chartList.totalViewCount :
+                                                                            x.title === "Unique Views" ? chartList.uniqueViewCount :
+                                                                                x.title === "Feedback" ? chartList.feedbackCount :
+                                                                                    x.title === "Total Reaction" ? chartList.reactionCount : ""}
+                                                                    </h3>
+                                                                    <p className={"text-xs font-medium"}>
+                                                                        {x.title === "Total Views" ? <>{chartList.totalViewCountDiff} {x.compareText}</> :
+                                                                            x.title === "Unique Views" ? <>{chartList.uniqueViewDiff} {x.compareText}</> :
+                                                                                x.title === "Feedback" ? <>{chartList.feedbackCountDiff} {x.compareText}</> :
+                                                                                    x.title === "Total Reaction" ? <>{chartList.reactionCountDiff} {x.compareText}</> : ""}
+                                                                    </p>
+                                                                </CardContent>
+                                                            </CardHeader>
+                                                        </Card>
+                                                }
+                                            </Fragment>
                                         )
                                     })
                                 }
@@ -302,13 +311,18 @@ export function Dashboard() {
                                     {
                                         (chartList.feedbacks && chartList.feedbacks.length > 0) ? (
                                             (chartList.feedbacks || []).map((x, i) => (
-                                                <CardContent className={"p-2 pl-6 pr-4 flex flex-col gap-2"} key={i}>
-                                                    <div className="flex gap-2 items-center">
-                                                        <h4 className="text-sm font-semibold">{x.customer_name}</h4>
-                                                        <p className="text-xs font-medium text-muted-foreground">{x.customer_email_id}</p>
-                                                    </div>
-                                                    <p className="text-xs font-medium text-foreground">“{x.feedback}”</p>
-                                                </CardContent>
+                                                <Fragment>
+                                                    {
+                                                        isLoading ? CommSkel.commonParagraphTwo :
+                                                            <CardContent className={"p-2 pl-6 pr-4 flex flex-col gap-2"} key={i}>
+                                                                <div className="flex gap-2 items-center">
+                                                                    <h4 className="text-sm font-semibold">{x.customer_name}</h4>
+                                                                    <p className="text-xs font-medium text-muted-foreground">{x.customer_email_id}</p>
+                                                                </div>
+                                                                <p className="text-xs font-medium text-foreground">“{x.feedback}”</p>
+                                                            </CardContent>
+                                                    }
+                                                </Fragment>
                                             ))
                                         ) : (
                                             <EmptyData />
@@ -325,18 +339,23 @@ export function Dashboard() {
                                     {
                                         (chartList.reactions && chartList.reactions.length > 0) ? (
                                                 (chartList.reactions || []).map((x, i) => (
-                                                    <CardContent className={"py-2.5 px-0"} key={i}>
-                                                        <div className={"flex gap-4"}>
-                                                            <div>{emoji[x.reaction_id]}</div>
-                                                            <div className={"flex flex-col gap-1"}>
-                                                                <div className="flex gap-1 items-center">
-                                                                    <h4 className="text-sm font-semibold">{x.customer_name}</h4>
-                                                                    <p className="text-xs font-medium text-muted-foreground">Reacted To</p>
-                                                                </div>
-                                                                <p className="text-xs font-medium text-foreground">"{x.post_title}"</p>
-                                                            </div>
-                                                        </div>
-                                                    </CardContent>
+                                                    <Fragment>
+                                                        {
+                                                            isLoading ? CommSkel.commonParagraphTwoAvatar :
+                                                                <CardContent className={"py-2.5 px-0"} key={i}>
+                                                                    <div className={"flex gap-4"}>
+                                                                        <div>{emoji[x.reaction_id]}</div>
+                                                                        <div className={"flex flex-col gap-1"}>
+                                                                            <div className="flex gap-1 items-center">
+                                                                                <h4 className="text-sm font-semibold">{x.customer_name}</h4>
+                                                                                <p className="text-xs font-medium text-muted-foreground">Reacted To</p>
+                                                                            </div>
+                                                                            <p className="text-xs font-medium text-foreground">"{x.post_title}"</p>
+                                                                        </div>
+                                                                    </div>
+                                                                </CardContent>
+                                                        }
+                                                    </Fragment>
                                                 ))
                                             ) :
                                             (

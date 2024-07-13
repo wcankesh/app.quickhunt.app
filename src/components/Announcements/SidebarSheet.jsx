@@ -6,7 +6,7 @@ import {Sheet,
 import {Separator} from "../ui/separator";
 import {Icon} from "../../utils/Icon";
 import {Button} from "../ui/button";
-import {ChevronLeft, ChevronRight, ChevronsRight, Pin, X} from "lucide-react";
+import {ChevronLeft, ChevronRight, X} from "lucide-react";
 import {ApiService} from "../../utils/ApiService";
 import {Skeleton} from "../ui/skeleton";
 
@@ -34,7 +34,7 @@ const reaction ={
 
 const perPageLimit = 15;
 
-const SidebarSheet = ({ isOpen, onOpen, onClose ,selectedViewAnalyticsRecord,}) => {
+const   SidebarSheet = ({ isOpen, onOpen, onClose ,selectedViewAnalyticsRecord}) => {
     const apiService = new ApiService();
     const [feedbackList, setFeedbackList] = useState([])
     const [reactionList, setReactionList] = useState([])
@@ -80,22 +80,22 @@ const SidebarSheet = ({ isOpen, onOpen, onClose ,selectedViewAnalyticsRecord,}) 
                     <SheetContent className={"pt-[24px] p-0 max-h-screen overflow-y-auto lg:max-w-[504px]"} >
                         <SheetHeader className={"px-8 py-6 flex flex-row justify-between items-center"}>
                             <h5 className={"text-xl font-medium leading-5"}>{selectedViewAnalyticsRecord?.post_title}</h5>
-                            <Button className={"h-5 w-5 p-0"} variant={"ghost"} onClick={onClose} onClick={onClose}><X className={"h-4 w-4"} size={18} /></Button>
+                            <Button className={"h-5 w-5 p-0"} variant={"ghost"}  onClick={onClose}><X className={"h-4 w-4"} size={18} /></Button>
                         </SheetHeader>
                         <Separator className={""} />
                         <div className={"pt-6 px-8 pb-4 pr-16 flex flex-row justify-between"}>
                             <div className={"flex flex-col gap-2"}>
                                 <h5 className={" text-base font-semibold leading-5"}>Total Views</h5>
-                                { isLoadingReaction ? <Skeleton className={"w-full h-6 rounded-md"} /> :<h5 className={" text-2xl font-bold"}>{views && views[0] && views[0].totalView ? views[0].totalView : 0}</h5>}
+                                { isLoadingReaction ? <Skeleton className={"w-full h-[32px] rounded-md"} /> :<h5 className={" text-2xl font-bold"}>{views && views[0] && views[0].totalView ? views[0].totalView : 0}</h5>}
                             </div>
                             <div className={"flex flex-col gap-2"}>
                                 <h5 className={"text-base font-semibold leading-5"}>Unique Views</h5>
-                                {isLoadingReaction ? <Skeleton className={"w-full h-6 rounded-md"} /> : <h5
+                                {isLoadingReaction ? <Skeleton className={"w-full h-[32px] rounded-md"} /> : <h5
                                     className={"text-2xl font-bold"}>{views && views[0] && views[0].uniqueView ? views[0].uniqueView : 0}</h5>}
                             </div>
                             <div className={"flex flex-col gap-2"}>
                                 <h5 className={"text-base font-semibold leading-5"}>Feedback</h5>
-                                {isLoadingReaction ? <Skeleton className={"w-full h-6 rounded-md"} /> :<h5 className={"text-2xl font-bold"}>{totalFeedback}</h5>}
+                                {isLoadingReaction ? <Skeleton className={"w-full h-[32px] rounded-md"} /> :<h5 className={"text-2xl font-bold"}>{totalFeedback}</h5>}
                             </div>
                         </div>
                         <Separator />

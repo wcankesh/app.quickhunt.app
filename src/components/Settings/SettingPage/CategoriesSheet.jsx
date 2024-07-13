@@ -15,6 +15,7 @@ const CategoriesSheet = ({ isOpen, onOpen, onClose }) => {
     const [categoryDetails,setCategoryDetails] =useState(initialState);
     const [formError, setFormError] = useState(initialState);
 
+
     const onChange = (e) => {
         setCategoryDetails({...categoryDetails,[e.target.name]:e.target.value});
         setFormError(formError => ({...formError, [e.target.name]: ""}));
@@ -47,6 +48,8 @@ const CategoriesSheet = ({ isOpen, onOpen, onClose }) => {
             }
         }
     };
+
+
 
     const addCategory = () => {
         let validationErrors = {};

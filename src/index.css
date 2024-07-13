@@ -217,10 +217,12 @@ button.inline-flex.items-center.justify-center.whitespace-nowrap.rounded-md.text
 .m-inline-0{margin-inline: 0 !important}
 
 /*Color Picker*/
-.color_picker span {top: -2px; left: 16px;position: absolute;display: flex;flex-wrap: wrap;align-items: center;padding-left: 4px;cursor: pointer;}
+.color_picker span {display: flex;flex-wrap: wrap;align-items: center;padding-left: 4px;cursor: pointer;}
 .color_picker input[type=color] {width: 40px;padding: 3px 7px;background: #fff;border: none;border-radius: 4px 0 0 4px;position: absolute;top: 0;left: 0;bottom: 0;display: inline-block;height: auto;}
 .color_picker input:focus {outline: none;}
-.color_picker {position: relative;}
+.color_picker {position: relative;
+  display: flex;
+  align-items: center;}
 .color_picker_color {width: 16px; height: 16px;}
 .sketch-picker {position: absolute; z-index: 999; top: 36px}
 .LinesEllipsis-ellipsis{color: #7C3AED;font-family: "Geist";font-weight: 600;}
@@ -265,6 +267,20 @@ span.LinesEllipsis-ellipsis {
     background-color: #000000; /* Default background color */
     color: #ffffff; /* Default text color */
   }
+}
+
+.update-idea span {
+  height: 22px; width: 24px; justify-content: center;
+}
+
+.upload-img {
+  width: 100%;
+  height: 100%;
+  /*position: absolute;*/
+  left: 0;
+  top: 0;
+  object-fit: contain;
+  object-position: center;
 }
 
 

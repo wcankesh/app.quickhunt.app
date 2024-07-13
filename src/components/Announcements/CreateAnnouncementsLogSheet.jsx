@@ -1,7 +1,7 @@
 import React, { useEffect, useState} from 'react';
 import {Sheet, SheetContent, SheetHeader,} from "../ui/sheet";
 import {Separator} from "../ui/separator";
-import {CalendarIcon, Check, Circle, Pin, X} from "lucide-react";
+import {CalendarIcon, Check, Circle, Pin, X, Loader2} from "lucide-react";
 import {Label} from "../ui/label";
 import {Input} from "../ui/input";
 import {Textarea} from "../ui/textarea";
@@ -44,7 +44,7 @@ const initialStateError = {
     post_description: "",
 }
 
-const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,editTitle,callBack}) => {
+const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,callBack,selectedRecord}) => {
     const [previewImage,setPreviewImage] = useState("");
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
@@ -58,20 +58,23 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,editTitle,callBack
     const [formError, setFormError] = useState(initialStateError);
     const [selectedValues, setSelectedValues] = useState([]);
     const [selectedLabels, setSelectedLabels] = useState([]);
-    const {theme}=useTheme();
+    const {theme} = useTheme();
     let apiService = new ApiService();
 
+    console.log(labelList,"labelList");
+
     useEffect(()=>{
-        if(editTitle){
+        if(selectedRecord?.post_slug_url){
             getSinglePosts();
         }
         setLabelList(allStatusAndTypes.labels);
         setMemberList(allStatusAndTypes.members);
         setCategoriesList(allStatusAndTypes.categories);
     },[])
+    console.log(changeLogDetails.post_assign_to,"changeLogDetails.post_assign_to");
 
     const getSinglePosts = async () => {
-        const data = await apiService.getSinglePosts(editTitle)
+        const data = await apiService.getSinglePosts(selectedRecord?.post_slug_url)
         if(data.status === 200){
             setChangeLogDetails({
                 ...data.data,
@@ -128,17 +131,13 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,editTitle,callBack
             [event.target.name]: formValidate(event.target.name, event.target.value)
         }));
     }
-
-    const onchangeAssignTo = (selectedItems ) =>{
-        setChangeLogDetails({...changeLogDetails, post_assign_to: selectedItems})
-    }
     const onChangeCategory = (selectedItems ) =>{
         setChangeLogDetails({...changeLogDetails, category_id: selectedItems})
     }
 
-    const onDateChange = (date) => {
+    const onDateChange = (name, date) => {
         if (date) {
-            setChangeLogDetails({...changeLogDetails,post_published_at: moment(date)});
+            setChangeLogDetails({...changeLogDetails,[name]: date});
         }
     };
 
@@ -189,7 +188,7 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,editTitle,callBack
         } else {
             setIsSave(false)
         }
-        callBack();
+        callBack(changeLogDetails, "isCreate");
         onClose();
     }
 
@@ -246,13 +245,9 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,editTitle,callBack
                 variant: "destructive"
             });
         }
-        callBack();
-        onClose();
+        // callBack({}, "isUpdate");
+        onClose(data.data);
     }
-
-    const saveAsDraft = async () => {
-        console.log("save as draft");
-    };
 
     const handleValueChange = (value) => {
         const clone = [...changeLogDetails.post_assign_to]
@@ -285,9 +280,9 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,editTitle,callBack
         <Sheet open={isOpen} onOpenChange={isOpen ? onClose : onOpen}>
             <SheetContent className={"pt-[24px] p-0 overflow-y-scroll lg:max-w-[663px] md:max-w-[720px] sm:max-w-[520px]"}>
                 <SheetHeader className={"px-8 py-6 flex flex-row justify-between items-center"}>
-                    <h5 className={"text-xl font-medium leading-5"}>{ editTitle ? "Update Announcement" :"Create New Announcements"}</h5>
+                    <h5 className={"text-xl font-medium leading-5"}>{ selectedRecord?.post_slug_url ? "Update Announcement" :"Create New Announcements"}</h5>
                     <div className={"flex items-center gap-6"}>
-                        <Button className={"h-5 w-5 p-0"} variant={"ghost"}><Pin className={"h-4 w-4"} size={18}/></Button>
+                        <Button className={"h-5 w-5 p-0"} onClick={() => onChangeText({target:{name: "post_pin_to_top", value: changeLogDetails.post_pin_to_top === 1 ? 0 : 1}}) } variant={"ghost"} >{changeLogDetails.post_pin_to_top === 1 ? <Pin fill={"bg-card-foreground"} className={"h-4 w-4"}  size={18}/> : <Pin className={"h-4 w-4"}  size={18}/>}</Button>
                         <Button className={"h-5 w-5 p-0"} onClick={onClose}  variant={"ghost"}><X size={18} className={"h-5 w-5"}/></Button>
                     </div>
                 </SheetHeader>
@@ -302,8 +297,10 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,editTitle,callBack
                         <div className="grid w-full gap-2">
                             <Label className={"text-[14px] text=[#0F172A]"} htmlFor="link">Permalink / Slug</Label>
                             <Input type="text" className={"h-9"} id="link" name={"post_slug_url"} value={changeLogDetails.post_slug_url} onChange={onChangeText}/>
-                            <p className={"text-[14px] font-normal leading-5"}>This release will be available at <span
-                                className={"text-violet-600 text-[14px]"}>https://testingapp.quickhunt.app/</span></p>
+                            <p className={"text-[14px] font-normal leading-5"}>This release will be available at {changeLogDetails.fullDomain ? <a
+                                href={`${changeLogDetails.fullDomain}/${changeLogDetails.post_slug_url}`}
+                                target={"_blank"}
+                                className={"text-violet-600 text-[14px]"}>{`${changeLogDetails.fullDomain}/${changeLogDetails.post_slug_url}`}</a> : ""}</p>
                         </div>
                         <div className="grid w-full gap-2">
                             <Label htmlFor="description">Description</Label>
@@ -425,8 +422,9 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,editTitle,callBack
                                     <Button
                                         id="date"
                                         variant={"outline"}
-                                        className={cn("justify-start text-left font-normal", "text-muted-foreground")}
+                                        className={cn("justify-between text-left font-normal d-flex", "text-muted-foreground")}
                                     >
+                                        {moment(changeLogDetails.post_published_at).format("LL")}
                                         <CalendarIcon className="mr-2 h-4 w-4" />
                                     </Button>
                                 </PopoverTrigger>
@@ -434,7 +432,7 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,editTitle,callBack
                                     <Calendar
                                         mode="single"
                                         selected={changeLogDetails.post_published_at}
-                                        onSelect={onDateChange}
+                                        onSelect={(date) => onDateChange("post_published_at", date)}
                                     />
                                 </PopoverContent>
                             </Popover>
@@ -444,8 +442,8 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,editTitle,callBack
                 <Separator className={"my-6"}/>
                 <div className={"px-8"}>
                     <h5 className={"mb-3 text-[14px] font-medium leading-5"}>Featured Image</h5>
-                    <div className={"flex flex-row flex-wrap gap-4"}>
-                        <div className="flex items-center justify-center">
+                    <div className={"flex  gap-4 "}>
+                        <div className="flex basis-1/2 items-center justify-center">
                                 <label
                                     htmlFor="upload_image"
                                     className="flex w-[282px] h-[128px] py-0 justify-center items-center flex-shrink-0 border-dashed border-[1px] border-gray-300 rounded cursor-pointer"
@@ -460,23 +458,52 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,editTitle,callBack
                                   />
                                 </label>
                         </div>
-                        <div className={"flex flex-col gap-[18px]"}>
+                        <div className={"flex basis-1/2 flex-col gap-[18px]"}>
                             <div className={"flex gap-6"}>
                                 <Switch disabled={userDetailsReducer.plan == 0} checked={changeLogDetails.post_nodify_customer ===  1} onCheckedChange={(checked)=>onChangeText({target:{name: "post_nodify_customer", value: checked === true ? 1 : 0}})} />
                                 <p className={"text-[14px] non-italic font-medium"}>Notify Customers</p>
                             </div>
                             <div className={"flex gap-6"}>
+                                <Switch checked={changeLogDetails.post_save_as_draft ===  1} onCheckedChange={(checked)=>onChangeText({target:{name: "post_save_as_draft", value: checked === true ? 1 : 0}})} />
+                                <p className={"text-[14px] non-italic font-medium"}>Save as Draft</p>
+                            </div>
+                            <div className={"flex gap-6"}>
                                 <Switch disabled={userDetailsReducer.plan == 0} checked={changeLogDetails.post_expired_boolean ===  1} onCheckedChange={(checked)=>onChangeText({target:{name: "post_expired_boolean", value: checked === true ? 1 : 0}})} />
                                 <p className={"text-[14px] non-italic font-medium"}>Expire At</p>
                             </div>
+
+                            {
+                                changeLogDetails.post_expired_boolean ===  1 ?  <div className="grid w-full gap-2 basis-1/2">
+                                    <Popover>
+                                        <PopoverTrigger asChild>
+                                            <Button
+                                                id="date"
+                                                variant={"outline"}
+                                                className={cn("justify-between text-left font-normal d-flex", "text-muted-foreground")}
+                                            >
+                                                {moment(changeLogDetails.post_expired_datetime).format("LL")}
+                                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                            </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-auto p-0" align="start">
+                                            <Calendar
+                                                mode="single"
+                                                selected={changeLogDetails.post_expired_datetime}
+                                                onSelect={(date) => onDateChange("post_expired_datetime", date)}
+                                            />
+                                        </PopoverContent>
+                                    </Popover>
+                                </div> : ""
+                            }
+
                         </div>
                     </div>
                 </div>
                 <Separator className={"my-6"}/>
                 <div className={"pt-2 pb-8 px-8 flex flex-row gap-4 flex-wrap"}>
-                    <Button variant={"outline "} onClick={editTitle ? updatePost : createPosts} className={"bg-violet-600 text-[#fff]"}>{editTitle ? "Update Post" : "Publish Post"}</Button>
-                    <Button onClick={saveAsDraft} variant={"outline "}
-                            className={"rounded-md border border-violet-600 text-violet-600 text-[14px] font-semibold"}>Save as Draft</Button>
+                    <Button variant={"outline "} disabled={isSave}  onClick={selectedRecord?.post_slug_url ? updatePost : createPosts} className={"bg-violet-600 text-[#fff]"}>
+                        { isSave ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : selectedRecord?.post_slug_url ? "Update Post" : "Publish Post"}
+                    </Button>
                     <Button onClick={onClose} variant={"outline "}
                             className={"rounded-md border border-violet-600 text-violet-600 text-[14px] font-semibold"}>Cancel</Button>
                 </div>

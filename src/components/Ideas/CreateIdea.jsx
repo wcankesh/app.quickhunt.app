@@ -7,17 +7,15 @@ import {ApiService} from "../../utils/ApiService";
 import {useSelector} from "react-redux";
 import {baseUrl, urlParams} from "../../utils/constent";
 import moment from "moment";
-import {X} from "lucide-react";
+import {Check, Loader2, X} from "lucide-react";
 import {RadioGroup, RadioGroupItem} from "../ui/radio-group";
 import {useTheme} from "../theme-provider";
 import {Sheet, SheetContent, SheetHeader,} from "../ui/sheet";
 import {Avatar, AvatarFallback, AvatarImage} from "../ui/avatar";
 import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "../ui/select";
 import {Textarea} from "../ui/textarea";
-import {Switch} from "../ui/switch";
-import {Tabs, TabsContent, TabsList, TabsTrigger} from "../ui/tabs";
-import {Card} from "../ui/card";
 import {useToast} from "../ui/use-toast";
+import {Badge} from "../ui/badge";
 
 const initialState = {
     title: "",
@@ -37,8 +35,7 @@ const CreateIdea = ({
                         isOpen,
                         onOpen,
                         onClose,
-                        isCreateIdea,
-                        setIsCreateIdea,
+                        closeCreateIdea,
                         ideasList,
                         setIdeasList,
                         isRoadmap,
@@ -48,8 +45,6 @@ const CreateIdea = ({
                         setRoadmapList,
                         isNoStatus,
                         setIsNoStatus,
-                        setSelectedIdea,
-                        selectedIdea
                     }) => {
     const { theme } = useTheme()
     let navigate = useNavigate();
@@ -63,77 +58,33 @@ const CreateIdea = ({
     const [isLoading, setIsLoading] = useState(false);
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const [formError, setFormError] = useState(initialStateError);
-    const [roadmapStatus, setRoadmapStatus] = useState([]);
-    const [isLoadingSidebar, setIsLoadingSidebar] = useState('');
-    const [isEditIdea, setIsEditIdea] = useState(false);
-
-    const [selectedStatus, setSelectedStatus] = useState('');
-    const [selectedFile, setSelectedFile] = useState(null);
-    const [imagePreview, setImagePreview] = useState(null);
-
-    const handleStatusChange = (event) => {setSelectedStatus(event.target.value);};
-
-    const handleRemoveImage = () => {setSelectedFile(null);setImagePreview(null);};
-
-    const handleFileChange = (event) => {
-        const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setSelectedFile(file);
-                setImagePreview(reader.result);
-            };
-            reader.readAsDataURL(file);
-        }
-    };
+    const [selectedValues, setSelectedValues] = useState([]);
 
     useEffect(() => {
         setTopicLists(allStatusAndTypes.topics)
-        setRoadmapStatus(allStatusAndTypes.roadmap_status)
     }, [projectDetailsReducer.id, allStatusAndTypes]);
 
     const handleUpdate = (event) => {
         const { value } = event.target;
-
         setDescription(value);
         setIdeaDetail(ideaDetail => ({...ideaDetail, description: value}));
-
         setFormError(formError => ({
             ...formError,
             description: formValidate("description", value)
         }));
     };
 
-    const handleChange = (tag, checked) => {
+    const handleChange = (id) => {
         const clone = [...ideaDetail.topic];
-        const nextSelectedTags = checked ? [...clone, tag] : clone.filter(t => t !== tag);
-        setIdeaDetail({...ideaDetail, topic:nextSelectedTags})
-    }
-
-    const dummyRequest = ({ file, onSuccess }) => {
-        setTimeout(() => {
-            onSuccess("ok");
-        }, 0);
-    };
-
-    const onPreview = async file => {
-        let src = file.url;
-        if (!src) {
-            src = await new Promise(resolve => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file.originFileObj);
-                reader.onload = () => resolve(reader.result);
-            });
+        const index = clone.indexOf(id);
+        if (index > -1) {
+            clone.splice(index, 1);
+        } else {
+            clone.push(id);
         }
-        const image = new Image();
-        image.src = src;
-        const imgWindow = window.open(src);
-        imgWindow.document.write(image.outerHTML);
+        setIdeaDetail({ ...ideaDetail, topic: clone });
     };
 
-    const beforeUpload = (file, files) => {
-        setIdeaDetail({...ideaDetail, images: [...ideaDetail.images, ...files]})
-    }
 
     const onChangeText = (event) => {
         setIdeaDetail(ideaDetail => ({...ideaDetail, [event.target.name]:event.target.value}))
@@ -163,8 +114,6 @@ const CreateIdea = ({
         formData.append('description', description);
         formData.append('project_id', projectDetailsReducer.id);
         formData.append('topic', ideaDetail.topic.join());
-        formData.append('roadmap_id', selectedRoadmap && selectedRoadmap.id ? selectedRoadmap.id : "");
-        formData.append('images[]', selectedFile);
         const data = await apiSerVice.createIdea(formData)
         if(data.status === 200){
             const clone = [...ideasList];
@@ -183,7 +132,9 @@ const CreateIdea = ({
                 }
             }
             setIsLoading(false)
-            setIsCreateIdea(false)
+            setIdeaDetail(initialState)
+            setDescription("")
+            closeCreateIdea()
             if(isNoStatus) {
                 setIsNoStatus(false)
             }
@@ -214,183 +165,18 @@ const CreateIdea = ({
         }
     };
 
-    const onDeleteIdeaImage = (index) => {
-        const clone = [...ideaDetail.images];
-        clone.splice(index, 1);
-        setIdeaDetail({...ideaDetail, images: clone})
-    }
-
-    const onChangeStatus = async (name,value) => {
-        setIsLoadingSidebar(name);
-        setSelectedIdea({...selectedIdea, [name]: value})
-        let formData = new FormData();
-        formData.append(name, value);
-        const data = await apiSerVice.updateIdea(formData, selectedIdea.id)
-        if (data.status === 200) {
-            let clone = [...ideasList];
-            let index = clone.findIndex((x) => x.id === selectedIdea.id);
-            if (index !== -1) {
-                if (name === "pin_to_top" && value == 1) {
-                    clone.splice(index, 1)
-                    clone.unshift(data.data)
-                } else {
-                    clone[index] = {...data.data,};
-                }
-                if (isRoadmap) {
-                    const cloneRoadmap = [...roadmapList]
-                    const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap.id);
-                    if (name === "roadmap_id") {
-                        if (isNoStatus) {
-                            let ideaIndex = clone.findIndex((x) => x.id === selectedIdea.id);
-                            if (ideaIndex !== -1) {
-                                let ideaObj = clone[ideaIndex]
-                                const roadmapIndexChange = cloneRoadmap.findIndex((x) => x.id == value);
-                                const cloneRoadmapIdeas = [...cloneRoadmap[roadmapIndexChange].ideas]
-                                cloneRoadmapIdeas.push(ideaObj)
-                                cloneRoadmap[roadmapIndexChange].ideas = cloneRoadmapIdeas
-                                clone.splice(ideaIndex, 1)
-                                setRoadmapList(cloneRoadmap);
-                                setNoStatus(clone);
-                            }
-                        } else {
-                            if (roadmapIndex !== -1) {
-                                let cloneIdea = [...cloneRoadmap[roadmapIndex].ideas];
-                                let ideaIndex = cloneIdea.findIndex((x) => x.id === selectedIdea.id);
-                                if (ideaIndex !== -1) {
-                                    let ideaObj = cloneIdea[ideaIndex]
-                                    const roadmapIndexChange = cloneRoadmap.findIndex((x) => x.id == value);
-                                    const cloneRoadmapIdeas = [...cloneRoadmap[roadmapIndexChange].ideas]
-                                    cloneRoadmapIdeas.push(ideaObj);
-                                    cloneIdea.splice(ideaIndex, 1);
-                                    cloneRoadmap[roadmapIndexChange].ideas = cloneRoadmapIdeas
-                                    cloneRoadmap[roadmapIndex].ideas = cloneIdea
-                                    setRoadmapList(cloneRoadmap);
-                                }
-                            }
-                        }
-                    } else {
-                        if (roadmapIndex !== -1) {
-                            cloneRoadmap[roadmapIndex].ideas = clone
-                            setRoadmapList(cloneRoadmap);
-                        }
-                    }
-                }
-            }
-            setSelectedIdea({...data.data,})
-            setIdeasList(clone);
-            setIsLoading(false)
-            setIsEditIdea(false)
-            setIsLoadingSidebar('');
-            toast({description: "Idea Update successfully"})
-        } else {
-            setIsLoading(false)
-            setIsLoadingSidebar('');
-            toast({variant: "destructive", description: data.error})
-        }
-    }
-
     return (
         <div>
-            <Sheet open={isOpen} onOpenChange={isOpen ? onClose : onOpen} isCreateIdea={isCreateIdea}>
-                <SheetContent className={"lg:max-w-[1101px] md:max-w-[720px] sm:max-w-[520px] p-0"}>
+            <Sheet open={isOpen} onOpenChange={isOpen ? onClose : onOpen} closeCreateIdea={closeCreateIdea}>
+                <SheetContent className={"lg:max-w-[800px] md:max-w-[620px] sm:max-w-[420px] p-0"}>
                     <SheetHeader className={"px-[32px] py-[22px] border-b"}>
                         <div className={"flex justify-between items-center w-full"}>
                             <h2 className={"text-xl font-medium"}>Tell us your Idea!</h2>
                             <X onClick={onClose} className={"cursor-pointer"}/>
                         </div>
                     </SheetHeader>
-                    <div className={"lg:flex md:block overflow-auto h-[100vh]"}>
-                        <div className={`basis-[440px] ${theme === "dark" ? "" : "bg-muted"} border-r overflow-auto pb-[100px]`}>
-                            <div className={"border-b py-4 pl-8 pr-6 flex flex-col gap-3"}>
-                                <div className={"flex flex-col gap-1"}>
-                                    <h3 className={"text-sm font-medium"}>Status</h3>
-                                    <p className={"text-muted-foreground text-xs font-normal"}>Apply a status to Manage this idea on roadmap.</p>
-                                </div>
-                                <div className={"flex flex-col "}>
-                                    <RadioGroup
-                                        // defaultValue={selectedStatus}
-                                        // onValueChange={(value) => onChangeStatus('roadmap_id', value)}
-                                        // value={selectedIdea.id}
-                                        // onValueChange={(e) => console.log(e)}
-                                    >
-                                        {
-                                            (roadmapStatus || []).map((x, i) => {
-                                                return (
-                                                    <div key={i} className="flex items-center space-x-2">
-                                                        <RadioGroupItem value={x.id} id={x.id}/>
-                                                        <Label className={"text-secondary-foreground text-sm font-normal"} htmlFor={x.id}>{x.title}</Label>
-                                                    </div>
-                                                )
-                                            })
-                                        }
-                                    </RadioGroup>
-                                </div>
-                            </div>
-                            <div className={"border-b"}>
-                                <div className="py-4 pl-8 pr-6 w-full items-center gap-1.5">
-                                    <Label htmlFor="picture">Featured image</Label>
-                                    <div className="w-[282px] h-[128px] relative">
-
-                                        {selectedFile ? (
-                                            <>
-                                                <img src={imagePreview} alt="Preview" className="w-full h-full object-cover rounded" />
-                                                <Button
-                                                    variant="outline"
-                                                    onClick={handleRemoveImage}
-                                                    className={`${theme === "light" ? "text-card" : ""} w-[129px] px-4 py-2 absolute top-[50%] left-[50%] origin-center translate-x-[-50%] translate-y-[-50%] border-0 flex justify-center items-center bg-primary hover:bg-primary hover:text-card text-sm font-semibold`}
-                                                >
-                                                    Change image
-                                                </Button>
-                                            </>
-                                        ) : (
-                                            <>
-                                                <input
-                                                    id="pictureInput"
-                                                    type="file"
-                                                    className="hidden"
-                                                    onChange={handleFileChange}
-                                                />
-                                                <label
-                                                    htmlFor="pictureInput"
-                                                    className="border-dashed w-full h-full py-[52px] inset-0 flex items-center justify-center bg-muted border border-muted-foreground rounded cursor-pointer"
-                                                >
-                                                    <h4 className={"text-sm font-semibold"}>Upload Image</h4>
-                                                </label>
-                                            </>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-                            <div className={"py-4 pl-8 pr-6 flex flex-col gap-[26px]"}>
-                                <div className={"flex flex-wrap gap-1 justify-between"}>
-                                    <div className={"flex flex-col gap-1"}>
-                                        <h4 className={"text-sm font-medium"}>Mark as bug</h4>
-                                        <p className={"text-muted-foreground text-xs font-normal"}>Hides Idea from your users</p>
-                                    </div>
-                                    <Button
-                                        variant={"outline"}
-                                        className={`hover:bg-muted w-[132px] ${theme === "dark" ? "" : "border-card-foreground text-muted-foreground"} text-sm font-semibold`}
-                                        // onClick={() => onChangeStatus({name: "is_active",value: selectedIdea.is_active === 1 ? 0 : 1})}
-                                    >
-                                        {/*{selectedIdea.is_active === 0 ? "Convert to Idea": "Mark as bug"}*/}
-                                    </Button>
-                                </div>
-                                <div className={"flex flex-wrap gap-1 justify-between"}>
-                                    <div className={"flex flex-col gap-1"}>
-                                        <h4 className={"text-sm font-medium"}>Archive</h4>
-                                        <p className={"text-muted-foreground text-xs font-normal"}>Remove Idea from Board and Roadmap</p>
-                                    </div>
-                                    <Button
-                                        variant={"outline"}
-                                        className={`w-[100px] hover:bg-muted ${theme === "dark" ? "" : "border-card-foreground text-muted-foreground"} text-sm font-semibold`}
-                                        // onClick={() => onChangeStatus({name: "is_archive",value: selectedIdea.is_archive === 1 ? 0 : 1})}
-                                    >
-                                        {/*{selectedIdea.is_archive === 1 ? "Unarchive" : "Archive"}*/}
-                                    </Button>
-                                </div>
-                            </div>
-                        </div>
-                        <div className={"basis-[661px] overflow-auto"}>
+                    <div className={"w-full overflow-auto h-[100vh]"}>
+                        <div className={"overflow-auto"}>
                             <div className={"pb-100px"}>
                                 <div className={"py-6 px-8 flex flex-col gap-6 border-b"}>
                                     <div className="items-center gap-1.5">
@@ -411,25 +197,53 @@ const CreateIdea = ({
                                 </div>
                                 <div className={"py-6 px-8 border-b"}>
                                     <Label>Choose Topics for this Idea (optional)</Label>
-                                    <Select>
-                                        <SelectTrigger className="">
-                                            <SelectValue placeholder="Select topic" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectGroup>
-                                                {
-                                                    (topicLists || []).map((x, i) => {
-                                                        return (
-                                                            <SelectItem key={i} value={x.id}>{x.title}</SelectItem>
-                                                        )
-                                                    })
-                                                }
-                                            </SelectGroup>
-                                        </SelectContent>
-                                    </Select>
+                                        <Select onValueChange={handleChange} value={selectedValues}>
+                                            <SelectTrigger className="">
+                                                <SelectValue className={"text-muted-foreground text-sm"} placeholder="Assign to">
+                                                    <div className={"flex gap-[2px]"}>
+                                                        {
+                                                            (ideaDetail.topic || []).map((x,index)=>{
+                                                                const findObj = topicLists.find((y) => y.id === x);
+                                                                return(
+                                                                    <>
+                                                                        <div key={index} className={"text-sm flex gap-[2px] bg-slate-300 items-center rounded py-0 px-2"} >
+                                                                            {findObj?.title}
+                                                                        </div>
+                                                                    </>
+
+                                                                )
+                                                            })
+                                                        }
+                                                        {(ideaDetail.topic || []).length > 2 && <div>...</div>}
+                                                    </div>
+                                                </SelectValue>
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectGroup>
+                                                    {
+                                                        (topicLists || []).map((x, i) => {
+                                                            return (
+                                                                <SelectItem className={""} key={i} value={x.id}>
+                                                                    <div className={"flex gap-2"}>
+                                                                        <div onClick={() => handleChange(x.id)} className="checkbox-icon">
+                                                                            {ideaDetail.topic.includes(x.id) ? <Check size={18} />: <div className={"h-[18px] w-[18px]"}></div>}
+                                                                        </div>
+                                                                        <span>{x.title ? x.title : ""}</span>
+                                                                    </div>
+                                                                </SelectItem>
+                                                            )
+                                                        })
+                                                    }
+                                                </SelectGroup>
+                                            </SelectContent>
+                                        </Select>
                                 </div>
                                 <div className={"p-8 flex gap-6"}>
-                                    <Button className={"py-2 px-6 text-sm font-semibold"} onClick={onCreateIdea}>Create Idea</Button>
+                                    <Button className={`${isLoading === true ? "w-[126px] py-2 px-6" : "py-2 px-6"} text-sm font-semibold`} onClick={onCreateIdea}>
+                                        {
+                                            isLoading ? <Loader2 className="h-4 w-4 animate-spin"/> : "Create Idea"
+                                        }
+                                        </Button>
                                     <Button variant={"outline hover:bg-transparent"} className={"border border-primary py-2 px-6 text-sm font-semibold"} onClick={onClose}>Cancel</Button>
                                 </div>
                             </div>

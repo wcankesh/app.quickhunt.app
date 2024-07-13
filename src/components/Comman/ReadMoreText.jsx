@@ -5,11 +5,11 @@ import {Button} from "../ui/button";
 const ReadMoreText = ({html}) => {
     const [isExpanded, setIsExpanded] = useState(false);
 
-    return(
+    return (
         <React.Fragment>
             {isExpanded ? (
                 <React.Fragment>
-                    <div dangerouslySetInnerHTML={{__html:html}}></div>
+                    <div dangerouslySetInnerHTML={{__html: html}}></div>
                     <Button
                         variant={"ghost hover:bg-none"}
                         className={"p-0 h-0 text-primary font-semibold"}
@@ -23,7 +23,7 @@ const ReadMoreText = ({html}) => {
                     <HTMLEllipsis
                         unsafeHTML={html}
                         maxLine='3'
-                        isClamped={true}
+                        isclamped="true"
                         ellipsis="...Read more"
                         basedOn='letters'
                     />
@@ -32,6 +32,6 @@ const ReadMoreText = ({html}) => {
             )}
 
         </React.Fragment>
-    )
-}
+    );
+};
 export default ReadMoreText
