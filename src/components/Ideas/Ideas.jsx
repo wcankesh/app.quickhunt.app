@@ -249,7 +249,8 @@ const Ideas = () => {
         formData.append(name, value);
 
         const data = await apiSerVice.updateIdea(formData, id);
-        if (data.data.id) {
+        // if (data.status === 200) {
+        if (data.id) {
             const clone = [...ideasList];
             clone[index] = data.data;
             setIdeasList(clone);
@@ -264,7 +265,7 @@ const Ideas = () => {
         formData.append(name, value);
         const data = await apiSerVice.updateIdea(formData, record.id);
         // if (data.status === 200) {
-        if (data?.data?.id) {
+        if (data?.id) {
             let clone = [...ideasList]
             clone[index].roadmap_id = value
             setIdeasList(clone);
