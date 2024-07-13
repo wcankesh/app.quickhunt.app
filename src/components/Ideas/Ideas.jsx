@@ -178,23 +178,28 @@ const Ideas = () => {
             // payload.no_status = 1;
             payload.all = 1;
         } else if(e.name === 'topic') {
-            const clone = [...topicLists];
-            const index = clone.findIndex(item => item.id === e.value);
-            if (index !== -1) {
-                clone.splice(index, 1);
-            } else {
-                const topicToAdd = topicLists.find(item => item.id === e.value);
-                if (topicToAdd) {
-                    clone.push(topicToAdd);
+            debugger
+            if(e.value){
+                const clone = [...filter.topic];
+                const index = clone.findIndex(item => item === e.value);
+                if (index !== -1) {
+                    clone.splice(index, 1);
+                } else {
+                    clone.push(e.value);
                 }
+                payload.topic = clone
+            } else {
+                payload.topic = []
             }
-            console.log(clone)
+
+
             // setSelectedIdea({...selectedIdea, topic: clone});
         }
         console.log(payload)
         console.log(e.value)
-        // ideaSearch(payload);
-        // setFilter(payload);
+        setFilter(payload);
+         ideaSearch(payload);
+
     };
 
     const giveVote = async (record, type) => {
@@ -385,12 +390,12 @@ const Ideas = () => {
                                     </SelectGroup>
                                 </SelectContent>
                             </Select>
-                            <Select onValueChange={(selectedItems) => handleChange({name: "topic", value: selectedItems})} value={topicLists.map(x => x.id)}>
+                            <Select onValueChange={(selectedItems) => handleChange({name: "topic", value: selectedItems})} value={filter.topic.map(x => x)}>
                                 <SelectTrigger className="w-[193px] bg-card">
                                     <SelectValue className={"text-muted-foreground text-sm"} placeholder="Assign to">
                                         <div className={"flex flex-wrap gap-[2px]"}>
-                                            {(topicLists || []).map((x, index) => {
-                                                const findObj = (topicLists || []).find((y) => y.id === x?.id);
+                                            {(filter.topic || []).map((x, index) => {
+                                                const findObj = (topicLists || []).find((y) => y.id === x);
                                                 return (
                                                     <div key={index}
                                                          className={"text-xs flex gap-[2px] bg-slate-300 items-center rounded py-0 px-2"}>
@@ -398,7 +403,7 @@ const Ideas = () => {
                                                     </div>
                                                 );
                                             })}
-                                            {(topicLists || []).length > 2 && <div>...</div>}
+                                            {(filter.topic || []).length > 2 && <div>...</div>}
                                         </div>
                                     </SelectValue>
                                 </SelectTrigger>
@@ -414,12 +419,10 @@ const Ideas = () => {
                                                 return (
                                                     <SelectItem className={""} key={i} value={x.id}>
                                                         <div className={"flex gap-2"}>
-                                                            {/*<div onClick={() => handleChangeTopic(x.id)}*/}
-                                                            <div onClick={() => console.log(x.id)}
-                                                                 className="checkbox-icon">
-                                                                {/*{(x.map((x) => x.id) || []).includes(x.id) ?*/}
-                                                                {/*    <Check size={18}/> : <div*/}
-                                                                {/*        className={"h-[18px] w-[18px]"}></div>}*/}
+                                                            <div onClick={() => handleChange({name: "topic", value: x.id})} className="checkbox-icon">
+                                                                {(filter.topic.map((x) => x) || []).includes(x.id) ?
+                                                                    <Check size={18}/> : <div
+                                                                        className={"h-[18px] w-[18px]"}></div>}
                                                             </div>
                                                             <span>{x.title ? x.title : ""}</span>
                                                         </div>
