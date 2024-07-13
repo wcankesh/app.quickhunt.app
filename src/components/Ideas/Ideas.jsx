@@ -71,11 +71,6 @@ const Ideas = () => {
     const [openDelete, setOpenDelete] = useState(false);
     const [deleteRecord, setDeleteRecord] = useState(null);
 
-    {console.log("selectedIdea", selectedIdea)}
-
-    {console.log("topicLists", topicLists)}
-
-
     const openSheet = () => setSheetOpen(true);
     const closeSheet = () => setSheetOpen(false);
 
@@ -191,15 +186,9 @@ const Ideas = () => {
             } else {
                 payload.topic = []
             }
-
-
-            // setSelectedIdea({...selectedIdea, topic: clone});
         }
-        console.log(payload)
-        console.log(e.value)
         setFilter(payload);
-         ideaSearch(payload);
-
+        ideaSearch(payload);
     };
 
     const giveVote = async (record, type) => {
@@ -257,11 +246,10 @@ const Ideas = () => {
 
     const updateIdeaStatus = async (id, name, value, index) => {
         const formData = new FormData();
-        formData.append(name, value == 1 ? 0 : 1);
+        formData.append(name, value);
 
         const data = await apiSerVice.updateIdea(formData, id);
-        if (data.status === 200) {
-            console.log(id,name, value, index)
+        if (data.data.id) {
             const clone = [...ideasList];
             clone[index] = data.data;
             setIdeasList(clone);
@@ -275,7 +263,8 @@ const Ideas = () => {
         let formData = new FormData();
         formData.append(name, value);
         const data = await apiSerVice.updateIdea(formData, record.id);
-        if (data.status === 200) {
+        // if (data.status === 200) {
+        if (data?.data?.id) {
             let clone = [...ideasList]
             clone[index].roadmap_id = value
             setIdeasList(clone);
@@ -377,7 +366,7 @@ const Ideas = () => {
                                     <SelectGroup>
                                         <SelectItem value={null}>
                                             <div className={"flex items-center gap-2"}>
-                                                All Status
+                                                {filter.topic.length === 0 ? "All Topics" : ""}
                                             </div>
                                         </SelectItem>
                                         {
@@ -531,10 +520,10 @@ const Ideas = () => {
                                                                             </DropdownMenuTrigger>
                                                                             <DropdownMenuContent>
                                                                                 <DropdownMenuItem className={"cursor-pointer"} onClick={() => openDetailsSheet(x)}>Edit</DropdownMenuItem>
-                                                                                <DropdownMenuItem className={"cursor-pointer"} onClick={() => updateIdeaStatus(x.id, "is_archive", x.is_archive, i)}>
+                                                                                <DropdownMenuItem className={"cursor-pointer"} onClick={() => updateIdeaStatus(x.id, "is_archive", x.is_archive == 1 ? 0 : 1, i)}>
                                                                                     {x?.is_archive === 1 ? "Unarchive" : "Archive"}
                                                                                 </DropdownMenuItem>
-                                                                                <DropdownMenuItem className={"cursor-pointer"} onClick={() => updateIdeaStatus(x.id, "is_active",  x.is_active, i)}>
+                                                                                <DropdownMenuItem className={"cursor-pointer"} onClick={() => updateIdeaStatus(x.id, "is_active",  x.is_active == 0 ? 1 : 0, i)}>
                                                                                     {x.is_active === 0 ? "Convert to Idea" : "Mark as bug"}
                                                                                 </DropdownMenuItem>
                                                                                 <DropdownMenuItem className={"cursor-pointer"} onClick={() => deleteIdea(x)}>Delete</DropdownMenuItem>

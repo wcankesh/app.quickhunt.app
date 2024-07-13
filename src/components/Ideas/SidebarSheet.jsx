@@ -273,7 +273,7 @@ const SidebarSheet = ({
         let formData = new FormData();
         formData.append("cover_image", file);
         const data = await apiSerVice.updateIdea(formData, selectedIdea.id)
-        if (data.status === 200) {
+        if (data.data.id) {
             setSelectedIdea({...data.data})
             // setIdeasList(clone);
             setIsLoading(false)
@@ -333,7 +333,7 @@ const SidebarSheet = ({
         let formData = new FormData();
         formData.append(name, value);
         const data = await apiSerVice.updateIdea(formData, selectedIdea.id)
-        if (data.status === 200) {
+        if (data.data.id) {
             let clone = [...ideasList];
             let index = clone.findIndex((x) => x.id === selectedIdea.id);
             if (index !== -1) {
@@ -662,7 +662,7 @@ const SidebarSheet = ({
         formData.append('description', selectedIdea.description?.trim() === '' ? "" : selectedIdea.description);
         formData.append('topic', topics.join(","));
         const data = await apiSerVice.updateIdea(formData, selectedIdea.id)
-        if (data.status === 200) {
+        if (data.data.id) {
             setSelectedIdea({...data.data})
             setOldSelectedIdea({...data.data})
             setIsEditIdea(false)
