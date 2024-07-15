@@ -832,7 +832,7 @@ const RoadMapSidebarSheet = ({
                                 <div className={"flex flex-col "}>
                                     <RadioGroup
                                         onValueChange={(value) => onChangeStatus('roadmap_id', value)}
-                                        value={selectedIdea.roadmap_id}
+                                        value={selectedIdea?.roadmap_id}
                                     >
                                         {
                                             (roadmapStatus || []).map((x, i) => {
@@ -855,13 +855,13 @@ const RoadMapSidebarSheet = ({
                                     <div className="w-[282px] h-[128px] flex gap-1">
 
                                         {
-                                            selectedIdea.cover_image ?
+                                            selectedIdea?.cover_image ?
                                                 <div>
-                                                    {selectedIdea && selectedIdea.cover_image && selectedIdea.cover_image.name ?
+                                                    {selectedIdea && selectedIdea?.cover_image && selectedIdea?.cover_image?.name ?
                                                         <div className={"w-[282px] h-[128px] relative border p-[5px]"}>
                                                             <img
                                                                 className={"upload-img"}
-                                                                src={selectedIdea && selectedIdea.cover_image && selectedIdea.cover_image.name ? URL.createObjectURL(selectedIdea.cover_image) : selectedIdea.cover_image}
+                                                                src={selectedIdea && selectedIdea?.cover_image && selectedIdea?.cover_image?.name ? URL.createObjectURL(selectedIdea?.cover_image) : selectedIdea?.cover_image}
                                                                 alt=""/>
                                                             <CircleX
                                                                 size={20}
@@ -871,9 +871,9 @@ const RoadMapSidebarSheet = ({
                                                                     value: ""
                                                                 })}
                                                             />
-                                                        </div> : selectedIdea.cover_image ?
+                                                        </div> : selectedIdea?.cover_image ?
                                                             <div className={"w-[282px] h-[128px] relative border p-[5px]"}>
-                                                                <img className={"upload-img"} src={selectedIdea.cover_image} alt=""/>
+                                                                <img className={"upload-img"} src={selectedIdea?.cover_image} alt=""/>
                                                                 <CircleX
                                                                     size={20}
                                                                     className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
@@ -917,12 +917,12 @@ const RoadMapSidebarSheet = ({
                                         className={`hover:bg-muted w-[132px] ${theme === "dark" ? "" : "border-muted-foreground text-muted-foreground"} text-sm font-semibold`}
                                         onClick={() => onChangeStatus(
                                             "is_active",
-                                            selectedIdea.is_active === 1 ? 0 : 1
+                                            selectedIdea?.is_active === 1 ? 0 : 1
                                         )}
                                     >
                                         {
                                             isLoading ? <Loader2
-                                                className="h-4 w-4 animate-spin"/> : (selectedIdea.is_active === 0 ? "Convert to Idea" : "Mark as bug")
+                                                className="h-4 w-4 animate-spin"/> : (selectedIdea?.is_active === 0 ? "Convert to Idea" : "Mark as bug")
                                         }
                                     </Button>
                                 </div>
@@ -938,12 +938,12 @@ const RoadMapSidebarSheet = ({
                                         className={`w-[100px] hover:bg-muted ${theme === "dark" ? "" : "border-muted-foreground text-muted-foreground"} text-sm font-semibold`}
                                         onClick={() => onChangeStatus(
                                             "is_archive",
-                                            selectedIdea.is_archive === 1 ? 0 : 1
+                                            selectedIdea?.is_archive === 1 ? 0 : 1
                                         )}
                                     >
                                         {
                                             isLoadingArchive ? <Loader2
-                                                className="h-4 w-4 animate-spin"/> : (selectedIdea.is_archive === 1 ? "Unarchive" : "Archive")
+                                                className="h-4 w-4 animate-spin"/> : (selectedIdea?.is_archive === 1 ? "Unarchive" : "Archive")
                                         }
                                     </Button>
                                 </div>
@@ -957,7 +957,7 @@ const RoadMapSidebarSheet = ({
                                         <div className={"py-6 px-8 flex flex-col gap-6 border-b"}>
                                             <div className="items-center gap-1.5">
                                                 <Label htmlFor="text">Title</Label>
-                                                <Input type="text" id="text" placeholder="" value={selectedIdea.title}
+                                                <Input type="text" id="text" placeholder="" value={selectedIdea?.title}
                                                        name={"title"} onChange={onChangeText}/>
                                                 {
                                                     formError.title &&
@@ -967,7 +967,7 @@ const RoadMapSidebarSheet = ({
                                             <div className="gap-1.5">
                                                 <Label htmlFor="message">Description</Label>
                                                 <Textarea placeholder="Start writing..." id="message"
-                                                          value={selectedIdea.description}
+                                                          value={selectedIdea?.description}
                                                           onChange={handleUpdate}
                                                 />
                                                 {formError.description &&
@@ -977,12 +977,12 @@ const RoadMapSidebarSheet = ({
                                         <div className={"py-6 px-8 border-b"}>
                                             <Label>Choose Topics for this Idea (optional)</Label>
                                             <Select onValueChange={handleChangeTopic}
-                                                    value={selectedIdea.topic.map(x => x.id)}>
+                                                    value={selectedIdea?.topic.map(x => x.id)}>
                                                 <SelectTrigger>
                                                     <SelectValue className={"text-muted-foreground text-sm"}
                                                                  placeholder="Assign to">
                                                         <div className={"flex flex-wrap gap-[2px]"}>
-                                                            {(selectedIdea.topic || []).map((x, index) => {
+                                                            {(selectedIdea?.topic || []).map((x, index) => {
                                                                 const findObj = (topicLists || []).find((y) => y.id === x?.id);
                                                                 return (
                                                                     <div key={index}
@@ -991,7 +991,7 @@ const RoadMapSidebarSheet = ({
                                                                     </div>
                                                                 );
                                                             })}
-                                                            {(selectedIdea.topic || []).length > 2 && <div>...</div>}
+                                                            {(selectedIdea?.topic || []).length > 2 && <div>...</div>}
                                                         </div>
                                                     </SelectValue>
                                                 </SelectTrigger>
@@ -1004,7 +1004,7 @@ const RoadMapSidebarSheet = ({
                                                                         <div className={"flex gap-2"}>
                                                                             <div onClick={() => handleChangeTopic(x.id)}
                                                                                  className="checkbox-icon">
-                                                                                {(selectedIdea.topic.map((x) => x.id) || []).includes(x.id) ?
+                                                                                {(selectedIdea?.topic.map((x) => x.id) || []).includes(x.id) ?
                                                                                     <Check size={18}/> : <div
                                                                                         className={"h-[18px] w-[18px]"}></div>}
                                                                             </div>
@@ -1052,11 +1052,11 @@ const RoadMapSidebarSheet = ({
                                                             <ArrowBigUp
                                                                 className={"fill-primary stroke-primary"}/>
                                                         </Button>
-                                                        <p className={"text-xl font-medium"}>{selectedIdea.vote}</p>
+                                                        <p className={"text-xl font-medium"}>{selectedIdea?.vote}</p>
                                                     </div>
                                                     <div className={"flex gap-2"}>
                                                         {
-                                                            selectedIdea.is_edit === 1 ?
+                                                            selectedIdea?.is_edit === 1 ?
                                                                 <Button
                                                                     variant={"outline"}
                                                                     className={"w-[30px] h-[30px] p-1"}
@@ -1069,9 +1069,9 @@ const RoadMapSidebarSheet = ({
                                                         <Button
                                                             variant={"outline"}
                                                             className={`w-[30px] h-[30px] p-1`}
-                                                            onClick={() => onChangeStatus("pin_to_top", selectedIdea.pin_to_top === 0 ? 1 : 0)}
+                                                            onClick={() => onChangeStatus("pin_to_top", selectedIdea?.pin_to_top === 0 ? 1 : 0)}
                                                         >
-                                                            {selectedIdea.pin_to_top == 0 ?
+                                                            {selectedIdea?.pin_to_top == 0 ?
                                                                 <Pin className={"w-[16px] h-[16px]"}/> :
                                                                 <Pin fill={"bg-card-foreground"}
                                                                      className={"w-[16px] h-[16px]"}/>}
@@ -1088,11 +1088,11 @@ const RoadMapSidebarSheet = ({
                                                 </div>
                                                 <div className={"flex flex-col gap-4"}>
                                                     <div className={"flex items-center gap-2"}>
-                                                        <h2 className={"text-xl font-medium"}>{selectedIdea.title}</h2>
+                                                        <h2 className={"text-xl font-medium"}>{selectedIdea?.title}</h2>
                                                     </div>
                                                     <div
                                                         className={"description-container text-sm text-muted-foreground"}>
-                                                        <ReadMoreText html={selectedIdea.description}/>
+                                                        <ReadMoreText html={selectedIdea?.description}/>
                                                     </div>
                                                 </div>
                                                 <div className={"flex items-center"}>
@@ -1100,29 +1100,29 @@ const RoadMapSidebarSheet = ({
                                                         <div className={"flex items-center gap-2"}>
                                                             <Avatar className={"w-[20px] h-[20px]"}>
                                                                 {
-                                                                    selectedIdea.user_photo ?
-                                                                        <AvatarImage src={selectedIdea.user_photo}
+                                                                    selectedIdea?.user_photo ?
+                                                                        <AvatarImage src={selectedIdea?.user_photo}
                                                                                      alt="@shadcn"/>
                                                                         :
-                                                                        <AvatarFallback>{selectedIdea && selectedIdea.name && selectedIdea.name.substring(0, 1)}</AvatarFallback>
+                                                                        <AvatarFallback>{selectedIdea && selectedIdea?.name && selectedIdea?.name.substring(0, 1)}</AvatarFallback>
                                                                 }
                                                             </Avatar>
                                                             <div className={"flex items-center"}>
-                                                                <h4 className={"text-sm font-medium"}>{selectedIdea.name}</h4>
+                                                                <h4 className={"text-sm font-medium"}>{selectedIdea?.name}</h4>
                                                                 <p className={"text-sm font-normal flex items-center text-muted-foreground"}>
                                                                     <Dot
                                                                         className={"fill-text-card-foreground stroke-text-card-foreground"}/>
-                                                                    {moment(selectedIdea.created_at).format('D MMM')}
+                                                                    {moment(selectedIdea?.created_at).format('D MMM')}
                                                                 </p>
                                                             </div>
                                                             {
-                                                                selectedIdea && selectedIdea.vote_list && selectedIdea.vote_list.length ?
+                                                                selectedIdea && selectedIdea?.vote_list && selectedIdea?.vote_list.length ?
                                                                     <Popover>
                                                                         <PopoverTrigger asChild>
                                                                             <Button variant="ghost hover-none"
                                                                                     className={"rounded-full p-0 h-[24px]"}>
                                                                                 {
-                                                                                    (selectedIdea.vote_list || []).map((x, i) => {
+                                                                                    (selectedIdea?.vote_list || []).map((x, i) => {
                                                                                         return (
                                                                                             <div className={"flex"}>
                                                                                                 <div
@@ -1142,7 +1142,7 @@ const RoadMapSidebarSheet = ({
                                                                                                 </div>
                                                                                                 <div
                                                                                                     className={"update-idea  text-sm rounded-full border text-center ml-[-5px]"}>
-                                                                                                    <Avatar><AvatarFallback>+{selectedIdea.vote_list.length - 2}</AvatarFallback></Avatar>
+                                                                                                    <Avatar><AvatarFallback>+{selectedIdea?.vote_list.length - 2}</AvatarFallback></Avatar>
                                                                                                 </div>
                                                                                             </div>
                                                                                         )
@@ -1154,12 +1154,12 @@ const RoadMapSidebarSheet = ({
                                                                             <div className="">
                                                                                 <div
                                                                                     className="space-y-2 px-4 py-[5px]">
-                                                                                    <h4 className="font-medium leading-none text-sm">{`Voters (${selectedIdea.vote})`}</h4>
+                                                                                    <h4 className="font-medium leading-none text-sm">{`Voters (${selectedIdea?.vote})`}</h4>
                                                                                 </div>
                                                                                 <div
                                                                                     className="border-t px-4 py-3 space-y-2">
                                                                                     {
-                                                                                        (selectedIdea.vote_list || []).map((x, i) => {
+                                                                                        (selectedIdea?.vote_list || []).map((x, i) => {
                                                                                             return (
                                                                                                 <div
                                                                                                     className={"flex gap-2"}>
@@ -1168,12 +1168,12 @@ const RoadMapSidebarSheet = ({
                                                                                                         <Avatar
                                                                                                             className={"w-[20px] h-[20px]"}>
                                                                                                             {
-                                                                                                                selectedIdea.user_photo ?
+                                                                                                                selectedIdea?.user_photo ?
                                                                                                                     <AvatarImage
-                                                                                                                        src={selectedIdea.user_photo}
+                                                                                                                        src={selectedIdea?.user_photo}
                                                                                                                         alt="@shadcn"/>
                                                                                                                     :
-                                                                                                                    <AvatarFallback>{selectedIdea && selectedIdea.name && selectedIdea.name.substring(0, 1)}</AvatarFallback>
+                                                                                                                    <AvatarFallback>{selectedIdea && selectedIdea?.name && selectedIdea?.name.substring(0, 1)}</AvatarFallback>
                                                                                                             }
                                                                                                         </Avatar>
                                                                                                     </div>
@@ -1191,7 +1191,7 @@ const RoadMapSidebarSheet = ({
                                                         </div>
                                                         <Select
                                                             onValueChange={(value) => onChangeStatus('roadmap_id', value)}
-                                                            value={selectedIdea.roadmap_id}
+                                                            value={selectedIdea?.roadmap_id}
                                                         >
                                                             <SelectTrigger className="w-[234px] h-[24px] px-3 py-1">
                                                                 <SelectValue/>
@@ -1224,10 +1224,10 @@ const RoadMapSidebarSheet = ({
                                                     </div>
                                                 </div>
                                                 {
-                                                    selectedIdea && selectedIdea.images ?
+                                                    selectedIdea && selectedIdea?.images ?
                                                         <div className={"flex gap-2"}>
                                                             {
-                                                                (selectedIdea.images || []).map((x, i) => {
+                                                                (selectedIdea?.images || []).map((x, i) => {
                                                                         return (
                                                                             <Fragment>
                                                                                 {
@@ -1373,8 +1373,8 @@ const RoadMapSidebarSheet = ({
                                                 <TabsContent value="comment"
                                                              className={`${theme === "dark" ? "" : "bg-muted"}`}>
                                                     {
-                                                        selectedIdea && selectedIdea.comments && selectedIdea.comments.length > 0 ?
-                                                            (selectedIdea.comments || []).map((x, i) => {
+                                                        selectedIdea && selectedIdea?.comments && selectedIdea?.comments.length > 0 ?
+                                                            (selectedIdea?.comments || []).map((x, i) => {
                                                                 return (
                                                                     <Fragment>
                                                                         <div
