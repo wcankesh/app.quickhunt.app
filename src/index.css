@@ -29,6 +29,7 @@
     --input: 214.3 31.8% 91.4%;
     --ring: 221.2 83.2% 53.3%;
     --radius: 0.5rem;
+    --border-color: #e5ebf2
   }
 
   .dark {
@@ -51,6 +52,7 @@
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 224.3 76.3% 48%;
+    --border-color: #192535
   }
 }
 
@@ -283,4 +285,86 @@ span.LinesEllipsis-ellipsis {
   object-position: center;
 }
 
+
+.board-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+}
+
+
+.react-kanban-board > :nth-child(1) > div {
+  width: 342px;
+}
+.react-kanban-column {
+  border-radius: 10px!important;
+  border: 1px solid!important;
+  border-color:  var(--border-color)!important;
+  background: var(--background)!important;
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)!important;
+
+  padding: 9px  !important;
+  padding-bottom: 56px!important;
+
+  position: relative;
+}
+.react-kanban-column .add-idea{
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  padding: 14px 12px;
+  border-top: 1px solid!important;
+  border-color:  var(--border-color)!important;
+  width: 100%;
+}
+.react-kanban-column>div:nth-child(2){    max-height: calc(100vh - 291px) !important;
+  overflow: auto;
+  display: block;
+  scrollbar-width: none;-ms-overflow-style: none;}
+
+.react-kanban-column>div:nth-child(2)::-webkit-scrollbar {
+  display: none;
+}
+
+
+.react-kanban-column > :nth-child(2) > div > div {
+  width: 100%;
+}
+/*.kanban-card {*/
+/*  width: 100%;*/
+/*  display: flex;*/
+/*  flex-direction: column;*/
+/*  border-radius: 10px !important;;*/
+/*  border: 1px solid!important;*/
+/*  border-color:  var(--border-color)!important;*/
+/*  background: var(--background);*/
+/*  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)!important;*/
+/*  padding: 9px!important;*/
+/*  gap:12px;*/
+/*  margin-top: 12px*/
+/*}*/
+
+.kanban-card > :nth-child(1) {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+
+.remove-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.column-header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  padding: 0px 8px;
+}
+
+.column-header > svg {
+  cursor: pointer;
+}
 

@@ -253,7 +253,7 @@ const AnnouncementsView = ({data,isLoading,setSelectedRecord,handleDelete,setAna
                     </div>
                     <Separator/>
                     {
-                      isLoading == true !=   <CardFooter className={"p-0"}>
+                      isLoading == true &&   <CardFooter className={"p-0"}>
                             <div className={`w-full p-5 ${theme === "dark" ? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end pe-16 py-15px`}>
                                 <div className={"flex flex-row gap-8 items-center"}>
                                     <div>
