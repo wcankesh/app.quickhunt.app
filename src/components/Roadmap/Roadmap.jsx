@@ -8,89 +8,18 @@ import {useSelector} from "react-redux";
 import {ApiService} from "../../utils/ApiService";
 import { Container, Draggable } from "react-smooth-dnd";
 import cloneDeep from "lodash.clonedeep"
-const roadMapCards = [
-    {
-        id: 1,
-        circleFill: "#64676B",
-        circleStroke: "#64676B",
-        statusTitle: "No Status (2)",
-        children: [
-            {
-                id: 1,
-                ideaTitle: "Welcome To Our Release Notes",
-                ideaTopic: "# Welcome 👋",
-                review: "5",
-            }
-        ],
-    },
-    {
-        id: 2,
-        circleFill: "#EB765D",
-        circleStroke: "#EB765D",
-        statusTitle: "Under consideration (1)",
-        children: [
-            {
-                id: 2,
-                ideaTitle: "Welcome To Our Release Notes",
-                ideaTopic: "# Welcome 👋",
-                review: "3",
-            }
-        ],
-    },
-    {
-        id: 3,
-        circleFill: "#6392D9",
-        circleStroke: "#6392D9",
-        statusTitle: "Planned (7)",
-        children: [
-            {
-                id: 3,
-                ideaTitle: "Welcome To Our Release Notes",
-                ideaTopic: "# Welcome 👋",
-                review: "9",
-            }
-        ],
-    },
-    {
-        id: 4,
-        circleFill: "#D96363",
-        circleStroke: "#D96363",
-        statusTitle: "In Development (4)",
-        children: [
-            {
-                id: 4,
-                ideaTitle: "Welcome To Our Release Notes",
-                ideaTopic: "# Welcome 👋",
-                review: "1",
-            }
-        ],
-    },
-    {
-        id: 5,
-        circleFill: "#63C8D9",
-        circleStroke: "#63C8D9",
-        statusTitle: "Shipped (6)",
-        children: [
-            {
-                id: 5,
-                ideaTitle: "Welcome To Our Release Notes",
-                ideaTopic: "# Welcome 👋",
-                review: "1",
-            }
-        ],
-    },
-]
+import CreateIdea from "../Ideas/CreateIdea";
 
 const Roadmap = () => {
     const { theme } = useTheme()
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const [isSheetOpen, setSheetOpen] = useState(false);
-    const [sheetType, setSheetType] = useState('');
-    const [statusCard, setStatusCard] = useState(roadMapCards);
+    const [isSheetOpenCreate, setSheetOpenCreate] = useState(false);
     const [noStatus, setNoStatus] = useState([])
     const [roadmapList, setRoadmapList] = useState([])
     const [selectedIdea, setSelectedIdea] = useState({});
     const [isUpdateIdea, setIsUpdateIdea] = useState(false);
+    const [oldSelectedIdea, setOldSelectedIdea] = useState({});
     const [isNoStatus, setIsNoStatus] = useState(false);
     const [ideasList, setIdeasList] = useState([]);
     const [selectedRoadmap, setSelectedRoadmap] = useState({});
@@ -102,18 +31,21 @@ const Roadmap = () => {
     const openSheet = () => setSheetOpen(true);
     const closeSheet = () => setSheetOpen(false);
 
-    const onType = (type) => {
-        setSheetType(type)
-        openSheet()
-    }
+    const openCreateIdea = () => setSheetOpenCreate(true);
+    const closeCreateIdea = () => setSheetOpenCreate(false);
 
-    const openDetailsSheet = () => {
-        setSheetType('viewDetails');
+    const openDetailsSheet = (mainRecord, record) => {
+        setIsUpdateIdea(true);
+        setIdeasList(mainRecord.ideas || []);
+        setSelectedIdea(record)
+        setSelectedRoadmap(mainRecord)
         openSheet();
     };
+
     useEffect(() => {
         getRoadmapIdea()
     }, [projectDetailsReducer.id])
+
     const getRoadmapIdea = async () => {
         setIsLoading(true)
         const payload = {
@@ -139,32 +71,11 @@ const Roadmap = () => {
         setIdeasList([]);
         setIsNoStatus(false)
     }
-
-    const onUpdateIdea = (mainRecord, record) => {
-        setIsUpdateIdea(true);
-        setIdeasList(mainRecord.ideas || []);
-        setSelectedIdea(record)
-        setSelectedRoadmap(mainRecord)
-    }
-
     const onCreateIdea = (mainRecord) => {
         setIsCreateIdea(true);
         setIdeasList(mainRecord.ideas || []);
         setSelectedRoadmap(mainRecord)
-    }
-
-    const onCreateIdeaNoStatus = () => {
-        setIsCreateIdea(true);
-        setIdeasList(noStatus);
-        setIsNoStatus(true);
-    }
-
-    const onUpdateIdeaNoStatus = (record) => {
-        setIsUpdateIdea(true);
-        setIsNoStatus(true);
-        setIdeasList(noStatus)
-        setSelectedIdea(record)
-        setSelectedIdea(record)
+        openCreateIdea()
     }
 
     const applyDrag = (arr, dragResult, columnId) => {
@@ -225,9 +136,40 @@ const Roadmap = () => {
     const getCardPayload = (columnId, index) => {
         return cloneDeep(roadmapList).filter((p) => p.id === columnId)[0].ideas[index];
     };
+
     return (
         <div className={"height-inherit h-svh overflow-scroll overflow-y-auto xl:container-secondary xl:max-w-[1605px] lg:container lg:max-w-[992px] md:container md:max-w-[768px] sm:container sm:max-w-[639px] xs:container xs:max-w-[475px] p-8"}>
-            <RoadMapSidebarSheet isOpen={isSheetOpen} onOpen={openSheet} onClose={closeSheet} sheetType={sheetType}/>
+            <RoadMapSidebarSheet
+                isOpen={isSheetOpen}
+                onOpen={openSheet}
+                onClose={closeSheet}
+
+                isRoadmap={false}
+                isUpdateIdea={isUpdateIdea}
+                setIsUpdateIdea={setIsUpdateIdea}
+                setIdeasList={setIdeasList}
+                ideasList={ideasList}
+                selectedIdea={selectedIdea}
+                setSelectedIdea={setSelectedIdea}
+                oldSelectedIdea={oldSelectedIdea}
+                setOldSelectedIdea={setOldSelectedIdea}
+                onUpdateIdeaClose={onUpdateIdeaClose}
+                isNoStatus={isNoStatus}
+                setIsNoStatus={setIsNoStatus}
+                setSelectedRoadmap={setSelectedRoadmap}
+                selectedRoadmap={selectedRoadmap}
+            />
+            <CreateIdea
+                isOpen={isSheetOpenCreate}
+                onOpen={openCreateIdea}
+                onClose={closeCreateIdea}
+
+                isRoadmap={false}
+                closeCreateIdea={closeCreateIdea}
+                setIdeasList={setIdeasList}
+                ideasList={ideasList}
+                isNoStatus={false}
+            />
             <div className={"pb-4"}><h1 className={"text-2xl font-medium"}>Roadmap</h1></div>
             <Container
                 orientation="horizontal"
@@ -240,7 +182,6 @@ const Roadmap = () => {
                 }}
             >
             <div className={"flex gap-[18px] items-start width-fit-content"}>
-
                 {(roadmapList || []).map((x, i) =>{
                     return(
                         <div key={i}>
@@ -271,10 +212,10 @@ const Roadmap = () => {
                                             dropPlaceholderAnimationDuration={200}
                                         >
 
-                                            {x.ideas.map((y, index) => {
+                                            {(x && x.ideas || []).map((y, index) => {
                                                 return(
                                                     <Draggable key={y.id}>
-                                                        <Card key={index} onClick={openDetailsSheet} className={"mb-3"}>
+                                                        <Card key={index} onClick={() => openDetailsSheet(x, y)} className={"mb-3 cursor-grab"}>
                                                             <CardHeader className={"flex-row gap-2 p-2 pb-3"}>
                                                                 <Button variant={"outline hover:transparent"} className={"text-sm font-medium border px-[9px] py-1 w-[28px] h-[28px]"}>{y.vote}</Button>
                                                                 <h3 className={"text-sm font-normal"}>{y.title}</h3>
@@ -303,7 +244,7 @@ const Roadmap = () => {
                                         <Button
                                             variant={"ghost hover:bg-transparent"}
                                             className={`gap-2 p-0 ${theme === "dark" ? "" : "text-muted-foreground"} text-sm font-semibold h-auto`}
-                                            onClick={() => onType('createNewRoadMapIdeas')}
+                                            onClick={() => onCreateIdea(x)}
                                         >
                                             <Plus className={"w-[20px] h-[20px]"} />Create Idea
                                         </Button>

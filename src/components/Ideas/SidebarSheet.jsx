@@ -1,19 +1,7 @@
 import React, {Fragment, useState, useRef, useEffect} from 'react';
 import {Sheet, SheetContent, SheetHeader,} from "../ui/sheet";
 import {Button} from "../ui/button";
-import {
-    ArrowBigDown,
-    ArrowBigUp, Check,
-    Circle,
-    CircleX,
-    Dot,
-    Loader2, MessageCircleMore,
-    Paperclip,
-    Pencil,
-    Pin,
-    Trash2,
-    X
-} from "lucide-react";
+import {ArrowBigUp, Check, Circle, CircleX, Dot, Loader2, MessageCircleMore, Paperclip, Pencil, Pin, Trash2, X} from "lucide-react";
 import {RadioGroup, RadioGroupItem} from "../ui/radio-group";
 import {Label} from "../ui/label";
 import {Input} from "../ui/input";
@@ -273,8 +261,7 @@ const SidebarSheet = ({
         let formData = new FormData();
         formData.append("cover_image", file);
         const data = await apiSerVice.updateIdea(formData, selectedIdea.id)
-        // if (data.status === 200) {
-        if (data.id) {
+        if (data.status === 200) {
             setSelectedIdea({...data.data})
             // setIdeasList(clone);
             setIsLoading(false)
@@ -334,8 +321,8 @@ const SidebarSheet = ({
         let formData = new FormData();
         formData.append(name, value);
         const data = await apiSerVice.updateIdea(formData, selectedIdea.id)
-        // if (data.status === 200) {
-        if (data.id) {
+        if (data.status === 200) {
+        // if (data.id) {
             let clone = [...ideasList];
             let index = clone.findIndex((x) => x.id === selectedIdea.id);
             if (index !== -1) {
@@ -664,8 +651,7 @@ const SidebarSheet = ({
         formData.append('description', selectedIdea.description?.trim() === '' ? "" : selectedIdea.description);
         formData.append('topic', topics.join(","));
         const data = await apiSerVice.updateIdea(formData, selectedIdea.id)
-        // if (data.status === 200) {
-        if (data.id) {
+        if (data.status === 200) {
             setSelectedIdea({...data.data})
             setOldSelectedIdea({...data.data})
             setIsEditIdea(false)
@@ -772,7 +758,7 @@ const SidebarSheet = ({
                                                             </div>
                                                             : ''}
                                                 </div> :
-<div>
+                                                <div>
 
                                                 <input
                                                     id="pictureInput"
@@ -1426,7 +1412,9 @@ const SidebarSheet = ({
                                                                                                 >
                                                                                                     Reply
                                                                                                 </Button>
-                                                                                                <div className={"flex items-center gap-2 cursor-pointer"}>
+                                                                                                <div className={"flex items-center gap-2 cursor-pointer"}
+                                                                                                     onClick={() => onShowSubComment(i)}
+                                                                                                >
                                                                                                     <span>
                                                                                                         <MessageCircleMore
                                                                                                             className={"stroke-primary w-[16px] h-[16px]"}/>
@@ -1648,7 +1636,7 @@ const SidebarSheet = ({
                                                                                                                 isSaveSubComment ?
                                                                                                                     <Loader2
                                                                                                                         size={16}
-                                                                                                                        className="animate-spin"/> : "Reply"
+                                                                                                                        className="animate-spin"/> : ""
                                                                                                             }
                                                                                                         </Button>
                                                                                                         <div

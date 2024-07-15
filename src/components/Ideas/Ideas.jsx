@@ -140,56 +140,123 @@ const Ideas = () => {
         openSheet();
     };
 
-    const handleChange = async (e) => {
+    // const handleChange = async (e) => {
+    //     let payload = {
+    //         ...filter,
+    //         project_id: projectDetailsReducer.id,
+    //         page: 1,
+    //         limit: perPageLimit,
+    //     };
+    //     if (e.name === "topic") {
+    //         payload.topic = e.value !== null ? [e.value] : [];
+    //     } else if (e.name === "roadmap") {
+    //         payload.roadmap = e.value !== null ? [e.value] : [];
+    //     }
+    //     if (e.name === "status" && e.value === "bugs") {
+    //         payload.bug = 1;
+    //         payload.archive = 0;
+    //         // payload.no_status = 0;
+    //         payload.all = 0;
+    //     } else if (e.name === "status" && e.value === "archived") {
+    //         payload.archive = 1;
+    //         payload.bug = 0;
+    //         // payload.no_status = 0;
+    //         payload.all = 0;
+    //     } /*else if (e.name === "status" && e.value === "nostatus") {
+    //         payload.archive = 0;
+    //         payload.bug = 0;
+    //         payload.no_status = 1;
+    //         payload.all = 0;
+    //     }*/ else if (e.name === "status" && e.value === null) {
+    //         payload.archive = 1;
+    //         payload.bug = 1;
+    //         // payload.no_status = 1;
+    //         payload.all = 1;
+    //     } else if(e.name === 'topic') {
+    //         if(e.value){
+    //             const clone = [...filter.topic];
+    //             const index = clone.findIndex(item => item === e.value);
+    //             if (index !== -1) {
+    //                 clone.splice(index, 1);
+    //             } else {
+    //                 clone.push(e.value);
+    //             }
+    //             payload.topic = clone
+    //         } else {
+    //             payload.topic = []
+    //         }
+    //     } else if(e.name === 'roadmap') {
+    //         if(e.value){
+    //             const clone = [...filter.roadmap];
+    //             const index = clone.findIndex(item => item === e.value);
+    //             if (index !== -1) {
+    //                 clone.splice(index, 1);
+    //             } else {
+    //                 clone.push(e.value);
+    //             }
+    //             payload.roadmap = clone
+    //         } else {
+    //             payload.roadmap = []
+    //         }
+    //     }
+    //     setFilter(payload);
+    //     ideaSearch(payload);
+    // };
+
+    const handleChange = (e) => {
         let payload = {
             ...filter,
             project_id: projectDetailsReducer.id,
             page: 1,
             limit: perPageLimit,
         };
+
         if (e.name === "topic") {
-            payload.topic = e.value !== null ? [e.value] : [];
-        } else if (e.name === "roadmap") {
-            payload.roadmap = e.value !== null ? [e.value] : [];
-        }
-        if (e.name === "status" && e.value === "bugs") {
-            payload.bug = 1;
-            payload.archive = 0;
-            // payload.no_status = 0;
-            payload.all = 0;
-        } else if (e.name === "status" && e.value === "archived") {
-            payload.archive = 1;
-            payload.bug = 0;
-            // payload.no_status = 0;
-            payload.all = 0;
-        } /*else if (e.name === "status" && e.value === "nostatus") {
-            payload.archive = 0;
-            payload.bug = 0;
-            payload.no_status = 1;
-            payload.all = 0;
-        }*/ else if (e.name === "status" && e.value === null) {
-            payload.archive = 1;
-            payload.bug = 1;
-            // payload.no_status = 1;
-            payload.all = 1;
-        } else if(e.name === 'topic') {
-            debugger
-            if(e.value){
-                const clone = [...filter.topic];
+            if (e.value !== null) {
+                const clone = [...payload.topic];
                 const index = clone.findIndex(item => item === e.value);
                 if (index !== -1) {
                     clone.splice(index, 1);
                 } else {
                     clone.push(e.value);
                 }
-                payload.topic = clone
+                payload.topic = clone;
             } else {
-                payload.topic = []
+                payload.topic = [];
+            }
+        } else if (e.name === "roadmap") {
+            if (e.value !== null) {
+                const clone = [...payload.roadmap];
+                const index = clone.findIndex(item => item === e.value);
+                if (index !== -1) {
+                    clone.splice(index, 1);
+                } else {
+                    clone.push(e.value);
+                }
+                payload.roadmap = clone;
+            } else {
+                payload.roadmap = [];
+            }
+        } else if (e.name === "status") {
+            if (e.value === "bugs") {
+                payload.bug = 1;
+                payload.archive = 0;
+                payload.all = 0;
+            } else if (e.value === "archived") {
+                payload.archive = 1;
+                payload.bug = 0;
+                payload.all = 0;
+            } else if (e.value === null) {
+                payload.archive = 1;
+                payload.bug = 1;
+                payload.all = 1;
             }
         }
+
         setFilter(payload);
         ideaSearch(payload);
     };
+
 
     const giveVote = async (record, type) => {
         if (record.is_edit !== 1) {
@@ -244,34 +311,38 @@ const Ideas = () => {
         }
     };
 
-    const updateIdeaStatus = async (id, name, value, index) => {
-        const formData = new FormData();
-        formData.append(name, value);
-
-        const data = await apiSerVice.updateIdea(formData, id);
-        // if (data.status === 200) {
-        if (data.id) {
-            const clone = [...ideasList];
-            clone[index] = data.data;
-            setIdeasList(clone);
-            toast({ description: "Idea status updated successfully" });
-        } else {
-            toast({ variant: "destructive", description: "Failed to update idea status" });
-        }
-    };
-
     const handleRoadmapUpdate = async (name, value, index, record) => {
         let formData = new FormData();
         formData.append(name, value);
         const data = await apiSerVice.updateIdea(formData, record.id);
-        // if (data.status === 200) {
-        if (data?.id) {
+        if (data.status === 200) {
+        // if (data?.id) {
             let clone = [...ideasList]
             clone[index].roadmap_id = value
             setIdeasList(clone);
             toast({description: "Roadmap status updated successfully"});
         } else {
             toast({variant: "destructive", description: "Failed to update roadmap status"});
+        }
+    };
+
+    const handleStatusUpdate = async (id, name, value, index, record) => {
+        const formData = new FormData();
+        formData.append(name, value);
+
+        const data = await apiSerVice.updateIdea(formData, id, record.id);
+        if (data.status === 200) {
+        // if (data?.id) {
+            const clone = [...ideasList];
+            if (name === "is_archive" || name === "is_active") {
+                clone[index][name] = value;
+            } else if (name === "roadmap_id") {
+                clone[index].roadmap_id = value;
+            }
+            setIdeasList(clone);
+            toast({ description: `${name.replace('_', ' ')} status updated successfully` });
+        } else {
+            toast({ variant: "destructive", description: `Failed to update ${name.replace('_', ' ')} status` });
         }
     };
 
@@ -367,7 +438,7 @@ const Ideas = () => {
                                     <SelectGroup>
                                         <SelectItem value={null}>
                                             <div className={"flex items-center gap-2"}>
-                                                {filter.topic.length === 0 ? "All Topics" : ""}
+                                               All Status
                                             </div>
                                         </SelectItem>
                                         {
@@ -382,8 +453,8 @@ const Ideas = () => {
                             </Select>
                             <Select onValueChange={(selectedItems) => handleChange({name: "topic", value: selectedItems})} value={filter.topic.map(x => x)}>
                                 <SelectTrigger className="w-[193px] bg-card">
-                                    <SelectValue className={"text-muted-foreground text-sm"} placeholder="Assign to">
-                                        <div className={"flex flex-wrap gap-[2px]"}>
+                                    <SelectValue className={"text-muted-foreground text-sm"} placeholder={filter.topic.length === 0 ? "All Topics" : ""}>
+                                        <div className={"flex gap-[2px]"}>
                                             {(filter.topic || []).map((x, index) => {
                                                 const findObj = (topicLists || []).find((y) => y.id === x);
                                                 return (
@@ -423,12 +494,24 @@ const Ideas = () => {
                                     </SelectGroup>
                                 </SelectContent>
                             </Select>
-                            <Select onValueChange={(selectedItems) => handleChange({
-                                name: "roadmap",
-                                value: selectedItems
-                            })}>
+                            <Select onValueChange={(selectedItems) => handleChange({name: "roadmap", value: selectedItems})} value={filter.roadmap.map(x => x)}>
                                 <SelectTrigger className="w-[262px] bg-card">
-                                    <SelectValue placeholder="Filter by roadmap status"/>
+                                    <SelectValue className={"text-muted-foreground text-sm"} placeholder={filter.roadmap.length === 0 ? "All Roadmap" : "Filter by roadmap status"}>
+                                        <div className={"flex gap-[2px]"}>
+                                            {(filter.roadmap || []).map((x, index) => {
+                                                const findObj = (roadmapStatus || []).find((y) => y.id === x);
+                                                return (
+                                                    <div key={index}
+                                                         className={"text-xs flex gap-[5px] bg-slate-300 items-center rounded py-0 px-2"}>
+                                                        <Circle fill={findObj.color_code} stroke={findObj.color_code}
+                                                                className={` w-[10px] h-[10px]`}/>
+                                                        {findObj?.title}
+                                                    </div>
+                                                );
+                                            })}
+                                            {(filter.roadmap || []).length > 2 && <div>...</div>}
+                                        </div>
+                                    </SelectValue>
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectGroup>
@@ -440,11 +523,18 @@ const Ideas = () => {
                                         {
                                             (roadmapStatus || []).map((x, i) => {
                                                 return (
-                                                    <SelectItem key={i} value={x.id}>
-                                                        <div className={"flex items-center gap-2"}>
+                                                    <SelectItem className={""} key={i} value={x.id}>
+                                                        <div className={"flex gap-2"}>
+                                                            <div onClick={() => handleChange({name: "roadmap", value: x.id})} className="checkbox-icon">
+                                                                {(filter.roadmap.map((x) => x) || []).includes(x.id) ?
+                                                                    <Check size={18}/> : <div
+                                                                        className={"h-[18px] w-[18px]"}></div>}
+                                                            </div>
+                                                            <div className={"flex items-center gap-2"}>
                                                             <Circle fill={x.color_code} stroke={x.color_code}
                                                                     className={` w-[10px] h-[10px]`}/>
-                                                            {x.title}
+                                                            <span>{x.title ? x.title : ""}</span>
+                                                            </div>
                                                         </div>
                                                     </SelectItem>
                                                 )
@@ -504,7 +594,7 @@ const Ideas = () => {
                                                                             </Badge>
                                                                         }
                                                                         {
-                                                                            x?.is_archive ==  1 && <Badge
+                                                                            x.is_archive ==  1 && <Badge
                                                                                 variant={"outline"}
                                                                                 className={`border border-green-500 text-green-500 bg-green-100
                                                                            `}
@@ -521,10 +611,10 @@ const Ideas = () => {
                                                                             </DropdownMenuTrigger>
                                                                             <DropdownMenuContent>
                                                                                 <DropdownMenuItem className={"cursor-pointer"} onClick={() => openDetailsSheet(x)}>Edit</DropdownMenuItem>
-                                                                                <DropdownMenuItem className={"cursor-pointer"} onClick={() => updateIdeaStatus(x.id, "is_archive", x.is_archive == 1 ? 0 : 1, i)}>
+                                                                                <DropdownMenuItem className={"cursor-pointer"} onClick={() => handleStatusUpdate(x.id, "is_archive", x.is_archive == 1 ? 0 : 1, i)}>
                                                                                     {x?.is_archive === 1 ? "Unarchive" : "Archive"}
                                                                                 </DropdownMenuItem>
-                                                                                <DropdownMenuItem className={"cursor-pointer"} onClick={() => updateIdeaStatus(x.id, "is_active",  x.is_active == 0 ? 1 : 0, i)}>
+                                                                                <DropdownMenuItem className={"cursor-pointer"} onClick={() => handleStatusUpdate(x.id, "is_active",  x.is_active === 1 ? 0 : 1, i)}>
                                                                                     {x.is_active === 0 ? "Convert to Idea" : "Mark as bug"}
                                                                                 </DropdownMenuItem>
                                                                                 <DropdownMenuItem className={"cursor-pointer"} onClick={() => deleteIdea(x)}>Delete</DropdownMenuItem>
@@ -543,15 +633,13 @@ const Ideas = () => {
                                                                         (x.topic || []).map((y, i) => {
                                                                             return (
                                                                                 <div className={"text-sm font-medium"}
-                                                                                     key={i}> {y.title}</div>
+                                                                                     key={i}> {y?.title}</div>
                                                                             )
                                                                         })
                                                                     }
                                                                 </div>
                                                                 <div className={"flex items-center gap-8"}>
-                                                                    <Select
-                                                                        onValueChange={(value) => handleRoadmapUpdate("roadmap_id", value, i, x)}
-                                                                        value={x.roadmap_id}>
+                                                                    <Select onValueChange={(value) => handleRoadmapUpdate("roadmap_id", value, i, x)} value={x.roadmap_id}>
                                                                         <SelectTrigger className="w-[291px] bg-card">
                                                                             <SelectValue/>
                                                                         </SelectTrigger>
