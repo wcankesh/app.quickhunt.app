@@ -118,6 +118,12 @@ const CreateIdea = ({
         console.log("selectedRoadmap", selectedRoadmap)
         const data = await apiSerVice.createIdea(formData)
         if(data.status === 200){
+
+            // let cloneRoadmap = [...roadmapList.columns];
+            // const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap?.id);
+            // const addIdea = [data.data].concat(cloneRoadmap)
+            // setRoadmapList(addIdea)
+
             const clone = [...ideasList];
             const newArray = [data.data].concat(clone)
             setIdeasList(newArray);

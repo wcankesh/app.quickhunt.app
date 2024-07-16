@@ -1,4 +1,4 @@
-import React, {Fragment, useState, useRef, useEffect} from 'react';
+import React, {Fragment, useState, useEffect} from 'react';
 import {Sheet, SheetContent, SheetHeader,} from "../ui/sheet";
 import {Button} from "../ui/button";
 import {ArrowBigUp, Check, Circle, CircleX, Dot, Loader2, MessageCircleMore, Paperclip, Pencil, Pin, Trash2, X} from "lucide-react";
@@ -15,13 +15,10 @@ import {Tabs, TabsContent, TabsList, TabsTrigger} from "../ui/tabs";
 import {useTheme} from "../theme-provider";
 import {Card} from "../ui/card";
 import {useToast} from "../ui/use-toast";
-import {useNavigate} from "react-router";
 import {ApiService} from "../../utils/ApiService";
 import {useSelector} from "react-redux";
 import ReadMoreText from "../Comman/ReadMoreText";
 import moment from "moment";
-
-const initialStateTopic = {topic: []}
 
 const initialStateError = {
     title: "",
@@ -32,36 +29,24 @@ const RoadMapSidebarSheet = ({
                                  isOpen,
                                  onOpen,
                                  onClose,
+                                 isUpdateIdea,
+                                 setIsUpdateIdea,
                                  selectedIdea,
                                  setSelectedIdea,
-                                 ideasList,
-                                 setIdeasList,
-                                 isRoadmap,
+                                 onUpdateIdeaClose,
+                                 setSelectedRoadmap,
                                  selectedRoadmap,
                                  roadmapList,
                                  setRoadmapList,
-                                 isNoStatus,
-                                 setNoStatus,
-                                 setOldSelectedIdea,
-                                 oldSelectedIdea,
-                                 setIsNoStatus,
-                                 setSelectedRoadmap,
-                                 setIsUpdateIdea
                              }) => {
     const {theme} = useTheme()
     let apiSerVice = new ApiService();
     const {toast} = useToast()
-    // const [selectedFile, setSelectedFile] = useState(null);
-    // const [imagePreview, setImagePreview] = useState(null)
-
-    const [selectedFiles, setSelectedFiles] = useState([]);
-    const [imagePreviews, setImagePreviews] = useState([]);
 
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const [isLoading, setIsLoading] = useState(false);
     const [isLoadingCreateIdea, setIsLoadingCreateIdea] = useState(false);
-    const [isLoadingArchive, setIsLoadingArchive] = useState(false);
     const [isLoadingSidebar, setIsLoadingSidebar] = useState('');
     const [topicLists, setTopicLists] = useState([]);
     const [description, setDescription] = useState("");
@@ -118,37 +103,33 @@ const RoadMapSidebarSheet = ({
 
                 const data = await apiSerVice.giveVote(payload);
                 if (data.status === 200) {
-                    const clone = [...ideasList];
-                    const index = clone.findIndex((x) => x.id === selectedIdea?.id)
-                    if (index !== -1) {
-                        let newVoteCount = clone[index].vote;
-                        newVoteCount = type === 1 ? newVoteCount + 1 : newVoteCount >= 1 ? newVoteCount - 1 : 0;
-                        clone[index].vote = newVoteCount;
-                        clone[index].user_vote = type;
-                        let vote_list = [...clone[index].vote_list];
-                        if (type === 1) {
-                            vote_list.push(data.data)
-                            clone[index].vote_list = vote_list;
-                        } else {
-                            let voteIndex = vote_list.findIndex((x) => x.name === data.data.name);
-                            if (voteIndex !== -1) {
-                                vote_list.splice(voteIndex, 1)
+                    let cloneRoadmap = [...roadmapList.columns];
+                    const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap.id);
+                    if(roadmapIndex !== -1){
+                        const clone = [...cloneRoadmap[roadmapIndex].ideas];
+                        const index = clone.findIndex((x) => x.id === selectedIdea?.id)
+                        if (index !== -1) {
+                            let newVoteCount = clone[index].vote;
+                            newVoteCount = type === 1 ? newVoteCount + 1 : newVoteCount >= 1 ? newVoteCount - 1 : 0;
+                            clone[index].vote = newVoteCount;
+                            clone[index].user_vote = type;
+                            let vote_list = [...clone[index].vote_list];
+                            if (type === 1) {
+                                vote_list.push(data.data)
                                 clone[index].vote_list = vote_list;
+                            } else {
+                                let voteIndex = vote_list.findIndex((x) => x.name === data.data.name);
+                                if (voteIndex !== -1) {
+                                    vote_list.splice(voteIndex, 1)
+                                    clone[index].vote_list = vote_list;
+                                }
                             }
-                        }
-                        setIdeasList(clone);
-                        if (isRoadmap) {
-                            const cloneRoadmap = [...roadmapList]
-                            const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap.id);
-                            if (roadmapIndex !== -1) {
-                                cloneRoadmap[roadmapIndex].ideas = clone
-                                setRoadmapList(cloneRoadmap);
-                            }
-                            if (isNoStatus) {
-                                setNoStatus(clone)
-                            }
+                            cloneRoadmap[roadmapIndex] = {...cloneRoadmap[roadmapIndex], ideas: clone, cards: clone};
+
                         }
                     }
+                    setRoadmapList({columns: cloneRoadmap})
+
                     toast({description: 'Vote successfully'})
                 } else {
                     toast({description: data.error})
@@ -180,32 +161,28 @@ const RoadMapSidebarSheet = ({
         formData.append('feature_idea_id', selectedIdea?.id);
         formData.append('reply_id', '');
         const data = await apiSerVice.createComment(formData)
+
         if (data.status === 200) {
-            const clone = selectedIdea && selectedIdea?.comments ? [...selectedIdea?.comments] : [];
-            clone.push(data.data)
-            let obj = {...selectedIdea, comments: clone}
-            setSelectedIdea(obj)
-            let index = ideasList.findIndex((x) => x.id === selectedIdea?.id)
-            const cloneIdea = [...ideasList];
-            if (index !== -1) {
-                cloneIdea[index] = obj;
-                setIdeasList(cloneIdea)
-                if (isRoadmap) {
-                    const cloneRoadmap = [...roadmapList]
-                    const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap.id);
-                    if (roadmapIndex !== -1) {
-                        cloneRoadmap[roadmapIndex].ideas = cloneIdea
-                        setRoadmapList(cloneRoadmap);
-                    }
-                    if (isNoStatus) {
-                        setNoStatus(cloneIdea)
-                    }
+            setIsSaveComment(false)
+            let cloneRoadmap = [...roadmapList.columns];
+            const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap?.id);
+            if(roadmapIndex !== -1){
+                const ideaIndex = cloneRoadmap[roadmapIndex].ideas.findIndex((x) => x.id === selectedIdea?.id);
+                if(ideaIndex !== -1){
+                    let cloneIdeas = [cloneRoadmap[roadmapIndex].ideas];
+                    let cloneIdea = {...cloneRoadmap[roadmapIndex].ideas[ideaIndex]};
+                    const cloneComments = cloneIdea && cloneIdea?.comments ?[...cloneIdea?.comments] :[];
+                    cloneComments.push(data.data);
+                    cloneIdea = {...cloneIdea,comments: cloneComments};
+                    cloneIdeas[ideaIndex] = cloneIdea;
+                    setSelectedIdea(cloneIdea);
+                     cloneRoadmap[roadmapIndex] = {...cloneRoadmap[roadmapIndex], ideas:cloneIdeas, cards: cloneIdeas}
                 }
             }
+            setRoadmapList({columns: cloneRoadmap});
             toast({description: 'Comment create successfully'})
             setCommentText('');
             setCommentFiles([])
-            setIsSaveComment(false)
         } else {
             setIsSaveComment(false)
             toast({description: data.error})
@@ -229,27 +206,26 @@ const RoadMapSidebarSheet = ({
         formData.append('reply_id', record.id);
         const data = await apiSerVice.createComment(formData)
         if (data.status === 200) {
-            const clone = [...selectedIdea?.comments];
-            clone[index].reply.push(data.data)
-            let obj = {...selectedIdea, comments: clone};
-            setSelectedIdea(obj);
-            let indexIdea = ideasList.findIndex((x) => x.id === selectedIdea?.id);
-            const cloneIdea = [...ideasList];
-            if (indexIdea !== -1) {
-                cloneIdea[indexIdea] = obj;
-                setIdeasList(cloneIdea);
-                if (isRoadmap) {
-                    const cloneRoadmap = [...roadmapList]
-                    const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap.id);
-                    if (roadmapIndex !== -1) {
-                        cloneRoadmap[roadmapIndex].ideas = cloneIdea
-                        setRoadmapList(cloneRoadmap);
-                    }
-                    if (isNoStatus) {
-                        setNoStatus(cloneIdea)
-                    }
+
+            let cloneRoadmap = [...roadmapList.columns];
+            const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap?.id);
+            if(roadmapIndex !== -1){
+                const ideaIndex = cloneRoadmap[roadmapIndex].ideas.findIndex((x) => x.id === selectedIdea?.id);
+
+                if(ideaIndex !== -1){
+                    let cloneIdeas = [cloneRoadmap[roadmapIndex].ideas];
+                    let cloneIdea = {...cloneRoadmap[roadmapIndex].ideas[ideaIndex]};
+                    const cloneComments = cloneIdea && cloneIdea?.comments ? [...cloneIdea?.comments] : [];
+                    const cloneSubComment = [...cloneComments[index]?.reply] || [];
+                    cloneSubComment.push(data.data)
+                    cloneComments[index]["reply"] = cloneSubComment;
+                    cloneIdea = {...cloneIdea,comments: cloneComments};
+                    cloneIdeas[ideaIndex] = cloneIdea;
+                    setSelectedIdea(cloneIdea)
+                    cloneRoadmap[roadmapIndex] = {...cloneRoadmap[roadmapIndex], ideas: cloneIdeas, cards: cloneIdeas}
                 }
             }
+            setRoadmapList({columns: cloneRoadmap});
             setSubCommentText('');
             setSubCommentFiles([])
             setIsSaveSubComment(false)
@@ -267,7 +243,15 @@ const RoadMapSidebarSheet = ({
         formData.append("cover_image", file);
         const data = await apiSerVice.updateIdea(formData, selectedIdea?.id)
         if (data.status === 200) {
-            setSelectedIdea({...data.data})
+            let cloneRoadmap = [...roadmapList.columns];
+            const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap?.id);
+            if(roadmapIndex !== -1) {
+                let clone = [...cloneRoadmap[roadmapIndex].ideas];
+                const ideaIndex = clone.findIndex((x) => x.id === selectedIdea?.id)
+                clone[ideaIndex] = data.data
+                cloneRoadmap[roadmapIndex] = {...cloneRoadmap[roadmapIndex], ideas: clone, cards: clone};
+            }
+            setRoadmapList({columns: cloneRoadmap})
             setIsLoading(false)
             setIsEditIdea(false)
             toast({description: "Idea Update successfully"})
@@ -315,82 +299,64 @@ const RoadMapSidebarSheet = ({
     }
 
     const onChangeStatus = async (name, value) => {
-        // if (name === "is_active") {
-        //     setIsLoading(true)
-        // } else if (name === "is_archive") {
-        //     setIsLoadingArchive(true)
-        // }
         setIsLoadingSidebar(name);
         setSelectedIdea({...selectedIdea, [name]: value})
         let formData = new FormData();
         formData.append(name, value);
-        console.log(name, value);
         const data = await apiSerVice.updateIdea(formData, selectedIdea?.id)
         if (data.status === 200) {
-            let clone = [...ideasList];
-            let index = clone.findIndex((x) => x.id === selectedIdea?.id);
-            if (index !== -1) {
-                if (name === "pin_to_top" && value == 1) {
-                    clone.splice(index, 1)
-                    clone.unshift(data.data)
-                } else {
-                    clone[index] = {...data.data,};
-                }
-                if(isRoadmap){
-                    const cloneRoadmap = [...roadmapList]
-                    const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap.id);
-                    if(name === "roadmap_id"){
-                        if(isNoStatus){
-                            let ideaIndex = clone.findIndex((x) => x.id === selectedIdea?.id);
-                            if(ideaIndex !== -1) {
-                                let ideaObj = clone[ideaIndex]
-                                const roadmapIndexChange = cloneRoadmap.findIndex((x) => x.id == value);
-                                const cloneRoadmapIdeas = [...cloneRoadmap[roadmapIndexChange].ideas]
-                                cloneRoadmapIdeas.push(ideaObj)
-                                cloneRoadmap[roadmapIndexChange].ideas = cloneRoadmapIdeas
-                                clone.splice(ideaIndex, 1)
-                                setRoadmapList(cloneRoadmap);
-                                setNoStatus(clone);
-                            }
+            let cloneRoadmap = [...roadmapList.columns];
+            const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap?.id);
+            if(roadmapIndex !== -1){
+                const ideaIndex = cloneRoadmap[roadmapIndex].ideas.findIndex((x) => x.id === selectedIdea?.id);
+                let cloneIdeas = [...cloneRoadmap[roadmapIndex].ideas];
+                if(name === "pin_to_top"){
+                    if(ideaIndex !== -1){
+                        const obj = data.data
+                        if(value == 1){
+                            cloneIdeas.splice(ideaIndex, 1)
+                            cloneIdeas.unshift(obj)
                         } else {
-                            if(roadmapIndex !== -1){
-                                let cloneIdea = [...cloneRoadmap[roadmapIndex].ideas];
-                                let ideaIndex = cloneIdea.findIndex((x) => x.id === selectedIdea?.id);
-                                if(ideaIndex !== -1){
-                                    let ideaObj = cloneIdea[ideaIndex]
-                                    const roadmapIndexChange = cloneRoadmap.findIndex((x) => x.id == value);
-                                    const cloneRoadmapIdeas = [...cloneRoadmap[roadmapIndexChange].ideas]
-                                    cloneRoadmapIdeas.push(ideaObj);
-                                    cloneIdea.splice(ideaIndex, 1);
-                                    cloneRoadmap[roadmapIndexChange].ideas = cloneRoadmapIdeas
-                                    cloneRoadmap[roadmapIndex].ideas = cloneIdea
-                                    setRoadmapList(cloneRoadmap);
-                                }
-                            }
+                            cloneIdeas[ideaIndex] =  obj
                         }
-                    } else {
-                        if(roadmapIndex !== -1){
-                            cloneRoadmap[roadmapIndex].ideas = clone
-                            setRoadmapList(cloneRoadmap);
-                        }
+                        setSelectedIdea(data.data)
+                        cloneRoadmap[roadmapIndex] = {...cloneRoadmap[roadmapIndex], ideas: cloneIdeas, cards: cloneIdeas}
                     }
+                } else if(name === "roadmap_id"){
+                    const oldIdeaIndex =  cloneRoadmap[roadmapIndex].ideas.findIndex((x) => x.id === selectedIdea?.id);
+                    const oldRoadmapIndex =  roadmapIndex;
+                    const newRoadmapIndex =  cloneRoadmap.findIndex((x) => x.id == value);
+                    if(oldIdeaIndex !== -1){
+                        let cloneOldIdeas = [...cloneRoadmap[oldRoadmapIndex].ideas];
+                        cloneOldIdeas.splice(oldIdeaIndex, 1)
+                        cloneRoadmap[oldRoadmapIndex] = {...cloneRoadmap[oldRoadmapIndex], ideas: cloneOldIdeas, cards: cloneOldIdeas}
+                    }
+                    if(newRoadmapIndex !== -1){
+                        let cloneIdeas = [...cloneRoadmap[newRoadmapIndex].ideas];
+                        const obj = data.data
+                        cloneIdeas.push(obj)
+                        cloneRoadmap[newRoadmapIndex] = {...cloneRoadmap[newRoadmapIndex], ideas: cloneIdeas, cards: cloneIdeas}
+                        setSelectedRoadmap(cloneRoadmap[newRoadmapIndex]);
+                        setSelectedIdea(obj)
+                    }
+
+                } else {
+                    cloneIdeas[ideaIndex] =  {...data.data,}
+                    cloneRoadmap[roadmapIndex] = {...cloneRoadmap[roadmapIndex], ideas: cloneIdeas, cards: cloneIdeas}
                 }
+
             }
-            setSelectedIdea({
-                ...data.data,
-                roadmap_color: data.data.roadmap_color,
-                roadmap_id: data.data.roadmap_id,
-                roadmap_title: data.data.roadmap_title
-            })
-            setIdeasList(clone);
+            setRoadmapList({columns: cloneRoadmap});
+
+
             setIsLoading(false)
-            setIsLoadingArchive(false)
+
             setIsEditIdea(false)
             setIsLoadingSidebar('');
             toast({description: "Idea Update successfully"})
         } else {
             setIsLoading(false)
-            setIsLoadingArchive(false)
+
             setIsLoadingSidebar('');
             toast({variant: "destructive", description: data.error})
         }
@@ -468,28 +434,23 @@ const RoadMapSidebarSheet = ({
         formData.append('id', selectedComment.id);
         const data = await apiSerVice.updateComment(formData)
         if (data.status === 200) {
-            let obj = {...selectedComment, images: data.data.images}
-            const cloneComment = [...selectedIdea?.comments];
-            cloneComment[selectedCommentIndex] = obj;
-            let selectedIdeaObj = {...selectedIdea, comments: cloneComment}
-            setSelectedIdea(selectedIdeaObj)
-            const index = ideasList.findIndex((x) => x.id === selectedIdea?.id)
-            if (index !== -1) {
-                const cloneIdea = [...ideasList];
-                cloneIdea[index] = selectedIdeaObj;
-                setIdeasList(cloneIdea)
-                if (isRoadmap) {
-                    const cloneRoadmap = [...roadmapList]
-                    const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap.id);
-                    if (roadmapIndex !== -1) {
-                        cloneRoadmap[roadmapIndex].ideas = cloneIdea
-                        setRoadmapList(cloneRoadmap);
-                    }
-                    if (isNoStatus) {
-                        setNoStatus(cloneIdea)
-                    }
+            let cloneRoadmap = [...roadmapList.columns];
+            const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap?.id);
+            if(roadmapIndex !== -1){
+                const ideaIndex = cloneRoadmap[roadmapIndex].ideas.findIndex((x) => x.id === selectedIdea?.id);
+                if(ideaIndex !== -1){
+                    let cloneIdeas = [cloneRoadmap[roadmapIndex].ideas];
+                    let cloneIdea = {...cloneRoadmap[roadmapIndex].ideas[ideaIndex]};
+                    const cloneComments = cloneIdea && cloneIdea?.comments ? [...cloneIdea?.comments] : [];
+                    let obj = {...selectedComment, images: data.data.images}
+                    cloneComments[selectedCommentIndex] = obj;
+                    cloneIdea = {...cloneIdea,comments: cloneComments};
+                    cloneIdeas[ideaIndex] = cloneIdea;
+                    setSelectedIdea(cloneIdea);
+                    cloneRoadmap[roadmapIndex] = {...cloneRoadmap[roadmapIndex], ideas: cloneIdeas, cards: cloneIdeas}
                 }
             }
+            setRoadmapList({columns: cloneRoadmap})
             setSelectedCommentIndex(null)
             setSelectedComment(null);
             setIsEditComment(false)
@@ -517,30 +478,24 @@ const RoadMapSidebarSheet = ({
         formData.append('id', selectedSubComment.id);
         const data = await apiSerVice.updateComment(formData)
         if (data.status === 200) {
-            const ideaIndex = ideasList.findIndex((x) => x.id === selectedIdea?.id)
-            const commentIndex = ((selectedIdea?.comments) || []).findIndex((x) => x.id === selectedComment.id);
-            if (commentIndex !== -1) {
-                const cloneComment = [...selectedIdea?.comments];
-                cloneComment[commentIndex].reply[selectedSubCommentIndex] = data.data;
-                let selectedIdeaObj = {...selectedIdea, comments: cloneComment}
-                setSelectedIdea(selectedIdeaObj)
-                if (ideaIndex !== -1) {
-                    const cloneIdea = [...ideasList];
-                    cloneIdea[ideaIndex] = selectedIdeaObj;
-                    setIdeasList(cloneIdea)
-                    if (isRoadmap) {
-                        const cloneRoadmap = [...roadmapList]
-                        const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap.id);
-                        if (roadmapIndex !== -1) {
-                            cloneRoadmap[roadmapIndex].ideas = cloneIdea
-                            setRoadmapList(cloneRoadmap);
-                        }
-                        if (isNoStatus) {
-                            setNoStatus(cloneIdea)
-                        }
-                    }
+            let cloneRoadmap = [...roadmapList.columns];
+            const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap.id);
+            if(roadmapIndex !== -1){
+                const ideaIndex = cloneRoadmap[roadmapIndex].ideas.findIndex((x) => x.id === selectedIdea.id);
+                if(ideaIndex !== -1){
+                    let cloneIdeas = [cloneRoadmap[roadmapIndex].ideas];
+                    let cloneIdea = {...cloneRoadmap[roadmapIndex].ideas[ideaIndex]};
+                    const cloneComments = cloneIdea && cloneIdea?.comments ? [...cloneIdea?.comments] : [];
+                    const cloneSubComment = [...cloneComments[selectedCommentIndex]?.reply] || [];
+                    cloneSubComment[selectedSubCommentIndex] = data.data;
+                    cloneComments[selectedCommentIndex]["reply"] = cloneSubComment;
+                    cloneIdea = {...cloneIdea,comments: cloneComments};
+                    cloneIdeas[ideaIndex] = cloneIdea;
+                    setSelectedIdea(cloneIdea)
+                    cloneRoadmap[roadmapIndex] = {...cloneRoadmap[roadmapIndex], ideas: cloneIdeas, cards: cloneIdeas}
                 }
             }
+            setRoadmapList({columns: cloneRoadmap})
             setSelectedCommentIndex(null)
             setSelectedComment(null);
             setSelectedSubComment(null);
@@ -557,27 +512,22 @@ const RoadMapSidebarSheet = ({
     const deleteComment = async (id, indexs) => {
         const data = await apiSerVice.deleteComment({id: id})
         if (data.status === 200) {
-            const cloneComment = [...selectedIdea?.comments];
-            cloneComment.splice(indexs, 1);
-            let selectedIdeaObj = {...selectedIdea, comments: cloneComment};
-            setSelectedIdea(selectedIdeaObj)
-            const index = ideasList.findIndex((x) => x.id === selectedIdea?.id)
-            if (index !== -1) {
-                const cloneIdea = [...ideasList];
-                cloneIdea[index] = selectedIdeaObj;
-                setIdeasList(cloneIdea)
-                if (isRoadmap) {
-                    const cloneRoadmap = [...roadmapList]
-                    const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap.id);
-                    if (roadmapIndex !== -1) {
-                        cloneRoadmap[roadmapIndex].ideas = cloneIdea
-                        setRoadmapList(cloneRoadmap);
-                    }
-                    if (isNoStatus) {
-                        setNoStatus(cloneIdea)
-                    }
+            let cloneRoadmap = [...roadmapList.columns];
+            const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap?.id);
+            if(roadmapIndex !== -1){
+                const ideaIndex = cloneRoadmap[roadmapIndex].ideas.findIndex((x) => x.id === selectedIdea?.id);
+                if(ideaIndex !== -1){
+                    let cloneIdeas = [cloneRoadmap[roadmapIndex].ideas];
+                    let cloneIdea = {...cloneRoadmap[roadmapIndex].ideas[ideaIndex]};
+                    const cloneComments = cloneIdea && cloneIdea?.comments ? [...cloneIdea?.comments] : [];
+                    cloneComments.splice(indexs, 1);
+                    cloneIdea = {...cloneIdea,comments: cloneComments};
+                    cloneIdeas[ideaIndex] = cloneIdea;
+                    setSelectedIdea(cloneIdea)
+                    cloneRoadmap[roadmapIndex] = {...cloneRoadmap[roadmapIndex], ideas: cloneIdeas, cards: cloneIdeas}
                 }
             }
+            setRoadmapList({columns: cloneRoadmap});
             toast({description: 'Comment delete successfully'})
         } else {
             toast({description: data.error})
@@ -587,27 +537,24 @@ const RoadMapSidebarSheet = ({
     const deleteSubComment = async (id, record, index, subIndex) => {
         const data = await apiSerVice.deleteComment({id: id})
         if (data.status === 200) {
-            const cloneComment = [...selectedIdea?.comments];
-            cloneComment[index].reply.splice(subIndex, 1);
-            let selectedIdeaObj = {...selectedIdea, comments: cloneComment};
-            setSelectedIdea(selectedIdeaObj)
-            const indexs = ideasList.findIndex((x) => x.id === selectedIdea?.id)
-            if (indexs !== -1) {
-                const cloneIdea = [...ideasList];
-                cloneIdea[indexs] = selectedIdeaObj;
-                setIdeasList(cloneIdea)
-                if (isRoadmap) {
-                    const cloneRoadmap = [...roadmapList]
-                    const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap.id);
-                    if (roadmapIndex !== -1) {
-                        cloneRoadmap[roadmapIndex].ideas = cloneIdea
-                        setRoadmapList(cloneRoadmap);
-                    }
-                    if (isNoStatus) {
-                        setNoStatus(cloneIdea)
-                    }
+            let cloneRoadmap = [...roadmapList.columns];
+            const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap?.id);
+            if(roadmapIndex !== -1){
+                const ideaIndex = cloneRoadmap[roadmapIndex].ideas.findIndex((x) => x.id === selectedIdea?.id);
+                if(ideaIndex !== -1){
+                    let cloneIdeas = [cloneRoadmap[roadmapIndex].ideas];
+                    let cloneIdea = {...cloneRoadmap[roadmapIndex].ideas[ideaIndex]};
+                    const cloneComments = cloneIdea && cloneIdea?.comments ? [...cloneIdea?.comments] : [];
+                    const cloneSubComment = [...cloneComments[index]?.reply] || [];
+                    cloneSubComment.splice(subIndex, 1);
+                    cloneComments[index]["reply"] = cloneSubComment;
+                    cloneIdea = {...cloneIdea,comments: cloneComments};
+                    cloneIdeas[ideaIndex] = cloneIdea;
+                    setSelectedIdea(cloneIdea)
+                    cloneRoadmap[roadmapIndex] = {...cloneRoadmap[roadmapIndex], ideas: cloneIdeas, cards: cloneIdeas}
                 }
             }
+            setRoadmapList({columns: cloneRoadmap})
             toast({description: 'Comment delete successfully'})
         } else {
             toast({description: data.error})
@@ -672,43 +619,42 @@ const RoadMapSidebarSheet = ({
 
     const onCreateIdea = async () => {
         debugger
-        setIsLoadingCreateIdea(true)
-        let validationErrors = {};
-        Object.keys(selectedIdea).forEach(name => {
-            const error = formValidate(name, selectedIdea[name]);
-            if (error && error.length > 0) {
-                validationErrors[name] = error;
-            }
-        });
-        if (Object.keys(validationErrors).length > 0) {
-            setFormError(validationErrors);
-            return;
-        }
-        let formData = new FormData();
-        let topics = [];
-
-        (selectedIdea?.topic || []).map((x) => {
-            topics.push(x.id)
-        })
-        formData.append('title', selectedIdea?.title);
-        formData.append('slug_url', selectedIdea?.title ? selectedIdea?.title.replace(/ /g, "-").replace(/\?/g, "-") : "");
-        formData.append('description', selectedIdea?.description?.trim() === '' ? "" : selectedIdea?.description);
-        formData.append('topic', topics.join(","));
-        const data = await apiSerVice.updateIdea(formData, selectedIdea?.id)
-        if (data.status === 200) {
-            setSelectedIdea({...data.data})
-            setOldSelectedIdea({...data.data})
-            setIsEditIdea(false)
-            setIsLoadingCreateIdea(false)
-            toast({description: "Idea Update successfully"})
-        } else {
-            setIsLoadingCreateIdea(false)
-            toast({description: data.error})
-        }
+        // setIsLoadingCreateIdea(true)
+        // let validationErrors = {};
+        // Object.keys(selectedIdea).forEach(name => {
+        //     const error = formValidate(name, selectedIdea[name]);
+        //     if (error && error.length > 0) {
+        //         validationErrors[name] = error;
+        //     }
+        // });
+        // if (Object.keys(validationErrors).length > 0) {
+        //     setFormError(validationErrors);
+        //     return;
+        // }
+        // let formData = new FormData();
+        // let topics = [];
+        //
+        // (selectedIdea?.topic || []).map((x) => {
+        //     topics.push(x.id)
+        // })
+        // formData.append('title', selectedIdea?.title);
+        // formData.append('slug_url', selectedIdea?.title ? selectedIdea?.title.replace(/ /g, "-").replace(/\?/g, "-") : "");
+        // formData.append('description', selectedIdea?.description?.trim() === '' ? "" : selectedIdea?.description);
+        // formData.append('topic', topics.join(","));
+        // const data = await apiSerVice.updateIdea(formData, selectedIdea?.id)
+        // if (data.status === 200) {
+        //     setSelectedIdea({...data.data})
+        //
+        //     setIsEditIdea(false)
+        //     setIsLoadingCreateIdea(false)
+        //     toast({description: "Idea Update successfully"})
+        // } else {
+        //     setIsLoadingCreateIdea(false)
+        //     toast({description: data.error})
+        // }
     }
 
     const handleOnCreateCancel = () => {
-        setSelectedIdea(oldSelectedIdea);
         setIsEditIdea(false);
     }
 
@@ -730,49 +676,49 @@ const RoadMapSidebarSheet = ({
     }
 
     const onDeleteIdea = async () => {
-        setIsLoadingSidebar("delete")
-        const data = await apiSerVice.onDeleteIdea(selectedIdea?.id)
-        if (data.status === 200) {
-            if (isRoadmap) {
-                if (isNoStatus) {
-                    let clone = [...ideasList];
-                    let ideaIndex = clone.findIndex((x) => x.id === selectedIdea?.id);
-                    clone.splice(ideaIndex, 1)
-                    setSelectedIdea({})
-                    setNoStatus(clone);
-                    setIsNoStatus(false)
-                } else {
-                    const cloneRoadmap = [...roadmapList]
-                    const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap?.id);
-                    const cloneRoadmapIdeas = [...cloneRoadmap[roadmapIndex].ideas]
-                    let ideaIndex = cloneRoadmapIdeas.findIndex((x) => x.id === selectedIdea?.id);
-                    cloneRoadmapIdeas.splice(ideaIndex, 1);
-                    cloneRoadmap[roadmapIndex].ideas = cloneRoadmapIdeas
-                    setRoadmapList(cloneRoadmap)
-                    setSelectedIdea({})
-                    setSelectedRoadmap({})
-                }
-
-            } else {
-                const clone = [...ideasList];
-                const index = clone.findIndex((x) => x.id === selectedIdea?.id)
-                if (index !== -1) {
-                    clone.splice(index, 1)
-                    setIdeasList(clone)
-                    setSelectedIdea({})
-                }
-            }
-
-            setIsUpdateIdea(false);
-            setOpenDelete(false)
-            onClose()
-            setDeleteRecord(null)
-            toast({description: "Idea delete successfully"})
-            setIsLoadingSidebar("")
-        } else {
-            setIsLoadingSidebar("")
-            toast({description: data.error})
-        }
+        // setIsLoadingSidebar("delete")
+        // const data = await apiSerVice.onDeleteIdea(selectedIdea?.id)
+        // if (data.status === 200) {
+        //     if (isRoadmap) {
+        //         if (isNoStatus) {
+        //             let clone = [...ideasList];
+        //             let ideaIndex = clone.findIndex((x) => x.id === selectedIdea?.id);
+        //             clone.splice(ideaIndex, 1)
+        //             setSelectedIdea({})
+        //             setNoStatus(clone);
+        //             setIsNoStatus(false)
+        //         } else {
+        //             const cloneRoadmap = [...roadmapList]
+        //             const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap?.id);
+        //             const cloneRoadmapIdeas = [...cloneRoadmap[roadmapIndex].ideas]
+        //             let ideaIndex = cloneRoadmapIdeas.findIndex((x) => x.id === selectedIdea?.id);
+        //             cloneRoadmapIdeas.splice(ideaIndex, 1);
+        //             cloneRoadmap[roadmapIndex].ideas = cloneRoadmapIdeas
+        //             setRoadmapList(cloneRoadmap)
+        //             setSelectedIdea({})
+        //             setSelectedRoadmap({})
+        //         }
+        //
+        //     } else {
+        //         const clone = [...ideasList];
+        //         const index = clone.findIndex((x) => x.id === selectedIdea?.id)
+        //         if (index !== -1) {
+        //             clone.splice(index, 1)
+        //             setIdeasList(clone)
+        //             setSelectedIdea({})
+        //         }
+        //     }
+        //
+        //     setIsUpdateIdea(false);
+        //     setOpenDelete(false)
+        //     onClose()
+        //     setDeleteRecord(null)
+        //     toast({description: "Idea delete successfully"})
+        //     setIsLoadingSidebar("")
+        // } else {
+        //     setIsLoadingSidebar("")
+        //     toast({description: data.error})
+        // }
     }
 
     const deleteIdea = (record) => {
@@ -895,49 +841,6 @@ const RoadMapSidebarSheet = ({
                                     </div>
                                 </div>
                             </div>
-                            {/*<div className={"py-4 pl-8 pr-6 flex flex-col gap-[26px]"}>*/}
-                            {/*    <div className={"flex flex-wrap gap-1 justify-between"}>*/}
-                            {/*        <div className={"flex flex-col gap-1"}>*/}
-                            {/*            <h4 className={"text-sm font-medium"}>Mark as bug</h4>*/}
-                            {/*            <p className={"text-muted-foreground text-xs font-normal"}>Hides Idea from your*/}
-                            {/*                users</p>*/}
-                            {/*        </div>*/}
-                            {/*        <Button*/}
-                            {/*            variant={"outline"}*/}
-                            {/*            className={`hover:bg-muted w-[132px] ${theme === "dark" ? "" : "border-muted-foreground text-muted-foreground"} text-sm font-semibold`}*/}
-                            {/*            onClick={() => onChangeStatus(*/}
-                            {/*                "is_active",*/}
-                            {/*                selectedIdea?.is_active === 1 ? 0 : 1*/}
-                            {/*            )}*/}
-                            {/*        >*/}
-                            {/*            {*/}
-                            {/*                isLoading ? <Loader2*/}
-                            {/*                    className="h-4 w-4 animate-spin"/> : (selectedIdea?.is_active === 0 ? "Convert to Idea" : "Mark as bug")*/}
-                            {/*            }*/}
-                            {/*        </Button>*/}
-                            {/*    </div>*/}
-                            {/*    <div className={"flex flex-wrap gap-1 justify-between"}>*/}
-                            {/*        <div className={"flex flex-col gap-1"}>*/}
-                            {/*            <h4 className={"text-sm font-medium"}>Archive</h4>*/}
-                            {/*            <p className={"text-muted-foreground text-xs font-normal"}>Remove Idea from*/}
-                            {/*                Board*/}
-                            {/*                and Roadmap</p>*/}
-                            {/*        </div>*/}
-                            {/*        <Button*/}
-                            {/*            variant={"outline"}*/}
-                            {/*            className={`w-[100px] hover:bg-muted ${theme === "dark" ? "" : "border-muted-foreground text-muted-foreground"} text-sm font-semibold`}*/}
-                            {/*            onClick={() => onChangeStatus(*/}
-                            {/*                "is_archive",*/}
-                            {/*                selectedIdea?.is_archive === 1 ? 0 : 1*/}
-                            {/*            )}*/}
-                            {/*        >*/}
-                            {/*            {*/}
-                            {/*                isLoadingArchive ? <Loader2*/}
-                            {/*                    className="h-4 w-4 animate-spin"/> : (selectedIdea?.is_archive === 1 ? "Unarchive" : "Archive")*/}
-                            {/*            }*/}
-                            {/*        </Button>*/}
-                            {/*    </div>*/}
-                            {/*</div>*/}
                         </div>
                         <div className={"basis-[661px] overflow-auto"}>
 
@@ -1081,7 +984,7 @@ const RoadMapSidebarSheet = ({
                                                         <h2 className={"text-xl font-medium"}>{selectedIdea?.title}</h2>
                                                     </div>
                                                     <div
-                                                        className={"description-container text-sm text-muted-foreground"}>
+                                                        className={"description-container text-xs text-muted-foreground"}>
                                                         <ReadMoreText html={selectedIdea?.description}/>
                                                     </div>
                                                 </div>
@@ -1414,8 +1317,7 @@ const RoadMapSidebarSheet = ({
                                                                                                             className={"w-[30px] h-[30px] p-1"}
                                                                                                             onClick={() => deleteComment(x.id, i)}
                                                                                                         >
-                                                                                                            <Trash2
-                                                                                                                className={"w-[16px] h-[16px]"}/>
+                                                                                                            <Trash2 className={"w-[16px] h-[16px]"}/>
                                                                                                         </Button></> : ""
                                                                                         }
                                                                                     </div>
@@ -1594,8 +1496,7 @@ const RoadMapSidebarSheet = ({
                                                                                                                                                 variant={"outline"}
                                                                                                                                                 className={"w-[30px] h-[30px] p-1"}
                                                                                                                                                 onClick={() => deleteSubComment(y.id, x, i, j)}>
-                                                                                                                                                <Trash2
-                                                                                                                                                    className={"w-[16px] h-[16px]"}/>
+                                                                                                                                                <Trash2 className={"w-[16px] h-[16px]"}/>
                                                                                                                                             </Button>
                                                                                                                                         </div> : ''
                                                                                                                             }
@@ -1611,8 +1512,7 @@ const RoadMapSidebarSheet = ({
                                                                                                                                         />
                                                                                                                                         {
                                                                                                                                             selectedSubComment && selectedSubComment.images && selectedSubComment.images.length ?
-                                                                                                                                                <div
-                                                                                                                                                    className={"flex gap-2"}>
+                                                                                                                                                <div className={"flex gap-2"}>
                                                                                                                                                     {
                                                                                                                                                         (selectedSubComment.images || []).map((x, ind) => {
                                                                                                                                                             return (
@@ -1620,10 +1520,8 @@ const RoadMapSidebarSheet = ({
                                                                                                                                                                     {
                                                                                                                                                                         x && x.name ?
                                                                                                                                                                             <div
-                                                                                                                                                                                className={"w-[100px] relative border p-[5px]"}>
-                                                                                                                                                                                <img
-                                                                                                                                                                                    src={x && x.name ? URL.createObjectURL(x) : x}
-                                                                                                                                                                                    alt=""/>
+                                                                                                                                                                                className={"w-[100px] h-[100px] relative border p-[5px]"}>
+                                                                                                                                                                                <img className={"upload-img"} src={x && x.name ? URL.createObjectURL(x) : x} alt=""/>
                                                                                                                                                                                 <CircleX
                                                                                                                                                                                     size={20}
                                                                                                                                                                                     className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
@@ -1631,10 +1529,8 @@ const RoadMapSidebarSheet = ({
                                                                                                                                                                                 />
                                                                                                                                                                             </div> : x ?
                                                                                                                                                                             <div
-                                                                                                                                                                                className={"w-[100px] relative border p-[5px]"}>
-                                                                                                                                                                                <img
-                                                                                                                                                                                    src={x}
-                                                                                                                                                                                    alt={x}/>
+                                                                                                                                                                                className={"w-[100px] h-[100px] relative border p-[5px]"}>
+                                                                                                                                                                                <img className={"upload-img"} src={x} alt={x}/>
                                                                                                                                                                                 <CircleX
                                                                                                                                                                                     size={20}
                                                                                                                                                                                     className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
@@ -1686,21 +1582,22 @@ const RoadMapSidebarSheet = ({
                                                                                                                                     <div
                                                                                                                                         className={"space-y-2"}>
                                                                                                                                         <p className={"text-xs"}>{y.comment}</p>
+                                                                                                                                        <div className={"flex gap-2"}>
                                                                                                                                         {
                                                                                                                                             y && y.images && y.images.length ?
-                                                                                                                                                <div
-                                                                                                                                                    className={"w-[100px] border p-[5px]"}>
+                                                                                                                                                <Fragment>
                                                                                                                                                     {
                                                                                                                                                         (y.images || []).map((z, i) => {
                                                                                                                                                             return (
-                                                                                                                                                                <img
-                                                                                                                                                                    src={z}
-                                                                                                                                                                    alt={z}/>
+                                                                                                                                                                <div className={"w-[100px] h-[100px] border p-[5px]"}>
+                                                                                                                                                                    <img className={"upload-img"} src={z} alt={z}/>
+                                                                                                                                                                </div>
                                                                                                                                                             )
                                                                                                                                                         })
                                                                                                                                                     }
-                                                                                                                                                </div> : ''
+                                                                                                                                                </Fragment> : ''
                                                                                                                                         }
+                                                                                                                                        </div>
                                                                                                                                     </div>
                                                                                                                             }
                                                                                                                         </div>
@@ -1717,34 +1614,31 @@ const RoadMapSidebarSheet = ({
                                                                                                         onChange={(e) => setSubCommentText(e.target.value)}/>
                                                                                                     {
                                                                                                         subCommentFiles && subCommentFiles.length ?
-                                                                                                            <div>
+                                                                                                            <div className={"flex gap-2"}>
                                                                                                                 {
                                                                                                                     (subCommentFiles || []).map((z, i) => {
                                                                                                                         return (
-                                                                                                                            <div>
+                                                                                                                            <Fragment>
                                                                                                                                 {
                                                                                                                                     z && z.name ?
-                                                                                                                                        <div
-                                                                                                                                            className=''>
-                                                                                                                                            <div>
-                                                                                                                                                <Button
-                                                                                                                                                    onClick={() => onDeleteSubCommentImageOld(i, false)}><CircleX/></Button>
-                                                                                                                                            </div>
-                                                                                                                                            <img
-                                                                                                                                                src={z && z.name ? URL.createObjectURL(z) : z}/>
+                                                                                                                                        <div className={"relative border p-[5px]"}>
+                                                                                                                                            <img className={"w-[100px] h-[100px]"} src={z && z.name ? URL.createObjectURL(z) : z}/>
+                                                                                                                                            <CircleX
+                                                                                                                                                size={20}
+                                                                                                                                                className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
+                                                                                                                                                onClick={() => onDeleteSubCommentImageOld(i, false)}
+                                                                                                                                            />
                                                                                                                                         </div> : z ?
-                                                                                                                                        <div
-                                                                                                                                            className=''>
-                                                                                                                                            <div>
-                                                                                                                                                <Button
-                                                                                                                                                    onClick={() => onDeleteSubCommentImageOld(i, false)}><CircleX/></Button>
-                                                                                                                                            </div>
-                                                                                                                                            <img
-                                                                                                                                                src={z}
-                                                                                                                                                alt={z}/>
+                                                                                                                                        <div className={"relative border p-[5px]"}>
+                                                                                                                                            <img className={"w-[100px] h-[100px]"} src={z} alt={z}/>
+                                                                                                                                            <CircleX
+                                                                                                                                                size={20}
+                                                                                                                                                className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
+                                                                                                                                                onClick={() => onDeleteSubCommentImageOld(i, false)}
+                                                                                                                                            />
                                                                                                                                         </div> : ''
                                                                                                                                 }
-                                                                                                                            </div>
+                                                                                                                            </Fragment>
                                                                                                                         )
                                                                                                                     })
                                                                                                                 }
@@ -1753,7 +1647,7 @@ const RoadMapSidebarSheet = ({
                                                                                                     <div
                                                                                                         className={"flex gap-2"}>
                                                                                                         <Button
-                                                                                                            className={`${isSaveSubComment === true ? "py-2 px-6" : "w-[86px] py-2 px-6"} h-[30px] text-sm font-semibold`}
+                                                                                                            className={`${isSaveSubComment === true ? "py-2 px-6" : "py-2 px-6"} w-[86px] h-[30px] text-sm font-semibold`}
                                                                                                             disabled={subCommentText.trim() === "" || subCommentText === ""}
                                                                                                             onClick={() => onCreateSubComment(x, i)}
                                                                                                         >

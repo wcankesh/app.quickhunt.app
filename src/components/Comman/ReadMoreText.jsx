@@ -12,7 +12,7 @@ const ReadMoreText = ({html}) => {
                     <div dangerouslySetInnerHTML={{__html: html}}></div>
                     <Button
                         variant={"ghost hover:bg-none"}
-                        className={"p-0 h-0 text-primary font-semibold"}
+                        className={"p-0 h-0 text-primary font-semibold text-xs"}
                         onClick={() => setIsExpanded(!isExpanded)}
                     >
                         Read less

@@ -24,7 +24,7 @@ const Roadmap = () => {
     const [selectedRoadmap, setSelectedRoadmap] = useState({});
     const [isCreateIdea, setIsCreateIdea] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const [oldSelectedIdea, setOldSelectedIdea] = useState({});
+
 
     const apiService = new ApiService();
 
@@ -34,11 +34,11 @@ const Roadmap = () => {
     const openCreateIdea = () => setSheetOpenCreate(true);
     const closeCreateIdea = () => setSheetOpenCreate(false);
 
-    const openDetailsSheet = (mainRecord, record, roadmap_id) => {
+    const openDetailsSheet = (record) => {
+        const findRoadmap = roadmapList.columns.find((x) => x.id === record.roadmap_id)
         setIsUpdateIdea(true);
-        setIdeasList(mainRecord.ideas || []);
         setSelectedIdea(record)
-        setSelectedRoadmap(mainRecord)
+        setSelectedRoadmap(findRoadmap)
         openSheet();
     };
 
@@ -107,21 +107,19 @@ const Roadmap = () => {
                 isOpen={isSheetOpen}
                 onOpen={openSheet}
                 onClose={closeSheet}
-
-                isRoadmap={false}
                 isUpdateIdea={isUpdateIdea}
                 setIsUpdateIdea={setIsUpdateIdea}
-                setIdeasList={setIdeasList}
-                ideasList={ideasList}
                 selectedIdea={selectedIdea}
                 setSelectedIdea={setSelectedIdea}
-                oldSelectedIdea={oldSelectedIdea}
-                setOldSelectedIdea={setOldSelectedIdea}
+
                 onUpdateIdeaClose={onUpdateIdeaClose}
-                isNoStatus={isNoStatus}
-                setIsNoStatus={setIsNoStatus}
+
+
                 setSelectedRoadmap={setSelectedRoadmap}
                 selectedRoadmap={selectedRoadmap}
+                roadmapList={roadmapList}
+                setRoadmapList={setRoadmapList}
+
             />
             <CreateIdea
                 isOpen={isSheetOpenCreate}
@@ -131,9 +129,7 @@ const Roadmap = () => {
                 isRoadmap={false}
                 closeCreateIdea={closeCreateIdea}
                 selectedRoadmap={selectedRoadmap}
-                setIdeasList={setIdeasList}
-                ideasList={ideasList}
-                isNoStatus={false}
+
             />
             <div className={"pb-4"}><h1 className={"text-2xl font-medium"}>Roadmap</h1></div>
             {
@@ -146,7 +142,7 @@ const Roadmap = () => {
                     addCard={{on: "bottom"}}
                     renderCard={(y) => {
                         return (
-                            <Card onClick={() => openDetailsSheet(selectedRoadmap, y, y.id)} className={"mb-3"}>
+                            <Card onClick={() => openDetailsSheet(y)} className={"mb-3"}>
                                 <CardHeader className={"gap-2 p-2 pb-3"}>
                                     {
                                         y && y?.cover_image &&  <img className="object-center object-cover w-full h-[125px]" src={y?.cover_image} alt={""}/>

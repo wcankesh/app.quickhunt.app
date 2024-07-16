@@ -313,7 +313,6 @@ const Ideas = () => {
     };
 
     const handleStatusUpdate = async (name, value, index, record) => {
-        debugger
         const formData = new FormData();
         formData.append(name, value);
 
