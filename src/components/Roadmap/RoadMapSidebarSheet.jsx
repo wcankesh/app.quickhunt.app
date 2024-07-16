@@ -88,12 +88,12 @@ const RoadMapSidebarSheet = ({
 
     useEffect(() => {
         setTopicLists(allStatusAndTypes.topics)
-        setDescription(selectedIdea.description)
+        setDescription(selectedIdea?.description)
         setRoadmapStatus(allStatusAndTypes.roadmap_status)
     }, [projectDetailsReducer.id, allStatusAndTypes]);
 
     const handleChangeTopic = (id) => {
-        const clone = [...selectedIdea.topic];
+        const clone = [...selectedIdea?.topic];
         const index = clone.findIndex(item => item.id === id);
         if (index !== -1) {
             clone.splice(index, 1);
@@ -107,19 +107,19 @@ const RoadMapSidebarSheet = ({
     };
 
     const giveVote = async (type) => {
-        if (selectedIdea.is_edit !== 1) {
-            if (selectedIdea.user_vote === type) {
+        if (selectedIdea?.is_edit !== 1) {
+            if (selectedIdea?.user_vote === type) {
 
             } else {
                 const payload = {
-                    feature_idea_id: selectedIdea.id,
+                    feature_idea_id: selectedIdea?.id,
                     type: type
                 }
 
                 const data = await apiSerVice.giveVote(payload);
                 if (data.status === 200) {
                     const clone = [...ideasList];
-                    const index = clone.findIndex((x) => x.id === selectedIdea.id)
+                    const index = clone.findIndex((x) => x.id === selectedIdea?.id)
                     if (index !== -1) {
                         let newVoteCount = clone[index].vote;
                         newVoteCount = type === 1 ? newVoteCount + 1 : newVoteCount >= 1 ? newVoteCount - 1 : 0;
@@ -177,15 +177,15 @@ const RoadMapSidebarSheet = ({
             formData.append(`images[]`, commentFiles[i]);
         }
         formData.append('comment', commentText);
-        formData.append('feature_idea_id', selectedIdea.id);
+        formData.append('feature_idea_id', selectedIdea?.id);
         formData.append('reply_id', '');
         const data = await apiSerVice.createComment(formData)
         if (data.status === 200) {
-            const clone = selectedIdea && selectedIdea.comments ? [...selectedIdea.comments] : [];
+            const clone = selectedIdea && selectedIdea?.comments ? [...selectedIdea?.comments] : [];
             clone.push(data.data)
             let obj = {...selectedIdea, comments: clone}
             setSelectedIdea(obj)
-            let index = ideasList.findIndex((x) => x.id === selectedIdea.id)
+            let index = ideasList.findIndex((x) => x.id === selectedIdea?.id)
             const cloneIdea = [...ideasList];
             if (index !== -1) {
                 cloneIdea[index] = obj;
@@ -213,7 +213,7 @@ const RoadMapSidebarSheet = ({
     }
 
     const onShowSubComment = (index) => {
-        const clone = [...selectedIdea.comments];
+        const clone = [...selectedIdea?.comments];
         clone[index].show_reply = !clone[index].show_reply;
         setSelectedIdea({...selectedIdea, comments: clone})
     }
@@ -225,15 +225,15 @@ const RoadMapSidebarSheet = ({
             formData.append(`images[]`, subCommentFiles[i]);
         }
         formData.append('comment', subCommentText);
-        formData.append('feature_idea_id', selectedIdea.id);
+        formData.append('feature_idea_id', selectedIdea?.id);
         formData.append('reply_id', record.id);
         const data = await apiSerVice.createComment(formData)
         if (data.status === 200) {
-            const clone = [...selectedIdea.comments];
+            const clone = [...selectedIdea?.comments];
             clone[index].reply.push(data.data)
             let obj = {...selectedIdea, comments: clone};
             setSelectedIdea(obj);
-            let indexIdea = ideasList.findIndex((x) => x.id === selectedIdea.id);
+            let indexIdea = ideasList.findIndex((x) => x.id === selectedIdea?.id);
             const cloneIdea = [...ideasList];
             if (indexIdea !== -1) {
                 cloneIdea[indexIdea] = obj;
@@ -265,11 +265,9 @@ const RoadMapSidebarSheet = ({
         setSelectedIdea({...selectedIdea, cover_image: file})
         let formData = new FormData();
         formData.append("cover_image", file);
-        const data = await apiSerVice.updateIdea(formData, selectedIdea.id)
-        // if (data.status === 200) {
-        if (data.id) {
+        const data = await apiSerVice.updateIdea(formData, selectedIdea?.id)
+        if (data.status === 200) {
             setSelectedIdea({...data.data})
-            // setIdeasList(clone);
             setIsLoading(false)
             setIsEditIdea(false)
             toast({description: "Idea Update successfully"})
@@ -317,20 +315,20 @@ const RoadMapSidebarSheet = ({
     }
 
     const onChangeStatus = async (name, value) => {
-        if (name === "is_active") {
-            setIsLoading(true)
-        } else if (name === "is_archive") {
-            setIsLoadingArchive(true)
-        }
+        // if (name === "is_active") {
+        //     setIsLoading(true)
+        // } else if (name === "is_archive") {
+        //     setIsLoadingArchive(true)
+        // }
         setIsLoadingSidebar(name);
         setSelectedIdea({...selectedIdea, [name]: value})
         let formData = new FormData();
         formData.append(name, value);
-        const data = await apiSerVice.updateIdea(formData, selectedIdea.id)
-        // if (data.status === 200) {
-        if (data.id) {
+        console.log(name, value);
+        const data = await apiSerVice.updateIdea(formData, selectedIdea?.id)
+        if (data.status === 200) {
             let clone = [...ideasList];
-            let index = clone.findIndex((x) => x.id === selectedIdea.id);
+            let index = clone.findIndex((x) => x.id === selectedIdea?.id);
             if (index !== -1) {
                 if (name === "pin_to_top" && value == 1) {
                     clone.splice(index, 1)
@@ -338,14 +336,12 @@ const RoadMapSidebarSheet = ({
                 } else {
                     clone[index] = {...data.data,};
                 }
-                debugger
                 if(isRoadmap){
                     const cloneRoadmap = [...roadmapList]
                     const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap.id);
                     if(name === "roadmap_id"){
-                        debugger
                         if(isNoStatus){
-                            let ideaIndex = clone.findIndex((x) => x.id === selectedIdea.id);
+                            let ideaIndex = clone.findIndex((x) => x.id === selectedIdea?.id);
                             if(ideaIndex !== -1) {
                                 let ideaObj = clone[ideaIndex]
                                 const roadmapIndexChange = cloneRoadmap.findIndex((x) => x.id == value);
@@ -359,7 +355,7 @@ const RoadMapSidebarSheet = ({
                         } else {
                             if(roadmapIndex !== -1){
                                 let cloneIdea = [...cloneRoadmap[roadmapIndex].ideas];
-                                let ideaIndex = cloneIdea.findIndex((x) => x.id === selectedIdea.id);
+                                let ideaIndex = cloneIdea.findIndex((x) => x.id === selectedIdea?.id);
                                 if(ideaIndex !== -1){
                                     let ideaObj = cloneIdea[ideaIndex]
                                     const roadmapIndexChange = cloneRoadmap.findIndex((x) => x.id == value);
@@ -473,11 +469,11 @@ const RoadMapSidebarSheet = ({
         const data = await apiSerVice.updateComment(formData)
         if (data.status === 200) {
             let obj = {...selectedComment, images: data.data.images}
-            const cloneComment = [...selectedIdea.comments];
+            const cloneComment = [...selectedIdea?.comments];
             cloneComment[selectedCommentIndex] = obj;
             let selectedIdeaObj = {...selectedIdea, comments: cloneComment}
             setSelectedIdea(selectedIdeaObj)
-            const index = ideasList.findIndex((x) => x.id === selectedIdea.id)
+            const index = ideasList.findIndex((x) => x.id === selectedIdea?.id)
             if (index !== -1) {
                 const cloneIdea = [...ideasList];
                 cloneIdea[index] = selectedIdeaObj;
@@ -521,10 +517,10 @@ const RoadMapSidebarSheet = ({
         formData.append('id', selectedSubComment.id);
         const data = await apiSerVice.updateComment(formData)
         if (data.status === 200) {
-            const ideaIndex = ideasList.findIndex((x) => x.id === selectedIdea.id)
-            const commentIndex = ((selectedIdea.comments) || []).findIndex((x) => x.id === selectedComment.id);
+            const ideaIndex = ideasList.findIndex((x) => x.id === selectedIdea?.id)
+            const commentIndex = ((selectedIdea?.comments) || []).findIndex((x) => x.id === selectedComment.id);
             if (commentIndex !== -1) {
-                const cloneComment = [...selectedIdea.comments];
+                const cloneComment = [...selectedIdea?.comments];
                 cloneComment[commentIndex].reply[selectedSubCommentIndex] = data.data;
                 let selectedIdeaObj = {...selectedIdea, comments: cloneComment}
                 setSelectedIdea(selectedIdeaObj)
@@ -561,11 +557,11 @@ const RoadMapSidebarSheet = ({
     const deleteComment = async (id, indexs) => {
         const data = await apiSerVice.deleteComment({id: id})
         if (data.status === 200) {
-            const cloneComment = [...selectedIdea.comments];
+            const cloneComment = [...selectedIdea?.comments];
             cloneComment.splice(indexs, 1);
             let selectedIdeaObj = {...selectedIdea, comments: cloneComment};
             setSelectedIdea(selectedIdeaObj)
-            const index = ideasList.findIndex((x) => x.id === selectedIdea.id)
+            const index = ideasList.findIndex((x) => x.id === selectedIdea?.id)
             if (index !== -1) {
                 const cloneIdea = [...ideasList];
                 cloneIdea[index] = selectedIdeaObj;
@@ -591,11 +587,11 @@ const RoadMapSidebarSheet = ({
     const deleteSubComment = async (id, record, index, subIndex) => {
         const data = await apiSerVice.deleteComment({id: id})
         if (data.status === 200) {
-            const cloneComment = [...selectedIdea.comments];
+            const cloneComment = [...selectedIdea?.comments];
             cloneComment[index].reply.splice(subIndex, 1);
             let selectedIdeaObj = {...selectedIdea, comments: cloneComment};
             setSelectedIdea(selectedIdeaObj)
-            const indexs = ideasList.findIndex((x) => x.id === selectedIdea.id)
+            const indexs = ideasList.findIndex((x) => x.id === selectedIdea?.id)
             if (indexs !== -1) {
                 const cloneIdea = [...ideasList];
                 cloneIdea[indexs] = selectedIdeaObj;
@@ -664,7 +660,7 @@ const RoadMapSidebarSheet = ({
     };
 
     const handleChange = (tag) => {
-        const clone = selectedIdea && selectedIdea.topic && selectedIdea.topic.length ? [...selectedIdea.topic] : [];
+        const clone = selectedIdea && selectedIdea?.topic && selectedIdea?.topic.length ? [...selectedIdea?.topic] : [];
         let index = clone.findIndex((t) => t.id === tag.id);
         if (index === -1) {
             clone.push(tag);
@@ -675,6 +671,7 @@ const RoadMapSidebarSheet = ({
     }
 
     const onCreateIdea = async () => {
+        debugger
         setIsLoadingCreateIdea(true)
         let validationErrors = {};
         Object.keys(selectedIdea).forEach(name => {
@@ -690,16 +687,15 @@ const RoadMapSidebarSheet = ({
         let formData = new FormData();
         let topics = [];
 
-        (selectedIdea.topic || []).map((x) => {
+        (selectedIdea?.topic || []).map((x) => {
             topics.push(x.id)
         })
-        formData.append('title', selectedIdea.title);
-        formData.append('slug_url', selectedIdea.title ? selectedIdea.title.replace(/ /g, "-").replace(/\?/g, "-") : "");
-        formData.append('description', selectedIdea.description?.trim() === '' ? "" : selectedIdea.description);
+        formData.append('title', selectedIdea?.title);
+        formData.append('slug_url', selectedIdea?.title ? selectedIdea?.title.replace(/ /g, "-").replace(/\?/g, "-") : "");
+        formData.append('description', selectedIdea?.description?.trim() === '' ? "" : selectedIdea?.description);
         formData.append('topic', topics.join(","));
-        const data = await apiSerVice.updateIdea(formData, selectedIdea.id)
-        // if (data.status === 200) {
-        if (data.id) {
+        const data = await apiSerVice.updateIdea(formData, selectedIdea?.id)
+        if (data.status === 200) {
             setSelectedIdea({...data.data})
             setOldSelectedIdea({...data.data})
             setIsEditIdea(false)
@@ -735,21 +731,21 @@ const RoadMapSidebarSheet = ({
 
     const onDeleteIdea = async () => {
         setIsLoadingSidebar("delete")
-        const data = await apiSerVice.onDeleteIdea(selectedIdea.id)
+        const data = await apiSerVice.onDeleteIdea(selectedIdea?.id)
         if (data.status === 200) {
             if (isRoadmap) {
                 if (isNoStatus) {
                     let clone = [...ideasList];
-                    let ideaIndex = clone.findIndex((x) => x.id === selectedIdea.id);
+                    let ideaIndex = clone.findIndex((x) => x.id === selectedIdea?.id);
                     clone.splice(ideaIndex, 1)
                     setSelectedIdea({})
                     setNoStatus(clone);
                     setIsNoStatus(false)
                 } else {
                     const cloneRoadmap = [...roadmapList]
-                    const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap.id);
+                    const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap?.id);
                     const cloneRoadmapIdeas = [...cloneRoadmap[roadmapIndex].ideas]
-                    let ideaIndex = cloneRoadmapIdeas.findIndex((x) => x.id === selectedIdea.id);
+                    let ideaIndex = cloneRoadmapIdeas.findIndex((x) => x.id === selectedIdea?.id);
                     cloneRoadmapIdeas.splice(ideaIndex, 1);
                     cloneRoadmap[roadmapIndex].ideas = cloneRoadmapIdeas
                     setRoadmapList(cloneRoadmap)
@@ -759,7 +755,7 @@ const RoadMapSidebarSheet = ({
 
             } else {
                 const clone = [...ideasList];
-                const index = clone.findIndex((x) => x.id === selectedIdea.id)
+                const index = clone.findIndex((x) => x.id === selectedIdea?.id)
                 if (index !== -1) {
                     clone.splice(index, 1)
                     setIdeasList(clone)
@@ -866,10 +862,7 @@ const RoadMapSidebarSheet = ({
                                                             <CircleX
                                                                 size={20}
                                                                 className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
-                                                                onClick={() => onChangeStatus({
-                                                                    name: 'cover_image',
-                                                                    value: ""
-                                                                })}
+                                                                onClick={() => onChangeStatus('cover_image', "")}
                                                             />
                                                         </div> : selectedIdea?.cover_image ?
                                                             <div className={"w-[282px] h-[128px] relative border p-[5px]"}>
@@ -877,10 +870,7 @@ const RoadMapSidebarSheet = ({
                                                                 <CircleX
                                                                     size={20}
                                                                     className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
-                                                                    onClick={() => onChangeStatus({
-                                                                        name: 'cover_image',
-                                                                        value: ""
-                                                                    })}
+                                                                    onClick={() => onChangeStatus('cover_image', "")}
                                                                 />
                                                             </div>
                                                             : ''}
@@ -905,49 +895,49 @@ const RoadMapSidebarSheet = ({
                                     </div>
                                 </div>
                             </div>
-                            <div className={"py-4 pl-8 pr-6 flex flex-col gap-[26px]"}>
-                                <div className={"flex flex-wrap gap-1 justify-between"}>
-                                    <div className={"flex flex-col gap-1"}>
-                                        <h4 className={"text-sm font-medium"}>Mark as bug</h4>
-                                        <p className={"text-muted-foreground text-xs font-normal"}>Hides Idea from your
-                                            users</p>
-                                    </div>
-                                    <Button
-                                        variant={"outline"}
-                                        className={`hover:bg-muted w-[132px] ${theme === "dark" ? "" : "border-muted-foreground text-muted-foreground"} text-sm font-semibold`}
-                                        onClick={() => onChangeStatus(
-                                            "is_active",
-                                            selectedIdea?.is_active === 1 ? 0 : 1
-                                        )}
-                                    >
-                                        {
-                                            isLoading ? <Loader2
-                                                className="h-4 w-4 animate-spin"/> : (selectedIdea?.is_active === 0 ? "Convert to Idea" : "Mark as bug")
-                                        }
-                                    </Button>
-                                </div>
-                                <div className={"flex flex-wrap gap-1 justify-between"}>
-                                    <div className={"flex flex-col gap-1"}>
-                                        <h4 className={"text-sm font-medium"}>Archive</h4>
-                                        <p className={"text-muted-foreground text-xs font-normal"}>Remove Idea from
-                                            Board
-                                            and Roadmap</p>
-                                    </div>
-                                    <Button
-                                        variant={"outline"}
-                                        className={`w-[100px] hover:bg-muted ${theme === "dark" ? "" : "border-muted-foreground text-muted-foreground"} text-sm font-semibold`}
-                                        onClick={() => onChangeStatus(
-                                            "is_archive",
-                                            selectedIdea?.is_archive === 1 ? 0 : 1
-                                        )}
-                                    >
-                                        {
-                                            isLoadingArchive ? <Loader2
-                                                className="h-4 w-4 animate-spin"/> : (selectedIdea?.is_archive === 1 ? "Unarchive" : "Archive")
-                                        }
-                                    </Button>
-                                </div>
-                            </div>
+                            {/*<div className={"py-4 pl-8 pr-6 flex flex-col gap-[26px]"}>*/}
+                            {/*    <div className={"flex flex-wrap gap-1 justify-between"}>*/}
+                            {/*        <div className={"flex flex-col gap-1"}>*/}
+                            {/*            <h4 className={"text-sm font-medium"}>Mark as bug</h4>*/}
+                            {/*            <p className={"text-muted-foreground text-xs font-normal"}>Hides Idea from your*/}
+                            {/*                users</p>*/}
+                            {/*        </div>*/}
+                            {/*        <Button*/}
+                            {/*            variant={"outline"}*/}
+                            {/*            className={`hover:bg-muted w-[132px] ${theme === "dark" ? "" : "border-muted-foreground text-muted-foreground"} text-sm font-semibold`}*/}
+                            {/*            onClick={() => onChangeStatus(*/}
+                            {/*                "is_active",*/}
+                            {/*                selectedIdea?.is_active === 1 ? 0 : 1*/}
+                            {/*            )}*/}
+                            {/*        >*/}
+                            {/*            {*/}
+                            {/*                isLoading ? <Loader2*/}
+                            {/*                    className="h-4 w-4 animate-spin"/> : (selectedIdea?.is_active === 0 ? "Convert to Idea" : "Mark as bug")*/}
+                            {/*            }*/}
+                            {/*        </Button>*/}
+                            {/*    </div>*/}
+                            {/*    <div className={"flex flex-wrap gap-1 justify-between"}>*/}
+                            {/*        <div className={"flex flex-col gap-1"}>*/}
+                            {/*            <h4 className={"text-sm font-medium"}>Archive</h4>*/}
+                            {/*            <p className={"text-muted-foreground text-xs font-normal"}>Remove Idea from*/}
+                            {/*                Board*/}
+                            {/*                and Roadmap</p>*/}
+                            {/*        </div>*/}
+                            {/*        <Button*/}
+                            {/*            variant={"outline"}*/}
+                            {/*            className={`w-[100px] hover:bg-muted ${theme === "dark" ? "" : "border-muted-foreground text-muted-foreground"} text-sm font-semibold`}*/}
+                            {/*            onClick={() => onChangeStatus(*/}
+                            {/*                "is_archive",*/}
+                            {/*                selectedIdea?.is_archive === 1 ? 0 : 1*/}
+                            {/*            )}*/}
+                            {/*        >*/}
+                            {/*            {*/}
+                            {/*                isLoadingArchive ? <Loader2*/}
+                            {/*                    className="h-4 w-4 animate-spin"/> : (selectedIdea?.is_archive === 1 ? "Unarchive" : "Archive")*/}
+                            {/*            }*/}
+                            {/*        </Button>*/}
+                            {/*    </div>*/}
+                            {/*</div>*/}
                         </div>
                         <div className={"basis-[661px] overflow-auto"}>
 
@@ -1547,7 +1537,9 @@ const RoadMapSidebarSheet = ({
                                                                                             >
                                                                                                 Reply
                                                                                             </Button>
-                                                                                            <div className={"flex items-center gap-2 cursor-pointer"}>
+                                                                                            <div className={"flex items-center gap-2 cursor-pointer"}
+                                                                                                 onClick={() => onShowSubComment(i)}
+                                                                                            >
                                                                                                     <span>
                                                                                                         <MessageCircleMore
                                                                                                             className={"stroke-primary w-[16px] h-[16px]"}/>

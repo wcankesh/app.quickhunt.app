@@ -312,28 +312,13 @@ const Ideas = () => {
         }
     };
 
-    const handleRoadmapUpdate = async (name, value, index, record) => {
-        let formData = new FormData();
-        formData.append(name, value);
-        const data = await apiSerVice.updateIdea(formData, record.id);
-        if (data.status === 200) {
-        // if (data?.id) {
-            let clone = [...ideasList]
-            clone[index].roadmap_id = value
-            setIdeasList(clone);
-            toast({description: "Roadmap status updated successfully"});
-        } else {
-            toast({variant: "destructive", description: "Failed to update roadmap status"});
-        }
-    };
-
-    const handleStatusUpdate = async (id, name, value, index, record) => {
+    const handleStatusUpdate = async (name, value, index, record) => {
+        debugger
         const formData = new FormData();
         formData.append(name, value);
 
-        const data = await apiSerVice.updateIdea(formData, id, record.id);
+        const data = await apiSerVice.updateIdea(formData, record?.id);
         if (data.status === 200) {
-        // if (data?.id) {
             const clone = [...ideasList];
             if (name === "is_archive" || name === "is_active") {
                 clone[index][name] = value;
@@ -612,10 +597,10 @@ const Ideas = () => {
                                                                             </DropdownMenuTrigger>
                                                                             <DropdownMenuContent>
                                                                                 <DropdownMenuItem className={"cursor-pointer"} onClick={() => openDetailsSheet(x)}>Edit</DropdownMenuItem>
-                                                                                <DropdownMenuItem className={"cursor-pointer"} onClick={() => handleStatusUpdate(x.id, "is_archive", x.is_archive == 1 ? 0 : 1, i)}>
+                                                                                <DropdownMenuItem className={"cursor-pointer"} onClick={() => handleStatusUpdate("is_archive", x.is_archive == 1 ? 0 : 1, i, x)}>
                                                                                     {x?.is_archive === 1 ? "Unarchive" : "Archive"}
                                                                                 </DropdownMenuItem>
-                                                                                <DropdownMenuItem className={"cursor-pointer"} onClick={() => handleStatusUpdate(x.id, "is_active",  x.is_active === 1 ? 0 : 1, i)}>
+                                                                                <DropdownMenuItem className={"cursor-pointer"} onClick={() => handleStatusUpdate("is_active",  x.is_active === 1 ? 0 : 1, i, x)}>
                                                                                     {x.is_active === 0 ? "Convert to Idea" : "Mark as bug"}
                                                                                 </DropdownMenuItem>
                                                                                 <DropdownMenuItem className={"cursor-pointer"} onClick={() => deleteIdea(x)}>Delete</DropdownMenuItem>
@@ -640,7 +625,7 @@ const Ideas = () => {
                                                                     }
                                                                 </div>
                                                                 <div className={"flex items-center gap-8"}>
-                                                                    <Select onValueChange={(value) => handleRoadmapUpdate("roadmap_id", value, i, x)} value={x.roadmap_id}>
+                                                                    <Select onValueChange={(value) => handleStatusUpdate("roadmap_id", value, i, x)} value={x.roadmap_id}>
                                                                         <SelectTrigger className="w-[291px] bg-card">
                                                                             <SelectValue/>
                                                                         </SelectTrigger>

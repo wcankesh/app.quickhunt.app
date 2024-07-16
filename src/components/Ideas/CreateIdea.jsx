@@ -115,7 +115,6 @@ const CreateIdea = ({
         formData.append('project_id', projectDetailsReducer.id);
         formData.append('topic', ideaDetail.topic.join());
         const data = await apiSerVice.createIdea(formData)
-        debugger
         if(data.status === 200){
             const clone = [...ideasList];
             const newArray = [data.data].concat(clone)

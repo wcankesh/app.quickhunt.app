@@ -114,7 +114,8 @@ const CreateIdea = ({
         formData.append('description', description);
         formData.append('project_id', projectDetailsReducer.id);
         formData.append('topic', ideaDetail.topic.join());
-        formData.append('roadmap_id', selectedRoadmap && selectedRoadmap.id ? selectedRoadmap.id : "");
+        formData.append('roadmap_id', selectedRoadmap && selectedRoadmap ? selectedRoadmap : "");
+        console.log("selectedRoadmap", selectedRoadmap)
         const data = await apiSerVice.createIdea(formData)
         if(data.status === 200){
             const clone = [...ideasList];
