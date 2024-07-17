@@ -1,16 +1,6 @@
 import React, {Fragment, useEffect, useState} from 'react';
 import {Button} from "../ui/button";
-import {
-    ArrowBigUp, Check,
-    ChevronLeft,
-    ChevronRight,
-    ChevronsLeft,
-    ChevronsRight,
-    Circle,
-    Dot, Ellipsis, Loader2,
-    MessageCircleMore, Pin,
-    Plus,
-} from "lucide-react";
+import {ArrowBigUp, Check, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Circle, Dot, Ellipsis, Loader2, MessageCircleMore, Pin, Plus,} from "lucide-react";
 import {Card, CardContent, CardFooter} from "../ui/card";
 import {Select, SelectItem, SelectGroup, SelectContent, SelectTrigger, SelectValue} from "../ui/select";
 import SidebarSheet from "../Ideas/SidebarSheet";
@@ -380,8 +370,7 @@ const Ideas = () => {
                     </Dialog>
                 </Fragment>
             }
-            <div
-                className={"xl:container xl:max-w-[1200px] lg:container lg:max-w-[992px] md:container md:max-w-[768px] sm:container sm:max-w-[639px] xs:container xs:max-w-[475px] pt-8 pb-5"}>
+            <div className={"xl:container xl:max-w-[1200px] lg:container lg:max-w-[992px] md:container md:max-w-[768px] sm:container sm:max-w-[639px] xs:container xs:max-w-[475px] pt-8 pb-5"}>
                 <SidebarSheet
                     isOpen={isSheetOpen}
                     onOpen={openSheet}
@@ -681,7 +670,7 @@ const Ideas = () => {
 
                         <CardFooter className={"p-0"}>
                             <div
-                                className={`w-full p-5 ${theme === "dark" ? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end pe-16 py-15px`}>
+                                className={`w-full p-5 ${theme === "dark" ? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end px-16 py-15px`}>
                                 <div className={"flex flex-row gap-8 items-center"}>
                                     <div>
                                         <h5 className={"text-sm font-semibold"}>Page {pageNo} of {totalPages}</h5>

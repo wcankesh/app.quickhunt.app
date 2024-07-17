@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, Fragment} from 'react';
 import {Card, CardContent, CardHeader, CardTitle} from "../ui/card";
 import {Circle, Plus} from "lucide-react";
 import {Button} from "../ui/button";
@@ -9,9 +9,23 @@ import {ApiService} from "../../utils/ApiService";
 import Board, {moveCard, allowAddColumn} from '@asseinfo/react-kanban'
 import "@asseinfo/react-kanban/dist/styles.css";
 import CreateIdea from "./CreateIdea";
+import {useToast} from "../ui/use-toast";
+import {CommSkel} from "../Comman/CommSkel";
+
+const loading = {
+    columns: Array.from({ length: 5 }, (_, index) => ({
+        id: index + 1,
+        title: "",
+        cards: Array.from({ length: 5 }, (_, i) => ({
+            id: i + 1,
+            title: ""
+        }))
+    }))
+};
 
 const Roadmap = () => {
     const {theme} = useTheme()
+    const {toast} = useToast()
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const [isSheetOpen, setSheetOpen] = useState(false);
     const [isSheetOpenCreate, setSheetOpenCreate] = useState(false);
@@ -74,7 +88,7 @@ const Roadmap = () => {
         formData.append("roadmap_id", columnId);
         const data = await apiService.updateIdea(formData, payload)
         if (data.status === 200) {
-            // successMsg("Roadmap Update successfully")
+            toast({description: "Roadmap Update successfully"})
         } else {
 
         }
@@ -102,7 +116,7 @@ const Roadmap = () => {
 
     return (
         <div
-            className={"height-inherit h-svh  overflow-y-auto xl:container-secondary xl:max-w-[1605px] lg:container lg:max-w-[992px] md:container md:max-w-[768px] sm:container sm:max-w-[639px] xs:container xs:max-w-[475px] p-8"}>
+            className={"height-inherit h-svh  overflow-y-auto xl:container-secondary xl:max-w-[1605px] lg:container lg:max-w-[992px] md:container md:max-w-[768px] sm:container sm:max-w-[639px] xs:container xs:max-w-[475px] "}>
             <RoadMapSidebarSheet
                 isOpen={isSheetOpen}
                 onOpen={openSheet}
@@ -111,10 +125,7 @@ const Roadmap = () => {
                 setIsUpdateIdea={setIsUpdateIdea}
                 selectedIdea={selectedIdea}
                 setSelectedIdea={setSelectedIdea}
-
                 onUpdateIdeaClose={onUpdateIdeaClose}
-
-
                 setSelectedRoadmap={setSelectedRoadmap}
                 selectedRoadmap={selectedRoadmap}
                 roadmapList={roadmapList}
@@ -126,14 +137,44 @@ const Roadmap = () => {
                 onOpen={openCreateIdea}
                 onClose={closeCreateIdea}
 
-                isRoadmap={false}
                 closeCreateIdea={closeCreateIdea}
                 selectedRoadmap={selectedRoadmap}
-
+                setSelectedRoadmap={setSelectedRoadmap}
+                roadmapList={roadmapList}
+                setRoadmapList={setRoadmapList}
             />
-            <div className={"pb-4"}><h1 className={"text-2xl font-medium"}>Roadmap</h1></div>
+            <div className={"p-4"}><h1 className={"text-2xl font-medium"}>Roadmap</h1></div>
+            <div className={"p-[11px] pt-[3px]"}>
             {
-                roadmapList.columns.length > 0 && <Board
+                isLoading ?
+                     <Board
+                        allowAddColumn
+                        disableColumnDrag
+                        allowAddCard={{on: "bottom"}}
+                        addCard={{on: "bottom"}}
+                        renderCard={(y) => {
+                            return (
+                                <Card  className={"mb-3"}>
+                                    {CommSkel.commonParagraphThreeIcon}
+                                </Card>
+                            )
+                        }}
+
+                        renderColumnHeader={({ id}) => {
+                            return (
+                                <React.Fragment>
+                                    {CommSkel.commonParagraphOne}
+                                    <div className={"add-idea"}>
+                                        {CommSkel.commonParagraphOne}
+                                    </div>
+                                </React.Fragment>
+
+                            )
+                        }}
+                    >
+                        {loading}
+                    </Board>
+                    : roadmapList.columns.length > 0 && <Board
                     allowAddColumn
                     disableColumnDrag
                     onCardDragEnd={handleCardMove}
@@ -143,27 +184,30 @@ const Roadmap = () => {
                     renderCard={(y) => {
                         return (
                             <Card onClick={() => openDetailsSheet(y)} className={"mb-3"}>
-                                <CardHeader className={"gap-2 p-2 pb-3"}>
-                                    {
-                                        y && y?.cover_image &&  <img className="object-center object-cover w-full h-[125px]" src={y?.cover_image} alt={""}/>
-                                    }
-                                    <div className={"flex gap-2"}>
-                                    <Button variant={"outline hover:transparent"} className={"text-sm font-medium border px-[9px] py-1 w-[28px] h-[28px]"}>{y.vote}</Button>
-                                    <h3 className={"text-sm font-normal m-0"}>{y.title}</h3>
-                                    </div>
-                                </CardHeader>
-                                <CardContent className={"px-[20px] pb-4"}>
-                                    <div className={"flex gap-1"}>
-                                        {
-                                            ((y && y.topic) || []).map((x, i) => {
-                                                return (
-                                                    <div className={"text-xs flex"}>{x.title}</div>
-                                                )
-                                            })
-                                        }
-                                    </div>
+                                            <CardHeader className={"gap-2 p-2 pb-3"}>
+                                                {
+                                                    y && y?.cover_image &&
+                                                    <img className="object-center object-cover w-full h-[125px]"
+                                                         src={y?.cover_image} alt={""}/>
+                                                }
+                                                <div className={"flex gap-2"}>
+                                                    <Button variant={"outline hover:transparent"}
+                                                            className={"text-sm font-medium border px-[9px] py-1 w-[28px] h-[28px]"}>{y.vote}</Button>
+                                                    <h3 className={"text-sm font-normal m-0"}>{y.title}</h3>
+                                                </div>
+                                            </CardHeader>
+                                            <CardContent className={"px-[20px] pb-4"}>
+                                                <div className={"flex gap-1"}>
+                                                    {
+                                                        ((y && y.topic) || []).map((x, i) => {
+                                                            return (
+                                                                <div className={"text-xs flex"}>{x.title}</div>
+                                                            )
+                                                        })
+                                                    }
+                                                </div>
 
-                                </CardContent>
+                                            </CardContent>
                             </Card>
                         )
                     }}
@@ -171,19 +215,20 @@ const Roadmap = () => {
                     renderColumnHeader={({title, color_code, id}) => {
                         return (
                             <React.Fragment>
-                                <CardTitle
-                                    className={"flex items-center gap-2 text-sm font-semibold px-[7px] mb-[16px]"}>
-                                    <Circle fill={color_code} stroke={color_code} className={"w-[10px] h-[10px]"}/>
-                                    {title}
-                                </CardTitle>
+                                        <CardTitle
+                                            className={"flex items-center gap-2 text-sm font-semibold px-[7px] mb-[16px]"}>
+                                            <Circle fill={color_code} stroke={color_code}
+                                                    className={"w-[10px] h-[10px]"}/>
+                                            {title}
+                                        </CardTitle>
                                 <div className={"add-idea"}>
-                                    <Button
-                                        variant={"ghost hover:bg-transparent"}
-                                        className={`gap-2 p-0 ${theme === "dark" ? "" : "text-muted-foreground"} text-sm font-semibold h-auto`}
-                                        onClick={() => onCreateIdea(id)}
-                                    >
-                                        <Plus className={"w-[20px] h-[20px]"}/>Create Idea
-                                    </Button>
+                                            <Button
+                                                variant={"ghost hover:bg-transparent"}
+                                                className={`gap-2 p-0 ${theme === "dark" ? "" : "text-muted-foreground"} text-sm font-semibold h-auto`}
+                                                onClick={() => onCreateIdea(id)}
+                                            >
+                                                <Plus className={"w-[20px] h-[20px]"}/>Create Idea
+                                            </Button>
                                 </div>
                             </React.Fragment>
 
@@ -194,7 +239,7 @@ const Roadmap = () => {
                     {roadmapList}
                 </Board>
             }
-
+            </div>
 
             {/*<div className={"flex gap-[18px] flex-col  items-start "}>*/}
 

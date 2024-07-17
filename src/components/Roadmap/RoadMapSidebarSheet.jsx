@@ -619,39 +619,38 @@ const RoadMapSidebarSheet = ({
 
     const onCreateIdea = async () => {
         debugger
-        // setIsLoadingCreateIdea(true)
-        // let validationErrors = {};
-        // Object.keys(selectedIdea).forEach(name => {
-        //     const error = formValidate(name, selectedIdea[name]);
-        //     if (error && error.length > 0) {
-        //         validationErrors[name] = error;
-        //     }
-        // });
-        // if (Object.keys(validationErrors).length > 0) {
-        //     setFormError(validationErrors);
-        //     return;
-        // }
-        // let formData = new FormData();
-        // let topics = [];
-        //
-        // (selectedIdea?.topic || []).map((x) => {
-        //     topics.push(x.id)
-        // })
-        // formData.append('title', selectedIdea?.title);
-        // formData.append('slug_url', selectedIdea?.title ? selectedIdea?.title.replace(/ /g, "-").replace(/\?/g, "-") : "");
-        // formData.append('description', selectedIdea?.description?.trim() === '' ? "" : selectedIdea?.description);
-        // formData.append('topic', topics.join(","));
-        // const data = await apiSerVice.updateIdea(formData, selectedIdea?.id)
-        // if (data.status === 200) {
-        //     setSelectedIdea({...data.data})
-        //
-        //     setIsEditIdea(false)
-        //     setIsLoadingCreateIdea(false)
-        //     toast({description: "Idea Update successfully"})
-        // } else {
-        //     setIsLoadingCreateIdea(false)
-        //     toast({description: data.error})
-        // }
+        setIsLoadingCreateIdea(true)
+        let validationErrors = {};
+        Object.keys(selectedIdea).forEach(name => {
+            const error = formValidate(name, selectedIdea[name]);
+            if (error && error.length > 0) {
+                validationErrors[name] = error;
+            }
+        });
+        if (Object.keys(validationErrors).length > 0) {
+            setFormError(validationErrors);
+            return;
+        }
+        let formData = new FormData();
+        let topics = [];
+
+        (selectedIdea?.topic || []).map((x) => {
+            topics.push(x.id)
+        })
+        formData.append('title', selectedIdea?.title);
+        formData.append('slug_url', selectedIdea?.title ? selectedIdea?.title.replace(/ /g, "-").replace(/\?/g, "-") : "");
+        formData.append('description', selectedIdea?.description?.trim() === '' ? "" : selectedIdea?.description);
+        formData.append('topic', topics.join(","));
+        const data = await apiSerVice.updateIdea(formData, selectedIdea?.id)
+        if (data.status === 200) {
+            setSelectedIdea({...data.data})
+            setIsEditIdea(false)
+            setIsLoadingCreateIdea(false)
+            toast({description: "Idea Update successfully"})
+        } else {
+            setIsLoadingCreateIdea(false)
+            toast({description: data.error})
+        }
     }
 
     const handleOnCreateCancel = () => {
@@ -675,87 +674,82 @@ const RoadMapSidebarSheet = ({
         setIsEditIdea(false)
     }
 
-    const onDeleteIdea = async () => {
-        // setIsLoadingSidebar("delete")
-        // const data = await apiSerVice.onDeleteIdea(selectedIdea?.id)
-        // if (data.status === 200) {
-        //     if (isRoadmap) {
-        //         if (isNoStatus) {
-        //             let clone = [...ideasList];
-        //             let ideaIndex = clone.findIndex((x) => x.id === selectedIdea?.id);
-        //             clone.splice(ideaIndex, 1)
-        //             setSelectedIdea({})
-        //             setNoStatus(clone);
-        //             setIsNoStatus(false)
-        //         } else {
-        //             const cloneRoadmap = [...roadmapList]
-        //             const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap?.id);
-        //             const cloneRoadmapIdeas = [...cloneRoadmap[roadmapIndex].ideas]
-        //             let ideaIndex = cloneRoadmapIdeas.findIndex((x) => x.id === selectedIdea?.id);
-        //             cloneRoadmapIdeas.splice(ideaIndex, 1);
-        //             cloneRoadmap[roadmapIndex].ideas = cloneRoadmapIdeas
-        //             setRoadmapList(cloneRoadmap)
-        //             setSelectedIdea({})
-        //             setSelectedRoadmap({})
-        //         }
-        //
-        //     } else {
-        //         const clone = [...ideasList];
-        //         const index = clone.findIndex((x) => x.id === selectedIdea?.id)
-        //         if (index !== -1) {
-        //             clone.splice(index, 1)
-        //             setIdeasList(clone)
-        //             setSelectedIdea({})
-        //         }
-        //     }
-        //
-        //     setIsUpdateIdea(false);
-        //     setOpenDelete(false)
-        //     onClose()
-        //     setDeleteRecord(null)
-        //     toast({description: "Idea delete successfully"})
-        //     setIsLoadingSidebar("")
-        // } else {
-        //     setIsLoadingSidebar("")
-        //     toast({description: data.error})
-        // }
-    }
-
-    const deleteIdea = (record) => {
-        setDeleteRecord(record.id)
-        setOpenDelete(!openDelete)
-    }
+    // const onDeleteIdea = async () => {
+    //     setIsLoadingSidebar("delete")
+    //     const data = await apiSerVice.onDeleteIdea(selectedIdea?.id)
+    //     if (data.status === 200) {
+    //         debugger
+    //         let cloneRoadmap = [...roadmapList.columns];
+    //         const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap?.id);
+    //         if(roadmapIndex !== -1) {
+    //             const ideaIndex = cloneRoadmap[roadmapIndex].ideas.findIndex((x) => x.id === selectedIdea?.id);
+    //             if (ideaIndex !== -1) {
+    //                 const cloneRoadmapIdeas = [...cloneRoadmap[roadmapIndex].ideas]
+    //                 cloneRoadmapIdeas.splice(ideaIndex, 1);
+    //                 cloneRoadmap[roadmapIndex].ideas = cloneRoadmapIdeas
+    //                 // setRoadmapList(cloneRoadmap)
+    //                 // setSelectedIdea({})
+    //                 // setSelectedRoadmap({})
+    //             } else {
+    //                 // const clone = [...roadmapList.columns];
+    //                 // const index = cloneRoadmap.findIndex((x) => x.id === selectedIdea?.id)
+    //                 // if (index !== -1) {
+    //                 //     cloneRoadmap.splice(index, 1);
+    //                 // }
+    //             }
+    //         }
+    //         setRoadmapList({columns: cloneRoadmap})
+    //
+    //         setSelectedIdea({});
+    //         setSelectedRoadmap({});
+    //
+    //         setIsUpdateIdea(false);
+    //         setOpenDelete(false)
+    //         onClose()
+    //         setDeleteRecord(null)
+    //         toast({description: "Idea delete successfully"})
+    //         setIsLoadingSidebar("")
+    //     } else {
+    //         setIsLoadingSidebar("")
+    //         toast({description: data.error})
+    //     }
+    // }
+    //
+    // const deleteIdea = (record) => {
+    //     setDeleteRecord(record.id)
+    //     setOpenDelete(!openDelete)
+    // }
 
     return (
         <Fragment>
-            {
-                openDelete &&
-                <Fragment>
-                    <Dialog open onOpenChange={deleteIdea}>
-                        <DialogContent className="sm:max-w-[425px]">
-                            <DialogHeader className={"flex flex-col gap-2"}>
-                                <DialogTitle>You really want delete this idea?</DialogTitle>
-                                <DialogDescription>
-                                    This action can't be undone.
-                                </DialogDescription>
-                            </DialogHeader>
-                            <DialogFooter>
-                                <Button type="submit" variant={"outline"}
-                                        className={"text-sm font-semibold"}
-                                        onClick={() => setOpenDelete(false)}>Cancel</Button>
-                                <Button
-                                    type="submit"
-                                    variant={"hover:bg-destructive"}
-                                    className={`text-sm ${theme === "dark" ? "text-card-foreground" : "text-card"} w-[77px] font-semibold bg-destructive`}
-                                    onClick={() => onDeleteIdea(deleteRecord)}
-                                >
-                                    {isLoadingSidebar ? <Loader2 size={16} className={"animate-spin"}/> : "Delete"}
-                                </Button>
-                            </DialogFooter>
-                        </DialogContent>
-                    </Dialog>
-                </Fragment>
-            }
+            {/*{*/}
+            {/*    openDelete &&*/}
+            {/*    <Fragment>*/}
+            {/*        <Dialog open onOpenChange={deleteIdea}>*/}
+            {/*            <DialogContent className="sm:max-w-[425px]">*/}
+            {/*                <DialogHeader className={"flex flex-col gap-2"}>*/}
+            {/*                    <DialogTitle>You really want delete this idea?</DialogTitle>*/}
+            {/*                    <DialogDescription>*/}
+            {/*                        This action can't be undone.*/}
+            {/*                    </DialogDescription>*/}
+            {/*                </DialogHeader>*/}
+            {/*                <DialogFooter>*/}
+            {/*                    <Button type="submit" variant={"outline"}*/}
+            {/*                            className={"text-sm font-semibold"}*/}
+            {/*                            onClick={() => setOpenDelete(false)}>Cancel</Button>*/}
+            {/*                    <Button*/}
+            {/*                        type="submit"*/}
+            {/*                        variant={"hover:bg-destructive"}*/}
+            {/*                        className={`text-sm ${theme === "dark" ? "text-card-foreground" : "text-card"} w-[77px] font-semibold bg-destructive`}*/}
+            {/*                        onClick={() => onDeleteIdea(deleteRecord)}*/}
+            {/*                    >*/}
+            {/*                        {isLoadingSidebar ? <Loader2 size={16} className={"animate-spin"}/> : "Delete"}*/}
+            {/*                    </Button>*/}
+            {/*                </DialogFooter>*/}
+            {/*            </DialogContent>*/}
+            {/*        </Dialog>*/}
+            {/*    </Fragment>*/}
+            {/*}*/}
             <Sheet open={isOpen} onOpenChange={isOpen ? onCloseBoth : onOpen}>
                 <SheetContent className={"lg:max-w-[1101px] md:max-w-[720px] sm:max-w-[520px] p-0"}>
                     <SheetHeader className={"px-[32px] py-[22px] border-b"}>
@@ -969,14 +963,14 @@ const RoadMapSidebarSheet = ({
                                                                 <Pin fill={"bg-card-foreground"}
                                                                      className={"w-[16px] h-[16px]"}/>}
                                                         </Button>
-                                                        <Button
-                                                            variant={"outline"}
-                                                            className={"w-[30px] h-[30px] p-1"}
-                                                            onClick={deleteIdea}
-                                                            loading={isLoadingSidebar === "delete"}
-                                                        >
-                                                            <Trash2 className={"w-[16px] h-[16px]"}/>
-                                                        </Button>
+                                                        {/*<Button*/}
+                                                        {/*    variant={"outline"}*/}
+                                                        {/*    className={"w-[30px] h-[30px] p-1"}*/}
+                                                        {/*    onClick={deleteIdea}*/}
+                                                        {/*    loading={isLoadingSidebar === "delete"}*/}
+                                                        {/*>*/}
+                                                        {/*    <Trash2 className={"w-[16px] h-[16px]"}/>*/}
+                                                        {/*</Button>*/}
                                                     </div>
                                                 </div>
                                                 <div className={"flex flex-col gap-4"}>
