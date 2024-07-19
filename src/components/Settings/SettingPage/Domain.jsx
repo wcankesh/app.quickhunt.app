@@ -2,7 +2,6 @@ import React,{useState,useEffect,} from 'react';
 import {Card, CardContent, CardHeader, CardTitle, CardFooter, CardDescription} from "../../ui/card";
 import {Label} from "../../ui/label";
 import {Input} from "../../ui/input";
-import {useTheme} from "../../theme-provider";
 import {Button} from "../../ui/button";
 import {ApiService} from "../../../utils/ApiService";
 import {useSelector} from "react-redux";
@@ -27,13 +26,11 @@ const initialState = {
 
 
 const Domain = () => {
-    const {theme} = useTheme();
     const apiService = new ApiService();
     const [settingData, setSettingData] = useState(initialState);
     const [isSave, setIsSave] = useState(false);
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const userDetailsReducer = useSelector(state => state.userDetailsReducer);
-    const [isProModal, setIsProModal] = useState(false);
 
     useEffect(() =>{
         getPortalSetting()

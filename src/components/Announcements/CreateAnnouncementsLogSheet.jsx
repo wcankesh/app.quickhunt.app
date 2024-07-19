@@ -61,8 +61,6 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,callBack,selectedR
     const {theme} = useTheme();
     let apiService = new ApiService();
 
-    console.log(labelList,"labelList");
-
     useEffect(()=>{
         if(selectedRecord?.post_slug_url){
             getSinglePosts();
@@ -71,7 +69,6 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,callBack,selectedR
         setMemberList(allStatusAndTypes.members);
         setCategoriesList(allStatusAndTypes.categories);
     },[])
-    console.log(changeLogDetails.post_assign_to,"changeLogDetails.post_assign_to");
 
     const getSinglePosts = async () => {
         const data = await apiService.getSinglePosts(selectedRecord?.post_slug_url)
@@ -279,13 +276,13 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,callBack,selectedR
     return (
         <Sheet open={isOpen} onOpenChange={isOpen ? onClose : onOpen}>
             <SheetContent className={"pt-[24px] p-0 overflow-y-scroll lg:max-w-[663px] md:max-w-[720px] sm:max-w-[520px]"}>
-                <SheetHeader className={"px-8 py-6 flex flex-row justify-between items-center"}>
-                    <h5 className={"text-xl font-medium leading-5"}>{ selectedRecord?.post_slug_url ? "Update Announcement" :"Create New Announcements"}</h5>
-                    <div className={"flex items-center gap-6"}>
-                        <Button className={"h-5 w-5 p-0"} onClick={() => onChangeText({target:{name: "post_pin_to_top", value: changeLogDetails.post_pin_to_top === 1 ? 0 : 1}}) } variant={"ghost"} >{changeLogDetails.post_pin_to_top === 1 ? <Pin fill={"bg-card-foreground"} className={"h-4 w-4"}  size={18}/> : <Pin className={"h-4 w-4"}  size={18}/>}</Button>
-                        <Button className={"h-5 w-5 p-0"} onClick={onClose}  variant={"ghost"}><X size={18} className={"h-5 w-5"}/></Button>
-                    </div>
-                </SheetHeader>
+                    <SheetHeader className={`px-8 py-6 flex flex-row justify-between items-center sticky top-0 ${theme == "dark" ? "bg-[#020817]" : "bg-[#f8fafc]"} z-10`}>
+                        <h5 className={"text-xl font-medium leading-5"}>{ selectedRecord?.post_slug_url ? "Update Announcement" :"Create New Announcements"}</h5>
+                        <div className={"flex items-center gap-6"}>
+                            <Button className={"h-5 w-5 p-0"} onClick={() => onChangeText({target:{name: "post_pin_to_top", value: changeLogDetails.post_pin_to_top === 1 ? 0 : 1}}) } variant={"ghost"} >{changeLogDetails.post_pin_to_top === 1 ? <Pin fill={"bg-card-foreground"} className={"h-4 w-4"}  size={18}/> : <Pin className={"h-4 w-4"}  size={18}/>}</Button>
+                            <Button className={"h-5 w-5 p-0"} onClick={onClose}  variant={"ghost"}><X size={18} className={"h-5 w-5"}/></Button>
+                        </div>
+                    </SheetHeader>
                 <Separator className={"mb-6"}/>
                 <div className={"px-8"}>
                     <div className={"flex flex-col gap-6"}>

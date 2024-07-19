@@ -36,7 +36,8 @@ const status = [
 ];
 
 const Announcements = () => {
-    const [tab, setTab] = useState(localStorage.getItem("tabIndex" || 0));
+    const activeTab = localStorage.getItem("tabIndex") || 0;
+    const [tab, setTab] = useState(Number(activeTab));
     const {theme} = useTheme();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
@@ -50,8 +51,6 @@ const Announcements = () => {
     const [editIndex, setEditIndex] = useState(null);
     const [analyticsObj, setAnalyticsObj] = useState({})
     const apiService = new ApiService();
-
-    console.log(allStatusAndTypes)
 
     const openSheet = () => {
         setSelectedRecord({id: "new"})
@@ -94,8 +93,7 @@ const Announcements = () => {
     }
 
     useEffect(() => {
-        getAllPosts()
-
+        getAllPosts();
     }, [projectDetailsReducer.id, allStatusAndTypes, pageNo,]);
 
     const getAllPosts = async () => {
@@ -138,7 +136,6 @@ const Announcements = () => {
         setFilter({...filter, [event.name]: event.value,})
         const data = await apiService.filterPost(payload)
         if (data.status === 200) {
-            console.log(data.data)
             setIsLoading(false)
             setAnnouncementList(data.data)
         } else {

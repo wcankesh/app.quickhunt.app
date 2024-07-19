@@ -14,6 +14,8 @@ import Categories from "./SettingPage/Categories";
 import Topics from "./SettingPage/Topics";
 import Statuses from "./SettingPage/Statuses";
 import Social from "./SettingPage/Social";
+import Emoji from "./SettingPage/Emoji";
+import {SmilePlus} from "lucide-react";
 
 const Settings = () => {
     let navigate = useNavigate();
@@ -63,6 +65,13 @@ const Settings = () => {
             useFor: "(Announcements)",
         },
         {
+            title: 'Emoji',
+            link: 'emoji',
+            icon: <SmilePlus size={17} />,
+            selected: `${baseUrl}/emoji`,
+            useFor: "(Announcements)",
+        },
+        {
             title: 'Topics',
             link: 'topics',
             icon: Icon.setTopicsIcon,
@@ -106,6 +115,8 @@ const Settings = () => {
                 return <Topics />;
             case 'statuses':
                 return <Statuses />;
+            case 'emoji':
+                return <Emoji />;
             case 'social':
                 return <Social />;
             default:

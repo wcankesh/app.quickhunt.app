@@ -1,6 +1,5 @@
 import React, {useState,useEffect} from 'react';
 import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "../../ui/card";
-import SettingProfile from "../../../img/settingprofile.png";
 import {Label} from "../../ui/label";
 import {Input} from "../../ui/input";
 import {Button} from "../../ui/button";
@@ -55,7 +54,6 @@ const Profile = () => {
     const dispatch = useDispatch();
     const apiSerVice = new ApiService();
     const [previewImage,setPreviewImage] = useState("");
-    const [isSave,setIsSave]=useState(false);
 
     useEffect(() => {
         setUserDetails({...userDetailsReducer});
@@ -77,6 +75,14 @@ const Profile = () => {
             [name]: formValidate(name, value)
         });
     };
+
+    const onBlurPassWord = (event)=> {
+        const {name, value} = event.target;
+        setFormErrorPassword({
+            ...formErrorPassword,
+            [name]:formValidate(name,value)
+        });
+    }
 
     const onChangePassword = (event) => {
         setPassword({...password, [event.target.name] : event.target.value})
@@ -108,22 +114,22 @@ const Profile = () => {
                 } else {
                     return "";
                 }
-            case "user_current_password":
+            case "current_password":
                 if (!value || value.trim() === "") {
                     return "Current password is required";
                 } else {
                     return "";
                 }
-            case "user_password":
+            case "password":
                 if (!value || value.trim() === "") {
                     return "Password is required";
                 } else {
                     return "";
                 }
-            case "user_confirm_password":
+            case "confirm_password":
                 if (!value || value.trim() === "") {
                     return "Confirm password is required";
-                } else if (value !== userDetails.user_password) {
+                } else if (value !== password.password) {
                     return "Passwords do not match";
                 } else {
                     return "";
@@ -167,7 +173,7 @@ const Profile = () => {
             dispatch(userDetailsAction({...data.data}));
             setIsLoading(false);
             toast({
-                title: data.success,
+                title: data.message,
             })
         } else {
             setIsLoading(false);
@@ -331,19 +337,20 @@ const Profile = () => {
                                 value={password.current_password}
                                 name="current_password"
                                 onChange={onChangePassword}
-                                onBlur={onBlur}
+                                onBlur={onBlurPassWord}
                                 className={"bg-card"}
                             />
                             <Button variant={"ghost hover:none"} onClick={() => togglePasswordVisibility('user_current_password')}
                                     className={"absolute top-0 right-0"}>
                                 {passwordVisibility.user_current_password ? <Eye className={"w-[16px] h-[16px]"}/> : <EyeOff className={"w-[16px] h-[16px]"}/>}
                             </Button>
+                            {
+                                formErrorPassword.current_password &&
+                                <span className="text-destructive text-sm">{formErrorPassword.current_password}</span>
+                            }
                         </div>
                         </div>
-                        {
-                            formError.user_current_password &&
-                            <span className="text-destructive text-sm">{formError.user_current_password}</span>
-                        }
+
                         <div>
                         <Label htmlFor="email">Password</Label>
                         <div className={"relative"}>
@@ -354,19 +361,20 @@ const Profile = () => {
                                 value={password.password}
                                 name="password"
                                 onChange={onChangePassword}
-                                onBlur={onBlur}
+                                onBlur={onBlurPassWord}
                                 className={"bg-card"}
                             />
                             <Button variant={"ghost hover:none"} onClick={() => togglePasswordVisibility('user_password')}
                                     className={"absolute top-0 right-0"}>
                                 {passwordVisibility.user_password ? <Eye className={"w-[16px] h-[16px]"}/> : <EyeOff className={"w-[16px] h-[16px]"}/>}
                             </Button>
+                            {
+                                formErrorPassword.password &&
+                                <span className="text-destructive text-sm">{formErrorPassword.password}</span>
+                            }
                         </div>
                         </div>
-                        {
-                            formError.user_password &&
-                            <span className="text-destructive text-sm">{formError.user_password}</span>
-                        }
+
                         <div>
                         <Label htmlFor="email">Password confirmation</Label>
                         <div className={"relative"}>
@@ -377,19 +385,20 @@ const Profile = () => {
                                 value={password.confirm_password}
                                 name="confirm_password"
                                 onChange={onChangePassword}
-                                onBlur={onBlur}
+                                onBlur={onBlurPassWord}
                                 className={"bg-card"}
                             />
                             <Button variant={"ghost hover:none"} onClick={() => togglePasswordVisibility('user_confirm_password')}
                                     className={"absolute top-0 right-0"}>
                                 {passwordVisibility.user_confirm_password ? <Eye className={"w-[16px] h-[16px]"}/> : <EyeOff className={"w-[16px] h-[16px]"}/>}
                             </Button>
+                            {
+                                formErrorPassword.confirm_password &&
+                                <span className="text-destructive text-sm">{formErrorPassword.confirm_password}</span>
+                            }
                         </div>
                         </div>
-                        {
-                            formError.user_confirm_password &&
-                            <span className="text-destructive text-sm">{formError.user_confirm_password}</span>
-                        }
+
                     </div>
                 </CardContent>
                 <CardFooter className={"p-6 pt-0 justify-end"}>

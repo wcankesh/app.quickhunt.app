@@ -1,7 +1,7 @@
 import React, { Fragment, useState,useEffect, } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../../ui/card";
 import { Button } from "../../ui/button";
-import {Check, Loader2, Menu, Pencil, Plus, Square, Trash2, X} from "lucide-react";
+import {Check, Loader2, Pencil, Plus, Square, Trash2, X} from "lucide-react";
 import { Table, TableHeader, TableHead, TableRow, TableBody, TableCell } from "../../ui/table";
 import ColorInput from "../../Comman/ColorPicker";
 import {Input} from "../../ui/input";
@@ -109,22 +109,14 @@ const Labels = () => {
         const data = await apiService.createLabels(payload)
         if (data.status === 200) {
             let clone = [...labelList];
-            clone[index] = data.data
-            setLabelList(clone)
+            clone.push(data.data);
+            setLabelList(clone);
             dispatch(allStatusAndTypesAction({...allStatusAndTypes, labels: clone}))
             setSelectedRecord(null)
             setIsSave(false)
         } else {
             setIsSave(false)
         }
-
-        setLabelList((prevLabels) => [
-            ...prevLabels,
-            {
-                label_name: newLabel.label_name,
-                label_color_code: newLabel.label_color_code,
-            },
-        ]);
 
         setNewLabel({ ...initialNewLabel });
         setShowColorInput(false);
@@ -162,7 +154,6 @@ const Labels = () => {
     const handleSaveLabel = async (index) => {
         const updatedColors = [...labelList];
         const labelToSave = updatedColors[index];
-        console.log(labelToSave)
 
         if (!labelToSave.label_name || labelToSave.label_name.trim() === "") {
             setLabelError({
@@ -198,9 +189,7 @@ const Labels = () => {
             ...labelError,
             label_name: ""
         });
-
         updatedColors[index] = { ...labelToSave };
-        // setLabelColors(updatedColors);
         setIsEdit(null);
     };
 
@@ -221,7 +210,6 @@ const Labels = () => {
         if (deleteId) {
             const data = await apiService.deleteLabels(deleteId)
             if (data.status === 200) {
-                console.log("ddfad")
                 const clone = [...labelList];
                 clone.splice(deleteIndex, 1);
                 setLabelList(clone);
@@ -229,7 +217,6 @@ const Labels = () => {
             } else {
             }
         } else {
-            console.log("else")
             const clone = [...labelList];
             clone.splice(deleteIndex, 1);
             setLabelList(clone);
@@ -286,7 +273,6 @@ const Labels = () => {
                                         [...Array(3)].map((_,index)=>{
                                             return(
                                                 <TableRow key={index}>
-                                                    {/*<TableCell><Skeleton className={"w-full h-[24px] rounded-md"}/></TableCell>*/}
                                                     <TableCell><Skeleton className={"w-full h-[24px] rounded-md"}/></TableCell>
                                                     <TableCell><Skeleton className={"w-full h-[24px] rounded-md"}/></TableCell>
                                                     <TableCell><Skeleton className={"w-full h-[24px] rounded-md"}/></TableCell>
@@ -298,7 +284,6 @@ const Labels = () => {
                              </Table> : <Table>
                                 <TableHeader className="p-0">
                                     <TableRow>
-                                        {/*<TableHead className={"w-[48px]"}/>*/}
                                         <TableHead className={`w-2/5 pl-4 ${theme === "dark" ? "" : "text-card-foreground"}`}>Label
                                             Name</TableHead>
                                         <TableHead
@@ -412,7 +397,7 @@ const Labels = () => {
                                                 </div>
                                             </TableCell>
                                             <TableCell className={`${labelError ? "align-top" : ""} p-0 py-4`}>
-                                                <div className={"py-2 px-3 border border-border rounded-lg"}>
+                                                <div className={"flex justify-center items-center"}>
                                                     <ColorInput
                                                         name="label_color_code"
                                                         value={newLabel.label_color_code}

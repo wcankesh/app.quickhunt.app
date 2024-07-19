@@ -36,51 +36,6 @@ import {
     AlertDialogTitle
 } from "../ui/alert-dialog";
 
-
-const dummyDetails ={
-    data:[
-        {
-            title:"Welcome To Our Release Notes",
-            description:"All great things around you were not built in a day, some took weeks, quite a few of them took months and a rare few even decades. As builders, our quest is to reach for that perfect product that solves your problems and adds value to your lives, and we too realise it will be a journey of minor and major improvements made day after day...",
-            isNew:0,
-            isImp:0,
-            author:"testingapp",
-            date:"17 Jun",
-            msg:25,
-            up:25,
-            status:0,
-            value:0,
-        },
-        {
-            title:"Welcome To Our Release Notes",
-            description:"All great things around you were not built in a day, some took weeks, quite a few of them took months and a rare few even decades. As builders, our quest is to reach for that perfect product that solves your problems and adds value to your lives, and we too realise it will be a journey of minor and major improvements made day after day...",
-            isNew:0,
-            isImp:1,
-            author:"testingapp",
-            date:"17 Jun",
-            msg:25,
-            up:25,
-            status:0,
-            value:1,
-
-        },
-        {
-            title:"Welcome To Our Release Notes",
-            description:"All great things around you were not built in a day, some took weeks, quite a few of them took months and a rare few even decades. As builders, our quest is to reach for that perfect product that solves your problems and adds value to your lives, and we too realise it will be a journey of minor and major improvements made day after day...",
-            isNew:0,
-            isImp:0,
-            author:"testingapp",
-            date:"17 Jun",
-            msg:25,
-            up:25,
-            status:1,
-            value:1,
-        },
-    ],
-    page:1,
-    preview:0,
-}
-
 const status = [
     {name: "Publish", value: 0, fillColor: "#389E0D", strokeColor: "#389E0D",},
     {name: "Draft", value: 1, fillColor: "#CF1322", strokeColor: "#CF1322",},
@@ -163,7 +118,7 @@ const AnnouncementsView = ({data,isLoading,setSelectedRecord,handleDelete,setAna
                         {
                             (announcementList || []).map((x,index)=>{
                                 return(
-                                    <Fragment>
+                                    <Fragment key={index}>
                                         <div className={"flex flex-row gap-4 items-center justify-between px-[31px] mb-[22px]"}>
                                             <div className={"basis-4/5 flex flex-row gap-4 items-center flex-wrap"}>
                                                 <h4 className={"text-base font-medium capitalize"}>{x.post_title}</h4>
@@ -257,19 +212,19 @@ const AnnouncementsView = ({data,isLoading,setSelectedRecord,handleDelete,setAna
                             <div className={`w-full p-5 ${theme === "dark" ? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end pe-16 py-15px`}>
                                 <div className={"flex flex-row gap-8 items-center"}>
                                     <div>
-                                        <h5 className={"text-sm font-semibold"}>Page {dummyDetails.page} of 10</h5>
+                                        <h5 className={"text-sm font-semibold"}>Page 1 of 10</h5>
                                     </div>
                                     <div className={"flex flex-row gap-2 items-center"}>
-                                        <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5 hover:none"}>
-                                            <ChevronsLeft  className={`${dummyDetails.preview === 0 ? "stroke-slate-300" : "stroke-primary"}`} />
+                                        <Button variant={"outline"}  disabled={true} className={"h-[30px] w-[30px] p-1.5 hover:none"}>
+                                            <ChevronsLeft  />
                                         </Button>
-                                        <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5 hover:none"}>
-                                            <ChevronLeft  className={`${dummyDetails.preview === 0 ? "stroke-slate-300" : "stroke-primary"}`} />
+                                        <Button variant={"outline"}  disabled={true} className={"h-[30px] w-[30px] p-1.5 hover:none"}>
+                                            <ChevronLeft  />
                                         </Button>
-                                        <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5 hover:none"}>
-                                            <ChevronRight  className={"stroke-primary"} />
+                                        <Button variant={"outline"} disabled={true} className={"h-[30px] w-[30px] p-1.5 hover:none"}>
+                                            <ChevronRight className={"stroke-primary"} />
                                         </Button>
-                                        <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5 hover:none"}>
+                                        <Button variant={"outline"}  disabled={true} className={"h-[30px] w-[30px] p-1.5 hover:none"}>
                                             <ChevronsRight className={"stroke-primary"} />
                                         </Button>
                                     </div>

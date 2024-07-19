@@ -1,7 +1,7 @@
 import React, { Fragment, useState,useEffect, } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../../ui/card";
 import { Button } from "../../ui/button";
-import {Check, Menu, Pencil, Plus, Square, Trash2, X} from "lucide-react";
+import {Check, Loader2, Menu, Pencil, Plus, Square, Trash2, X} from "lucide-react";
 import { Table, TableHeader, TableHead, TableRow, TableBody, TableCell } from "../../ui/table";
 import ColorInput from "../../Comman/ColorPicker";
 import {Input} from "../../ui/input";
@@ -20,11 +20,19 @@ import {
     AlertDialogHeader,
     AlertDialogTitle
 } from "../../ui/alert-dialog";
+import {Skeleton} from "../../ui/skeleton";
+import SettingEmptyDataTable from "../../Comman/SettingEmptyDataTable";
 
 const initialStatus = {
     title: '',
     color_code: '#000000',
 };
+
+const tableHeadingsArray = [
+    {label:"Status Name"},
+    {label:"Status Update"},
+    {label:"Action"}
+];
 
 
 
@@ -49,9 +57,6 @@ const Statuses = () => {
     const dispatch = useDispatch();
     let apiService = new ApiService();
 
-
-
-
     useEffect(() => {
         getAllRoadmapStatus()
     },[projectDetailsReducer.id])
@@ -65,10 +70,10 @@ const Statuses = () => {
                 let obj = {...x,index: i}
                 clone.push(obj)
             })
-            setStatusList(clone)
-            setIsLoading(false)
+            setStatusList(clone);
+            setIsLoading(false);
         } else {
-            setIsLoading(false)
+            setIsLoading(false);
         }
     }
 
@@ -119,28 +124,21 @@ const Statuses = () => {
         const data = await apiService.createRoadmapStatus(payload)
         if (data.status === 200) {
             let clone = [...statusList];
-            clone[index] = data.data
-            setStatusList(clone)
+            clone.push(data.data);
+            setStatusList(clone);
             dispatch(allStatusAndTypesAction({...allStatusAndTypes, roadmap_status: clone}))
-            // setSelectedRecord(null)
-            setIsSave(false)
-            // message.success("Status add successfully")
+            setIsSave(false);
+            setShowColorInput(false);
+            setNewStatus(initialStatus);
+            toast({
+                title:"Status added successfully"
+            })
         } else {
             setIsSave(false)
-            // message.error(data.message)
+            toast({
+                title:"Something went wrong"
+            })
         }
-
-        // setLabelColors((prevLabels) => [
-        //     ...prevLabels,
-        //     {
-        //         labelName: newLabel.labelName,
-        //         name: 'clr',
-        //         value: newLabel.value,
-        //     },
-        // ]);
-        //
-        // setNewLabel({ ...initialNewLabel });
-        // setShowColorInput(false);
     };
 
     const onBlur = (event) => {
@@ -155,7 +153,7 @@ const Statuses = () => {
         switch (name) {
             case "title":
                 if(!value || value.trim() === "") {
-                    return "Label name is required."
+                    return "Status name is required."
                 } else {
                     return "";
                 }
@@ -179,7 +177,7 @@ const Statuses = () => {
         if (!labelToSave.title || labelToSave.title.trim() === "") {
             setLabelError({
                 ...labelError,
-                title: "Label name is required."
+                title: "Status name is required."
             });
             return;
         }
@@ -203,7 +201,6 @@ const Statuses = () => {
                 setStatusList(clone)
                 dispatch(allStatusAndTypesAction({...allStatusAndTypes, roadmap_status: clone}))
             }
-            // setSelectedRecord(null)
             setIsSave(false)
             toast({
                 title:"Status update successfully"
@@ -221,9 +218,6 @@ const Statuses = () => {
     };
 
     const handleCancelEdit = (index) => {
-        const updatedColors = [...labelColors];
-        updatedColors[index] = { ...updatedColors[index],};
-        setLabelColors(updatedColors);
         setIsEdit(null);
     };
 
@@ -241,7 +235,12 @@ const Statuses = () => {
                 setStatusList(clone)
                 dispatch(allStatusAndTypesAction({...allStatusAndTypes, roadmap_status: clone}))
                 toast({
-                    title:"Status delete successfully"
+                    title:data.success
+                })
+            } else if(data.status === 201){
+                toast({
+                    title:data.success,
+                    variant: "destructive"
                 })
             } else {
                 toast({
@@ -288,19 +287,42 @@ const Statuses = () => {
                     </Button>
                 </CardHeader>
                 <CardContent className="p-0">
-                    <Table>
+                    {isLoading ? <Table>
+                        <TableHeader className={"p-0"}>
+                            <TableRow>
+                                <TableHead className={"w-[48px] p-0"}/>
+                                <TableHead className={`w-2/5 pl-0 ${theme === "dark" ? "" : "text-card-foreground"}`}>Status Name</TableHead>
+                                <TableHead className={`text-center ${theme === "dark" ? "" : "text-card-foreground"}`}>Status Color</TableHead>
+                                <TableHead className={`pr-[39px] text-end ${theme === "dark" ? "" : "text-card-foreground"}`}>Action</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {
+                                [...Array(5)].map((_,index)=>{
+                                    return(
+                                        <TableRow key={index}>
+                                            <TableCell className={"py-[3px]"}><Menu className={"cursor-grab"} size={16}/></TableCell>
+                                            <TableCell className={"pl-0"}><Skeleton className={"w-full h-[24px] rounded-md"}/></TableCell>
+                                            <TableCell><Skeleton className={"w-full h-[24px] rounded-md"}/></TableCell>
+                                            <TableCell><Skeleton className={"w-full h-[24px] rounded-md"}/></TableCell>
+                                        </TableRow>
+                                    )
+                                })
+                            }
+                        </TableBody>
+                    </Table> : showColorInput === false && statusList.length === 0 ? <SettingEmptyDataTable tableHeadings={tableHeadingsArray}/> : <Table>
                         <TableHeader className="p-0">
                             <TableRow>
                                 <TableHead className={"w-[48px]"}/>
-                                <TableHead className={`w-2/5 pl-0 ${theme === "dark" ? "" : "text-card-foreground"}`}>Label Name</TableHead>
-                                <TableHead className={`text-center ${theme === "dark" ? "" : "text-card-foreground"}`}>Label Color</TableHead>
+                                <TableHead className={`w-2/5 pl-0 ${theme === "dark" ? "" : "text-card-foreground"}`}>Status Name</TableHead>
+                                <TableHead className={`text-center ${theme === "dark" ? "" : "text-card-foreground"}`}>Status Color</TableHead>
                                 <TableHead className={`pr-[39px] text-end ${theme === "dark" ? "" : "text-card-foreground"}`}>Action</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {(statusList || []).map((x, i) => (
                                 <TableRow key={i}>
-                                    <TableCell><Menu className={"cursor-grab"} size={16} /></TableCell>
+                                    <TableCell><Menu className={"cursor-grab"} size={16}/></TableCell>
                                     {
                                         isEdit === i ?
                                             <TableCell className={"py-[8.5px] pl-0 py-[11px]"}>
@@ -319,15 +341,18 @@ const Statuses = () => {
                                                     }
                                                 </div>
                                             </TableCell>
-                                            : <TableCell className={`font-medium text-xs py-[8.5px] pl-0 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.title}</TableCell>
+                                            : <TableCell
+                                                className={`font-medium text-xs py-[8.5px] pl-0 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.title}</TableCell>
                                     }
                                     {isEdit === i ?
-                                        <TableCell className={`font-medium text-xs ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                        <TableCell
+                                            className={`font-medium text-xs ${theme === "dark" ? "" : "text-muted-foreground"}`}>
                                             <div className={"flex justify-center items-center"}>
-                                                <ColorInput name={"color_code"} value={x.color_code} onChange={(color) => onChangeColorColor(color, i)} />
+                                                <ColorInput name={"color_code"} value={x.color_code} onChange={(color) => onChangeColorColor(color, i)}/>
                                             </div>
                                         </TableCell> :
-                                        <TableCell className={`font-medium text-xs ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                        <TableCell
+                                            className={`font-medium text-xs ${theme === "dark" ? "" : "text-muted-foreground"}`}>
                                             <div className={"flex justify-center items-center gap-1"}>
                                                 <Square size={16} strokeWidth={1} fill={x.color_code} stroke={x.color_code}/>
                                                 <p>{x.color_code}</p>
@@ -339,17 +364,17 @@ const Statuses = () => {
                                             <Fragment>
                                                 <Button
                                                     variant="outline hover:bg-transparent"
-                                                    className="p-1 border w-[30px] h-[30px]"
-                                                    onClick={() => handleSaveStatus(x,i)}
+                                                    className={`p-1 border w-[30px] h-[30px] ${isSave ? "justify-center items-center" : ""}`}
+                                                    onClick={() => handleSaveStatus(x, i)}
                                                 >
-                                                    <Check size={16} />
+                                                    {isSave ? <Loader2 className="mr-1 h-4 w-4 animate-spin justify-center"/> : <Check size={16}/>}
                                                 </Button>
                                                 <Button
                                                     variant="outline hover:bg-transparent"
                                                     className="p-1 border w-[30px] h-[30px]"
                                                     onClick={() => handleCancelEdit(i)}
                                                 >
-                                                    <X size={16} />
+                                                    <X size={16}/>
                                                 </Button>
                                             </Fragment>
                                         ) : (
@@ -359,14 +384,14 @@ const Statuses = () => {
                                                     className="p-1 border w-[30px] h-[30px]"
                                                     onClick={() => handleEditLabel(i)}
                                                 >
-                                                    <Pencil size={16} />
+                                                    <Pencil size={16}/>
                                                 </Button>
                                                 <Button
                                                     variant="outline hover:bg-transparent"
                                                     className="p-1 border w-[30px] h-[30px]"
-                                                    onClick={() => handleDeleteLabel(x.id,i)}
+                                                    onClick={() => handleDeleteLabel(x.id, i)}
                                                 >
-                                                    <Trash2 size={16} />
+                                                    <Trash2 size={16}/>
                                                 </Button>
                                             </Fragment>
                                         )}
@@ -376,7 +401,8 @@ const Statuses = () => {
                             {showColorInput && (
                                 <TableRow>
                                     <TableCell className={`${labelError ? "align-top" : ""}`}>
-                                        <Button variant={"ghost hover:bg-transparent"} className={"p-0 cursor-grab"}><Menu size={16} /></Button>
+                                        <Button variant={"ghost hover:bg-transparent"}
+                                                className={"p-0 cursor-grab"}><Menu size={16}/></Button>
                                     </TableCell>
                                     <TableCell className={"p-0 py-4 pr-4"}>
                                         <Input
@@ -386,7 +412,7 @@ const Statuses = () => {
                                             name="title"
                                             value={newStatus.title}
                                             onChange={handleInputChange}
-                                            placeholder="Enter Label Name"
+                                            placeholder="Enter Status Name"
                                             onBlur={onBlur}
                                         />
                                         <div className="grid gap-2">
@@ -397,11 +423,14 @@ const Statuses = () => {
                                         </div>
                                     </TableCell>
                                     <TableCell className={`${labelError ? "align-top" : ""} p-0 py-4`}>
-                                        <div className={"py-2 px-3 border border-border rounded-lg"}>
+                                        <div className={"flex justify-center items-center"}>
                                             <ColorInput
                                                 name="color_code"
                                                 value={newStatus.color_code}
-                                                onChange={(color) => setNewStatus((prevState) => ({ ...prevState, color_code: color.color_code }))}
+                                                onChange={(color) => setNewStatus((prevState) => ({
+                                                    ...prevState,
+                                                    color_code: color.color_code
+                                                }))}
                                             />
                                         </div>
                                     </TableCell>
@@ -409,15 +438,15 @@ const Statuses = () => {
                                         <Button
                                             variant=""
                                             className="text-sm font-semibold"
-                                            onClick={()=>handleAddNewLabel()}
+                                            onClick={() => handleAddNewLabel()}
                                         >
-                                            Add Label
+                                            {isSave ? <Loader2 className={"mr-2 h-4 w-4 animate-spin"}/> : "Add Status"}
                                         </Button>
                                     </TableCell>
                                 </TableRow>
                             )}
                         </TableBody>
-                    </Table>
+                    </Table>}
                 </CardContent>
         </Card>
         </Fragment>

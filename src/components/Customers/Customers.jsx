@@ -1,6 +1,6 @@
 import React, {useState,useEffect} from 'react';
 import {Button} from "../ui/button";
-import {ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Plus} from "lucide-react";
+import {ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Plus, Trash2} from "lucide-react";
 import {Card, CardContent, CardFooter} from "../ui/card";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "../ui/table";
 import NoDataThumbnail from "../../img/Frame.png"
@@ -11,6 +11,17 @@ import {ApiService} from "../../utils/ApiService";
 import {useSelector} from "react-redux";
 import EmptyDataTable from "../Comman/EmptyDataTable";
 import SkeletonTable from "../Comman/SkeletonTable";
+import {toast} from "../ui/use-toast";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle
+} from "../ui/alert-dialog";
 
 const tableHeadingsArray = [
     {label:"Name"},
@@ -23,55 +34,10 @@ const tableHeadingsArray = [
     {label:"Country"},
     {label:"Browser"},
     {label:"Os"},
+    {label:"Action"},
 ];
 
-const dummyTable = {
-        data: [{
-            name: "Darshan Jiyani",
-            email: "wc.darshan2003@gmail.com",
-            company: "Testtingapp",
-            added_via: "",
-            segment: "",
-            designation: "",
-            tags: "",
-            country: "",
-            browser: "",
-            os: "",
-            avatar: "https://avatars.githubusercontent.com/u/124599?v=4&size=20",
-            id: 1
-        },
-            {
-                name: "Darshan Jiyani",
-                email: "wc.darshan2003@gmail.com",
-                company: "Testtingapp",
-                added_via: "",
-                segment: "",
-                designation: "",
-                tags: "",
-                country: "",
-                browser: "",
-                os: "",
-                avatar: "https://avatars.githubusercontent.com/u/124599?v=4&size=20",
-                id: 2
-            },
-            {
-                name: "Darshan Jiyani",
-                email: "wc.darshan2003@gmail.com",
-                company: "Testtingapp",
-                added_via: "",
-                segment: "",
-                designation: "",
-                tags: "",
-                country: "",
-                browser: "",
-                os: "",
-                avatar: "https://avatars.githubusercontent.com/u/124599?v=4&size=20",
-                id: 3
-            }],
-        page:1,
-        preview:0
-    }
-    const perPageLimit = 10;
+const perPageLimit = 10;
 
 const Customers = () => {
     const [isSheetOpen, setSheetOpen] = useState(false);
@@ -84,8 +50,8 @@ const Customers = () => {
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const [pageNo, setPageNo] = useState(1);
     const [totalRecord, setTotalRecord] = useState(0);
-
-    console.log(projectDetailsReducer);
+    const [deleteId,setDeleteId]=useState(null);
+    const [deleteIndex,setDeleteIndex]=useState(null);
 
     useEffect(() => {
         getAllCustomers();
@@ -116,10 +82,47 @@ const Customers = () => {
         }
     };
 
+    const deleteCustomer =  (id,index) => {
+        setDeleteId(id);
+        setDeleteIndex(index);
+    }
+
+    const handleDelete = async () =>{
+        const data = await apiService.deleteCustomers(deleteId);
+        if(data.status === 200) {
+            const clone = [...customerList];
+            clone.splice(deleteIndex,1);
+            setCustomerList(clone);
+            toast({
+                title:data.success
+            })
+        }
+        else{
+            toast({
+                title:"Something went wrong"
+            })
+        };
+        setDeleteId(null);
+        setDeleteIndex(null);
+    }
 
     return (
         <div className={"pt-8  xl:container xl:max-w-[1622px] lg:container lg:max-w-[796px] md:container md:max-w-[530px] sm:container sm:max-w-[639px] max-[639px]:container max-[639px]:max-w-[639px] xs:container xs:max-w-[475px] "}>
             <NewCustomerSheet isOpen={isSheetOpen} onOpen={openSheet} callback={getAllCustomers} onClose={closeSheet}/>
+            <AlertDialog open={deleteId} onOpenChange={() => setDeleteId(null)}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>You really want delete customer ?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            This action can't be undone.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel onClick={() => setDeleteId(null)}>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleDelete} className={"bg-red-600 hover:bg-red-600"}>Delete</AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
             <div className={""}>
                 <div className={"flex flex-row justify-between items-center"}>
                     <div>
@@ -130,7 +133,7 @@ const Customers = () => {
                 </div>
                 <div className={"pt-8"}>
                     {
-                        isLoading ? <SkeletonTable tableHeadings={tableHeadingsArray} arrayLength={3} numberOfCells={10}/> : customerList.length === 0 ? <EmptyDataTable tableHeadings={tableHeadingsArray}/>:
+                        isLoading ? <SkeletonTable tableHeadings={tableHeadingsArray} arrayLength={3} numberOfCells={11}/> : customerList.length === 0 ? <EmptyDataTable tableHeadings={tableHeadingsArray}/>:
                             <Card>
                                 <CardContent className={"p-0 rounded-md"}>
                                     <Table className={""}>
@@ -147,7 +150,7 @@ const Customers = () => {
                                         </TableHeader>
                                         <TableBody className={""}>
                                             {
-                                                (customerList || []).map((x)=>{
+                                                (customerList || []).map((x,index)=>{
                                                     return(
                                                         <TableRow key={x.id} className={"font-medium"}>
                                                             <TableCell className={`py-3 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.customer_name ? x.customer_name : "-"}</TableCell>
@@ -163,6 +166,11 @@ const Customers = () => {
                                                             <TableCell className={`py-3 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.country ? x.country : "-"}</TableCell>
                                                             <TableCell className={`py-3 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.browser ? x.browser : "-"}</TableCell>
                                                             <TableCell className={`py-3 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.os ? x.os : "-"}</TableCell>
+                                                            <TableCell className={`py-3 ${theme === "dark" ? "" : "text-muted-foreground flex justify-center"}`}>
+                                                                <Button onClick={() => deleteCustomer(x.id,index)} variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px]`}>
+                                                                    <Trash2 size={16}/>
+                                                                </Button>
+                                                            </TableCell>
                                                         </TableRow>
                                                     )
                                                 })

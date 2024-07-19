@@ -14,7 +14,7 @@ const SettingEmptyDataTable = ({tableHeadings}) => {
                         {
                             (tableHeadings || []).map((x,index)=>{
                                 return(
-                                        <TableHead className={`w-2/5 pl-4 ${theme === "dark" ? "" : "text-card-foreground"} ${index === 1 ? "text-center" : index ? "text-end" : ""}`}>{x.label}</TableHead>
+                                        <TableHead key={index} className={`w-2/5 pl-4 ${theme === "dark" ? "" : "text-card-foreground"} ${index === 1 ? "text-center" : index ? "text-end" : ""}`}>{x.label}</TableHead>
                                     )
                             })
                         }

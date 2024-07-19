@@ -383,4 +383,16 @@ export class ApiService{
     async roadmapStatusRank (payload){
         return await this.postData(`${baseUrlApi}/roadmap-status/rank`,payload)
     }
+    async createEmoji (payload){
+        return await this.postData(`${baseUrlApi}/emoji`, payload)
+    }
+    async getAllEmoji (id){
+        return await this.getData(`${baseUrlApi}/emoji?project_id=${id}`)
+    }
+    async deleteEmoji (id){
+        return await this.deleteData(`${baseUrlApi}/emoji/${id}`)
+    }
+    async updateEmoji (payload, id){
+        return await this.putData(`${baseUrlApi}/emoji/${id}`,payload)
+    }
 }

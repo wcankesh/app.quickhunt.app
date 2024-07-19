@@ -54,7 +54,7 @@ const Categories = () => {
         setIsLoading(true)
         const data = await apiService.getAllCategory(projectDetailsReducer.id)
         if(data.status === 200){
-            setCategoriesList(data.data)
+            setCategoriesList(data.data);
             setIsLoading(false)
         } else {
             setIsLoading(false)
@@ -201,7 +201,6 @@ const Categories = () => {
             }
             setCategoriesList(clone)
             setCategoryDetails(initialState);
-            // setIsAddCategories(false);
             setIsSave(false);
             toast({
                 title:"Categories update successfully",
@@ -209,7 +208,6 @@ const Categories = () => {
         } else {
             setIsSave(false);
         }
-
         setEditRecord({});
         closeSheet();
     }
@@ -245,7 +243,6 @@ const Categories = () => {
                         isLoading ? <Table>
                                         <TableHeader className={""}>
                                             <TableRow>
-                                                {/*<TableHead className={"w-[50px]"}></TableHead>*/}
                                                 <TableHead className={`w-2/5 pl-4 ${theme === "dark" ? "" : "text-card-foreground"}`}>Label Name</TableHead>
                                                 <TableHead className={`text-center ${theme === "dark" ? "" : "text-card-foreground"}`}>Last Update</TableHead>
                                                 <TableHead className={`pr-[39px] text-end ${theme === "dark" ? "" : "text-card-foreground"}`}>Action</TableHead>
@@ -256,7 +253,6 @@ const Categories = () => {
                                                 [...Array(5)].map((_,index)=>{
                                                     return(
                                                         <TableRow key={index}>
-                                                            {/*<TableCell><Skeleton className={"w-full h-[24px] rounded-md"}/></TableCell>*/}
                                                             <TableCell><Skeleton className={"w-full h-[24px] rounded-md"}/></TableCell>
                                                             <TableCell><Skeleton className={"w-full h-[24px] rounded-md"}/></TableCell>
                                                             <TableCell><Skeleton className={"w-full h-[24px] rounded-md"}/></TableCell>
@@ -269,7 +265,6 @@ const Categories = () => {
                                     <Table>
                                         <TableHeader className={""}>
                                             <TableRow>
-                                                {/*<TableHead className={"w-[50px]"}></TableHead>*/}
                                                 <TableHead className={`w-2/5 pl-4 ${theme === "dark" ? "" : "text-card-foreground"}`}>Label Name</TableHead>
                                                 <TableHead className={`text-center ${theme === "dark" ? "" : "text-card-foreground"}`}>Last Update</TableHead>
                                                 <TableHead className={`pr-[39px] text-end ${theme === "dark" ? "" : "text-card-foreground"}`}>Action</TableHead>
@@ -280,16 +275,15 @@ const Categories = () => {
                                                 (categoriesList || []).map((x,index)=>{
                                                     return(
                                                         <TableRow key={x.id}>
-                                                            {/*<TableCell className={` leading-normal ${theme === "dark" ? "" : "text-muted-foreground"}`}><Menu size={16} className={"cursor-grab"} /></TableCell>*/}
                                                             <TableCell className={`font-medium text-xs py-[8.5px] pl-4 ${theme === "dark" ? "" : "text-muted-foreground"}`}>
                                                                 {x.name}
                                                             </TableCell>
                                                             <TableCell className={`font-medium text-xs leading-normal text-center ${theme === "dark" ? "" : "text-muted-foreground"}`}>{moment.utc(x.updated_at).local().startOf('seconds').fromNow()}</TableCell>
                                                             <TableCell className={"flex justify-end"}>
                                                                 <div className="pr-0">
-                                                                         <Button onClick={() => onEditOption(x,index)} variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px] ${theme === "dark" ? "" : "text-muted-foreground"}`}><Pencil size={16}/></Button>
+                                                                         <Button onClick={() => onEditOption(x,index)} variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px]`}><Pencil size={16}/></Button>
                                                                 </div>
-                                                                <div className="pl-2"><Button onClick={()=>deleteCategory(x.id,index)} variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px] ${theme === "dark" ? "" : "text-muted-foreground"}`}><Trash2 size={16} /></Button></div>
+                                                                <div className="pl-2"><Button onClick={()=>deleteCategory(x.id,index)} variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px]`}><Trash2 size={16} /></Button></div>
                                                             </TableCell>
                                                         </TableRow>
                                                     )
@@ -298,7 +292,6 @@ const Categories = () => {
                                         </TableBody>
                                     </Table>
                     }
-
                 </CardContent>
             </Card>
             {isSheetOpen && (
@@ -328,8 +321,6 @@ const Categories = () => {
                         <Separator/>
                         <div className={"px-8 py-6"}>
                             <Button onClick={editRecord?.id ? updateCategory : addCategory}>{isSave ? <Loader2 className={"mr-2 h-4 w-4 animate-spin"}/> : editRecord.id ? "Update Category" : "Add Category" }</Button>
-                            {/*<Button onClick={editRecord?.id ? updateCategory : addCategory}>{editRecord.id ? "Update Category" : "Add Category"}</Button>*/}
-
                         </div>
                     </SheetContent>
                 </Sheet>

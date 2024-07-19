@@ -55,11 +55,6 @@ const AnnouncementsTable = ({data,isLoading ,setSelectedRecord,setEditIndex ,han
         handleAnalyticRow(x);
 
     };
-    const closeSheet = () => {
-        setSelectedViewAnalyticsRecord({id: ''});
-        setSheetOpen(false);
-        setIsViewAnalytics(false);
-    };
 
     const handleStatusChange = async (object, value) => {
         setAnnouncementData(announcementData.map(x => x.id === object.id ? { ...x, post_save_as_draft: value } : x));
