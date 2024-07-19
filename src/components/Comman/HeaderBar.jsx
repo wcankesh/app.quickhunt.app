@@ -450,7 +450,7 @@ const HeaderBar = () => {
                                             {(projectList || []).map((x, i) => (
                                                 <Fragment key={i}>
                                                     <CommandItem
-                                                        className={`${projectDetailsReducer.id === x.id ? `${theme === "dark" ? "text-card-foreground" : "text-card"} bg-primary` : 'bg-card'}`}
+                                                        className={`${projectDetailsReducer.id === x.id ? `${theme === "dark" ? "text-card-foreground" : "text-card"} bg-primary hov-primary` : 'bg-card'}`}
                                                         value={x.id}
                                                         onSelect={() => {
                                                             onChangeProject(x.id);

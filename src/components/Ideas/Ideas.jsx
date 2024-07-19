@@ -1,16 +1,6 @@
 import React, {Fragment, useEffect, useState} from 'react';
 import {Button} from "../ui/button";
-import {
-    ArrowBigUp, Check,
-    ChevronLeft,
-    ChevronRight,
-    ChevronsLeft,
-    ChevronsRight,
-    Circle,
-    Dot, Ellipsis, Loader2,
-    MessageCircleMore, Pin,
-    Plus,
-} from "lucide-react";
+import {ArrowBigUp, Check, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Circle, Dot, Ellipsis, Loader2, MessageCircleMore, Pin, Plus,} from "lucide-react";
 import {Card, CardContent, CardFooter} from "../ui/card";
 import {Select, SelectItem, SelectGroup, SelectContent, SelectTrigger, SelectValue} from "../ui/select";
 import SidebarSheet from "../Ideas/SidebarSheet";
@@ -312,28 +302,12 @@ const Ideas = () => {
         }
     };
 
-    const handleRoadmapUpdate = async (name, value, index, record) => {
-        let formData = new FormData();
-        formData.append(name, value);
-        const data = await apiSerVice.updateIdea(formData, record.id);
-        if (data.status === 200) {
-        // if (data?.id) {
-            let clone = [...ideasList]
-            clone[index].roadmap_id = value
-            setIdeasList(clone);
-            toast({description: "Roadmap status updated successfully"});
-        } else {
-            toast({variant: "destructive", description: "Failed to update roadmap status"});
-        }
-    };
-
-    const handleStatusUpdate = async (id, name, value, index, record) => {
+    const handleStatusUpdate = async (name, value, index, record) => {
         const formData = new FormData();
         formData.append(name, value);
 
-        const data = await apiSerVice.updateIdea(formData, id, record.id);
+        const data = await apiSerVice.updateIdea(formData, record?.id);
         if (data.status === 200) {
-        // if (data?.id) {
             const clone = [...ideasList];
             if (name === "is_archive" || name === "is_active") {
                 clone[index][name] = value;
@@ -396,8 +370,7 @@ const Ideas = () => {
                     </Dialog>
                 </Fragment>
             }
-            <div
-                className={"xl:container xl:max-w-[1200px] lg:container lg:max-w-[992px] md:container md:max-w-[768px] sm:container sm:max-w-[639px] xs:container xs:max-w-[475px] pt-8 pb-5"}>
+            <div className={"xl:container xl:max-w-[1200px] lg:container lg:max-w-[992px] md:container md:max-w-[768px] sm:container sm:max-w-[639px] xs:container xs:max-w-[475px] pt-8 pb-5"}>
                 <SidebarSheet
                     isOpen={isSheetOpen}
                     onOpen={openSheet}
@@ -612,10 +585,10 @@ const Ideas = () => {
                                                                             </DropdownMenuTrigger>
                                                                             <DropdownMenuContent>
                                                                                 <DropdownMenuItem className={"cursor-pointer"} onClick={() => openDetailsSheet(x)}>Edit</DropdownMenuItem>
-                                                                                <DropdownMenuItem className={"cursor-pointer"} onClick={() => handleStatusUpdate(x.id, "is_archive", x.is_archive == 1 ? 0 : 1, i)}>
+                                                                                <DropdownMenuItem className={"cursor-pointer"} onClick={() => handleStatusUpdate("is_archive", x.is_archive == 1 ? 0 : 1, i, x)}>
                                                                                     {x?.is_archive === 1 ? "Unarchive" : "Archive"}
                                                                                 </DropdownMenuItem>
-                                                                                <DropdownMenuItem className={"cursor-pointer"} onClick={() => handleStatusUpdate(x.id, "is_active",  x.is_active === 1 ? 0 : 1, i)}>
+                                                                                <DropdownMenuItem className={"cursor-pointer"} onClick={() => handleStatusUpdate("is_active",  x.is_active === 1 ? 0 : 1, i, x)}>
                                                                                     {x.is_active === 0 ? "Convert to Idea" : "Mark as bug"}
                                                                                 </DropdownMenuItem>
                                                                                 <DropdownMenuItem className={"cursor-pointer"} onClick={() => deleteIdea(x)}>Delete</DropdownMenuItem>
@@ -640,7 +613,7 @@ const Ideas = () => {
                                                                     }
                                                                 </div>
                                                                 <div className={"flex items-center gap-8"}>
-                                                                    <Select onValueChange={(value) => handleRoadmapUpdate("roadmap_id", value, i, x)} value={x.roadmap_id}>
+                                                                    <Select onValueChange={(value) => handleStatusUpdate("roadmap_id", value, i, x)} value={x.roadmap_id}>
                                                                         <SelectTrigger className="w-[291px] bg-card">
                                                                             <SelectValue/>
                                                                         </SelectTrigger>
@@ -697,7 +670,7 @@ const Ideas = () => {
 
                         <CardFooter className={"p-0"}>
                             <div
-                                className={`w-full p-5 ${theme === "dark" ? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end pe-16 py-15px`}>
+                                className={`w-full p-5 ${theme === "dark" ? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end px-16 py-15px`}>
                                 <div className={"flex flex-row gap-8 items-center"}>
                                     <div>
                                         <h5 className={"text-sm font-semibold"}>Page {pageNo} of {totalPages}</h5>

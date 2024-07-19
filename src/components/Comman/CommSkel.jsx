@@ -22,6 +22,37 @@ import {Skeleton} from "../ui/skeleton";
 // }
 
 export const CommSkel = {
+    commonParagraphColumnFour: <div className={"grid grid-cols-4 gap-4"}>
+        {
+            Array.from(Array(4)).map((_, r) => {
+                return (
+                    <div className={"flex gap-2 py-2 px-4 border-b"} key={r}>
+                            <Skeleton className="h-[15px] w-[15px] rounded-full"/>
+                        <div className="space-y-2 w-full">
+                            <Skeleton className="h-4"/>
+                            <Skeleton className="h-4"/>
+                            <Skeleton className="h-4"/>
+                            <Skeleton className="h-4"/>
+                        </div>
+                    </div>
+                )
+            })
+        }
+    </div>,
+    commonParagraphOne: <div className={"flex flex-col gap-8"}>
+        {
+            Array.from(Array(1)).map((_, r) => {
+                return (
+                    <div className={"flex gap-2 py-2 px-4 border-b"} key={r}>
+                            <Skeleton className="h-[15px] w-[15px] rounded-full"/>
+                        <div className="space-y-2 w-full">
+                            <Skeleton className="h-4"/>
+                        </div>
+                    </div>
+                )
+            })
+        }
+    </div>,
     commonParagraphFourIdea: <div className={"flex flex-col gap-8"}>
         {
             Array.from(Array(4)).map((_, r) => {
@@ -44,6 +75,22 @@ export const CommSkel = {
             Array.from(Array(1)).map((_, r) => {
                 return (
                     <Fragment key={r}>
+                        <div className="space-y-2 w-full">
+                            <Skeleton className="h-4"/>
+                            <Skeleton className="h-4"/>
+                            <Skeleton className="h-4"/>
+                        </div>
+                    </Fragment>
+                )
+            })
+        }
+    </div>,
+    commonParagraphThreeIcon: <div className={"flex gap-2 p-6"}>
+        {
+            Array.from(Array(1)).map((_, r) => {
+                return (
+                    <Fragment key={r}>
+                        <Skeleton className="h-[30px] w-[30px] rounded-full"/>
                         <div className="space-y-2 w-full">
                             <Skeleton className="h-4"/>
                             <Skeleton className="h-4"/>

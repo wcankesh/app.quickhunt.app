@@ -36,15 +36,10 @@ const CreateIdea = ({
                         onOpen,
                         onClose,
                         closeCreateIdea,
-                        ideasList,
-                        setIdeasList,
-                        isRoadmap,
                         selectedRoadmap,
-                        setNoStatus,
+                        setSelectedRoadmap,
                         roadmapList,
                         setRoadmapList,
-                        isNoStatus,
-                        setIsNoStatus,
                     }) => {
     const { theme } = useTheme()
     let navigate = useNavigate();
@@ -114,31 +109,24 @@ const CreateIdea = ({
         formData.append('description', description);
         formData.append('project_id', projectDetailsReducer.id);
         formData.append('topic', ideaDetail.topic.join());
-        formData.append('roadmap_id', selectedRoadmap && selectedRoadmap.id ? selectedRoadmap.id : "");
+        formData.append('roadmap_id', selectedRoadmap && selectedRoadmap ? selectedRoadmap : "");
         const data = await apiSerVice.createIdea(formData)
         if(data.status === 200){
-            const clone = [...ideasList];
-            const newArray = [data.data].concat(clone)
-            setIdeasList(newArray);
-            if(isRoadmap){
-                const cloneRoadmap = [...roadmapList]
-                const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap.id);
-                if(roadmapIndex !== -1){
-                    cloneRoadmap[roadmapIndex].ideas = newArray
-                    setRoadmapList(cloneRoadmap);
-
-                }
-                if(isNoStatus){
-                    setNoStatus(newArray)
-                }
+            debugger
+            let cloneRoadmap = [...roadmapList.columns];
+            // cloneRoadmap.push(data.data);
+            // cloneRoadmap.push(data.data);
+            const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap);
+            if(roadmapIndex !== -1) {
+                const cloneIdea = [...cloneRoadmap[roadmapIndex].ideas];
+                cloneIdea.push(data.data);
+                cloneRoadmap[roadmapIndex] = {...cloneRoadmap[roadmapIndex], ideas: cloneIdea, cards: cloneIdea}
             }
             setIsLoading(false)
             setIdeaDetail(initialState)
             setDescription("")
+            setRoadmapList({columns: cloneRoadmap});
             closeCreateIdea()
-            if(isNoStatus) {
-                setIsNoStatus(false)
-            }
             toast({description: "Idea create successfully"})
         } else {
             setIsLoading(false)

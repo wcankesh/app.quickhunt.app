@@ -322,7 +322,6 @@ const SidebarSheet = ({
         formData.append(name, value);
         const data = await apiSerVice.updateIdea(formData, selectedIdea.id)
         if (data.status === 200) {
-        // if (data.id) {
             let clone = [...ideasList];
             let index = clone.findIndex((x) => x.id === selectedIdea.id);
             if (index !== -1) {
