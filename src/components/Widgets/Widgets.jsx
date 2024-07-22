@@ -1,20 +1,33 @@
 import React, {useState, Fragment} from 'react';
 import {Button} from "../ui/button";
 import {Table, TableBody, TableCaption, TableCell, TableFooter, TableHead, TableHeader, TableRow,} from "../ui/table";
-import {BarChart, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Ellipsis, Loader2} from "lucide-react";
+import {
+    BarChart,
+    ChevronLeft,
+    ChevronRight,
+    ChevronsLeft,
+    ChevronsRight, Copy,
+    Ellipsis,
+    Eye,
+    EyeOff,
+    Loader2
+} from "lucide-react";
 import WidgetSideBarSheet from "./WidgetSideBarSheet";
 import {useTheme} from "../theme-provider";
 import {Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "../ui/dialog";
 import {DropdownMenu, DropdownMenuTrigger} from "@radix-ui/react-dropdown-menu";
 import {DropdownMenuContent, DropdownMenuItem} from "../ui/dropdown-menu";
 import { Input } from "../ui/input";
-import { Label } from "../ui/label";
 import {Tabs, TabsContent, TabsList, TabsTrigger,} from "../ui/tabs";
 import {Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter} from "../ui/card";
 import {Icon} from "../../utils/Icon";
+import {useLocation, useNavigate, useParams} from "react-router-dom";
+import {baseUrl} from "../../utils/constent";
+import WidgetSideBar from "./WidgetSideBar";
 
 const invoices = [
     {
+        id: 1,
         invoice: "My new widget",
         paymentStatus: "Ideas, Roadmap, announcement",
         totalAmount: "17 Jul, 2024",
@@ -25,9 +38,13 @@ const invoices = [
 const perPageLimit = 10;
 
 const Widgets = () => {
+    let navigate = useNavigate();
+    let location = useLocation();
+    const {id} = useParams();
     const {theme} = useTheme();
     const [isLoading, setIsLoading] = useState(false);
     const [isSheetOpen, setSheetOpen] = useState(false);
+    const [sideBar, setSheetOpenSideBar] = useState(false);
     const [pageNo, setPageNo] = useState(1);
     const [totalRecord, setTotalRecord] = useState(0);
     const [openDelete, setOpenDelete] = useState(false);
@@ -36,6 +53,14 @@ const Widgets = () => {
 
     const openSheet = () => setSheetOpen(true);
     const closeSheet = () => setSheetOpen(false);
+
+    const openSheetSideBar = () => setSheetOpenSideBar(true);
+    const closeSheetSideBar = () => setSheetOpenSideBar(false);
+
+    const handleCreateNew = (id) => {
+        navigate(`${baseUrl}/widgets/${id}`);
+        setSheetOpenSideBar(true)
+    };
 
     const onDeleteIdea = async (id) => {
         // if (id) {
@@ -112,7 +137,7 @@ const Widgets = () => {
                                     <TabsTrigger value="embedlink">Embed Link</TabsTrigger>
                                     <TabsTrigger value="iframe">iFrame</TabsTrigger>
                                 </TabsList>
-                                <TabsContent value="script">
+                                <TabsContent value="script" className={"flex flex-col gap-2"}>
                                     <Card>
                                         <CardHeader>
                                             <CardDescription>
@@ -121,9 +146,18 @@ const Widgets = () => {
                                         </CardHeader>
                                         <CardContent className="flex flex-col gap-2">
                                             <div>
-                                                <div className="space-y-1">
-                                                    <Label htmlFor="name">Name</Label>
-                                                    <Input id="name" defaultValue="Pedro Duarte"/>
+                                                <div className={"relative"}>
+                                                    <Input
+                                                        id="text"
+                                                        type={"text"}
+                                                        placeholder={"Copy"}
+                                                        name={'copy'}
+                                                        className={"border-slate-300 placeholder:text-slate-400"}
+                                                    />
+                                                    <Button variant={"ghost hover:none"}
+                                                            className={"absolute top-0 right-0"}>
+                                                        <Copy size={16}/>
+                                                    </Button>
                                                 </div>
                                                 <p className={"text-xs"}>Read the {" "}
                                                     <Button
@@ -141,7 +175,7 @@ const Widgets = () => {
                                                     </Button>
                                                 </p>
                                             </div>
-                                            <div>
+                                            <div className={"flex flex-col gap-2"}>
                                                 <h3 className={"text-sm font-semibold"}>Code Examples</h3>
                                                 <div className={"flex justify-between"}>
                                                     <Button variant={"ghost"}
@@ -196,24 +230,34 @@ const Widgets = () => {
                                 <TabsContent value="iframe">
                                     <Card>
                                         <CardHeader>
-                                            <CardTitle>iframe</CardTitle>
                                             <CardDescription>
-                                                Change your password here. After saving, you'll be logged out.
+                                                Paste the code below on your site where you want the widget to appear.
                                             </CardDescription>
                                         </CardHeader>
                                         <CardContent className="space-y-2">
-                                            <div className="space-y-1">
-                                                <Label htmlFor="current">Current password</Label>
-                                                <Input id="current" type="password"/>
+                                            <div className={"relative"}>
+                                                <Input
+                                                    id="text"
+                                                    type={"text"}
+                                                    placeholder={"Copy"}
+                                                    name={'copy'}
+                                                    className={"border-slate-300 placeholder:text-slate-400"}
+                                                />
+                                                <Button variant={"ghost hover:none"}
+                                                        className={"absolute top-0 right-0"}>
+                                                    <Copy size={16}/>
+                                                </Button>
                                             </div>
-                                            <div className="space-y-1">
-                                                <Label htmlFor="new">New password</Label>
-                                                <Input id="new" type="password"/>
-                                            </div>
+                                            <p className={"text-xs text-muted-foreground"}>Read the {" "}
+                                                <Button
+                                                    variant={"ghost hover:none"}
+                                                    className={"p-0 text-xs text-primary font-semibold"}
+                                                >
+                                                    Setup Guide
+                                                </Button>
+                                                for more information.
+                                            </p>
                                         </CardContent>
-                                        <CardFooter>
-                                            <Button>Save password</Button>
-                                        </CardFooter>
                                     </Card>
                                 </TabsContent>
                             </Tabs>
@@ -222,8 +266,8 @@ const Widgets = () => {
                                         className={"text-sm font-semibold border"}
                                         onClick={() => setOpenDelete(false)}>Cancel</Button>
                                 <Button
-                                    variant={"hover:bg-destructive"}
-                                    className={`${theme === "dark" ? "text-card-foreground" : "text-card"} ${isLoading === true ? "py-2 px-6" : "py-2 px-6"} w-[106px] text-sm font-semibold bg-destructive`}
+                                    variant={"hover:none"}
+                                    className={`${theme === "dark" ? "text-card-foreground" : "text-card"} ${isLoading === true ? "py-2 px-6" : "py-2 px-6"} w-[106px] text-sm font-semibold bg-primary`}
 
                                 >
                                     {isLoading ? <Loader2 size={16} className={"animate-spin"}/> : "Copy code"}
@@ -235,6 +279,11 @@ const Widgets = () => {
             }
             <div
                 className={"xl:container xl:max-w-[1200px] lg:container lg:max-w-[992px] md:container md:max-w-[768px] sm:container sm:max-w-[639px] xs:container xs:max-w-[475px] pt-8 pb-5"}>
+                <WidgetSideBar
+                    isOpen={sideBar}
+                    onOpen={openSheetSideBar}
+                    onClose={closeSheetSideBar}
+                />
                 <WidgetSideBarSheet
                     isOpen={isSheetOpen}
                     onOpen={openSheet}
@@ -244,7 +293,14 @@ const Widgets = () => {
                     <div className={"flex flex-col gap-1"}>
                         <div className={"flex items-center justify-between"}>
                             <h1 className={"text-2xl font-medium"}>Widgets</h1>
-                            <Button className={"text-sm font-semibold hover:bg-primary px-3 h-auto"}>Create New</Button>
+                            <Button
+                                className={"text-sm font-semibold hover:bg-primary px-3 h-auto"}
+                                // onClick={() => navigate(`${baseUrl}/widgets/new`)}
+                                onClick={() => handleCreateNew("new")}
+                                // onClick={() => navigate(`${baseUrl}/widgets/${id}`)}
+                            >
+                                Create New
+                            </Button>
                         </div>
                         <div className={"flex flex-col space-y-4"}>
                             <p className={"text-base text-muted-foreground"}>Embed Ideas, Roadmap & Announcements inside
@@ -264,16 +320,16 @@ const Widgets = () => {
                             </TableHeader>
                             <TableBody>
                                 {invoices.map((invoice) => (
-                                    <TableRow key={invoice.invoice}>
+                                    <TableRow key={invoice.invoice.id}>
                                         <TableCell className="font-medium">{invoice.invoice}</TableCell>
                                         <TableCell>{invoice.paymentStatus}</TableCell>
                                         <TableCell>{invoice.totalAmount}</TableCell>
-                                        <TableCell><BarChart onClick={openSheet} size={13}
+                                        <TableCell><BarChart onClick={() => openSheet(invoice.id)} size={13}
                                                              className={"cursor-pointer"}/></TableCell>
                                         <TableCell className={"flex gap-2 items-center justify-end"}>
                                             <Button
                                                 className={"py-[6px] px-3 h-auto text-xs font-semibold hover:bg-primary"}
-                                                onClick={getCodeCopy}>Get code</Button>
+                                                onClick={() => getCodeCopy(invoice.id)}>Get code</Button>
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger>
                                                     <Ellipsis size={16} className={"cursor-pointer"}/>

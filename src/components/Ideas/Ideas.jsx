@@ -370,7 +370,7 @@ const Ideas = () => {
                     </Dialog>
                 </Fragment>
             }
-            <div className={"xl:container xl:max-w-[1200px] lg:container lg:max-w-[992px] md:container md:max-w-[768px] sm:container sm:max-w-[639px] xs:container xs:max-w-[475px] pt-8 pb-5"}>
+            <div className={"xl:container xl:max-w-[1200px] lg:container lg:max-w-[992px] md:container md:max-w-[768px] sm:container sm:max-w-[639px] xs:container xs:max-w-[475px] pt-8 pb-5 px-4"}>
                 <SidebarSheet
                     isOpen={isSheetOpen}
                     onOpen={openSheet}
@@ -399,9 +399,10 @@ const Ideas = () => {
                     ideasList={ideasList}
                     isNoStatus={false}
                 />
-                <div className={"flex flex-row flex-wrap gap-6 items-center"}>
+                <div className={"flex flex-wrap items-center gap-6 xl:flex-nowrap"}>
                     <span><h1 className={"text-2xl font-medium"}>Ideas</h1></span>
-                    <div className="ml-auto gap-6">
+                    <div className={"w-full flex flex-wrap gap-6 "}>
+                    <div className={"xl:ml-auto gap-6"}>
                         <div className={"flex flex-row flex-wrap gap-6 items-center"}>
                             <Select defaultValue={null}
                                 onValueChange={(selectedItems) => handleChange({name: "status", value: selectedItems})}>
@@ -452,7 +453,7 @@ const Ideas = () => {
                                         {
                                             (topicLists || []).map((x, i) => {
                                                 return (
-                                                    <SelectItem className={""} key={i} value={x.id}>
+                                                    <SelectItem className={"p-2"} key={i} value={x.id}>
                                                         <div className={"flex gap-2"}>
                                                             <div onClick={() => handleChange({name: "topic", value: x.id})} className="checkbox-icon">
                                                                 {(filter.topic.map((x) => x) || []).includes(x.id) ?
@@ -497,7 +498,7 @@ const Ideas = () => {
                                         {
                                             (roadmapStatus || []).map((x, i) => {
                                                 return (
-                                                    <SelectItem className={""} key={i} value={x.id}>
+                                                    <SelectItem className={"p-2"} key={i} value={x.id}>
                                                         <div className={"flex gap-2"}>
                                                             <div onClick={() => handleChange({name: "roadmap", value: x.id})} className="checkbox-icon">
                                                                 {(filter.roadmap.map((x) => x) || []).includes(x.id) ?
@@ -523,6 +524,7 @@ const Ideas = () => {
                         <Button className="gap-2 text-sm font-semibold w-[139px]"
                                 onClick={openCreateIdea}><Plus/>Create Idea</Button>
                     </div>
+                    </div>
                 </div>
                 <div className={"mt-8"}>
                     <Card>
@@ -546,17 +548,19 @@ const Ideas = () => {
                                                         </div>
                                                         <div className={"flex flex-col w-full gap-6"}>
                                                             <div className={"flex flex-col gap-[11px]"}>
-                                                                <div className={"flex items-center justify-between"}>
+                                                                <div className={"flex items-center justify-between gap-3"}>
                                                                     <div
-                                                                        className={"flex items-center gap-3 cursor-pointer"}
+                                                                        className={"flex flex-wrap items-center gap-1 cursor-pointer xl:gap-3"}
                                                                         onClick={() => openDetailsSheet(x)}>
                                                                         <h3 className={"text-base font-medium"}>{x.title}</h3>
+                                                                        <div className={"flex gap-2"}>
                                                                         <h4 className={"text-sm font-medium"}>{x.name}</h4>
                                                                         <p className={"text-xs font-normal flex items-center text-muted-foreground"}>
                                                                             <Dot
                                                                                 className={"fill-text-card-foreground stroke-text-card-foreground"}/>
                                                                             {moment(x.created_at).format('D MMM')}
                                                                         </p>
+                                                                        </div>
                                                                     </div>
                                                                     <div className={"flex gap-2 items-center"}>
                                                                         {
@@ -601,17 +605,19 @@ const Ideas = () => {
                                                                     <ReadMoreText html={x.description}/>
                                                                 </div>
                                                             </div>
-                                                            <div className={"flex justify-between items-center gap-1"}>
-                                                                <div className={"flex flex-wrap gap-2"}>
-                                                                    {
-                                                                        (x.topic || []).map((y, i) => {
-                                                                            return (
-                                                                                <div className={"text-sm font-medium"}
-                                                                                     key={i}> {y?.title}</div>
-                                                                            )
-                                                                        })
-                                                                    }
-                                                                </div>
+                                                            <div className={`flex justify-between items-center flex-wrap gap-2`}>
+                                                                    <div className={`flex flex-wrap gap-2`}>
+                                                                {
+                                                                    (x.topic && x.topic.length > 0) &&
+                                                                    <div className={`flex flex-wrap gap-2`}>
+                                                                        {
+                                                                            x.topic.map((y, i) => (
+                                                                                <div className={"text-sm font-medium"} key={i}> {y?.title}</div>
+                                                                            ))
+                                                                        }
+                                                                    </div>
+                                                                }
+                                                                    </div>
                                                                 <div className={"flex items-center gap-8"}>
                                                                     <Select onValueChange={(value) => handleStatusUpdate("roadmap_id", value, i, x)} value={x.roadmap_id}>
                                                                         <SelectTrigger className="w-[291px] bg-card">

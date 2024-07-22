@@ -1,5 +1,5 @@
 import React, {Fragment, useState, useRef, useEffect} from 'react';
-import {Sheet, SheetContent, SheetHeader,} from "../ui/sheet";
+import {Sheet, SheetContent, SheetHeader, SheetOverlay} from "../ui/sheet";
 import {Button} from "../ui/button";
 import {ArrowBigUp, Check, Circle, CircleX, Dot, Loader2, MessageCircleMore, Paperclip, Pencil, Pin, Trash2, X} from "lucide-react";
 import {RadioGroup, RadioGroupItem} from "../ui/radio-group";
@@ -317,6 +317,7 @@ const SidebarSheet = ({
             setIsLoadingArchive(true)
         }
         setIsLoadingSidebar(name);
+
         setSelectedIdea({...selectedIdea, [name]: value})
         let formData = new FormData();
         formData.append(name, value);
@@ -687,13 +688,13 @@ const SidebarSheet = ({
     return (
         <Fragment>
             <Sheet open={isOpen} onOpenChange={isOpen ? onCloseBoth : onOpen}>
-                <SheetContent className={"lg:max-w-[1101px] md:max-w-[720px] sm:max-w-[520px] p-0"}>
+                <SheetOverlay className={"inset-0"} />
+                <SheetContent className={"lg:max-w-[1101px] md:max-w-[720px] max-w-full p-0"}>
                     <SheetHeader className={"px-[32px] py-[22px] border-b"}>
                         <X onClick={onCloseBoth} className={"cursor-pointer"}/>
                     </SheetHeader>
-                    <div className={"lg:flex md:block overflow-auto h-[100vh]"}>
-                        <div
-                            className={`basis-[440px] ${theme === "dark" ? "" : "bg-muted"} border-r overflow-auto pb-[100px]`}>
+                    <div className={"grid lg:grid-cols-12 md:grid-cols-1 overflow-auto h-[100vh]"}>
+                        <div className={`col-span-4 lg:block hidden ${theme === "dark" ? "" : "bg-muted"} border-r lg:overflow-auto pb-[100px]`}>
                             <div className={"border-b py-4 pl-8 pr-6 flex flex-col gap-3"}>
                                 <div className={"flex flex-col gap-1"}>
                                     <h3 className={"text-sm font-medium"}>Status</h3>
@@ -738,10 +739,7 @@ const SidebarSheet = ({
                                                             <CircleX
                                                                 size={20}
                                                                 className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
-                                                                onClick={() => onChangeStatus({
-                                                                    name: 'cover_image',
-                                                                    value: ""
-                                                                })}
+                                                                onClick={() => onChangeStatus('cover_image', '')}
                                                             />
                                                         </div> : selectedIdea.cover_image ?
                                                             <div className={"w-[282px] h-[128px] relative border p-[5px]"}>
@@ -749,10 +747,7 @@ const SidebarSheet = ({
                                                                 <CircleX
                                                                     size={20}
                                                                     className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
-                                                                    onClick={() => onChangeStatus({
-                                                                        name: 'cover_image',
-                                                                        value: ""
-                                                                    })}
+                                                                    onClick={() => onChangeStatus('cover_image', '')}
                                                                 />
                                                             </div>
                                                             : ''}
@@ -778,7 +773,7 @@ const SidebarSheet = ({
                                 </div>
                             </div>
                             <div className={"py-4 pl-8 pr-6 flex flex-col gap-[26px]"}>
-                                <div className={"flex flex-wrap gap-1 justify-between"}>
+                                <div className={"flex gap-1 justify-between"}>
                                     <div className={"flex flex-col gap-1"}>
                                         <h4 className={"text-sm font-medium"}>Mark as bug</h4>
                                         <p className={"text-muted-foreground text-xs font-normal"}>Hides Idea from your
@@ -798,7 +793,7 @@ const SidebarSheet = ({
                                         }
                                     </Button>
                                 </div>
-                                <div className={"flex flex-wrap gap-1 justify-between"}>
+                                <div className={"flex gap-1 justify-between"}>
                                     <div className={"flex flex-col gap-1"}>
                                         <h4 className={"text-sm font-medium"}>Archive</h4>
                                         <p className={"text-muted-foreground text-xs font-normal"}>Remove Idea from
@@ -821,8 +816,7 @@ const SidebarSheet = ({
                                 </div>
                             </div>
                         </div>
-                        <div className={"basis-[661px] overflow-auto"}>
-
+                        <div className={"col-span-8 lg:overflow-auto"}>
                             {
                                 isEditIdea ?
                                     <div className={"pb-100px"}>
@@ -927,6 +921,34 @@ const SidebarSheet = ({
                                                         <p className={"text-xl font-medium"}>{selectedIdea.vote}</p>
                                                     </div>
                                                     <div className={"flex gap-2"}>
+                                                        <div className={"flex gap-2 lg:hidden"}>
+                                                                <Button
+                                                                    variant={"outline"}
+                                                                    className={`hover:bg-muted w-[132px] ${theme === "dark" ? "" : "border-muted-foreground text-muted-foreground"} h-auto py-1 px-2 text-sm font-semibold`}
+                                                                    onClick={() => onChangeStatus(
+                                                                        "is_active",
+                                                                        selectedIdea.is_active === 1 ? 0 : 1
+                                                                    )}
+                                                                >
+                                                                    {
+                                                                        isLoading ? <Loader2
+                                                                            className="h-4 w-4 animate-spin"/> : (selectedIdea.is_active === 0 ? "Convert to Idea" : "Mark as bug")
+                                                                    }
+                                                                </Button>
+                                                                <Button
+                                                                    variant={"outline"}
+                                                                    className={`w-[100px] h-auto py-1 px-2 hover:bg-muted ${theme === "dark" ? "" : "border-muted-foreground text-muted-foreground"} text-sm font-semibold`}
+                                                                    onClick={() => onChangeStatus(
+                                                                        "is_archive",
+                                                                        selectedIdea.is_archive === 1 ? 0 : 1
+                                                                    )}
+                                                                >
+                                                                    {
+                                                                        isLoadingArchive ? <Loader2
+                                                                            className="h-4 w-4 animate-spin"/> : (selectedIdea.is_archive === 1 ? "Unarchive" : "Archive")
+                                                                    }
+                                                                </Button>
+                                                        </div>
                                                         {
                                                             selectedIdea.is_edit === 1 ?
                                                                 <Button
@@ -959,6 +981,33 @@ const SidebarSheet = ({
                                                         <ReadMoreText html={selectedIdea.description}/>
                                                     </div>
                                                 </div>
+                                                {
+                                                    selectedIdea && selectedIdea.images ?
+                                                        <div className={"flex gap-2"}>
+                                                            {
+                                                                (selectedIdea.images || []).map((x, i) => {
+                                                                        return (
+                                                                            <Fragment>
+                                                                                {
+                                                                                    x && x.name ?
+                                                                                        <div
+                                                                                            className="w-[100px] h-[100px] border p-[3px] relative">
+                                                                                            <img className={"upload-img"}
+                                                                                                 src={x && x.name ? URL.createObjectURL(x) : x}
+                                                                                                 alt=""/>
+                                                                                        </div> : x ?
+                                                                                        <div
+                                                                                            className="w-[100px] h-[100px] border p-[3px] relative">
+                                                                                            <img className={"upload-img"}
+                                                                                                 src={x} alt=""/>
+                                                                                        </div> : ""
+                                                                                }
+                                                                            </Fragment>
+                                                                        )
+                                                                    }
+                                                                )}
+                                                        </div> : ""
+                                                }
                                                 <div className={"flex items-center"}>
                                                     <div className={"flex items-center gap-4"}>
                                                         <div className={"flex items-center gap-2"}>
@@ -1087,33 +1136,6 @@ const SidebarSheet = ({
                                                         </Select>
                                                     </div>
                                                 </div>
-                                                {
-                                                    selectedIdea && selectedIdea.images ?
-                                                        <div className={"flex gap-2"}>
-                                                            {
-                                                                (selectedIdea.images || []).map((x, i) => {
-                                                                        return (
-                                                                            <Fragment>
-                                                                                {
-                                                                                    x && x.name ?
-                                                                                        <div
-                                                                                            className="w-[93px] border p-2 relative">
-                                                                                            <img className={"upload-img"}
-                                                                                                 src={x && x.name ? URL.createObjectURL(x) : x}
-                                                                                                 alt=""/>
-                                                                                        </div> : x ?
-                                                                                        <div
-                                                                                            className="w-[93px] border p-2 rounded-md relative">
-                                                                                            <img className={"upload-img"}
-                                                                                                 src={x} alt=""/>
-                                                                                        </div> : ""
-                                                                                }
-                                                                            </Fragment>
-                                                                        )
-                                                                    }
-                                                                )}
-                                                        </div> : ""
-                                                }
                                                 <div className={"flex flex-col gap-2"}>
                                                     <div className="w-full flex flex-col gap-2">
                                                         <Label htmlFor="message">Add comment</Label>
@@ -1151,7 +1173,7 @@ const SidebarSheet = ({
                                                                                         {
                                                                                             x && x.name ?
                                                                                                 <div
-                                                                                                    className={"w-[100px] h-[100px] relative border p-[5px]"}>
+                                                                                                    className={"w-[100px] h-[100px] relative border p-[3px]"}>
                                                                                                     <img
                                                                                                         className={"upload-img"}
                                                                                                         src={x && x.name ? URL.createObjectURL(x) : x}
@@ -1163,7 +1185,7 @@ const SidebarSheet = ({
                                                                                                     />
                                                                                                 </div> : x ?
                                                                                                 <div
-                                                                                                    className={"w-[100px] h-[100px] relative border p-[5px]"}>
+                                                                                                    className={"w-[100px] h-[100px] relative border p-[3px]"}>
                                                                                                     <img
                                                                                                         className={"upload-img"}
                                                                                                         src={x}
@@ -1316,7 +1338,7 @@ const SidebarSheet = ({
                                                                                                                             {
                                                                                                                                 x && x.name ?
                                                                                                                                     <div
-                                                                                                                                        className={"w-[100px] h-[100px] relative border p-[5px]"}>
+                                                                                                                                        className={"w-[100px] h-[100px] relative border p-[3px]"}>
                                                                                                                                         <img
                                                                                                                                             className={"upload-img"}
                                                                                                                                             src={x && x.name ? URL.createObjectURL(x) : x}
@@ -1327,7 +1349,7 @@ const SidebarSheet = ({
                                                                                                                                             onClick={() => onDeleteCommentImage(i, true)}/>
                                                                                                                                     </div> : x ?
                                                                                                                                     <div
-                                                                                                                                        className={"w-[100px] h-[100px] relative border p-[5px]"}>
+                                                                                                                                        className={"w-[100px] h-[100px] relative border p-[3px]"}>
                                                                                                                                         <img
                                                                                                                                             className={"upload-img"}
                                                                                                                                             src={x}
@@ -1389,7 +1411,7 @@ const SidebarSheet = ({
                                                                                                     {
                                                                                                         ((x && x.images) || []).map((img, ind) => {
                                                                                                             return (
-                                                                                                                <div key={ind} className={"w-[100px] h-[100px] border p-[5px]"}>
+                                                                                                                <div key={ind} className={"w-[100px] h-[100px] border p-[3px]"}>
                                                                                                                     <img className={"upload-img"} src={img} alt={img}/>
                                                                                                                 </div>
                                                                                                             )
@@ -1494,8 +1516,8 @@ const SidebarSheet = ({
                                                                                                                                                                     {
                                                                                                                                                                         x && x.name ?
                                                                                                                                                                             <div
-                                                                                                                                                                                className={"w-[100px] relative border p-[5px]"}>
-                                                                                                                                                                                <img
+                                                                                                                                                                                className={"w-[100px] h-[100px] relative border p-[3px]"}>
+                                                                                                                                                                                <img className={"upload-img"}
                                                                                                                                                                                     src={x && x.name ? URL.createObjectURL(x) : x}
                                                                                                                                                                                     alt=""/>
                                                                                                                                                                                 <CircleX
@@ -1505,8 +1527,8 @@ const SidebarSheet = ({
                                                                                                                                                                                 />
                                                                                                                                                                             </div> : x ?
                                                                                                                                                                             <div
-                                                                                                                                                                                className={"w-[100px] relative border p-[5px]"}>
-                                                                                                                                                                                <img
+                                                                                                                                                                                className={"w-[100px] h-[100px] relative border p-[3px]"}>
+                                                                                                                                                                                <img className={"upload-img"}
                                                                                                                                                                                     src={x}
                                                                                                                                                                                     alt={x}/>
                                                                                                                                                                                 <CircleX
@@ -1563,11 +1585,11 @@ const SidebarSheet = ({
                                                                                                                                         {
                                                                                                                                             y && y.images && y.images.length ?
                                                                                                                                                 <div
-                                                                                                                                                    className={"w-[100px] border p-[5px]"}>
+                                                                                                                                                    className={"w-[100px] h-[100px] border p-[5px]"}>
                                                                                                                                                     {
                                                                                                                                                         (y.images || []).map((z, i) => {
                                                                                                                                                             return (
-                                                                                                                                                                <img
+                                                                                                                                                                <img className={"upload-img"}
                                                                                                                                                                     src={z}
                                                                                                                                                                     alt={z}/>
                                                                                                                                                             )
@@ -1599,23 +1621,26 @@ const SidebarSheet = ({
                                                                                                                                 {
                                                                                                                                     z && z.name ?
                                                                                                                                         <div
-                                                                                                                                            className=''>
-                                                                                                                                            <div>
-                                                                                                                                                <Button
-                                                                                                                                                    onClick={() => onDeleteSubCommentImageOld(i, false)}><CircleX/></Button>
-                                                                                                                                            </div>
-                                                                                                                                            <img
+                                                                                                                                            className={"w-[100px] h-[100px] relative border p-[3px]"}>
+                                                                                                                                            <img className={"upload-img"}
                                                                                                                                                 src={z && z.name ? URL.createObjectURL(z) : z}/>
+                                                                                                                                            <CircleX
+                                                                                                                                                size={20}
+                                                                                                                                                className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
+                                                                                                                                                onClick={() => onDeleteSubCommentImageOld(i, false)}
+                                                                                                                                            />
                                                                                                                                         </div> : z ?
                                                                                                                                         <div
-                                                                                                                                            className=''>
-                                                                                                                                            <div>
-                                                                                                                                                <Button
-                                                                                                                                                    onClick={() => onDeleteSubCommentImageOld(i, false)}><CircleX/></Button>
-                                                                                                                                            </div>
+                                                                                                                                            className={"w-[100px] h-[100px] relative border p-[3px]"}>
                                                                                                                                             <img
+                                                                                                                                                className={"upload-img"}
                                                                                                                                                 src={z}
                                                                                                                                                 alt={z}/>
+                                                                                                                                            <CircleX
+                                                                                                                                                size={20}
+                                                                                                                                                className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
+                                                                                                                                                onClick={() => onDeleteSubCommentImageOld(i, false)}
+                                                                                                                                            />
                                                                                                                                         </div> : ''
                                                                                                                                 }
                                                                                                                             </div>
@@ -1635,7 +1660,7 @@ const SidebarSheet = ({
                                                                                                                 isSaveSubComment ?
                                                                                                                     <Loader2
                                                                                                                         size={16}
-                                                                                                                        className="animate-spin"/> : ""
+                                                                                                                        className="animate-spin"/> : "Reply"
                                                                                                             }
                                                                                                         </Button>
                                                                                                         <div

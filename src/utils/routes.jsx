@@ -9,6 +9,8 @@ import Notification from "../components/Notification/Notification";
 import Settings from "../components/Settings/Settings";
 import PricingPlans from "../components/PricingPlan/PricingPlans";
 import HelpSupport from "../components/HelpSupport/HelpSupport";
+import WidgetSideBar from "../components/Widgets/WidgetSideBar";
+import CreateWidget from "../components/Widgets/CreateWidget";
 
 export const routes = [
      {path: `${baseUrl}/dashboard`, component: <Dashboard/>},
@@ -17,6 +19,8 @@ export const routes = [
      {path: `${baseUrl}/roadmap`, component: <Roadmap/>},
      {path: `${baseUrl}/customers`, component: <Customers/>},
      {path: `${baseUrl}/widgets`, component: <Widgets/>},
+     {path: `${baseUrl}/widgets/:id`, component: <WidgetSideBar/>},
+     {path: `${baseUrl}/widgets/new`, component: <CreateWidget/>},
      {path: `${baseUrl}/notification`, component: <Notification/>},
      {path: `${baseUrl}/help-support`, component: <HelpSupport/>},
      {path: `${baseUrl}/pricing-plan`, component: <PricingPlans/>},

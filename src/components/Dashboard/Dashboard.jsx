@@ -41,10 +41,9 @@ const programAnalytics = [
 ]
 
 const emoji = {
-    "1" : Icon.emojiLaugh,
-    "2" : Icon.emojiSad,
-    "3" : Icon.emojiSmile,
-    "4" : Icon.emojiLaugh,
+    29 : Icon.emojiLaugh,
+    54 : Icon.emojiSad,
+    55 : Icon.emojiSmile,
 }
 
 export function Dashboard() {
@@ -229,16 +228,15 @@ export function Dashboard() {
     return (
         <Fragment>
                 <div className={"py-8"}>
-                    <div className='xl:container xl:max-w-[1200px] lg:container lg:max-w-[992px] md:container md:max-w-[768px] sm:container sm:max-w-[639px] xs:container xs:max-w-[475px]'>
+                    <div className='xl:container xl:max-w-[1200px] lg:container lg:max-w-[992px] md:container md:max-w-[768px] sm:container sm:max-w-[639px] px-4'>
                         <h1 className="text-[32px] font-medium">Welcome to Quickhunt</h1>
                     </div>
 
                 </div>
                 <div className={"border-b"} />
-                <div className="xl:container xl:max-w-[1200px] lg:container lg:max-w-[992px] md:container md:max-w-[768px] sm:container sm:max-w-[639px] xs:container xs:max-w-[475px] pb-5">
-                    <div className="program-data">
-                        <div className={"analytics-date flex justify-between items-center pb-6 pt-9 md:flex-wrap md:gap-4 sm:flex-wrap sm:gap-2"}>
-                            <h3 className="text-base font-bold text-card-foreground-subtext">Here's what has happened to your program</h3>
+                <div className="xl:container xl:max-w-[1200px] lg:container lg:max-w-[992px] md:container md:max-w-[768px] sm:container sm:max-w-[639px] pb-5 px-4">
+                        <div className={"flex items-center flex-wrap pb-6 pt-9 gap-2 md:justify-between md:flex-nowrap"}>
+                            <h3 className="text-base font-bold">Here's what has happened to your program</h3>
                             <Popover>
                                 <PopoverTrigger asChild>
                                     <Button
@@ -269,7 +267,7 @@ export function Dashboard() {
                             </Popover>
                         </div>
                         <div className={"flex flex-col gap-8"}>
-                            <div className={"grid lg:grid-cols-4 lg:gap-8 md:grid-cols-2 md:gap-4 sm:gap-2 xs:gap-2"}>
+                            <div className={"grid lg:grid-cols-4 lg:gap-8 md:grid-cols-2 md:gap-4 gap-3"}>
                                 {
                                     (programAnalytics || []).map((x, i) => {
                                         return (
@@ -303,8 +301,9 @@ export function Dashboard() {
                                     })
                                 }
                             </div>
-                            <div className={"flex lg:flex-nowrap md:flex-wrap sm:flex-wrap gap-8"}>
-                                <Card className={"lg:basis-2/3 md:basis-full sm:basis-full p-4 pr-8 divide-y shadow border"}>
+                            <div className={"flex flex-wrap gap-8 md:flex-nowrap"}>
+                                <Card className={"lg:basis-2/3 basis-full p-4 pr-8 divide-y shadow border"}>
+                                {/*<Card className={"feed p-4 pr-8 divide-y shadow border"}>*/}
                                     <CardHeader className={"p-0 pb-4"}>
                                         <CardTitle className={"text-base font-bold"}>New Feedbacks</CardTitle>
                                     </CardHeader>
@@ -332,7 +331,8 @@ export function Dashboard() {
                                         <Button className={"text-primary p-0 h-[20px] text-sm font-semibold"} variant={"ghost hover:none"}>View More Feedbacks</Button>
                                     </CardFooter>
                                 </Card>
-                                <Card className={"lg:basis-1/3 md:basis-full sm:basis-full p-4 pr-8 divide-y shadow border"}>
+                                <Card className={"lg:basis-1/3 basis-full p-4 pr-8 divide-y shadow border"}>
+                                {/*<Card className={"emoj p-4 pr-8 divide-y shadow border"}>*/}
                                     <CardHeader className={"p-0 pb-4"}>
                                         <CardTitle className={"text-base font-bold"}>Reaction</CardTitle>
                                     </CardHeader>
@@ -382,7 +382,6 @@ export function Dashboard() {
                                 </Card>
                             </div>
                         </div>
-                    </div>
                 </div>
         </Fragment>
     )

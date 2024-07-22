@@ -84,12 +84,12 @@ const Forgot = () => {
     }
 
     return (
-        <div className={"w-full flex flex-col items-center justify-center"}>
+        <div className={"w-full flex flex-col items-center justify-center px-4"}>
             <div className={"max-w-2xl m-auto"}>
                 <div className={"flex items-center justify-center mt-24"}>
                     {Icon.blackLogo}
                 </div>
-                <h1 className="scroll-m-20 text-3xl font-semibold tracking-tight lg:text-3xl mb-3.5 mt-6">
+                <h1 className="scroll-m-20 text-3xl font-semibold text-center lg:text-3xl mb-3.5 mt-6">
                     Forgot Password
                 </h1>
                 <div className={"mb-2.5"}>

@@ -175,7 +175,7 @@ const Login = () => {
                         </Button>
                     </p>
                 </div>
-                <div className="mx-auto grid w-[384px] gap-8 lg:pt-[142px] sm:pt-[100px] xs:pt-[50px]">
+                <div className="mx-auto grid w-[384px] gap-8 lg:pt-[142px] pt-[100px]">
                     <div className="gap-2 flex flex-col items-center">
                     {/*<div className="grid gap-2 text-center">*/}
                         {Icon.blackLogo}
@@ -193,7 +193,7 @@ const Login = () => {
                                 name={'user_email_id'}
                                 onChange={onChange}
                                 onBlur={onBlur}
-                                className={"border-slate-300 placeholder:text-slate-400"}
+                                // className={"border-slate-300 placeholder:text-slate-400"}
                             />
                             {
                                 formError.user_email_id ? (
@@ -215,10 +215,10 @@ const Login = () => {
                                     onChange={onChange}
                                     onBlur={onBlur}
                                     onKeyDown={handleKeyDown}
-                                    className={"border-slate-300 placeholder:text-slate-400"}
+                                    // className={"border-slate-300 placeholder:text-slate-400"}
                                 />
                                 <Button variant={"ghost hover:none"} onClick={togglePasswordVisibility} className={"absolute top-0 right-0"}>
-                                    {showPassword ? <Eye/> : <EyeOff /> }
+                                    {showPassword ? <Eye size={16}/> : <EyeOff size={16}/> }
                                 </Button>
                             </div>
                             <div className={"flex justify-between"}>
