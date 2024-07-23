@@ -1,16 +1,16 @@
 import React from 'react';
-import {Sheet, SheetContent, SheetHeader,} from "../ui/sheet";
+import {Sheet, SheetContent, SheetHeader, SheetOverlay,} from "../ui/sheet";
 import {X} from "lucide-react";
 
 const WidgetSideBarSheet = ({ isOpen, onOpen, onClose }) => {
     return (
         <Sheet open={isOpen} onOpenChange={isOpen ? onClose : onOpen}>
-            <div>
+            <SheetOverlay className={"inset-0"} />
                 <SheetContent className={"lg:max-w-[800px] md:max-w-[620px] sm:max-w-[420px] p-0"} >
                     <SheetHeader className={"px-[32px] py-[22px] border-b"}>
                         <div className={"flex justify-between items-center w-full"}>
                             <h2 className={"text-xl font-medium"}>Analytics</h2>
-                            <X size={18} onClick={onClose}/>
+                            <X size={18} onClick={onClose} className={"cursor-pointer"}/>
                         </div>
                     </SheetHeader>
                     <div className={"pt-6 px-8 pb-4 pr-16 flex flex-row justify-between"}>
@@ -32,7 +32,6 @@ const WidgetSideBarSheet = ({ isOpen, onOpen, onClose }) => {
                         </div>
                     </div>
                 </SheetContent>
-            </div>
         </Sheet>
     );
 };

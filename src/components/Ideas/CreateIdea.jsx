@@ -10,7 +10,7 @@ import moment from "moment";
 import {Check, Loader2, X} from "lucide-react";
 import {RadioGroup, RadioGroupItem} from "../ui/radio-group";
 import {useTheme} from "../theme-provider";
-import {Sheet, SheetContent, SheetHeader,} from "../ui/sheet";
+import {Sheet, SheetContent, SheetHeader, SheetOverlay} from "../ui/sheet";
 import {Avatar, AvatarFallback, AvatarImage} from "../ui/avatar";
 import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "../ui/select";
 import {Textarea} from "../ui/textarea";
@@ -168,15 +168,15 @@ const CreateIdea = ({
     return (
         <div>
             <Sheet open={isOpen} onOpenChange={isOpen ? onClose : onOpen} closeCreateIdea={closeCreateIdea}>
-                <SheetContent className={"lg:max-w-[800px] md:max-w-[620px] sm:max-w-[420px] p-0"}>
+                <SheetOverlay className={"inset-0"} />
+                <SheetContent className={"lg:max-w-[800px] md:max-w-full sm:max-w-full p-0"}>
                     <SheetHeader className={"px-[32px] py-[22px] border-b"}>
                         <div className={"flex justify-between items-center w-full"}>
                             <h2 className={"text-xl font-medium"}>Tell us your Idea!</h2>
                             <X onClick={onClose} className={"cursor-pointer"}/>
                         </div>
                     </SheetHeader>
-                    <div className={"w-full overflow-auto h-[100vh]"}>
-                        <div className={"overflow-auto"}>
+                    <div className={"w-full overflow-auto"}>
                             <div className={"pb-100px"}>
                                 <div className={"py-6 px-8 flex flex-col gap-6 border-b"}>
                                     <div className="items-center gap-1.5">
@@ -223,7 +223,7 @@ const CreateIdea = ({
                                                     {
                                                         (topicLists || []).map((x, i) => {
                                                             return (
-                                                                <SelectItem className={""} key={i} value={x.id}>
+                                                                <SelectItem className={"p-2"} key={i} value={x.id}>
                                                                     <div className={"flex gap-2"}>
                                                                         <div onClick={() => handleChange(x.id)} className="checkbox-icon">
                                                                             {ideaDetail.topic.includes(x.id) ? <Check size={18} />: <div className={"h-[18px] w-[18px]"}></div>}
@@ -247,7 +247,6 @@ const CreateIdea = ({
                                     <Button variant={"outline hover:bg-transparent"} className={"border border-primary py-2 px-6 text-sm font-semibold"} onClick={onClose}>Cancel</Button>
                                 </div>
                             </div>
-                        </div>
                     </div>
                 </SheetContent>
             </Sheet>
