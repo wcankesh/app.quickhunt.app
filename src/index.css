@@ -148,16 +148,15 @@
 
 .sidebar-hidden {transform: translateX(-100%);}
 
-
 ::-webkit-scrollbar {width: 5px; height: 5px}
 ::-webkit-scrollbar-thumb{border-radius: 5px;background: #6d6d6d;}
 ::-webkit-scrollbar-track{background-color: #ebebeb;border-radius: 5px;}
 
-
 p {margin: 0 !important;}
 .m-0{margin: 0 !important;}
 
-.bodyScreenHeight{height: calc(100vh - 60px);}
+/*.bodyScreenHeight{height: calc(100vh - 60px);}*/
+.bodyScreenHeight{height: calc(100vh - 64px);}
 
 .hov-primary.data-\[selected\=true\]\:bg-accent[data-selected=true]{background-color: hsl(var(--primary));color: hsl(var(--card))}
 

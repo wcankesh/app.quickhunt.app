@@ -1,5 +1,14 @@
 import React, {Fragment, useEffect, useState} from 'react';
-import {Sheet, SheetContent, SheetFooter, SheetHeader, SheetTitle, SheetTrigger, SheetClose} from "../ui/sheet";
+import {
+    Sheet,
+    SheetContent,
+    SheetFooter,
+    SheetHeader,
+    SheetTitle,
+    SheetTrigger,
+    SheetClose,
+    SheetOverlay
+} from "../ui/sheet";
 import {Button} from "../ui/button";
 import {Menu, Plus, X, Moon, Sun, Loader2, ChevronsUpDown} from "lucide-react";
 import {Input} from "../ui/input";
@@ -161,6 +170,7 @@ const HeaderBar = () => {
     const [isSaveProject, setIsSaveProject] = useState(false);
     const [projectList, setProjectList] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [scrollingDown, setScrollingDown] = useState(false);
     const dispatch = useDispatch();
     const {toast} = useToast()
 
@@ -239,6 +249,7 @@ const HeaderBar = () => {
 
     const onRedirect = (link) => {
         setSelectedUrl(link)
+        closeSheetMenu()
         navigate(`${baseUrl}${link}`);
     };
 
@@ -327,21 +338,48 @@ const HeaderBar = () => {
         navigate(`${baseUrl}/dashboard`);
     }
 
-    return (
-        <header className="flex h-14 lg:justify-between md:justify-between items-center sm:justify-between gap-4 px-4 lg:h-[60px] lg:px-6 ">
+    const onCancel = () => {
+        setCreateProjectDetails(initialStateProject);
+        setFormError(initialStateErrorProject);
+        closeSheet();
+    }
 
+    useEffect(() => {
+        const handleScroll = () => {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            setScrollingDown(scrollTop > 5);
+        };
+        window.addEventListener('scroll', handleScroll);
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+        };
+    }, []);
+
+    return (
+        // <header className="flex h-14 items-center justify-between gap-4 px-4 lg:h-[60px] lg:px-6 w-full">
+        // <header className="z-50 ltr:xl:ml-[282px] rtl:xl:mr-[282px] sticky top-0">
+            <header className={`z-50 ltr:xl:ml-[282px] rtl:xl:mr-[282px] sticky top-0 ${scrollingDown ? 'bg-background' : ''} ${theme === "dark" ? "border-b" : ""}`}>
+        {/*// <header className="z-50 ml-[282px] sticky top-0">*/}
+            <div className={"w-full p-3"}>
+            <div className={"flex justify-between items-center h-full gap-2"}>
+            <div className={"flex gap-3 items-center"}>
             {/*Mobile said bar start */}
             <Sheet open={isSheetOpenMenu} onOpenChange={isSheetOpenMenu ? closeSheetMenu : openSheetMenu}>
                 <SheetTrigger asChild>
-                    <Button variant="outline" size="icon" className="shrink-0 md:hidden">
-                        <Menu className="h-5 w-5"/>
+                    <Button variant="outline" size="icon" className="shrink-0 xl:hidden">
+                        <Menu size={20}/>
                     </Button>
                 </SheetTrigger>
-
-                <SheetContent side="left" className="flex flex-col overflow-auto">
-                    <Button className={"self-end p-0 bg-transparent hover:bg-transparent w-[20px] h-[20px]"}>
-                        <X className={"fill-card-foreground stroke-card-foreground"} onClick={closeSheetMenu}/>
-                    </Button>
+                <SheetOverlay className={"inset-0"} />
+                <SheetContent side="left" className="flex flex-col overflow-auto md:w-2/6">
+                    <SheetHeader className={"flex flex-row justify-between items-center"}>
+                        <div className={"app-logo cursor-pointer"}  onClick={() => onRedirect("/dashboard")}>
+                            {
+                                theme === "dark" ? Icon.whiteLogo : Icon.blackLogo
+                            }
+                        </div>
+                        <X size={18} className={"fill-card-foreground stroke-card-foreground m-0"} onClick={closeSheetMenu}/>
+                    </SheetHeader>
                     <nav className="grid gap-2">
                         {
                             (menuComponent || []).map((x, i) => {
@@ -414,13 +452,15 @@ const HeaderBar = () => {
             </Sheet>
             {/*Mobile said bar End */}
 
-            <div className="flex h-14 items-center lg:h-[60px] ">
+            <div className="flex h-11 items-center xl:hidden md:block hidden">
                 <div className={"app-logo cursor-pointer"}  onClick={() => onRedirect("/dashboard")}>
                     {
                         theme === "dark" ? Icon.whiteLogo : Icon.blackLogo
                     }
                 </div>
             </div>
+            </div>
+
             <div className={"flex gap-8"}>
 
                 <div className={"flex gap-6 items-center"}>
@@ -471,13 +511,6 @@ const HeaderBar = () => {
                             </PopoverContent>
                         </Popover>
                     </div>
-                    <div className="relative ml-auto flex-1 md:grow-0 rounded-md">
-                        <Input
-                            type="search"
-                            placeholder="Search..."
-                            className="w-full pl-4 pr-14 md:w-[200px] lg:w-[352px] text-sm font-normal bg-card"
-                        />
-                    </div>
                 </div>
                 <div className={"flex gap-4 items-center"}>
                     <Button variant="ghost hover:none" size="icon" className="h-8 w-8" onClick={toggleTheme}>
@@ -486,8 +519,8 @@ const HeaderBar = () => {
                     </Button>
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button variant="secondary" size="icon" className="rounded-full">
-                                <Avatar>
+                            <Button variant="secondary" size="icon" className="rounded-full w-[30px] h-[30px]">
+                                <Avatar className={"w-[30px] h-[30px]"}>
                                     {
                                         userDetails.user_photo ?
                                             <AvatarImage src={userDetails.user_photo} alt="@shadcn"/> :
@@ -530,7 +563,7 @@ const HeaderBar = () => {
 
             {isSheetOpen && (
                 <Sheet open={isSheetOpen} onOpenChange={isSheetOpen ? closeSheet : openSheet}>
-                    <SheetContent className={"sm:max-w-[662px] sm:overflow-auto p-0"}>
+                    <SheetContent className={"sm:max-w-[662px] sm:overflow-auto p-0 bg-card"}>
                         <SheetHeader className={"px-[32px] py-[22px] border-b flex"}>
                             <SheetTitle className={"text-xl font-medium flex justify-between items-center"}>Create new
                                 Project
@@ -571,7 +604,7 @@ const HeaderBar = () => {
                                 <Input
                                     id="domain"
                                     placeholder="https://projectname.quickhunt.io"
-                                    className={`${theme === "dark" ? "" : "placeholder:text-muted-foreground/75 pr-[115px]"}`}
+                                    className={`${theme === "dark" ? "placeholder:text-muted-foreground/75 pr-[115px]" : "placeholder:text-muted-foreground/75 pr-[115px]"}`}
                                     value={createProjectDetails.domain}
                                     name="domain"
                                     onChange={onChangeText}
@@ -579,18 +612,18 @@ const HeaderBar = () => {
                                 <span className={"absolute top-[33px] right-[13px] text-sm font-medium"}>Project domain</span>
                             </div>
                         </div>
-                        <SheetFooter className={"px-[32px] gap-[16px] sm:justify-start"}>
-                                <Button className={"text-card text-sm font-semibold hover:bg-primary bg-primary"}
+                        <div className={"px-8 gap-4 flex sm:justify-start"}>
+                                <Button className={"text-sm font-semibold hover:bg-primary"}
                                         onClick={onCreateProject} type="submit">Create Project</Button>
-                            <SheetClose asChild onClick={closeSheet}>
                                 <Button
                                     className={"text-primary text-sm font-semibold hover:bg-card border border-primary bg-card"}
-                                    type="submit">Cancel</Button>
-                            </SheetClose>
-                        </SheetFooter>
+                                    type="submit" onClick={onCancel}>Cancel</Button>
+                        </div>
                     </SheetContent>
                 </Sheet>
             )}
+            </div>
+            </div>
         </header>
     );
 };

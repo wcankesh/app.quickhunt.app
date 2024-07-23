@@ -1,6 +1,22 @@
 import React, {Fragment, useEffect, useState} from 'react';
 import {Button} from "../ui/button";
-import {ArrowBigUp, Check, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Circle, Dot, Ellipsis, Loader2, MessageCircleMore, Pin, Plus,} from "lucide-react";
+import {
+    Archive,
+    ArrowBigUp, Ban, Bug,
+    Check,
+    ChevronLeft,
+    ChevronRight,
+    ChevronsLeft,
+    ChevronsRight,
+    Circle, Cloud, CreditCard,
+    Dot,
+    Ellipsis, Github, Keyboard, LifeBuoy, ListFilter,
+    Loader2, LogOut, Mail,
+    MessageCircleMore, MessageSquare,
+    Pin,
+    Plus, PlusCircle, Settings,
+    User, UserPlus, Users,
+} from "lucide-react";
 import {Card, CardContent, CardFooter} from "../ui/card";
 import {Select, SelectItem, SelectGroup, SelectContent, SelectTrigger, SelectValue} from "../ui/select";
 import SidebarSheet from "../Ideas/SidebarSheet";
@@ -15,8 +31,14 @@ import ReadMoreText from "../Comman/ReadMoreText";
 import {CommSkel} from "../Comman/CommSkel";
 import EmptyData from "../Comman/EmptyData";
 import CreateIdea from "./CreateIdea";
-import {DropdownMenu, DropdownMenuTrigger} from "@radix-ui/react-dropdown-menu";
-import {DropdownMenuContent, DropdownMenuItem} from "../ui/dropdown-menu";
+import {DropdownMenu, DropdownMenuGroup, DropdownMenuSub, DropdownMenuTrigger} from "@radix-ui/react-dropdown-menu";
+import {
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuPortal,
+    DropdownMenuSeparator, DropdownMenuShortcut, DropdownMenuSubContent, DropdownMenuSubTrigger,
+} from "../ui/dropdown-menu";
 import {Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "../ui/dialog";
 import {Badge} from "../ui/badge";
 
@@ -370,7 +392,7 @@ const Ideas = () => {
                     </Dialog>
                 </Fragment>
             }
-            <div className={"xl:container xl:max-w-[1200px] lg:container lg:max-w-[992px] md:container md:max-w-[768px] sm:container sm:max-w-[639px] xs:container xs:max-w-[475px] pt-8 pb-5 px-4"}>
+            <div className={"xl:container xl:max-w-[1200px] lg:container lg:max-w-[992px] md:container md:max-w-[768px] sm:container sm:max-w-[639px] pt-8 pb-5 px-4"}>
                 <SidebarSheet
                     isOpen={isSheetOpen}
                     onOpen={openSheet}
@@ -399,9 +421,10 @@ const Ideas = () => {
                     ideasList={ideasList}
                     isNoStatus={false}
                 />
-                <div className={"flex flex-wrap items-center gap-6 xl:flex-nowrap"}>
+                <div className={"flex flex-nowrap items-center gap-6 lg:flex-nowrap md:flex-wrap"}>
                     <span><h1 className={"text-2xl font-medium"}>Ideas</h1></span>
-                    <div className={"w-full flex flex-wrap gap-6 "}>
+                    <div className={"w-full md:block hidden"}>
+                    <div className={"flex flex-wrap gap-6"}>
                     <div className={"xl:ml-auto gap-6"}>
                         <div className={"flex flex-row flex-wrap gap-6 items-center"}>
                             <Select defaultValue={null}
@@ -525,6 +548,107 @@ const Ideas = () => {
                                 onClick={openCreateIdea}><Plus/>Create Idea</Button>
                     </div>
                     </div>
+                    </div>
+                    <div className={"w-full flex justify-end md:hidden gap-2"}>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="outline" className={"gap-2"}><ListFilter size={15} />Filter</Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="w-56">
+                            <DropdownMenuLabel>Filter by</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuGroup>
+                                <DropdownMenuSub>
+                                    <DropdownMenuSubTrigger>
+                                        <UserPlus className="mr-2 h-4 w-4" />
+                                        <span>Status</span>
+                                    </DropdownMenuSubTrigger>
+                                    <DropdownMenuPortal>
+                                        <DropdownMenuSubContent>
+                                            <DropdownMenuItem>
+                                                <Circle size={15} className="mr-2" />
+                                                <span>All Status</span>
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem>
+                                                <Bug size={15} className="mr-2" />
+                                                {/*<span onClick={() => handleStatusUpdate("is_active",  ideasList.is_active === 1 ? 0 : 1, i, x)}>*/}
+                                                {/*    {ideasList.is_active === 0 ? "Convert to Idea" : "Mark as bug"}*/}
+                                                {/*</span>*/}
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem>
+                                                <Archive size={15} className="mr-2" />
+                                                {/*<span onClick={() => handleStatusUpdate("is_archive", ideasList.is_archive == 1 ? 0 : 1, i, x)}>*/}
+                                                {/*    {ideasList?.is_archive === 1 ? "Unarchive" : "Archive"}*/}
+                                                {/*</span>*/}
+                                            </DropdownMenuItem>
+                                        </DropdownMenuSubContent>
+                                    </DropdownMenuPortal>
+                                    <DropdownMenuSubTrigger>
+                                        <UserPlus className="mr-2 h-4 w-4" />
+                                        <span>Topics</span>
+                                    </DropdownMenuSubTrigger>
+                                    <DropdownMenuPortal>
+                                        <DropdownMenuSubContent>
+                                            <DropdownMenuItem className={"flex flex-col justify-start"}>
+                                                {
+                                                    (topicLists || []).map((x, i) => {
+                                                        return (
+                                                            <div className={"p-2"} key={i} value={x.id}>
+                                                                <div className={"flex gap-2"}>
+                                                                    <div onClick={() => handleChange({name: "topic", value: x.id})} className="checkbox-icon">
+                                                                        {(filter.topic.map((x) => x) || []).includes(x.id) ?
+                                                                            <Check size={18}/> : <div
+                                                                                className={"h-[15px] w-[15px]"}></div>}
+                                                                    </div>
+                                                                    <span>{x.title ? x.title : ""}</span>
+                                                                </div>
+                                                            </div>
+                                                        )
+                                                    })
+                                                }
+                                            </DropdownMenuItem>
+                                        </DropdownMenuSubContent>
+                                    </DropdownMenuPortal>
+                                    <DropdownMenuSubTrigger>
+                                        <UserPlus className="mr-2 h-4 w-4" />
+                                        <span>Roadmap</span>
+                                    </DropdownMenuSubTrigger>
+                                    <DropdownMenuPortal>
+                                        <DropdownMenuSubContent>
+                                            <DropdownMenuItem className={"flex flex-col justify-start"}>
+                                                {
+                                                    (roadmapStatus || []).map((x, i) => {
+                                                        return (
+                                                            <div className={"p-2"} key={i} value={x.id}>
+                                                                <div className={"flex gap-2"}>
+                                                                    <div onClick={() => handleChange({name: "roadmap", value: x.id})} className="checkbox-icon">
+                                                                        {(filter.roadmap.map((x) => x) || []).includes(x.id) ?
+                                                                            <Check size={18}/> : <div
+                                                                                className={"h-[18px] w-[18px]"}></div>}
+                                                                    </div>
+                                                                    <div className={"flex items-center gap-2"}>
+                                                                        <Circle fill={x.color_code} stroke={x.color_code}
+                                                                                className={` w-[10px] h-[10px]`}/>
+                                                                        <span>{x.title ? x.title : ""}</span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        )
+                                                    })
+                                                }
+                                            </DropdownMenuItem>
+                                        </DropdownMenuSubContent>
+                                    </DropdownMenuPortal>
+                                </DropdownMenuSub>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem>
+                                    <Plus size={15} className="mr-2" />
+                                    <span onClick={openCreateIdea}>Create Idea</span>
+                                </DropdownMenuItem>
+                            </DropdownMenuGroup>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                    </div>
                 </div>
                 <div className={"mt-8"}>
                     <Card>
@@ -535,7 +659,7 @@ const Ideas = () => {
                                         (ideasList || []).map((x, i) => {
                                             return (
                                                 <Fragment key={i}>
-                                                    <div className={"flex gap-8 py-6 px-16"}>
+                                                    <div className={"flex gap-4 md:gap-8 md:py-6 md:px-16 py-3 px-8"}>
                                                         <div className={"flex gap-2"}>
                                                             <Button
                                                                 className={"p-[7px] bg-white shadow border hover:bg-white w-[30px] h-[30px]"}
@@ -548,7 +672,7 @@ const Ideas = () => {
                                                         </div>
                                                         <div className={"flex flex-col w-full gap-6"}>
                                                             <div className={"flex flex-col gap-[11px]"}>
-                                                                <div className={"flex items-center justify-between gap-3"}>
+                                                                <div className={"flex flex-wrap items-center justify-between gap-3 md:flex-nowrap"}>
                                                                     <div
                                                                         className={"flex flex-wrap items-center gap-1 cursor-pointer xl:gap-3"}
                                                                         onClick={() => openDetailsSheet(x)}>
@@ -618,9 +742,9 @@ const Ideas = () => {
                                                                     </div>
                                                                 }
                                                                     </div>
-                                                                <div className={"flex items-center gap-8"}>
+                                                                <div className={"flex items-center md:gap-8 gap-4"}>
                                                                     <Select onValueChange={(value) => handleStatusUpdate("roadmap_id", value, i, x)} value={x.roadmap_id}>
-                                                                        <SelectTrigger className="w-[291px] bg-card">
+                                                                        <SelectTrigger className="md:w-[291px] w-[170px] bg-card">
                                                                             <SelectValue/>
                                                                         </SelectTrigger>
                                                                         <SelectContent>
@@ -676,8 +800,9 @@ const Ideas = () => {
 
                         <CardFooter className={"p-0"}>
                             <div
-                                className={`w-full p-5 ${theme === "dark" ? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end px-16 py-15px`}>
-                                <div className={"flex flex-row gap-8 items-center"}>
+                                className={`w-full p-5 ${theme === "dark" ? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end px-8 py-4 md:px-16 md:py-15px`}>
+                                <div className={"w-full flex gap-8 items-center justify-between sm:justify-end"}>
+                                    {/*<div className={"w-full flex justify-between gap-2 items-center"}>*/}
                                     <div>
                                         <h5 className={"text-sm font-semibold"}>Page {pageNo} of {totalPages}</h5>
                                     </div>

@@ -154,6 +154,11 @@ const CreateIdea = ({
         }
     };
 
+    const onCancel = () => {
+        setFormError(initialStateError);
+        onClose();
+    }
+
     return (
         <div>
             <Sheet open={isOpen} onOpenChange={isOpen ? onClose : onOpen} closeCreateIdea={closeCreateIdea}>
@@ -234,7 +239,7 @@ const CreateIdea = ({
                                             isLoading ? <Loader2 className="h-4 w-4 animate-spin"/> : "Create Idea"
                                         }
                                         </Button>
-                                    <Button variant={"outline hover:bg-transparent"} className={"border border-primary py-2 px-6 text-sm font-semibold"} onClick={onClose}>Cancel</Button>
+                                    <Button variant={"outline hover:bg-transparent"} className={"border border-primary py-2 px-6 text-sm font-semibold"} onClick={onCancel}>Cancel</Button>
                                 </div>
                             </div>
                     </div>

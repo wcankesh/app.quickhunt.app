@@ -1,13 +1,22 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {Button} from "../ui/button";
 import {Icon} from "../../utils/Icon";
 import {baseUrl} from "../../utils/constent";
 import {useNavigate, useLocation, useParams} from "react-router-dom";
+import {Sheet, SheetContent, SheetTrigger} from "../ui/sheet";
+import {Menu, X} from "lucide-react";
+import {useTheme} from "../theme-provider";
 
 const SaidBarDesktop = () => {
+    const {setTheme, theme} = useTheme()
     let navigate = useNavigate();
     let location = useLocation();
     const {type} = useParams();
+    const [isSheetOpenMenu, setSheetOpenMenu] = useState(false);
+
+
+    const openSheetMenu = () => setSheetOpenMenu(true);
+    const closeSheetMenu = () => setSheetOpenMenu(false);
 
     const onRedirect = (link) => {
         navigate(`${baseUrl}${link}`);
@@ -105,10 +114,24 @@ const SaidBarDesktop = () => {
     };
 
     return (
-        <div className="hidden md:block bodyScreenHeight overflow-auto">
-            <div className="flex h-full max-h-screen flex-col gap-2">
+        // <div className="hidden md:block bodyScreenHeight overflow-auto">
+        <div className="main-sidebar pointer-events-none fixed start-0 top-0 z-[60] flex h-full xl:z-10 hidden md:block overflow-auto">
+            {/*<div className="flex h-full max-h-screen flex-col gap-2">*/}
+            <div className="pointer-events-auto relative z-30 flex h-full w-[282px] flex-col ltr:-translate-x-full rtl:translate-x-full ltr:xl:translate-x-0 rtl:xl:translate-x-0">
+            {/*<div className="border-default-200 pointer-events-auto relative z-30 flex flex-col h-full w-[282px] border-r bg-card transition-all duration-300 rtl:translate-x-[calc(100%_+_72px)] translate-x-[calc(-100%_-_72px)]">*/}
+
+                <div className={"flex gap-3 items-center px-4"}>
+                    <div className="flex h-14 items-center lg:h-[60px] ">
+                        <div className={"app-logo cursor-pointer"}  onClick={() => onRedirect("/dashboard")}>
+                            {
+                                theme === "dark" ? Icon.whiteLogo : Icon.blackLogo
+                            }
+                        </div>
+                    </div>
+                </div>
 
                 <div className="flex-1 pt-5">
+
                     <nav className="grid items-start px-2 lg:px-4 gap-5">
                         {
                             (menuComponent || []).map((x, i) => {

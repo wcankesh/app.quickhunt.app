@@ -665,6 +665,7 @@ const SidebarSheet = ({
 
     const handleOnCreateCancel = () => {
         setSelectedIdea(oldSelectedIdea);
+        setFormError(initialStateError);
         setIsEditIdea(false);
     }
 
@@ -688,13 +689,14 @@ const SidebarSheet = ({
     return (
         <Fragment>
             <Sheet open={isOpen} onOpenChange={isOpen ? onCloseBoth : onOpen}>
-                <SheetOverlay className={"inset-0"} />
+                <SheetOverlay className={"inset-0"}/>
                 <SheetContent className={"lg:max-w-[1101px] md:max-w-[720px] max-w-full p-0"}>
                     <SheetHeader className={"px-[32px] py-[22px] border-b"}>
                         <X onClick={onCloseBoth} className={"cursor-pointer"}/>
                     </SheetHeader>
                     <div className={"grid lg:grid-cols-12 md:grid-cols-1 overflow-auto h-[100vh]"}>
-                        <div className={`col-span-4 lg:block hidden ${theme === "dark" ? "" : "bg-muted"} border-r lg:overflow-auto pb-[100px]`}>
+                        <div
+                            className={`col-span-4 lg:block hidden ${theme === "dark" ? "" : "bg-muted"} border-r lg:overflow-auto pb-[100px]`}>
                             <div className={"border-b py-4 pl-8 pr-6 flex flex-col gap-3"}>
                                 <div className={"flex flex-col gap-1"}>
                                     <h3 className={"text-sm font-medium"}>Status</h3>
@@ -742,8 +744,10 @@ const SidebarSheet = ({
                                                                 onClick={() => onChangeStatus('cover_image', '')}
                                                             />
                                                         </div> : selectedIdea.cover_image ?
-                                                            <div className={"w-[282px] h-[128px] relative border p-[5px]"}>
-                                                                <img className={"upload-img"} src={selectedIdea.cover_image} alt=""/>
+                                                            <div
+                                                                className={"w-[282px] h-[128px] relative border p-[5px]"}>
+                                                                <img className={"upload-img"}
+                                                                     src={selectedIdea.cover_image} alt=""/>
                                                                 <CircleX
                                                                     size={20}
                                                                     className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
@@ -754,19 +758,19 @@ const SidebarSheet = ({
                                                 </div> :
                                                 <div>
 
-                                                <input
-                                                    id="pictureInput"
-                                                    type="file"
-                                                    className="hidden"
-                                                    multiple
-                                                    onChange={handleFeatureImgUpload}
-                                                />
-                                            <label
-                                            htmlFor="pictureInput"
-                                            className="border-dashed w-[282px] h-[128px] py-[52px] flex items-center justify-center bg-muted border border-muted-foreground rounded cursor-pointer"
-                                            >
-                                            <h4 className="text-xs font-semibold">Upload</h4>
-                                            </label>
+                                                    <input
+                                                        id="pictureInput"
+                                                        type="file"
+                                                        className="hidden"
+                                                        multiple
+                                                        onChange={handleFeatureImgUpload}
+                                                    />
+                                                    <label
+                                                        htmlFor="pictureInput"
+                                                        className="border-dashed w-[282px] h-[128px] py-[52px] flex items-center justify-center bg-muted border border-muted-foreground rounded cursor-pointer"
+                                                    >
+                                                        <h4 className="text-xs font-semibold">Upload</h4>
+                                                    </label>
                                                 </div>
                                         }
                                     </div>
@@ -897,7 +901,6 @@ const SidebarSheet = ({
                                             <Button
                                                 variant={"outline hover:bg-transparent"}
                                                 className={"border border-primary py-2 px-6 text-sm font-semibold"}
-                                                // onClick={handleOnCreateCancel}
                                                 onClick={handleOnCreateCancel}
                                             >
                                                 Cancel
@@ -908,7 +911,8 @@ const SidebarSheet = ({
                                     <Fragment>
                                         <div className={"py-6 px-8"}>
                                             <div className={"flex flex-col gap-6"}>
-                                                <div className={"flex justify-between items-center"}>
+                                                <div
+                                                    className={"flex justify-between items-center gap-4 md:flex-nowrap flex-wrap"}>
                                                     <div className={"flex gap-2"}>
                                                         <Button
                                                             className={"p-[7px] bg-white shadow border hover:bg-white w-[30px] h-[30px]"}
@@ -922,32 +926,32 @@ const SidebarSheet = ({
                                                     </div>
                                                     <div className={"flex gap-2"}>
                                                         <div className={"flex gap-2 lg:hidden"}>
-                                                                <Button
-                                                                    variant={"outline"}
-                                                                    className={`hover:bg-muted w-[132px] ${theme === "dark" ? "" : "border-muted-foreground text-muted-foreground"} h-auto py-1 px-2 text-sm font-semibold`}
-                                                                    onClick={() => onChangeStatus(
-                                                                        "is_active",
-                                                                        selectedIdea.is_active === 1 ? 0 : 1
-                                                                    )}
-                                                                >
-                                                                    {
-                                                                        isLoading ? <Loader2
-                                                                            className="h-4 w-4 animate-spin"/> : (selectedIdea.is_active === 0 ? "Convert to Idea" : "Mark as bug")
-                                                                    }
-                                                                </Button>
-                                                                <Button
-                                                                    variant={"outline"}
-                                                                    className={`w-[100px] h-auto py-1 px-2 hover:bg-muted ${theme === "dark" ? "" : "border-muted-foreground text-muted-foreground"} text-sm font-semibold`}
-                                                                    onClick={() => onChangeStatus(
-                                                                        "is_archive",
-                                                                        selectedIdea.is_archive === 1 ? 0 : 1
-                                                                    )}
-                                                                >
-                                                                    {
-                                                                        isLoadingArchive ? <Loader2
-                                                                            className="h-4 w-4 animate-spin"/> : (selectedIdea.is_archive === 1 ? "Unarchive" : "Archive")
-                                                                    }
-                                                                </Button>
+                                                            <Button
+                                                                variant={"outline"}
+                                                                className={`hover:bg-muted w-[132px] ${theme === "dark" ? "" : "border-muted-foreground text-muted-foreground"} h-auto py-1 px-2 text-sm font-semibold`}
+                                                                onClick={() => onChangeStatus(
+                                                                    "is_active",
+                                                                    selectedIdea.is_active === 1 ? 0 : 1
+                                                                )}
+                                                            >
+                                                                {
+                                                                    isLoading ? <Loader2
+                                                                        className="h-4 w-4 animate-spin"/> : (selectedIdea.is_active === 0 ? "Convert to Idea" : "Mark as bug")
+                                                                }
+                                                            </Button>
+                                                            <Button
+                                                                variant={"outline"}
+                                                                className={`w-[100px] h-auto py-1 px-2 hover:bg-muted ${theme === "dark" ? "" : "border-muted-foreground text-muted-foreground"} text-sm font-semibold`}
+                                                                onClick={() => onChangeStatus(
+                                                                    "is_archive",
+                                                                    selectedIdea.is_archive === 1 ? 0 : 1
+                                                                )}
+                                                            >
+                                                                {
+                                                                    isLoadingArchive ? <Loader2
+                                                                        className="h-4 w-4 animate-spin"/> : (selectedIdea.is_archive === 1 ? "Unarchive" : "Archive")
+                                                                }
+                                                            </Button>
                                                         </div>
                                                         {
                                                             selectedIdea.is_edit === 1 ?
@@ -983,7 +987,7 @@ const SidebarSheet = ({
                                                 </div>
                                                 {
                                                     selectedIdea && selectedIdea.images ?
-                                                        <div className={"flex gap-2"}>
+                                                        <div className={"flex gap-2 flex-wrap"}>
                                                             {
                                                                 (selectedIdea.images || []).map((x, i) => {
                                                                         return (
@@ -1009,7 +1013,7 @@ const SidebarSheet = ({
                                                         </div> : ""
                                                 }
                                                 <div className={"flex items-center"}>
-                                                    <div className={"flex items-center gap-4"}>
+                                                    <div className={"flex items-center gap-4 md:flex-nowrap flex-wrap"}>
                                                         <div className={"flex items-center gap-2"}>
                                                             <Avatar className={"w-[20px] h-[20px]"}>
                                                                 {
@@ -1246,7 +1250,7 @@ const SidebarSheet = ({
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className={"pb-[100px]"}>
+                                        <div className={"pb-[150px] md:pb-[100px]"}>
                                             <Tabs defaultValue="comment" className="">
                                                 <div className={"px-8"}>
                                                     <TabsList
@@ -1330,7 +1334,8 @@ const SidebarSheet = ({
                                                                                                 />
                                                                                                 {
                                                                                                     selectedComment && selectedComment.images && selectedComment.images.length ?
-                                                                                                        <div className={"flex gap-2"}>
+                                                                                                        <div
+                                                                                                            className={"flex gap-2"}>
                                                                                                             {
                                                                                                                 (selectedComment.images || []).map((x, i) => {
                                                                                                                     return (
@@ -1403,16 +1408,25 @@ const SidebarSheet = ({
                                                                                                     </div>
                                                                                                 </div>
                                                                                             </div>
-                                                                                            : <div className={"space-y-2"}>
+                                                                                            : <div
+                                                                                                className={"space-y-2"}>
                                                                                                 <p className={"text-xs"}>
-                                                                                                    <ReadMoreText className={"text-xs"} html={x.comment}/>
+                                                                                                    <ReadMoreText
+                                                                                                        className={"text-xs"}
+                                                                                                        html={x.comment}/>
                                                                                                 </p>
-                                                                                                <div className={"flex gap-2"}>
+                                                                                                <div
+                                                                                                    className={"flex gap-2 flex-wrap"}>
                                                                                                     {
                                                                                                         ((x && x.images) || []).map((img, ind) => {
                                                                                                             return (
-                                                                                                                <div key={ind} className={"w-[100px] h-[100px] border p-[3px]"}>
-                                                                                                                    <img className={"upload-img"} src={img} alt={img}/>
+                                                                                                                <div
+                                                                                                                    key={ind}
+                                                                                                                    className={"w-[100px] h-[100px] border p-[3px]"}>
+                                                                                                                    <img
+                                                                                                                        className={"upload-img"}
+                                                                                                                        src={img}
+                                                                                                                        alt={img}/>
                                                                                                                 </div>
                                                                                                             )
                                                                                                         })
@@ -1422,30 +1436,32 @@ const SidebarSheet = ({
                                                                                     }
                                                                                 </div>
 
-                                                                                    {
-                                                                                        selectedCommentIndex === i ? "" :
-                                                                                            <div className={"flex justify-between"}>
-                                                                                                <Button
-                                                                                                    className="p-0 text-sm font-semibold text-primary"
-                                                                                                    variant={"ghost hover-none"}
-                                                                                                    onClick={() => onShowSubComment(i)}
-                                                                                                    key={`comment-nested-reply-to-${i}`}
-                                                                                                >
-                                                                                                    Reply
-                                                                                                </Button>
-                                                                                                <div className={"flex items-center gap-2 cursor-pointer"}
-                                                                                                     onClick={() => onShowSubComment(i)}
-                                                                                                >
+                                                                                {
+                                                                                    selectedCommentIndex === i ? "" :
+                                                                                        <div
+                                                                                            className={"flex justify-between"}>
+                                                                                            <Button
+                                                                                                className="p-0 text-sm font-semibold text-primary"
+                                                                                                variant={"ghost hover-none"}
+                                                                                                onClick={() => onShowSubComment(i)}
+                                                                                                key={`comment-nested-reply-to-${i}`}
+                                                                                            >
+                                                                                                Reply
+                                                                                            </Button>
+                                                                                            <div
+                                                                                                className={"flex items-center gap-2 cursor-pointer"}
+                                                                                                onClick={() => onShowSubComment(i)}
+                                                                                            >
                                                                                                     <span>
                                                                                                         <MessageCircleMore
                                                                                                             className={"stroke-primary w-[16px] h-[16px]"}/>
                                                                                                     </span>
-                                                                                                    <p className={"text-base font-medium"}>
-                                                                                                        {x.reply.length}
-                                                                                                    </p>
-                                                                                                </div>
+                                                                                                <p className={"text-base font-medium"}>
+                                                                                                    {x.reply.length}
+                                                                                                </p>
                                                                                             </div>
-                                                                                    }
+                                                                                        </div>
+                                                                                }
                                                                                 <div>
                                                                                     {
                                                                                         x.show_reply ?
@@ -1517,7 +1533,8 @@ const SidebarSheet = ({
                                                                                                                                                                         x && x.name ?
                                                                                                                                                                             <div
                                                                                                                                                                                 className={"w-[100px] h-[100px] relative border p-[3px]"}>
-                                                                                                                                                                                <img className={"upload-img"}
+                                                                                                                                                                                <img
+                                                                                                                                                                                    className={"upload-img"}
                                                                                                                                                                                     src={x && x.name ? URL.createObjectURL(x) : x}
                                                                                                                                                                                     alt=""/>
                                                                                                                                                                                 <CircleX
@@ -1528,7 +1545,8 @@ const SidebarSheet = ({
                                                                                                                                                                             </div> : x ?
                                                                                                                                                                             <div
                                                                                                                                                                                 className={"w-[100px] h-[100px] relative border p-[3px]"}>
-                                                                                                                                                                                <img className={"upload-img"}
+                                                                                                                                                                                <img
+                                                                                                                                                                                    className={"upload-img"}
                                                                                                                                                                                     src={x}
                                                                                                                                                                                     alt={x}/>
                                                                                                                                                                                 <CircleX
@@ -1589,7 +1607,8 @@ const SidebarSheet = ({
                                                                                                                                                     {
                                                                                                                                                         (y.images || []).map((z, i) => {
                                                                                                                                                             return (
-                                                                                                                                                                <img className={"upload-img"}
+                                                                                                                                                                <img
+                                                                                                                                                                    className={"upload-img"}
                                                                                                                                                                     src={z}
                                                                                                                                                                     alt={z}/>
                                                                                                                                                             )
@@ -1622,7 +1641,8 @@ const SidebarSheet = ({
                                                                                                                                     z && z.name ?
                                                                                                                                         <div
                                                                                                                                             className={"w-[100px] h-[100px] relative border p-[3px]"}>
-                                                                                                                                            <img className={"upload-img"}
+                                                                                                                                            <img
+                                                                                                                                                className={"upload-img"}
                                                                                                                                                 src={z && z.name ? URL.createObjectURL(z) : z}/>
                                                                                                                                             <CircleX
                                                                                                                                                 size={20}
@@ -1669,7 +1689,7 @@ const SidebarSheet = ({
                                                                                                                 id="commentFileInput"
                                                                                                                 type="file"
                                                                                                                 className="hidden"
-                                                                                                                onChange={handleSubCommentUploadImg} />
+                                                                                                                onChange={handleSubCommentUploadImg}/>
                                                                                                             <label
                                                                                                                 htmlFor="commentFileInput"
                                                                                                                 className="absolute inset-0 flex items-center justify-center bg-white border border-primary rounded cursor-pointer">

@@ -227,9 +227,9 @@ export function Dashboard() {
 
     return (
         <Fragment>
-                <div className={"py-8"}>
+                <div className={"md:py-8 py-4"}>
                     <div className='xl:container xl:max-w-[1200px] lg:container lg:max-w-[992px] md:container md:max-w-[768px] sm:container sm:max-w-[639px] px-4'>
-                        <h1 className="text-[32px] font-medium">Welcome to Quickhunt</h1>
+                        <h1 className="md:text-[32px] text-[30px] font-medium">Welcome to Quickhunt</h1>
                     </div>
 
                 </div>

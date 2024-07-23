@@ -654,6 +654,7 @@ const RoadMapSidebarSheet = ({
     }
 
     const handleOnCreateCancel = () => {
+        setFormError(initialStateError);
         setIsEditIdea(false);
     }
 
@@ -919,7 +920,6 @@ const RoadMapSidebarSheet = ({
                                             <Button
                                                 variant={"outline hover:bg-transparent"}
                                                 className={"border border-primary py-2 px-6 text-sm font-semibold"}
-                                                // onClick={handleOnCreateCancel}
                                                 onClick={handleOnCreateCancel}
                                             >
                                                 Cancel
@@ -1011,7 +1011,7 @@ const RoadMapSidebarSheet = ({
                                                         </div> : ""
                                                 }
                                                 <div className={"flex items-center"}>
-                                                    <div className={"flex items-center gap-4"}>
+                                                    <div className={"flex items-center gap-4 md:flex-nowrap flex-wrap"}>
                                                         <div className={"flex items-center gap-2"}>
                                                             <Avatar className={"w-[20px] h-[20px]"}>
                                                                 {
@@ -1248,7 +1248,7 @@ const RoadMapSidebarSheet = ({
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className={"pb-[100px]"}>
+                                        <div className={"pb-[150px] md:md-[100px]"}>
                                             <Tabs defaultValue="comment" className="">
                                                 <div className={"px-8"}>
                                                     <TabsList
