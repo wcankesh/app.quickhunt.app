@@ -90,14 +90,14 @@ const Emoji = () => {
             setEmojiList(clone);
             dispatch(allStatusAndTypesAction({...allStatusAndTypes, emoji: clone}))
             toast({
-                title: data.success
+                description: data.message
             });
             setIsSave(false);
         }
         else{
             setIsSave(false);
             toast({
-                title: "Something went wrong",
+                description: data.message,
                 variant: "destructive"
             });
         }
@@ -119,11 +119,11 @@ const Emoji = () => {
             setDeleteId(null);
             dispatch(allStatusAndTypesAction({...allStatusAndTypes, emoji: clone}));
             toast({
-                title:"Emoji deleted successfully"
+                description:data.message
             })
         } else {
             toast({
-                title:"Something went wrong",
+                description:"Something went wrong",
                 variant: "destructive"
             })
         }
@@ -140,26 +140,27 @@ const Emoji = () => {
         const payload ={
             project_id:projectDetailsReducer.id,
             emoji:selectedEmoji.emoji,
-            emoji_url:selectedEmoji.imageUrl
+            emoji_url:selectedEmoji.imageUrl ? selectedEmoji.imageUrl : record.emoji_url
         }
         const data = await apiService.updateEmoji(payload,record.id);
-        if(data.status === 401) {
+        if(data.status === 400) {
             setIsSave(false);
             const clone = [...emojiList];
-            clone[index] = {project_id:projectDetailsReducer.id, emoji:selectedEmoji.emoji, emoji_url:selectedEmoji.imageUrl,id:record.id};
+            clone[index] = {project_id:projectDetailsReducer.id, emoji:selectedEmoji.emoji, emoji_url:payload.emoji_url,id:record.id};
+            console.log(clone[index]);
             setEmojiList(clone);
             dispatch(allStatusAndTypesAction({...allStatusAndTypes, emoji: clone}))
             setEditIndex(null);
             setSelectedEmoji({});
             toast({
-                title:"Emoji updated successfully"
+                description:data.message
             })
             setIsEdit(false);
             setIsChangeEditEmoji(false);
         }
         else{
             toast({
-                title:"Something went wrong",
+                description:data.message,
                 variant: "destructive"
             });
             setIsEdit(false);
@@ -233,10 +234,10 @@ const Emoji = () => {
                                                                 {selectedEmoji?.emoji_url ?
                                                                     <div
                                                                         className={"border border-input w-full p-1 rounded-md bg-background cursor-pointer"}>
-                                                                        <img className={"cursor-pointer h-[30px] w-[30px]"} src={selectedEmoji?.emoji_url}/>
+                                                                        <img className={"cursor-pointer h-[30px] w-[30px]"} alt={"not-found"} src={selectedEmoji?.emoji_url}/>
                                                                     </div>
                                                                      : isChangeEditEmoji ? <div className={"border border-input w-full p-1 rounded-md bg-background cursor-pointer"}>
-                                                                                <img className={"cursor-pointer h-[30px] w-[30px]"} src={selectedEmoji?.imageUrl}/>
+                                                                                <img className={"cursor-pointer h-[30px] w-[30px]"} alt={"not-found"} src={selectedEmoji?.imageUrl}/>
                                                                               </div>
                                                                      :
                                                                     <Input placeholder="Choose Emoji"/>}
@@ -247,7 +248,7 @@ const Emoji = () => {
                                                         </PopoverContent>
                                                     </Popover>
                                                     :
-                                                    <img className={"h-[30px] w-[30px] m-[5px]"} src={x.emoji_url}/>
+                                                    <img className={"h-[30px] w-[30px] m-[5px]"} alt={"not-found"} src={x.emoji_url}/>
                                                 }
                                             </TableCell>
                                             <TableCell className={"flex justify-end items-center"}>
@@ -286,7 +287,7 @@ const Emoji = () => {
                                                 <PopoverTrigger asChild>
                                                     <div className={"flex flex-col"}>
                                                         {selectedEmoji?.imageUrl ? <div className={"border border-input w-full p-1 rounded-md bg-background cursor-pointer"}>
-                                                                <img className={"cursor-pointer h-[30px] w-[30px]"} src={selectedEmoji?.imageUrl}/></div>
+                                                                <img className={"cursor-pointer h-[30px] w-[30px]"} alt={"not-found"} src={selectedEmoji?.imageUrl}/></div>
                                                                 :
                                                                 <Input placeholder="Choose Emoji"/>
                                                         }

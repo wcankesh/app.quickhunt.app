@@ -1,5 +1,5 @@
 import React, { useEffect, useState} from 'react';
-import {Sheet, SheetContent, SheetHeader,} from "../ui/sheet";
+import {Sheet, SheetContent, SheetHeader, SheetOverlay,} from "../ui/sheet";
 import {Separator} from "../ui/separator";
 import {CalendarIcon, Check, Circle, Pin, X, Loader2} from "lucide-react";
 import {Label} from "../ui/label";
@@ -44,14 +44,13 @@ const initialStateError = {
     post_description: "",
 }
 
-const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,callBack,selectedRecord}) => {
+const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) => {
     const [previewImage,setPreviewImage] = useState("");
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
     const userDetailsReducer = useSelector(state => state.userDetailsReducer);
     const [changeLogDetails, setChangeLogDetails] = useState(initialState);
     const [labelList, setLabelList] = useState([]);
-    const [convertedContent, setConvertedContent] = useState(null);
     const [memberList, setMemberList] = useState([])
     const [categoriesList, setCategoriesList] = useState([])
     const [isSave, setIsSave] = useState(false)
@@ -63,29 +62,23 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,callBack,selectedR
 
     useEffect(()=>{
         if(selectedRecord?.post_slug_url){
-            getSinglePosts();
+             getSinglePosts();
         }
         setLabelList(allStatusAndTypes.labels);
         setMemberList(allStatusAndTypes.members);
         setCategoriesList(allStatusAndTypes.categories);
     },[])
 
-    const getSinglePosts = async () => {
-        const data = await apiService.getSinglePosts(selectedRecord?.post_slug_url)
-        if(data.status === 200){
-            setChangeLogDetails({
-                ...data.data,
-                image: data.data.feature_image,
-                post_assign_to: data.data.post_assign_to !== null ? data.data.post_assign_to.split(',') : [],
-                post_published_at: data.data.post_published_at ? moment(data.data.post_published_at).format('YYYY-MM-DD') : moment(new Date()),
-                post_expired_datetime: data.data.post_expired_datetime ? moment(data.data.post_expired_datetime).format('YYYY-MM-DD') : undefined,
-                category_id: data.data.category_id == "0" ? "" : data.data.category_id,
-            })
-            setConvertedContent(data.data.post_description);
-            setPreviewImage(data.data.feature_image);
-        } else {
-
-        }
+    const getSinglePosts = () => {
+        setChangeLogDetails({
+            ...selectedRecord,
+            image: selectedRecord.feature_image,
+            post_assign_to: selectedRecord.post_assign_to !== null ? selectedRecord.post_assign_to.split(',') : [],
+            post_published_at: selectedRecord.post_published_at ? moment(selectedRecord.post_published_at).format('YYYY-MM-DD') : moment(new Date()),
+            post_expired_datetime: selectedRecord.post_expired_datetime ? moment(selectedRecord.post_expired_datetime).format('YYYY-MM-DD') : undefined,
+            category_id: selectedRecord.category_id == "0" ? "" : selectedRecord.category_id,
+        });
+        setPreviewImage(selectedRecord.feature_image);
     }
 
     const handleFileChange = (file) => {
@@ -117,7 +110,6 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,callBack,selectedR
         if(event.target.name === "post_title"){
             setChangeLogDetails({...changeLogDetails, [event.target.name]: event.target.value, post_slug_url: event.target.value.replace(/ /g,"-").replace(/\?/g, "-")})
         } else if(event.target.name === "post_slug_url"){
-
             setChangeLogDetails({...changeLogDetails, post_slug_url: event.target.value.replace(/ /g,"-").replace(/\?/g, "-")})
         }else {
             setChangeLogDetails({...changeLogDetails, [event.target.name]: event.target.value})
@@ -177,16 +169,18 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,callBack,selectedR
         const data = await apiService.createPosts(formData);
         if(data.status === 200){
             setChangeLogDetails(initialState)
-            setConvertedContent(null)
             setIsSave(false)
             toast({
-                title: "Announcement created successfully",
+                description: "Announcement created successfully",
             });
         } else {
-            setIsSave(false)
+            setIsSave(false);
+            toast({
+                description: "Something went wrong",
+                variant: "destructive",
+            });
         }
-        callBack(changeLogDetails, "isCreate");
-        onClose();
+        onClose("",data.data);
     }
 
     const updatePost = async () => {
@@ -229,20 +223,18 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,callBack,selectedR
         if(data.status === 200){
           //  message.success("Post update successfully")
             setChangeLogDetails(initialState)
-            setConvertedContent(null)
             setIsSave(false)
             toast({
-                title: "Announcement updated successfully",
+                description: "Announcement updated successfully",
             });
 
         } else {
             setIsSave(false)
             toast({
-                title: "Uh oh! Something went wrong.",
+                description: "Something went wrong.",
                 variant: "destructive"
             });
         }
-        // callBack({}, "isUpdate");
         onClose(data.data);
     }
 
@@ -273,8 +265,12 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,callBack,selectedR
         console.log("delete",index);
     }
 
+    console.log(changeLogDetails.labels,"changeLogDetails.labels");
+    console.log(labelList,"labellsit");
+
     return (
         <Sheet open={isOpen} onOpenChange={isOpen ? onClose : onOpen}>
+            <SheetOverlay className={"inset-0"} />
             <SheetContent className={"pt-[24px] p-0 overflow-y-scroll lg:max-w-[663px] md:max-w-[720px] sm:max-w-[520px]"}>
                     <SheetHeader className={`px-8 py-6 flex flex-row justify-between items-center sticky top-0 ${theme == "dark" ? "bg-[#020817]" : "bg-[#f8fafc]"} z-10`}>
                         <h5 className={"text-xl font-medium leading-5"}>{ selectedRecord?.post_slug_url ? "Update Announcement" :"Create New Announcements"}</h5>
@@ -320,11 +316,11 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,callBack,selectedR
                                                     const findObj = labelList.find((y) => y.id == x);
                                                     return(
                                                         <Badge variant={"outline"} style={{
-                                                            color: findObj.label_color_code,
-                                                            borderColor: findObj.label_color_code,
+                                                            color: findObj?.label_color_code,
+                                                            borderColor: findObj?.label_color_code,
                                                             textTransform: "capitalize"
                                                         }}
-                                                               className={`h-[20px] py-0 px-2 text-xs rounded-[5px]  font-medium text-[${findObj.label_color_code}] border-[${findObj.label_color_code}] capitalize`}>{findObj.label_name}</Badge>
+                                                               className={`h-[20px] py-0 px-2 text-xs rounded-[5px]  font-medium text-[${findObj?.label_color_code}] border-[${findObj?.label_color_code}] capitalize`}>{findObj?.label_name}</Badge>
                                                     )
                                                 })
                                             }

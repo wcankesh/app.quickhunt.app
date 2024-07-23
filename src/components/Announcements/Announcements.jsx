@@ -61,15 +61,20 @@ const Announcements = () => {
     const onCloseAnalyticsSheet = () => {
         setAnalyticsObj({})
     }
-    const closeSheet = (record) => {
+    const closeSheet = (record,addRecord) => {
         if (record) {
             const updatedItems = announcementList.map((x) => x.id === record.id ? {...x, ...record} : x);
             setAnnouncementList(updatedItems);
             setSelectedRecord({});
-        } else {
+        } else if (addRecord) {
+           const clone = [...announcementList];
+           clone.unshift(addRecord);
+           setAnnouncementList(clone);
+           setSelectedRecord({});
+        }
+        else {
             setSelectedRecord({});
         }
-
     };
 
     const handleDelete = async (id) => {
@@ -82,11 +87,11 @@ const Announcements = () => {
                 setAnnouncementList(clone);
             }
             toast({
-                title: data.success,
+                description: data.message,
             })
         } else {
             toast({
-                title: "Something went wrong.",
+                description: data.message,
                 variant: "destructive"
             })
         }
@@ -109,19 +114,6 @@ const Announcements = () => {
             setTotalRecord(data.total)
         } else {
             setIsLoading(false)
-        }
-    }
-
-    const callBackForProps = async () => {
-        const data = await apiService.getAllPosts({
-            project_id: projectDetailsReducer.id,
-            page: pageNo,
-            limit: perPageLimit
-        })
-        if (data.status === 200) {
-            setIsLoading(false)
-            setAnnouncementList(data.data)
-            setTotalRecord(data.total)
         }
     }
 
@@ -156,13 +148,15 @@ const Announcements = () => {
         }
     };
 
+    console.log(announcementList);
+
     return (
         <div
             className={"pt-8 xl:container xl:max-w-[1200px] lg:container lg:max-w-[992px] md:container md:max-w-[530px] sm:container sm:max-w-[639px] xs:container xs:max-w-[475px] max-[639px]:container max-[639px]:max-w-[507px]"}>
             {selectedRecord.id &&
             <CreateAnnouncementsLogSheet isOpen={selectedRecord.id} selectedRecord={selectedRecord}
                                          setSelectedRecord={setSelectedRecord} onOpen={openSheet} onClose={closeSheet}
-                                         callBack={callBackForProps}/>}
+            />}
             {analyticsObj.id && <SidebarSheet selectedViewAnalyticsRecord={analyticsObj} analyticsObj={analyticsObj}
                                               isOpen={analyticsObj.id} onOpen={openAnalyticsSheet}
                                               onClose={onCloseAnalyticsSheet}/>}
@@ -254,15 +248,18 @@ const Announcements = () => {
                     analyticsObj={analyticsObj}
                     handleDelete={handleDelete}
                     editIndex={editIndex}
-                    setEditIndex={setEditIndex} data={announcementList} selectedRecord={selectedRecord}
-                    setSelectedRecord={setSelectedRecord} isLoading={isLoading} callBack={callBackForProps}/>
+                    setEditIndex={setEditIndex}
+                    data={announcementList}
+                    selectedRecord={selectedRecord}
+                    setSelectedRecord={setSelectedRecord}
+                    isLoading={isLoading}/>
                 }
                 {tab == 1 && <AnnouncementsView
                     setAnalyticsObj={setAnalyticsObj}
                     analyticsObj={analyticsObj} handleDelete={handleDelete}
                     isLoading={isLoading} selectedRecord={selectedRecord}
                     setSelectedRecord={setSelectedRecord}
-                    data={announcementList} callBack={callBackForProps}/>
+                    data={announcementList}/>
                 }
                 <div
                     className={`w-full p-5 ${theme === "dark" ? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end pe-16 py-15px`}>

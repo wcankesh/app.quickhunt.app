@@ -22,6 +22,7 @@ import {
     AlertDialogHeader,
     AlertDialogTitle
 } from "../ui/alert-dialog";
+// import {create} from "domain";
 
 const tableHeadingsArray = [
     {label:"Name"},
@@ -41,8 +42,6 @@ const perPageLimit = 10;
 
 const Customers = () => {
     const [isSheetOpen, setSheetOpen] = useState(false);
-    const openSheet = () => setSheetOpen(true);
-    const closeSheet = () => setSheetOpen(false);
     const {theme} =useTheme();
     const apiService = new ApiService();
     const [customerList, setCustomerList] = useState([])
@@ -56,6 +55,16 @@ const Customers = () => {
     useEffect(() => {
         getAllCustomers();
     }, [projectDetailsReducer.id])
+
+    const openSheet = () => setSheetOpen(true);
+    const closeSheet = (createRecord) => {
+        if(createRecord?.id){
+            const clone = [...customerList];
+            clone.push(createRecord);
+            setCustomerList(clone);
+        }
+        setSheetOpen(false);
+    };
 
     const getAllCustomers = async () => {
         setIsLoading(true)
@@ -94,12 +103,13 @@ const Customers = () => {
             clone.splice(deleteIndex,1);
             setCustomerList(clone);
             toast({
-                title:data.success
+                description: "Customer deleted successfully"
             })
         }
         else{
             toast({
-                title:"Something went wrong"
+                description:"Something went wrong",
+                variant: "destructive",
             })
         };
         setDeleteId(null);
@@ -136,7 +146,7 @@ const Customers = () => {
                         isLoading ? <SkeletonTable tableHeadings={tableHeadingsArray} arrayLength={3} numberOfCells={11}/> : customerList.length === 0 ? <EmptyDataTable tableHeadings={tableHeadingsArray}/>:
                             <Card>
                                 <CardContent className={"p-0 rounded-md"}>
-                                    <Table className={""}>
+                                    <Table>
                                         <TableHeader className={"py-8 px-5"}>
                                             <TableRow className={""}>
                                                 {
@@ -156,7 +166,7 @@ const Customers = () => {
                                                             <TableCell className={`py-3 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.customer_name ? x.customer_name : "-"}</TableCell>
                                                             <TableCell className={`py-3 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.customer_email_id ? x.customer_email_id : "-"}</TableCell>
                                                             <TableCell className={`py-3 flex flex-row gap-2 ${theme === "dark" ? "" : "text-muted-foreground"}`}>
-                                                                <img className={"rounded-full mr-2"} src={x.avatar} alt={"not_found"}/>
+                                                                <img className={"rounded-full mr-2"} src={x?.avatar} alt={"not_found"}/>
                                                                 <p>{x.company ? x.company : "-"}</p>
                                                             </TableCell>
                                                             <TableCell className={`py-3 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.added_via ? x.added_via : "-"}</TableCell>

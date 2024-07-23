@@ -1,8 +1,9 @@
 import React,{useState,useEffect,Fragment} from 'react';
-import {Sheet,
-        SheetContent,
-        SheetHeader,
-        } from "../ui/sheet";
+import {
+    Sheet,
+    SheetContent,
+    SheetHeader, SheetOverlay,
+} from "../ui/sheet";
 import {Separator} from "../ui/separator";
 import {Icon} from "../../utils/Icon";
 import {Button} from "../ui/button";
@@ -58,6 +59,7 @@ const   SidebarSheet = ({ isOpen, onOpen, onClose ,selectedViewAnalyticsRecord})
 
     return (
             <Sheet open={isOpen} onOpenChange={isOpen ? onClose : onOpen}>
+                <SheetOverlay className={"inset-0"} />
                 <div>
                     <SheetContent className={"pt-[24px] p-0 max-h-screen overflow-y-auto lg:max-w-[504px]"} >
                         <SheetHeader className={`px-8 py-6 flex flex-row justify-between items-center sticky top-0 z-10 ${theme == "dark" ? "bg-[#020817]" : "bg-[#f8fafc]"}` }>

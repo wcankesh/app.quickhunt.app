@@ -24,7 +24,7 @@ const initialState = {
     user_ip_address : '',
 }
 
-const NewCustomerSheet = ({isOpen,onOpen,onClose,callback}) => {
+const NewCustomerSheet = ({isOpen,onOpen,onClose}) => {
     const [customerDetails, setCustomerDetails] = useState(initialState);
     const [isSave,setIsSave]=useState(false);
     const apiService = new ApiService();
@@ -41,19 +41,21 @@ const NewCustomerSheet = ({isOpen,onOpen,onClose,callback}) => {
             customer_first_seen: new Date(),
             customer_last_seen: new Date(),
         }
-        console.log(payload);
         const data = await apiService.createCustomers(payload)
         if(data.status === 200) {
             setIsSave(false);
             setCustomerDetails(initialState);
             toast({
-                title: "Customer created successfully",
+                description: "Customer created successfully",
             });
         } else {
             setIsSave(false);
+            toast({
+                description:"Something went wrong",
+                variant: "destructive",
+            })
         }
-        callback();
-        onClose();
+        onClose(data.data);
     }
 
     return (

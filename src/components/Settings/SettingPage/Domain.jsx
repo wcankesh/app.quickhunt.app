@@ -66,10 +66,14 @@ const Domain = () => {
         if(data.status === 200){
             setIsSave(false)
            toast({
-               title:"Portal update successfully"
+               description:"Domain update successfully"
            })
         } else {
-            setIsSave(false)
+            setIsSave(false);
+            toast({
+                description:"Something went wrong",
+                variant: "destructive"
+            })
         }
     }
 

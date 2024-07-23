@@ -102,12 +102,16 @@ const Topics = () => {
             setTopicLists(clone);
             setIsSave(false);
             toast({
-                title:"Topic create successfully"
+                description:"Topic create successfully"
             });
             setTopicDetails(initialState);
             setShowNewTopics(false);
         } else {
             setIsSave(false);
+            toast({
+                description:data.message,
+                variant: "destructive",
+            });
         }
     };
 
@@ -139,14 +143,14 @@ const Topics = () => {
             }
             setIsSave(false);
             toast({
-                title:"Topic update successfully"
+                description:"Topic update successfully"
             });
             setIsEdit(null);
             setTopicDetails(initialState);
         } else {
             setIsSave(false);
             toast({
-                title:"Something went wrong",
+                description:"Something went wrong",
                 variant: "destructive"
             });
         }
@@ -168,11 +172,11 @@ const Topics = () => {
                 setDeleteId(null);
             }
             toast({
-                title:"Topic delete successfully"
+                description:"Topic delete successfully"
             });
         } else {
             toast({
-                title:"Something went wrong",
+                description:"Something went wrong",
                 variant: "destructive"
             })
         }

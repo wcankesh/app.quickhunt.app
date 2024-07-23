@@ -41,6 +41,7 @@ const Categories = () => {
     const [isSave,setIsSave]=useState(false);
     const [isOpenDeleteAlert,setIsOpenDeleteAlert] =useState(false);
     const [deleteId,setDeleteId]= useState(null);
+    const [deleteIndex,setDeleteIndex]=useState(null);
     const apiService = new ApiService();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
@@ -138,7 +139,7 @@ const Categories = () => {
             setIsSave(false);
             closeSheet();
             toast({
-                title:"Category added successfully."
+                description:"Category added successfully."
             });
             setCategoryDetails({
                 name:"",
@@ -146,7 +147,7 @@ const Categories = () => {
             })
         } else {
             toast({
-                title:"Something went wrong.",
+                description:"Something went wrong.",
                 variant: "destructive"
             })
         }
@@ -156,19 +157,26 @@ const Categories = () => {
         const data = await apiService.deleteCategories(deleteId)
         if(data.status === 200) {
             const clone = [...categoriesList];
-            let index = clone.findIndex((x) => x.id === deleteId);
-            clone.splice(index, 1);
-            dispatch(allStatusAndTypesAction({...allStatusAndTypes, categories: clone}))
-            setCategoriesList(clone)
+            setCategoriesList(clone);
+            clone.splice(deleteIndex,1);
+            dispatch(allStatusAndTypesAction({...allStatusAndTypes, categories: clone}));
+            setCategoriesList(clone);
             toast({
-                title:"Categories delete successfully"
+                description:"Category delete successfully"
+            })
+        }
+        else{
+            toast({
+                description:data.message,
+                variant: "destructive"
             })
         }
     }
 
-    const deleteCategory = (id) => {
+    const deleteCategory = (id,index) => {
         setIsOpenDeleteAlert(true);
         setDeleteId(id);
+        setDeleteIndex(index);
     }
 
     const updateCategory = async () => {
@@ -203,10 +211,14 @@ const Categories = () => {
             setCategoryDetails(initialState);
             setIsSave(false);
             toast({
-                title:"Categories update successfully",
+                description:"Category update successfully",
             })
         } else {
             setIsSave(false);
+            toast({
+                description:data.message,
+                variant: "destructive"
+            })
         }
         setEditRecord({});
         closeSheet();

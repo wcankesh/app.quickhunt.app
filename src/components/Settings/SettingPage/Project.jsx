@@ -122,9 +122,15 @@ const Project = () => {
             setProjectDetails(data.data);
             dispatch(projectDetailsAction(data.data))
             setIsSave(false)
-         //   message.success("Project update successfully")
+            toast({
+                description :"Project update successfully"
+            })
         } else {
-            setIsSave(false)
+            setIsSave(false);
+            toast({
+                description :"Something went wrong",
+                variant: "destructive"
+            })
         }
     }
 

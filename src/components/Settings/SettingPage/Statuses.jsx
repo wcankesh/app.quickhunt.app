@@ -131,12 +131,13 @@ const Statuses = () => {
             setShowColorInput(false);
             setNewStatus(initialStatus);
             toast({
-                title:"Status added successfully"
+                description:"Status added successfully"
             })
         } else {
             setIsSave(false)
             toast({
-                title:"Something went wrong"
+                description:"Something went wrong",
+                variant: "destructive",
             })
         }
     };
@@ -203,12 +204,13 @@ const Statuses = () => {
             }
             setIsSave(false)
             toast({
-                title:"Status update successfully"
+                description:"Status update successfully"
             })
         } else {
             setIsSave(false)
             toast({
-                title:"Something went wrong"
+                description:"Something went wrong",
+                variant: "destructive"
             })
         }
 
@@ -235,16 +237,16 @@ const Statuses = () => {
                 setStatusList(clone)
                 dispatch(allStatusAndTypesAction({...allStatusAndTypes, roadmap_status: clone}))
                 toast({
-                    title:data.success
+                    description:data.success
                 })
             } else if(data.status === 201){
                 toast({
-                    title:data.success,
+                    description:data.success,
                     variant: "destructive"
                 })
             } else {
                 toast({
-                    title:"Something went wrong "
+                    description:"Something went wrong "
                 })
             }
         } else {

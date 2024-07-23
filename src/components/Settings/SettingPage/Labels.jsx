@@ -1,13 +1,13 @@
-import React, { Fragment, useState,useEffect, } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../../ui/card";
-import { Button } from "../../ui/button";
+import React, {Fragment, useEffect, useState,} from 'react';
+import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "../../ui/card";
+import {Button} from "../../ui/button";
 import {Check, Loader2, Pencil, Plus, Square, Trash2, X} from "lucide-react";
-import { Table, TableHeader, TableHead, TableRow, TableBody, TableCell } from "../../ui/table";
+import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "../../ui/table";
 import ColorInput from "../../Comman/ColorPicker";
 import {Input} from "../../ui/input";
 import {useTheme} from "../../theme-provider";
 import {ApiService} from "../../../utils/ApiService";
-import {useSelector,useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -19,6 +19,7 @@ import {
     AlertDialogTitle
 } from "../../ui/alert-dialog";
 import {allStatusAndTypesAction} from "../../../redux/action/AllStatusAndTypesAction";
+import {toast} from "../../ui/use-toast";
 import {Skeleton} from "../../ui/skeleton";
 
 const initialNewLabel = {
@@ -113,9 +114,16 @@ const Labels = () => {
             setLabelList(clone);
             dispatch(allStatusAndTypesAction({...allStatusAndTypes, labels: clone}))
             setSelectedRecord(null)
-            setIsSave(false)
+            setIsSave(false);
+            toast({
+                description:"Label added successfully"
+            })
         } else {
-            setIsSave(false)
+            setIsSave(false);
+            toast({
+                description:"Something went wrong",
+                variant: "destructive"
+            })
         }
 
         setNewLabel({ ...initialNewLabel });
@@ -182,8 +190,15 @@ const Labels = () => {
             }
             setSelectedRecord(null)
             setIsSave(false)
+            toast({
+                description:"Label updated successfully"
+            })
         } else {
-            setIsSave(false)
+            setIsSave(false);
+            toast({
+                description:"Something went wrong",
+                variant: "destructive"
+            })
         }
         setLabelError({
             ...labelError,
@@ -214,15 +229,26 @@ const Labels = () => {
                 clone.splice(deleteIndex, 1);
                 setLabelList(clone);
                 dispatch(allStatusAndTypesAction({...allStatusAndTypes, labels: clone}));
+                toast({
+                    description:data.message,
+                })
             } else {
+                toast({
+                    description:data.message,
+                    variant: "destructive",
+                })
             }
         } else {
             const clone = [...labelList];
             clone.splice(deleteIndex, 1);
             setLabelList(clone);
+
         }
     }
 
+
+    console.log(isLoading);
+    console.log()
     return (
         <Card>
             <AlertDialog open={isOpenDeleteAlert} onOpenChange={setIsOpenDeleteAlert}>
@@ -255,44 +281,39 @@ const Labels = () => {
                 </Button>
             </CardHeader>
             <CardContent className="p-0">
-                {isLoading ? <Table>
+               <Table>
                                 <TableHeader className="p-0">
                                     <TableRow>
-                                        {/*<TableHead className={"w-[48px]"}/>*/}
-                                        <TableHead className={`w-2/5 pl-4 ${theme === "dark" ? "" : "text-card-foreground"}`}>Label
-                                            Name</TableHead>
-                                        <TableHead
-                                            className={`w-1/5 text-center ${theme === "dark" ? "" : "text-card-foreground"}`}>Label
-                                            Color</TableHead>
-                                        <TableHead
-                                            className={`pr-[39px] text-end ${theme === "dark" ? "" : "text-card-foreground"}`}>Action</TableHead>
+                                        {
+                                            ["Label Name","Label Color","Action"].map((x,i)=>{
+                                                return(
+                                                    <TableHead key={i} className={`${i === 0 ? "w-2/5" : i === 1 ? "w-1/5 text-center" : "pr-[39px] text-end"} pl-4 ${theme === "dark" ? "" : "text-card-foreground"}`}>Label Name</TableHead>
+                                                )
+                                            })
+                                        }
                                     </TableRow>
                                 </TableHeader>
-                                <TableBody>
+                                {/*<TableBody>*/}
+                                {isLoading ? <TableBody>
                                     {
-                                        [...Array(3)].map((_,index)=>{
-                                            return(
+                                        [...Array(4)].map((_, index) => {
+                                            return (
                                                 <TableRow key={index}>
-                                                    <TableCell><Skeleton className={"w-full h-[24px] rounded-md"}/></TableCell>
-                                                    <TableCell><Skeleton className={"w-full h-[24px] rounded-md"}/></TableCell>
-                                                    <TableCell><Skeleton className={"w-full h-[24px] rounded-md"}/></TableCell>
+                                                    {
+                                                        [...Array(2)].map((_, i) => {
+                                                            return (
+                                                                <TableCell key={i} className={""}>
+                                                                    <Skeleton className={"rounded-md  w-full h-[24px]"}/>
+                                                                </TableCell>
+                                                            )
+                                                        })
+                                                    }
                                                 </TableRow>
                                             )
                                         })
                                     }
                                 </TableBody>
-                             </Table> : <Table>
-                                <TableHeader className="p-0">
-                                    <TableRow>
-                                        <TableHead className={`w-2/5 pl-4 ${theme === "dark" ? "" : "text-card-foreground"}`}>Label
-                                            Name</TableHead>
-                                        <TableHead
-                                            className={`w-1/5 text-center ${theme === "dark" ? "" : "text-card-foreground"}`}>Label
-                                            Color</TableHead>
-                                        <TableHead
-                                            className={`pr-[39px] text-end ${theme === "dark" ? "" : "text-card-foreground"}`}>Action</TableHead>
-                                    </TableRow>
-                                </TableHeader>
+                                    :
                                 <TableBody>
                                     {(labelList || []).map((x, i) => (
                                         <TableRow key={i}>
@@ -322,7 +343,7 @@ const Labels = () => {
                                                 <TableCell
                                                     className={`font-medium text-xs ${theme === "dark" ? "" : "text-muted-foreground"}`}>
                                                     <div className={"flex justify-center items-center"}>
-                                                        <ColorInput name={"clr"} value={x.label_color_code}
+                                                        <ColorInput style={{width:"98px"}} name={"clr"} value={x.label_color_code}
                                                                     onChange={(color) => onChangeColorColor(color, i)}/>
                                                     </div>
                                                 </TableCell> :
@@ -399,6 +420,7 @@ const Labels = () => {
                                             <TableCell className={`${labelError ? "align-top" : ""} p-0 py-4`}>
                                                 <div className={"flex justify-center items-center"}>
                                                     <ColorInput
+                                                        className={"w-[98px]"}
                                                         name="label_color_code"
                                                         value={newLabel.label_color_code}
                                                         onChange={(color) => setNewLabel((prevState) => ({
@@ -420,7 +442,98 @@ const Labels = () => {
                                         </TableRow>
                                     )}
                                 </TableBody>
-                            </Table>}
+
+                                }
+                                {/*</TableBody>*/}
+                             </Table>
+                                    <Table>
+
+                                <TableBody>
+                                    {/*{(labelList || []).map((x, i) => (*/}
+                                    {/*    <TableRow key={i}>*/}
+                                    {/*        {*/}
+                                    {/*            isEdit === i ?*/}
+                                    {/*                <TableCell className={"py-[8.5px] pl-4 py-[11px] "}>*/}
+                                    {/*                    <Input*/}
+                                    {/*                        className={"bg-card h-9 "}*/}
+                                    {/*                        type="text"*/}
+                                    {/*                        value={x.label_name}*/}
+                                    {/*                        name={"label_name"}*/}
+                                    {/*                        onBlur={onBlur}*/}
+                                    {/*                        onChange={(e) => handleInputChange(e, i)}*/}
+                                    {/*                    />*/}
+                                    {/*                    <div className="grid gap-2">*/}
+                                    {/*                        {*/}
+                                    {/*                            labelError.label_name &&*/}
+                                    {/*                            <span*/}
+                                    {/*                                className="text-red-500 text-sm">{labelError.label_name}</span>*/}
+                                    {/*                        }*/}
+                                    {/*                    </div>*/}
+                                    {/*                </TableCell>*/}
+                                    {/*                : <TableCell*/}
+                                    {/*                    className={`font-medium text-xs py-[8.5px] pl-4 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.label_name}</TableCell>*/}
+                                    {/*        }*/}
+                                    {/*        {isEdit === i ?*/}
+                                    {/*            <TableCell*/}
+                                    {/*                className={`font-medium text-xs ${theme === "dark" ? "" : "text-muted-foreground"}`}>*/}
+                                    {/*                <div className={"flex justify-center items-center"}>*/}
+                                    {/*                    <ColorInput style={{width:"98px"}} name={"clr"} value={x.label_color_code}*/}
+                                    {/*                                onChange={(color) => onChangeColorColor(color, i)}/>*/}
+                                    {/*                </div>*/}
+                                    {/*            </TableCell> :*/}
+                                    {/*            <TableCell*/}
+                                    {/*                className={`font-medium text-xs ${theme === "dark" ? "" : "text-muted-foreground"}`}>*/}
+                                    {/*                <div className={"flex justify-center items-center gap-1"}>*/}
+                                    {/*                    <Square size={16} strokeWidth={1} fill={x.label_color_code}*/}
+                                    {/*                            stroke={x.label_color_code}/>*/}
+                                    {/*                    <p>{x.label_color_code}</p>*/}
+                                    {/*                </div>*/}
+                                    {/*            </TableCell>*/}
+                                    {/*        }*/}
+                                    {/*        <TableCell className="flex justify-end gap-2 pr-6">*/}
+                                    {/*            {isEdit === i ? (*/}
+                                    {/*                <Fragment>*/}
+                                    {/*                    <Button*/}
+                                    {/*                        variant="outline hover:bg-transparent"*/}
+                                    {/*                        className={`p-1 border w-[30px] h-[30px] ${isSave ? "justify-center items-center" : ""}`}*/}
+                                    {/*                        onClick={() => handleSaveLabel(i)}*/}
+                                    {/*                    >*/}
+                                    {/*                        {isSave ?*/}
+                                    {/*                            <Loader2 className="mr-1 h-4 w-4 animate-spin justify-center"/> :*/}
+                                    {/*                            <Check size={16}/>}*/}
+                                    {/*                    </Button>*/}
+                                    {/*                    <Button*/}
+                                    {/*                        variant="outline hover:bg-transparent"*/}
+                                    {/*                        className="p-1 border w-[30px] h-[30px]"*/}
+                                    {/*                        onClick={() => handleCancelEdit(i)}*/}
+                                    {/*                    >*/}
+                                    {/*                        <X size={16}/>*/}
+                                    {/*                    </Button>*/}
+                                    {/*                </Fragment>*/}
+                                    {/*            ) : (*/}
+                                    {/*                <Fragment>*/}
+                                    {/*                    <Button*/}
+                                    {/*                        variant="outline hover:bg-transparent"*/}
+                                    {/*                        className="p-1 border w-[30px] h-[30px]"*/}
+                                    {/*                        onClick={() => handleEditLabel(i)}*/}
+                                    {/*                    >*/}
+                                    {/*                        <Pencil size={16}/>*/}
+                                    {/*                    </Button>*/}
+                                    {/*                    <Button*/}
+                                    {/*                        variant="outline hover:bg-transparent"*/}
+                                    {/*                        className="p-1 border w-[30px] h-[30px]"*/}
+                                    {/*                        onClick={() => handleDeleteLabel(x.id, i)}*/}
+                                    {/*                    >*/}
+                                    {/*                        <Trash2 size={16}/>*/}
+                                    {/*                    </Button>*/}
+                                    {/*                </Fragment>*/}
+                                    {/*            )}*/}
+                                    {/*        </TableCell>*/}
+                                    {/*    </TableRow>*/}
+                                    {/*))}*/}
+
+                                </TableBody>
+                            </Table>
             </CardContent>
         </Card>
     );

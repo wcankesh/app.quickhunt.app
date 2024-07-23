@@ -173,12 +173,12 @@ const Profile = () => {
             dispatch(userDetailsAction({...data.data}));
             setIsLoading(false);
             toast({
-                title: data.message,
+                description: data.message,
             })
         } else {
             setIsLoading(false);
             toast({
-                title: "Something went wrong!!!",
+                description: "Something went wrong!!!",
                 variant:"destructive"
             })
         }
@@ -204,12 +204,12 @@ const Profile = () => {
         if(data.status === 200){
             setIsLoadingPass(false)
             toast({
-                title: data.success,
+                description: data.success,
             })
         }else {
             setIsLoadingPass(false);
             toast({
-                title: "Something went wrong!!!",
+                description: "Something went wrong!!!",
                 variant:"destructive"
             });
         }

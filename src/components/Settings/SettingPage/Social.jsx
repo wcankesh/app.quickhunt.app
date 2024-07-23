@@ -59,10 +59,14 @@ const Social = () => {
         if(data.status === 200){
             setIsSave(false)
             toast({
-                title:"Social links update successfully",
+                description:"Social links updated successfully",
             })
         } else {
-            setIsSave(false)
+            setIsSave(false);
+            toast({
+                description:data.message,
+                variant: "destructive"
+            })
         }
     }
 

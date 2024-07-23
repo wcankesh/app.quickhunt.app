@@ -43,9 +43,6 @@ const status = [
 
 const AnnouncementsView = ({data,isLoading,setSelectedRecord,handleDelete,setAnalyticsObj}) => {
     const [announcementList,setAnnouncementList]=useState([]);
-    const [isSidebarSheetOpen, setSidebarSheetOpen] = useState(false);
-    const [isViewAnalytics, setIsViewAnalytics] = useState(false);
-    const [selectedViewAnalyticsRecord, setSelectedViewAnalyticsRecord] = useState({id: ""});
     const [isOpenDeleteAlert,setIsOpenDeleteAlert]= useState(false);
     const [idToDelete,setIdToDelete]=useState(null);
     const {theme} =useTheme();
@@ -71,15 +68,7 @@ const AnnouncementsView = ({data,isLoading,setSelectedRecord,handleDelete,setAna
     };
 
     const openSheetSidebar = (x) => {
-        setSidebarSheetOpen(true);
-        setSelectedViewAnalyticsRecord(x);
-        setIsViewAnalytics(true);
         setAnalyticsObj(x)
-    }
-    const closeSheetSideBar = () => {
-        setSidebarSheetOpen(false);
-        setSelectedViewAnalyticsRecord({id: ''});
-        setIsViewAnalytics(false);
     }
 
     const onEdit =(record)=>{
@@ -113,7 +102,7 @@ const AnnouncementsView = ({data,isLoading,setSelectedRecord,handleDelete,setAna
                 </AlertDialogContent>
             </AlertDialog>
             {
-                isLoading ? <Card><CardContent className={"p-0"}><CommSkel count={4}/></CardContent></Card> : <div className="pt-[38px]">
+                isLoading ? <Card><CardContent className={"p-0"}>{CommSkel.commonParagraphFourIdea}</CardContent></Card> : <div className="pt-[38px]">
                     <div className={"flex flex-col px-[33px] pb-[32px] "}>
                         {
                             (announcementList || []).map((x,index)=>{
