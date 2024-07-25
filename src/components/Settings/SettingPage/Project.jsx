@@ -47,7 +47,6 @@ const Project = () => {
     const [formError, setFormError] = useState(initialStateError);
     const [isSave, setIsSave] = useState(false);
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
-    const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
     const allProjectReducer = useSelector(state => state.allProjectReducer);
     const [previewImageFav,setPreviewImageFav]=useState("");
     const [isOpenDeleteAlert,setIsOpenDeleteAlert]=useState(false);
@@ -192,7 +191,7 @@ const Project = () => {
             <CardContent className={"p-0 border-b"}>
                 <div className={"px-6 pt-6"}><h3 className={"text-sm font-medium"}>Edit Images</h3></div>
                 <div className={"pt-4 p-6"}>
-                    <div className="w-full items-center gap-1.5">
+                    <div className="w-full items-center ">
                         <div className={"flex gap-[94px]"}>
                             <div className={"flex gap-2"}>
                                 <div className="w-[50px] h-[50px] relative">

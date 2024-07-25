@@ -171,17 +171,17 @@ const Emoji = () => {
     return (
         <Fragment>
             <AlertDialog open={deleteId} onOpenChange={() => setDeleteId(null)}>
-                <AlertDialogContent>
+                <AlertDialogContent className={"w-[310px] md:w-full rounded-lg"}>
                     <AlertDialogHeader>
                         <AlertDialogTitle>You really want delete Emoji ?</AlertDialogTitle>
                         <AlertDialogDescription>
                             This action can't be undone.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
-                    <AlertDialogFooter>
+                    <div className={"flex justify-end gap-2"}>
                         <AlertDialogCancel onClick={() => setDeleteId(null)}>Cancel</AlertDialogCancel>
                         <AlertDialogAction onClick={handleDelete} className={"bg-red-600 hover:bg-red-600"}>Delete</AlertDialogAction>
-                    </AlertDialogFooter>
+                    </div>
                 </AlertDialogContent>
             </AlertDialog>
             <Card>

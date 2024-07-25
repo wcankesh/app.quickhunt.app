@@ -3,7 +3,6 @@ import {Button} from "../ui/button";
 import {ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Plus, Trash2} from "lucide-react";
 import {Card, CardContent, CardFooter} from "../ui/card";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "../ui/table";
-import NoDataThumbnail from "../../img/Frame.png"
 import NewCustomerSheet from "./NewCustomerSheet";
 import {useTheme} from "../theme-provider";
 import {Separator} from "../ui/separator";
@@ -22,7 +21,6 @@ import {
     AlertDialogHeader,
     AlertDialogTitle
 } from "../ui/alert-dialog";
-// import {create} from "domain";
 
 const tableHeadingsArray = [
     {label:"Name"},
@@ -117,20 +115,20 @@ const Customers = () => {
     }
 
     return (
-        <div className={"pt-8  xl:container xl:max-w-[1622px] lg:container lg:max-w-[796px] md:container md:max-w-[530px] sm:container sm:max-w-[639px] max-[639px]:container max-[639px]:max-w-[639px] xs:container xs:max-w-[475px] "}>
+        <div className={"pt-8  xl:container xl:max-w-[1622px] lg:container lg:max-w-[992px] md:container md:max-w-[768px] sm:container sm:max-w-[639px] px-4"}>
             <NewCustomerSheet isOpen={isSheetOpen} onOpen={openSheet} callback={getAllCustomers} onClose={closeSheet}/>
             <AlertDialog open={deleteId} onOpenChange={() => setDeleteId(null)}>
-                <AlertDialogContent>
+                <AlertDialogContent className={"w-[310px] md:w-full rounded-lg"}>
                     <AlertDialogHeader>
                         <AlertDialogTitle>You really want delete customer ?</AlertDialogTitle>
                         <AlertDialogDescription>
                             This action can't be undone.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
-                    <AlertDialogFooter>
+                    <div className={"flex justify-end gap-2"}>
                         <AlertDialogCancel onClick={() => setDeleteId(null)}>Cancel</AlertDialogCancel>
                         <AlertDialogAction onClick={handleDelete} className={"bg-red-600 hover:bg-red-600"}>Delete</AlertDialogAction>
-                    </AlertDialogFooter>
+                    </div>
                 </AlertDialogContent>
             </AlertDialog>
             <div className={""}>
@@ -144,8 +142,9 @@ const Customers = () => {
                 <div className={"pt-8"}>
                     {
                         isLoading ? <SkeletonTable tableHeadings={tableHeadingsArray} arrayLength={3} numberOfCells={11}/> : customerList.length === 0 ? <EmptyDataTable tableHeadings={tableHeadingsArray}/>:
-                            <Card>
-                                <CardContent className={"p-0 rounded-md"}>
+                            <Card className={""}>
+
+                                <CardContent className={"p-0 rounded-md grid grid-cols-1 overflow-auto whitespace-nowrap"}>
                                     <Table>
                                         <TableHeader className={"py-8 px-5"}>
                                             <TableRow className={""}>
@@ -191,11 +190,9 @@ const Customers = () => {
                                 </CardContent>
                                 <Separator/>
                                 <CardFooter className={"p-0"}>
-                                        <div className={`w-full p-5 rounded-b-sm rounded-t-none flex justify-end pe-16 py-15px ${theme === "dark"? "" : "bg-muted"}`}>
-                                            <div className={"flex flex-row gap-8 items-center"}>
-                                                <div>
-                                                    <h5 className={"text-sm font-semibold"}>Page {pageNo} of 10</h5>
-                                                </div>
+                                        <div className={`w-full p-5 rounded-b-lg rounded-t-none flex justify-end px-8 py-4 md:px-16 md:py-15px ${theme === "dark"? "" : "bg-muted"}`}>
+                                            <div className={"w-full flex gap-8 items-center justify-between sm:justify-end"}>
+                                                <h5 className={"text-sm font-semibold"}>Page {pageNo} of 10</h5>
                                                 <div className={"flex flex-row gap-2 items-center"}>
                                                     <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"} onClick={() => handlePaginationClick(1)} disabled={pageNo === 1}>
                                                         <ChevronsLeft className={pageNo === 1 ? "stroke-muted-foreground" : "stroke-primary"}/>

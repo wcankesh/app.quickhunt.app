@@ -1,5 +1,4 @@
-import React from 'react';
-
+import React, {useEffect, useState} from 'react';
 import { Button } from "../ui/button";
 import {Card, CardContent, CardHeader, CardTitle,} from "../ui/card";
 import {Icon} from "../../utils/Icon";
@@ -15,14 +14,31 @@ import Topics from "./SettingPage/Topics";
 import Statuses from "./SettingPage/Statuses";
 import Social from "./SettingPage/Social";
 import Emoji from "./SettingPage/Emoji";
-import {SmilePlus} from "lucide-react";
+import {Menu, SmilePlus} from "lucide-react";
+import {  Popover, PopoverContent, PopoverTrigger} from "../ui/popover";
 
 const Settings = () => {
     let navigate = useNavigate();
     const {type} = useParams();
+    const [windowSize, setWindowSize] = useState({
+        width: window.innerWidth,
+    });
+    const [open, setOpen] = useState(false)
+
+
+    useEffect(() => {
+        const handleResize = () => {
+            setWindowSize({
+                width: window.innerWidth,
+            });
+        };
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
 
     const onRedirect = (link) => {
         navigate(`${baseUrl}/settings/${link}`);
+        setOpen(false)
     };
 
     const settingsLinksList = [
@@ -125,40 +141,69 @@ const Settings = () => {
     };
 
     return (
-        <div className='xl:container xl:max-w-[1200px] lg:container lg:max-w-[992px] md:container md:max-w-[768px] sm:container sm:max-w-[639px] xs:container xs:max-w-[475px]'>
-            <div className={"pt-8"}>
+        <div className='xl:container xl:max-w-[1200px] lg:container lg:max-w-[992px] md:container md:max-w-[768px] sm:container sm:max-w-[639px] xs:container xs:max-w-[475px] px-4'>
+            <div className={"pt-8 flex flex-row justify-between items-center px-1 relative"}>
                 <h1 className="text-2xl font-medium">Settings</h1>
+                {windowSize.width <= 768 && <Popover open={open} onOpenChange={setOpen}>
+                    <PopoverTrigger>
+                        <Button variant="outline" className={"w-[30px] h-[30px]"} size="icon">
+                            <Menu size={16}/>
+                        </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className={"flex flex-col gap-1 pt-[14px] px-4 pb-8 p-2 absolute right-[-20px]"}> {
+                        (settingsLinksList || []).map((x, i) => {
+                            return (
+                                <Button
+                                    key={i}
+                                    variant={"link hover:no-underline"}
+                                    className={`${isActive(x.link) ? "flex justify-start gap-4 h-9 rounded-md bg-primary/15 transition-none" : 'flex items-center gap-4 h-9 justify-start transition-none'}`}
+                                    onClick={() => onRedirect(x.link)}
+                                >
+                                    <div
+                                        className={`${isActive(x.link) ? "setting-active-menu" : "profile-menu-icon"}`}>{x.icon}</div>
+                                    <div
+                                        className={`flex justify-between w-full ${isActive(x.link) ? "text-primary text-sm font-medium" : "text-sm font-medium"}`}>
+                                        {x.title}
+                                        <div>{x.useFor}</div>
+                                    </div>
+                                </Button>
+                            )
+                        })
+                    }</PopoverContent>
+                </Popover>}
             </div>
             {/*<div className="mx-auto grid w-full max-w-6xl items-start gap-6 md:grid-cols-[180px_1fr] lg:grid-cols-[250px_1fr]">*/}
-            <div className="w-full flex lg:flex-nowrap md:flex-wrap sm:flex-wrap items-start gap-6 pt-6 pb-[58px]">
-                <div className="lg:w-[320px] md:w-full sm:w-full">
+            <div className="w-full flex lg:flex-nowrap md:flex-wrap sm:flex-wrap items-start gap-4 pt-6 pb-[58px]">
+                {windowSize.width > 768 ? <div className="lg:w-[320px] md:w-full sm:w-full">
                     <Card>
-                    <CardHeader className={"p-4 pb-0"}>
-                        <CardTitle className={"text-base font-medium"}>General Settings</CardTitle>
-                    </CardHeader>
-                    <CardContent className={"flex flex-col gap-1 pt-[14px] px-4 pb-8"}>
-                        {
-                            (settingsLinksList || []).map((x, i) => {
-                                return (
-                                    <Button
-                                        key={i}
-                                        variant={"link hover:no-underline"}
-                                        className={`${isActive(x.link) ? "flex justify-start gap-4 h-9 rounded-md bg-primary/15 transition-none" : 'flex items-center gap-4 h-9 justify-start transition-none'}`}
-                                        onClick={() => onRedirect(x.link)}
-                                    >
-                                        <div className={`${isActive(x.link) ? "setting-active-menu" : "profile-menu-icon"}`}>{x.icon}</div>
-                                        <div className={`flex justify-between w-full ${isActive(x.link) ? "text-primary text-sm font-medium" : "text-sm font-medium"}`}>
-                                            {x.title}
-                                            <div>{x.useFor}</div>
-                                        </div>
-                                    </Button>
-                                )
-                            })
-                        }
-                    </CardContent>
-                </Card>
-                </div>
-                <div className="lg:w-[754px] md:w-full sm:w-full">
+                        <CardHeader className={"p-4 pb-0"}>
+                            <CardTitle className={"text-base font-medium"}>General Settings</CardTitle>
+                        </CardHeader>
+                        <CardContent className={"flex flex-col gap-1 pt-[14px] px-4 pb-8"}>
+                            {
+                                (settingsLinksList || []).map((x, i) => {
+                                    return (
+                                        <Button
+                                            key={i}
+                                            variant={"link hover:no-underline"}
+                                            className={`${isActive(x.link) ? "flex justify-start gap-4 h-9 rounded-md bg-primary/15 transition-none" : 'flex items-center gap-4 h-9 justify-start transition-none'}`}
+                                            onClick={() => onRedirect(x.link)}
+                                        >
+                                            <div
+                                                className={`${isActive(x.link) ? "setting-active-menu" : "profile-menu-icon"}`}>{x.icon}</div>
+                                            <div
+                                                className={`flex justify-between w-full ${isActive(x.link) ? "text-primary text-sm font-medium" : "text-sm font-medium"}`}>
+                                                {x.title}
+                                                <div>{x.useFor}</div>
+                                            </div>
+                                        </Button>
+                                    )
+                                })
+                            }
+                        </CardContent>
+                    </Card>
+                </div> : null}
+                <div className="w-full">
                     {renderMenu(type ?? "profile")}
                 </div>
             </div>

@@ -5,7 +5,7 @@ import {Loader2, Pencil, Plus, Trash2, X} from "lucide-react";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "../../ui/table";
 import {useTheme} from "../../theme-provider";
 import {Input} from "../../ui/input";
-import {Sheet, SheetContent, SheetHeader, SheetTitle} from "../../ui/sheet";
+import {Sheet, SheetContent, SheetHeader, SheetOverlay, SheetTitle} from "../../ui/sheet";
 import {Label} from "../../ui/label";
 import {Separator} from "../../ui/separator";
 import {ApiService} from "../../../utils/ApiService";
@@ -227,17 +227,18 @@ const Categories = () => {
     return (
         <Fragment>
             <AlertDialog open={isOpenDeleteAlert} onOpenChange={setIsOpenDeleteAlert}>
-                <AlertDialogContent>
+                <AlertDialogContent className={"w-[310px] md:w-full rounded-lg"}>
                     <AlertDialogHeader>
                         <AlertDialogTitle>You really want delete Category?</AlertDialogTitle>
                         <AlertDialogDescription>
                             This action can't be undone.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
-                    <AlertDialogFooter>
+
+                    <div className={"flex justify-end gap-2"}>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
                         <AlertDialogAction className={"bg-red-600 hover:bg-red-600"} onClick={onDelete}>Delete</AlertDialogAction>
-                    </AlertDialogFooter>
+                    </div>
                 </AlertDialogContent>
             </AlertDialog>
             <Card>
@@ -308,6 +309,7 @@ const Categories = () => {
             </Card>
             {isSheetOpen && (
                 <Sheet open={isSheetOpen} onOpenChange={isSheetOpen ? closeSheet : openSheet}>
+                    <SheetOverlay className={"inset-0"} />
                     <SheetContent className={"sm:max-w-[662px] sm:overflow-auto p-0"}>
                         <SheetHeader className={"px-[32px] py-[22px] border-b flex"}>
                             <SheetTitle className={"text-xl font-medium flex justify-between items-center"}>{editRecord.id ? "Edit New Category" : "New Category"}

@@ -1,7 +1,8 @@
 import React, {useState} from 'react';
-import {Sheet,
-        SheetContent,
-        SheetHeader,
+import {
+    Sheet,
+    SheetContent,
+    SheetHeader, SheetOverlay,
 } from "../ui/sheet";
 import {Separator} from "../ui/separator";
 import {Button} from "../ui/button";
@@ -60,10 +61,11 @@ const NewCustomerSheet = ({isOpen,onOpen,onClose}) => {
 
     return (
         <Sheet open={isOpen} onOpenChange={isOpen ? onClose : onOpen}>
+            <SheetOverlay className={"inset-0"} />
              <SheetContent className={"pt-[24px] p-0 max-h-screen overflow-y-auto  lg:max-w-[662px] h-full sm:max-w-[520px] p-0"} >
                  <SheetHeader className={"px-8 py-6 flex flex-row justify-between items-center"}>
                      <h5 className={"text-xl font-medium leading-5"}>Add New Customer</h5>
-                     <Button className={"h-5 w-5 p-0"} onClick={onClose} variant={"ghost"}><X className={"h-4 w-4"} size={18}/></Button>
+                     <Button className={"h-5 w-5 p-0"} onClick={onClose} variant={"ghost"}><X size={18} className={"h-5 w-5"}/></Button>
                  </SheetHeader>
                  <Separator className={"text-muted-foreground"}/>
                  <div className={"px-8 py-6"}>

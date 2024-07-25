@@ -209,7 +209,7 @@ button.inline-flex.items-center.justify-center.whitespace-nowrap.rounded-md.text
 .color_picker input:focus {outline: none;}
 .color_picker {position: relative;
   display: flex;
-  align-items: center;width: 98px;}
+  align-items: center;width: 109px;}
 .color_picker_color {width: 16px; height: 16px;}
 .sketch-picker {position: absolute; z-index: 999; top: 36px}
 .LinesEllipsis-ellipsis{color: #7C3AED;font-family: "Geist";font-weight: 600;}

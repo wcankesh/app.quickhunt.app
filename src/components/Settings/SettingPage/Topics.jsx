@@ -215,17 +215,17 @@ const Topics = () => {
     return (
         <Fragment>
             <AlertDialog open={deleteId} onOpenChange={setDeleteId}>
-                <AlertDialogContent>
+                <AlertDialogContent className={"w-[310px] md:w-full rounded-lg"}>
                     <AlertDialogHeader>
                         <AlertDialogTitle>You really want delete Topic?</AlertDialogTitle>
                         <AlertDialogDescription>
                             This action can't be undone.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
-                    <AlertDialogFooter>
+                    <div className={"flex justify-end gap-2"}>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
                         <AlertDialogAction className={"bg-red-600 hover:bg-red-600"} onClick={onDelete}>Delete</AlertDialogAction>
-                    </AlertDialogFooter>
+                    </div>
                 </AlertDialogContent>
             </AlertDialog>
             <Card>

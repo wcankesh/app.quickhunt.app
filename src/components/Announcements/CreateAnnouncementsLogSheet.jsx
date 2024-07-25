@@ -67,9 +67,10 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
         setLabelList(allStatusAndTypes.labels);
         setMemberList(allStatusAndTypes.members);
         setCategoriesList(allStatusAndTypes.categories);
-    },[])
+    },[projectDetailsReducer.id,allStatusAndTypes])
 
     const getSinglePosts = () => {
+        const labelId = selectedRecord.labels.map(x => x?.id?.toString());
         setChangeLogDetails({
             ...selectedRecord,
             image: selectedRecord.feature_image,
@@ -77,6 +78,7 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
             post_published_at: selectedRecord.post_published_at ? moment(selectedRecord.post_published_at).format('YYYY-MM-DD') : moment(new Date()),
             post_expired_datetime: selectedRecord.post_expired_datetime ? moment(selectedRecord.post_expired_datetime).format('YYYY-MM-DD') : undefined,
             category_id: selectedRecord.category_id == "0" ? "" : selectedRecord.category_id,
+            labels: labelId
         });
         setPreviewImage(selectedRecord.feature_image);
     }
