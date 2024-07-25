@@ -2,14 +2,9 @@ import React, {useState, Fragment, useEffect} from 'react';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "../ui/table";
 import {Badge} from "../ui/badge";
 import {Button} from "../ui/button";
-import {
-    BarChart,
-    Circle,
-    Ellipsis,
-    Eye,
-} from "lucide-react";
+import {BarChart, Circle, Ellipsis, Eye,} from "lucide-react";
 import {useTheme} from "../theme-provider"
-import { CardContent} from "../ui/card";
+import { Card, CardContent} from "../ui/card";
 import {DropdownMenu, DropdownMenuTrigger} from "@radix-ui/react-dropdown-menu";
 import {DropdownMenuContent, DropdownMenuItem} from "../ui/dropdown-menu";
 import {Separator} from "../ui/separator";
@@ -20,14 +15,7 @@ import {apiService} from "../../utils/constent";
 import {Toaster} from "../ui/toaster";
 import {toast} from "../ui/use-toast";
 import {Skeleton} from "../ui/skeleton";
-import {AlertDialog,
-    AlertDialogContent,
-    AlertDialogHeader,
-    AlertDialogFooter,
-    AlertDialogTitle,
-    AlertDialogDescription,
-    AlertDialogAction,
-    AlertDialogCancel,} from "../ui/alert-dialog";
+import {AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogFooter, AlertDialogTitle, AlertDialogDescription, AlertDialogAction, AlertDialogCancel,} from "../ui/alert-dialog";
 
 const status = [
     {name: "Publish", value: 0, fillColor: "#389E0D", strokeColor: "#389E0D",},
@@ -85,151 +73,153 @@ const AnnouncementsTable = ({data,isLoading ,setSelectedRecord,setEditIndex ,han
     }
 
     return (
-        <div className={""}>
+        <Fragment>
             <Toaster/>
             <AlertDialog open={isOpenDeleteAlert} onOpenChange={setIsOpenDeleteAlert}>
-                <AlertDialogContent>
-                    <AlertDialogHeader>
-                        <AlertDialogTitle>You really want delete this announcement?</AlertDialogTitle>
+                <AlertDialogContent className={"w-[310px] md:w-auto rounded-lg p-3"}>
+                    <AlertDialogHeader className={"text-left gap-2"}>
+                        <AlertDialogTitle className={"text-sm"}>You really want delete this announcement?</AlertDialogTitle>
                         <AlertDialogDescription>
                             This action can't be undone.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
-                    <AlertDialogFooter>
+                    <AlertDialogFooter className={"flex flex-row justify-end gap-2"}>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction className={"bg-red-600 hover:bg-red-600"} onClick={deleteParticularRow}>Delete</AlertDialogAction>
+                        <AlertDialogAction className={"bg-red-600 hover:bg-red-600 m-0"} onClick={deleteParticularRow}>Delete</AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
-
-            <div>
-                    <CardContent className={"p-0 rounded-md"}>
-                        <Table>
-                                <TableHeader className={"py-8 px-5"}>
-                                    <TableRow>
+            <Card className={""}>
+            <CardContent className={"p-0 overflow-auto"}>
+                <Table className={""}>
+                        <TableHeader className={"p-0"}>
+                            <TableRow className={""}>
+                                {
+                                    ["Title","Last Updated","Published At","Status","","",""].map((x,i)=>{
+                                        return(
+                                            <TableHead className={`md:text-base font-semibold px-2 md:py-5 md:px-4 ${theme === "dark" ? "text-[]" : "bg-muted"}`}>
+                                                {x}
+                                            </TableHead>
+                                        // <TableHead className={`text-base font-semibold py-5 rounded-tl-sm ${theme === "dark" ? "text-[]" : "bg-muted"} ${i === 0 ? "max-w-[375px] rounded-lg" :""} ${i === 6 ? "rounded-lg" :""}`}>{x}</TableHead>
+                                        )
+                                    })
+                                }
+                            </TableRow>
+                        </TableHeader>
+                    {isLoading ? <TableBody>
+                        {
+                            [...Array(4)].map((_, index) => {
+                                return (
+                                    <TableRow key={index}>
                                         {
-                                            ["Title","Last Updated","Published At","Status","","",""].map((x,i)=>{
-                                                return(
-                                                    <TableHead className={`text-base font-semibold py-5 rounded-tl-sm ${theme === "dark" ? "text-[]" : "bg-muted"} ${i === 0 ? "max-w-[375px] rounded-lg" :""} ${i === 6 ? "rounded-lg" :""}`}>{x}</TableHead>
+                                            [...Array(7)].map((_, i) => {
+                                                return (
+                                                    <TableCell className={"max-w-[373px]"}>
+                                                        <Skeleton className={"rounded-md  w-full h-[40px]"}/>
+                                                    </TableCell>
                                                 )
                                             })
                                         }
                                     </TableRow>
-                                </TableHeader>
-                            {isLoading ? <TableBody>
-                                {
-                                    [...Array(4)].map((_, index) => {
-                                        return (
-                                            <TableRow key={index}>
-                                                {
-                                                    [...Array(7)].map((_, i) => {
-                                                        return (
-                                                            <TableCell className={"max-w-[373px]"}>
-                                                                <Skeleton className={"rounded-md  w-full h-[40px]"}/>
-                                                            </TableCell>
-                                                        )
-                                                    })
-                                                }
-                                            </TableRow>
-                                        )
-                                    })
-                                }
-                            </TableBody> :
-                            <TableBody>
-                                   {(announcementData || []).map((x, index) => {
-                                                        return (
-                                                            <TableRow key={x?.id} className={"font-medium"}>
-                                                                <TableCell
-                                                                    className={`py-6 inline-flex items-center justify-center ${theme === "dark" ? "" : "text-muted-foreground"}`}>
-                                                                    <span className={"mr-4"}>{x?.post_title}</span>
-                                                                    <div className={"flex flex-wrap gap-1"}>
+                                )
+                            })
+                        }
+                    </TableBody> :
+                    <TableBody>
+                           {(announcementData || []).map((x, index) => {
+                                                return (
+                                                    <TableRow key={x?.id} className={"font-medium"}>
+                                                        <TableCell
+                                                            className={`inline-flex gap-2 md:gap-3 flex-wrap items-center justify-center px-2 md:py-5 md:px-4 ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                                            <span className={""}>{x?.post_title}</span>
+                                                            <div className={"flex flex-wrap gap-1"}>
+                                                                {
+                                                                    (x.labels || []).map((y,index) => {
+                                                                        return (
+                                                                            <Badge variant={"outline"} key={index} style={{
+                                                                                color: y.label_color_code,
+                                                                                borderColor: y.label_color_code,
+                                                                                textTransform: "capitalize"
+                                                                            }}
+                                                                                   className={`h-[20px] py-0 px-2 text-xs rounded-[5px]  font-medium text-[${y.label_color_code}] border-[${y.label_color_code}] capitalize`}>{y.label_name}</Badge>
+                                                                        )
+                                                                    })
+                                                                }
+                                                            </div>
+                                                        </TableCell>
+                                                        <TableCell
+                                                            className={`${theme === "dark" ? "" : "text-muted-foreground"} px-2 md:py-5 md:px-4`}>{x?.post_modified_date ? moment.utc(x.post_modified_date).local().startOf('seconds').fromNow() : "-"}</TableCell>
+                                                        <TableCell
+                                                            className={`${theme === "dark" ? "" : "text-muted-foreground"} px-2 md:py-5 md:px-4`}>{x?.post_published_at ? moment.utc(x.post_published_at).local().startOf('seconds').fromNow() : "-"}</TableCell>
+                                                        <TableCell className={"px-2 md:py-5 md:px-4"}>
+                                                            <Select value={x.post_save_as_draft}
+                                                                    onValueChange={(value) => handleStatusChange(x, value)}>
+                                                                <SelectTrigger className="w-[114px] h-7">
+                                                                    <SelectValue placeholder="Publish"/>
+                                                                </SelectTrigger>
+                                                                <SelectContent>
+                                                                    <SelectGroup>
                                                                         {
-                                                                            (x.labels || []).map((y,index) => {
+                                                                            (status || []).map((x, i) => {
                                                                                 return (
-                                                                                    <Badge variant={"outline"} key={index} style={{
-                                                                                        color: y.label_color_code,
-                                                                                        borderColor: y.label_color_code,
-                                                                                        textTransform: "capitalize"
-                                                                                    }}
-                                                                                           className={`h-[20px] py-0 px-2 text-xs rounded-[5px]  font-medium text-[${y.label_color_code}] border-[${y.label_color_code}] capitalize`}>{y.label_name}</Badge>
+                                                                                    <Fragment key={i}>
+                                                                                        <SelectItem value={x.value}>
+                                                                                            <div
+                                                                                                className={"flex items-center gap-2"}>
+                                                                                                <Circle fill={x.fillColor}
+                                                                                                        stroke={x.strokeColor}
+                                                                                                        className={`${theme === "dark" ? "" : "text-muted-foreground"} w-2 h-2`}/>
+                                                                                                {x.name}
+                                                                                            </div>
+                                                                                        </SelectItem>
+                                                                                    </Fragment>
                                                                                 )
                                                                             })
                                                                         }
-                                                                    </div>
-                                                                </TableCell>
-                                                                <TableCell
-                                                                    className={`${theme === "dark" ? "" : "text-muted-foreground"}`}>{x?.post_modified_date ? moment.utc(x.post_modified_date).local().startOf('seconds').fromNow() : "-"}</TableCell>
-                                                                <TableCell
-                                                                    className={`${theme === "dark" ? "" : "text-muted-foreground"}`}>{x?.post_published_at ? moment.utc(x.post_published_at).local().startOf('seconds').fromNow() : "-"}</TableCell>
-                                                                <TableCell>
-                                                                    <Select value={x.post_save_as_draft}
-                                                                            onValueChange={(value) => handleStatusChange(x, value)}>
-                                                                        <SelectTrigger className="w-[114px] h-7">
-                                                                            <SelectValue placeholder="Publish"/>
-                                                                        </SelectTrigger>
-                                                                        <SelectContent>
-                                                                            <SelectGroup>
-                                                                                {
-                                                                                    (status || []).map((x, i) => {
-                                                                                        return (
-                                                                                            <Fragment key={i}>
-                                                                                                <SelectItem value={x.value}>
-                                                                                                    <div
-                                                                                                        className={"flex items-center gap-2"}>
-                                                                                                        <Circle fill={x.fillColor}
-                                                                                                                stroke={x.strokeColor}
-                                                                                                                className={`${theme === "dark" ? "" : "text-muted-foreground"} w-2 h-2`}/>
-                                                                                                        {x.name}
-                                                                                                    </div>
-                                                                                                </SelectItem>
-                                                                                            </Fragment>
-                                                                                        )
-                                                                                    })
-                                                                                }
-                                                                            </SelectGroup>
-                                                                        </SelectContent>
-                                                                    </Select>
-                                                                </TableCell>
-                                                                <TableCell>
-                                                                    <Button disabled={x.post_save_as_draft == 1 ? true : false} variant={"ghost"}
-                                                                            onClick={() => shareFeedback(x.domain,x.post_slug_url)}><Eye
-                                                                        size={18}
-                                                                        className={`${theme === "dark" ? "" : "text-muted-foreground"}`}/></Button>
-                                                                </TableCell>
-                                                                <TableCell>
-                                                                    <Button onClick={() => openSheet(x)} variant={"ghost"}><BarChart
-                                                                        size={18}
-                                                                        className={`${theme === "dark" ? "" : "text-muted-foreground"}`}/></Button>
-                                                                </TableCell>
-                                                                <TableCell>
-                                                                    <DropdownMenu>
-                                                                        <DropdownMenuTrigger><Button variant={"ghost"}><Ellipsis
-                                                                            className={`${theme === "dark" ? "" : "text-muted-foreground"}`}
-                                                                            size={18}/></Button></DropdownMenuTrigger>
-                                                                        <DropdownMenuContent>
-                                                                            <DropdownMenuItem
-                                                                                onClick={() => onEdit(x,index)}>Edit</DropdownMenuItem>
-                                                                            <DropdownMenuItem onClick={()=>deleteRow(x.id)}>Delete</DropdownMenuItem>
-                                                                        </DropdownMenuContent>
-                                                                    </DropdownMenu>
-                                                                </TableCell>
-                                                            </TableRow>
-                                                        )
-                                                    })}
-                            </TableBody> }
-                                     </Table>
-                    </CardContent>
-                    {announcementData.length > 0 &&  <Separator/>}
-                    {isLoading ? null : (isLoading === false && announcementData?.length > 0 ? "" :
-                            <div className={"flex flex-row justify-center py-[45px]"}>
-                                <div className={"flex flex-col items-center gap-2"}>
-                                    <img src={NoDataThumbnail} className={"flex items-center"}/>
-                                    <h5 className={`text-center text-2xl font-medium leading-8 ${theme === "dark" ? "" : "text-[#A4BBDB]"}`}>No Data</h5>
-                                </div>
-                            </div>
-                    )}
-                </div>
-        </div>
+                                                                    </SelectGroup>
+                                                                </SelectContent>
+                                                            </Select>
+                                                        </TableCell>
+                                                        <TableCell className={"px-2 md:py-5 md:px-4"}>
+                                                            <Button disabled={x.post_save_as_draft == 1 ? true : false} variant={"ghost"}
+                                                                    onClick={() => shareFeedback(x.domain,x.post_slug_url)}><Eye
+                                                                size={18}
+                                                                className={`${theme === "dark" ? "" : "text-muted-foreground"}`}/></Button>
+                                                        </TableCell>
+                                                        <TableCell className={"px-2 md:py-5 md:px-4"}>
+                                                            <Button onClick={() => openSheet(x)} variant={"ghost"}><BarChart
+                                                                size={18}
+                                                                className={`${theme === "dark" ? "" : "text-muted-foreground"}`}/></Button>
+                                                        </TableCell>
+                                                        <TableCell className={"px-2 md:py-5 md:px-4"}>
+                                                            <DropdownMenu>
+                                                                <DropdownMenuTrigger><Button variant={"ghost"}><Ellipsis
+                                                                    className={`${theme === "dark" ? "" : "text-muted-foreground"}`}
+                                                                    size={18}/></Button></DropdownMenuTrigger>
+                                                                <DropdownMenuContent>
+                                                                    <DropdownMenuItem
+                                                                        onClick={() => onEdit(x,index)}>Edit</DropdownMenuItem>
+                                                                    <DropdownMenuItem onClick={()=>deleteRow(x.id)}>Delete</DropdownMenuItem>
+                                                                </DropdownMenuContent>
+                                                            </DropdownMenu>
+                                                        </TableCell>
+                                                    </TableRow>
+                                                )
+                                            })}
+                    </TableBody> }
+                             </Table>
+            </CardContent>
+            </Card>
+            {announcementData.length > 0 &&  <Separator/>}
+            {isLoading ? null : (isLoading === false && announcementData?.length > 0 ? "" :
+                    <div className={"flex flex-row justify-center py-[45px]"}>
+                        <div className={"flex flex-col items-center gap-2"}>
+                            <img src={NoDataThumbnail} className={"flex items-center"}/>
+                            <h5 className={`text-center text-2xl font-medium leading-8 ${theme === "dark" ? "" : "text-[#A4BBDB]"}`}>No Data</h5>
+                        </div>
+                    </div>
+            )}
+        </Fragment>
     );
 };
 

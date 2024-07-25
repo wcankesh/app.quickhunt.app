@@ -3,16 +3,28 @@ import {Button} from "../ui/button";
 import {Input} from "../ui/input";
 import AnnouncementsView from "./AnnouncementsView";
 import AnnouncementsTable from "./AnnouncementsTable";
-import {ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Circle, LayoutList, Plus, Text} from "lucide-react";
+import {
+    ChevronLeft,
+    ChevronRight,
+    ChevronsLeft,
+    ChevronsRight,
+    Circle,
+    Ellipsis,
+    LayoutList,
+    Plus,
+    Text
+} from "lucide-react";
 import CreateAnnouncementsLogSheet from "./CreateAnnouncementsLogSheet";
 import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "../ui/select";
 import {useTheme} from "../theme-provider";
 import {useSelector} from "react-redux";
 import {ApiService} from "../../utils/ApiService";
 import {getProjectDetails} from "../../utils/constent";
-import {Card} from "../ui/card";
+import {Card, CardFooter} from "../ui/card";
 import SidebarSheet from "./SidebarSheet";
 import {toast} from "../ui/use-toast";
+import {DropdownMenu, DropdownMenuTrigger} from "@radix-ui/react-dropdown-menu";
+import {DropdownMenuContent, DropdownMenuItem} from "../ui/dropdown-menu";
 
 const initialStateFilter = {
     l: "",
@@ -148,11 +160,9 @@ const Announcements = () => {
         }
     };
 
-    console.log(announcementList);
-
     return (
         <div
-            className={"pt-8 xl:container xl:max-w-[1200px] lg:container lg:max-w-[992px] md:container md:max-w-[530px] sm:container sm:max-w-[639px] xs:container xs:max-w-[475px] max-[639px]:container max-[639px]:max-w-[507px]"}>
+            className={"xl:container xl:max-w-[1200px] lg:container lg:max-w-[992px] md:container md:max-w-[768px] sm:container sm:max-w-[639px] pt-8 pb-5 px-4"}>
             {selectedRecord.id &&
             <CreateAnnouncementsLogSheet isOpen={selectedRecord.id} selectedRecord={selectedRecord}
                                          setSelectedRecord={setSelectedRecord} onOpen={openSheet} onClose={closeSheet}
@@ -160,13 +170,36 @@ const Announcements = () => {
             {analyticsObj.id && <SidebarSheet selectedViewAnalyticsRecord={analyticsObj} analyticsObj={analyticsObj}
                                               isOpen={analyticsObj.id} onOpen={openAnalyticsSheet}
                                               onClose={onCloseAnalyticsSheet}/>}
-            <div
-                className={"flex flex-row gap-6 items-center xl:flex-nowrap md:flex-wrap sm:flex-wrap min-[320px]:flex-wrap max-[639px]:flex-wrap max-[639px]:gap-3"}>
-                <div className="basis-1/4">
+            <div className={"flex items-center justify-between flex-wrap gap-6"}>
+                <div className={"flex justify-between items-center w-full md:w-auto"}>
                     <h3 className={"text-2xl font-medium leading-8"}>{getProjectDetails('project_name')}</h3>
+                    <div className={"md:hidden"}>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger>
+                            <Ellipsis size={16}/>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                            <DropdownMenuItem className={"cursor-pointer p-0"}>
+                                <div className={"w-full"}>
+                                    {
+                                        (status || []).map((x, index) => {
+                                            return (
+                                                <div className={"p-2"} onClick={(event) => filterPosts({name: "s", value: x.value})}>
+                                                    <span key={x.label}>{x.label}</span>
+                                                </div>
+                                            )
+                                        })
+                                    }
+                                </div>
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                    </div>
                 </div>
-                <div className="basis-2/4 gap-6">
-                    <div className={"flex flex-row gap-6 items-center"}>
+                <div className={"flex gap-6 flex-wrap items-center"}>
+                    <div className={"flex gap-6 items-center w-full md:w-auto"}>
+                    <div className={"md:block hidden"}>
+                        <div className={"flex gap-6 items-center"}>
                         <Select value={filter.s} onValueChange={(select) => filterPosts({name: "s", value: select})}>
                             <SelectTrigger className="h-9 w-[115px]">
                                 <SelectValue placeholder="All"/>
@@ -213,36 +246,34 @@ const Announcements = () => {
                                 </SelectGroup>
                             </SelectContent>
                         </Select>
-                        <form>
-                            <div
-                                className="relative ml-auto flex-1 md:grow-0">
+                        </div>
+                    </div>
+                            <div className={"w-full"}>
                                 <Input
                                     type="search"
                                     placeholder="Search..."
-                                    className="w-full pl-4 pr-14 w-[198px] text-slate-400 text-sm font-normal h-9"
+                                    className="w-full pl-4 pr-14 text-sm font-normal h-9"
                                 />
                             </div>
-                        </form>
 
                     </div>
-                </div>
-                <div className="basis-1/4">
                     <div className={"flex flex-grow gap-2 items-center"}>
                         <Button onClick={() => handleTab(0)} variant={"outline"}
-                                className={`h-9 w-9 p-2 ${tab == 0 ? "bg-violet-600" : ""} ${tab == 0 ? "hover:bg-[#7C3AED]" : ""}`}>
-                            <Text className={"w-5 h-5"} color={`${tab == 0 ? "#FFFFFF" : "#5F5F5F"}`}/>
+                                className={`h-9 w-9 p-2 ${tab == 0 ? "bg-primary hover:bg-primary" : ""} `}>
+                            <Text color={`${tab == 0 ? "#FFFFFF" : "#5F5F5F"}`}/>
                         </Button>
                         <Button onClick={() => handleTab(1)} variant={"outline"}
-                                className={`h-9 w-9 p-2 ${tab == 1 ? "bg-violet-600" : ""} ${tab == 1 ? "hover:bg-[#7C3AED]" : ""}`}>
-                            <LayoutList className={"w-5 h-5"} color={`${tab == 1 ? "#FFFFFF" : "#5F5F5F"}`}/>
+                                className={`h-9 w-9 p-2 ${tab == 1 ? "bg-primary hover:bg-primary" : ""} `}>
+                            <LayoutList color={`${tab == 1 ? "#FFFFFF" : "#5F5F5F"}`}/>
                         </Button>
-                        <Button onClick={openSheet} className={"hover:bg-violet-600"}>
-                            <Plus className={"mr-4"} size={18}/> New Announcement
+                        <Button onClick={openSheet} className={"flex gap-2 px-3 md:px-6 w-[195px] md:w-auto hover:bg-primary"}>
+                            <Plus className={"w-[15px] h-[15px] md:w-[20px] md:h-[20px]"}/>
+                            <span className={"text-xs md:text-sm font-semibold"}>New Announcement</span>
                         </Button>
                     </div>
                 </div>
             </div>
-            <Card className={"my-9"}>
+            <Card className={"mt-8"}>
                 {tab == 0 && <AnnouncementsTable
                     setAnalyticsObj={setAnalyticsObj}
                     analyticsObj={analyticsObj}
@@ -261,38 +292,42 @@ const Announcements = () => {
                     setSelectedRecord={setSelectedRecord}
                     data={announcementList}/>
                 }
-                <div
-                    className={`w-full p-5 ${theme === "dark" ? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end pe-16 py-15px`}>
-                    <div className={"flex flex-row gap-8 items-center"}>
-                        <div>
-                            <h5 className={"text-sm font-semibold"}>Page {pageNo} of {totalPages}</h5>
-                        </div>
-                        <div className={"flex flex-row gap-2 items-center"}>
-                            <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
-                                    onClick={() => handlePaginationClick(1)} disabled={pageNo === 1}>
-                                <ChevronsLeft
-                                    className={pageNo === 1 ? "stroke-muted-foreground" : "stroke-primary"}/>
-                            </Button>
-                            <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
-                                    onClick={() => handlePaginationClick(pageNo - 1)} disabled={pageNo === 1}>
-                                <ChevronLeft
-                                    className={pageNo === 1 ? "stroke-muted-foreground" : "stroke-primary"}/>
-                            </Button>
-                            <Button variant={"outline"} className={" h-[30px] w-[30px] p-1.5"}
-                                    onClick={() => handlePaginationClick(pageNo + 1)}
-                                    disabled={pageNo === totalPages}>
-                                <ChevronRight
-                                    className={pageNo === totalPages ? "stroke-muted-foreground" : "stroke-primary"}/>
-                            </Button>
-                            <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
-                                    onClick={() => handlePaginationClick(totalPages)}
-                                    disabled={pageNo === totalPages}>
-                                <ChevronsRight
-                                    className={pageNo === totalPages ? "stroke-muted-foreground" : "stroke-primary"}/>
-                            </Button>
+                <CardFooter className={"p-0"}>
+                    <div
+                        className={`w-full p-5 ${theme === "dark" ? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end px-4 py-4 md:px-16 md:py-15px`}>
+                        <div className={"w-full flex gap-8 items-center justify-between sm:justify-end"}>
+                            {/*<div className={"w-full flex justify-between gap-2 items-center"}>*/}
+                            <div>
+                                <h5 className={"text-xs md:text-sm font-semibold"}>Page {pageNo} of {totalPages}</h5>
+                            </div>
+                            <div className={"flex flex-row gap-2 items-center"}>
+                                <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
+                                        onClick={() => handlePaginationClick(1)} disabled={pageNo === 1}>
+                                    <ChevronsLeft
+                                        className={pageNo === 1 ? "stroke-muted-foreground" : "stroke-primary"}/>
+                                </Button>
+                                <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
+                                        onClick={() => handlePaginationClick(pageNo - 1)}
+                                        disabled={pageNo === 1}>
+                                    <ChevronLeft
+                                        className={pageNo === 1 ? "stroke-muted-foreground" : "stroke-primary"}/>
+                                </Button>
+                                <Button variant={"outline"} className={" h-[30px] w-[30px] p-1.5"}
+                                        onClick={() => handlePaginationClick(pageNo + 1)}
+                                        disabled={pageNo === totalPages}>
+                                    <ChevronRight
+                                        className={pageNo === totalPages ? "stroke-muted-foreground" : "stroke-primary"}/>
+                                </Button>
+                                <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
+                                        onClick={() => handlePaginationClick(totalPages)}
+                                        disabled={pageNo === totalPages}>
+                                    <ChevronsRight
+                                        className={pageNo === totalPages ? "stroke-muted-foreground" : "stroke-primary"}/>
+                                </Button>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </CardFooter>
             </Card>
 
         </div>

@@ -50,6 +50,9 @@ const Widgets = () => {
     const [openDelete, setOpenDelete] = useState(false);
     const [openCopyCode, setOpenCopyCode] = useState(false);
     const [deleteRecord, setDeleteRecord] = useState(null);
+    // const [openCopyCode, setOpenCopyCode] = useState(false);
+    const [copySuccess, setCopySuccess] = useState(false);
+
 
     const openSheet = () => setSheetOpen(true);
     const closeSheet = () => setSheetOpen(false);
@@ -92,6 +95,15 @@ const Widgets = () => {
     const handlePaginationClick = (newPage) => {
         if (newPage >= 1 && newPage <= totalPages) {
             setPageNo(newPage);
+        }
+    };
+
+    const handleCopyCode = () => {
+        const copyText = document.getElementById("text");
+        if (copyText) {
+            copyText.select();
+            document.execCommand("copy");
+            setCopySuccess(true);
         }
     };
 
@@ -147,17 +159,48 @@ const Widgets = () => {
                                         <CardContent className="flex flex-col gap-2">
                                             <div>
                                                 <div className={"relative"}>
+                                                    {/*<Input*/}
+                                                    {/*    id="text"*/}
+                                                    {/*    type={"text"}*/}
+                                                    {/*    placeholder={"<!-- Frill Widget (https://frill.co) -->\n" +*/}
+                                                    {/*    "<script>\n" +*/}
+                                                    {/*    "  window.Frill_Config = window.Frill_Config || [];\n" +*/}
+                                                    {/*    "  window.Frill_Config.push({ key: '5c40f9a5-3288-4400-832e-e02e063843b8' });\n" +*/}
+                                                    {/*    "</script>\n" +*/}
+                                                    {/*    "<script async src=\"https://widget.frill.co/v2/widget.js\"></script>\n" +*/}
+                                                    {/*    "<!-- End Frill Widget -->"}*/}
+                                                    {/*    name={'copy'}*/}
+                                                    {/*    className={"border-slate-300 placeholder:text-slate-400 pr-[47px]"}*/}
+                                                    {/*    readOnly*/}
+                                                    {/*/>*/}
+                                                    {/*<Button variant={"ghost hover:none"} className={"absolute top-0 right-0"}>*/}
+                                                    {/*    <Copy size={16}/>*/}
+                                                    {/*</Button>*/}
                                                     <Input
                                                         id="text"
                                                         type={"text"}
-                                                        placeholder={"Copy"}
-                                                        name={'copy'}
-                                                        className={"border-slate-300 placeholder:text-slate-400"}
+                                                        className={"pr-[47px]"}
+                                                        placeholder={"<!-- Embed code here -->"}
+                                                        value={
+                                                            "<!-- Frill Widget (https://frill.co) -->\n" +
+                                                            "<script>\n" +
+                                                            "  window.Frill_Config = window.Frill_Config || [];\n" +
+                                                            "  window.Frill_Config.push({ key: '5c40f9a5-3288-4400-832e-e02e063843b8' });\n" +
+                                                            "</script>\n" +
+                                                            "<script async src=\"https://widget.frill.co/v2/widget.js\"></script>\n" +
+                                                            "<!-- End Frill Widget -->"
+                                                        }
+                                                        readOnly
                                                     />
-                                                    <Button variant={"ghost hover:none"}
-                                                            className={"absolute top-0 right-0"}>
-                                                        <Copy size={16}/>
+
+                                                    <Button
+                                                        variant={"ghost hover:none"}
+                                                        className={`absolute top-0 right-0`}
+                                                        onClick={handleCopyCode}
+                                                    >
+                                                        {isLoading ? <Loader2 size={16} className={"animate-spin"} /> : <Copy size={16}/>}
                                                     </Button>
+
                                                 </div>
                                                 <p className={"text-xs"}>Read the {" "}
                                                     <Button
@@ -236,16 +279,47 @@ const Widgets = () => {
                                         </CardHeader>
                                         <CardContent className="space-y-2">
                                             <div className={"relative"}>
+                                                {/*<Input*/}
+                                                {/*    id="text"*/}
+                                                {/*    type={"text"}*/}
+                                                {/*    placeholder={"<!-- Frill Widget (https://frill.co) -->\n" +*/}
+                                                {/*    "<script>\n" +*/}
+                                                {/*    "  window.Frill_Config = window.Frill_Config || [];\n" +*/}
+                                                {/*    "  window.Frill_Config.push({ key: '5c40f9a5-3288-4400-832e-e02e063843b8' });\n" +*/}
+                                                {/*    "</script>\n" +*/}
+                                                {/*    "<script async src=\"https://widget.frill.co/v2/widget.js\"></script>\n" +*/}
+                                                {/*    "<!-- End Frill Widget -->"}*/}
+                                                {/*    name={'copy'}*/}
+                                                {/*    className={"border-slate-300 placeholder:text-slate-400 pr-[47px]"}*/}
+                                                {/*    readOnly*/}
+                                                {/*/>*/}
+                                                {/*<Button variant={"ghost hover:none"}*/}
+                                                {/*        className={"absolute top-0 right-0"}>*/}
+                                                {/*    <Copy size={16}/>*/}
+                                                {/*</Button>*/}
                                                 <Input
                                                     id="text"
                                                     type={"text"}
-                                                    placeholder={"Copy"}
-                                                    name={'copy'}
-                                                    className={"border-slate-300 placeholder:text-slate-400"}
+                                                    className={"pr-[47px]"}
+                                                    placeholder={"<!-- Embed code here -->"}
+                                                    value={
+                                                        "<!-- Frill Widget (https://frill.co) -->\n" +
+                                                        "<script>\n" +
+                                                        "  window.Frill_Config = window.Frill_Config || [];\n" +
+                                                        "  window.Frill_Config.push({ key: '5c40f9a5-3288-4400-832e-e02e063843b8' });\n" +
+                                                        "</script>\n" +
+                                                        "<script async src=\"https://widget.frill.co/v2/widget.js\"></script>\n" +
+                                                        "<!-- End Frill Widget -->"
+                                                    }
+                                                    readOnly
                                                 />
-                                                <Button variant={"ghost hover:none"}
-                                                        className={"absolute top-0 right-0"}>
-                                                    <Copy size={16}/>
+
+                                                <Button
+                                                    variant={"ghost hover:none"}
+                                                    className={`absolute top-0 right-0`}
+                                                    onClick={handleCopyCode}
+                                                >
+                                                    {isLoading ? <Loader2 size={16} className={"animate-spin"} /> : <Copy size={16}/>}
                                                 </Button>
                                             </div>
                                             <p className={"text-xs text-muted-foreground"}>Read the {" "}

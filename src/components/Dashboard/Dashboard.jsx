@@ -229,7 +229,7 @@ export function Dashboard() {
         <Fragment>
                 <div className={"md:py-8 py-4"}>
                     <div className='xl:container xl:max-w-[1200px] lg:container lg:max-w-[992px] md:container md:max-w-[768px] sm:container sm:max-w-[639px] px-4'>
-                        <h1 className="md:text-[32px] text-[30px] font-medium">Welcome to Quickhunt</h1>
+                        <h1 className="md:text-[32px] text-[26px] font-medium">Welcome to Quickhunt</h1>
                     </div>
 
                 </div>
@@ -302,7 +302,7 @@ export function Dashboard() {
                                 }
                             </div>
                             <div className={"flex flex-wrap gap-8 md:flex-nowrap"}>
-                                <Card className={"lg:basis-2/3 basis-full p-4 pr-8 divide-y shadow border"}>
+                                <Card className={"lg:basis-2/3 basis-full min-w-[286px] p-4 md:pr-8 divide-y shadow border"}>
                                 {/*<Card className={"feed p-4 pr-8 divide-y shadow border"}>*/}
                                     <CardHeader className={"p-0 pb-4"}>
                                         <CardTitle className={"text-base font-bold"}>New Feedbacks</CardTitle>
@@ -331,7 +331,7 @@ export function Dashboard() {
                                         <Button className={"text-primary p-0 h-[20px] text-sm font-semibold"} variant={"ghost hover:none"}>View More Feedbacks</Button>
                                     </CardFooter>
                                 </Card>
-                                <Card className={"lg:basis-1/3 basis-full p-4 pr-8 divide-y shadow border"}>
+                                <Card className={"lg:basis-1/3 basis-full min-w-[286px] p-4 md:pr-8 divide-y shadow border"}>
                                 {/*<Card className={"emoj p-4 pr-8 divide-y shadow border"}>*/}
                                     <CardHeader className={"p-0 pb-4"}>
                                         <CardTitle className={"text-base font-bold"}>Reaction</CardTitle>

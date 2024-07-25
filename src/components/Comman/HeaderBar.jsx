@@ -461,7 +461,7 @@ const HeaderBar = () => {
             </div>
             </div>
 
-            <div className={"flex gap-8"}>
+            <div className={"flex gap-1 md:gap-8"}>
 
                 <div className={"flex gap-6 items-center"}>
                     <div className={"drop-option"}>
@@ -471,7 +471,7 @@ const HeaderBar = () => {
                                     variant="outline"
                                     role="combobox"
                                     aria-expanded={open}
-                                    className="w-[200px] justify-between bg-card"
+                                    className="min-w-[150px] md:w-[200px] justify-between bg-card"
                                 >
                                     {projectDetailsReducer.id
                                         ? projectDetailsReducer.project_name

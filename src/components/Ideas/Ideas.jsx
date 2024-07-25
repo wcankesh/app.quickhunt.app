@@ -337,9 +337,9 @@ const Ideas = () => {
                 clone[index].roadmap_id = value;
             }
             setIdeasList(clone);
-            toast({ description: `${name.replace('_', ' ')} status updated successfully` });
+            toast({description: `${name.replace('_', ' ')} status updated successfully`});
         } else {
-            toast({ variant: "destructive", description: `Failed to update ${name.replace('_', ' ')} status` });
+            toast({variant: "destructive", description: `Failed to update ${name.replace('_', ' ')} status`});
         }
     };
 
@@ -392,7 +392,8 @@ const Ideas = () => {
                     </Dialog>
                 </Fragment>
             }
-            <div className={"xl:container xl:max-w-[1200px] lg:container lg:max-w-[992px] md:container md:max-w-[768px] sm:container sm:max-w-[639px] pt-8 pb-5 px-4"}>
+            <div
+                className={"xl:container xl:max-w-[1200px] lg:container lg:max-w-[992px] md:container md:max-w-[768px] sm:container sm:max-w-[639px] pt-8 pb-5 px-4"}>
                 <SidebarSheet
                     isOpen={isSheetOpen}
                     onOpen={openSheet}
@@ -424,230 +425,267 @@ const Ideas = () => {
                 <div className={"flex flex-nowrap items-center gap-6 lg:flex-nowrap md:flex-wrap"}>
                     <span><h1 className={"text-2xl font-medium"}>Ideas</h1></span>
                     <div className={"w-full md:block hidden"}>
-                    <div className={"flex flex-wrap gap-6"}>
-                    <div className={"xl:ml-auto gap-6"}>
-                        <div className={"flex flex-row flex-wrap gap-6 items-center"}>
-                            <Select defaultValue={null}
-                                onValueChange={(selectedItems) => handleChange({name: "status", value: selectedItems})}>
-                                <SelectTrigger className="w-[173px] bg-card">
-                                    <SelectValue placeholder="Filter by status"/>
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectGroup>
-                                        <SelectItem value={null}>
-                                            <div className={"flex items-center gap-2"}>
-                                               All Status
-                                            </div>
-                                        </SelectItem>
-                                        {
-                                            (filterByStatus || []).map((x, i) => {
-                                                return (
-                                                    <SelectItem key={i} value={x.value}>{x.name}</SelectItem>
-                                                )
-                                            })
-                                        }
-                                    </SelectGroup>
-                                </SelectContent>
-                            </Select>
-                            <Select onValueChange={(selectedItems) => handleChange({name: "topic", value: selectedItems})} value={filter.topic.map(x => x)}>
-                                <SelectTrigger className="w-[193px] bg-card">
-                                    <SelectValue className={"text-muted-foreground text-sm"} placeholder={filter.topic.length === 0 ? "All Topics" : ""}>
-                                        <div className={"flex gap-[2px]"}>
-                                            {(filter.topic || []).map((x, index) => {
-                                                const findObj = (topicLists || []).find((y) => y.id === x);
-                                                return (
-                                                    <div key={index}
-                                                         className={"text-xs flex gap-[2px] bg-slate-300 items-center rounded py-0 px-2"}>
-                                                        {findObj?.title}
+                        <div className={"flex flex-wrap gap-6"}>
+                            <div className={"xl:ml-auto gap-6"}>
+                                <div className={"flex flex-row flex-wrap gap-6 items-center"}>
+                                    <Select defaultValue={null}
+                                            onValueChange={(selectedItems) => handleChange({
+                                                name: "status",
+                                                value: selectedItems
+                                            })}>
+                                        <SelectTrigger className="w-[173px] bg-card">
+                                            <SelectValue placeholder="Filter by status"/>
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectGroup>
+                                                <SelectItem value={null}>
+                                                    <div className={"flex items-center gap-2"}>
+                                                        All Status
                                                     </div>
-                                                );
-                                            })}
-                                            {(filter.topic || []).length > 2 && <div>...</div>}
-                                        </div>
-                                    </SelectValue>
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectGroup>
-                                        <SelectItem value={null}>
-                                            <div className={"flex items-center gap-2"}>
-                                                All Topics
-                                            </div>
-                                        </SelectItem>
-                                        {
-                                            (topicLists || []).map((x, i) => {
-                                                return (
-                                                    <SelectItem className={"p-2"} key={i} value={x.id}>
-                                                        <div className={"flex gap-2"}>
-                                                            <div onClick={() => handleChange({name: "topic", value: x.id})} className="checkbox-icon">
-                                                                {(filter.topic.map((x) => x) || []).includes(x.id) ?
-                                                                    <Check size={18}/> : <div
-                                                                        className={"h-[18px] w-[18px]"}></div>}
-                                                            </div>
-                                                            <span>{x.title ? x.title : ""}</span>
-                                                        </div>
-                                                    </SelectItem>
-                                                )
-                                            })
-                                        }
-                                    </SelectGroup>
-                                </SelectContent>
-                            </Select>
-                            <Select onValueChange={(selectedItems) => handleChange({name: "roadmap", value: selectedItems})} value={filter.roadmap.map(x => x)}>
-                                <SelectTrigger className="w-[262px] bg-card">
-                                    <SelectValue className={"text-muted-foreground text-sm"} placeholder={filter.roadmap.length === 0 ? "All Roadmap" : "Filter by roadmap status"}>
-                                        <div className={"flex gap-[2px]"}>
-                                            {(filter.roadmap || []).map((x, index) => {
-                                                const findObj = (roadmapStatus || []).find((y) => y.id === x);
-                                                return (
-                                                    <div key={index}
-                                                         className={"text-xs flex gap-[5px] bg-slate-300 items-center rounded py-0 px-2"}>
-                                                        <Circle fill={findObj.color_code} stroke={findObj.color_code}
-                                                                className={` w-[10px] h-[10px]`}/>
-                                                        {findObj?.title}
-                                                    </div>
-                                                );
-                                            })}
-                                            {(filter.roadmap || []).length > 2 && <div>...</div>}
-                                        </div>
-                                    </SelectValue>
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectGroup>
-                                        <SelectItem value={null}>
-                                            <div className={"flex items-center gap-2"}>
-                                                All Roadmap
-                                            </div>
-                                        </SelectItem>
-                                        {
-                                            (roadmapStatus || []).map((x, i) => {
-                                                return (
-                                                    <SelectItem className={"p-2"} key={i} value={x.id}>
-                                                        <div className={"flex gap-2"}>
-                                                            <div onClick={() => handleChange({name: "roadmap", value: x.id})} className="checkbox-icon">
-                                                                {(filter.roadmap.map((x) => x) || []).includes(x.id) ?
-                                                                    <Check size={18}/> : <div
-                                                                        className={"h-[18px] w-[18px]"}></div>}
-                                                            </div>
-                                                            <div className={"flex items-center gap-2"}>
-                                                            <Circle fill={x.color_code} stroke={x.color_code}
-                                                                    className={` w-[10px] h-[10px]`}/>
-                                                            <span>{x.title ? x.title : ""}</span>
-                                                            </div>
-                                                        </div>
-                                                    </SelectItem>
-                                                )
-                                            })
-                                        }
-                                    </SelectGroup>
-                                </SelectContent>
-                            </Select>
-                        </div>
-                    </div>
-                    <div className="flex justify-end">
-                        <Button className="gap-2 text-sm font-semibold w-[139px]"
-                                onClick={openCreateIdea}><Plus/>Create Idea</Button>
-                    </div>
-                    </div>
-                    </div>
-                    <div className={"w-full flex justify-end md:hidden gap-2"}>
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="outline" className={"gap-2"}><ListFilter size={15} />Filter</Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent className="w-56">
-                            <DropdownMenuLabel>Filter by</DropdownMenuLabel>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuGroup>
-                                <DropdownMenuSub>
-                                    <DropdownMenuSubTrigger>
-                                        <UserPlus className="mr-2 h-4 w-4" />
-                                        <span>Status</span>
-                                    </DropdownMenuSubTrigger>
-                                    <DropdownMenuPortal>
-                                        <DropdownMenuSubContent>
-                                            <DropdownMenuItem>
-                                                <Circle size={15} className="mr-2" />
-                                                <span>All Status</span>
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem>
-                                                <Bug size={15} className="mr-2" />
-                                                {/*<span onClick={() => handleStatusUpdate("is_active",  ideasList.is_active === 1 ? 0 : 1, i, x)}>*/}
-                                                {/*    {ideasList.is_active === 0 ? "Convert to Idea" : "Mark as bug"}*/}
-                                                {/*</span>*/}
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem>
-                                                <Archive size={15} className="mr-2" />
-                                                {/*<span onClick={() => handleStatusUpdate("is_archive", ideasList.is_archive == 1 ? 0 : 1, i, x)}>*/}
-                                                {/*    {ideasList?.is_archive === 1 ? "Unarchive" : "Archive"}*/}
-                                                {/*</span>*/}
-                                            </DropdownMenuItem>
-                                        </DropdownMenuSubContent>
-                                    </DropdownMenuPortal>
-                                    <DropdownMenuSubTrigger>
-                                        <UserPlus className="mr-2 h-4 w-4" />
-                                        <span>Topics</span>
-                                    </DropdownMenuSubTrigger>
-                                    <DropdownMenuPortal>
-                                        <DropdownMenuSubContent>
-                                            <DropdownMenuItem className={"flex flex-col justify-start"}>
+                                                </SelectItem>
                                                 {
-                                                    (topicLists || []).map((x, i) => {
+                                                    (filterByStatus || []).map((x, i) => {
                                                         return (
-                                                            <div className={"p-2"} key={i} value={x.id}>
-                                                                <div className={"flex gap-2"}>
-                                                                    <div onClick={() => handleChange({name: "topic", value: x.id})} className="checkbox-icon">
-                                                                        {(filter.topic.map((x) => x) || []).includes(x.id) ?
-                                                                            <Check size={18}/> : <div
-                                                                                className={"h-[15px] w-[15px]"}></div>}
-                                                                    </div>
-                                                                    <span>{x.title ? x.title : ""}</span>
-                                                                </div>
-                                                            </div>
+                                                            <SelectItem key={i} value={x.value}>{x.name}</SelectItem>
                                                         )
                                                     })
                                                 }
-                                            </DropdownMenuItem>
-                                        </DropdownMenuSubContent>
-                                    </DropdownMenuPortal>
-                                    <DropdownMenuSubTrigger>
-                                        <UserPlus className="mr-2 h-4 w-4" />
-                                        <span>Roadmap</span>
-                                    </DropdownMenuSubTrigger>
-                                    <DropdownMenuPortal>
-                                        <DropdownMenuSubContent>
-                                            <DropdownMenuItem className={"flex flex-col justify-start"}>
+                                            </SelectGroup>
+                                        </SelectContent>
+                                    </Select>
+                                    <Select onValueChange={(selectedItems) => handleChange({
+                                        name: "topic",
+                                        value: selectedItems
+                                    })} value={filter.topic.map(x => x)}>
+                                        <SelectTrigger className="w-[193px] bg-card">
+                                            <SelectValue className={"text-muted-foreground text-sm"}
+                                                         placeholder={filter.topic.length === 0 ? "All Topics" : ""}>
+                                                <div className={"flex gap-[2px]"}>
+                                                    {(filter.topic || []).map((x, index) => {
+                                                        const findObj = (topicLists || []).find((y) => y.id === x);
+                                                        return (
+                                                            <div key={index}
+                                                                 className={"text-xs flex gap-[2px] bg-slate-300 items-center rounded py-0 px-2"}>
+                                                                {findObj?.title}
+                                                            </div>
+                                                        );
+                                                    })}
+                                                    {(filter.topic || []).length > 2 && <div>...</div>}
+                                                </div>
+                                            </SelectValue>
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectGroup>
+                                                <SelectItem value={null}>
+                                                    <div className={"flex items-center gap-2"}>
+                                                        All Topics
+                                                    </div>
+                                                </SelectItem>
+                                                {
+                                                    (topicLists || []).map((x, i) => {
+                                                        return (
+                                                            <SelectItem className={"p-2"} key={i} value={x.id}>
+                                                                <div className={"flex gap-2"}>
+                                                                    <div onClick={() => handleChange({
+                                                                        name: "topic",
+                                                                        value: x.id
+                                                                    })} className="checkbox-icon">
+                                                                        {(filter.topic.map((x) => x) || []).includes(x.id) ?
+                                                                            <Check size={18}/> : <div
+                                                                                className={"h-[18px] w-[18px]"}></div>}
+                                                                    </div>
+                                                                    <span>{x.title ? x.title : ""}</span>
+                                                                </div>
+                                                            </SelectItem>
+                                                        )
+                                                    })
+                                                }
+                                            </SelectGroup>
+                                        </SelectContent>
+                                    </Select>
+                                    <Select onValueChange={(selectedItems) => handleChange({
+                                        name: "roadmap",
+                                        value: selectedItems
+                                    })} value={filter.roadmap.map(x => x)}>
+                                        <SelectTrigger className="w-[262px] bg-card">
+                                            <SelectValue className={"text-muted-foreground text-sm"}
+                                                         placeholder={filter.roadmap.length === 0 ? "All Roadmap" : "Filter by roadmap status"}>
+                                                <div className={"flex gap-[2px]"}>
+                                                    {(filter.roadmap || []).map((x, index) => {
+                                                        const findObj = (roadmapStatus || []).find((y) => y.id === x);
+                                                        return (
+                                                            <div key={index}
+                                                                 className={"text-xs flex gap-[5px] bg-slate-300 items-center rounded py-0 px-2"}>
+                                                                <Circle fill={findObj.color_code}
+                                                                        stroke={findObj.color_code}
+                                                                        className={` w-[10px] h-[10px]`}/>
+                                                                {findObj?.title}
+                                                            </div>
+                                                        );
+                                                    })}
+                                                    {(filter.roadmap || []).length > 2 && <div>...</div>}
+                                                </div>
+                                            </SelectValue>
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectGroup>
+                                                <SelectItem value={null}>
+                                                    <div className={"flex items-center gap-2"}>
+                                                        All Roadmap
+                                                    </div>
+                                                </SelectItem>
                                                 {
                                                     (roadmapStatus || []).map((x, i) => {
                                                         return (
-                                                            <div className={"p-2"} key={i} value={x.id}>
+                                                            <SelectItem className={"p-2"} key={i} value={x.id}>
                                                                 <div className={"flex gap-2"}>
-                                                                    <div onClick={() => handleChange({name: "roadmap", value: x.id})} className="checkbox-icon">
+                                                                    <div onClick={() => handleChange({
+                                                                        name: "roadmap",
+                                                                        value: x.id
+                                                                    })} className="checkbox-icon">
                                                                         {(filter.roadmap.map((x) => x) || []).includes(x.id) ?
                                                                             <Check size={18}/> : <div
                                                                                 className={"h-[18px] w-[18px]"}></div>}
                                                                     </div>
                                                                     <div className={"flex items-center gap-2"}>
-                                                                        <Circle fill={x.color_code} stroke={x.color_code}
+                                                                        <Circle fill={x.color_code}
+                                                                                stroke={x.color_code}
                                                                                 className={` w-[10px] h-[10px]`}/>
                                                                         <span>{x.title ? x.title : ""}</span>
                                                                     </div>
                                                                 </div>
-                                                            </div>
+                                                            </SelectItem>
                                                         )
                                                     })
                                                 }
-                                            </DropdownMenuItem>
-                                        </DropdownMenuSubContent>
-                                    </DropdownMenuPortal>
-                                </DropdownMenuSub>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem>
-                                    <Plus size={15} className="mr-2" />
-                                    <span onClick={openCreateIdea}>Create Idea</span>
-                                </DropdownMenuItem>
-                            </DropdownMenuGroup>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
+                                            </SelectGroup>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            </div>
+                            <div className="flex justify-end">
+                                <Button className="gap-2 text-sm font-semibold w-[139px]"
+                                        onClick={openCreateIdea}><Plus/>Create Idea</Button>
+                            </div>
+                        </div>
+                    </div>
+                    <div className={"w-full flex justify-end md:hidden gap-2"}>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="outline" className={"gap-2"}><ListFilter size={15}/>Filter</Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent className="w-56">
+                                <DropdownMenuLabel>Filter by</DropdownMenuLabel>
+                                <DropdownMenuSeparator/>
+                                <DropdownMenuGroup>
+                                    <DropdownMenuSub>
+                                        <DropdownMenuSubTrigger>
+                                            {/*<UserPlus className="mr-2 h-4 w-4" />*/}
+                                            <span>Status</span>
+                                        </DropdownMenuSubTrigger>
+                                        <DropdownMenuPortal>
+                                            <DropdownMenuSubContent>
+                                                <DropdownMenuItem className={"flex flex-col items-start"}>
+                                                    {/*<Circle size={15} className="mr-2" />*/}
+                                                    <div className={"p-2"}
+                                                         onClick={() => handleChange({name: "status", value: null})}>All
+                                                        Status
+                                                    </div>
+                                                    <div>
+                                                        {
+                                                            (filterByStatus || []).map((x, i) => {
+                                                                return (
+                                                                    <div className={"p-2"} onClick={() => handleChange({
+                                                                        name: "status",
+                                                                        value: x.value
+                                                                    })}>
+                                                                        <span key={i}>{x.name}</span>
+                                                                    </div>
+                                                                )
+                                                            })
+                                                        }
+                                                    </div>
+                                                </DropdownMenuItem>
+                                            </DropdownMenuSubContent>
+                                        </DropdownMenuPortal>
+                                    </DropdownMenuSub>
+                                    <DropdownMenuSub>
+                                        <DropdownMenuSubTrigger>
+                                            {/*<UserPlus className="mr-2 h-4 w-4" />*/}
+                                            <span>Topics</span>
+                                        </DropdownMenuSubTrigger>
+                                        <DropdownMenuPortal>
+                                            <DropdownMenuSubContent>
+                                                <DropdownMenuItem className={"flex flex-col items-start p-0"}>
+                                                    {
+                                                        (topicLists || []).map((x, i) => {
+                                                            return (
+                                                                <div className={"p-2 w-full"} key={i}
+                                                                     onClick={(e) => handleChange({
+                                                                         name: "topic",
+                                                                         value: x.id
+                                                                     })}>
+                                                                    <div className={"flex gap-2"}>
+                                                                        <div className="checkbox-icon">
+                                                                            {(filter.topic.map((x) => x) || []).includes(x.id) ?
+                                                                                <Check size={18}/> :
+                                                                                <div className={"h-[15px] w-[15px]"}/>}
+                                                                        </div>
+                                                                        <span>{x.title ? x.title : ""}</span>
+                                                                    </div>
+                                                                </div>
+                                                            )
+                                                        })
+                                                    }
+                                                </DropdownMenuItem>
+                                            </DropdownMenuSubContent>
+                                        </DropdownMenuPortal>
+                                    </DropdownMenuSub>
+                                    <DropdownMenuSub>
+                                        <DropdownMenuSubTrigger>
+                                            {/*<UserPlus className="mr-2 h-4 w-4" />*/}
+                                            <span>Roadmap</span>
+                                        </DropdownMenuSubTrigger>
+                                        <DropdownMenuPortal>
+                                            <DropdownMenuSubContent>
+                                                <DropdownMenuItem className={"flex flex-col items-start p-0"}>
+                                                    {
+                                                        (roadmapStatus || []).map((x, i) => {
+                                                            return (
+                                                                <div className={"p-2 w-full"} key={i}
+                                                                     onClick={(e) => handleChange({
+                                                                         name: "roadmap",
+                                                                         value: x.id
+                                                                     })}>
+                                                                    <div className={"flex items-center gap-2"}>
+                                                                        <div className="checkbox-icon">
+                                                                            {(filter.roadmap.map((x) => x) || []).includes(x.id) ?
+                                                                                <Check size={18}/> :
+                                                                                <div className={"h-[18px] w-[18px]"}/>}
+                                                                        </div>
+                                                                        <div className={"flex items-center gap-2"}>
+                                                                            <Circle fill={x.color_code}
+                                                                                    stroke={x.color_code}
+                                                                                    className={` w-[10px] h-[10px]`}/>
+                                                                            <span>{x.title ? x.title : ""}</span>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            )
+                                                        })
+                                                    }
+                                                </DropdownMenuItem>
+                                            </DropdownMenuSubContent>
+                                        </DropdownMenuPortal>
+                                    </DropdownMenuSub>
+                                    <DropdownMenuSeparator/>
+                                    <DropdownMenuItem>
+                                        <Plus size={15} className="mr-2"/>
+                                        <span onClick={openCreateIdea}>Create Idea</span>
+                                    </DropdownMenuItem>
+                                </DropdownMenuGroup>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                     </div>
                 </div>
                 <div className={"mt-8"}>
@@ -659,36 +697,38 @@ const Ideas = () => {
                                         (ideasList || []).map((x, i) => {
                                             return (
                                                 <Fragment key={i}>
-                                                    <div className={"flex gap-4 md:gap-8 md:py-6 md:px-16 py-3 px-8"}>
-                                                        <div className={"flex gap-2"}>
+                                                    <div className={"flex gap-[5px] md:gap-8 md:py-6 md:px-16 p-3"}>
+                                                        <div className={"flex gap-1 md:gap-2"}>
                                                             <Button
-                                                                className={"p-[7px] bg-white shadow border hover:bg-white w-[30px] h-[30px]"}
+                                                                className={"p-0 bg-white shadow border hover:bg-white w-[20px] h-[20px] md:w-[30px] md:h-[30px]"}
                                                                 variant={"outline"}
                                                                 onClick={() => giveVote(x, 1)}
                                                             >
-                                                                <ArrowBigUp className={"fill-primary stroke-primary"}/>
+                                                                <ArrowBigUp size={15}
+                                                                            className={"fill-primary stroke-primary"}/>
                                                             </Button>
-                                                            <p className={"text-xl font-medium"}>{x.vote}</p>
+                                                            <p className={"text-base md:text-xl font-medium"}>{x.vote}</p>
                                                         </div>
                                                         <div className={"flex flex-col w-full gap-6"}>
                                                             <div className={"flex flex-col gap-[11px]"}>
-                                                                <div className={"flex flex-wrap items-center justify-between gap-3 md:flex-nowrap"}>
+                                                                <div
+                                                                    className={"flex flex-wrap items-center justify-between gap-3 md:flex-nowrap"}>
                                                                     <div
                                                                         className={"flex flex-wrap items-center gap-1 cursor-pointer xl:gap-3"}
                                                                         onClick={() => openDetailsSheet(x)}>
                                                                         <h3 className={"text-base font-medium"}>{x.title}</h3>
                                                                         <div className={"flex gap-2"}>
-                                                                        <h4 className={"text-sm font-medium"}>{x.name}</h4>
-                                                                        <p className={"text-xs font-normal flex items-center text-muted-foreground"}>
-                                                                            <Dot
-                                                                                className={"fill-text-card-foreground stroke-text-card-foreground"}/>
-                                                                            {moment(x.created_at).format('D MMM')}
-                                                                        </p>
+                                                                            <h4 className={"text-sm font-medium"}>{x.name}</h4>
+                                                                            <p className={"text-xs font-normal flex items-center text-muted-foreground"}>
+                                                                                <Dot
+                                                                                    className={"fill-text-card-foreground stroke-text-card-foreground"}/>
+                                                                                {moment(x.created_at).format('D MMM')}
+                                                                            </p>
                                                                         </div>
                                                                     </div>
                                                                     <div className={"flex gap-2 items-center"}>
                                                                         {
-                                                                            x.is_active == 0 &&  <Badge
+                                                                            x.is_active == 0 && <Badge
                                                                                 variant={"outline"}
                                                                                 className={`border border-red-500 text-red-500 bg-red-100 `}
                                                                             >
@@ -696,7 +736,7 @@ const Ideas = () => {
                                                                             </Badge>
                                                                         }
                                                                         {
-                                                                            x.is_archive ==  1 && <Badge
+                                                                            x.is_archive == 1 && <Badge
                                                                                 variant={"outline"}
                                                                                 className={`border border-green-500 text-green-500 bg-green-100
                                                                            `}
@@ -712,14 +752,22 @@ const Ideas = () => {
                                                                                 <Ellipsis size={16}/>
                                                                             </DropdownMenuTrigger>
                                                                             <DropdownMenuContent>
-                                                                                <DropdownMenuItem className={"cursor-pointer"} onClick={() => openDetailsSheet(x)}>Edit</DropdownMenuItem>
-                                                                                <DropdownMenuItem className={"cursor-pointer"} onClick={() => handleStatusUpdate("is_archive", x.is_archive == 1 ? 0 : 1, i, x)}>
+                                                                                <DropdownMenuItem
+                                                                                    className={"cursor-pointer"}
+                                                                                    onClick={() => openDetailsSheet(x)}>Edit</DropdownMenuItem>
+                                                                                <DropdownMenuItem
+                                                                                    className={"cursor-pointer"}
+                                                                                    onClick={() => handleStatusUpdate("is_archive", x.is_archive == 1 ? 0 : 1, i, x)}>
                                                                                     {x?.is_archive === 1 ? "Unarchive" : "Archive"}
                                                                                 </DropdownMenuItem>
-                                                                                <DropdownMenuItem className={"cursor-pointer"} onClick={() => handleStatusUpdate("is_active",  x.is_active === 1 ? 0 : 1, i, x)}>
+                                                                                <DropdownMenuItem
+                                                                                    className={"cursor-pointer"}
+                                                                                    onClick={() => handleStatusUpdate("is_active", x.is_active === 1 ? 0 : 1, i, x)}>
                                                                                     {x.is_active === 0 ? "Convert to Idea" : "Mark as bug"}
                                                                                 </DropdownMenuItem>
-                                                                                <DropdownMenuItem className={"cursor-pointer"} onClick={() => deleteIdea(x)}>Delete</DropdownMenuItem>
+                                                                                <DropdownMenuItem
+                                                                                    className={"cursor-pointer"}
+                                                                                    onClick={() => deleteIdea(x)}>Delete</DropdownMenuItem>
                                                                             </DropdownMenuContent>
                                                                         </DropdownMenu>
                                                                     </div>
@@ -729,22 +777,28 @@ const Ideas = () => {
                                                                     <ReadMoreText html={x.description}/>
                                                                 </div>
                                                             </div>
-                                                            <div className={`flex justify-between items-center flex-wrap gap-2`}>
-                                                                    <div className={`flex flex-wrap gap-2`}>
-                                                                {
-                                                                    (x.topic && x.topic.length > 0) &&
-                                                                    <div className={`flex flex-wrap gap-2`}>
-                                                                        {
-                                                                            x.topic.map((y, i) => (
-                                                                                <div className={"text-sm font-medium"} key={i}> {y?.title}</div>
-                                                                            ))
-                                                                        }
-                                                                    </div>
-                                                                }
-                                                                    </div>
-                                                                <div className={"flex items-center md:gap-8 gap-4"}>
-                                                                    <Select onValueChange={(value) => handleStatusUpdate("roadmap_id", value, i, x)} value={x.roadmap_id}>
-                                                                        <SelectTrigger className="md:w-[291px] w-[170px] bg-card">
+                                                            <div
+                                                                className={`flex justify-between items-center flex-wrap gap-2`}>
+                                                                <div className={`flex flex-wrap gap-2`}>
+                                                                    {
+                                                                        (x.topic && x.topic.length > 0) &&
+                                                                        <div className={`flex flex-wrap gap-2`}>
+                                                                            {
+                                                                                x.topic.map((y, i) => (
+                                                                                    <div
+                                                                                        className={"text-sm font-medium"}
+                                                                                        key={i}> {y?.title}</div>
+                                                                                ))
+                                                                            }
+                                                                        </div>
+                                                                    }
+                                                                </div>
+                                                                <div className={"flex items-center md:gap-8 gap-1"}>
+                                                                    <Select
+                                                                        onValueChange={(value) => handleStatusUpdate("roadmap_id", value, i, x)}
+                                                                        value={x.roadmap_id}>
+                                                                        <SelectTrigger
+                                                                            className="md:w-[291px] w-[170px] bg-card">
                                                                             <SelectValue/>
                                                                         </SelectTrigger>
                                                                         <SelectContent>
@@ -780,7 +834,8 @@ const Ideas = () => {
                                                                         onClick={() => openDetailsSheet(x)}
                                                                     >
                                                                         <span>
-                                                                            <MessageCircleMore className={"stroke-primary w-[16px] h-[16px]"}/>
+                                                                            <MessageCircleMore
+                                                                                className={"stroke-primary w-[16px] h-[16px]"}/>
                                                                         </span>
                                                                         <p className={"text-base font-medium"}>
                                                                             {x && x.comments && x.comments.length ? x.comments.length : 0}
@@ -800,7 +855,7 @@ const Ideas = () => {
 
                         <CardFooter className={"p-0"}>
                             <div
-                                className={`w-full p-5 ${theme === "dark" ? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end px-8 py-4 md:px-16 md:py-15px`}>
+                                className={`w-full ${theme === "dark" ? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end px-4 py-4 md:px-16 md:py-15px`}>
                                 <div className={"w-full flex gap-8 items-center justify-between sm:justify-end"}>
                                     {/*<div className={"w-full flex justify-between gap-2 items-center"}>*/}
                                     <div>

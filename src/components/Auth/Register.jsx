@@ -11,6 +11,7 @@ import {ApiService} from "../../utils/ApiService";
 import {baseUrl} from "../../utils/constent";
 import {Eye, EyeOff, Loader2} from "lucide-react";
 import {useToast} from "../ui/use-toast";
+import {useTheme} from "../theme-provider";
 
 const initialState = {
     user_first_name: '',
@@ -22,6 +23,7 @@ const initialState = {
 }
 
 const Register = () => {
+    const {theme} = useTheme();
     let apiSerVice = new ApiService()
     let navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(false);
@@ -94,7 +96,7 @@ const Register = () => {
     const onRedirect = (link) => {
         const urlParams = new URLSearchParams(window.location.search);
         const token = urlParams.get('token');
-        if(token){
+        if (token) {
             navigate(`${baseUrl}/${link}?token=${token}`);
         } else {
             navigate(`${baseUrl}/${link}`);
@@ -157,197 +159,236 @@ const Register = () => {
     };
 
     return (
-        <div className="w-full lg:grid lg:min-h-[600px] lg:grid-cols-2 xl:min-h-[100vh]">
-        {/*<div className="w-full flex justify-center h-[100vh]">*/}
-        {/*    <div className="hidden lg:block p-16 lg:flex justify-between flex-col basis-1/2 bg-purple-400">*/}
-            <div className="hidden lg:block p-16 lg:flex bg-purple-400 justify-center pb-[90px]">
-                <div className={"grid gap-6"}>
-                <div className={"app-logo"}>
-                    {Icon.whiteLogo}
-                </div>
-                <Carousel
-                    plugins={[plugin.current]}
-                    className="w-full"
-                    onMouseEnter={plugin.current.stop}
-                    onMouseLeave={plugin.current.reset}
-                >
-                    <CarouselContent>
-                        {Array.from({length: 3}).map((_, index) => (
-                            <CarouselItem key={index}>
-                                <img className={"w-[806px]"} src={widget_01} alt= '' />
-                            </CarouselItem>
-                        ))}
-                    </CarouselContent>
-                    {/*<CarouselPrevious/>*/}
-                    {/*<CarouselNext/>*/}
-                </Carousel>
-                <div className={"description"}>
-                    <p className={"text-white text-center text-2xl"}>“This library has saved me countless hours of work and
-                        helped me deliver stunning designs to my clients faster than ever before.”</p>
-                </div>
-                </div>
-            </div>
-            {/*<div className="flex flex-col p-16 basis-1/2 justify-between">*/}
-            <div className="flex p-16">
-                <div className={"w-full"}>
-                <div className="text-right text-sm">
-                    <p className={"font-medium"}>
-                        Already have an account?{" "}
-                        <Button
-                            variant={"link"}
-                            className="p-0 h-auto hover:no-underline"
-                            onClick={() => onRedirect('login')}
-                        >
-                            <span className={"font-bold text-violet-600"}>Login</span>
-                        </Button>
-                    </p>
-                </div>
-                {/*<div className="mx-auto grid w-[384px] gap-8">*/}
-                <div className="mx-auto grid w-[392px] gap-8 lg:pt-[76px] pt-[100px]">
-                <div className="gap-2 flex flex-col items-center">
-                    {Icon.blackLogo}
-                        <h1 className="text-3xl font-medium text-slate-900">Let's Set Up Your Account</h1>
-                        <h6 className="font-normal text-sm text-zinc-500">Enhance customer experience now.</h6>
-                    </div>
-                    <div className="grid gap-6">
-                        <div className="grid grid-flow-col gap-4">
-                            <div className="grid gap-2 content-start">
-                                    <Label htmlFor="email" className={"font-medium"}>First Name</Label>
-                                    <Input
-                                        id="user_first_name"
-                                        placeholder="First Name"
-                                        value={companyDetails.user_first_name}
-                                        name={'user_first_name'}
-                                        onChange={onChange}
-                                        onBlur={onBlur}
-                                        // className={"border-slate-300 placeholder:text-slate-400"}
-                                    />
-                                <div className="grid gap-2">
-                                    {
-                                        formError.user_first_name &&
-                                        <span className="text-red-500 text-sm">{formError.user_first_name}</span>
-                                    }
+        // <div className="w-full lg:grid lg:min-h-[600px] lg:grid-cols-2 xl:min-h-[100vh]">
+        <div className="h-full">
+            <div className="ltr">
+                <div>
+                    <div className={"min-h-screen bg-background  flex items-center  overflow-hidden w-full"}>
+                        <div className={"min-h-screen basis-full flex w-full  justify-center overflow-y-auto"}>
+                            {/*<div className="w-full flex justify-center h-[100vh]">*/}
+                            {/*    <div className="hidden lg:block p-16 lg:flex justify-between flex-col basis-1/2 bg-purple-400">*/}
+                            {/*    <div className="hidden lg:block p-16 lg:flex bg-purple-400 justify-center pb-[90px]">*/}
+                            <div
+                                className="basis-1/2 bg-purple-400 w-full relative hidden xl:flex justify-center items-center p-16 pb-[90px]">
+                                <div className={"grid gap-6"}>
+                                    <div className={"app-logo"}>
+                                        {
+                                            theme === "dark" ? Icon.whiteLogo : Icon.blackLogo
+                                        }
+                                    </div>
+                                    <Carousel
+                                        plugins={[plugin.current]}
+                                        className="w-full"
+                                        onMouseEnter={plugin.current.stop}
+                                        onMouseLeave={plugin.current.reset}
+                                    >
+                                        <CarouselContent>
+                                            {Array.from({length: 3}).map((_, index) => (
+                                                <CarouselItem key={index}>
+                                                    <img className={"w-[806px]"} src={widget_01} alt=''/>
+                                                </CarouselItem>
+                                            ))}
+                                        </CarouselContent>
+                                        {/*<CarouselPrevious/>*/}
+                                        {/*<CarouselNext/>*/}
+                                    </Carousel>
+                                    <div className={"description"}>
+                                        <p className={"text-white text-center text-2xl"}>“This library has saved me
+                                            countless hours of work and
+                                            helped me deliver stunning designs to my clients faster than ever
+                                            before.”</p>
+                                    </div>
                                 </div>
                             </div>
-                            <div className="grid gap-2 content-start">
-                                    <Label htmlFor="email" className={"font-medium"}>Last Name</Label>
-                                    <Input
-                                        id="user_last_name"
-                                        placeholder="Last Name"
-                                        value={companyDetails.user_last_name}
-                                        name={'user_last_name'}
-                                        onChange={onChange}
-                                        onBlur={onBlur}
-                                        // className={"border-slate-300 placeholder:text-slate-400"}
-                                    />
-                                <div className="grid gap-2">
-                                    {
-                                        formError.user_last_name &&
-                                        <span className="text-red-500 text-sm">{formError.user_last_name}</span>
-                                    }
-                                </div>
-                            </div>
-                        </div>
-                        <div className="grid gap-6">
-                            <div className="grid gap-2">
-                                <Label htmlFor="email" className={"font-medium"}>Email</Label>
-                                <Input
-                                    id="email"
-                                    type="email"
-                                    placeholder="Email"
-                                    value={companyDetails.user_email_id}
-                                    name={'user_email_id'}
-                                    onChange={onChange}
-                                    onBlur={onBlur}
-                                    // className={"border-slate-300 placeholder:text-slate-400"}
-                                />
-                                {
-                                    formError.user_email_id &&
-                                    <span className="text-red-500 text-sm">{formError.user_email_id}</span>
-                                }
-                            </div>
-                            <div className="grid gap-2">
-                                <div className="flex items-center">
-                                    <Label htmlFor="password" className={"font-medium"}>Password</Label>
-                                </div>
-                                <div className={"relative"}>
-                                    <Input
-                                        id="password"
-                                        type={passwordVisibility.user_password ? "text" : "password"}
-                                        placeholder={"Password"}
-                                        value={companyDetails.user_password}
-                                        name={'user_password'}
-                                        onChange={onChange}
-                                        onBlur={onBlur}
-                                        // className={"border-slate-300 placeholder:text-slate-400"}
-                                    />
-                                    <Button variant={"ghost hover:none"} onClick={() => togglePasswordVisibility('user_password')}
-                                            className={"absolute top-0 right-0"}>
-                                        {passwordVisibility.user_password ? <Eye size={16}/> : <EyeOff size={16}/>}
-                                    </Button>
-                                </div>
-                                {
-                                    formError.user_password &&
-                                    <span className="text-red-500 text-sm">{formError.user_password}</span>
-                                }
-                            </div>
-                            <div className="grid gap-2">
-                                <Label htmlFor="confirmPassword" className={"font-medium"}>Confirm Password</Label>
-                                <div className={"relative"}>
-                                    <Input
-                                        id="confirmPassword"
-                                        type={passwordVisibility.user_confirm_password ? "text" : "password"}
-                                        placeholder={"Confirm Password"}
-                                        value={companyDetails.user_confirm_password}
-                                        name={'user_confirm_password'}
-                                        onChange={onChange}
-                                        onBlur={onBlur}
-                                        onKeyDown={handleKeyDown}
-                                        // className={"border-slate-300 placeholder:text-slate-400"}
-                                    />
-                                    <Button variant={"ghost hover:none"}
-                                            onClick={() => togglePasswordVisibility('user_confirm_password')}
-                                            className={"absolute top-0 right-0"}>
-                                        {passwordVisibility.user_confirm_password ? <Eye size={16}/> : <EyeOff size={16}/>}
-                                    </Button>
-                                </div>
-                                {
-                                    formError.user_confirm_password &&
-                                    <span className="text-red-500 text-sm">{formError.user_confirm_password}</span>
-                                }
-                            </div>
-                            <Button type="submit" className={"w-full bg-violet-600 hover:bg-violet-600"}
-                                    onClick={onRegister}>
-                                {
-                                    isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : ""
-                                }
-                                <span className={"font-normal font-semibold"}>Continue Registration</span>
-                            </Button>
-                            <div className={"or-divider flex items-center"}>
-                                <div className={"border-t basis-4/12 border-slate-500"}/>
-                                <p className={"text-xs font-medium text-slate-500 basis-4/12 text-center"}>Or continue
-                                    with</p>
-                                <div className={"border-t basis-4/12 border-slate-500"}/>
-                            </div>
-                            <Button variant="outline" className="w-full border border-violet-600">
+                            {/*<div className="flex flex-col p-16 basis-1/2 justify-between">*/}
+                            {/*<div className="flex p-16">*/}
+                            <div
+                                className=" min-h-screen basis-full md:basis-1/2 w-full px-4 py-5 flex justify-center items-center">
+                                {/*<div className={"w-full"}>*/}
+                                <div className={"lg:w-[480px] "}>
+                                    <div className={"w-full py-10"}>
+                                        <div className="text-center md:text-right text-sm">
+                                            <p className={"font-medium"}>
+                                                Already have an account?{" "}
+                                                <Button
+                                                    variant={"link"}
+                                                    className="p-0 h-auto hover:no-underline"
+                                                    onClick={() => onRedirect('login')}
+                                                >
+                                                    <span className={"font-bold text-violet-600"}>Login</span>
+                                                </Button>
+                                            </p>
+                                        </div>
+                                        {/*<div className="mx-auto grid w-[384px] gap-8">*/}
+                                        <div className="mx-auto grid w-[320px] md:w-[384px] gap-8 lg:pt-[76px] pt-[100px]">
+                                            <div className="gap-2 flex flex-col items-center">
+                                                {
+                                                    theme === "dark" ? Icon.whiteLogo : Icon.blackLogo
+                                                }
+                                                <h1 className="text-2xl md:text-3xl font-medium">Let's Set Up Your Account</h1>
+                                                <h6 className="font-normal text-sm text-muted-foreground">Enhance
+                                                    customer experience now.</h6>
+                                            </div>
+                                            <div className="grid gap-6">
+                                                <div className="grid md:grid-flow-col gap-4">
+                                                    <div className="grid gap-2 content-start">
+                                                        <Label htmlFor="email" className={"font-medium"}>First
+                                                            Name</Label>
+                                                        <Input
+                                                            id="user_first_name"
+                                                            placeholder="First Name"
+                                                            value={companyDetails.user_first_name}
+                                                            name={'user_first_name'}
+                                                            onChange={onChange}
+                                                            onBlur={onBlur}
+                                                            // className={"border-slate-300 placeholder:text-slate-400"}
+                                                        />
+                                                        <div className="grid gap-2">
+                                                            {
+                                                                formError.user_first_name &&
+                                                                <span
+                                                                    className="text-red-500 text-sm">{formError.user_first_name}</span>
+                                                            }
+                                                        </div>
+                                                    </div>
+                                                    <div className="grid gap-2 content-start">
+                                                        <Label htmlFor="email" className={"font-medium"}>Last
+                                                            Name</Label>
+                                                        <Input
+                                                            id="user_last_name"
+                                                            placeholder="Last Name"
+                                                            value={companyDetails.user_last_name}
+                                                            name={'user_last_name'}
+                                                            onChange={onChange}
+                                                            onBlur={onBlur}
+                                                            // className={"border-slate-300 placeholder:text-slate-400"}
+                                                        />
+                                                        <div className="grid gap-2">
+                                                            {
+                                                                formError.user_last_name &&
+                                                                <span
+                                                                    className="text-red-500 text-sm">{formError.user_last_name}</span>
+                                                            }
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className="grid gap-6">
+                                                    <div className="grid gap-2">
+                                                        <Label htmlFor="email" className={"font-medium"}>Email</Label>
+                                                        <Input
+                                                            id="email"
+                                                            type="email"
+                                                            placeholder="Email"
+                                                            value={companyDetails.user_email_id}
+                                                            name={'user_email_id'}
+                                                            onChange={onChange}
+                                                            onBlur={onBlur}
+                                                            // className={"border-slate-300 placeholder:text-slate-400"}
+                                                        />
+                                                        {
+                                                            formError.user_email_id &&
+                                                            <span
+                                                                className="text-red-500 text-sm">{formError.user_email_id}</span>
+                                                        }
+                                                    </div>
+                                                    <div className="grid gap-2">
+                                                        <div className="flex items-center">
+                                                            <Label htmlFor="password"
+                                                                   className={"font-medium"}>Password</Label>
+                                                        </div>
+                                                        <div className={"relative"}>
+                                                            <Input
+                                                                id="password"
+                                                                type={passwordVisibility.user_password ? "text" : "password"}
+                                                                placeholder={"Password"}
+                                                                value={companyDetails.user_password}
+                                                                name={'user_password'}
+                                                                onChange={onChange}
+                                                                onBlur={onBlur}
+                                                                // className={"border-slate-300 placeholder:text-slate-400"}
+                                                            />
+                                                            <Button variant={"ghost hover:none"}
+                                                                    onClick={() => togglePasswordVisibility('user_password')}
+                                                                    className={"absolute top-0 right-0"}>
+                                                                {passwordVisibility.user_password ? <Eye size={16}/> :
+                                                                    <EyeOff size={16}/>}
+                                                            </Button>
+                                                        </div>
+                                                        {
+                                                            formError.user_password &&
+                                                            <span
+                                                                className="text-red-500 text-sm">{formError.user_password}</span>
+                                                        }
+                                                    </div>
+                                                    <div className="grid gap-2">
+                                                        <Label htmlFor="confirmPassword" className={"font-medium"}>Confirm
+                                                            Password</Label>
+                                                        <div className={"relative"}>
+                                                            <Input
+                                                                id="confirmPassword"
+                                                                type={passwordVisibility.user_confirm_password ? "text" : "password"}
+                                                                placeholder={"Confirm Password"}
+                                                                value={companyDetails.user_confirm_password}
+                                                                name={'user_confirm_password'}
+                                                                onChange={onChange}
+                                                                onBlur={onBlur}
+                                                                onKeyDown={handleKeyDown}
+                                                                // className={"border-slate-300 placeholder:text-slate-400"}
+                                                            />
+                                                            <Button variant={"ghost hover:none"}
+                                                                    onClick={() => togglePasswordVisibility('user_confirm_password')}
+                                                                    className={"absolute top-0 right-0"}>
+                                                                {passwordVisibility.user_confirm_password ?
+                                                                    <Eye size={16}/> : <EyeOff size={16}/>}
+                                                            </Button>
+                                                        </div>
+                                                        {
+                                                            formError.user_confirm_password &&
+                                                            <span
+                                                                className="text-red-500 text-sm">{formError.user_confirm_password}</span>
+                                                        }
+                                                    </div>
+                                                    <Button type="submit"
+                                                            className={"w-full bg-violet-600 hover:bg-violet-600"}
+                                                            onClick={onRegister}>
+                                                        {
+                                                            isLoading ?
+                                                                <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : ""
+                                                        }
+                                                        <span className={"font-normal font-semibold"}>Continue Registration</span>
+                                                    </Button>
+                                                    <div className={"or-divider flex items-center"}>
+                                                        <div className={"border-t basis-4/12 border-slate-500"}/>
+                                                        <p className={"text-xs font-medium text-slate-500 basis-4/12 text-center"}>Or
+                                                            continue
+                                                            with</p>
+                                                        <div className={"border-t basis-4/12 border-slate-500"}/>
+                                                    </div>
+                                                    <Button variant="outline"
+                                                            className="w-full border border-violet-600">
                             <span className={"font-normal flex gap-x-1 text-violet-600 font-semibold"}>
                                 {Icon.googleIcon}
                                 Login With Google
                             </span>
-                            </Button>
-                            <p className='text-xs text-center'>
-                                By registering you agree to our{" "}
-                                <Button variant={"link"}
-                                        className="p-0 h-auto hover:no-underline"> <span
-                                    className={"font-medium text-violet-600"}>Terms of Service</span></Button> and {""}
-                                <Button variant={"link"}
-                                        className="p-0 h-auto hover:no-underline"> <span
-                                    className={"font-medium text-violet-600"}>Privacy Policy</span></Button>.
-                            </p>
+                                                    </Button>
+                                                    <p className='text-xs text-center'>
+                                                        By registering you agree to our{" "}
+                                                        <Button variant={"link"}
+                                                                className="p-0 h-auto hover:no-underline"> <span
+                                                            className={"font-medium text-violet-600"}>Terms of Service</span></Button> and {""}
+                                                        <Button variant={"link"}
+                                                                className="p-0 h-auto hover:no-underline"> <span
+                                                            className={"font-medium text-violet-600"}>Privacy Policy</span></Button>.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
             </div>
         </div>
     );

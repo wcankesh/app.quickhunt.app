@@ -60,30 +60,29 @@ const   SidebarSheet = ({ isOpen, onOpen, onClose ,selectedViewAnalyticsRecord})
     return (
             <Sheet open={isOpen} onOpenChange={isOpen ? onClose : onOpen}>
                 <SheetOverlay className={"inset-0"} />
-                <div>
-                    <SheetContent className={"pt-[24px] p-0 max-h-screen overflow-y-auto lg:max-w-[504px]"} >
-                        <SheetHeader className={`px-8 py-6 flex flex-row justify-between items-center sticky top-0 z-10 ${theme == "dark" ? "bg-[#020817]" : "bg-[#f8fafc]"}` }>
-                            <h5 className={"text-xl font-medium leading-5"}>{selectedViewAnalyticsRecord?.post_title}</h5>
+                    <SheetContent className={"pt-6 p-0 max-h-screen overflow-y-auto lg:max-w-[504px]"} >
+                        <SheetHeader className={`px-2 py-4 md:px-8 md:py-6 flex flex-row justify-between items-center sticky top-0 z-10 ${theme == "dark" ? "bg-[#020817]" : "bg-[#f8fafc]"}` }>
+                            <h5 className={"text-sm md:text-xl font-medium"}>{selectedViewAnalyticsRecord?.post_title}</h5>
                             <Button className={"h-5 w-5 p-0"} variant={"ghost"}  onClick={onClose}><X className={"h-4 w-4"} size={18} /></Button>
                         </SheetHeader>
                         <Separator className={""} />
-                        <div className={"pt-6 px-8 pb-4 pr-16 flex flex-row justify-between"}>
+                        <div className={"pt-4 px-4 pb-3 pr-8 md:pt-8 md:px-8 md:pb-6 md:pr-16 flex flex-row justify-between gap-2"}>
                             <div className={"flex flex-col gap-2"}>
-                                <h5 className={" text-base font-semibold leading-5"}>Total Views</h5>
-                                { isLoadingReaction ? <Skeleton className={"w-full h-[32px] rounded-md"} /> :<h5 className={"text-2xl font-bold"}>{views && views[0] && views[0].totalView ? views[0].totalView : 0}</h5>}
+                                <h5 className={"text-sm md:text-base font-semibold"}>Total Views</h5>
+                                { isLoadingReaction ? <Skeleton className={"w-full h-8 rounded-md"} /> :<h5 className={"text-xl md:text-2xl font-bold"}>{views && views[0] && views[0].totalView ? views[0].totalView : 0}</h5>}
                             </div>
                             <div className={"flex flex-col gap-2"}>
-                                <h5 className={"text-base font-semibold leading-5"}>Unique Views</h5>
-                                {isLoadingReaction ? <Skeleton className={"w-full h-[32px] rounded-md"} /> : <h5
-                                    className={"text-2xl font-bold"}>{views && views[0] && views[0].uniqueView ? views[0].uniqueView : 0}</h5>}
+                                <h5 className={"text-sm md:text-base font-semibold"}>Unique Views</h5>
+                                {isLoadingReaction ? <Skeleton className={"w-full h-8 rounded-md"} /> : <h5
+                                    className={"text-xl md:text-2xl font-bold"}>{views && views[0] && views[0].uniqueView ? views[0].uniqueView : 0}</h5>}
                             </div>
                             <div className={"flex flex-col gap-2"}>
-                                <h5 className={"text-base font-semibold leading-5"}>Feedback</h5>
-                                {isLoadingReaction ? <Skeleton className={"w-full h-[32px] rounded-md"} /> :<h5 className={"text-2xl font-bold"}>{totalFeedback}</h5>}
+                                <h5 className={"text-sm md:text-base font-semibold"}>Feedback</h5>
+                                {isLoadingReaction ? <Skeleton className={"w-full h-8 rounded-md"} /> :<h5 className={"text-xl md:text-2xl font-bold"}>{totalFeedback}</h5>}
                             </div>
                         </div>
                         <Separator />
-                        <div className={"py-6 px-8 flex flex-col gap-3"}>
+                        <div className={"py-3 px-4 md:py-6 md:px-8 flex flex-col gap-3"}>
                             <h5 className={"text-base font-semibold leading-5"}>Reaction</h5>
                             {feedbackList.length == 0 != <Separator className={"mb-2"}/>}
                             {isLoadingReaction ?  <div className="flex items-center space-x-6">
@@ -124,7 +123,7 @@ const   SidebarSheet = ({ isOpen, onOpen, onClose ,selectedViewAnalyticsRecord})
                             </div>}
                         </div>
                         <Separator className={"p-0 m-0"}/>
-                        <div className={"py-6 px-8 flex flex-col gap-2"}>
+                        <div className={"py-3 px-4 md:py-6 md:px-8 flex flex-col gap-2"}>
                             <h5 className={"text-base font-semibold leading-5"}>Feedback</h5>
                             {
                                 isLoadingFeedBack ?
@@ -173,7 +172,6 @@ const   SidebarSheet = ({ isOpen, onOpen, onClose ,selectedViewAnalyticsRecord})
                             }
                         </div>
                 </SheetContent>
-                </div>
             </Sheet>
     );
 };

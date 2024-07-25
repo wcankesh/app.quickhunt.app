@@ -157,11 +157,15 @@ p {margin: 0 !important;}
 
 /*.bodyScreenHeight{height: calc(100vh - 60px);}*/
 .bodyScreenHeight{height: calc(100vh - 64px);}
+.side-sheet-height{height: calc(100vh - 53px);}
 
 .hov-primary.data-\[selected\=true\]\:bg-accent[data-selected=true]{background-color: hsl(var(--primary));color: hsl(var(--card))}
 
 .widget-switch .data-\[state\=checked\]\:translate-x-5[data-state=checked]{width: 14px;height: 14px;--tw-translate-x: 11px}
 .widget-switch .data-\[state\=unchecked\]\:translate-x-0[data-state=unchecked]{width: 14px;height: 14px;}
+
+.announce-create-switch .data-\[state\=checked\]\:translate-x-5[data-state=checked]{width: 14px;height: 14px;--tw-translate-x: 20px}
+.announce-create-switch .data-\[state\=unchecked\]\:translate-x-0[data-state=unchecked]{width: 14px;height: 14px;}
 
 .active-menu svg {fill: hsl(var(--primary));}
 .active-menu svg path {fill: hsl(var(--primary));}

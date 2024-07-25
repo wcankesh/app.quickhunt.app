@@ -7,7 +7,7 @@ import {
     ChevronLeft,
     ChevronRight,
     ChevronsLeft,
-    ChevronsRight, Circle, Ellipsis,
+    ChevronsRight, Circle, Dot, Ellipsis,
     MessageCircleMore
 } from "lucide-react";
 import {Card, CardContent, CardFooter} from "../ui/card";
@@ -102,22 +102,38 @@ const AnnouncementsView = ({data,isLoading,setSelectedRecord,handleDelete,setAna
                 </AlertDialogContent>
             </AlertDialog>
             {
-                isLoading ? <Card><CardContent className={"p-0"}>{CommSkel.commonParagraphFourIdea}</CardContent></Card> : <div className="pt-[38px]">
-                    <div className={"flex flex-col px-[33px] pb-[32px] "}>
+                isLoading ? <Card><CardContent className={"p-0"}>{CommSkel.commonParagraphFourIdea}</CardContent></Card> :
+                    <div className={"flex flex-col px-3 lg:px-[33px] pt-[9px] pb-0"}>
                         {
                             (announcementList || []).map((x,index)=>{
                                 return(
                                     <Fragment key={index}>
-                                        <div className={"flex flex-row gap-4 items-center justify-between px-[31px] mb-[22px]"}>
-                                            <div className={"basis-4/5 flex flex-row gap-4 items-center flex-wrap"}>
-                                                <h4 className={"text-base font-medium capitalize"}>{x.post_title}</h4>
-                                                <div className={"flex flex-row items-center gap-2"}>
-                                                    <h5 className={"text-base font-medium text-sm"}>{getProjectDetails('project_name')}</h5>
-                                                    <div className={"w-1 h-1 rounded-full bg-[#5F5F5F]"}/>
-                                                    <h5 className={"text-sm font-normal flex items-center text-muted-foreground leading-5"}>{moment.utc(x.post_modified_date).local().startOf('seconds').fromNow()}</h5>
+                                        <div className={"flex flex-col gap-[20px] border-b pt-2 pb-3 md:pt-[30px] md:pb-[24px]"}>
+                                            <div className={"flex justify-between flex-wrap md:flex-nowrap gap-2 lg:px-[31px]"}>
+                                            <div className={"flex gap-1 items-center w-full md:w-auto md:gap-4"}>
+                                                <div className={"flex justify-between gap-1 items-center"}>
+                                                    <h4 className={"text-base font-medium text-muted-foreground capitalize"}>{x.post_title}</h4>
+                                                    {/*<div className={"md:hidden"}>*/}
+                                                    {/*<DropdownMenu>*/}
+                                                    {/*    <DropdownMenuTrigger><Button variant={"outline"} className={"p-2 h-9 w-9"}><Ellipsis size={18} /></Button></DropdownMenuTrigger>*/}
+                                                    {/*    <DropdownMenuContent>*/}
+                                                    {/*        <DropdownMenuItem onClick={() => openSheetSidebar(x)}>Analytics</DropdownMenuItem>*/}
+                                                    {/*        <DropdownMenuItem onClick={() => onEdit(x)}>Edit</DropdownMenuItem>*/}
+                                                    {/*        <DropdownMenuItem onClick={()=>deleteRow(x.id)}>Delete</DropdownMenuItem>*/}
+                                                    {/*    </DropdownMenuContent>*/}
+                                                    {/*</DropdownMenu>*/}
+                                                    {/*</div>*/}
+                                                </div>
+                                                <div className={"flex items-center gap-2"}>
+                                                    {/*<h4 className={"text-base font-medium text-sm"}>{getProjectDetails('project_name')}</h4>*/}
+                                                    <p className={"text-xs font-normal flex items-center text-muted-foreground"}>
+                                                        <Dot
+                                                            className={"fill-text-card-foreground stroke-text-card-foreground"}/>
+                                                    {moment.utc(x.post_modified_date).local().startOf('seconds').fromNow()}
+                                                    </p>
                                                 </div>
                                             </div>
-                                            <div className={"basis-1/5 flex justify-end"}>
+                                            <div className={"flex gap-2 items-center"}>
                                                 <Select value={x.post_save_as_draft} onValueChange={(value) => handleStatusChange(x,value)}>
                                                     <SelectTrigger className="w-[114px] h-7">
                                                         <SelectValue placeholder="Publish" />
@@ -141,60 +157,57 @@ const AnnouncementsView = ({data,isLoading,setSelectedRecord,handleDelete,setAna
                                                         </SelectGroup>
                                                     </SelectContent>
                                                 </Select>
+                                                {/*<div className={"md:block hidden"}>*/}
+                                                    <DropdownMenu>
+                                                        <DropdownMenuTrigger><Ellipsis size={18}/></DropdownMenuTrigger>
+                                                        <DropdownMenuContent>
+                                                            <DropdownMenuItem onClick={() => openSheetSidebar(x)}>Analytics</DropdownMenuItem>
+                                                            <DropdownMenuItem onClick={() => onEdit(x)}>Edit</DropdownMenuItem>
+                                                            <DropdownMenuItem onClick={() => deleteRow(x.id)}>Delete</DropdownMenuItem>
+                                                        </DropdownMenuContent>
+                                                    </DropdownMenu>
+                                                {/*</div>*/}
                                             </div>
                                         </div>
-                                        <div className={"flex flex-row gap-4 justify-between px-[31px] mb-4"}>
-                                            <div className={"basis-4/5 flex flex-row gap-4"}>
-                                                <ReadMoreText html={x.post_description}/>
-                                            </div>
-                                            <div className={""}>
-                                                <DropdownMenu>
-                                                    <DropdownMenuTrigger><Button variant={"outline"} className={"p-2 h-9 w-9"}><Ellipsis size={18} /></Button></DropdownMenuTrigger>
-                                                    <DropdownMenuContent>
-                                                        <DropdownMenuItem onClick={() => openSheetSidebar(x)}>Analytics</DropdownMenuItem>
-                                                        <DropdownMenuItem onClick={() => onEdit(x)}>Edit</DropdownMenuItem>
-                                                        <DropdownMenuItem onClick={()=>deleteRow(x.id)}>Delete</DropdownMenuItem>
-                                                    </DropdownMenuContent>
-                                                </DropdownMenu>
-                                            </div>
-                                        </div>
-                                        <div className={"flex flex-row gap-4 justify-between px-[31px]"}>
-                                            <div className={"flex flex-row gap-10 items-center "}>
-                                                <div className={"flex flex-row gap-2 items-center "}>
-                                                    <Button variant={"outline"} className={"p-1 h-[30px] w-[30px] hover:none"}>
-                                                        <ArrowBigUp size={18} className={"fill-black text-violet-600"}  />
-                                                    </Button>
-                                                    <p className={" font-medium leading-4"}>{x.msg}</p>
-                                                    <Button variant={"outline"} className={"p-1 h-[30px] w-[30px]"}><ArrowBigDown size={18} className={"text-violet-600"} /></Button>
-                                                </div>
-                                                <div className={""}>
-                                                    <div className={"flex flex-row gap-2 items-center"}>
-                                                        <Button variant={"outline hover:none"} className={"p-2 h-9 w-9"}><MessageCircleMore size={18} className={"text-violet-600"} /></Button>
-                                                        <p className={"font-medium leading-4"}>{x.msg}</p>
+                                            <div className={"lg:px-[31px] flex flex-col gap-4"}>
+                                                <div className={"flex gap-4 justify-between"}>
+                                                    <div
+                                                        className={"description-container text-sm text-muted-foreground"}>
+                                                        <ReadMoreText html={x.post_description}/>
                                                     </div>
                                                 </div>
+                                                <div className={"flex gap-4 justify-end items-center flex-wrap"}>
+                                                    <div className={"flex items-center gap-2 cursor-pointer"}>
+                                                        <span><MessageCircleMore className={"stroke-primary w-[16px] h-[16px]"}/></span>
+                                                        <p className={"text-base font-medium"}>{x.msg}</p>
+                                                    </div>
+                                                    {
+                                                        (x.labels && x.labels.length > 0) ? (
+                                                            <div className={"flex flex-wrap gap-1"}>
+                                                                {
+                                                                    x.labels.map((y, index) => (
+                                                                        <Badge
+                                                                            key={index}
+                                                                            variant={"outline"}
+                                                                            style={{color: y.label_color_code, borderColor: y.label_color_code, textTransform: "capitalize"}}
+                                                                            className={`h-[20px] py-0 px-2 text-xs rounded-[5px] shadow-[0px_1px_4px_0px_${y.label_color_code}] font-medium text-[${y.label_color_code}] border-[${y.label_color_code}] capitalize`}
+                                                                        >
+                                                                            {y.label_name}
+                                                                        </Badge>
+                                                                    ))
+                                                                }
+                                                            </div>
+                                                        ) : null
+                                                    }
+
+                                                </div>
                                             </div>
-                                            <div className={"flex flex-wrap gap-1"}>
-                                                {
-                                                    (x.labels || []).map((y,index) => {
-                                                        return (
-                                                            <Badge key={index} variant={"outline"} style={{
-                                                                color: y.label_color_code,
-                                                                borderColor: y.label_color_code,
-                                                                textTransform: "capitalize"
-                                                            }}
-                                                                   className={`h-[20px] py-0 px-2 text-xs rounded-[5px] shadow-[0px_1px_4px_0px_${y.label_color_code}] font-medium text-[${y.label_color_code}] border-[${y.label_color_code}] capitalize`}>{y.label_name}</Badge>
-                                                        )
-                                                    })
-                                                }
-                                            </div>
+                                        {/*{index != announcementList.length - 1  && <hr className={"bg-[#E4E4E7] h-[1px] my-6"}/>}*/}
                                         </div>
-                                        {index != announcementList.length - 1  && <hr className={"bg-[#E4E4E7] h-[1px] my-6"}/>}
                                     </Fragment>
                                 )
                             })
                         }
-                    </div>
                     <Separator/>
                     {
                       isLoading == true &&   <CardFooter className={"p-0"}>

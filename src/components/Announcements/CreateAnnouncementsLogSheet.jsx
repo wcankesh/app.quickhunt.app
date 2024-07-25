@@ -265,22 +265,19 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
         console.log("delete",index);
     }
 
-    console.log(changeLogDetails.labels,"changeLogDetails.labels");
-    console.log(labelList,"labellsit");
-
     return (
         <Sheet open={isOpen} onOpenChange={isOpen ? onClose : onOpen}>
             <SheetOverlay className={"inset-0"} />
-            <SheetContent className={"pt-[24px] p-0 overflow-y-scroll lg:max-w-[663px] md:max-w-[720px] sm:max-w-[520px]"}>
-                    <SheetHeader className={`px-8 py-6 flex flex-row justify-between items-center sticky top-0 ${theme == "dark" ? "bg-[#020817]" : "bg-[#f8fafc]"} z-10`}>
-                        <h5 className={"text-xl font-medium leading-5"}>{ selectedRecord?.post_slug_url ? "Update Announcement" :"Create New Announcements"}</h5>
-                        <div className={"flex items-center gap-6"}>
+            <SheetContent className={"pt-6 p-0 lg:max-w-[663px] md:max-w-[720px] sm:max-w-[520px]"}>
+                    <SheetHeader className={`px-3 py-4 lg:px-8 lg:py-6 flex flex-row justify-between items-center sticky top-0 z-10 border-b`}>
+                        <h5 className={"text-sm md:text-xl font-medium"}>{ selectedRecord?.post_slug_url ? "Update Announcement" :"Create New Announcements"}</h5>
+                        <div className={"flex items-center gap-6 m-0"}>
                             <Button className={"h-5 w-5 p-0"} onClick={() => onChangeText({target:{name: "post_pin_to_top", value: changeLogDetails.post_pin_to_top === 1 ? 0 : 1}}) } variant={"ghost"} >{changeLogDetails.post_pin_to_top === 1 ? <Pin fill={"bg-card-foreground"} className={"h-4 w-4"}  size={18}/> : <Pin className={"h-4 w-4"}  size={18}/>}</Button>
                             <Button className={"h-5 w-5 p-0"} onClick={onClose}  variant={"ghost"}><X size={18} className={"h-5 w-5"}/></Button>
                         </div>
                     </SheetHeader>
-                <Separator className={"mb-6"}/>
-                <div className={"px-8"}>
+                <div className={"side-sheet-height overflow-y-auto"}>
+                <div className={"px-3 lg:px-8 border-b py-6"}>
                     <div className={"flex flex-col gap-6"}>
                         <div className="grid w-full gap-2">
                             <Label htmlFor="title">Title</Label>
@@ -288,12 +285,12 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
                             {formError.post_title && <span className="text-sm text-red-500">{formError.post_title}</span>}
                         </div>
                         <div className="grid w-full gap-2">
-                            <Label className={"text-[14px] text=[#0F172A]"} htmlFor="link">Permalink / Slug</Label>
+                            <Label htmlFor="link">Permalink / Slug</Label>
                             <Input type="text" className={"h-9"} id="link" name={"post_slug_url"} value={changeLogDetails.post_slug_url} onChange={onChangeText}/>
-                            <p className={"text-[14px] font-normal leading-5"}>This release will be available at {changeLogDetails.fullDomain ? <a
+                            <p className={"text-sm font-normal text-muted-foreground"}>This release will be available at {changeLogDetails.fullDomain ? <a
                                 href={`${changeLogDetails.fullDomain}/${changeLogDetails.post_slug_url}`}
                                 target={"_blank"}
-                                className={"text-violet-600 text-[14px]"}>{`${changeLogDetails.fullDomain}/${changeLogDetails.post_slug_url}`}</a> : ""}</p>
+                                className={"text-primary text-sm"}>{`${changeLogDetails.fullDomain}/${changeLogDetails.post_slug_url}`}</a> : ""}</p>
                         </div>
                         <div className="grid w-full gap-2">
                             <Label htmlFor="description">Description</Label>
@@ -302,10 +299,9 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
                         </div>
                     </div>
                 </div>
-                <Separator className={"my-6"}/>
-                <div className={"flex flex-col gap-4"}>
-                    <div className={"px-8 flex flex-row gap-4 items-start"}>
-                        <div className="grid w-full gap-2 basis-1/2">
+                <div className={"flex flex-col gap-4 border-b py-6"}>
+                    <div className={"px-3 lg:px-8 flex flex-wrap md:flex-nowrap gap-4 items-start"}>
+                        <div className="grid w-full gap-2 md:basis-1/2">
                             <Label htmlFor="label">Label</Label>
                             <Select   value={selectedLabels} onValueChange={onChangeLabel}>
                                 <SelectTrigger className="h-9">
@@ -351,7 +347,7 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
                                 </SelectContent>
                             </Select>
                         </div>
-                        <div className="grid w-full gap-2 basis-1/2">
+                        <div className="grid w-full gap-2 md:basis-1/2">
                             <Label htmlFor="label">Assign to</Label>
                             <Select value={selectedValues} onValueChange={handleValueChange}>
                                 <SelectTrigger className={"h-9"}>
@@ -388,8 +384,8 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
                             </Select>
                         </div>
                     </div>
-                    <div className={"px-8 flex flex-row gap-4 items-start"}>
-                        <div className={"grid w-full gap-2 basis-1/2"}>
+                    <div className={"px-3 lg:px-8 flex flex-wrap md:flex-nowrap gap-4 items-start"}>
+                        <div className={"grid w-full gap-2 md:basis-1/2"}>
                             <Label htmlFor="label">Category</Label>
                             <Select value={changeLogDetails && changeLogDetails.category_id && changeLogDetails.category_id.toString()} onValueChange={onChangeCategory}>
                                 <SelectTrigger className="h-9">
@@ -408,7 +404,7 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
                                 </SelectContent>
                             </Select>
                         </div>
-                        <div className="grid w-full gap-2 basis-1/2">
+                        <div className="grid w-full gap-2 md:basis-1/2">
                             <Label htmlFor="date">Published at</Label>
                             <Popover>
                                 <PopoverTrigger asChild>
@@ -432,37 +428,37 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
                         </div>
                     </div>
                 </div>
-                <Separator className={"my-6"}/>
-                <div className={"px-8"}>
-                    <h5 className={"mb-3 text-[14px] font-medium leading-5"}>Featured Image</h5>
-                    <div className={"flex  gap-4 "}>
-                        <div className="flex basis-1/2 items-center justify-center">
-                                <label
-                                    htmlFor="upload_image"
-                                    className="flex w-[282px] h-[128px] py-0 justify-center items-center flex-shrink-0 border-dashed border-[1px] border-gray-300 rounded cursor-pointer"
-                                >
-                                  {previewImage ? <img className={"h-[70px] w-[70px] rounded-md object-cover"} src={previewImage} alt={"not_found"} /> : <span className="text-center text-muted-foreground font-semibold text-[14px]">Upload Image</span>}
-                                  <input
-                                        id="upload_image"
-                                        type="file"
-                                        className="hidden"
-                                        onChange={handleFileChange}
-                                        accept="image/*"
-                                  />
-                                </label>
+                <div className={"px-3 lg:px-8 flex flex-wrap items-center gap-4 md:flex-nowrap border-b py-6"}>
+                    <div className={"space-y-3"}>
+                        <h5 className={"text-sm font-medium"}>Featured Image</h5>
+                        <div>
+                            <label
+                                htmlFor="upload_image"
+                                className="flex w-[250px] md:w-[282px] h-[128px] py-0 justify-center items-center flex-shrink-0 border-dashed border-[1px] border-gray-300 rounded cursor-pointer"
+                            >
+                                {previewImage ? <img className={"h-[70px] w-[70px] rounded-md object-cover"} src={previewImage} alt={"not_found"} /> : <span className="text-center text-muted-foreground font-semibold text-[14px]">Upload Image</span>}
+                                <input
+                                    id="upload_image"
+                                    type="file"
+                                    className="hidden"
+                                    onChange={handleFileChange}
+                                    accept="image/*"
+                                />
+                            </label>
                         </div>
-                        <div className={"flex basis-1/2 flex-col gap-[18px]"}>
-                            <div className={"flex gap-6"}>
-                                <Switch disabled={userDetailsReducer.plan == 0} checked={changeLogDetails.post_nodify_customer ===  1} onCheckedChange={(checked)=>onChangeText({target:{name: "post_nodify_customer", value: checked === true ? 1 : 0}})} />
-                                <p className={"text-[14px] non-italic font-medium"}>Notify Customers</p>
+                    </div>
+                        <div className={"flex flex-col gap-[18px]"}>
+                            <div className={"announce-create-switch flex gap-6"}>
+                                <Switch className={"w-[38px] h-[20px]"} disabled={userDetailsReducer.plan == 0} checked={changeLogDetails.post_nodify_customer ===  1} onCheckedChange={(checked)=>onChangeText({target:{name: "post_nodify_customer", value: checked === true ? 1 : 0}})} />
+                                <p className={"text-sm text-muted-foreground font-medium"}>Notify Customers</p>
                             </div>
-                            <div className={"flex gap-6"}>
-                                <Switch checked={changeLogDetails.post_save_as_draft ===  1} onCheckedChange={(checked)=>onChangeText({target:{name: "post_save_as_draft", value: checked === true ? 1 : 0}})} />
-                                <p className={"text-[14px] non-italic font-medium"}>Save as Draft</p>
+                            <div className={"announce-create-switch flex gap-6"}>
+                                <Switch className={"w-[38px] h-[20px]"} checked={changeLogDetails.post_save_as_draft ===  1} onCheckedChange={(checked)=>onChangeText({target:{name: "post_save_as_draft", value: checked === true ? 1 : 0}})} />
+                                <p className={"text-sm text-muted-foreground font-medium"}>Save as Draft</p>
                             </div>
-                            <div className={"flex gap-6"}>
-                                <Switch disabled={userDetailsReducer.plan == 0} checked={changeLogDetails.post_expired_boolean ===  1} onCheckedChange={(checked)=>onChangeText({target:{name: "post_expired_boolean", value: checked === true ? 1 : 0}})} />
-                                <p className={"text-[14px] non-italic font-medium"}>Expire At</p>
+                            <div className={"announce-create-switch flex gap-6"}>
+                                <Switch className={"w-[38px] h-[20px]"} disabled={userDetailsReducer.plan == 0} checked={changeLogDetails.post_expired_boolean ===  1} onCheckedChange={(checked)=>onChangeText({target:{name: "post_expired_boolean", value: checked === true ? 1 : 0}})} />
+                                <p className={"text-sm text-muted-foreground font-medium"}>Expire At</p>
                             </div>
 
                             {
@@ -490,15 +486,19 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
                             }
 
                         </div>
-                    </div>
                 </div>
-                <Separator className={"my-6"}/>
-                <div className={"pt-2 pb-8 px-8 flex flex-row gap-4 flex-wrap"}>
-                    <Button variant={"outline "} disabled={isSave}  onClick={selectedRecord?.post_slug_url ? updatePost : createPosts} className={"bg-violet-600 text-[#fff]"}>
+                <div className={"p-3 lg:p-8 flex flex-row gap-4"}>
+                    <Button
+                        variant={"outline "}
+                        disabled={isSave}
+                        onClick={selectedRecord?.post_slug_url ? updatePost : createPosts}
+                        className={` bg-primary ${theme === "dark" ? "text-card-foreground" : "text-card"} font-semibold`}
+                    >
                         { isSave ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : selectedRecord?.post_slug_url ? "Update Post" : "Publish Post"}
                     </Button>
                     <Button onClick={onClose} variant={"outline "}
-                            className={"rounded-md border border-violet-600 text-violet-600 text-[14px] font-semibold"}>Cancel</Button>
+                            className={"border border-primary text-primary text-sm font-semibold"}>Cancel</Button>
+                </div>
                 </div>
             </SheetContent>
         </Sheet>
