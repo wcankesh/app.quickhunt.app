@@ -7,8 +7,10 @@ import {Loader2} from "lucide-react";
 import {useToast} from "../ui/use-toast";
 import {ApiService} from "../../utils/ApiService";
 import {Icon} from "../../utils/Icon";
+import {useTheme} from "../theme-provider";
 
 const Forgot = () => {
+    const {theme} = useTheme();
     let apiSerVice = new ApiService();
     const [formError, setFormError] = useState({email:""});
     const [forgotPasswordDetails, setForgotPasswordDetails] = useState({email:""});
@@ -84,22 +86,24 @@ const Forgot = () => {
     }
 
     return (
-        <div className={"w-full flex flex-col items-center justify-center px-4"}>
+        <div className={"w-full flex flex-col items-center justify-center p-4 md:px-4 md:py-0"}>
             <div className={"max-w-2xl m-auto"}>
-                <div className={"flex items-center justify-center mt-24"}>
-                    {Icon.blackLogo}
+                <div className={"flex items-center justify-center mt-20"}>
+                    {
+                        theme === "dark" ? Icon.whiteLogo : Icon.blackLogo
+                    }
                 </div>
-                <h1 className="scroll-m-20 text-3xl font-semibold text-center lg:text-3xl mb-3.5 mt-6">
+                <h1 className="scroll-m-20 text-2xl md:text-3xl font-semibold text-center lg:text-3xl mb-3.5 mt-6">
                     Forgot Password
                 </h1>
                 <div className={"mb-2.5"}>
-                    <p className="leading-6 text-center text-muted-foreground">
+                    <p className="text-sm text-center text-muted-foreground">
                         Enter the email associated to your quickhunt account and we'll send an email with instrcutions to reset your password.
                     </p>
                 </div>
                 <div className={"mt-2.5"}>
                     <Card>
-                        <CardContent className={"p-6"}>
+                        <CardContent className={"p-3 md:p-6"}>
                             <Label htmlFor="email" className={"font-normal"}>Your email</Label>
                             <Input
                                 id="email"

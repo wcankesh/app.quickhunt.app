@@ -353,9 +353,9 @@ const Ideas = () => {
                 setOpenDelete(false)
                 setIsLoading(false)
                 setDeleteRecord(null)
-                toast({description: "Idea deleted successfully"});
+                toast({description: data.message});
             } else {
-                toast({variant: "destructive", description: "Failed to delete idea"});
+                toast({variant: "destructive", description: data.message});
             }
         }
     };
@@ -697,7 +697,7 @@ const Ideas = () => {
                                         (ideasList || []).map((x, i) => {
                                             return (
                                                 <Fragment key={i}>
-                                                    <div className={"flex gap-[5px] md:gap-8 md:py-6 md:px-16 p-3"}>
+                                                    <div className={"flex gap-[5px] md:gap-8 p-2 sm:p-3 md:py-6 md:px-16"}>
                                                         <div className={"flex gap-1 md:gap-2"}>
                                                             <Button
                                                                 className={"p-0 bg-white shadow border hover:bg-white w-[20px] h-[20px] md:w-[30px] md:h-[30px]"}
@@ -778,7 +778,7 @@ const Ideas = () => {
                                                                 </div>
                                                             </div>
                                                             <div
-                                                                className={`flex justify-between items-center flex-wrap gap-2`}>
+                                                                className={`flex ${x.topic && x.topic.length > 0 ? "justify-between" : "sm:justify-between gap-0 justify-start"} items-center flex-wrap gap-2`}>
                                                                 <div className={`flex flex-wrap gap-2`}>
                                                                     {
                                                                         (x.topic && x.topic.length > 0) &&
@@ -830,7 +830,7 @@ const Ideas = () => {
                                                                         </SelectContent>
                                                                     </Select>
                                                                     <div
-                                                                        className={"flex items-center gap-2 cursor-pointer"}
+                                                                        className={"flex items-center gap-1 sm:gap-2 cursor-pointer"}
                                                                         onClick={() => openDetailsSheet(x)}
                                                                     >
                                                                         <span>
@@ -855,8 +855,8 @@ const Ideas = () => {
 
                         <CardFooter className={"p-0"}>
                             <div
-                                className={`w-full ${theme === "dark" ? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end px-4 py-4 md:px-16 md:py-15px`}>
-                                <div className={"w-full flex gap-8 items-center justify-between sm:justify-end"}>
+                                className={`w-full ${theme === "dark" ? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end p-2 md:p-4`}>
+                                <div className={"w-full flex gap-2 items-center justify-between sm:justify-end"}>
                                     {/*<div className={"w-full flex justify-between gap-2 items-center"}>*/}
                                     <div>
                                         <h5 className={"text-sm font-semibold"}>Page {pageNo} of {totalPages}</h5>

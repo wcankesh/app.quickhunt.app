@@ -333,8 +333,11 @@ const SidebarSheet = ({
             setIsLoadingArchive(true)
         }
         setIsLoadingSidebar(name);
-
-        setSelectedIdea({...selectedIdea, [name]: value})
+       if(name === "delete_image"){
+           setSelectedIdea({...selectedIdea, cover_image: ""})
+       } else {
+           setSelectedIdea({...selectedIdea, [name]: value})
+       }
         let formData = new FormData();
         formData.append(name, value);
         const data = await apiSerVice.updateIdea(formData, selectedIdea.id)
@@ -707,12 +710,13 @@ const SidebarSheet = ({
             <Sheet open={isOpen} onOpenChange={isOpen ? onCloseBoth : onOpen}>
                 <SheetOverlay className={"inset-0"}/>
                 <SheetContent className={"lg:max-w-[1101px] md:max-w-[720px] max-w-full p-0"}>
-                    <SheetHeader className={"px-[32px] py-[22px] border-b"}>
+                    <SheetHeader className={"px-4 py-3 md:py-5 lg:px-8 lg:py-[20px] border-b"}>
                         <X onClick={onCloseBoth} className={"cursor-pointer"}/>
                     </SheetHeader>
-                    <div className={"grid lg:grid-cols-12 md:grid-cols-1 overflow-auto h-[100vh]"}>
+                    {/*<div className={"grid lg:grid-cols-12 md:grid-cols-1 overflow-auto h-[100vh]"}>*/}
+                    <div className={"grid lg:grid-cols-12 md:grid-cols-1 overflow-auto idea-sheet-height"}>
                         <div
-                            className={`col-span-4 lg:block hidden ${theme === "dark" ? "" : "bg-muted"} border-r lg:overflow-auto pb-[100px]`}>
+                            className={`col-span-4 lg:block hidden ${theme === "dark" ? "" : "bg-muted"} border-r lg:overflow-auto idea-sheet-height`}>
                             <div className={"border-b py-4 pl-8 pr-6 flex flex-col gap-3"}>
                                 <div className={"flex flex-col gap-1"}>
                                     <h3 className={"text-sm font-medium"}>Status</h3>
@@ -759,7 +763,7 @@ const SidebarSheet = ({
                                                             <CircleX
                                                                 size={20}
                                                                 className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
-                                                                onClick={() => onChangeStatus('cover_image', '')}
+                                                                onClick={() => onChangeStatus('delete_image', selectedIdea && selectedIdea.cover_image && selectedIdea.cover_image.name ? "" : [selectedIdea.cover_image.replace("https://code.quickhunt.app/public/storage/feature_idea/", "")])}
                                                             />
                                                         </div> : selectedIdea.cover_image ?
                                                             <div
@@ -770,7 +774,7 @@ const SidebarSheet = ({
                                                                 <CircleX
                                                                     size={20}
                                                                     className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
-                                                                    onClick={() => onChangeStatus('cover_image', '')}
+                                                                    onClick={() => onChangeStatus('delete_image', '')}
                                                                 />
                                                             </div>
                                                             : ''}
@@ -928,10 +932,9 @@ const SidebarSheet = ({
                                     </div>
                                     :
                                     <Fragment>
-                                        <div className={"py-6 px-8"}>
+                                        <div className={"px-4 py-3 lg:py-6 lg:px-8"}>
                                             <div className={"flex flex-col gap-6"}>
-                                                <div
-                                                    className={"flex justify-between items-center gap-4 md:flex-nowrap flex-wrap"}>
+                                                <div className={"flex justify-between items-center gap-4 md:flex-nowrap flex-wrap"}>
                                                     <div className={"flex gap-2"}>
                                                         <Button
                                                             className={"p-[7px] bg-white shadow border hover:bg-white w-[30px] h-[30px]"}
@@ -1327,7 +1330,7 @@ const SidebarSheet = ({
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className={"pb-[150px] md:pb-[100px]"}>
+                                        <div>
                                             <Tabs defaultValue="comment" className="">
                                                 <div className={"px-8"}>
                                                     <TabsList

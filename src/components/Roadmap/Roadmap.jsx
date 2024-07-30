@@ -116,7 +116,8 @@ const Roadmap = () => {
 
     return (
         <div
-            className={"roadmap-container height-inherit h-svh  overflow-y-auto xl:container-secondary xl:max-w-[1605px] lg:container lg:max-w-[992px] md:container md:max-w-[768px] sm:container max-w-[639px]"}>
+            // className={"roadmap-container height-inherit h-svh  overflow-y-auto xl:container-secondary xl:max-w-[1605px] lg:container lg:max-w-[992px] md:container md:max-w-[768px] sm:container max-w-[639px]"}>
+            className={"roadmap-container height-inherit h-svh  overflow-y-auto xl:container-secondary xl:max-w-[1605px] lg:container lg:max-w-[1230px] md:container md:max-w-[960px] sm:container max-w-[639px]"}>
             <RoadMapSidebarSheet
                 isOpen={isSheetOpen}
                 onOpen={openSheet}

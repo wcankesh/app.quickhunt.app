@@ -1,19 +1,9 @@
-import React, {useState, Fragment} from 'react';
+import React, {useState, Fragment, useEffect} from 'react';
 import {Button} from "../ui/button";
-import {Table, TableBody, TableCaption, TableCell, TableFooter, TableHead, TableHeader, TableRow,} from "../ui/table";
-import {
-    BarChart,
-    ChevronLeft,
-    ChevronRight,
-    ChevronsLeft,
-    ChevronsRight, Copy,
-    Ellipsis,
-    Eye,
-    EyeOff,
-    Loader2
-} from "lucide-react";
-import WidgetSideBarSheet from "./WidgetSideBarSheet";
+import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow,} from "../ui/table";
+import {BarChart, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Copy, Ellipsis, Loader2} from "lucide-react";
 import {useTheme} from "../theme-provider";
+import {useSelector} from "react-redux";
 import {Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "../ui/dialog";
 import {DropdownMenu, DropdownMenuTrigger} from "@radix-ui/react-dropdown-menu";
 import {DropdownMenuContent, DropdownMenuItem} from "../ui/dropdown-menu";
@@ -21,69 +11,87 @@ import { Input } from "../ui/input";
 import {Tabs, TabsContent, TabsList, TabsTrigger,} from "../ui/tabs";
 import {Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter} from "../ui/card";
 import {Icon} from "../../utils/Icon";
-import {useLocation, useNavigate, useParams} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import {baseUrl} from "../../utils/constent";
-import WidgetSideBar from "./WidgetSideBar";
-
-const invoices = [
-    {
-        id: 1,
-        invoice: "My new widget",
-        paymentStatus: "Ideas, Roadmap, announcement",
-        totalAmount: "17 Jul, 2024",
-        paymentMethod: "Credit Card",
-    },
-];
+import {ApiService} from "../../utils/ApiService";
+import {useToast} from "../ui/use-toast";
+import WidgetAnalyticsSideBarSheet from "./WidgetAnalyticsSideBarSheet";
+import {Skeleton} from "../ui/skeleton";
+import EmptyData from "../Comman/EmptyData";
+import moment from "moment";
 
 const perPageLimit = 10;
 
 const Widgets = () => {
-    let navigate = useNavigate();
-    let location = useLocation();
-    const {id} = useParams();
-    const {theme} = useTheme();
+    const {theme} = useTheme()
+    const navigate = useNavigate();
+    let apiSerVice = new ApiService();
+    const {toast} = useToast()
+    const [widgetsSetting, setWidgetsSetting] = useState([])
+    const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const [isLoading, setIsLoading] = useState(false);
     const [isSheetOpen, setSheetOpen] = useState(false);
-    const [sideBar, setSheetOpenSideBar] = useState(false);
     const [pageNo, setPageNo] = useState(1);
     const [totalRecord, setTotalRecord] = useState(0);
     const [openDelete, setOpenDelete] = useState(false);
     const [openCopyCode, setOpenCopyCode] = useState(false);
     const [deleteRecord, setDeleteRecord] = useState(null);
-    // const [openCopyCode, setOpenCopyCode] = useState(false);
     const [copySuccess, setCopySuccess] = useState(false);
+    const [analyticsObj, setAnalyticsObj] = useState({});
+    const [selectedRecordAnalytics, setSelectedRecordAnalytics] = useState({})
 
+    const openSheet = (id) => {
+        setSheetOpen(true);
+        setSelectedRecordAnalytics(id)
+    }
+    const closeSheet = () => {
+        setSheetOpen(false);
+        setAnalyticsObj({})
+    }
 
-    const openSheet = () => setSheetOpen(true);
-    const closeSheet = () => setSheetOpen(false);
+    useEffect(() => {
+        if(projectDetailsReducer?.id !== ""){
+            getWidgetsSetting()
+        }
+    },[projectDetailsReducer.id])
 
-    const openSheetSideBar = () => setSheetOpenSideBar(true);
-    const closeSheetSideBar = () => setSheetOpenSideBar(false);
+    const getWidgetsSetting = async () => {
+        setIsLoading(true)
+        const data = await apiSerVice.getWidgetsSetting(projectDetailsReducer.id)
+        if(data.status === 200){
+            setWidgetsSetting(data.data);
+            setTotalRecord(data.total);
+            setIsLoading(false);
+        } else {
+            setIsLoading(false);
+        }
+    }
 
     const handleCreateNew = (id) => {
-        navigate(`${baseUrl}/widgets/${id}`);
-        setSheetOpenSideBar(true)
+        navigate(`${baseUrl}/widget/${id}`);
     };
 
     const onDeleteIdea = async (id) => {
-        // if (id) {
-        //     setIsLoading(true)
-        //     const data = await apiSerVice.onDeleteIdea(id);
-        //     if (data.status === 200) {
-        //         const filteredIdeas = ideasList.filter((idea) => idea.id !== id);
-        //         setIdeasList(filteredIdeas);
-        //         setOpenDelete(false)
-        //         setIsLoading(false)
-        //         setDeleteRecord(null)
-        //         toast({description: "Idea deleted successfully"});
-        //     } else {
-        //         toast({variant: "destructive", description: "Failed to delete idea"});
-        //     }
-        // }
+        setIsLoading(true);
+        const data = await apiSerVice.onDeleteWidget(id, deleteRecord)
+        if (data.status === 200) {
+            const clone = [...widgetsSetting];
+            const index = clone.findIndex((x) => x.id === id)
+            if (index !== -1) {
+                clone.splice(index, 1)
+                setWidgetsSetting(clone);
+                setOpenDelete(false);
+                setIsLoading(false);
+                toast({description: data.message});
+            } else {
+                    toast({variant: "destructive", description: data.message});
+                }
+        }
     };
 
-    const deleteIdea = () => {
-        setOpenDelete(!openDelete)
+    const deleteWidget = (id) => {
+        setDeleteRecord(id)
+        setOpenDelete(true)
     }
 
     const getCodeCopy = () => {
@@ -112,7 +120,7 @@ const Widgets = () => {
             {
                 openDelete &&
                 <Fragment>
-                    <Dialog open onOpenChange={deleteIdea}>
+                    <Dialog open onOpenChange={() => setOpenDelete(!openDelete)}>
                         <DialogContent className="sm:max-w-[425px]">
                             <DialogHeader className={"flex flex-col gap-2"}>
                                 <DialogTitle>Delete widget?</DialogTitle>
@@ -159,23 +167,6 @@ const Widgets = () => {
                                         <CardContent className="flex flex-col gap-2">
                                             <div>
                                                 <div className={"relative"}>
-                                                    {/*<Input*/}
-                                                    {/*    id="text"*/}
-                                                    {/*    type={"text"}*/}
-                                                    {/*    placeholder={"<!-- Frill Widget (https://frill.co) -->\n" +*/}
-                                                    {/*    "<script>\n" +*/}
-                                                    {/*    "  window.Frill_Config = window.Frill_Config || [];\n" +*/}
-                                                    {/*    "  window.Frill_Config.push({ key: '5c40f9a5-3288-4400-832e-e02e063843b8' });\n" +*/}
-                                                    {/*    "</script>\n" +*/}
-                                                    {/*    "<script async src=\"https://widget.frill.co/v2/widget.js\"></script>\n" +*/}
-                                                    {/*    "<!-- End Frill Widget -->"}*/}
-                                                    {/*    name={'copy'}*/}
-                                                    {/*    className={"border-slate-300 placeholder:text-slate-400 pr-[47px]"}*/}
-                                                    {/*    readOnly*/}
-                                                    {/*/>*/}
-                                                    {/*<Button variant={"ghost hover:none"} className={"absolute top-0 right-0"}>*/}
-                                                    {/*    <Copy size={16}/>*/}
-                                                    {/*</Button>*/}
                                                     <Input
                                                         id="text"
                                                         type={"text"}
@@ -279,24 +270,6 @@ const Widgets = () => {
                                         </CardHeader>
                                         <CardContent className="space-y-2">
                                             <div className={"relative"}>
-                                                {/*<Input*/}
-                                                {/*    id="text"*/}
-                                                {/*    type={"text"}*/}
-                                                {/*    placeholder={"<!-- Frill Widget (https://frill.co) -->\n" +*/}
-                                                {/*    "<script>\n" +*/}
-                                                {/*    "  window.Frill_Config = window.Frill_Config || [];\n" +*/}
-                                                {/*    "  window.Frill_Config.push({ key: '5c40f9a5-3288-4400-832e-e02e063843b8' });\n" +*/}
-                                                {/*    "</script>\n" +*/}
-                                                {/*    "<script async src=\"https://widget.frill.co/v2/widget.js\"></script>\n" +*/}
-                                                {/*    "<!-- End Frill Widget -->"}*/}
-                                                {/*    name={'copy'}*/}
-                                                {/*    className={"border-slate-300 placeholder:text-slate-400 pr-[47px]"}*/}
-                                                {/*    readOnly*/}
-                                                {/*/>*/}
-                                                {/*<Button variant={"ghost hover:none"}*/}
-                                                {/*        className={"absolute top-0 right-0"}>*/}
-                                                {/*    <Copy size={16}/>*/}
-                                                {/*</Button>*/}
                                                 <Input
                                                     id="text"
                                                     type={"text"}
@@ -352,26 +325,22 @@ const Widgets = () => {
                 </Fragment>
             }
             <div
-                className={"xl:container xl:max-w-[1200px] lg:container lg:max-w-[992px] md:container md:max-w-[768px] sm:container sm:max-w-[639px] xs:container xs:max-w-[475px] pt-8 pb-5"}>
-                <WidgetSideBar
-                    isOpen={sideBar}
-                    onOpen={openSheetSideBar}
-                    onClose={closeSheetSideBar}
-                />
-                <WidgetSideBarSheet
+                className={"xl:container xl:max-w-[1200px] lg:container lg:max-w-[992px] md:container md:max-w-[768px] sm:container sm:max-w-[639px] pt-8 pb-5 px-4"}>
+
+              <WidgetAnalyticsSideBarSheet
                     isOpen={isSheetOpen}
                     onOpen={openSheet}
                     onClose={closeSheet}
+                    widgetsSetting={widgetsSetting}
+                    selectedRecordAnalytics={selectedRecordAnalytics}
                 />
                 <div className={"flex mb-10 flex-col space-y-10"}>
-                    <div className={"flex flex-col gap-1"}>
+                    <div className={"flex flex-col gap-2"}>
                         <div className={"flex items-center justify-between"}>
                             <h1 className={"text-2xl font-medium"}>Widgets</h1>
                             <Button
                                 className={"text-sm font-semibold hover:bg-primary px-3 h-auto"}
-                                // onClick={() => navigate(`${baseUrl}/widgets/new`)}
                                 onClick={() => handleCreateNew("new")}
-                                // onClick={() => navigate(`${baseUrl}/widgets/${id}`)}
                             >
                                 Create New
                             </Button>
@@ -381,82 +350,114 @@ const Widgets = () => {
                                 your site.</p>
                         </div>
                     </div>
-                    <div className={"flex flex-col"}>
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>Name</TableHead>
-                                    <TableHead>Sections</TableHead>
-                                    <TableHead>Last Updated</TableHead>
-                                    <TableHead>Analytics</TableHead>
-                                    <TableHead className={"text-right"}>Actions</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {invoices.map((invoice) => (
-                                    <TableRow key={invoice.invoice.id}>
-                                        <TableCell className="font-medium">{invoice.invoice}</TableCell>
-                                        <TableCell>{invoice.paymentStatus}</TableCell>
-                                        <TableCell>{invoice.totalAmount}</TableCell>
-                                        <TableCell><BarChart onClick={() => openSheet(invoice.id)} size={13}
-                                                             className={"cursor-pointer"}/></TableCell>
-                                        <TableCell className={"flex gap-2 items-center justify-end"}>
-                                            <Button
-                                                className={"py-[6px] px-3 h-auto text-xs font-semibold hover:bg-primary"}
-                                                onClick={() => getCodeCopy(invoice.id)}>Get code</Button>
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger>
-                                                    <Ellipsis size={16} className={"cursor-pointer"}/>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent>
-                                                    <DropdownMenuItem
-                                                        className={"cursor-pointer"}>Edit</DropdownMenuItem>
-                                                    <DropdownMenuItem className={"cursor-pointer"}
-                                                                      onClick={deleteIdea}>Delete</DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
-                                        </TableCell>
+                    <Card>
+                        <CardContent className={"p-0 overflow-auto"}>
+                            <Table>
+                                <TableHeader className={`p-2 lg:py-5 lg:px-8 ${theme === "dark" ? "" : "bg-muted"}`}>
+                                    <TableRow>
+                                        {
+                                            ["Name", "Sections", "Last Updated", "", "Analytics", "Actions"].map((x, i) => {
+                                                return (
+                                                    <TableHead className={"px-2 lg:px-4 font-semibold"}>{x}</TableHead>
+                                                )
+                                            })
+                                        }
                                     </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                        {/*<TableFooter>*/}
-                        <div
-                            className={`w-full p-5 ${theme === "dark" ? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end px-16 py-15px`}>
-                            <div className={"flex flex-row gap-8 items-center"}>
-                                <div>
-                                    <h5 className={"text-sm font-semibold"}>Page {pageNo} of {totalPages}</h5>
-                                </div>
-                                <div className={"flex flex-row gap-2 items-center"}>
-                                    <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
-                                            onClick={() => handlePaginationClick(1)} disabled={pageNo === 1}>
-                                        <ChevronsLeft
-                                            className={pageNo === 1 ? "stroke-muted-foreground" : "stroke-primary"}/>
-                                    </Button>
-                                    <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
-                                            onClick={() => handlePaginationClick(pageNo - 1)}
-                                            disabled={pageNo === 1}>
-                                        <ChevronLeft
-                                            className={pageNo === 1 ? "stroke-muted-foreground" : "stroke-primary"}/>
-                                    </Button>
-                                    <Button variant={"outline"} className={" h-[30px] w-[30px] p-1.5"}
-                                            onClick={() => handlePaginationClick(pageNo + 1)}
-                                            disabled={pageNo === totalPages}>
-                                        <ChevronRight
-                                            className={pageNo === totalPages ? "stroke-muted-foreground" : "stroke-primary"}/>
-                                    </Button>
-                                    <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
-                                            onClick={() => handlePaginationClick(totalPages)}
-                                            disabled={pageNo === totalPages}>
-                                        <ChevronsRight
-                                            className={pageNo === totalPages ? "stroke-muted-foreground" : "stroke-primary"}/>
-                                    </Button>
+                                </TableHeader>
+                                {
+                                    isLoading ? <TableBody>
+                                        {
+                                            [...Array(10)].map((_, index) => {
+                                                return (
+                                                    <TableRow key={index}>
+                                                        {
+                                                            [...Array(6)].map((_, i) => {
+                                                                return (
+                                                                    <TableCell className={"p-2 lg:p-4"}>
+                                                                        <Skeleton className={"rounded-md  w-full h-[40px]"}/>
+                                                                    </TableCell>
+                                                                )
+                                                            })
+                                                        }
+                                                    </TableRow>
+                                                )
+                                            })
+                                        }
+                                    </TableBody> : widgetsSetting.length > 0 ?
+                                            <TableBody>
+                                                {widgetsSetting.map((x, i) => (
+                                                    <TableRow key={i}>
+                                                        <TableCell className={"font-medium p-2 lg:p-4"}>{x.name}</TableCell>
+                                                        <TableCell className={"font-medium p-2 lg:p-4"}>{x.type}</TableCell>
+                                                        <TableCell className={"font-medium p-2 lg:p-4"}>{moment(x.created_at).format('D MMM, YYYY')}</TableCell>
+                                                        <TableCell className={" p-2 lg:p-4"}>
+                                                            <Button
+                                                                className={"py-[6px] px-3 h-auto text-xs font-semibold hover:bg-primary"}
+                                                                onClick={() => getCodeCopy(x.id)}>Get code</Button>
+                                                        </TableCell>
+                                                        <TableCell className={"font-medium p-2 lg:p-4"}>
+                                                            <BarChart
+                                                                onClick={() => openSheet(x.id)} size={16}
+                                                                className={"cursor-pointer"}
+                                                            />
+                                                        </TableCell>
+                                                        <TableCell className={" p-2 lg:p-4"}>
+                                                            <DropdownMenu>
+                                                                <DropdownMenuTrigger>
+                                                                    <Ellipsis size={16} className={"cursor-pointer"}/>
+                                                                </DropdownMenuTrigger>
+                                                                <DropdownMenuContent>
+                                                                    <DropdownMenuItem
+                                                                        className={"cursor-pointer"} onClick={() => handleCreateNew(x.id)}>Edit</DropdownMenuItem>
+                                                                    <DropdownMenuItem className={"cursor-pointer"}
+                                                                                      onClick={() => deleteWidget(x.id)}>Delete</DropdownMenuItem>
+                                                                </DropdownMenuContent>
+                                                            </DropdownMenu>
+                                                        </TableCell>
+                                                    </TableRow>
+                                                ))}
+                                            </TableBody>
+                                       : <EmptyData/>
+                                }
+                            </Table>
+                        </CardContent>
+                        <CardFooter className={"p-0"}>
+                            <div
+                                className={`w-full ${theme === "dark" ? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end p-2 md:p-4`}>
+                                <div className={"w-full flex gap-2 items-center justify-between sm:justify-end"}>
+                                    {/*<div className={"w-full flex justify-between gap-2 items-center"}>*/}
+                                    <div>
+                                        <h5 className={"text-sm font-semibold"}>Page {pageNo} of {totalPages}</h5>
+                                    </div>
+                                    <div className={"flex flex-row gap-2 items-center"}>
+                                        <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
+                                                onClick={() => handlePaginationClick(1)} disabled={pageNo === 1}>
+                                            <ChevronsLeft
+                                                className={pageNo === 1 ? "stroke-muted-foreground" : "stroke-primary"}/>
+                                        </Button>
+                                        <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
+                                                onClick={() => handlePaginationClick(pageNo - 1)}
+                                                disabled={pageNo === 1}>
+                                            <ChevronLeft
+                                                className={pageNo === 1 ? "stroke-muted-foreground" : "stroke-primary"}/>
+                                        </Button>
+                                        <Button variant={"outline"} className={" h-[30px] w-[30px] p-1.5"}
+                                                onClick={() => handlePaginationClick(pageNo + 1)}
+                                                disabled={pageNo === totalPages}>
+                                            <ChevronRight
+                                                className={pageNo === totalPages ? "stroke-muted-foreground" : "stroke-primary"}/>
+                                        </Button>
+                                        <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
+                                                onClick={() => handlePaginationClick(totalPages)}
+                                                disabled={pageNo === totalPages}>
+                                            <ChevronsRight
+                                                className={pageNo === totalPages ? "stroke-muted-foreground" : "stroke-primary"}/>
+                                        </Button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        {/*</TableFooter>*/}
-                        {/*</Table>*/}
-                    </div>
+                        </CardFooter>
+                    </Card>
                 </div>
             </div>
         </Fragment>

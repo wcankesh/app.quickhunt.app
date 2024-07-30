@@ -88,16 +88,16 @@ const AnnouncementsView = ({data,isLoading,setSelectedRecord,handleDelete,setAna
         <div className={""}>
             <Toaster/>
             <AlertDialog open={isOpenDeleteAlert} onOpenChange={setIsOpenDeleteAlert}>
-                <AlertDialogContent>
-                    <AlertDialogHeader>
-                        <AlertDialogTitle>You really want delete this announcement?</AlertDialogTitle>
+                <AlertDialogContent className={"w-[310px] md:w-auto rounded-lg p-3"}>
+                    <AlertDialogHeader className={"text-left gap-2"}>
+                        <AlertDialogTitle className={"text-sm md:text-xl"}>You really want delete this announcement?</AlertDialogTitle>
                         <AlertDialogDescription>
                             This action can't be undone.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
-                    <AlertDialogFooter>
+                    <AlertDialogFooter className={"flex flex-row justify-end gap-2"}>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction className={"bg-red-600 hover:bg-red-600"} onClick={deleteParticularRow}>Delete</AlertDialogAction>
+                        <AlertDialogAction className={"bg-red-600 hover:bg-red-600 m-0"} onClick={deleteParticularRow}>Delete</AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
@@ -106,23 +106,14 @@ const AnnouncementsView = ({data,isLoading,setSelectedRecord,handleDelete,setAna
                     <div className={"flex flex-col px-3 lg:px-[33px] pt-[9px] pb-0"}>
                         {
                             (announcementList || []).map((x,index)=>{
+                                const isLastItem = index === announcementList.length - 1;
                                 return(
                                     <Fragment key={index}>
-                                        <div className={"flex flex-col gap-[20px] border-b pt-2 pb-3 md:pt-[30px] md:pb-[24px]"}>
+                                        <div className={`flex flex-col gap-[20px] ${isLastItem ? '' : 'border-b'} pt-2 pb-3 lg:pt-[30px] lg:pb-[24px]`}>
                                             <div className={"flex justify-between flex-wrap md:flex-nowrap gap-2 lg:px-[31px]"}>
                                             <div className={"flex gap-1 items-center w-full md:w-auto md:gap-4"}>
                                                 <div className={"flex justify-between gap-1 items-center"}>
                                                     <h4 className={"text-base font-medium text-muted-foreground capitalize"}>{x.post_title}</h4>
-                                                    {/*<div className={"md:hidden"}>*/}
-                                                    {/*<DropdownMenu>*/}
-                                                    {/*    <DropdownMenuTrigger><Button variant={"outline"} className={"p-2 h-9 w-9"}><Ellipsis size={18} /></Button></DropdownMenuTrigger>*/}
-                                                    {/*    <DropdownMenuContent>*/}
-                                                    {/*        <DropdownMenuItem onClick={() => openSheetSidebar(x)}>Analytics</DropdownMenuItem>*/}
-                                                    {/*        <DropdownMenuItem onClick={() => onEdit(x)}>Edit</DropdownMenuItem>*/}
-                                                    {/*        <DropdownMenuItem onClick={()=>deleteRow(x.id)}>Delete</DropdownMenuItem>*/}
-                                                    {/*    </DropdownMenuContent>*/}
-                                                    {/*</DropdownMenu>*/}
-                                                    {/*</div>*/}
                                                 </div>
                                                 <div className={"flex items-center gap-2"}>
                                                     {/*<h4 className={"text-base font-medium text-sm"}>{getProjectDetails('project_name')}</h4>*/}
@@ -157,7 +148,6 @@ const AnnouncementsView = ({data,isLoading,setSelectedRecord,handleDelete,setAna
                                                         </SelectGroup>
                                                     </SelectContent>
                                                 </Select>
-                                                {/*<div className={"md:block hidden"}>*/}
                                                     <DropdownMenu>
                                                         <DropdownMenuTrigger><Ellipsis size={18}/></DropdownMenuTrigger>
                                                         <DropdownMenuContent>
@@ -166,7 +156,6 @@ const AnnouncementsView = ({data,isLoading,setSelectedRecord,handleDelete,setAna
                                                             <DropdownMenuItem onClick={() => deleteRow(x.id)}>Delete</DropdownMenuItem>
                                                         </DropdownMenuContent>
                                                     </DropdownMenu>
-                                                {/*</div>*/}
                                             </div>
                                         </div>
                                             <div className={"lg:px-[31px] flex flex-col gap-4"}>
@@ -208,7 +197,6 @@ const AnnouncementsView = ({data,isLoading,setSelectedRecord,handleDelete,setAna
                                 )
                             })
                         }
-                    <Separator/>
                     {
                       isLoading == true &&   <CardFooter className={"p-0"}>
                             <div className={`w-full p-5 ${theme === "dark" ? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end pe-16 py-15px`}>

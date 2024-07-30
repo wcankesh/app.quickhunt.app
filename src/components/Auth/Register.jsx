@@ -136,7 +136,7 @@ const Register = () => {
         } else {
             setIsLoading(false)
             toast({
-                description: "Something want wrong!",
+                description: data.message,
             })
         }
     }
@@ -169,7 +169,7 @@ const Register = () => {
                             {/*    <div className="hidden lg:block p-16 lg:flex justify-between flex-col basis-1/2 bg-purple-400">*/}
                             {/*    <div className="hidden lg:block p-16 lg:flex bg-purple-400 justify-center pb-[90px]">*/}
                             <div
-                                className="basis-1/2 bg-purple-400 w-full relative hidden xl:flex justify-center items-center p-16 pb-[90px]">
+                                className="min-h-screen basis-1/2 bg-purple-400 w-full relative hidden xl:flex justify-center items-center p-16 ">
                                 <div className={"grid gap-6"}>
                                     <div className={"app-logo"}>
                                         {
@@ -202,12 +202,12 @@ const Register = () => {
                             </div>
                             {/*<div className="flex flex-col p-16 basis-1/2 justify-between">*/}
                             {/*<div className="flex p-16">*/}
-                            <div
-                                className=" min-h-screen basis-full md:basis-1/2 w-full px-4 py-5 flex justify-center items-center">
-                                {/*<div className={"w-full"}>*/}
-                                <div className={"lg:w-[480px] "}>
-                                    <div className={"w-full py-10"}>
-                                        <div className="text-center md:text-right text-sm">
+                            {/*<div className=" min-h-screen basis-full md:basis-1/2 w-full p-16 flex justify-center items-center">*/}
+                            <div className=" min-h-screen md:basis-1/2 pt-5 md:p-16 flex justify-center items-center">
+                                {/*<div className={"lg:w-[833px] h-full"}>*/}
+                                <div className={"h-full"}>
+                                    <div className={"w-full"}>
+                                        <div className="text-center md:text-right text-xs md:text-sm">
                                             <p className={"font-medium"}>
                                                 Already have an account?{" "}
                                                 <Button
@@ -215,12 +215,13 @@ const Register = () => {
                                                     className="p-0 h-auto hover:no-underline"
                                                     onClick={() => onRedirect('login')}
                                                 >
-                                                    <span className={"font-bold text-violet-600"}>Login</span>
+                                                    <span className={"font-bold text-primary"}>Login</span>
                                                 </Button>
                                             </p>
                                         </div>
                                         {/*<div className="mx-auto grid w-[384px] gap-8">*/}
-                                        <div className="mx-auto grid w-[320px] md:w-[384px] gap-8 lg:pt-[76px] pt-[100px]">
+                                        {/*<div className="mx-auto grid w-[320px] md:w-[384px] gap-8 px-3 sm:px-0 lg:pt-[67px] pt-[100px]">*/}
+                                            <div className="mx-auto grid w-[320px] md:w-[384px] gap-8 lg:pt-[142px] pt-[50px] px-3">
                                             <div className="gap-2 flex flex-col items-center">
                                                 {
                                                     theme === "dark" ? Icon.whiteLogo : Icon.blackLogo
@@ -349,7 +350,7 @@ const Register = () => {
                                                         }
                                                     </div>
                                                     <Button type="submit"
-                                                            className={"w-full bg-violet-600 hover:bg-violet-600"}
+                                                            className={"w-full bg-primary hover:bg-primary"}
                                                             onClick={onRegister}>
                                                         {
                                                             isLoading ?
@@ -365,8 +366,8 @@ const Register = () => {
                                                         <div className={"border-t basis-4/12 border-slate-500"}/>
                                                     </div>
                                                     <Button variant="outline"
-                                                            className="w-full border border-violet-600">
-                            <span className={"font-normal flex gap-x-1 text-violet-600 font-semibold"}>
+                                                            className="w-full border border-primary">
+                            <span className={"font-normal flex gap-x-1 text-primary font-semibold"}>
                                 {Icon.googleIcon}
                                 Login With Google
                             </span>
@@ -375,10 +376,10 @@ const Register = () => {
                                                         By registering you agree to our{" "}
                                                         <Button variant={"link"}
                                                                 className="p-0 h-auto hover:no-underline"> <span
-                                                            className={"font-medium text-violet-600"}>Terms of Service</span></Button> and {""}
+                                                            className={"font-medium text-primary"}>Terms of Service</span></Button> and {""}
                                                         <Button variant={"link"}
                                                                 className="p-0 h-auto hover:no-underline"> <span
-                                                            className={"font-medium text-violet-600"}>Privacy Policy</span></Button>.
+                                                            className={"font-medium text-primary"}>Privacy Policy</span></Button>.
                                                     </p>
                                                 </div>
                                             </div>

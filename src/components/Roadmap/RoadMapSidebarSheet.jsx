@@ -754,12 +754,12 @@ const RoadMapSidebarSheet = ({
             <Sheet open={isOpen} onOpenChange={isOpen ? onCloseBoth : onOpen}>
                 <SheetOverlay className={"inset-0"} />
                 <SheetContent className={"lg:max-w-[1101px] md:max-w-[720px] sm:max-w-full p-0"}>
-                    <SheetHeader className={"px-[32px] py-[22px] border-b"}>
+                    <SheetHeader className={"px-4 py-5 lg:px-8 lg:py-[20px] border-b"}>
                         <X onClick={onCloseBoth} className={"cursor-pointer"}/>
                     </SheetHeader>
-                    <div className={"grid lg:grid-cols-12 md:grid-cols-1 overflow-auto h-[100vh]"}>
+                    <div className={"grid lg:grid-cols-12 md:grid-cols-1 overflow-auto idea-sheet-height"}>
                         <div
-                            className={`col-span-4 lg:block hidden ${theme === "dark" ? "" : "bg-muted"} border-r lg:overflow-auto pb-[100px]`}>
+                            className={`col-span-4 lg:block hidden ${theme === "dark" ? "" : "bg-muted"} border-r lg:overflow-auto idea-sheet-height`}>
                             <div className={"border-b py-4 pl-8 pr-6 flex flex-col gap-3"}>
                                 <div className={"flex flex-col gap-1"}>
                                     <h3 className={"text-sm font-medium"}>Status</h3>
@@ -928,9 +928,9 @@ const RoadMapSidebarSheet = ({
                                     </div>
                                     :
                                     <Fragment>
-                                        <div className={"py-6 px-8"}>
+                                        <div className={"px-4 py-3 lg:py-6 lg:px-8"}>
                                             <div className={"flex flex-col gap-6"}>
-                                                <div className={"flex justify-between items-center"}>
+                                                <div className={"flex justify-between items-center gap-4 md:flex-nowrap flex-wrap"}>
                                                     <div className={"flex gap-2"}>
                                                         <Button
                                                             className={"p-[7px] bg-white shadow border hover:bg-white w-[30px] h-[30px]"}
@@ -985,7 +985,7 @@ const RoadMapSidebarSheet = ({
                                                 </div>
                                                 {
                                                     selectedIdea && selectedIdea?.images ?
-                                                        <div className={"flex gap-2"}>
+                                                        <div className={"flex gap-2 flex-wrap"}>
                                                             {
                                                                 (selectedIdea?.images || []).map((x, i) => {
                                                                         return (
@@ -993,13 +993,13 @@ const RoadMapSidebarSheet = ({
                                                                                 {
                                                                                     x && x.name ?
                                                                                         <div
-                                                                                            className="w-[100px] h-[100px] border p-2 relative p-[3px]">
+                                                                                            className="w-[50px] h-[50px] md:w-[100px] md:h-[100px] border p-[3px] relative">
                                                                                             <img className={"upload-img"}
                                                                                                  src={x && x.name ? URL.createObjectURL(x) : x}
                                                                                                  alt=""/>
                                                                                         </div> : x ?
                                                                                         <div
-                                                                                            className="w-[100px] h-[100px] border p-2 relative p-[3px]">
+                                                                                            className="w-[50px] h-[50px] md:w-[100px] md:h-[100px] border p-[3px] relative">
                                                                                             <img className={"upload-img"}
                                                                                                  src={x} alt=""/>
                                                                                         </div> : ""
@@ -1175,7 +1175,7 @@ const RoadMapSidebarSheet = ({
                                                                                         {
                                                                                             x && x.name ?
                                                                                                 <div
-                                                                                                    className={"w-[100px] h-[100px] relative border p-[3px]"}>
+                                                                                                    className={"w-[50px] h-[50px] md:w-[100px] md:h-[100px] relative border p-[3px]"}>
                                                                                                     <img
                                                                                                         className={"upload-img"}
                                                                                                         src={x && x.name ? URL.createObjectURL(x) : x}
@@ -1187,7 +1187,7 @@ const RoadMapSidebarSheet = ({
                                                                                                     />
                                                                                                 </div> : x ?
                                                                                                 <div
-                                                                                                    className={"w-[100px] h-[100px] relative border p-[3px]"}>
+                                                                                                    className={"w-[50px] h-[50px] md:w-[100px] md:h-[100px] relative border p-[3px]"}>
                                                                                                     <img
                                                                                                         className={"upload-img"}
                                                                                                         src={x}
@@ -1248,7 +1248,7 @@ const RoadMapSidebarSheet = ({
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className={"pb-[150px] md:md-[100px]"}>
+                                        <div>
                                             <Tabs defaultValue="comment" className="">
                                                 <div className={"px-8"}>
                                                     <TabsList
@@ -1285,7 +1285,7 @@ const RoadMapSidebarSheet = ({
                                                                             </div>
                                                                             <div
                                                                                 className={"w-full flex flex-col gap-3"}>
-                                                                                <div className={"flex justify-between"}>
+                                                                                <div className={"flex gap-1 flex-wrap justify-between"}>
                                                                                     <div
                                                                                         className={"flex items-center"}>
                                                                                         <h4 className={"text-sm font-medium"}>{x.name}</h4>
@@ -1339,7 +1339,7 @@ const RoadMapSidebarSheet = ({
                                                                                                                             {
                                                                                                                                 x && x.name ?
                                                                                                                                     <div
-                                                                                                                                        className={"w-[100px] h-[100px] relative border p-[3px]"}>
+                                                                                                                                        className={"w-[50px] h-[50px] md:w-[100px] md:h-[100px] relative border p-[3px]"}>
                                                                                                                                         <img
                                                                                                                                             className={"upload-img"}
                                                                                                                                             src={x && x.name ? URL.createObjectURL(x) : x}
@@ -1350,7 +1350,7 @@ const RoadMapSidebarSheet = ({
                                                                                                                                             onClick={() => onDeleteCommentImage(i, true)}/>
                                                                                                                                     </div> : x ?
                                                                                                                                     <div
-                                                                                                                                        className={"w-[100px] h-[100px] relative border p-[3px]"}>
+                                                                                                                                        className={"w-[50px] h-[50px] md:w-[100px] md:h-[100px] relative border p-[3px]"}>
                                                                                                                                         <img
                                                                                                                                             className={"upload-img"}
                                                                                                                                             src={x}
@@ -1412,7 +1412,7 @@ const RoadMapSidebarSheet = ({
                                                                                                     {
                                                                                                         ((x && x.images) || []).map((img, ind) => {
                                                                                                             return (
-                                                                                                                <div key={ind} className={"w-[100px] h-[100px] border p-[3px]"}>
+                                                                                                                <div key={ind} className={"w-[50px] h-[50px] md:w-[100px] md:h-[100px] border p-[3px]"}>
                                                                                                                     <img className={"upload-img"} src={img} alt={img}/>
                                                                                                                 </div>
                                                                                                             )
@@ -1515,7 +1515,7 @@ const RoadMapSidebarSheet = ({
                                                                                                                                                                     {
                                                                                                                                                                         x && x.name ?
                                                                                                                                                                             <div
-                                                                                                                                                                                className={"w-[100px] h-[100px] relative border p-[3px]"}>
+                                                                                                                                                                                className={"w-[50px] h-[50px] md:w-[100px] md:h-[100px] relative border p-[3px]"}>
                                                                                                                                                                                 <img className={"upload-img"} src={x && x.name ? URL.createObjectURL(x) : x} alt=""/>
                                                                                                                                                                                 <CircleX
                                                                                                                                                                                     size={20}
@@ -1524,7 +1524,7 @@ const RoadMapSidebarSheet = ({
                                                                                                                                                                                 />
                                                                                                                                                                             </div> : x ?
                                                                                                                                                                             <div
-                                                                                                                                                                                className={"w-[100px] h-[100px] relative border p-[3px]"}>
+                                                                                                                                                                                className={"w-[50px] h-[50px] md:w-[100px] md:h-[100px] relative border p-[3px]"}>
                                                                                                                                                                                 <img className={"upload-img"} src={x} alt={x}/>
                                                                                                                                                                                 <CircleX
                                                                                                                                                                                     size={20}
@@ -1577,14 +1577,14 @@ const RoadMapSidebarSheet = ({
                                                                                                                                     <div
                                                                                                                                         className={"space-y-2"}>
                                                                                                                                         <p className={"text-xs"}>{y.comment}</p>
-                                                                                                                                        <div className={"flex gap-2"}>
+                                                                                                                                        <div className={"flex gap-2 flex-wrap"}>
                                                                                                                                         {
                                                                                                                                             y && y.images && y.images.length ?
                                                                                                                                                 <Fragment>
                                                                                                                                                     {
                                                                                                                                                         (y.images || []).map((z, i) => {
                                                                                                                                                             return (
-                                                                                                                                                                <div className={"w-[100px] h-[100px] border p-[3px]"}>
+                                                                                                                                                                <div className={"w-[50px] h-[50px] md:w-[100px] md:h-[100px] border p-[3px]"}>
                                                                                                                                                                     <img className={"upload-img"} src={z} alt={z}/>
                                                                                                                                                                 </div>
                                                                                                                                                             )
@@ -1616,7 +1616,7 @@ const RoadMapSidebarSheet = ({
                                                                                                                             <Fragment>
                                                                                                                                 {
                                                                                                                                     z && z.name ?
-                                                                                                                                        <div className={"w-[100px] h-[100px] relative border p-[3px]"}>
+                                                                                                                                        <div className={"w-[50px] h-[50px] md:w-[100px] md:h-[100px] relative border p-[3px]"}>
                                                                                                                                             <img className={"upload-img"} src={z && z.name ? URL.createObjectURL(z) : z}/>
                                                                                                                                             <CircleX
                                                                                                                                                 size={20}
@@ -1624,7 +1624,7 @@ const RoadMapSidebarSheet = ({
                                                                                                                                                 onClick={() => onDeleteSubCommentImageOld(i, false)}
                                                                                                                                             />
                                                                                                                                         </div> : z ?
-                                                                                                                                        <div className={"w-[100px] h-[100px] relative border p-[3px]"}>
+                                                                                                                                        <div className={"w-[50px] h-[50px] md:w-[100px] md:h-[100px] relative border p-[3px]"}>
                                                                                                                                             <img className={"upload-img"} src={z} alt={z}/>
                                                                                                                                             <CircleX
                                                                                                                                                 size={20}
@@ -1642,7 +1642,7 @@ const RoadMapSidebarSheet = ({
                                                                                                     <div
                                                                                                         className={"flex gap-2"}>
                                                                                                         <Button
-                                                                                                            className={`${isSaveSubComment === true ? "py-2 px-6" : "py-2 px-6"} w-[86px] h-[30px] text-sm font-semibold`}
+                                                                                                            className={`${isSaveSubComment === true ? "py-2 px-6" : "w-[86px] py-2 px-6"} h-[30px] text-sm font-semibold`}
                                                                                                             disabled={subCommentText.trim() === "" || subCommentText === ""}
                                                                                                             onClick={() => onCreateSubComment(x, i)}
                                                                                                         >

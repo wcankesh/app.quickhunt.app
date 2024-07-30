@@ -176,23 +176,23 @@ const CreateIdea = ({
             <Sheet open={isOpen} onOpenChange={isOpen ? onClose : onOpen} closeCreateIdea={closeCreateIdea}>
                 <SheetOverlay className={"inset-0"} />
                 <SheetContent className={"lg:max-w-[800px] md:max-w-full sm:max-w-full p-0"}>
-                    <SheetHeader className={"px-[32px] py-[22px] border-b"}>
+                    <SheetHeader className={"px-4 py-5 lg:px-8 lg:py-[20px] border-b"}>
                         <div className={"flex justify-between items-center w-full"}>
                             <h2 className={"text-xl font-medium"}>Tell us your Idea!</h2>
                             <X onClick={onClose} className={"cursor-pointer"}/>
                         </div>
                     </SheetHeader>
-                    <div className={"w-full overflow-auto"}>
-                            <div className={"pb-100px"}>
-                                <div className={"py-6 px-8 flex flex-col gap-6 border-b"}>
-                                    <div className="items-center gap-1.5">
+                    <div className={"w-full overflow-y-auto create-sheet-height"}>
+                            <div className={""}>
+                                <div className={"px-4 py-3 lg:py-6 lg:px-8 flex flex-col gap-6 border-b"}>
+                                    <div className="flex flex-col gap-2">
                                         <Label htmlFor="text">Title</Label>
                                         <Input type="text" id="text" placeholder="" value={ideaDetail.title} name={"title"} onChange={onChangeText} />
                                         {
                                             formError.title && <span className="text-red-500 text-sm">{formError.title}</span>
                                         }
                                     </div>
-                                    <div className="gap-1.5">
+                                    <div className="flex flex-col gap-2">
                                         <Label htmlFor="message">Description</Label>
                                         <Textarea placeholder="Start writing..." id="message"
                                                   value={description}
@@ -201,7 +201,7 @@ const CreateIdea = ({
                                         {formError.description && <span className="text-red-500 text-sm">{formError.description}</span>}
                                     </div>
                                 </div>
-                                <div className={"py-6 px-8 border-b"}>
+                                <div className={"px-4 py-3 lg:py-6 lg:px-8 border-b flex flex-col gap-2"}>
                                     <Label>Choose Topics for this Idea (optional)</Label>
                                         <Select onValueChange={handleChange} value={selectedValues}>
                                             <SelectTrigger className="">
@@ -244,7 +244,7 @@ const CreateIdea = ({
                                             </SelectContent>
                                         </Select>
                                 </div>
-                                <div className={"p-8 flex gap-6"}>
+                                <div className={"p-4 lg:p-8 flex gap-6"}>
                                     <Button className={`${isLoading === true ? "w-[126px] py-2 px-6" : "py-2 px-6"} text-sm font-semibold`} onClick={onCreateIdea}>
                                         {
                                             isLoading ? <Loader2 className="h-4 w-4 animate-spin"/> : "Create Idea"

@@ -103,9 +103,9 @@ const menuComponent = [
             },
             {
                 title: 'Widget',
-                link: '/widgets',
+                link: '/widget',
                 icon: Icon.widgetsIcon,
-                selected: `${baseUrl}/widgets`,
+                selected: `${baseUrl}/widget`,
             },
         ]
     },
@@ -358,9 +358,9 @@ const HeaderBar = () => {
     return (
         // <header className="flex h-14 items-center justify-between gap-4 px-4 lg:h-[60px] lg:px-6 w-full">
         // <header className="z-50 ltr:xl:ml-[282px] rtl:xl:mr-[282px] sticky top-0">
-            <header className={`z-50 ltr:xl:ml-[282px] rtl:xl:mr-[282px] sticky top-0 ${scrollingDown ? 'bg-background' : ''} ${theme === "dark" ? "border-b" : ""}`}>
+            <header className={`z-50 ltr:xl:ml-[282px] rtl:xl:mr-[282px] sticky top-0 pr-4 ${scrollingDown ? 'bg-background' : ''} ${theme === "dark" ? "border-b" : ""}`}>
         {/*// <header className="z-50 ml-[282px] sticky top-0">*/}
-            <div className={"w-full p-3"}>
+            <div className={"w-full p-3 pr-0 lg:py-3"}>
             <div className={"flex justify-between items-center h-full gap-2"}>
             <div className={"flex gap-3 items-center"}>
             {/*Mobile said bar start */}
@@ -371,7 +371,7 @@ const HeaderBar = () => {
                     </Button>
                 </SheetTrigger>
                 <SheetOverlay className={"inset-0"} />
-                <SheetContent side="left" className="flex flex-col overflow-auto md:w-2/6">
+                <SheetContent side="left" className="flex flex-col w-[280px] md:w-[340px]">
                     <SheetHeader className={"flex flex-row justify-between items-center"}>
                         <div className={"app-logo cursor-pointer"}  onClick={() => onRedirect("/dashboard")}>
                             {
@@ -380,73 +380,76 @@ const HeaderBar = () => {
                         </div>
                         <X size={18} className={"fill-card-foreground stroke-card-foreground m-0"} onClick={closeSheetMenu}/>
                     </SheetHeader>
-                    <nav className="grid gap-2">
-                        {
-                            (menuComponent || []).map((x, i) => {
-                                return (
-                                    <div key={i} className={`flex flex-col ${x.dashBtn ? "" : "gap-1"}`}>
-                                        {
-                                            (x.dashBtn || []).map((z, i) => {
-                                                return (
-                                                    <Button
-                                                        key={i}
-                                                        variant={"link hover:no-underline"}
-                                                        className={`${isActive(z.selected) ? "flex justify-start gap-4 h-9 rounded-md bg-primary/25 transition-none" : 'flex items-center gap-4 justify-start transition-none'}`}
-                                                        onClick={() => onRedirect(z.link)}
-                                                    >
-                                                        <div
-                                                            className={`${isActive(z.selected) ? "active-menu" : "menu-icon"}`}>{z.icon}</div>
-                                                        <div
-                                                            className={`${isActive(z.selected) ? "text-primary text-sm font-medium" : "text-sm font-medium"}`}>{z.title}</div>
-                                                    </Button>
-                                                )
-                                            })
-                                        }
-                                        <div className={"text-sm font-bold py-2 px-4"}>{x.mainTitle}</div>
-                                        <div className={"flex flex-col gap-1"}>
-                                            {
-                                                (x.items || []).map((y, i) => {
-                                                    return (
-                                                        <Button
-                                                            key={i}
-                                                            variant={"link hover:no-underline"}
-                                                            className={`${isActive(y.selected) ? "flex justify-start gap-4 h-9 rounded-md bg-primary/25 transition-none" : 'flex items-center gap-4 justify-start transition-none'}`}
-                                                            onClick={() => onRedirect(y.link)}
-                                                        >
-                                                            <div
-                                                                className={`${isActive(y.selected) ? "active-menu" : "menu-icon"}`}>{y.icon}</div>
-                                                            <div
-                                                                className={`${isActive(y.selected) ? "text-primary text-sm font-medium" : "text-sm font-medium"}`}>{y.title}</div>
-                                                        </Button>
-                                                    )
-                                                })
-                                            }
-                                        </div>
-                                    </div>
-                                )
-                            })
-                        }
-                    </nav>
-                    <div className="mt-auto">
-                        <nav className="grid gap-1">
-                            {
-                                (footerMenuComponent || []).map((x, i) => {
-                                    return (
-                                        <Button
-                                            key={i}
-                                            variant={"link hover:no-underline"}
-                                            className={`${isActive(x.selected) ? "flex justify-start gap-4 h-9 rounded-md bg-primary/25 transition-none" : 'flex items-center gap-4 justify-start transition-none'}`}
-                                            onClick={() => onRedirect(x.link)}
-                                        >
-                                            <div
-                                                className={`${isActive(x.selected) ? "active-menu" : "menu-icon"}`}>{x.icon}</div>
-                                            <div
-                                                className={`${isActive(x.selected) ? "text-primary text-sm font-medium" : "text-sm font-medium"}`}>{x.title}</div>
-                                        </Button>
-                                    )
-                                })
-                            }
-                        </nav>
+                    <div className={"sidebar-mobile-menu flex flex-col gap-3 overflow-y-auto"}>
+                        <div className="flex-1 pt-[4px]">
+
+                            <nav className="grid items-start gap-3">
+                                {
+                                    (menuComponent || []).map((x, i) => {
+                                        return (
+                                            <div key={i} className={`flex flex-col ${x.dashBtn ? "" : "gap-1"}`}>
+                                                {
+                                                    (x.dashBtn || []).map((z, i) => {
+                                                        return (
+                                                            <Button
+                                                                key={i}
+                                                                variant={"link hover:no-underline"}
+                                                                className={`${isActive(z.selected) ? "flex justify-start gap-4 h-9 rounded-md bg-primary/15 transition-none" : 'flex items-center gap-4 h-9 justify-start transition-none'}`}
+                                                                onClick={() => onRedirect(z.link)}
+                                                            >
+                                                                <div className={`${isActive(z.selected) ? "active-menu" : "menu-icon"}`}>{z.icon}</div>
+                                                                <div className={`${isActive(z.selected) ? "text-primary text-sm font-medium" : "text-sm font-medium"}`}>{z.title}</div>
+                                                            </Button>
+                                                        )
+                                                    })
+                                                }
+                                                {
+                                                    x.dashBtn ? "" :
+                                                        <Fragment>
+                                                            <h3 className={"text-sm font-bold py-2 px-4"}>{x.mainTitle}</h3>
+                                                            <div className={"flex flex-col gap-1"}>
+                                                                {
+                                                                    (x.items || []).map((y, i) => {
+                                                                        return (
+                                                                            <Button
+                                                                                key={i}
+                                                                                variant={"link hover:no-underline"}
+                                                                                className={`${isActive(y.selected) ? "flex justify-start gap-4 h-9 rounded-md bg-primary/15 transition-none" : 'flex items-center gap-4 h-9 justify-start transition-none'}`}
+                                                                                onClick={() => onRedirect(y.link)}
+                                                                            >
+                                                                                <div className={`${isActive(y.selected) ? "active-menu" : "menu-icon"}`}>{y.icon}</div>
+                                                                                <div className={`${isActive(y.selected) ? "text-primary text-sm font-medium" : "text-sm font-medium"}`}>{y.title}</div>
+                                                                            </Button>
+                                                                        )
+                                                                    })
+                                                                }
+                                                            </div></Fragment>
+                                                }
+                                            </div>
+                                        )
+                                    })
+                                }
+                            </nav>
+                        </div>
+                        <div className="mt-auto ">
+                            <nav className="grid gap-1">
+                                {
+                                    (footerMenuComponent || []).map((x, i) => {
+                                        return (
+                                            <Button
+                                                key={i}
+                                                variant={"link hover:no-underline"}
+                                                className={`${isActive(x.selected)  ? "flex justify-start gap-4 h-9 rounded-md bg-primary/15 transition-none" : 'flex items-center gap-4 h-9 justify-start transition-none'}`}
+                                                onClick={() => onRedirect(x.link)}
+                                            >
+                                                <div className={`${isActive(x.selected) ? "active-menu" : "menu-icon"}`}>{x.icon}</div>
+                                                <div className={`${isActive(x.selected) ? "text-primary text-sm font-medium" : "text-sm font-medium"}`}>{x.title}</div>
+                                            </Button>
+                                        )
+                                    })
+                                }
+                            </nav>
+                        </div>
                     </div>
                 </SheetContent>
             </Sheet>
@@ -471,7 +474,7 @@ const HeaderBar = () => {
                                     variant="outline"
                                     role="combobox"
                                     aria-expanded={open}
-                                    className="min-w-[150px] md:w-[200px] justify-between bg-card"
+                                    className="min-w-[150px] md:w-[200px] h-[36px] justify-between bg-card"
                                 >
                                     {projectDetailsReducer.id
                                         ? projectDetailsReducer.project_name

@@ -145,7 +145,6 @@
   }
 
 .sidebar {transition: transform 0.3s ease;transform: translateX(0);}
-
 .sidebar-hidden {transform: translateX(-100%);}
 
 ::-webkit-scrollbar {width: 5px; height: 5px}
@@ -158,11 +157,13 @@ p {margin: 0 !important;}
 /*.bodyScreenHeight{height: calc(100vh - 60px);}*/
 .bodyScreenHeight{height: calc(100vh - 64px);}
 .side-sheet-height{height: calc(100vh - 53px);}
+.idea-sheet-height{height: calc(100vh - 65px);}
+.widget-update-sheet-height{height: calc(100vh - 61px);}
+.sidebar-dek-menu{height: calc(100vh - 60px);}
+.sidebar-mobile-menu{height: calc(100vh - 40px);}
+.create-sheet-height{height: calc(100vh - 69px);}
 
 .hov-primary.data-\[selected\=true\]\:bg-accent[data-selected=true]{background-color: hsl(var(--primary));color: hsl(var(--card))}
-
-.widget-switch .data-\[state\=checked\]\:translate-x-5[data-state=checked]{width: 14px;height: 14px;--tw-translate-x: 11px}
-.widget-switch .data-\[state\=unchecked\]\:translate-x-0[data-state=unchecked]{width: 14px;height: 14px;}
 
 .announce-create-switch .data-\[state\=checked\]\:translate-x-5[data-state=checked]{width: 14px;height: 14px;--tw-translate-x: 20px}
 .announce-create-switch .data-\[state\=unchecked\]\:translate-x-0[data-state=unchecked]{width: 14px;height: 14px;}
@@ -180,15 +181,12 @@ p {margin: 0 !important;}
 .profile-menu-icon svg path {stroke: hsl(var(--muted-foreground));}
 
 .focus-visible\:ring-ring:focus-visible {--tw-ring-color: hsl(240, 5%, 65%) !important;}
-
 .focus-visible\:ring-ring:focus-visible {--tw-ring-color: hsl(240, 5%, 84%) !important;}
 
 .focus\:ring-ring:focus {--tw-ring-color: hsl(240, 5%, 65%) !important;}
-
 .focus\:ring-ring:focus {--tw-ring-color: hsl(240, 5%, 84%) !important;}
 
 .team-tab-active.data-\[state\=active\]\:bg-background[data-state=active] {background-color: hsl(var(--primary)/15%);}
-
 .team-tab-text-active.data-\[state\=active\]\:text-foreground[data-state=active] {color: hsl(var(--primary));}
 
 .container{width:100%;display: block; max-width: 1120px; padding-right: 12px;padding-left: 12px}
@@ -203,23 +201,24 @@ button.inline-flex.items-center.justify-center.whitespace-nowrap.rounded-md.text
 
 .m-inline-0{margin-inline: 0 !important}
 
+/*Widget Color Picker*/
+.widget-color-picker .color_picker{ width: 100%; gap: 8px}
+.widget-accordion button[data-state="closed"]{border-bottom-color: transparent;}
+/*.widget-accordion .accord-content {overflow: auto}*/
+.widget-switch .data-\[state\=checked\]\:translate-x-5[data-state=checked]{width: 14px;height: 14px;--tw-translate-x: 11px}
+.widget-switch .data-\[state\=unchecked\]\:translate-x-0[data-state=unchecked]{width: 14px;height: 14px;}
+
 /*Color Picker*/
-.color_picker span {display: flex;flex-wrap: wrap;align-items: center;padding-left: 4px;cursor: pointer;}
+.widget-color-pickerwidget-color-picker span {display: flex;flex-wrap: wrap;align-items: center;padding-left: 4px;cursor: pointer;}
 .color_picker input[type=color] {width: 40px;padding: 3px 7px;background: #fff;border: none;border-radius: 4px 0 0 4px;position: absolute;top: 0;left: 0;bottom: 0;display: inline-block;height: auto;}
 .color_picker input:focus {outline: none;}
-.color_picker {position: relative;
-  display: flex;
-  align-items: center;width: 98px;}
+.color_picker {position: relative;display: flex;align-items: center;width: 98px;}
 .color_picker_color {width: 16px; height: 16px;}
 .sketch-picker {position: absolute; z-index: 999; top: 36px}
 .LinesEllipsis-ellipsis{color: #7C3AED;font-family: "Geist";font-weight: 600;}
 
 /*span LinesEllipsis-ellipsis*/
-span.LinesEllipsis-ellipsis {
-  color: hsl(var(--primary)) !important;
-  font-weight: 600;
-  cursor: pointer;
-}
+span.LinesEllipsis-ellipsis {color: hsl(var(--primary)) !important;font-weight: 600;cursor: pointer;}
 
 /*description bg color*/
 @layer components {
@@ -232,9 +231,7 @@ span.LinesEllipsis-ellipsis {
 }
 
 .update-idea span {height: 22px; width: 24px; justify-content: center;}
-
 .upload-img {width: 100%;height: 100%; /*position: absolute;*/left: 0;top: 0;object-fit: contain;object-position: center;}
-
 .board-container {display: flex;flex-direction: column;gap: 1rem;}
 
 .react-kanban-board > :nth-child(1) > div {width: 342px;}
@@ -266,6 +263,3 @@ span.LinesEllipsis-ellipsis {
 @media (max-width: 640px) {
   .bodyScreenHeight {height: auto;}
 }
-
-
-

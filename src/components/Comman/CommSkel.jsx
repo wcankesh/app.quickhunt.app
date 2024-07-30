@@ -1,5 +1,6 @@
 import React, {Fragment} from "react";
 import {Skeleton} from "../ui/skeleton";
+import {TableBody, TableRow, TableCell} from "../ui/table";
 
 // export const CommSkel = ({count}) => {
 //     return <div className={"flex flex-col"}>
@@ -131,4 +132,29 @@ export const CommSkel = {
             })
         }
     </div>,
+    // commonParagraphTableCard: <div className={"flex gap-2 py-6"}>
+    //     <TableBody>
+    //         {
+    //             [...Array(1)].map((_, index) => {
+    //                 return (
+    //                     <TableRow key={index}>
+    //                         {
+    //                             [...Array(1)].map((_, i) => {
+    //                                 return (
+    //                                     <Fragment>
+    //                                     <TableCell><Skeleton className="h-4"/></TableCell>
+    //                                     <TableCell><Skeleton className="h-4"/></TableCell>
+    //                                     <TableCell><Skeleton className="h-4"/></TableCell>
+    //                                     <TableCell><Skeleton className="h-4"/></TableCell>
+    //                                     <TableCell><Skeleton className="h-4"/></TableCell>
+    //                                     </Fragment>
+    //                                 )
+    //                             })
+    //                         }
+    //                     </TableRow>
+    //                 )
+    //             })
+    //         }
+    //     </TableBody>
+    // </div>,
 }

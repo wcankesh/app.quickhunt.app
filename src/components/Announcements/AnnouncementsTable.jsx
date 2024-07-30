@@ -78,7 +78,7 @@ const AnnouncementsTable = ({data,isLoading ,setSelectedRecord,setEditIndex ,han
             <AlertDialog open={isOpenDeleteAlert} onOpenChange={setIsOpenDeleteAlert}>
                 <AlertDialogContent className={"w-[310px] md:w-auto rounded-lg p-3"}>
                     <AlertDialogHeader className={"text-left gap-2"}>
-                        <AlertDialogTitle className={"text-sm"}>You really want delete this announcement?</AlertDialogTitle>
+                        <AlertDialogTitle className={"text-sm md:text-xl"}>You really want delete this announcement?</AlertDialogTitle>
                         <AlertDialogDescription>
                             This action can't be undone.
                         </AlertDialogDescription>
@@ -89,7 +89,7 @@ const AnnouncementsTable = ({data,isLoading ,setSelectedRecord,setEditIndex ,han
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
-            <Card className={""}>
+            {/*<Card className={"rounded-none"}>*/}
             <CardContent className={"p-0 overflow-auto"}>
                 <Table className={""}>
                         <TableHeader className={"p-0"}>
@@ -97,7 +97,7 @@ const AnnouncementsTable = ({data,isLoading ,setSelectedRecord,setEditIndex ,han
                                 {
                                     ["Title","Last Updated","Published At","Status","","",""].map((x,i)=>{
                                         return(
-                                            <TableHead className={`md:text-base font-semibold px-2 md:py-5 md:px-4 ${theme === "dark" ? "text-[]" : "bg-muted"}`}>
+                                            <TableHead className={`text-sm lg:text-base font-semibold px-2 md:py-4 md:px-3 lg:py-5 lg:px-4 ${theme === "dark" ? "text-[]" : "bg-muted"}`}>
                                                 {x}
                                             </TableHead>
                                         // <TableHead className={`text-base font-semibold py-5 rounded-tl-sm ${theme === "dark" ? "text-[]" : "bg-muted"} ${i === 0 ? "max-w-[375px] rounded-lg" :""} ${i === 6 ? "rounded-lg" :""}`}>{x}</TableHead>
@@ -130,7 +130,7 @@ const AnnouncementsTable = ({data,isLoading ,setSelectedRecord,setEditIndex ,han
                                                 return (
                                                     <TableRow key={x?.id} className={"font-medium"}>
                                                         <TableCell
-                                                            className={`inline-flex gap-2 md:gap-3 flex-wrap items-center justify-center px-2 md:py-5 md:px-4 ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                                            className={`inline-flex gap-2 md:gap-3 flex-wrap items-center px-2 md:py-4 md:px-3 lg:py-5 lg:px-4 ${theme === "dark" ? "" : "text-muted-foreground"}`}>
                                                             <span className={""}>{x?.post_title}</span>
                                                             <div className={"flex flex-wrap gap-1"}>
                                                                 {
@@ -148,10 +148,10 @@ const AnnouncementsTable = ({data,isLoading ,setSelectedRecord,setEditIndex ,han
                                                             </div>
                                                         </TableCell>
                                                         <TableCell
-                                                            className={`${theme === "dark" ? "" : "text-muted-foreground"} px-2 md:py-5 md:px-4`}>{x?.post_modified_date ? moment.utc(x.post_modified_date).local().startOf('seconds').fromNow() : "-"}</TableCell>
+                                                            className={`${theme === "dark" ? "" : "text-muted-foreground"} px-2 md:py-4 md:px-3 lg:py-5 lg:px-4`}>{x?.post_modified_date ? moment.utc(x.post_modified_date).local().startOf('seconds').fromNow() : "-"}</TableCell>
                                                         <TableCell
-                                                            className={`${theme === "dark" ? "" : "text-muted-foreground"} px-2 md:py-5 md:px-4`}>{x?.post_published_at ? moment.utc(x.post_published_at).local().startOf('seconds').fromNow() : "-"}</TableCell>
-                                                        <TableCell className={"px-2 md:py-5 md:px-4"}>
+                                                            className={`${theme === "dark" ? "" : "text-muted-foreground"} px-2 md:py-4 md:px-3 lg:py-5 lg:px-4`}>{x?.post_published_at ? moment.utc(x.post_published_at).local().startOf('seconds').fromNow() : "-"}</TableCell>
+                                                        <TableCell className={"px-2 md:py-4 md:px-3 lg:py-5 lg:px-4"}>
                                                             <Select value={x.post_save_as_draft}
                                                                     onValueChange={(value) => handleStatusChange(x, value)}>
                                                                 <SelectTrigger className="w-[114px] h-7">
@@ -180,22 +180,30 @@ const AnnouncementsTable = ({data,isLoading ,setSelectedRecord,setEditIndex ,han
                                                                 </SelectContent>
                                                             </Select>
                                                         </TableCell>
-                                                        <TableCell className={"px-2 md:py-5 md:px-4"}>
-                                                            <Button disabled={x.post_save_as_draft == 1 ? true : false} variant={"ghost"}
-                                                                    onClick={() => shareFeedback(x.domain,x.post_slug_url)}><Eye
-                                                                size={18}
-                                                                className={`${theme === "dark" ? "" : "text-muted-foreground"}`}/></Button>
+                                                        <TableCell className={"px-2 md:py-4 md:px-3 lg:py-5 lg:px-4"}>
+                                                            <Button
+                                                                disabled={x.post_save_as_draft == 1 ? true : false}
+                                                                variant={"ghost"}
+                                                                onClick={() => shareFeedback(x.domain,x.post_slug_url)}
+                                                                className={"p-0 h-auto"}
+                                                            >
+                                                                <Eye size={18} className={`${theme === "dark" ? "" : "text-muted-foreground"}`}/>
+                                                            </Button>
                                                         </TableCell>
-                                                        <TableCell className={"px-2 md:py-5 md:px-4"}>
-                                                            <Button onClick={() => openSheet(x)} variant={"ghost"}><BarChart
-                                                                size={18}
-                                                                className={`${theme === "dark" ? "" : "text-muted-foreground"}`}/></Button>
+                                                        <TableCell className={"px-2 md:py-4 md:px-3 lg:py-5 lg:px-4"}>
+                                                            <Button
+                                                                onClick={() => openSheet(x)}
+                                                                variant={"ghost"}
+                                                                className={"p-0 h-auto"}
+                                                            >
+                                                                <BarChart size={18} className={`${theme === "dark" ? "" : "text-muted-foreground"}`}/>
+                                                            </Button>
                                                         </TableCell>
-                                                        <TableCell className={"px-2 md:py-5 md:px-4"}>
+                                                        <TableCell className={"px-2 md:py-4 md:px-3 lg:py-5 lg:px-4"}>
                                                             <DropdownMenu>
-                                                                <DropdownMenuTrigger><Button variant={"ghost"}><Ellipsis
-                                                                    className={`${theme === "dark" ? "" : "text-muted-foreground"}`}
-                                                                    size={18}/></Button></DropdownMenuTrigger>
+                                                                <DropdownMenuTrigger>
+                                                                    <Ellipsis className={`${theme === "dark" ? "" : "text-muted-foreground"}`} size={18}/>
+                                                                </DropdownMenuTrigger>
                                                                 <DropdownMenuContent>
                                                                     <DropdownMenuItem
                                                                         onClick={() => onEdit(x,index)}>Edit</DropdownMenuItem>
@@ -209,8 +217,8 @@ const AnnouncementsTable = ({data,isLoading ,setSelectedRecord,setEditIndex ,han
                     </TableBody> }
                              </Table>
             </CardContent>
-            </Card>
-            {announcementData.length > 0 &&  <Separator/>}
+            {/*</Card>*/}
+            {/*{announcementData.length > 0 &&  <Separator/>}*/}
             {isLoading ? null : (isLoading === false && announcementData?.length > 0 ? "" :
                     <div className={"flex flex-row justify-center py-[45px]"}>
                         <div className={"flex flex-col items-center gap-2"}>

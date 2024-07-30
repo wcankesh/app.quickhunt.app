@@ -278,8 +278,17 @@ export class ApiService{
     async updateTopics (payload, id){
         return await this.putData(`${baseUrlApi}/topic/${id}`, payload)
     }
+    async getWidgets (id){
+        return await this.getData(`${baseUrlApi}/widget/${id}`)
+    }
     async updateWidgets (payload, id){
         return await this.putData(`${baseUrlApi}/widget/${id}`, payload)
+    }
+    async createWidgets (payload){
+        return await this.postData(`${baseUrlApi}/widget`, payload)
+    }
+    async onDeleteWidget (id){
+        return await this.deleteData(`${baseUrlApi}/widget/${id}`)
     }
     async deleteTopics (id){
         return await this.deleteData(`${baseUrlApi}/topic/${id}`)

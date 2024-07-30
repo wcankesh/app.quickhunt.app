@@ -98,7 +98,7 @@ const Login = () => {
         }
         const data = await apiSerVice.login(payload)
         if (data.access_token) {
-            toast({description: "Login successfully!"})
+            toast({description: data.message})
             localStorage.setItem("token", data.access_token);
             const urlParams = new URLSearchParams(window.location.search);
             const token = urlParams.get('token');
@@ -111,7 +111,7 @@ const Login = () => {
             setIsLoading(false)
         } else {
             setIsLoading(false)
-            toast({description: "Your message has been sent."})
+            toast({description: data.message})
         }
     }
 
@@ -138,12 +138,12 @@ const Login = () => {
         <div className="h-full">
             <div className="ltr">
                 <div>
-                    <div className={"min-h-screen bg-background  flex items-center  overflow-hidden w-full"}>
-                        <div className={"min-h-screen basis-full flex w-full  justify-center overflow-y-auto"}>
+                    <div className={"min-h-screen bg-background flex items-center overflow-hidden w-full"}>
+                        <div className={"min-h-screen basis-full flex w-full justify-center overflow-y-auto"}>
                             {/*// <div className="w-full flex justify-center h-[100vh]">*/}
                             {/*    <div className="hidden lg:block p-16 lg:flex justify-between flex-col basis-1/2 bg-purple-400">*/}
                             {/*<div className="hidden lg:block p-16 lg:flex bg-purple-400 justify-center pb-[90px]">*/}
-                            <div className="basis-1/2 bg-purple-400 w-full relative hidden xl:flex justify-center items-center p-16 pb-[90px]">
+                            <div className="min-h-screen basis-1/2 bg-purple-400 w-full relative hidden xl:flex justify-center items-center p-16 ">
                                 <div className={"grid gap-6"}>
                                     <div className={"app-logo"}>
                                         {
@@ -174,11 +174,12 @@ const Login = () => {
                                 </div>
                             </div>
                             {/*<div className="flex p-16">*/}
-                            <div className=" min-h-screen basis-full md:basis-1/2 w-full px-4 py-5 flex justify-center items-center">
-                                {/*<div className={"w-full gap-6"}>*/}
-                                <div className={"lg:w-[480px] "}>
-                                    <div className={"w-full py-10"}>
-                                        <div className="text-center md:text-right text-sm">
+                            {/*<div className=" min-h-screen basis-full md:basis-1/2 w-full p-16 flex justify-center items-center">*/}
+                            <div className=" min-h-screen md:basis-1/2 pt-5 md:p-16 flex justify-center items-center">
+                                {/*<div className={"lg:w-[833px] h-full"}>*/}
+                                <div className={"h-full"}>
+                                    <div className={"w-full"}>
+                                        <div className="text-center md:text-right text-xs md:text-sm">
                                             <p className={"font-medium"}>
                                                 Don't have an account?{" "}
                                                 <Button
@@ -187,18 +188,17 @@ const Login = () => {
                                                     onClick={() => onRedirect('register')}
                                                 >
                                                     <span
-                                                        className={"font-bold text-violet-600"}>Create an account</span>
+                                                        className={"font-bold text-primary"}>Create an account</span>
                                                 </Button>
                                             </p>
                                         </div>
-                                        <div className="mx-auto grid w-[320px] md:w-[384px] gap-8 lg:pt-[142px] pt-[100px]">
+                                        <div className="mx-auto grid w-[320px] md:w-[384px] gap-8 lg:pt-[142px] pt-[50px] px-3">
                                             <div className="gap-2 flex flex-col items-center">
                                                 {/*<div className="grid gap-2 text-center">*/}
                                                 {
                                                     theme === "dark" ? Icon.whiteLogo : Icon.blackLogo
                                                 }
-                                                <h1 className="text-3xl font-medium ">Login to Your
-                                                    Account</h1>
+                                                <h1 className="text-2xl md:text-3xl font-medium ">Login to Your Account</h1>
                                                 <h6 className="font-normal text-sm text-muted-foreground">Enter your email below
                                                     to
                                                     create your account</h6>
@@ -260,13 +260,13 @@ const Login = () => {
                                                     </div>
                                                 </div>
                                                 <Button type="submit"
-                                                        className="w-full bg-violet-600 hover:bg-violet-600"
+                                                        className="w-full bg-primary hover:bg-primary"
                                                         onClick={onLogin}>
                                                     {
                                                         isLoading ?
                                                             <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : ""
                                                     }
-                                                    <span className={"font-normal"}>Login</span>
+                                                    <span className={"font-semibold"}>Login</span>
                                                 </Button>
                                                 <div className={"or-divider flex items-center"}>
                                                     <div className={"border-t basis-4/12 border-slate-500"}/>
@@ -274,8 +274,8 @@ const Login = () => {
                                                         continue with</p>
                                                     <div className={"border-t basis-4/12 border-slate-500"}/>
                                                 </div>
-                                                <Button variant="outline" className="w-full border border-violet-600">
-                            <span className={"font-normal flex gap-x-1 text-violet-600 font-semibold"}>
+                                                <Button variant="outline" className="w-full border border-primary">
+                            <span className={"font-normal flex gap-x-1 text-primary font-semibold"}>
                                 {Icon.googleIcon}
                                 Login With Google
                             </span>
