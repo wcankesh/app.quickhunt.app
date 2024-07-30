@@ -219,12 +219,14 @@ const Profile = () => {
         <div className={"flex flex-col gap-6"}>
             <Card>
                 <CardHeader className={"gap-1 border-b"}>
-                    <CardTitle className={"text-2xl font-medium"}>Edit Profile</CardTitle>
-                    <CardDescription className={"text-sm text-muted-foreground p-0"}>Manage your personal account settings.</CardDescription>
+                    {/*<CardTitle>*/}
+                        <h3 className={"font-medium text-2xl"}>Edit Profile</h3>
+                    {/*</CardTitle>*/}
+                    <CardDescription className={" text-sm text-muted-foreground p-0"}>Manage your personal account settings.</CardDescription>
                 </CardHeader>
                 <CardContent className={"py-6 px-4 border-b"}>
-                    <div className={"flex gap-4 lg:flex-nowrap md:flex-wrap sm:flex-wrap"}>
-                        <div className="flex items-center justify-center">
+                    <div className={"flex gap-4 flex-wrap lg:flex-nowrap md:flex-wrap sm:flex-wrap"}>
+                        <div className="flex justify-center mt-2">
                             <label
                                 htmlFor="upload_image"
                                 className="flex w-[132px] h-[128px] py-0 justify-center items-center flex-shrink-0 border-dashed border-[1px] border-gray-300 rounded cursor-pointer"
@@ -240,8 +242,8 @@ const Profile = () => {
                             </label>
                         </div>
                         <div className={"flex flex-col gap-4 md:w-full sm:w-full"}>
-                            <div className={"flex gap-4 lg:flex-nowrap md:flex-wrap sm:flex-wrap"}>
-                                <div className={"basis-1/2 md:basis-full sm:basis-full"}>
+                            <div className={"flex gap-4 flex-wrap lg:flex-nowrap md:flex-wrap sm:flex-wrap"}>
+                                <div className={"basis-full"}>
                                     <Label htmlFor="email" className={"font-medium"}>First Name</Label>
                                     <Input
                                         id="user_first_name"
@@ -259,7 +261,7 @@ const Profile = () => {
                                         }
                                     </div>
                                 </div>
-                                <div className={"basis-1/2 md:basis-full sm:basis-full"}>
+                                <div className={"basis-full"}>
                                     <Label htmlFor="email" className={"font-medium"}>Last Name</Label>
                                     <Input
                                         id="user_last_name"
@@ -279,7 +281,7 @@ const Profile = () => {
                                 </div>
                             </div>
                             <div className={"flex gap-4 lg:flex-nowrap md:flex-wrap"}>
-                                <div className={"lg:w-[289px] md:w-full sm:w-full"}>
+                                <div className={"w-full md:w-full sm:w-full"}>
                                     <Label htmlFor="email" className={"font-medium"}>Email</Label>
                                     <Input
                                         id="email"

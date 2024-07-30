@@ -259,17 +259,17 @@ const Statuses = () => {
     return (
         <Fragment>
             <AlertDialog open={deleteId} onOpenChange={setDeleteId}>
-                <AlertDialogContent>
+                <AlertDialogContent className={"w-[310px] md:w-full rounded-lg"}>
                     <AlertDialogHeader>
                         <AlertDialogTitle>You really want delete Status?</AlertDialogTitle>
                         <AlertDialogDescription>
                             This action can't be undone.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
-                    <AlertDialogFooter>
+                    <div className={"flex justify-end gap-2"}>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
                         <AlertDialogAction className={"bg-red-600 hover:bg-red-600"} onClick={onDelete}>Delete</AlertDialogAction>
-                    </AlertDialogFooter>
+                    </div>
                 </AlertDialogContent>
             </AlertDialog>
             <Card>
@@ -289,166 +289,169 @@ const Statuses = () => {
                     </Button>
                 </CardHeader>
                 <CardContent className="p-0">
-                    {isLoading ? <Table>
+                    <div className={"grid grid-cols-1 overflow-auto whitespace-nowrap"}>
+                        <Table>
                         <TableHeader className={"p-0"}>
                             <TableRow>
-                                <TableHead className={"w-[48px] p-0"}/>
-                                <TableHead className={`w-2/5 pl-0 ${theme === "dark" ? "" : "text-card-foreground"}`}>Status Name</TableHead>
-                                <TableHead className={`text-center ${theme === "dark" ? "" : "text-card-foreground"}`}>Status Color</TableHead>
-                                <TableHead className={`pr-[39px] text-end ${theme === "dark" ? "" : "text-card-foreground"}`}>Action</TableHead>
+                                {
+                                    ["","Status Name","Status Color","Action"].map((x,i)=>{
+                                        return(
+                                            <TableHead className={`w-[48px] p-0 ${theme === "dark" ? "" : "text-card-foreground"} ${i === 0 ? "w-[48px]" : i === 1 ? "w-2/5" : i === 2 ? "text-center" : i === 3 ? "text-end pr-[39px]" : ""}`}>{x}</TableHead>
+                                        )
+                                    })
+                                }
                             </TableRow>
                         </TableHeader>
-                        <TableBody>
+                        {isLoading ? <TableBody>
                             {
-                                [...Array(5)].map((_,index)=>{
-                                    return(
+                                [...Array(5)].map((_, index) => {
+                                    return (
                                         <TableRow key={index}>
-                                            <TableCell className={"py-[3px]"}><Menu className={"cursor-grab"} size={16}/></TableCell>
-                                            <TableCell className={"pl-0"}><Skeleton className={"w-full h-[24px] rounded-md"}/></TableCell>
-                                            <TableCell><Skeleton className={"w-full h-[24px] rounded-md"}/></TableCell>
-                                            <TableCell><Skeleton className={"w-full h-[24px] rounded-md"}/></TableCell>
+                                            {
+                                                [...Array(4)].map((_, i) => {
+                                                    return (
+                                                        <TableCell className={"max-w-[373px]"}>
+                                                            <Skeleton className={"rounded-md  w-full h-[40px]"}/>
+                                                        </TableCell>
+                                                    )
+                                                })
+                                            }
                                         </TableRow>
                                     )
                                 })
                             }
                         </TableBody>
-                    </Table> : showColorInput === false && statusList.length === 0 ? <SettingEmptyDataTable tableHeadings={tableHeadingsArray}/> : <Table>
-                        <TableHeader className="p-0">
-                            <TableRow>
-                                <TableHead className={"w-[48px]"}/>
-                                <TableHead className={`w-2/5 pl-0 ${theme === "dark" ? "" : "text-card-foreground"}`}>Status Name</TableHead>
-                                <TableHead className={`text-center ${theme === "dark" ? "" : "text-card-foreground"}`}>Status Color</TableHead>
-                                <TableHead className={`pr-[39px] text-end ${theme === "dark" ? "" : "text-card-foreground"}`}>Action</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {(statusList || []).map((x, i) => (
-                                <TableRow key={i}>
-                                    <TableCell><Menu className={"cursor-grab"} size={16}/></TableCell>
-                                    {
-                                        isEdit === i ?
-                                            <TableCell className={"py-[8.5px] pl-0 py-[11px]"}>
-                                                <Input
-                                                    className={"bg-card h-9"}
-                                                    type="title"
-                                                    value={x.title}
-                                                    name={"title"}
-                                                    onBlur={onBlur}
-                                                    onChange={(e) => handleInputChange(e, i)}
-                                                />
-                                                <div className="grid gap-2">
-                                                    {
-                                                        labelError.title &&
-                                                        <span className="text-red-500 text-sm">{labelError.title}</span>
-                                                    }
+                         :
+                            <TableBody>
+                                {(statusList || []).map((x, i) => (
+                                    <TableRow key={i}>
+                                        <TableCell><Menu className={"cursor-grab"} size={16}/></TableCell>
+                                        {
+                                            isEdit === i ?
+                                                <TableCell className={"py-[8.5px] pl-0 py-[11px]"}>
+                                                    <Input
+                                                        className={"bg-card h-9"}
+                                                        type="title"
+                                                        value={x.title}
+                                                        name={"title"}
+                                                        onBlur={onBlur}
+                                                        onChange={(e) => handleInputChange(e, i)}
+                                                    />
+                                                    <div className="grid gap-2">
+                                                        {
+                                                            labelError.title &&
+                                                            <span className="text-red-500 text-sm">{labelError.title}</span>
+                                                        }
+                                                    </div>
+                                                </TableCell>
+                                                : <TableCell
+                                                    className={`font-medium text-xs py-[8.5px] pl-0 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.title}</TableCell>
+                                        }
+                                        {isEdit === i ?
+                                            <TableCell
+                                                className={`font-medium text-xs ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                                <div className={"flex justify-center items-center"}>
+                                                    <ColorInput name={"color_code"} value={x.color_code} onChange={(color) => onChangeColorColor(color, i)}/>
+                                                </div>
+                                            </TableCell> :
+                                            <TableCell
+                                                className={`font-medium text-xs ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                                <div className={"flex justify-center items-center gap-1"}>
+                                                    <Square size={16} strokeWidth={1} fill={x.color_code} stroke={x.color_code}/>
+                                                    <p>{x.color_code}</p>
                                                 </div>
                                             </TableCell>
-                                            : <TableCell
-                                                className={`font-medium text-xs py-[8.5px] pl-0 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.title}</TableCell>
-                                    }
-                                    {isEdit === i ?
-                                        <TableCell
-                                            className={`font-medium text-xs ${theme === "dark" ? "" : "text-muted-foreground"}`}>
-                                            <div className={"flex justify-center items-center"}>
-                                                <ColorInput name={"color_code"} value={x.color_code} onChange={(color) => onChangeColorColor(color, i)}/>
-                                            </div>
-                                        </TableCell> :
-                                        <TableCell
-                                            className={`font-medium text-xs ${theme === "dark" ? "" : "text-muted-foreground"}`}>
-                                            <div className={"flex justify-center items-center gap-1"}>
-                                                <Square size={16} strokeWidth={1} fill={x.color_code} stroke={x.color_code}/>
-                                                <p>{x.color_code}</p>
+                                        }
+                                        <TableCell className="flex justify-end gap-2 pr-6">
+                                            {isEdit === i ? (
+                                                <Fragment>
+                                                    <Button
+                                                        variant="outline hover:bg-transparent"
+                                                        className={`p-1 border w-[30px] h-[30px] ${isSave ? "justify-center items-center" : ""}`}
+                                                        onClick={() => handleSaveStatus(x, i)}
+                                                    >
+                                                        {isSave ? <Loader2 className="mr-1 h-4 w-4 animate-spin justify-center"/> : <Check size={16}/>}
+                                                    </Button>
+                                                    <Button
+                                                        variant="outline hover:bg-transparent"
+                                                        className="p-1 border w-[30px] h-[30px]"
+                                                        onClick={() => handleCancelEdit(i)}
+                                                    >
+                                                        <X size={16}/>
+                                                    </Button>
+                                                </Fragment>
+                                            ) : (
+                                                <Fragment>
+                                                    <Button
+                                                        variant="outline hover:bg-transparent"
+                                                        className="p-1 border w-[30px] h-[30px]"
+                                                        onClick={() => handleEditLabel(i)}
+                                                    >
+                                                        <Pencil size={16}/>
+                                                    </Button>
+                                                    <Button
+                                                        variant="outline hover:bg-transparent"
+                                                        className="p-1 border w-[30px] h-[30px]"
+                                                        onClick={() => handleDeleteLabel(x.id, i)}
+                                                    >
+                                                        <Trash2 size={16}/>
+                                                    </Button>
+                                                </Fragment>
+                                            )}
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                                {showColorInput && (
+                                    <TableRow>
+                                        <TableCell className={`${labelError ? "align-top" : ""}`}>
+                                            <Button variant={"ghost hover:bg-transparent"}
+                                                    className={"p-0 cursor-grab"}><Menu size={16}/></Button>
+                                        </TableCell>
+                                        <TableCell className={"p-0 py-4 pr-4"}>
+                                            <Input
+                                                className={"bg-card"}
+                                                type="text"
+                                                id="title"
+                                                name="title"
+                                                value={newStatus.title}
+                                                onChange={handleInputChange}
+                                                placeholder="Enter Status Name"
+                                                onBlur={onBlur}
+                                            />
+                                            <div className="grid gap-2">
+                                                {
+                                                    labelError.title &&
+                                                    <span className="text-red-500 text-sm">{labelError.title}</span>
+                                                }
                                             </div>
                                         </TableCell>
-                                    }
-                                    <TableCell className="flex justify-end gap-2 pr-6">
-                                        {isEdit === i ? (
-                                            <Fragment>
-                                                <Button
-                                                    variant="outline hover:bg-transparent"
-                                                    className={`p-1 border w-[30px] h-[30px] ${isSave ? "justify-center items-center" : ""}`}
-                                                    onClick={() => handleSaveStatus(x, i)}
-                                                >
-                                                    {isSave ? <Loader2 className="mr-1 h-4 w-4 animate-spin justify-center"/> : <Check size={16}/>}
-                                                </Button>
-                                                <Button
-                                                    variant="outline hover:bg-transparent"
-                                                    className="p-1 border w-[30px] h-[30px]"
-                                                    onClick={() => handleCancelEdit(i)}
-                                                >
-                                                    <X size={16}/>
-                                                </Button>
-                                            </Fragment>
-                                        ) : (
-                                            <Fragment>
-                                                <Button
-                                                    variant="outline hover:bg-transparent"
-                                                    className="p-1 border w-[30px] h-[30px]"
-                                                    onClick={() => handleEditLabel(i)}
-                                                >
-                                                    <Pencil size={16}/>
-                                                </Button>
-                                                <Button
-                                                    variant="outline hover:bg-transparent"
-                                                    className="p-1 border w-[30px] h-[30px]"
-                                                    onClick={() => handleDeleteLabel(x.id, i)}
-                                                >
-                                                    <Trash2 size={16}/>
-                                                </Button>
-                                            </Fragment>
-                                        )}
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                            {showColorInput && (
-                                <TableRow>
-                                    <TableCell className={`${labelError ? "align-top" : ""}`}>
-                                        <Button variant={"ghost hover:bg-transparent"}
-                                                className={"p-0 cursor-grab"}><Menu size={16}/></Button>
-                                    </TableCell>
-                                    <TableCell className={"p-0 py-4 pr-4"}>
-                                        <Input
-                                            className={"bg-card"}
-                                            type="text"
-                                            id="title"
-                                            name="title"
-                                            value={newStatus.title}
-                                            onChange={handleInputChange}
-                                            placeholder="Enter Status Name"
-                                            onBlur={onBlur}
-                                        />
-                                        <div className="grid gap-2">
-                                            {
-                                                labelError.title &&
-                                                <span className="text-red-500 text-sm">{labelError.title}</span>
-                                            }
-                                        </div>
-                                    </TableCell>
-                                    <TableCell className={`${labelError ? "align-top" : ""} p-0 py-4`}>
-                                        <div className={"flex justify-center items-center"}>
-                                            <ColorInput
-                                                name="color_code"
-                                                value={newStatus.color_code}
-                                                onChange={(color) => setNewStatus((prevState) => ({
-                                                    ...prevState,
-                                                    color_code: color.color_code
-                                                }))}
-                                            />
-                                        </div>
-                                    </TableCell>
-                                    <TableCell className="flex justify-end gap-2 pr-6">
-                                        <Button
-                                            variant=""
-                                            className="text-sm font-semibold"
-                                            onClick={() => handleAddNewLabel()}
-                                        >
-                                            {isSave ? <Loader2 className={"mr-2 h-4 w-4 animate-spin"}/> : "Add Status"}
-                                        </Button>
-                                    </TableCell>
-                                </TableRow>
-                            )}
-                        </TableBody>
-                    </Table>}
+                                        <TableCell className={`${labelError ? "align-top" : ""} p-0 py-4`}>
+                                            <div className={"flex justify-center items-center"}>
+                                                <ColorInput
+                                                    name="color_code"
+                                                    value={newStatus.color_code}
+                                                    onChange={(color) => setNewStatus((prevState) => ({
+                                                        ...prevState,
+                                                        color_code: color.color_code
+                                                    }))}
+                                                />
+                                            </div>
+                                        </TableCell>
+                                        <TableCell className="flex justify-end gap-2 pr-6">
+                                            <Button
+                                                variant=""
+                                                className="text-sm font-semibold"
+                                                onClick={() => handleAddNewLabel()}
+                                            >
+                                                {isSave ? <Loader2 className={"mr-2 h-4 w-4 animate-spin"}/> : "Add Status"}
+                                            </Button>
+                                        </TableCell>
+                                    </TableRow>
+                                )}
+                            </TableBody>
+                        }
+                    </Table>
+                    </div>
                 </CardContent>
         </Card>
         </Fragment>

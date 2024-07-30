@@ -8,7 +8,7 @@ import {Avatar, AvatarFallback} from "../../ui/avatar";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "../../ui/table";
 import {Ellipsis, Loader2, X} from "lucide-react";
 import {useTheme} from "../../theme-provider";
-import {Sheet, SheetClose, SheetContent, SheetFooter, SheetHeader, SheetTitle} from "../../ui/sheet";
+import {Sheet, SheetClose, SheetContent, SheetFooter, SheetHeader, SheetOverlay, SheetTitle} from "../../ui/sheet";
 import {ApiService} from "../../../utils/ApiService";
 import {useSelector} from "react-redux";
 import {Badge} from "../../ui/badge";
@@ -207,22 +207,25 @@ const Team = () => {
     return (
         <Fragment>
             <AlertDialog open={isOpenDeleteAlert} onOpenChange={setIsOpenDeleteAlert}>
-                <AlertDialogContent>
+                <AlertDialogContent className={"w-[310px] md:w-full rounded-lg"}>
                     <AlertDialogHeader>
                         <AlertDialogTitle>You really want revoke invitation?</AlertDialogTitle>
                         <AlertDialogDescription>
                             This action can't be undone.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
-                    <AlertDialogFooter>
+                    {/*<AlertDialogFooter>*/}
+                    {/*    <AlertDialogCancel >Cancel</AlertDialogCancel>*/}
+                    {/*    <AlertDialogAction className={"bg-red-600 hover:bg-red-600"} onClick={onDelete}>Revoke</AlertDialogAction>*/}
+                    {/*</AlertDialogFooter>*/}
+                    <div className={"flex justify-end gap-2"}>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction className={"bg-red-600 hover:bg-red-600"}
-                                           onClick={onDelete}>Revoke</AlertDialogAction>
-                    </AlertDialogFooter>
+                        <AlertDialogAction className={"bg-red-600 hover:bg-red-600"} onClick={onDelete}>Revoke</AlertDialogAction>
+                    </div>
                 </AlertDialogContent>
             </AlertDialog>
             <Card>
-                <CardHeader className={"flex flex-row justify-between items-center"}>
+                <CardHeader className={"flex flex-row justify-between gap-1 items-center"}>
                     <div>
                         <CardTitle className={"text-2xl font-medium"}>Invite Team</CardTitle>
                         <CardDescription className={"text-sm text-muted-foreground p-0"}>Add members to your company to
@@ -244,7 +247,6 @@ const Team = () => {
                         </div>
                         <TabsContent value="users">
                             <div>
-                                {
                                     <Table>
                                         <TableHeader className={"p-0"}>
                                             <TableRow className={""}>
@@ -301,7 +303,7 @@ const Team = () => {
                                                 })
                                             }
                                         </TableBody>}
-                                    </Table>}
+                                    </Table>
                                 {isLoading === false && memberList.length === 0 && <div className={"flex flex-row justify-center py-[45px]"}>
                                     <div className={"flex flex-col items-center gap-2"}>
                                         <img src={NoDataThumbnail} className={"flex items-center"}/>
@@ -310,15 +312,15 @@ const Team = () => {
                                 </div>}
                             </div>
                         </TabsContent>
-                        <TabsContent value="invites">
-                            <div>
-                                <Table>
+                        <TabsContent value="invites" className={""}>
+                            <div className={"grid grid-cols-1 overflow-auto whitespace-nowrap"}>
+                                <Table className={""}>
                                     <TableHeader className={"p-0"}>
                                         <TableRow className={""}>
                                             {
                                                 ["Email", "Status", "Invited", "Action"].map((x, i) => {
                                                     return (
-                                                        <TableHead className={`h-[22px]  pb-2 text-sm font-medium ${i === 0 ? "pl-6" : i === 3 ? "pr-3" : ""} ${theme === "dark" ? "" : "text-card-foreground"}`}>{x}</TableHead>
+                                                        <TableHead key={i} className={`h-[22px] b-2 text-sm font-medium ${i === 0 ? "pl-6" : i === 3 ? "pr-3" : ""} ${theme === "dark" ? "" : "text-card-foreground"}`}>{x}</TableHead>
                                                     )
                                                 })
                                             }
@@ -327,17 +329,17 @@ const Team = () => {
                                     <TableBody>
                                         {(invitationList || []).map((x, i) => (
                                             <TableRow key={i}>
-                                                <TableCell className="font-medium pl-6">{x.member_email}</TableCell>
-                                                <TableCell>Expires in {moment(x.expire_at).diff(moment(new Date()), 'days')} days</TableCell>
+                                                <TableCell className="font-medium pl-6">{x?.member_email}</TableCell>
+                                                <TableCell>Expires in {moment(x?.expire_at).diff(moment(new Date()), 'days')} days</TableCell>
                                                 <TableCell>Invited about {moment.utc(x.created_at).local().startOf('seconds').fromNow()}</TableCell>
                                                 <TableCell className="pr-6 text-right">
-                                                    <DropdownMenu>
+                                                    <DropdownMenu className={"relative"} >
                                                         <DropdownMenuTrigger>
                                                             <Ellipsis className={`${theme === "dark" ? "" : "text-muted-foreground"}`} size={18}/>
                                                         </DropdownMenuTrigger>
-                                                        <DropdownMenuContent className={"hover:none"}>
-                                                            <DropdownMenuItem onClick={() => onResendUser(x)}>Resend Invitation</DropdownMenuItem>
-                                                            <DropdownMenuItem onClick={() => revokePopup(x)}>Revoke Invitation</DropdownMenuItem>
+                                                        <DropdownMenuContent className={"hover:none absolute right-[-20px]"}>
+                                                            <DropdownMenuItem className={"w-[130px]"} onClick={() => onResendUser(x)}>Resend Invitation</DropdownMenuItem>
+                                                            <DropdownMenuItem className={"w-[130px]"} onClick={() => revokePopup(x)}>Revoke Invitation</DropdownMenuItem>
                                                         </DropdownMenuContent>
                                                     </DropdownMenu>
                                                 </TableCell>
@@ -352,6 +354,7 @@ const Team = () => {
             </Card>
             {isSheetOpen && (
                 <Sheet open={isSheetOpen} onOpenChange={isSheetOpen ? closeSheet : openSheet}>
+                    <SheetOverlay className={"inset-0"} />
                     <SheetContent className={"sm:max-w-[662px] sm:overflow-auto p-0"}>
                         <SheetHeader className={"px-[32px] py-[22px] border-b flex"}>
                             <SheetTitle className={"text-xl font-medium flex justify-between items-center"}>Invite Users
@@ -379,16 +382,13 @@ const Team = () => {
                                 {formError.email && <p className="text-red-500 text-xs mt-1">{formError.email}</p>}
                             </div>
                         </div>
-                        <SheetFooter className={"px-[32px] gap-[16px] sm:justify-start"}>
-                            <Button className={"text-card text-sm font-semibold hover:bg-primary bg-primary"}
-                                    type="submit" onClick={onInviteUser}>{isSave ?
+                        <div className={"flex px-[32px] gap-[16px] sm:justify-start"}>
+                            <Button className={"text-card text-sm font-semibold hover:bg-primary bg-primary"} type="submit" onClick={onInviteUser}>{isSave ?
                                 <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : "Invite"}</Button>
                             <SheetClose asChild onClick={closeSheet}>
-                                <Button
-                                    className={"text-primary text-sm font-semibold hover:bg-card border border-primary bg-card ml-0 m-inline-0"}
-                                    type="submit">Cancel</Button>
+                                <Button className={"text-primary text-sm font-semibold hover:bg-card border border-primary bg-card ml-0 m-inline-0"} type="submit">Cancel</Button>
                             </SheetClose>
-                        </SheetFooter>
+                        </div>
                     </SheetContent>
                 </Sheet>
             )}

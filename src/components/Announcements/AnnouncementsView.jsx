@@ -15,7 +15,7 @@ import { DropdownMenu,
     DropdownMenuTrigger,
     DropdownMenuContent,
     DropdownMenuItem,
-  } from "../ui/dropdown-menu"
+} from "../ui/dropdown-menu"
 import {Separator} from "../ui/separator";
 import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "../ui/select";
 import {useTheme} from "../theme-provider";
