@@ -80,11 +80,11 @@ const Domain = () => {
 
     return (
         <Card>
-            <CardHeader className={"p-6 gap-1 border-b"}>
-                <CardTitle className={"text-2xl font-medium"}>Domain Setting</CardTitle>
+            <CardHeader className={"p-4 sm:p-6  gap-1 border-b"}>
+                <CardTitle className={"text-lg sm:text-2xl font-medium"}>Domain Setting</CardTitle>
                 <CardDescription className={"text-sm text-muted-foreground p-0"}>Personalise your Quickhunt page with a custom domain.</CardDescription>
             </CardHeader>
-            <CardContent className={"p-6 flex flex-col gap-6 border-b"}>
+            <CardContent className={"p-4 sm:p-6 flex flex-col gap-6 border-b"}>
                 <div className="gap-2 relative">
                     <Label htmlFor="domain" className="text-right">Subdomain</Label>
                     <Input disabled  value={settingData.domain.replace('.quickhunt.io', '')} id="domain" placeholder="https://" className={"pr-[115px] bg-card mt-1"} />
@@ -101,7 +101,7 @@ const Domain = () => {
                     <span className={"font-bold"}> DNS</span> and point it at the domain
                     <span className={"font-bold"}> "cname.quickhunt.app"</span>.</p>
             </CardContent>
-            <CardFooter className={"pt-[20px] justify-end"}>
+            <CardFooter className={"p-4 sm:p-6 justify-end"}>
                 <Button className={"text-sm font-semibold"} onClick={onUpdatePortal}>{isSave ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Update Domain"} </Button>
             </CardFooter>
         </Card>

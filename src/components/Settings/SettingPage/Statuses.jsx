@@ -16,34 +16,20 @@ import {
     AlertDialogCancel,
     AlertDialogContent,
     AlertDialogDescription,
-    AlertDialogFooter,
     AlertDialogHeader,
     AlertDialogTitle
 } from "../../ui/alert-dialog";
 import {Skeleton} from "../../ui/skeleton";
-import SettingEmptyDataTable from "../../Comman/SettingEmptyDataTable";
+import NoDataThumbnail from "../../../img/Frame.png";
 
 const initialStatus = {
     title: '',
     color_code: '#000000',
 };
 
-const tableHeadingsArray = [
-    {label:"Status Name"},
-    {label:"Status Update"},
-    {label:"Action"}
-];
-
-
-
 const Statuses = () => {
     const {theme} = useTheme();
     const [isLoading,setIsLoading]=useState(false);
-    const [labelColors, setLabelColors] = useState([
-        {labelName: "Under consideration", name: "clr", value: "#ff3c3c",},
-        {labelName: "Planned", name: "clr", value: "#3b82f6",},
-        {labelName: "In Development", name: "clr", value: "#63c8d9",},
-    ]);
     const [showColorInput, setShowColorInput] = useState(false);
     const [newStatus, setNewStatus] = useState({...initialStatus });
     const [labelError, setLabelError] = useState(initialStatus);
@@ -102,7 +88,7 @@ const Statuses = () => {
         }));
     };
 
-    const handleAddNewLabel = async () => {
+    const handleAddNewStatus = async () => {
         let validationErrors = {};
         Object.keys(newStatus).forEach(name => {
             const error = validation(name, newStatus[name]);
@@ -164,14 +150,7 @@ const Statuses = () => {
         }
     }
 
-    const handleEditLabel = (index) => {
-        const updatedColors = [...labelColors];
-        updatedColors[index] = { ...updatedColors[index]};
-        setLabelColors(updatedColors);
-        setIsEdit(index);
-    };
-
-    const handleSaveStatus = async (record,index) => {
+    const handleSaveStatus = async (index) => {
         const updatedColors = [...statusList];
         const labelToSave = updatedColors[index];
 
@@ -190,13 +169,13 @@ const Statuses = () => {
         setIsSave(true)
         const payload = {
             project_id: `${projectDetailsReducer.id}`,
-            title: record.title,
-            color_code: record.color_code,
+            title: labelToSave.title,
+            color_code: labelToSave.color_code,
         }
-        const data = await apiService.updateRoadmapStatus(payload, record.id)
+        const data = await apiService.updateRoadmapStatus(payload, labelToSave.id)
         if (data.status === 200) {
             let clone = [...statusList];
-            let index = clone.findIndex((x) => x.id === record.id);
+            let index = clone.findIndex((x) => x.id === labelToSave.id);
             if (index !== -1) {
                 clone[index] = data.data;
                 setStatusList(clone)
@@ -219,11 +198,7 @@ const Statuses = () => {
         setIsEdit(null);
     };
 
-    const handleCancelEdit = (index) => {
-        setIsEdit(null);
-    };
-
-    const handleDeleteLabel = (id,index) => {
+    const handleDeleteStatus = (id,index) => {
         setDeleteId(id);
         setDeleteIndex(index)
     };
@@ -237,7 +212,7 @@ const Statuses = () => {
                 setStatusList(clone)
                 dispatch(allStatusAndTypesAction({...allStatusAndTypes, roadmap_status: clone}))
                 toast({
-                    description:data.success
+                    description:"Status deleted successfully"
                 })
             } else if(data.status === 201){
                 toast({
@@ -246,13 +221,10 @@ const Statuses = () => {
                 })
             } else {
                 toast({
-                    description:"Something went wrong "
+                    description:data.message,
+                    variant: "destructive"
                 })
             }
-        } else {
-            const clone = [...statusList];
-            clone.splice(index, 1)
-            setStatusList(clone)
         }
     }
 
@@ -273,9 +245,9 @@ const Statuses = () => {
                 </AlertDialogContent>
             </AlertDialog>
             <Card>
-                <CardHeader className="flex flex-row justify-between items-center border-b">
+                <CardHeader className="flex flex-row flex-wrap gap-y-2 justify-between items-center border-b p-4 sm:p-6">
                     <div>
-                        <CardTitle className="text-2xl font-medium">Statuses</CardTitle>
+                        <CardTitle className="text-lg sm:text-2xl font-medium">Statuses</CardTitle>
                         <CardDescription className="text-sm text-muted-foreground p-0">
                             Use Statuses to track Ideas on your Roadmap.
                         </CardDescription>
@@ -296,7 +268,7 @@ const Statuses = () => {
                                 {
                                     ["","Status Name","Status Color","Action"].map((x,i)=>{
                                         return(
-                                            <TableHead className={`w-[48px] p-0 ${theme === "dark" ? "" : "text-card-foreground"} ${i === 0 ? "w-[48px]" : i === 1 ? "w-2/5" : i === 2 ? "text-center" : i === 3 ? "text-end pr-[39px]" : ""}`}>{x}</TableHead>
+                                            <TableHead className={`p-0 ${theme === "dark" ? "" : "text-card-foreground"} ${i === 0 ? "w-[48px]" : i === 1 ? "w-2/5" : i === 2 ? "text-center" : i === 3 ? "text-end pr-4" : ""}`}>{x}</TableHead>
                                         )
                                     })
                                 }
@@ -310,8 +282,8 @@ const Statuses = () => {
                                             {
                                                 [...Array(4)].map((_, i) => {
                                                     return (
-                                                        <TableCell className={"max-w-[373px]"}>
-                                                            <Skeleton className={"rounded-md  w-full h-[40px]"}/>
+                                                        <TableCell className={"px-2"}>
+                                                            <Skeleton className={`rounded-md  w-full h-[24px] ${i == 0 ? "w-full" : ""}`}/>
                                                         </TableCell>
                                                     )
                                                 })
@@ -362,20 +334,20 @@ const Statuses = () => {
                                                 </div>
                                             </TableCell>
                                         }
-                                        <TableCell className="flex justify-end gap-2 pr-6">
+                                        <TableCell className="flex justify-end gap-2 pr-4">
                                             {isEdit === i ? (
                                                 <Fragment>
                                                     <Button
                                                         variant="outline hover:bg-transparent"
                                                         className={`p-1 border w-[30px] h-[30px] ${isSave ? "justify-center items-center" : ""}`}
-                                                        onClick={() => handleSaveStatus(x, i)}
+                                                        onClick={() => handleSaveStatus(i)}
                                                     >
                                                         {isSave ? <Loader2 className="mr-1 h-4 w-4 animate-spin justify-center"/> : <Check size={16}/>}
                                                     </Button>
                                                     <Button
                                                         variant="outline hover:bg-transparent"
                                                         className="p-1 border w-[30px] h-[30px]"
-                                                        onClick={() => handleCancelEdit(i)}
+                                                        onClick={() => setIsEdit(null)}
                                                     >
                                                         <X size={16}/>
                                                     </Button>
@@ -385,14 +357,14 @@ const Statuses = () => {
                                                     <Button
                                                         variant="outline hover:bg-transparent"
                                                         className="p-1 border w-[30px] h-[30px]"
-                                                        onClick={() => handleEditLabel(i)}
+                                                        onClick={() => setIsEdit(i)}
                                                     >
                                                         <Pencil size={16}/>
                                                     </Button>
                                                     <Button
                                                         variant="outline hover:bg-transparent"
                                                         className="p-1 border w-[30px] h-[30px]"
-                                                        onClick={() => handleDeleteLabel(x.id, i)}
+                                                        onClick={() => handleDeleteStatus(x.id, i)}
                                                     >
                                                         <Trash2 size={16}/>
                                                     </Button>
@@ -441,7 +413,7 @@ const Statuses = () => {
                                             <Button
                                                 variant=""
                                                 className="text-sm font-semibold"
-                                                onClick={() => handleAddNewLabel()}
+                                                onClick={handleAddNewStatus}
                                             >
                                                 {isSave ? <Loader2 className={"mr-2 h-4 w-4 animate-spin"}/> : "Add Status"}
                                             </Button>
@@ -451,6 +423,12 @@ const Statuses = () => {
                             </TableBody>
                         }
                     </Table>
+                        {isLoading === false && statusList.length === 0 && <div className={"flex flex-row justify-center py-[45px]"}>
+                            <div className={"flex flex-col items-center gap-2"}>
+                                <img src={NoDataThumbnail} className={"flex items-center"}/>
+                                <h5 className={`text-center text-2xl font-medium leading-8 ${theme === "dark" ? "" : "text-[#A4BBDB]"}`}>No Data</h5>
+                            </div>
+                        </div>}
                     </div>
                 </CardContent>
         </Card>

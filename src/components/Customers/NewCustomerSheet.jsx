@@ -63,12 +63,12 @@ const NewCustomerSheet = ({isOpen,onOpen,onClose}) => {
         <Sheet open={isOpen} onOpenChange={isOpen ? onClose : onOpen}>
             <SheetOverlay className={"inset-0"} />
              <SheetContent className={"pt-[24px] p-0 max-h-screen overflow-y-auto  lg:max-w-[662px] h-full sm:max-w-[520px] p-0"} >
-                 <SheetHeader className={"px-8 py-6 flex flex-row justify-between items-center"}>
-                     <h5 className={"text-xl font-medium leading-5"}>Add New Customer</h5>
+                 <SheetHeader className={"sm:px-8 sm:py-6 px-3 py-4 flex flex-row justify-between items-center"}>
+                     <h5 className={"text-sm md:text-xl font-medium leading-5"}>Add New Customer</h5>
                      <Button className={"h-5 w-5 p-0"} onClick={onClose} variant={"ghost"}><X size={18} className={"h-5 w-5"}/></Button>
                  </SheetHeader>
                  <Separator className={"text-muted-foreground"}/>
-                 <div className={"px-8 py-6"}>
+                 <div className={"sm:px-8 sm:py-6 px-3 py-4"}>
                      <div className="grid w-full gap-2">
                          <Label htmlFor="name">Name</Label>
                          <Input value={customerDetails.customer_name} name="customer_name" onChange={onChangeText} type="text" id="name" className={"h-9 text-muted-foreground"} placeholder={"Enter the full name of customer..."}/>
@@ -85,7 +85,7 @@ const NewCustomerSheet = ({isOpen,onOpen,onClose}) => {
                      </div>
                  </div>
                  <Separator className={"mb-8 text-muted-foreground"}/>
-                 <div className={"px-8"}>
+                 <div className={"px-3 sm:px-8"}>
                      <Button onClick={createCustomers}>{isSave ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Add Customer"}</Button>
                  </div>
              </SheetContent>

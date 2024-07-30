@@ -1,7 +1,7 @@
 import React, {useEffect, useRef, useState, Fragment} from 'react';
 import { SketchPicker } from 'react-color'
 
-const ColorInput = ({ value, name, onChange}) => {
+const ColorInput = ({ value, name, onChange,style}) => {
     const [clickedOutside, setClickedOutside] = useState(false);
     const myRef = useRef();
     const handleClickOutside = (e) => {
@@ -18,7 +18,7 @@ const ColorInput = ({ value, name, onChange}) => {
     });
     return (
         <Fragment>
-            <div className="color_picker py-2 px-3 bg-card border border-border rounded-lg" onClick={handleClickInside} ref={myRef}>
+            <div className="color_picker py-2 px-3 bg-card border border-border rounded-lg" style={style} onClick={handleClickInside} ref={myRef}>
                 <div style={{background: value}} className="color_picker_color"></div>
                 <span id={name}>{value ? value: "#000000"}</span>
                 {

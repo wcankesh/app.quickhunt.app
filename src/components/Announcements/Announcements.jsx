@@ -59,17 +59,15 @@ const Announcements = () => {
     const [pageNo, setPageNo] = useState(1);
     const [totalRecord, setTotalRecord] = useState(0);
     const [selectedRecord, setSelectedRecord] = useState({})
-    const [selectedRecordAnalytics, setSelectedRecordAnalytics] = useState({})
     const [editIndex, setEditIndex] = useState(null);
     const [analyticsObj, setAnalyticsObj] = useState({})
     const apiService = new ApiService();
+    const totalPages = Math.ceil(totalRecord / perPageLimit);
 
     const openSheet = () => {
         setSelectedRecord({id: "new"})
     };
-    const openAnalyticsSheet = (record) => {
-        setSelectedRecordAnalytics(record)
-    }
+
     const onCloseAnalyticsSheet = () => {
         setAnalyticsObj({})
     }
@@ -152,7 +150,6 @@ const Announcements = () => {
         localStorage.setItem("tabIndex", tabIndex);
     }
 
-    const totalPages = Math.ceil(totalRecord / perPageLimit);
 
     const handlePaginationClick = (newPage) => {
         if (newPage >= 1 && newPage <= totalPages) {
@@ -164,11 +161,14 @@ const Announcements = () => {
         <div
             className={"xl:container xl:max-w-[1200px] lg:container lg:max-w-[992px] md:container md:max-w-[768px] sm:container sm:max-w-[639px] pt-8 pb-5 px-4"}>
             {selectedRecord.id &&
-            <CreateAnnouncementsLogSheet isOpen={selectedRecord.id} selectedRecord={selectedRecord}
-                                         setSelectedRecord={setSelectedRecord} onOpen={openSheet} onClose={closeSheet}
+            <CreateAnnouncementsLogSheet isOpen={selectedRecord.id}
+                                         selectedRecord={selectedRecord}
+                                         onOpen={openSheet}
+                                         onClose={closeSheet}
             />}
-            {analyticsObj.id && <SidebarSheet selectedViewAnalyticsRecord={analyticsObj} analyticsObj={analyticsObj}
-                                              isOpen={analyticsObj.id} onOpen={openAnalyticsSheet}
+            {analyticsObj.id && <SidebarSheet selectedViewAnalyticsRecord={analyticsObj}
+                                              analyticsObj={analyticsObj}
+                                              isOpen={analyticsObj.id}
                                               onClose={onCloseAnalyticsSheet}/>}
             <div className={"flex items-center justify-between flex-wrap gap-6"}>
                 <div className={"flex justify-between items-center w-full md:w-auto"}>
@@ -276,19 +276,16 @@ const Announcements = () => {
             <Card className={"mt-8"}>
                 {tab == 0 && <AnnouncementsTable
                     setAnalyticsObj={setAnalyticsObj}
-                    analyticsObj={analyticsObj}
                     handleDelete={handleDelete}
-                    editIndex={editIndex}
                     setEditIndex={setEditIndex}
                     data={announcementList}
-                    selectedRecord={selectedRecord}
                     setSelectedRecord={setSelectedRecord}
                     isLoading={isLoading}/>
                 }
                 {tab == 1 && <AnnouncementsView
                     setAnalyticsObj={setAnalyticsObj}
-                    analyticsObj={analyticsObj} handleDelete={handleDelete}
-                    isLoading={isLoading} selectedRecord={selectedRecord}
+                    handleDelete={handleDelete}
+                    isLoading={isLoading}
                     setSelectedRecord={setSelectedRecord}
                     data={announcementList}/>
                 }

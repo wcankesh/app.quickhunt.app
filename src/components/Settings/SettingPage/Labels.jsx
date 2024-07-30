@@ -14,7 +14,6 @@ import {
     AlertDialogCancel,
     AlertDialogContent,
     AlertDialogDescription,
-    AlertDialogFooter,
     AlertDialogHeader,
     AlertDialogTitle
 } from "../../ui/alert-dialog";
@@ -43,7 +42,6 @@ const Labels = () => {
     const [deleteIndex,setDeleteIndex] = useState(null);
     const [deleteId,setDeleteId]=useState(null);
     const [isSave,setIsSave]=useState(false);
-    const [selectedRecord,setSelectedRecord]=useState(null);
     const dispatch = useDispatch();
 
     useEffect(() => {
@@ -54,7 +52,7 @@ const Labels = () => {
         setIsLoading(true)
         const data = await apiService.getAllLabels(projectDetailsReducer.id)
         if (data.status === 200) {
-            setLabelList(data.data)
+            setLabelList(data.data);
             setIsLoading(false)
         } else {
             setIsLoading(false)
@@ -114,7 +112,6 @@ const Labels = () => {
             clone.push(data.data);
             setLabelList(clone);
             dispatch(allStatusAndTypesAction({...allStatusAndTypes, labels: clone}))
-            setSelectedRecord(null)
             setIsSave(false);
             toast({
                 description:"Label added successfully"
@@ -189,7 +186,6 @@ const Labels = () => {
                 setLabelList(clone)
                 dispatch(allStatusAndTypesAction({...allStatusAndTypes, labels: clone}))
             }
-            setSelectedRecord(null)
             setIsSave(false)
             toast({
                 description:"Label updated successfully"
@@ -262,9 +258,9 @@ const Labels = () => {
                     </div>
                 </AlertDialogContent>
             </AlertDialog>
-            <CardHeader className="flex flex-row justify-between items-center border-b">
+            <CardHeader className="flex flex-row justify-between items-center border-b p-4 flex-wrap md:flex-nowrap sm:p-6 gap-y-2">
                 <div>
-                    <CardTitle className="text-2xl font-medium">Labels</CardTitle>
+                    <CardTitle className="text-lg sm:text-2xl font-medium">Labels</CardTitle>
                     <CardDescription className="text-sm text-muted-foreground p-0">
                         Use Labels to organise your Changelog
                     </CardDescription>
@@ -278,7 +274,8 @@ const Labels = () => {
                 </Button>
             </CardHeader>
             <CardContent className="p-0">
-               <Table>
+                <div className={"grid grid-cols-1 overflow-auto whitespace-nowrap"}>
+                    <Table>
                     <TableHeader className="p-0">
                         <TableRow>
                             {
@@ -298,7 +295,7 @@ const Labels = () => {
                                         {
                                             [...Array(3)].map((_, i) => {
                                                 return (
-                                                    <TableCell key={i} className={""}>
+                                                    <TableCell className={"px-2"} key={i}>
                                                         <Skeleton className={"rounded-md  w-full h-[24px]"}/>
                                                     </TableCell>
                                                 )
@@ -440,12 +437,14 @@ const Labels = () => {
                     </TableBody>
                     }
              </Table>
-                {isLoading === false && labelList.length === 0 && <div className={"flex flex-row justify-center py-[45px]"}>
-                    <div className={"flex flex-col items-center gap-2"}>
-                        <img src={NoDataThumbnail} className={"flex items-center"}/>
-                        <h5 className={`text-center text-2xl font-medium leading-8 ${theme === "dark" ? "" : "text-[#A4BBDB]"}`}>No Data</h5>
-                    </div>
-                </div>}
+                    {isLoading === false && labelList.length === 0 && <div className={"flex flex-row justify-center py-[45px]"}>
+                        <div className={"flex flex-col items-center gap-2"}>
+                            <img src={NoDataThumbnail} className={"flex items-center"}/>
+                            <h5 className={`text-center text-2xl font-medium leading-8 ${theme === "dark" ? "" : "text-[#A4BBDB]"}`}>No Data</h5>
+                        </div>
+                    </div>}
+                </div>
+
             </CardContent>
         </Card>
     );

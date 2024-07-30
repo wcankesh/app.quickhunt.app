@@ -3,11 +3,12 @@ import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} f
 import {Label} from "../../ui/label";
 import {Input} from "../../ui/input";
 import {Button} from "../../ui/button";
-import {Eye, EyeOff, Loader2} from "lucide-react";
+import {CircleX, Eye, EyeOff, Loader2} from "lucide-react";
 import {useSelector,useDispatch} from "react-redux";
 import {ApiService} from "../../../utils/ApiService";
 import {userDetailsAction} from "../../../redux/action/UserDetailAction";
 import {toast} from "../../ui/use-toast";
+import {useTheme} from "../../theme-provider";
 
 const initialState = {
     id: "",
@@ -54,6 +55,7 @@ const Profile = () => {
     const dispatch = useDispatch();
     const apiSerVice = new ApiService();
     const [previewImage,setPreviewImage] = useState("");
+    const {theme} = useTheme();
 
     useEffect(() => {
         setUserDetails({...userDetailsReducer});
@@ -174,13 +176,13 @@ const Profile = () => {
             setIsLoading(false);
             toast({
                 description: data.message,
-            })
+            });
         } else {
             setIsLoading(false);
             toast({
                 description: "Something went wrong!!!",
                 variant:"destructive"
-            })
+            });
         }
     }
 
@@ -215,23 +217,35 @@ const Profile = () => {
         }
     }
 
+    const removePreviewImage = () => {
+        setPreviewImage("");
+    }
+
     return (
         <div className={"flex flex-col gap-6"}>
             <Card>
-                <CardHeader className={"gap-1 border-b"}>
-                    {/*<CardTitle>*/}
-                        <h3 className={"font-medium text-2xl"}>Edit Profile</h3>
-                    {/*</CardTitle>*/}
+                <CardHeader className={"gap-1 border-b p-4 sm:p-6"}>
+                       <h3 className={"font-medium text-lg sm:text-2xl"}>Edit Profile</h3>
                     <CardDescription className={" text-sm text-muted-foreground p-0"}>Manage your personal account settings.</CardDescription>
                 </CardHeader>
-                <CardContent className={"py-6 px-4 border-b"}>
-                    <div className={"flex gap-4 flex-wrap lg:flex-nowrap md:flex-wrap sm:flex-wrap"}>
-                        <div className="flex justify-center mt-2">
+                <CardContent className={"py-4 px-4 sm:py-6 border-b"}>
+                    <div className={"flex gap-4 flex-wrap lg:flex-nowrap md:flex-nowrap sm:flex-wrap"}>
+                        <div className="flex justify-center mt-2 relative">
                             <label
                                 htmlFor="upload_image"
-                                className="flex w-[132px] h-[128px] py-0 justify-center items-center flex-shrink-0 border-dashed border-[1px] border-gray-300 rounded cursor-pointer"
+                                className="flex w-[80px] h-[80px] sm:w-[132px] sm:h-[128px] py-0 justify-center items-center flex-shrink-0 border-dashed border-[1px] border-gray-300 rounded cursor-pointer"
                             >
-                                {previewImage ? <img className={"h-full w-full rounded-md object-cover"} src={previewImage} alt={"not_found"} /> : <span className="text-center text-muted-foreground font-semibold text-[14px]">Upload Image</span>}
+                                {previewImage ? (
+                                    <img
+                                        className="h-full w-full rounded-md object-cover"
+                                        src={previewImage}
+                                        alt="not_found"
+                                    />
+                                ) : (
+                                    <span className="text-center text-muted-foreground font-semibold text-[14px]">
+                                        Upload Image
+                                    </span>
+                                )}
                                 <input
                                     id="upload_image"
                                     type="file"
@@ -240,9 +254,13 @@ const Profile = () => {
                                     accept="image/*"
                                 />
                             </label>
+                            {previewImage && (
+                                    <CircleX size={20} className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`} onClick={removePreviewImage}/>
+                            )}
                         </div>
-                        <div className={"flex flex-col gap-4 md:w-full sm:w-full"}>
-                            <div className={"flex gap-4 flex-wrap lg:flex-nowrap md:flex-wrap sm:flex-wrap"}>
+
+                        <div className={"flex flex-col gap-4 w-full sm:w-full"}>
+                            <div className={"flex gap-4 flex-wrap sm:flex-nowrap"}>
                                 <div className={"basis-full"}>
                                     <Label htmlFor="email" className={"font-medium"}>First Name</Label>
                                     <Input
@@ -281,7 +299,7 @@ const Profile = () => {
                                 </div>
                             </div>
                             <div className={"flex gap-4 lg:flex-nowrap md:flex-wrap"}>
-                                <div className={"w-full md:w-full sm:w-full"}>
+                                <div className={"w-full sm:w-[49%]"}>
                                     <Label htmlFor="email" className={"font-medium"}>Email</Label>
                                     <Input
                                         id="email"
@@ -319,15 +337,15 @@ const Profile = () => {
                         </div>
                     </div>
                 </CardContent>
-                <CardFooter className={"p-6 justify-end"}>
+                <CardFooter className={"flex items-center p-4 sm:p-6 justify-end"}>
                     <Button onClick={onUpdateUser} className={"text-sm font-semibold"}>{isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Save Changes"}</Button>
                 </CardFooter>
             </Card>
             <Card>
-                <CardHeader className={"border-b"}>
+                <CardHeader className={"gap-1 border-b p-4 sm:p-6"}>
                     <CardTitle className={"text-sm font-medium"}>Change a password for your account</CardTitle>
                 </CardHeader>
-                <CardContent className={"pt-4 "}>
+                <CardContent className={"py-4 px-4 sm:p-6"}>
                     <div className={"flex flex-col gap-4"}>
                         <div>
                         <Label htmlFor="email">Current password</Label>
@@ -403,7 +421,7 @@ const Profile = () => {
 
                     </div>
                 </CardContent>
-                <CardFooter className={"p-6 pt-0 justify-end"}>
+                <CardFooter className={"justify-end sm:pt-0 pt-0 px-4 pt-0 pb-4 sm:px-6"}>
                     <Button className={"text-sm font-semibold"} onClick={changePassword}>{isLoadingPass ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Update Password"}</Button>
                 </CardFooter>
             </Card>

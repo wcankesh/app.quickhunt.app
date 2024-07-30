@@ -24,6 +24,7 @@ import {
     AlertDialogHeader,
     AlertDialogTitle
 } from "../../ui/alert-dialog";
+import NoDataThumbnail from "../../../img/Frame.png";
 
 const initialState = {
     name:"",
@@ -56,13 +57,13 @@ const Categories = () => {
         const data = await apiService.getAllCategory(projectDetailsReducer.id)
         if(data.status === 200){
             setCategoriesList(data.data);
-            setIsLoading(false)
+            setIsLoading(false);
         } else {
-            setIsLoading(false)
+            setIsLoading(false);
         }
     }
 
-    const onEditOption = (record,index) => {
+    const onEditOption = (record) => {
             setEditRecord(record);
             setSheetOpen(true);
             setCategoryDetails({...record});
@@ -130,9 +131,8 @@ const Categories = () => {
             const clone = [...categoriesList];
             let index = clone.findIndex((x) => x.id === categoryDetails.id);
             if(index === -1){
-                clone.push(data.data)
-                dispatch(allStatusAndTypesAction({...allStatusAndTypes, categories: clone}));
                 clone.unshift(data.data);
+                dispatch(allStatusAndTypesAction({...allStatusAndTypes, categories: clone}));
                 setCategoriesList(clone);
             }
             setCategoriesList(clone)
@@ -242,9 +242,9 @@ const Categories = () => {
                 </AlertDialogContent>
             </AlertDialog>
             <Card>
-                <CardHeader className={"p-6 gap-1 border-b flex flex-row justify-between items-center"}>
+                <CardHeader className={"p-6 gap-1 border-b flex flex-row flex-wrap justify-between items-center p-4 sm:p-6 gap-y-2"}>
                     <div>
-                        <CardTitle className={"text-2xl font-medium leading-8"}>Categories</CardTitle>
+                        <CardTitle className={"text-lg sm:text-2xl font-medium leading-8"}>Categories</CardTitle>
                         <CardDescription className={"text-sm text-muted-foreground p-0 mt-1 leading-5"}>Use Categories to organise your Changelog</CardDescription>
                     </div>
                     <div className={"m-0"}>
@@ -252,29 +252,6 @@ const Categories = () => {
                     </div>
                 </CardHeader>
                 <CardContent className={"p-0"}>
-                    {
-                        isLoading ? <Table>
-                                        <TableHeader className={""}>
-                                            <TableRow>
-                                                <TableHead className={`w-2/5 pl-4 ${theme === "dark" ? "" : "text-card-foreground"}`}>Label Name</TableHead>
-                                                <TableHead className={`text-center ${theme === "dark" ? "" : "text-card-foreground"}`}>Last Update</TableHead>
-                                                <TableHead className={`pr-[39px] text-end ${theme === "dark" ? "" : "text-card-foreground"}`}>Action</TableHead>
-                                            </TableRow>
-                                        </TableHeader>
-                                        <TableBody>
-                                            {
-                                                [...Array(5)].map((_,index)=>{
-                                                    return(
-                                                        <TableRow key={index}>
-                                                            <TableCell><Skeleton className={"w-full h-[24px] rounded-md"}/></TableCell>
-                                                            <TableCell><Skeleton className={"w-full h-[24px] rounded-md"}/></TableCell>
-                                                            <TableCell><Skeleton className={"w-full h-[24px] rounded-md"}/></TableCell>
-                                                        </TableRow>
-                                                    )
-                                                })
-                                            }
-                                        </TableBody>
-                                    </Table> :
                                     <Table>
                                         <TableHeader className={""}>
                                             <TableRow>
@@ -283,42 +260,66 @@ const Categories = () => {
                                                 <TableHead className={`pr-[39px] text-end ${theme === "dark" ? "" : "text-card-foreground"}`}>Action</TableHead>
                                             </TableRow>
                                         </TableHeader>
-                                        <TableBody>
-                                            {
-                                                (categoriesList || []).map((x,index)=>{
-                                                    return(
-                                                        <TableRow key={x.id}>
-                                                            <TableCell className={`font-medium text-xs py-[8.5px] pl-4 ${theme === "dark" ? "" : "text-muted-foreground"}`}>
-                                                                {x.name}
-                                                            </TableCell>
-                                                            <TableCell className={`font-medium text-xs leading-normal text-center ${theme === "dark" ? "" : "text-muted-foreground"}`}>{moment.utc(x.updated_at).local().startOf('seconds').fromNow()}</TableCell>
-                                                            <TableCell className={"flex justify-end"}>
-                                                                <div className="pr-0">
-                                                                         <Button onClick={() => onEditOption(x,index)} variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px]`}><Pencil size={16}/></Button>
-                                                                </div>
-                                                                <div className="pl-2"><Button onClick={()=>deleteCategory(x.id,index)} variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px]`}><Trash2 size={16} /></Button></div>
-                                                            </TableCell>
-                                                        </TableRow>
-                                                    )
-                                                })
-                                            }
-                                        </TableBody>
+                                        {
+                                            isLoading ? <TableBody>
+                                                    {
+                                                        [...Array(5)].map((_, index) => {
+                                                            return (
+                                                                <TableRow key={index}>
+                                                                    {
+                                                                        [...Array(3)].map((_, i) => {
+                                                                            return (
+                                                                                <TableCell key={i} className={"px-2"}>
+                                                                                    <Skeleton className={`rounded-md  w-full h-[24px] ${i == 0 ? "w-full" : ""}`}/>
+                                                                                </TableCell>
+                                                                            )
+                                                                        })
+                                                                    }
+                                                                </TableRow>
+                                                            )
+                                                        })
+                                                    }
+                                                </TableBody> :
+                                            <TableBody>
+                                                    {
+                                                        (categoriesList || []).map((x,index)=>{
+                                                            return(
+                                                                <TableRow key={x.id}>
+                                                                    <TableCell className={`font-medium text-xs py-[8.5px] pl-4 ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                                                        {x.name}
+                                                                    </TableCell>
+                                                                    <TableCell className={`font-medium text-xs leading-normal text-center ${theme === "dark" ? "" : "text-muted-foreground"}`}>{moment.utc(x.updated_at).local().startOf('seconds').fromNow()}</TableCell>
+                                                                    <TableCell className={"flex justify-end"}>
+                                                                        <div className="pr-0">
+                                                                            <Button onClick={() => onEditOption(x,index)} variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px]`}><Pencil size={16}/></Button>
+                                                                        </div>
+                                                                        <div className="pl-2"><Button onClick={()=>deleteCategory(x.id,index)} variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px]`}><Trash2 size={16} /></Button></div>
+                                                                    </TableCell>
+                                                                </TableRow>
+                                                            )
+                                                        })
+                                                    }
+                                                </TableBody>
+                                        }
                                     </Table>
-                    }
+                                {isLoading === false && categoriesList.length === 0 && <div className={"flex flex-row justify-center py-[45px]"}>
+                                    <div className={"flex flex-col items-center gap-2"}>
+                                        <img src={NoDataThumbnail} className={"flex items-center"}/>
+                                        <h5 className={`text-center text-2xl font-medium leading-8 ${theme === "dark" ? "" : "text-[#A4BBDB]"}`}>No Data</h5>
+                                    </div>
+                                </div>}
                 </CardContent>
             </Card>
             {isSheetOpen && (
                 <Sheet open={isSheetOpen} onOpenChange={isSheetOpen ? closeSheet : openSheet}>
                     <SheetOverlay className={"inset-0"} />
                     <SheetContent className={"sm:max-w-[662px] sm:overflow-auto p-0"}>
-                        <SheetHeader className={"px-[32px] py-[22px] border-b flex"}>
-                            <SheetTitle className={"text-xl font-medium flex justify-between items-center"}>{editRecord.id ? "Edit New Category" : "New Category"}
-                                <Button className={"bg-transparent hover:bg-transparent p-0 h-[24px]"}>
-                                    <X className={"stroke-card-foreground"} onClick={closeSheet} />
-                                </Button>
+                        <SheetHeader className={"sm:px-8 sm:py-6 py-4 px-3 border-b flex"}>
+                            <SheetTitle className={"text-sm md:text-xl font-medium flex justify-between items-center"}>{editRecord.id ? "Edit New Category" : "New Category"}
+                                <Button className={"h-5 w-5 p-0"} onClick={closeSheet}  variant={"ghost"}><X size={18} className={"h-5 w-5"}/></Button>
                             </SheetTitle>
                         </SheetHeader>
-                        <div className={"px-8 py-6"}>
+                        <div className={"py-4 px-3 sm:px-8 sm:py-6"}>
                             <div className={"flex flex-col gap-6"}>
                                 <div className="grid w-full gap-2">
                                     <Label htmlFor="name">Name</Label>
@@ -333,7 +334,7 @@ const Categories = () => {
                             </div>
                         </div>
                         <Separator/>
-                        <div className={"px-8 py-6"}>
+                        <div className={"sm:px-8 sm:py-6 py-4 px-3"}>
                             <Button onClick={editRecord?.id ? updateCategory : addCategory}>{isSave ? <Loader2 className={"mr-2 h-4 w-4 animate-spin"}/> : editRecord.id ? "Update Category" : "Add Category" }</Button>
                         </div>
                     </SheetContent>

@@ -160,7 +160,7 @@ const AnnouncementsTable = ({data,isLoading ,setSelectedRecord,setEditIndex ,han
                                                                 <SelectContent>
                                                                     <SelectGroup>
                                                                         {
-                                                                            (status || []).map((x, i) => {
+                                                                            (   status || []).map((x, i) => {
                                                                                 return (
                                                                                     <Fragment key={i}>
                                                                                         <SelectItem value={x.value}>

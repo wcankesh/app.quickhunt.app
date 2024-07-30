@@ -23,11 +23,11 @@ import {
     AlertDialogCancel,
     AlertDialogContent,
     AlertDialogDescription,
-    AlertDialogFooter,
     AlertDialogHeader,
     AlertDialogTitle,
 } from "../../ui/alert-dialog"
 import NoDataThumbnail from "../../../img/Frame.png";
+import {Separator} from "../../ui/separator";
 
 const initialState = {
     email: "",
@@ -214,10 +214,6 @@ const Team = () => {
                             This action can't be undone.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
-                    {/*<AlertDialogFooter>*/}
-                    {/*    <AlertDialogCancel >Cancel</AlertDialogCancel>*/}
-                    {/*    <AlertDialogAction className={"bg-red-600 hover:bg-red-600"} onClick={onDelete}>Revoke</AlertDialogAction>*/}
-                    {/*</AlertDialogFooter>*/}
                     <div className={"flex justify-end gap-2"}>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
                         <AlertDialogAction className={"bg-red-600 hover:bg-red-600"} onClick={onDelete}>Revoke</AlertDialogAction>
@@ -225,19 +221,19 @@ const Team = () => {
                 </AlertDialogContent>
             </AlertDialog>
             <Card>
-                <CardHeader className={"flex flex-row justify-between gap-1 items-center"}>
+                <CardHeader className={"flex flex-row flex-wrap md:flex-nowrap justify-between gap-x-6 items-center p-4 sm:p-6"}>
                     <div>
-                        <CardTitle className={"text-2xl font-medium"}>Invite Team</CardTitle>
+                        <CardTitle className={"text-lg sm:text-2xl font-medium"}>Invite Team</CardTitle>
                         <CardDescription className={"text-sm text-muted-foreground p-0"}>Add members to your company to
                             help manage ideas.</CardDescription>
                     </div>
-                    <div className={"m-0"}>
+                    <div className={"mt-1 md:m-0"}>
                         <Button className={"text-sm font-semibold"} onClick={openSheet}>Invite Team</Button>
                     </div>
                 </CardHeader>
                 <CardContent className={"p-0"}>
                     <Tabs defaultValue="users" className="space-y-6">
-                        <div className={"px-6"}>
+                        <div className={"px-4 sm:px-6"}>
                             <TabsList className="grid w-[141px] grid-cols-2 bg-card border">
                                 <TabsTrigger value="users"
                                              className={`text-sm font-medium team-tab-active team-tab-text-active ${theme === "dark" ? "text-card-foreground" : ""}`}>Users</TabsTrigger>
@@ -246,14 +242,14 @@ const Team = () => {
                             </TabsList>
                         </div>
                         <TabsContent value="users">
-                            <div>
+                            <div className={"grid grid-cols-1 overflow-auto whitespace-nowrap"}>
                                     <Table>
                                         <TableHeader className={"p-0"}>
                                             <TableRow className={""}>
                                                 {
                                                     ["Team", "Role"].map((x, i) => {
                                                         return (
-                                                            <TableHead key={x} className={`h-[22px] pl-6 pb-2 text-sm font-medium ${i === 1 ? "text-end" : ""} ${theme === "dark" ? "" : "text-card-foreground"}`}>{x}</TableHead>
+                                                            <TableHead key={x} className={`h-[22px] sm:pl-6 pb-2 text-sm font-medium ${i === 1 ? "text-end" : ""} ${theme === "dark" ? "" : "text-card-foreground"}`}>{x}</TableHead>
                                                         )
                                                     })
                                                 }
@@ -320,7 +316,7 @@ const Team = () => {
                                             {
                                                 ["Email", "Status", "Invited", "Action"].map((x, i) => {
                                                     return (
-                                                        <TableHead key={i} className={`h-[22px] b-2 text-sm font-medium ${i === 0 ? "pl-6" : i === 3 ? "pr-3" : ""} ${theme === "dark" ? "" : "text-card-foreground"}`}>{x}</TableHead>
+                                                        <TableHead key={i} className={`h-[22px] b-2 text-sm font-medium ${i === 0 ? "sm:pl-6" : i === 3 ? "pr-3" : ""} ${theme === "dark" ? "" : "text-card-foreground"}`}>{x}</TableHead>
                                                     )
                                                 })
                                             }
@@ -329,7 +325,7 @@ const Team = () => {
                                     <TableBody>
                                         {(invitationList || []).map((x, i) => (
                                             <TableRow key={i}>
-                                                <TableCell className="font-medium pl-6">{x?.member_email}</TableCell>
+                                                <TableCell className="font-medium sm:pl-6">{x?.member_email}</TableCell>
                                                 <TableCell>Expires in {moment(x?.expire_at).diff(moment(new Date()), 'days')} days</TableCell>
                                                 <TableCell>Invited about {moment.utc(x.created_at).local().startOf('seconds').fromNow()}</TableCell>
                                                 <TableCell className="pr-6 text-right">
@@ -356,14 +352,12 @@ const Team = () => {
                 <Sheet open={isSheetOpen} onOpenChange={isSheetOpen ? closeSheet : openSheet}>
                     <SheetOverlay className={"inset-0"} />
                     <SheetContent className={"sm:max-w-[662px] sm:overflow-auto p-0"}>
-                        <SheetHeader className={"px-[32px] py-[22px] border-b flex"}>
-                            <SheetTitle className={"text-xl font-medium flex justify-between items-center"}>Invite Users
-                                <Button className={"bg-transparent hover:bg-transparent p-0 h-[24px]"}>
-                                    <X className={"stroke-card-foreground"} onClick={closeSheet}/>
-                                </Button>
+                        <SheetHeader className={"px-3 py-4 sm:px-[32px] sm:py-[22px] border-b flex"}>
+                            <SheetTitle className={"text-sm md:text-xl font-medium flex justify-between items-center"}>Invite Users
+                                <Button className={"h-5 w-5 p-0"} onClick={closeSheet}  variant={"ghost"}><X size={18} className={"h-5 w-5"}/></Button>
                             </SheetTitle>
                         </SheetHeader>
-                        <div className="grid gap-[24px] px-[32px] pt-[24px] pb-[36px]">
+                        <div className="grid gap-[24px] px-3 py-4 sm:px-[32px] sm:pt-[24px] ">
                             <div className="flex flex-col gap-2">
                                 <div>
                                     <Label htmlFor="name" className="text-right">Add emails of users you want to invite to test, and click on Invite</Label>
@@ -382,7 +376,8 @@ const Team = () => {
                                 {formError.email && <p className="text-red-500 text-xs mt-1">{formError.email}</p>}
                             </div>
                         </div>
-                        <div className={"flex px-[32px] gap-[16px] sm:justify-start"}>
+                        <Separator/>
+                        <div className={"flex px-3 py-4 sm:px-[32px] gap-[16px] sm:justify-start"}>
                             <Button className={"text-card text-sm font-semibold hover:bg-primary bg-primary"} type="submit" onClick={onInviteUser}>{isSave ?
                                 <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : "Invite"}</Button>
                             <SheetClose asChild onClick={closeSheet}>

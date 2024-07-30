@@ -9,6 +9,7 @@ import Notification from "../components/Notification/Notification";
 import Settings from "../components/Settings/Settings";
 import PricingPlans from "../components/PricingPlan/PricingPlans";
 import HelpSupport from "../components/HelpSupport/HelpSupport";
+import InAppMessage from "../components/InAppMessage/InAppMessage";
 import UpdateWidget from "../components/Widgets/UpdateWidget";
 
 export const routes = [
@@ -23,4 +24,5 @@ export const routes = [
      {path: `${baseUrl}/help-support`, component: <HelpSupport/>},
      {path: `${baseUrl}/pricing-plan`, component: <PricingPlans/>},
      {path: `${baseUrl}/settings/:type`, component: <Settings/>},
+     {path: `${baseUrl}/in-app-message`, component: <InAppMessage/>},
 ]

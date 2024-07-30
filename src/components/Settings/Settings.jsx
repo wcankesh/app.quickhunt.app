@@ -10,12 +10,13 @@ import Project from "./SettingPage/Project";
 import Domain from "./SettingPage/Domain";
 import Labels from "./SettingPage/Labels";
 import Categories from "./SettingPage/Categories";
-import Topics from "./SettingPage/Topics";
+import Tags from "./SettingPage/Tags";
 import Statuses from "./SettingPage/Statuses";
 import Social from "./SettingPage/Social";
 import Emoji from "./SettingPage/Emoji";
-import {Menu, SmilePlus} from "lucide-react";
+import {Kanban, Menu, SmilePlus} from "lucide-react";
 import {  Popover, PopoverContent, PopoverTrigger} from "../ui/popover";
+import Board from "./SettingPage/Board";
 
 const Settings = () => {
     let navigate = useNavigate();
@@ -88,10 +89,17 @@ const Settings = () => {
             useFor: "(Announcements)",
         },
         {
-            title: 'Topics',
-            link: 'topics',
+            title: 'Tags',
+            link: 'tags',
             icon: Icon.setTopicsIcon,
-            selected: `${baseUrl}/topics`,
+            selected: `${baseUrl}/tags`,
+            useFor: "(Ideas)",
+        },
+        {
+            title: 'Board',
+            link: 'board',
+            icon:  <Kanban size={17} />,
+            selected: `${baseUrl}/board`,
             useFor: "(Ideas)",
         },
         {
@@ -107,6 +115,7 @@ const Settings = () => {
             icon: Icon.setSocialIcon,
             selected: `${baseUrl}/social`,
         },
+
     ];
 
     const isActive = (link) => {
@@ -127,14 +136,16 @@ const Settings = () => {
                 return <Labels />;
             case 'categories':
                 return <Categories />;
-            case 'topics':
-                return <Topics />;
+            case 'tags':
+                return <Tags />;
             case 'statuses':
                 return <Statuses />;
             case 'emoji':
                 return <Emoji />;
             case 'social':
                 return <Social />;
+            case 'board':
+                return <Board />;
             default:
                 return null;
         }
@@ -143,7 +154,7 @@ const Settings = () => {
     return (
         <div className='xl:container xl:max-w-[1200px] lg:container lg:max-w-[992px] md:container md:max-w-[768px] sm:container sm:max-w-[639px] xs:container xs:max-w-[475px] px-4'>
             <div className={"pt-8 flex flex-row justify-between items-center px-1 relative"}>
-                <h1 className="text-2xl font-medium">Settings</h1>
+                <h1 className="text-lg sm:text-2xl font-medium">Settings</h1>
                 {windowSize.width <= 768 && <Popover open={open} onOpenChange={setOpen}>
                     <PopoverTrigger>
                         <Button variant="outline" className={"w-[30px] h-[30px]"} size="icon">

@@ -21,6 +21,7 @@ import {
     AlertDialogHeader,
     AlertDialogTitle
 } from "../ui/alert-dialog";
+import {Skeleton} from "../ui/skeleton";
 
 const tableHeadingsArray = [
     {label:"Name"},
@@ -132,61 +133,82 @@ const Customers = () => {
                 </AlertDialogContent>
             </AlertDialog>
             <div className={""}>
-                <div className={"flex flex-row justify-between items-center"}>
+                <div className={"flex flex-row gap-x-4 flex-wrap justify-between gap-y-2 items-center"}>
                     <div>
-                        <h4 className={"font-medium text-2xl leading-8"}>Customers</h4>
+                        <h4 className={"font-medium text-lg sm:text-2xl leading-8"}>Customers</h4>
                         <h5 className={"text-muted-foreground text-base leading-5"}>Last updates</h5>
                     </div>
                     <Button onClick={openSheet} className={"hover:bg-violet-600"}> <Plus className={"mr-4"} />New Customer</Button>
                 </div>
-                <div className={"pt-8"}>
-                    {
-                        isLoading ? <SkeletonTable tableHeadings={tableHeadingsArray} arrayLength={3} numberOfCells={11}/> : customerList.length === 0 ? <EmptyDataTable tableHeadings={tableHeadingsArray}/>:
+                <div className={"pt-4 sm:pt-8"}>
                             <Card className={""}>
-
-                                <CardContent className={"p-0 rounded-md grid grid-cols-1 overflow-auto whitespace-nowrap"}>
-                                    <Table>
-                                        <TableHeader className={"py-8 px-5"}>
-                                            <TableRow className={""}>
-                                                {
-                                                    (tableHeadingsArray || []).map((x,i)=>{
-                                                        return(
-                                                            <TableHead className={`text-base font-semibold py-5 ${theme === "dark"? "text-[]" : "bg-muted"} ${i == 0 ? "rounded-tl-lg" : i == 9 ? "rounded-tr-lg" : ""}`} key={x.label}>{x.label}</TableHead>
-                                                        )
-                                                    })
-                                                }
-                                            </TableRow>
-                                        </TableHeader>
-                                        <TableBody className={""}>
+                                <CardContent className={"p-0 "}>
+                                    <div className={"rounded-md grid grid-cols-1 overflow-auto whitespace-nowrap"}>
+                                        <Table>
+                                            <TableHeader className={"py-8 px-5"}>
+                                                <TableRow className={""}>
+                                                    {
+                                                        (tableHeadingsArray || []).map((x,i)=>{
+                                                            return(
+                                                                <TableHead className={`text-base font-semibold py-5 ${theme === "dark"? "text-[]" : "bg-muted"} ${i == 0 ? "rounded-tl-lg" : i == 9 ? "rounded-tr-lg" : ""}`} key={x.label}>{x.label}</TableHead>
+                                                            )
+                                                        })
+                                                    }
+                                                </TableRow>
+                                            </TableHeader>
                                             {
-                                                (customerList || []).map((x,index)=>{
-                                                    return(
-                                                        <TableRow key={x.id} className={"font-medium"}>
-                                                            <TableCell className={`py-3 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.customer_name ? x.customer_name : "-"}</TableCell>
-                                                            <TableCell className={`py-3 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.customer_email_id ? x.customer_email_id : "-"}</TableCell>
-                                                            <TableCell className={`py-3 flex flex-row gap-2 ${theme === "dark" ? "" : "text-muted-foreground"}`}>
-                                                                <img className={"rounded-full mr-2"} src={x?.avatar} alt={"not_found"}/>
-                                                                <p>{x.company ? x.company : "-"}</p>
-                                                            </TableCell>
-                                                            <TableCell className={`py-3 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.added_via ? x.added_via : "-"}</TableCell>
-                                                            <TableCell className={`py-3 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.segment ? x.segment : "-"}</TableCell>
-                                                            <TableCell className={`py-3 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.designation ? x.designation : "-"}</TableCell>
-                                                            <TableCell className={`py-3 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.tags ? x.tags : "-"}</TableCell>
-                                                            <TableCell className={`py-3 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.country ? x.country : "-"}</TableCell>
-                                                            <TableCell className={`py-3 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.browser ? x.browser : "-"}</TableCell>
-                                                            <TableCell className={`py-3 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.os ? x.os : "-"}</TableCell>
-                                                            <TableCell className={`py-3 ${theme === "dark" ? "" : "text-muted-foreground flex justify-center"}`}>
-                                                                <Button onClick={() => deleteCustomer(x.id,index)} variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px]`}>
-                                                                    <Trash2 size={16}/>
-                                                                </Button>
-                                                            </TableCell>
-                                                        </TableRow>
-                                                    )
-                                                })
+                                                isLoading ? <TableBody>
+                                                        {
+                                                            [...Array(10)].map((_, index) => {
+                                                                return (
+                                                                    <TableRow key={index}>
+                                                                        {
+                                                                            [...Array(11)].map((_, i) => {
+                                                                                return (
+                                                                                    <TableCell key={i} className={"px-2"}>
+                                                                                        <Skeleton className={"rounded-md  w-full h-[24px]"}/>
+                                                                                    </TableCell>
+                                                                                )
+                                                                            })
+                                                                        }
+                                                                    </TableRow>
+                                                                )
+                                                            })
+                                                        }
+                                                    </TableBody> :
+                                                    <TableBody className={""}>
+                                                        {
+                                                            (customerList || []).map((x,index)=>{
+                                                                return(
+                                                                    <TableRow key={x.id} className={"font-medium"}>
+                                                                        <TableCell className={`py-3 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.customer_name ? x.customer_name : "-"}</TableCell>
+                                                                        <TableCell className={`py-3 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.customer_email_id ? x.customer_email_id : "-"}</TableCell>
+                                                                        <TableCell className={`py-3 flex flex-row gap-2 ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                                                            <img className={"rounded-full mr-2"} src={x?.avatar} alt={"not_found"}/>
+                                                                            <p>{x.company ? x.company : "-"}</p>
+                                                                        </TableCell>
+                                                                        <TableCell className={`py-3 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.added_via ? x.added_via : "-"}</TableCell>
+                                                                        <TableCell className={`py-3 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.segment ? x.segment : "-"}</TableCell>
+                                                                        <TableCell className={`py-3 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.designation ? x.designation : "-"}</TableCell>
+                                                                        <TableCell className={`py-3 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.tags ? x.tags : "-"}</TableCell>
+                                                                        <TableCell className={`py-3 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.country ? x.country : "-"}</TableCell>
+                                                                        <TableCell className={`py-3 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.browser ? x.browser : "-"}</TableCell>
+                                                                        <TableCell className={`py-3 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.os ? x.os : "-"}</TableCell>
+                                                                        <TableCell className={`py-3 ${theme === "dark" ? "" : "text-muted-foreground flex justify-center"}`}>
+                                                                            <Button onClick={() => deleteCustomer(x.id,index)} variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px]`}>
+                                                                                <Trash2 size={16}/>
+                                                                            </Button>
+                                                                        </TableCell>
+                                                                    </TableRow>
+                                                                )
+                                                            })
+                                                        }
+
+                                                    </TableBody>
                                             }
 
-                                        </TableBody>
                                     </Table>
+                                    </div>
                                 </CardContent>
                                 <Separator/>
                                 <CardFooter className={"p-0"}>
@@ -211,8 +233,6 @@ const Customers = () => {
                                         </div>
                                     </CardFooter>
                             </Card>
-                    }
-
                 </div>
             </div>
         </div>

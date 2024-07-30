@@ -404,4 +404,16 @@ export class ApiService{
     async updateEmoji (payload, id){
         return await this.putData(`${baseUrlApi}/emoji/${id}`,payload)
     }
+    async getAllBoards (payload){
+        return await this.getData(`${baseUrlApi}/board?${qs.stringify(payload)}`)
+    }
+    async createBoard (payload){
+        return await this.postData(`${baseUrlApi}/board`,payload)
+    }
+    async deleteBoard (id){
+        return await this.deleteData(`${baseUrlApi}/board/${id}`)
+    }
+    async updateBoard (payload, id){
+        return await this.putData(`${baseUrlApi}/board/${id}`, payload)
+    }
 }

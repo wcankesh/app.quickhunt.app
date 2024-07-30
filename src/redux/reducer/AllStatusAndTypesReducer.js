@@ -7,7 +7,8 @@ const initialState = {
     roadmap_status: [],
     topics: [],
     projectList: [],
-    emoji:[]
+    emoji:[],
+    boards:[]
 }
 export default function allStatusAndTypesReducer(state = initialState, action) {
 

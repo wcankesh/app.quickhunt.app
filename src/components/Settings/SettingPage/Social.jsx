@@ -11,7 +11,6 @@ import {Loader2} from "lucide-react";
 import {Alert, AlertDescription, AlertTitle} from "../../ui/alert";
 import {ExclamationTriangleIcon} from "@radix-ui/react-icons";
 
-
 const initialState = {
     facebook:"",
     twitter:"",
@@ -72,8 +71,8 @@ const Social = () => {
 
     return (
         <Card>
-            <CardHeader className={"p-6"}>
-                <h2 className={`text-2xl font-medium leading-8 ${userDetailsReducer.plan === 0 ? "mb-3" : ""}`}>Social links</h2>
+            <CardHeader className={"p-4 sm:p-6"}>
+                <h2 className={`text-lg sm:text-2xl font-medium leading-8 ${userDetailsReducer.plan === 0 ? "mb-3" : ""}`}>Social links</h2>
                 {userDetailsReducer.plan === 0 && <div className={"mt-3"}>
                     <Alert variant="destructive">
                         <ExclamationTriangleIcon className="h-4 w-4"/>
@@ -85,7 +84,7 @@ const Social = () => {
             </CardHeader>
             <Separator/>
             <CardContent className={"p-0"}>
-                <div className={"px-6 pt-4 pb-6"}>
+                <div className={"p-4 sm:p-6"}>
                     <div className="grid w-full">
                         <Label htmlFor="facebook" className={"mb-[6px]"}>Facebook</Label>
                         <Input value={socialLink.facebook} onChange={onChange} name="facebook" placeholder={"https://facebook.com/"} type="text" id="facebook" className={"h-9"}/>

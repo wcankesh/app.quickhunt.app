@@ -13,7 +13,6 @@ import {
     AlertDialogCancel,
     AlertDialogContent,
     AlertDialogDescription,
-    AlertDialogFooter,
     AlertDialogHeader,
     AlertDialogTitle
 } from "../../ui/alert-dialog";
@@ -171,31 +170,31 @@ const Project = () => {
     return (
         <Card>
             <AlertDialog open={isOpenDeleteAlert} onOpenChange={setIsOpenDeleteAlert}>
-                <AlertDialogContent>
+                <AlertDialogContent className={"w-[310px] md:w-full rounded-lg"}>
                     <AlertDialogHeader>
                         <AlertDialogTitle>You really want delete project?</AlertDialogTitle>
                         <AlertDialogDescription>
                             This action can't be undone.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
-                    <AlertDialogFooter>
+                    <div className={"flex justify-end gap-2"}>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
                         <AlertDialogAction className={"bg-red-600 hover:bg-red-600"} onClick={onDelete}>Delete</AlertDialogAction>
-                    </AlertDialogFooter>
+                    </div>
                 </AlertDialogContent>
             </AlertDialog>
-            <CardHeader className={"p-6 gap-1 border-b"}>
-                <CardTitle className={"text-2xl font-medium"}>Project Setting</CardTitle>
+            <CardHeader className={"p-6 gap-1 border-b p-4 sm:p-6"}>
+                <CardTitle className={"text-lg sm:text-2xl font-medium"}>Project Setting</CardTitle>
                 <CardDescription className={"text-sm text-muted-foreground p-0"}>Manage your project settings.</CardDescription>
             </CardHeader>
             <CardContent className={"p-0 border-b"}>
-                <div className={"px-6 pt-6"}><h3 className={"text-sm font-medium"}>Edit Images</h3></div>
-                <div className={"pt-4 p-6"}>
+                <div className={"p-4 sm:px-6 sm:pt-6 sm:pb-0"}><h3 className={"text-sm font-medium"}>Edit Images</h3></div>
+                <div className={"pt-0 p-4 sm:p-6"}>
                     <div className="w-full items-center ">
-                        <div className={"flex gap-[94px]"}>
+                        <div className={"flex flex-wrap sm:flex-nowrap gap-4 gap-x-[94px]"}>
                             <div className={"flex gap-2"}>
                                 <div className="w-[50px] h-[50px] relative">
-                                    <div className="flex basis-1/2 items-center justify-center">
+                                    <div className="flex gap-2 basis-1/2 items-center justify-center">
                                         <label
                                             htmlFor="upload_image"
                                             className="flex w-[50px] bg-muted h-[50px] py-0 justify-center items-center flex-shrink-0 rounded cursor-pointer"
@@ -212,18 +211,18 @@ const Project = () => {
                                     </div>
 
                                 </div>
-                                <div className={"flex flex-col gap-1"}>
+                                <div className={"flex flex-col gap-1 "}>
                                     <h4 className={"text-sm font-medium"}>Logo</h4>
                                     <p className={"text-xs font-medium text-muted-foreground"}>50px By 50px</p>
                                 </div>
                             </div>
                             <div className={"flex gap-2"}>
-                                <div className="w-[64px] h-[64px] relative">
+                                <div className="w-[50px] h-[50px] relative">
                                     <label
                                         htmlFor="upload_image_fav"
-                                        className="flex w-[64px] bg-muted h-[64px] py-0 justify-center items-center flex-shrink-0 rounded cursor-pointer"
+                                        className="flex w-[50px] bg-muted h-[50px] py-0 justify-center items-center flex-shrink-0 rounded cursor-pointer"
                                     >
-                                        {previewImageFav ? <img className={"h-[64px] w-[64px] rounded-md object-cover"} src={previewImageFav} alt={"not_found"} /> : <span className="text-center text-muted-foreground font-semibold text-[14px]">{Icon.editImgLogo}</span>}
+                                        {previewImageFav ? <img className={"h-[50px] w-[50px] rounded-md object-cover"} src={previewImageFav} alt={"not_found"} /> : <span className="text-center text-muted-foreground font-semibold text-[14px]">{Icon.editImgLogo}</span>}
                                         <input
                                             id="upload_image_fav"
                                             type="file"
@@ -244,16 +243,16 @@ const Project = () => {
                     </div>
                 </div>
             </CardContent>
-            <CardContent className={"p-6 border-b"}>
-                <div className={"flex gap-4 w-full"}>
-                    <div className="basis-1/2">
+            <CardContent className={"p-4 sm:p-6 border-b"}>
+                <div className={"flex flex-wrap sm:flex-nowrap gap-4 w-full"}>
+                    <div className="basis-full sm:basis-1/2">
                         <Label htmlFor="project_name">Project Name</Label>
                         <Input type="text" onChange={onChangeText} name={"project_name"} value={createProjectDetails.project_name} id="project_name" placeholder="testingapp" className={"mt-1 mb-1 bg-card"} />
                         {
                             formError.project_name &&  <p className="text-red-500 text-xs mt-1" >{formError.project_name}</p>
                         }
                     </div>
-                    <div className="basis-1/2">
+                    <div className="basis-full sm:basis-1/2">
                         <Label htmlFor="project_website">Project website</Label>
                         <Input type="text" name={"project_website"} onChange={onChangeText} value={createProjectDetails.project_website} id="project_website" placeholder="https://yourcompany.com" className={"mt-1 mb-1 bg-card"} />
                         {
@@ -262,7 +261,7 @@ const Project = () => {
                     </div>
                 </div>
             </CardContent>
-            <CardFooter className={"pt-4 justify-end gap-6"}>
+            <CardFooter className={"pt-4 flex flex-wrap justify-end sm:justify-end gap-4 sm:p-5 p-4"}>
                 <Button variant={"outline hover:bg-transparent"} onClick={deleteAlert} className={`text-sm font-semibold ${theme === "dark" ? "text-card-foreground" : "text-primary"} border border-primary`}>Delete project</Button>
                 <Button className={"text-sm font-semibold"} onClick={() => updateProjects('')}>{isSave ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Update project"}</Button>
             </CardFooter>
