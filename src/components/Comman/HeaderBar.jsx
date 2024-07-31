@@ -1,32 +1,29 @@
 import React, {Fragment, useEffect, useState} from 'react';
-import {
-    Sheet,
-    SheetContent,
-    SheetFooter,
-    SheetHeader,
-    SheetTitle,
-    SheetTrigger,
-    SheetClose,
-    SheetOverlay
-} from "../ui/sheet";
+import {Sheet, SheetContent, SheetHeader, SheetOverlay, SheetTitle, SheetTrigger} from "../ui/sheet";
 import {Button} from "../ui/button";
-import {Menu, Plus, X, Moon, Sun, Loader2, ChevronsUpDown} from "lucide-react";
+import {ChevronsUpDown, Menu, Moon, Plus, Sun, X} from "lucide-react";
 import {Input} from "../ui/input";
-import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger} from "../ui/dropdown-menu";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger
+} from "../ui/dropdown-menu";
 import {useTheme} from "../theme-provider";
-import {apiService, baseUrl, logout, removeProjectDetails, setProjectDetails} from "../../utils/constent";
+import {baseUrl, getProjectDetails, logout, removeProjectDetails, setProjectDetails} from "../../utils/constent";
 import {useNavigate} from "react-router-dom";
 import {Icon} from "../../utils/Icon";
 import {Avatar, AvatarFallback, AvatarImage} from "../ui/avatar";
 import {ApiService} from "../../utils/ApiService";
-import {Popover, PopoverTrigger, PopoverContent} from "../ui/popover";
+import {Popover, PopoverContent, PopoverTrigger} from "../ui/popover";
 import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList} from "../ui/command";
 import {Label} from "../ui/label";
 import {useDispatch, useSelector} from "react-redux";
 import {useToast} from "../ui/use-toast";
 import {projectDetailsAction} from "../../redux/action/ProjectDetailsAction";
 import {allProjectAction} from "../../redux/action/AllProjectAction";
-import {getProjectDetails} from "../../utils/constent";
 import {userDetailsAction} from "../../redux/action/UserDetailAction";
 import {allStatusAndTypesAction} from "../../redux/action/AllStatusAndTypesAction";
 import {useLocation} from "react-router";
@@ -151,7 +148,7 @@ const footerMenuComponent = [
 ];
 
 const HeaderBar = () => {
-    const {setTheme, theme} = useTheme()
+    const {setTheme, theme, onProModal} = useTheme()
     let navigate = useNavigate();
     let location = useLocation();
     let apiSerVice = new ApiService();
@@ -171,10 +168,25 @@ const HeaderBar = () => {
     const [projectList, setProjectList] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [scrollingDown, setScrollingDown] = useState(false);
+
     const dispatch = useDispatch();
     const {toast} = useToast()
 
-    const openSheet = () => setSheetOpen(true);
+    const openSheet = () => {
+        let length = projectList?.length;
+        if(userDetailsReducer.plan === 0){
+            if(length < 1){
+                setSheetOpen(true);
+                onProModal(false)
+            }  else{
+                onProModal(true)
+            }
+        } else if(userDetailsReducer.plan === 1){
+            setSheetOpen(true);
+            onProModal(false)
+        }
+
+    }
     const closeSheet = () => setSheetOpen(false);
     const openSheetMenu = () => setSheetOpenMenu(true);
     const closeSheetMenu = () => setSheetOpenMenu(false);

@@ -136,7 +136,7 @@
       @apply border-border;
     }
     body {
-      font-family: 'Geist';
+      font-family: 'Geist' !important;
       @apply bg-background text-foreground;
     }
     .main-content{
@@ -417,4 +417,8 @@ span.LinesEllipsis-ellipsis {color: hsl(var(--primary)) !important;font-weight: 
     -webkit-transform: scale(1);
     transform: scale(1)
   }
+}
+.scrollbars-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none
 }

@@ -19,6 +19,7 @@ import WidgetAnalyticsSideBarSheet from "./WidgetAnalyticsSideBarSheet";
 import {Skeleton} from "../ui/skeleton";
 import EmptyData from "../Comman/EmptyData";
 import moment from "moment";
+import {Textarea} from "../ui/textarea";
 
 const perPageLimit = 10;
 
@@ -35,6 +36,7 @@ const Widgets = () => {
     const [totalRecord, setTotalRecord] = useState(0);
     const [openDelete, setOpenDelete] = useState(false);
     const [openCopyCode, setOpenCopyCode] = useState(false);
+    const [selectedId, setSelectedId] = useState("");
     const [deleteRecord, setDeleteRecord] = useState(null);
     const [copySuccess, setCopySuccess] = useState(false);
     const [analyticsObj, setAnalyticsObj] = useState({});
@@ -94,8 +96,9 @@ const Widgets = () => {
         setOpenDelete(true)
     }
 
-    const getCodeCopy = () => {
+    const getCodeCopy = (id) => {
         setOpenCopyCode(!openCopyCode)
+        setSelectedId(id)
     }
 
     const totalPages = Math.ceil(totalRecord / perPageLimit);
@@ -106,15 +109,20 @@ const Widgets = () => {
         }
     };
 
-    const handleCopyCode = () => {
-        const copyText = document.getElementById("text");
-        if (copyText) {
-            copyText.select();
-            document.execCommand("copy");
-            setCopySuccess(true);
-        }
+    const handleCopyCode = (id) => {
+        navigator.clipboard.writeText(id).then(() => {
+            toast({description: "Copied to clipboard"})
+        }).catch(err => {
+            console.error('Failed to copy text: ', err);
+        });
     };
-
+    const codeString = `<script>
+    window.Quickhunt_Config = window.Quickhunt_Config || {};
+    window.Quickhunt_Config = { Quickhunt_Widget_Key:  "${selectedId}"};
+</script>
+<script src="https://quickhunt.app/widgetScript.js"></script>`;
+    const embedLink = `https://${projectDetailsReducer.domain}/ideas?widget="${selectedId}"`
+    const iFrame = `<iframe src="${embedLink}" style="border: 0px; outline: 0px; width: 450px; height: 400px;"></iframe>`
     return (
         <Fragment>
             {
@@ -145,180 +153,133 @@ const Widgets = () => {
             {
                 openCopyCode &&
                 <Fragment>
-                    <Dialog open onOpenChange={getCodeCopy}>
-                        <DialogContent className="sm:max-w-[580px]">
+                    <Dialog open onOpenChange={() => getCodeCopy("")}>
+                        <DialogContent className="sm:max-w-[580px] bg-white">
                             <DialogHeader className={"flex flex-col gap-2"}>
                                 <DialogTitle>Embed Widget</DialogTitle>
                                 <DialogDescription>Choose how you would like to embed your widget.</DialogDescription>
                             </DialogHeader>
                             <Tabs defaultValue="script">
-                                <TabsList className="grid w-full grid-cols-3">
+                                <TabsList className="grid w-full grid-cols-3 bg-white">
                                     <TabsTrigger value="script">Script</TabsTrigger>
                                     <TabsTrigger value="embedlink">Embed Link</TabsTrigger>
                                     <TabsTrigger value="iframe">iFrame</TabsTrigger>
                                 </TabsList>
                                 <TabsContent value="script" className={"flex flex-col gap-2"}>
-                                    <Card>
-                                        <CardHeader>
-                                            <CardDescription>
-                                                Place the code below before the closing body tag on your site.
-                                            </CardDescription>
-                                        </CardHeader>
-                                        <CardContent className="flex flex-col gap-2">
-                                            <div>
-                                                <div className={"relative"}>
-                                                    <Input
-                                                        id="text"
-                                                        type={"text"}
-                                                        className={"pr-[47px]"}
-                                                        placeholder={"<!-- Embed code here -->"}
-                                                        value={
-                                                            "<!-- Frill Widget (https://frill.co) -->\n" +
-                                                            "<script>\n" +
-                                                            "  window.Frill_Config = window.Frill_Config || [];\n" +
-                                                            "  window.Frill_Config.push({ key: '5c40f9a5-3288-4400-832e-e02e063843b8' });\n" +
-                                                            "</script>\n" +
-                                                            "<script async src=\"https://widget.frill.co/v2/widget.js\"></script>\n" +
-                                                            "<!-- End Frill Widget -->"
-                                                        }
-                                                        readOnly
-                                                    />
+                                    <div className={"text-muted-foreground text-sm"}>
+                                        Place the code below before the closing body tag on your site.
+                                    </div>
+                                    <div>
+                                        <div className={"relative px-6 rounded-md bg-black"}>
+                                            <div className={"relative"}>
+                                                <pre id="text"  className={"py-4 whitespace-pre overflow-x-auto scrollbars-none text-[10px] text-text-invert text-white max-w-[450px]"}>
+                                                      {codeString}
+                                                  </pre>
 
-                                                    <Button
-                                                        variant={"ghost hover:none"}
-                                                        className={`absolute top-0 right-0`}
-                                                        onClick={handleCopyCode}
-                                                    >
-                                                        {isLoading ? <Loader2 size={16} className={"animate-spin"} /> : <Copy size={16}/>}
-                                                    </Button>
+                                                <Button
+                                                    variant={"ghost hover:none"}
+                                                    className={`absolute top-0 right-0 px-0`}
+                                                    onClick={() => handleCopyCode(codeString)}
+                                                >
+                                                    {isLoading ? <Loader2 size={16} className={"animate-spin"} color={"white"}/> : <Copy size={16} color={"white"}/>}
+                                                </Button>
 
-                                                </div>
-                                                <p className={"text-xs"}>Read the {" "}
-                                                    <Button
-                                                        variant={"ghost hover:none"}
-                                                        className={"p-0 text-xs text-primary font-semibold"}
-                                                    >
-                                                        Setup Guide
-                                                    </Button>
-                                                    {" "}for more information or {" "}
-                                                    <Button
-                                                        variant={"ghost hover:none"}
-                                                        className={"p-0 text-xs text-primary font-semibold"}
-                                                    >
-                                                        download the HTML example.
-                                                    </Button>
-                                                </p>
                                             </div>
-                                            <div className={"flex flex-col gap-2"}>
-                                                <h3 className={"text-sm font-semibold"}>Code Examples</h3>
-                                                <div className={"flex justify-between"}>
-                                                    <Button variant={"ghost"}
-                                                            className={"flex gap-2"}>{Icon.htmlIcon} Html</Button>
-                                                    <Button variant={"ghost"}
-                                                            className={"flex gap-2"}>{Icon.vueIcon}Vue</Button>
-                                                    <Button variant={"ghost"}
-                                                            className={"flex gap-2"}>{Icon.reactIcon}React</Button>
-                                                    <Button variant={"ghost"}
-                                                            className={"flex gap-2"}>{Icon.angularIcon} Angular</Button>
-                                                </div>
-                                            </div>
-                                        </CardContent>
-                                    </Card>
+                                        </div>
+
+                                        <p className={"text-xs"}>Read the {" "}
+                                            <Button variant={"ghost hover:none"} className={"p-0 text-xs text-primary font-semibold"}>
+                                                Setup Guide
+                                            </Button>
+                                            {" "}for more information or {" "}
+                                            <Button
+                                                variant={"ghost hover:none"}
+                                                className={"p-0 text-xs text-primary font-semibold"}
+                                            >
+                                                download the HTML example.
+                                            </Button>
+                                        </p>
+                                    </div>
                                 </TabsContent>
                                 <TabsContent value="embedlink">
-                                    <Card>
-                                        <CardHeader className={"pb-0"}>
-                                            <CardDescription>
-                                                Follow these simple steps to embed the widget on any {" "}
-                                                <Button
-                                                    variant={"ghost hover:none"}
-                                                    className={"p-0 text-xs text-primary font-semibold"}
-                                                >
-                                                    supported website.
-                                                </Button>
-                                            </CardDescription>
-                                        </CardHeader>
-                                        <CardContent className="flex flex-col gap-2">
-                                            <div>
-                                                <p className={"text-xs text-muted-foreground"}>1. Copy the link
-                                                    below</p>
-                                                <p className={"text-xs text-muted-foreground"}>2. Paste the link on any
-                                                    site where you want the widget to show.</p>
-                                                <p className={"text-xs text-muted-foreground"}>3. That's it!</p>
-                                            </div>
-                                            <div>
-                                                <Input id="current" type=""/>
-                                            </div>
-                                            <p className={"text-xs"}>Read the {" "}
-                                                <Button
-                                                    variant={"ghost hover:none"}
-                                                    className={"p-0 text-xs text-primary font-semibold"}
-                                                >
-                                                    Setup Guide
-                                                </Button>
-                                                {" "}for more information.
-                                            </p>
-                                        </CardContent>
-                                    </Card>
+                                    <div className={"text-muted-foreground text-sm"}>
+                                        Follow these simple steps to embed the widget on any {" "}
+                                        <Button
+                                            variant={"ghost hover:none"}
+                                            className={"p-0 text-xs text-primary font-semibold"}
+                                        >
+                                            supported website.
+                                        </Button>
+                                    </div>
+                                    <div>
+                                        <p className={"text-xs text-muted-foreground pb-1"}>1. Copy the link below</p>
+                                        <p className={"text-xs text-muted-foreground pb-1"}>2. Paste the link on any site where you want the widget to show.</p>
+                                        <p className={"text-xs text-muted-foreground pb-1"}>3. That's it!</p>
+                                    </div>
+                                    <div className={"relative px-6 rounded-md bg-black"}>
+                                        <div className={"relative"}>
+                                                <pre id="text"  className={"py-4 whitespace-pre overflow-x-auto scrollbars-none text-[10px] text-text-invert text-white"}>
+                                                    {embedLink}
+                                                  </pre>
+
+                                            <Button
+                                                variant={"ghost hover:none"}
+                                                className={`absolute top-0 right-0 px-0`}
+                                                onClick={() => handleCopyCode(embedLink)}
+                                            >
+                                                {isLoading ? <Loader2 size={16} className={"animate-spin"} color={"white"}/> : <Copy size={16} color={"white"}/>}
+                                            </Button>
+
+                                        </div>
+                                    </div>
+                                    <p className={"text-xs"}>Read the {" "}
+                                        <Button
+                                            variant={"ghost hover:none"}
+                                            className={"p-0 text-xs text-primary font-semibold"}
+                                        >
+                                            Setup Guide
+                                        </Button>
+                                        {" "}for more information.
+                                    </p>
                                 </TabsContent>
-                                <TabsContent value="iframe">
-                                    <Card>
-                                        <CardHeader>
-                                            <CardDescription>
-                                                Paste the code below on your site where you want the widget to appear.
-                                            </CardDescription>
-                                        </CardHeader>
-                                        <CardContent className="space-y-2">
+                                <TabsContent value="iframe"  className={"flex flex-col gap-2"}>
+                                    <div className={"text-muted-foreground text-sm"}>
+                                        Place the code below before the closing body tag on your site.
+                                    </div>
+                                    <div>
+                                        <div className={"relative px-6 rounded-md bg-black"}>
                                             <div className={"relative"}>
-                                                <Input
-                                                    id="text"
-                                                    type={"text"}
-                                                    className={"pr-[47px]"}
-                                                    placeholder={"<!-- Embed code here -->"}
-                                                    value={
-                                                        "<!-- Frill Widget (https://frill.co) -->\n" +
-                                                        "<script>\n" +
-                                                        "  window.Frill_Config = window.Frill_Config || [];\n" +
-                                                        "  window.Frill_Config.push({ key: '5c40f9a5-3288-4400-832e-e02e063843b8' });\n" +
-                                                        "</script>\n" +
-                                                        "<script async src=\"https://widget.frill.co/v2/widget.js\"></script>\n" +
-                                                        "<!-- End Frill Widget -->"
-                                                    }
-                                                    readOnly
-                                                />
+                                                <pre id="text"  className={"py-4 whitespace-pre overflow-x-auto scrollbars-none text-[10px] text-text-invert text-white max-w-[450px]"}>
+                                                      {iFrame}
+                                                  </pre>
 
                                                 <Button
                                                     variant={"ghost hover:none"}
-                                                    className={`absolute top-0 right-0`}
-                                                    onClick={handleCopyCode}
+                                                    className={`absolute top-0 right-0 px-0`}
+                                                    onClick={() => handleCopyCode(iFrame)}
                                                 >
-                                                    {isLoading ? <Loader2 size={16} className={"animate-spin"} /> : <Copy size={16}/>}
+                                                    {isLoading ? <Loader2 size={16} className={"animate-spin"} color={"white"}/> : <Copy size={16} color={"white"}/>}
                                                 </Button>
+
                                             </div>
-                                            <p className={"text-xs text-muted-foreground"}>Read the {" "}
-                                                <Button
-                                                    variant={"ghost hover:none"}
-                                                    className={"p-0 text-xs text-primary font-semibold"}
-                                                >
-                                                    Setup Guide
-                                                </Button>
-                                                for more information.
-                                            </p>
-                                        </CardContent>
-                                    </Card>
+                                        </div>
+                                    </div>
+                                    <p className={"text-xs text-muted-foreground"}>Read the {" "}
+                                        <Button
+                                            variant={"ghost hover:none"}
+                                            className={"p-0 text-xs text-primary font-semibold"}
+                                        >
+                                            Setup Guide
+                                        </Button>
+                                        for more information.
+                                    </p>
+
                                 </TabsContent>
                             </Tabs>
                             <DialogFooter>
                                 <Button variant={"outline hover:none"}
                                         className={"text-sm font-semibold border"}
-                                        onClick={() => setOpenDelete(false)}>Cancel</Button>
-                                <Button
-                                    variant={"hover:none"}
-                                    className={`${theme === "dark" ? "text-card-foreground" : "text-card"} ${isLoading === true ? "py-2 px-6" : "py-2 px-6"} w-[106px] text-sm font-semibold bg-primary`}
-
-                                >
-                                    {isLoading ? <Loader2 size={16} className={"animate-spin"}/> : "Copy code"}
-                                </Button>
+                                        onClick={() => getCodeCopy("")}>Cancel</Button>
                             </DialogFooter>
                         </DialogContent>
                     </Dialog>
