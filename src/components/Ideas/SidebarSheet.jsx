@@ -20,16 +20,12 @@ import {RadioGroup, RadioGroupItem} from "../ui/radio-group";
 import {Label} from "../ui/label";
 import {Input} from "../ui/input";
 import {Avatar, AvatarFallback, AvatarImage} from "../ui/avatar";
-import {DialogTrigger, Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader,DialogTitle} from "../ui/dialog";
 import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "../ui/select";
 import {Popover, PopoverTrigger, PopoverContent} from "../ui/popover";
 import {Textarea} from "../ui/textarea";
-import {Switch} from "../ui/switch";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "../ui/tabs";
 import {useTheme} from "../theme-provider";
-import {Card} from "../ui/card";
 import {useToast} from "../ui/use-toast";
-import {useNavigate} from "react-router";
 import {ApiService} from "../../utils/ApiService";
 import {useSelector} from "react-redux";
 import ReadMoreText from "../Comman/ReadMoreText";
@@ -37,11 +33,11 @@ import moment from "moment";
 import {DropdownMenu, DropdownMenuTrigger} from "@radix-ui/react-dropdown-menu";
 import {DropdownMenuContent, DropdownMenuItem} from "../ui/dropdown-menu";
 
-const initialStateTopic = {topic: []}
 
 const initialStateError = {
     title: "",
-    description: null,
+    description: "",
+    board: "",
 }
 
 const SidebarSheet = ({
@@ -64,12 +60,6 @@ const SidebarSheet = ({
     const {theme} = useTheme()
     let apiSerVice = new ApiService();
     const {toast} = useToast()
-    // const [selectedFile, setSelectedFile] = useState(null);
-    // const [imagePreview, setImagePreview] = useState(null)
-
-    const [selectedFiles, setSelectedFiles] = useState([]);
-    const [imagePreviews, setImagePreviews] = useState([]);
-
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const [isLoading, setIsLoading] = useState(false);
@@ -77,7 +67,6 @@ const SidebarSheet = ({
     const [isLoadingArchive, setIsLoadingArchive] = useState(false);
     const [isLoadingSidebar, setIsLoadingSidebar] = useState('');
     const [topicLists, setTopicLists] = useState([]);
-    const [description, setDescription] = useState("");
     const [commentFiles, setCommentFiles] = useState([])
     const [subCommentFiles, setSubCommentFiles] = useState([])
     const [deletedCommentImage, setDeletedCommentImage] = useState([])
@@ -99,7 +88,6 @@ const SidebarSheet = ({
 
     useEffect(() => {
         setTopicLists(allStatusAndTypes.topics)
-        setDescription(selectedIdea.description)
         setRoadmapStatus(allStatusAndTypes.roadmap_status)
     }, [projectDetailsReducer.id, allStatusAndTypes]);
 
@@ -333,7 +321,7 @@ const SidebarSheet = ({
             setIsLoadingArchive(true)
         }
         setIsLoadingSidebar(name);
-       if(name === "delete_image"){
+       if(name === "delete_image[0]"){
            setSelectedIdea({...selectedIdea, cover_image: ""})
        } else {
            setSelectedIdea({...selectedIdea, [name]: value})
@@ -611,6 +599,12 @@ const SidebarSheet = ({
                 } else {
                     return "";
                 }
+            case "board":
+                if (!value || value?.toString()?.trim() === "") {
+                    return "Description is required";
+                } else {
+                    return "";
+                }
             default: {
                 return "";
             }
@@ -625,26 +619,6 @@ const SidebarSheet = ({
         }));
     }
 
-    const handleUpdate = (event) => {
-        const {value} = event.target;
-        setDescription(value);
-        setSelectedIdea(selectedIdea => ({...selectedIdea, description: value}));
-        setFormError(formError => ({
-            ...formError,
-            description: formValidate("description", value)
-        }));
-    };
-
-    const handleChange = (tag) => {
-        const clone = selectedIdea && selectedIdea.topic && selectedIdea.topic.length ? [...selectedIdea.topic] : [];
-        let index = clone.findIndex((t) => t.id === tag.id);
-        if (index === -1) {
-            clone.push(tag);
-        } else {
-            clone.splice(index, 1);
-        }
-        setSelectedIdea({...selectedIdea, topic: clone})
-    }
 
     const onCreateIdea = async () => {
         setIsLoadingCreateIdea(true)
@@ -666,6 +640,7 @@ const SidebarSheet = ({
             topics.push(x.id)
         })
         formData.append('title', selectedIdea.title);
+        formData.append('board', selectedIdea.board);
         formData.append('slug_url', selectedIdea.title ? selectedIdea.title.replace(/ /g, "-").replace(/\?/g, "-") : "");
         formData.append('description', selectedIdea.description?.trim() === '' ? "" : selectedIdea.description);
         formData.append('topic', topics.join(","));
@@ -678,7 +653,7 @@ const SidebarSheet = ({
             toast({description: "Idea Update successfully"})
         } else {
             setIsLoadingCreateIdea(false)
-            toast({description: data.error})
+            toast({description: data.message,variant: "destructive" })
         }
     }
 
@@ -763,7 +738,7 @@ const SidebarSheet = ({
                                                             <CircleX
                                                                 size={20}
                                                                 className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
-                                                                onClick={() => onChangeStatus('delete_image', selectedIdea && selectedIdea.cover_image && selectedIdea.cover_image.name ? "" : [selectedIdea.cover_image.replace("https://code.quickhunt.app/public/storage/feature_idea/", "")])}
+                                                                onClick={() => onChangeStatus('delete_image', selectedIdea && selectedIdea?.cover_image && selectedIdea.cover_image?.name ? "" : [selectedIdea.cover_image.replace("https://code.quickhunt.app/public/storage/feature_idea/", "")])}
                                                             />
                                                         </div> : selectedIdea.cover_image ?
                                                             <div
@@ -774,7 +749,7 @@ const SidebarSheet = ({
                                                                 <CircleX
                                                                     size={20}
                                                                     className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
-                                                                    onClick={() => onChangeStatus('delete_image', '')}
+                                                                    onClick={() => onChangeStatus('delete_image[0]', selectedIdea && selectedIdea?.cover_image && selectedIdea.cover_image?.name ? "" : selectedIdea.cover_image.replace("https://code.quickhunt.app/public/storage/feature_idea/", ""))}
                                                                 />
                                                             </div>
                                                             : ''}
@@ -859,19 +834,45 @@ const SidebarSheet = ({
                                             </div>
                                             <div className="gap-1.5">
                                                 <Label htmlFor="message">Description</Label>
-                                                <Textarea placeholder="Start writing..." id="message"
+                                                <Textarea placeholder="Start writing..." id="message" className="bg-card" name={"description"}
                                                           value={selectedIdea.description}
-                                                          onChange={handleUpdate}
+                                                          onChange={onChangeText}
                                                 />
                                                 {formError.description &&
                                                 <span className="text-red-500 text-sm">{formError.description}</span>}
+                                            </div>
+                                            <div className={"gap-1.5"}>
+                                                <Label>Choose Board for this Idea</Label>
+                                                <Select
+                                                    onValueChange={(value) => onChangeText({target:{name: "board", value}})}
+                                                    value={selectedIdea.board}>
+                                                    <SelectTrigger className="bg-card">
+                                                        <SelectValue/>
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectGroup>
+                                                            {
+                                                                (allStatusAndTypes?.boards || []).map((x, i) => {
+                                                                    return (
+                                                                        <SelectItem key={i} value={x.id}>
+                                                                            <div className={"flex items-center gap-2"}>
+                                                                                {x.title}
+                                                                            </div>
+                                                                        </SelectItem>
+                                                                    )
+                                                                })
+                                                            }
+                                                        </SelectGroup>
+                                                    </SelectContent>
+                                                </Select>
+                                                {formError.board && <span className="text-red-500 text-sm">{formError.board}</span>}
                                             </div>
                                         </div>
                                         <div className={"py-6 px-8 border-b"}>
                                             <Label>Choose Topics for this Idea (optional)</Label>
                                             <Select onValueChange={handleChangeTopic}
                                                     value={selectedIdea.topic.map(x => x.id)}>
-                                                <SelectTrigger>
+                                                <SelectTrigger className="bg-card">
                                                     <SelectValue className={"text-muted-foreground text-sm"}
                                                                  placeholder="Assign to">
                                                         <div className={"flex flex-wrap gap-[2px]"}>

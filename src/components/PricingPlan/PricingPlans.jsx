@@ -2,33 +2,11 @@ import React, {useState} from 'react';
 import {useTheme} from "../theme-provider";
 import {Button} from "../ui/button";
 import {Check} from "lucide-react";
+import {useDispatch, useSelector} from "react-redux";
+import {userDetailsAction} from "../../redux/action/UserDetailAction";
+import {ApiService} from "../../utils/ApiService";
+import {useToast} from "../ui/use-toast";
 
-
-const dummyPlan = {
-        plans: [{
-                name: "Free",
-                price: 0,
-                description: "Essential features you need to get started",
-                features: ["Example Feature Number 1", "Example Feature Number 1", "Example Feature Number 1"],
-                id: 1,
-            },
-            {
-                name: "Startup",
-                price: 19,
-                description: "Perfect for owners of small & medium businesses",
-                features: ["Example Feature Number 1", "Example Feature Number 1", "Example Feature Number 1"],
-                id: 2
-            },
-            {
-                name: "Growth",
-                price: 29,
-                description: "Dedicated support and infrastructure to fit your needs",
-                features: ["Example Feature Number 1", "Example Feature Number 1", "Example Feature Number 1"],
-                id: 3
-            }],
-        activatedPlan:"Growth",
-        duration:"May 28 - Jun 27"
-    }
 
 const features =[
     {
@@ -189,8 +167,76 @@ const features =[
 
 const PricingPlans = () => {
     const { theme } =useTheme();
-    const [tab,setTab]=useState(0);
-    // const [showComparePlan,setShowComparePlan]=useState(false);
+    let apiSerVice = new ApiService();
+    const {toast} = useToast();
+
+    const [tab,setTab] = useState(0);
+    const [isLoading, setLoading] = useState('');
+
+    const dispatch = useDispatch();
+    const userDetailsReducer = useSelector(state => state.userDetailsReducer);
+
+    const plans = [{
+        name: "Free",
+        price: 0,
+        description: "Essential features you need to get started",
+        features: ["Example Feature Number 1", "Example Feature Number 1", "Example Feature Number 1"],
+        planType: 0,
+        productId: "",
+        disabled: userDetailsReducer.plan === 0,
+        btnText: userDetailsReducer.plan > 0 ? "Downgrade" : "Activated"
+    },
+        {
+            name: "Startup",
+            price: 19,
+            description: "Perfect for owners of small & medium businesses",
+            features: ["Example Feature Number 1", "Example Feature Number 1", "Example Feature Number 1"],
+            planType: 1,
+            productId: "price_1Pi8vSKS40mIQp5T8LrFd5QC",
+            disabled: userDetailsReducer.plan === 1 && userDetailsReducer.final_expiration_time !== "" ? false : userDetailsReducer.plan === 1,
+            btnText: userDetailsReducer.plan === 1 && userDetailsReducer.final_expiration_time !== "" ? "Resubscribe" : userDetailsReducer.plan === 1 ? "Activated" : userDetailsReducer.plan > 1 ? "Downgrade" :"Upgrade"
+        },
+        ]
+    const redirectToCheckout = async (price, id) => {
+        setLoading(price)
+        if(userDetailsReducer.plan === id && userDetailsReducer.final_expiration_time !== ""){
+            const data = await apiSerVice.resubscribe({plan: id})
+            if(data.status === 200){
+                setLoading("")
+                dispatch(userDetailsAction({...data.data.user_detail}))
+                toast({ description: data.success})
+            } else {
+                toast({variant: "destructive", description: data.error})
+                setLoading("")
+            }
+        } else {
+            if(userDetailsReducer.plan === 0){
+                const data = await apiSerVice.checkout({plan: id})
+                if(data.status === 200){
+                    window.open(data.url, "_self")
+                    setLoading("")
+                } else {
+                    setLoading("")
+                }
+            } else {
+                const data = await apiSerVice.upcomingInvoice({plan:id})
+                if(data.status === 201){
+                    setLoading("")
+                } else {
+                    const res = await apiSerVice.changePlan({plan:id})
+                    if(res.status === 436){
+                        toast({ description: data.message})
+                        setLoading("")
+                    } else {
+                        setLoading("")
+                    }
+                }
+
+            }
+        }
+
+
+    };
 
     return (
         <div className={"xl:container xl:max-w-[1130px] lg:container lg:max-w-[992px] md:container md:max-w-[768px] sm:container sm:max-w-[639px] xs:container xs:max-w-[475px] max-[639px]:container max-[639px]:max-w-[639px]"}>
@@ -210,7 +256,7 @@ const PricingPlans = () => {
             </div>
             <div className={"flex flex-row justify-center gap-[18px] max-[639px]:flex-wrap xl:flex-nowrap lg:flex-wrap sm:flex-wrap"}>
                 {
-                    (dummyPlan.plans || []).map((x,index)=>{
+                    (plans || []).map((x,index)=>{
                         return(
                             <div key={index} className={`w-[354px] max-[639px]:w-max-[639px]  border-[1px] px-6 pt-6 pb-8 rounded-[10px] ${index === 1 ? "border-violet-600 relative" : ""}`}>
                                 {index === 1 && <div className={"top-[-14px] bg-violet-600 rounded-[10px] text-[#F9FAFB] text-sm h-7 w-[131px] py-1 flex justify-center text-center absolute left-[30%] right-[30%]"}><p>Most popular</p></div>}
@@ -226,10 +272,13 @@ const PricingPlans = () => {
                                         })
                                     }
                                 </div>
-                                {x.name === dummyPlan.activatedPlan ? <Button variant={"outline"} className={`w-full font-semibold ${theme === "dark" ? "" : "text-muted-foreground"} ${index == 1 ? "bg-violet-600" : ""}`}>Activated</Button> : <Button variant={"outline hover:none"}
-                                         className={`rounded-md h-10 border border-violet-600 text-violet-600 text-[14px] font-semibold w-full font-semibold ${index == 1 ? "bg-violet-600 text-[#F9FAFB] hover:bg-violet-600" : ""}`}>
-                                    Downgrade
-                                </Button>}
+                                {x.disabled ?
+                                    <Button  className={`w-full font-semibold`}>{x.btnText}</Button>
+                                    :
+                                    <Button variant={"outline"} className={`w-full font-semibold`} onClick={() =>redirectToCheckout(x.productId, x.planType)}>
+                                        {x.btnText}
+                                </Button>
+                                }
                             </div>
                         )
                     })

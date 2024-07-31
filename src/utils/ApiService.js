@@ -282,7 +282,7 @@ export class ApiService{
         return await this.getData(`${baseUrlApi}/widget/${id}`)
     }
     async updateWidgets (payload, id){
-        return await this.putData(`${baseUrlApi}/widget/${id}`, payload)
+        return await this.postData(`${baseUrlApi}/widget/${id}?_method=PUT`, payload)
     }
     async createWidgets (payload){
         return await this.postData(`${baseUrlApi}/widget`, payload)

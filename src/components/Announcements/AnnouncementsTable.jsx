@@ -60,7 +60,7 @@ const AnnouncementsTable = ({data,isLoading ,setSelectedRecord,setEditIndex ,han
     };
 
     const shareFeedback = (domain,slug)=>{
-        window.open(`https://${domain}/${slug}`, "_blank")
+        window.open(`https://${domain}/announcements/${slug}`, "_blank")
     }
 
     const deleteRow =(id)=>{

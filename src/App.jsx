@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 import {ThemeProvider} from "./components/theme-provider";
 import DefaultLayout from "./components/DefaultLayout/DefaultLayout";
 import {BrowserRouter, Navigate, Route, Routes} from "react-router-dom";
@@ -10,15 +10,13 @@ import Register from "./components/Auth/Register";
 import Login from "./components/Auth/Login";
 import Forgot from "./components/Auth/Forgot";
 
-
-
 function App() {
+
   return (
     <>
         <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
             <BrowserRouter>
                 <Routes>
-
                     <Route element={<ProtectedRoutes/>}>
                         <Route exact path={`${baseUrl}/`} element={<DefaultLayout/>}>
                             {
@@ -29,7 +27,6 @@ function App() {
                             <Route path={`${baseUrl}/`} element={<Navigate to={`${baseUrl}/dashboard`} replace/>}/>
                         </Route>
                     </Route>
-
                     <Route element={<PublicRoutes/>}>
                         <Route path={`${baseUrl}/register`} element={<Register/>}/>
                         <Route path={`${baseUrl}/login`} element={<Login/>}/>

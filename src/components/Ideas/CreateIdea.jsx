@@ -7,7 +7,7 @@ import {ApiService} from "../../utils/ApiService";
 import {useSelector} from "react-redux";
 import {baseUrl, urlParams} from "../../utils/constent";
 import moment from "moment";
-import {Check, Loader2, X} from "lucide-react";
+import {Check, Circle, Loader2, X} from "lucide-react";
 import {RadioGroup, RadioGroupItem} from "../ui/radio-group";
 import {useTheme} from "../theme-provider";
 import {Sheet, SheetContent, SheetHeader, SheetOverlay} from "../ui/sheet";
@@ -22,12 +22,14 @@ const initialState = {
     images: [],
     topic: [],
     project_id: "",
-    description: null,
+    description: "",
+    board: ""
 }
 
 const initialStateError = {
     title: "",
-    description: null,
+    description: "",
+    board: ""
 
 }
 
@@ -46,15 +48,11 @@ const CreateIdea = ({
                         isNoStatus,
                         setIsNoStatus,
                     }) => {
-    const { theme } = useTheme()
-    let navigate = useNavigate();
     let apiSerVice = new ApiService();
     const { toast } = useToast()
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
-    const editor = useRef(null);
     const [ideaDetail, setIdeaDetail] = useState(initialState);
     const [topicLists, setTopicLists] = useState([]);
-    const [description, setDescription] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const [formError, setFormError] = useState(initialStateError);
@@ -62,17 +60,10 @@ const CreateIdea = ({
 
     useEffect(() => {
         setTopicLists(allStatusAndTypes.topics)
+        setIdeaDetail({...initialState, board: allStatusAndTypes?.boards[0]?.id})
     }, [projectDetailsReducer.id, allStatusAndTypes]);
 
-    const handleUpdate = (event) => {
-        const { value } = event.target;
-        setDescription(value);
-        setIdeaDetail(ideaDetail => ({...ideaDetail, description: value}));
-        setFormError(formError => ({
-            ...formError,
-            description: formValidate("description", value)
-        }));
-    };
+
 
     const handleChange = (id) => {
         const clone = [...ideaDetail.topic];
@@ -111,8 +102,9 @@ const CreateIdea = ({
         let formData = new FormData();
         formData.append('title', ideaDetail.title);
         formData.append('slug_url', ideaDetail.title ? ideaDetail.title.replace(/ /g,"-").replace(/\?/g, "-") :"");
-        formData.append('description', description);
+        formData.append('description', ideaDetail.description);
         formData.append('project_id', projectDetailsReducer.id);
+        formData.append('board', ideaDetail.board);
         formData.append('topic', ideaDetail.topic.join());
         const data = await apiSerVice.createIdea(formData)
         if(data.status === 200){
@@ -125,7 +117,6 @@ const CreateIdea = ({
                 if(roadmapIndex !== -1){
                     cloneRoadmap[roadmapIndex].ideas = newArray
                     setRoadmapList(cloneRoadmap);
-
                 }
                 if(isNoStatus){
                     setNoStatus(newArray)
@@ -133,7 +124,6 @@ const CreateIdea = ({
             }
             setIsLoading(false)
             setIdeaDetail(initialState)
-            setDescription("")
             closeCreateIdea()
             if(isNoStatus) {
                 setIsNoStatus(false)
@@ -141,7 +131,7 @@ const CreateIdea = ({
             toast({description: "Idea create successfully"})
         } else {
             setIsLoading(false)
-            toast({description: data.error})
+            toast({description: data.message,variant: "destructive" })
         }
     }
 
@@ -156,6 +146,12 @@ const CreateIdea = ({
             case "description":
                 if (!value || value.trim() === "") {
                     return "Description is required";
+                } else {
+                    return "";
+                }
+            case "board":
+                if (!value || value.toString().trim() === "") {
+                    return "Board is required";
                 } else {
                     return "";
                 }
@@ -194,17 +190,44 @@ const CreateIdea = ({
                                     </div>
                                     <div className="flex flex-col gap-2">
                                         <Label htmlFor="message">Description</Label>
-                                        <Textarea placeholder="Start writing..." id="message"
-                                                  value={description}
-                                                  onChange={handleUpdate}
+                                        <Textarea placeholder="Start writing..." name={"description"} id="message" className="bg-card"
+                                                  value={ideaDetail.description}
+                                                  onChange={(e) => onChangeText(e)}
                                         />
                                         {formError.description && <span className="text-red-500 text-sm">{formError.description}</span>}
                                     </div>
+                                    <div className={"flex flex-col gap-2"}>
+                                        <Label>Choose Board for this Idea</Label>
+                                        <Select
+                                            onValueChange={(value) => onChangeText({target:{name: "board", value}})}
+                                            value={ideaDetail.board}>
+                                            <SelectTrigger className="bg-card">
+                                                <SelectValue/>
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectGroup>
+                                                    {
+                                                        (allStatusAndTypes?.boards || []).map((x, i) => {
+                                                            return (
+                                                                <SelectItem key={i} value={x.id}>
+                                                                    <div className={"flex items-center gap-2"}>
+                                                                        {x.title}
+                                                                    </div>
+                                                                </SelectItem>
+                                                            )
+                                                        })
+                                                    }
+                                                </SelectGroup>
+                                            </SelectContent>
+                                        </Select>
+                                        {formError.board && <span className="text-red-500 text-sm">{formError.board}</span>}
+                                    </div>
                                 </div>
+
                                 <div className={"px-4 py-3 lg:py-6 lg:px-8 border-b flex flex-col gap-2"}>
-                                    <Label>Choose Topics for this Idea (optional)</Label>
+                                    <Label>Choose tags for this Idea (optional)</Label>
                                         <Select onValueChange={handleChange} value={selectedValues}>
-                                            <SelectTrigger className="">
+                                            <SelectTrigger className="bg-card">
                                                 <SelectValue className={"text-muted-foreground text-sm"} placeholder="Assign to">
                                                     <div className={"flex gap-[2px]"}>
                                                         {

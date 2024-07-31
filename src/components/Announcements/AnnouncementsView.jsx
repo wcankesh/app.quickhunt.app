@@ -165,13 +165,10 @@ const AnnouncementsView = ({data,isLoading,setSelectedRecord,handleDelete,setAna
                                                         <ReadMoreText html={x.post_description}/>
                                                     </div>
                                                 </div>
-                                                <div className={"flex gap-4 justify-end items-center flex-wrap"}>
-                                                    <div className={"flex items-center gap-2 cursor-pointer"}>
-                                                        <span><MessageCircleMore className={"stroke-primary w-[16px] h-[16px]"}/></span>
-                                                        <p className={"text-base font-medium"}>{x.msg}</p>
-                                                    </div>
-                                                    {
-                                                        (x.labels && x.labels.length > 0) ? (
+                                                {
+                                                    (x.labels && x.labels.length > 0) ? (
+                                                        <div className={"flex gap-4 justify-end items-center flex-wrap"}>
+
                                                             <div className={"flex flex-wrap gap-1"}>
                                                                 {
                                                                     x.labels.map((y, index) => (
@@ -186,10 +183,11 @@ const AnnouncementsView = ({data,isLoading,setSelectedRecord,handleDelete,setAna
                                                                     ))
                                                                 }
                                                             </div>
-                                                        ) : null
-                                                    }
 
-                                                </div>
+                                                        </div>
+                                                    ) : null
+                                                }
+
                                             </div>
                                         {/*{index != announcementList.length - 1  && <hr className={"bg-[#E4E4E7] h-[1px] my-6"}/>}*/}
                                         </div>

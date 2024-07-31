@@ -59,7 +59,6 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
     const [selectedLabels, setSelectedLabels] = useState([]);
     const {theme} = useTheme();
     let apiService = new ApiService();
-
     useEffect(()=>{
         if(selectedRecord?.post_slug_url){
              getSinglePosts();
@@ -289,10 +288,10 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
                         <div className="grid w-full gap-2">
                             <Label htmlFor="link">Permalink / Slug</Label>
                             <Input type="text" className={"h-9"} id="link" name={"post_slug_url"} value={changeLogDetails.post_slug_url} onChange={onChangeText}/>
-                            <p className={"text-sm font-normal text-muted-foreground"}>This release will be available at {changeLogDetails.fullDomain ? <a
-                                href={`${changeLogDetails.fullDomain}/${changeLogDetails.post_slug_url}`}
+                            <p className={"text-sm font-normal text-muted-foreground"}>This release will be available at {projectDetailsReducer.domain ? <a
+                                href={`https://${projectDetailsReducer.domain}/announcements/${changeLogDetails.post_slug_url}`}
                                 target={"_blank"}
-                                className={"text-primary text-sm"}>{`${changeLogDetails.fullDomain}/${changeLogDetails.post_slug_url}`}</a> : ""}</p>
+                                className={"text-primary text-sm"}>{`https://${projectDetailsReducer.domain}/announcements/${changeLogDetails.post_slug_url}`}</a> : ""}</p>
                         </div>
                         <div className="grid w-full gap-2">
                             <Label htmlFor="description">Description</Label>

@@ -15,7 +15,7 @@ import {useTheme} from "../theme-provider";
 
 const perPageLimit = 15;
 
-const   SidebarSheet = ({ isOpen, onOpen, onClose ,selectedViewAnalyticsRecord}) => {
+const SidebarSheet = ({ isOpen, onOpen, onClose ,selectedViewAnalyticsRecord}) => {
     const apiService = new ApiService();
     const [feedbackList, setFeedbackList] = useState([])
     const [reactionList, setReactionList] = useState([])
@@ -82,14 +82,13 @@ const   SidebarSheet = ({ isOpen, onOpen, onClose ,selectedViewAnalyticsRecord})
                         </div>
                         <div className={"p-4 md:py-6 md:px-8 flex flex-col gap-3 border-b"}>
                             <h5 className={"text-base font-semibold leading-5"}>Reaction</h5>
-                            {feedbackList.length == 0 != <Separator className={"mb-2"}/>}
                             {isLoadingReaction ?  <div className="flex items-center space-x-6">
                                                         <Skeleton className="h-12 w-12 rounded-full" />
                                                         <Skeleton className="h-12 w-12 rounded-full" />
                                                         <Skeleton className="h-12 w-12 rounded-full" />
                                                         <Skeleton className="h-12 w-12 rounded-full" />
                                                     </div>
-                             : <div className={"flex flex-row flex-wrap justify-between"}>
+                             : <div className={"flex flex-row flex-wrap gap-4"}>
                                 {
                                     reactionList.length == 0 ?
                                         <p className={"text-muted-foreground text-xs font-medium"}>No reaction received
@@ -98,9 +97,9 @@ const   SidebarSheet = ({ isOpen, onOpen, onClose ,selectedViewAnalyticsRecord})
                                                 (reactionList || []).map((x, index) => {
                                                     const matchedEmojiObject = (allEmoji || []).find((y) => y.id === x.reaction_id);
                                                     return (
-                                                        <div className={"flex w-1/4 mt-1"} key={index}>
+                                                        <div className={"flex w-1/4"} key={index}>
                                                             <div className={"flex flex-row gap-2 items-center"}>
-                                                                <div>{matchedEmojiObject ? <img className={"h-10 w-10"} src={matchedEmojiObject?.emoji_url}/> : Icon?.smileEmoji2}</div>
+                                                                {matchedEmojiObject ? <img className={"h-10 w-10"} src={matchedEmojiObject?.emoji_url}/> : Icon?.smileEmoji2}
                                                                 <h5 className={"text-2xl font-bold leading-5"}>{x.total}</h5>
                                                             </div>
                                                         </div>
@@ -110,15 +109,7 @@ const   SidebarSheet = ({ isOpen, onOpen, onClose ,selectedViewAnalyticsRecord})
                                         </Fragment>
                                 }
                             </div>}
-                            {feedbackList.length == 0 != <div className={"flex flex-row justify-end items-center gap-3"}>
-                                <Button variant={"outline"} className={" h-[30px] w-[30px] p-1.5"}>
-                                    <ChevronLeft/>
-                                </Button>
-                                <h5 className={"text-[14px] font-bold"}>01</h5>
-                                <Button variant={"outline"} className={" h-[30px] w-[30px] p-1.5"}>
-                                    <ChevronRight className={"stroke-primary"}/>
-                                </Button>
-                            </div>}
+
                         </div>
                         <div className={"p-4 md:py-6 md:px-8 flex flex-col gap-2"}>
                             <h5 className={"text-base font-semibold leading-5"}>Feedback</h5>

@@ -268,3 +268,153 @@ span.LinesEllipsis-ellipsis {color: hsl(var(--primary)) !important;font-weight: 
 @media (max-width: 640px) {
   .bodyScreenHeight {height: auto;}
 }
+
+
+.QH-popover{
+  width: 410px;
+  height: 600px;
+  max-height: calc(100% - 120px);
+  position: absolute;
+  left: 40px;
+  bottom: 90px;
+  background-color: #fff;
+  border: 0;
+  border-radius: 5px;
+  -webkit-box-shadow: 0 8px 16px rgba(27, 39, 51, .07);
+  box-shadow: 0 8px 16px rgba(27, 39, 51, .07);
+  margin: 0;
+  max-width: 100%;
+  opacity: 1;
+  outline: 0;
+  overflow: hidden;
+  padding: 0;
+  -webkit-transition: opacity .2s ease-out;
+  transition: opacity .2s ease-out;
+  z-index: 99999;
+  display: block;
+}
+.QH-popover-open{
+  display: block;
+  -webkit-animation-duration: .3s;
+  animation-duration: .3s;
+  -webkit-animation-fill-mode: forwards;
+  animation-fill-mode: forwards;
+  -webkit-animation-name: QH_floating_trigger;
+  animation-name: QH_floating_trigger;
+  -webkit-animation-timing-function: cubic-bezier(.45,.45,0,.99);
+  animation-timing-function: cubic-bezier(.45,.45,0,.99);
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+
+.QH-sidebar{
+  bottom: 0;
+  display: block;
+  left: 0;
+  margin: 0;
+  min-height: 100%;
+  outline: 0;
+  overflow: hidden;
+  padding: 0;
+  pointer-events: all;
+  position: fixed;
+  right: 0;
+  top: 0;
+  z-index: 99999;
+}
+.QH-sidebar-content{
+  bottom: 0;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  max-width: 100%;
+  overflow: hidden;
+  position: fixed;
+  top: 0;
+  transform: translateX(0);
+  -webkit-transition: -webkit-transform .3s cubic-bezier(.46,.39,.11,.96);
+  transition: -webkit-transform .3s cubic-bezier(.46,.39,.11,.96);
+  transition: transform .3s cubic-bezier(.46,.39,.11,.96);
+}
+.QH-sidebar-open{
+  display: block;
+}
+.QH-sidebar-shadow{
+  background-color: #28313a;
+  height: 100%;
+  left: 350px;
+  opacity: .4;
+  position: fixed;
+  top: 0;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-transition: opacity .3s ease-in-out;
+  transition: opacity .3s ease-in-out;
+  width: 100%;
+  z-index: -1;
+}
+.QH-frame{
+  border: 0px;
+  outline: 0px;
+  width: 100%;
+  height: 100%;
+  -webkit-transform: translateY(0) scale(1);
+  transform: translateY(0) scale(1);
+  -webkit-transition: -webkit-transform .3s cubic-bezier(.46,.39,.11,.96);
+  transition: -webkit-transform .3s cubic-bezier(.46,.39,.11,.96);
+  transition: transform .3s cubic-bezier(.46,.39,.11,.96);
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+.QH-floating-trigger{
+  color: rgb(255, 255, 255);
+  background-color: rgb(89, 86, 240);
+  bottom: 20px;
+  left: 200px;
+  -webkit-animation-duration: .5s;
+  animation-duration: .5s;
+  -webkit-animation-fill-mode: forwards;
+  animation-fill-mode: forwards;
+  -webkit-animation-name: QH_floating_trigger;
+  animation-name: QH_floating_trigger;
+  -webkit-animation-timing-function: cubic-bezier(.45,.45,0,.99);
+  animation-timing-function: cubic-bezier(.45,.45,0,.99);
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  appearance: none;
+  border: 0;
+  border-radius: 50%;
+  -webkit-box-shadow: 0 4px 7px rgba(0, 0, 0, .1);
+  box-shadow: 0 4px 7px rgba(0, 0, 0, .1);
+  cursor: pointer;
+  height: 60px;
+  margin: 0;
+  outline: 0;
+  position: absolute;
+  width: 60px;
+  z-index: 999999;
+  display: flex; align-items: center; justify-content: center;
+}
+
+@-webkit-keyframes QH_floating_trigger {
+  0% {
+    opacity: 0;
+    -webkit-transform: scale(.5);
+    transform: scale(.5)
+  }
+
+  60% {
+    opacity: 1;
+    -webkit-transform: scale(1.1);
+    transform: scale(1.1)
+  }
+
+  to {
+    opacity: 1;
+    -webkit-transform: scale(1);
+    transform: scale(1)
+  }
+}
