@@ -754,7 +754,7 @@ const RoadMapSidebarSheet = ({
             <Sheet open={isOpen} onOpenChange={isOpen ? onCloseBoth : onOpen}>
                 <SheetOverlay className={"inset-0"} />
                 <SheetContent className={"lg:max-w-[1101px] md:max-w-[720px] sm:max-w-full p-0"}>
-                    <SheetHeader className={"px-4 py-5 lg:px-8 lg:py-[20px] border-b"}>
+                    <SheetHeader className={"px-4 py-3 md:py-5 lg:px-8 lg:py-[20px] border-b"}>
                         <X onClick={onCloseBoth} className={"cursor-pointer"}/>
                     </SheetHeader>
                     <div className={"grid lg:grid-cols-12 md:grid-cols-1 overflow-auto idea-sheet-height"}>
@@ -843,8 +843,8 @@ const RoadMapSidebarSheet = ({
                             {
                                 isEditIdea ?
                                     <div className={"pb-100px"}>
-                                        <div className={"py-6 px-8 flex flex-col gap-6 border-b"}>
-                                            <div className="items-center gap-1.5">
+                                        <div className={"px-4 py-3 lg:py-6 lg:px-8 flex flex-col gap-6 border-b"}>
+                                            <div className="space-y-2">
                                                 <Label htmlFor="text">Title</Label>
                                                 <Input type="text" id="text" placeholder="" value={selectedIdea?.title}
                                                        name={"title"} onChange={onChangeText}/>
@@ -853,7 +853,7 @@ const RoadMapSidebarSheet = ({
                                                     <span className="text-red-500 text-sm">{formError.title}</span>
                                                 }
                                             </div>
-                                            <div className="gap-1.5">
+                                            <div className="space-y-2">
                                                 <Label htmlFor="message">Description</Label>
                                                 <Textarea placeholder="Start writing..." id="message"
                                                           value={selectedIdea?.description}
@@ -863,7 +863,7 @@ const RoadMapSidebarSheet = ({
                                                 <span className="text-red-500 text-sm">{formError.description}</span>}
                                             </div>
                                         </div>
-                                        <div className={"py-6 px-8 border-b"}>
+                                        <div className={"px-4 py-3 lg:py-6 lg:px-8 border-b space-y-2"}>
                                             <Label>Choose Topics for this Idea (optional)</Label>
                                             <Select onValueChange={handleChangeTopic}
                                                     value={selectedIdea?.topic.map(x => x.id)}>
@@ -907,7 +907,7 @@ const RoadMapSidebarSheet = ({
                                                 </SelectContent>
                                             </Select>
                                         </div>
-                                        <div className={"p-8 flex gap-3"}>
+                                        <div className={"p-4 lg:p-8 flex gap-3"}>
                                             <Button
                                                 className={`${isLoadingCreateIdea === true ? "w-[81px] py-2 px-6" : "py-2 px-6"} text-sm font-semibold`}
                                                 onClick={onCreateIdea}
@@ -1037,27 +1037,27 @@ const RoadMapSidebarSheet = ({
                                                                             <Button variant="ghost hover-none"
                                                                                     className={"rounded-full p-0 h-[24px]"}>
                                                                                 {
-                                                                                    (selectedIdea?.vote_list || []).map((x, i) => {
+                                                                                    (selectedIdea.vote_list.slice(0, 1) || []).map((x, i) => {
                                                                                         return (
-                                                                                            <div className={"flex"}>
+                                                                                            <div className={"flex"} key={i}>
                                                                                                 <div
                                                                                                     className={"relative"}>
                                                                                                     <div
                                                                                                         className={"update-idea text-sm rounded-full border text-center"}>
                                                                                                         <Avatar>
                                                                                                             {
-                                                                                                                i < 2 ? x.user_photo ?
+                                                                                                                x.user_photo ?
                                                                                                                     <AvatarImage
                                                                                                                         src={x.user_photo}
-                                                                                                                        alt={x && x.name && x.name.substring(0, 1)}/> :
-                                                                                                                    <AvatarFallback>{x && x.name && x.name.substring(0, 1)}</AvatarFallback> : ""
+                                                                                                                        alt={x && x.name && x.name.substring(0, 1)} /> :
+                                                                                                                    <AvatarFallback>{x && x.name && x.name.substring(0, 1)}</AvatarFallback>
                                                                                                             }
                                                                                                         </Avatar>
                                                                                                     </div>
                                                                                                 </div>
                                                                                                 <div
                                                                                                     className={"update-idea  text-sm rounded-full border text-center ml-[-5px]"}>
-                                                                                                    <Avatar><AvatarFallback>+{selectedIdea?.vote_list.length - 2}</AvatarFallback></Avatar>
+                                                                                                    <Avatar><AvatarFallback>+{selectedIdea?.vote_list.length}</AvatarFallback></Avatar>
                                                                                                 </div>
                                                                                             </div>
                                                                                         )
@@ -1065,7 +1065,7 @@ const RoadMapSidebarSheet = ({
                                                                                 }
                                                                             </Button>
                                                                         </PopoverTrigger>
-                                                                        <PopoverContent className="p-0">
+                                                                        <PopoverContent className="p-0" align={"end"}>
                                                                             <div className="">
                                                                                 <div
                                                                                     className="space-y-2 px-4 py-[5px]">
@@ -1250,7 +1250,7 @@ const RoadMapSidebarSheet = ({
                                         </div>
                                         <div>
                                             <Tabs defaultValue="comment" className="">
-                                                <div className={"px-8"}>
+                                                <div className={"px-4 lg:px-8"}>
                                                     <TabsList
                                                         className="bg-transparent border-b-2 border-b-primary rounded-none">
                                                         <TabsTrigger value="comment">Comment</TabsTrigger>
@@ -1266,7 +1266,7 @@ const RoadMapSidebarSheet = ({
                                                                 return (
                                                                     <Fragment>
                                                                         <div
-                                                                            className={"flex gap-2 p-[32px] pb-0 pt-3"}>
+                                                                            className={"flex gap-2 p-4 lg:p-8 lg:pb-0 pt-3 pb-0"}>
                                                                             <div className={""}>
                                                                                 <div
                                                                                     className={"update-idea text-sm rounded-full border text-center"}>
@@ -1283,14 +1283,12 @@ const RoadMapSidebarSheet = ({
                                                                                     </Avatar>
                                                                                 </div>
                                                                             </div>
-                                                                            <div
-                                                                                className={"w-full flex flex-col gap-3"}>
+                                                                            <div className={"w-full flex flex-col space-y-3"}>
                                                                                 <div className={"flex gap-1 flex-wrap justify-between"}>
-                                                                                    <div
-                                                                                        className={"flex items-center"}>
+                                                                                    <div className={"flex items-start"}>
                                                                                         <h4 className={"text-sm font-medium"}>{x.name}</h4>
                                                                                         <p className={"text-sm font-normal flex items-center text-muted-foreground"}>
-                                                                                            <Dot
+                                                                                            <Dot size={20}
                                                                                                 className={"fill-text-card-foreground stroke-text-card-foreground"}/>
                                                                                             {moment.utc(x.created_at).local().startOf('seconds').fromNow()}
                                                                                         </p>
@@ -1299,7 +1297,7 @@ const RoadMapSidebarSheet = ({
                                                                                         {
                                                                                             selectedCommentIndex === i && isEditComment ? "" :
                                                                                                 x.is_edit === 1 ?
-                                                                                                    <><Button
+                                                                                                    <Fragment><Button
                                                                                                         variant={"outline"}
                                                                                                         className={"w-[30px] h-[30px] p-1"}
                                                                                                         onClick={() => onEditComment(x, i)}
@@ -1313,15 +1311,14 @@ const RoadMapSidebarSheet = ({
                                                                                                             onClick={() => deleteComment(x.id, i)}
                                                                                                         >
                                                                                                             <Trash2 className={"w-[16px] h-[16px]"}/>
-                                                                                                        </Button></> : ""
+                                                                                                        </Button></Fragment> : ""
                                                                                         }
                                                                                     </div>
                                                                                 </div>
                                                                                 <div>
                                                                                     {
                                                                                         selectedCommentIndex === i && isEditComment ?
-                                                                                            <div
-                                                                                                className={"space-y-2"}>
+                                                                                            <div className={"space-y-2"}>
                                                                                                 <Textarea
                                                                                                     value={selectedComment.comment}
                                                                                                     onChange={(e) => setSelectedComment({
@@ -1447,7 +1444,6 @@ const RoadMapSidebarSheet = ({
                                                                                             </div>
                                                                                         </div>
                                                                                 }
-                                                                                <div>
                                                                                     {
                                                                                         x.show_reply ?
                                                                                             <div
@@ -1467,7 +1463,7 @@ const RoadMapSidebarSheet = ({
                                                                                                                     <div
                                                                                                                         className={"w-full space-y-2"}>
                                                                                                                         <div
-                                                                                                                            className={"flex justify-between items-center"}>
+                                                                                                                            className={"flex flex-wrap justify-between items-start gap-2"}>
                                                                                                                             <div
                                                                                                                                 className={"flex gap-2"}>
                                                                                                                                 <h4 className={"text-sm font-medium"}>{y.name}</h4>
@@ -1496,7 +1492,6 @@ const RoadMapSidebarSheet = ({
                                                                                                                                         </div> : ''
                                                                                                                             }
                                                                                                                         </div>
-                                                                                                                        <div>
                                                                                                                             {
                                                                                                                                 selectedCommentIndex === i && selectedSubCommentIndex === j ?
                                                                                                                                     <div
@@ -1595,7 +1590,6 @@ const RoadMapSidebarSheet = ({
                                                                                                                                         </div>
                                                                                                                                     </div>
                                                                                                                             }
-                                                                                                                        </div>
                                                                                                                     </div>
                                                                                                                 </div>
                                                                                                             </Fragment>
@@ -1672,7 +1666,6 @@ const RoadMapSidebarSheet = ({
                                                                                                 </div>
                                                                                             </div> : ""
                                                                                     }
-                                                                                </div>
                                                                             </div>
                                                                         </div>
                                                                     </Fragment>

@@ -227,14 +227,12 @@ export function Dashboard() {
 
     return (
         <Fragment>
-                <div className={"md:py-8 py-4"}>
-                    <div className='xl:container xl:max-w-[1200px] lg:container lg:max-w-[992px] md:container md:max-w-[768px] sm:container sm:max-w-[639px] px-4'>
+                <div className={"md:py-8 py-4 border-b"}>
+                    <div className='container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] px-3 md:px-4'>
                         <h1 className="md:text-[32px] text-[26px] font-medium">Welcome to Quickhunt</h1>
                     </div>
-
                 </div>
-                <div className={"border-b"} />
-                <div className="xl:container xl:max-w-[1200px] lg:container lg:max-w-[992px] md:container md:max-w-[768px] sm:container sm:max-w-[639px] pb-5 px-4">
+                <div className="container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pb-5 px-3 md:px-4">
                         <div className={"flex items-center flex-wrap pb-6 pt-9 gap-2 md:justify-between md:flex-nowrap"}>
                             <h3 className="text-base font-bold">Here's what has happened to your program</h3>
                             <Popover>
@@ -301,9 +299,8 @@ export function Dashboard() {
                                     })
                                 }
                             </div>
-                            <div className={"flex flex-wrap gap-8 md:flex-nowrap"}>
-                                <Card className={"lg:basis-2/3 basis-full min-w-[286px] p-4 md:pr-8 divide-y shadow border"}>
-                                {/*<Card className={"feed p-4 pr-8 divide-y shadow border"}>*/}
+                            <div className={"flex flex-wrap gap-4 lg:gap-8 md:flex-nowrap"}>
+                                <Card className={"lg:basis-2/3 basis-full min-w-[270px] p-4 md:pr-8 divide-y shadow border"}>
                                     <CardHeader className={"p-0 pb-4"}>
                                         <CardTitle className={"text-base font-bold"}>New Feedbacks</CardTitle>
                                     </CardHeader>
@@ -331,8 +328,7 @@ export function Dashboard() {
                                         <Button className={"text-primary p-0 h-[20px] text-sm font-semibold"} variant={"ghost hover:none"}>View More Feedbacks</Button>
                                     </CardFooter>
                                 </Card>
-                                <Card className={"lg:basis-1/3 basis-full min-w-[286px] p-4 md:pr-8 divide-y shadow border"}>
-                                {/*<Card className={"emoj p-4 pr-8 divide-y shadow border"}>*/}
+                                <Card className={"lg:basis-1/3 basis-full min-w-[270px] p-4 md:pr-8 divide-y shadow border"}>
                                     <CardHeader className={"p-0 pb-4"}>
                                         <CardTitle className={"text-base font-bold"}>Reaction</CardTitle>
                                     </CardHeader>
@@ -357,10 +353,7 @@ export function Dashboard() {
                                                         }
                                                     </Fragment>
                                                 ))
-                                            ) :
-                                            (
-                                                <EmptyData />
-                                            )
+                                            ) : <EmptyData />
                                     }
                                     <CardFooter className={"pt-4 px-0 pb-0 justify-end"}>
                                         <Button className={"text-primary text-sm p-0 h-[20px] font-semibold"} variant={"ghost hover:none"}>View More Reactions</Button>
@@ -369,16 +362,15 @@ export function Dashboard() {
                             </div>
                             <div>
                                 <Card className={"shadow border"}>
-                                    <CardHeader className={"px-[28px] pb-0"}>
+                                    <CardHeader className={"p-4 pb-0 md:p-6"}>
                                         <CardTitle className={"text-base font-bold"}>Overview</CardTitle>
                                     </CardHeader>
                                     {dataAvailable ? (
-                                        <CardContent className={"pb-10 px-[28px] pt-8 m-0"}>
+                                        <CardContent className={"pb-10 px-4 pt-8 m-0 md:px-7"}>
                                             <HighchartsReact highcharts={Highcharts} options={options}/>
                                         </CardContent>
-                                    ) : (
-                                        <EmptyData/>
-                                    )}
+                                    ) : <EmptyData/>
+                                    }
                                 </Card>
                             </div>
                         </div>

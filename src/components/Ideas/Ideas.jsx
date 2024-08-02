@@ -1,21 +1,6 @@
 import React, {Fragment, useEffect, useState} from 'react';
 import {Button} from "../ui/button";
-import {
-    ArrowBigUp,
-    ChevronLeft,
-    ChevronRight,
-    ChevronsLeft,
-    ChevronsRight,
-    Circle,
-    Dot,
-    Ellipsis,
-    Filter,
-    Loader2,
-    MessageCircleMore,
-    Pin,
-    Plus,
-    X,
-} from "lucide-react";
+import {ArrowBigUp, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Circle, Dot, Ellipsis, Filter, Loader2, MessageCircleMore, Pin, Plus, X,} from "lucide-react";
 import {Card, CardContent, CardFooter} from "../ui/card";
 import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "../ui/select";
 import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList} from "../ui/command";
@@ -37,7 +22,6 @@ import {DropdownMenuContent, DropdownMenuItem,} from "../ui/dropdown-menu";
 import {Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "../ui/dialog";
 import {Badge} from "../ui/badge";
 import {Popover, PopoverContent, PopoverTrigger} from "../ui/popover";
-
 
 const filterByStatus = [
     {name: "Archived", value: "archive",},
@@ -92,11 +76,9 @@ const Ideas = () => {
         if (filter.topic.length || filter.roadmap.length || filter.bug || filter.archive /*|| filter.no_status*/ || filter.all) {
             let payload = {...filter, project_id: projectDetailsReducer.id, page: pageNo, limit: perPageLimit}
             ideaSearch(payload)
-
         } else {
             getAllIdea()
         }
-
         setTopicLists(allStatusAndTypes.topics)
         setRoadmapStatus(allStatusAndTypes.roadmap_status)
     }, [projectDetailsReducer.id, pageNo, allStatusAndTypes])
@@ -158,7 +140,6 @@ const Ideas = () => {
             page: 1,
             limit: perPageLimit,
         };
-
         if (e.name === "topic") {
             if (e.value !== null) {
                 const clone = [...payload.topic];
@@ -200,16 +181,13 @@ const Ideas = () => {
                 payload.all = 1;
             }
         }
-
         setFilter(payload);
         ideaSearch(payload);
     };
 
-
     const giveVote = async (record, type) => {
         if (record.is_edit !== 1) {
             if (record.user_vote === type) {
-
             } else {
                 const payload = {
                     feature_idea_id: record.id,
@@ -237,8 +215,9 @@ const Ideas = () => {
                         }
                         setIdeasList(clone);
                     }
+                    toast({description: data.message})
                 } else {
-
+                    toast({variant: "destructive", description: data.error})
                 }
             }
         } else {
@@ -262,7 +241,6 @@ const Ideas = () => {
     const handleStatusUpdate = async (name, value, index, record) => {
         const formData = new FormData();
         formData.append(name, value);
-
         const data = await apiSerVice.updateIdea(formData, record?.id);
         if (data.status === 200) {
             const clone = [...ideasList];
@@ -306,12 +284,12 @@ const Ideas = () => {
                 openDelete &&
                 <Fragment>
                     <Dialog open onOpenChange={deleteIdea}>
-                        <DialogContent className="sm:max-w-[425px]">
+                        <DialogContent className="max-w-[320px] w-full p-3 md:max-w-[425px] rounded-lg">
                             <DialogHeader className={"flex flex-col gap-2"}>
-                                <DialogTitle>You really want delete this idea?</DialogTitle>
-                                <DialogDescription>This action can't be undone.</DialogDescription>
+                                <DialogTitle className={"text-start"}>You really want delete this idea?</DialogTitle>
+                                <DialogDescription className={"text-start"}>This action can't be undone.</DialogDescription>
                             </DialogHeader>
-                            <DialogFooter>
+                            <DialogFooter className={"flex-row justify-end space-x-2"}>
                                 <Button variant={"outline hover:none"}
                                         className={"text-sm font-semibold border"}
                                         onClick={() => setOpenDelete(false)}>Cancel</Button>
@@ -327,8 +305,7 @@ const Ideas = () => {
                     </Dialog>
                 </Fragment>
             }
-            <div
-                className={"xl:container xl:max-w-[1200px] lg:container lg:max-w-[992px] md:container md:max-w-[768px] sm:container sm:max-w-[639px] pt-8 pb-5 px-4"}>
+            <div className={"container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-3 md:px-4"}>
                 <SidebarSheet
                     isOpen={isSheetOpen}
                     onOpen={openSheet}
@@ -349,7 +326,6 @@ const Ideas = () => {
                     isOpen={isSheetOpenCreate}
                     onOpen={openCreateIdea}
                     onClose={closeCreateIdea}
-
                     isRoadmap={false}
                     closeCreateIdea={closeCreateIdea}
                     setIdeasList={setIdeasList}
@@ -360,10 +336,14 @@ const Ideas = () => {
                     <div className="flex items-center gap-4 mb-6 justify-between">
                         <h1 className="text-2xl font-medium flex-initial w-auto">Ideas</h1>
                         <div className="flex gap-2 flex-1 w-full justify-end">
-                            <Popover open={openFilter} onOpenChange={() => {
-                                setOpenFilter(!openFilter);
-                                setOpenFilterType('');
-                            }} className="w-full p-0">
+                            <Popover
+                                open={openFilter}
+                                onOpenChange={() => {
+                                    setOpenFilter(!openFilter);
+                                    setOpenFilterType('');
+                                }}
+                                className="w-full p-0"
+                            >
                                 <PopoverTrigger asChild>
                                     <Button variant="outline" size="icon" className={"w-9 h-9 "}><Filter fill="true" className='w-4 -h4' /></Button>
                                 </PopoverTrigger>
@@ -375,94 +355,122 @@ const Ideas = () => {
                                             {
                                                 openFilterType === 'topic' ? <CommandGroup>
                                                     <CommandItem  className={"p-0 flex gap-2 items-center cursor-pointer p-1"}>
-                                                        <ChevronLeft className="mr-2 h-4 w-4" />  <span onClick={() => {
-                                                        setOpenFilterType('');
-                                                    }} className={"flex-1 w-full text-sm font-medium cursor-pointer flex gap-2 items-center"}>Back</span>
+                                                        <ChevronLeft className="mr-2 h-4 w-4" />
+                                                        <span
+                                                            onClick={() => {setOpenFilterType('');}}
+                                                            className={"flex-1 w-full text-sm font-medium cursor-pointer flex gap-2 items-center"}
+                                                        >
+                                                            Back
+                                                        </span>
                                                     </CommandItem>
                                                     {(topicLists || []).map((x, i) => {
                                                         return (
                                                             <CommandItem key={i} value={x.id} className={"p-0 flex gap-1 items-center cursor-pointer"}>
-                                                                <Checkbox className={'m-2'} checked={filter.topic.includes(x.id)} onClick={() => {
-                                                                    handleChange({name: "topic" , value: x.id});
-                                                                    setOpenFilter(true);
-                                                                    setOpenFilterType('topic');
-                                                                }}/>
-                                                                <span onClick={() => {
-                                                                    handleChange({name: "topic" , value: x.id});
-                                                                    setOpenFilter(true);
-                                                                    setOpenFilterType('topic');
-                                                                }} className={"flex-1 w-full text-sm font-medium cursor-pointer flex gap-2 items-center"}>{x.title}</span>
+                                                                <Checkbox
+                                                                    className={'m-2'}
+                                                                    checked={filter.topic.includes(x.id)}
+                                                                    onClick={() => {
+                                                                        handleChange({name: "topic" , value: x.id});
+                                                                        setOpenFilter(true);
+                                                                        setOpenFilterType('topic');
+                                                                    }}
+                                                                />
+                                                                <span
+                                                                    onClick={() => {
+                                                                        handleChange({name: "topic" , value: x.id});
+                                                                        setOpenFilter(true);
+                                                                        setOpenFilterType('topic');
+                                                                    }}
+                                                                    className={"flex-1 w-full text-sm font-medium cursor-pointer flex gap-2 items-center"}
+                                                                >
+                                                                    {x.title}
+                                                                </span>
                                                             </CommandItem>
                                                         )
                                                     })}
-                                                </CommandGroup> : openFilterType === 'roadmap' ? <CommandGroup>
-                                                    <CommandItem  className={"p-0 flex gap-2 items-center cursor-pointer p-1"}>
-                                                        <ChevronLeft className="mr-2 h-4 w-4" />  <span onClick={() => {
-                                                        setOpenFilterType('')}} className={"flex-1 w-full text-sm font-medium cursor-pointer flex gap-2 items-center"}>Back</span>
-                                                    </CommandItem>
+                                                </CommandGroup> : openFilterType === 'roadmap' ?
+                                                    <CommandGroup>
+                                                        <CommandItem className={"p-0 flex gap-2 items-center cursor-pointer p-1"}>
+                                                            <ChevronLeft className="mr-2 h-4 w-4" />
+                                                            <span
+                                                                onClick={() => {setOpenFilterType('')}}
+                                                                className={"flex-1 w-full text-sm font-medium cursor-pointer flex gap-2 items-center"}
+                                                            >
+                                                                Back
+                                                            </span>
+                                                        </CommandItem>
                                                     {(roadmapStatus || []).map((x, i) => {
                                                         return (
                                                             <CommandItem key={i} value={x.value} className={"p-0 flex gap-1 items-center cursor-pointer"}>
-                                                                <Checkbox className={'m-2'} checked={filter.roadmap.includes(x.id)} onClick={() => {
-                                                                    handleChange({name: "roadmap" , value: x.id});
-                                                                    setOpenFilter(true);
-                                                                    setOpenFilterType('roadmap');
-                                                                }}/>
-                                                                <span onClick={() => {
-                                                                    handleChange({name: "roadmap" , value: x.id});
-                                                                    setOpenFilter(true);
-                                                                    setOpenFilterType('roadmap');
-                                                                }} className={"flex-1 w-full text-sm font-medium cursor-pointer flex gap-2 items-center"}><span
-                                                                    className={"w-2.5 h-2.5 rounded-full"}
-                                                                    style={{backgroundColor: x.color_code}}/> {x.title}</span>
+                                                                <Checkbox
+                                                                    className={'m-2'}
+                                                                    checked={filter.roadmap.includes(x.id)}
+                                                                    onClick={() => {
+                                                                        handleChange({name: "roadmap" , value: x.id});
+                                                                        setOpenFilter(true);
+                                                                        setOpenFilterType('roadmap');
+                                                                    }}
+                                                                />
+                                                                <span
+                                                                    onClick={() => {
+                                                                        handleChange({name: "roadmap" , value: x.id});
+                                                                        setOpenFilter(true);
+                                                                        setOpenFilterType('roadmap');
+                                                                    }}
+                                                                    className={"flex-1 w-full text-sm font-medium cursor-pointer flex gap-2 items-center"}
+                                                                >
+                                                                    <span className={"w-2.5 h-2.5 rounded-full"} style={{backgroundColor: x.color_code}}/>
+                                                                    {x.title}
+                                                                </span>
                                                             </CommandItem>
                                                         )
                                                     })}
-                                                </CommandGroup> : openFilterType === 'status' ? <CommandGroup>
-                                                    <CommandItem  className={"p-0 flex gap-2 items-center cursor-pointer p-1"}>
-                                                        <ChevronLeft className="mr-2 h-4 w-4" />  <span onClick={() => {
-                                                        setOpenFilterType('');
-                                                    }} className={"flex-1 w-full text-sm font-medium cursor-pointer flex gap-2 items-center"}>Back</span>
-                                                    </CommandItem>
-                                                    {(filterByStatus || []).map((x, i) => {
-                                                        return (
-                                                            <CommandItem key={i} value={x.value} className={"p-0 flex gap-1 items-center cursor-pointer"}>
-                                                                <Checkbox className={'m-2'} checked={filter[x.value] === 1} onClick={() => {
-                                                                    handleChange({name: "status" , value: x.value});
-                                                                    setOpenFilter(true);
-                                                                    setOpenFilterType('status');
-                                                                }}/>
-                                                                <span onClick={() => {
-                                                                    handleChange({name: "status" , value: x.value});
-                                                                    setOpenFilter(true);
-                                                                    setOpenFilterType('status');
-                                                                }} className={"flex-1 w-full text-sm font-medium cursor-pointer flex gap-2 items-center"}>{x.name}</span>
+                                                </CommandGroup> : openFilterType === 'status' ?
+                                                    <CommandGroup>
+                                                        <CommandItem  className={"p-0 flex gap-2 items-center cursor-pointer p-1"}>
+                                                            <ChevronLeft className="mr-2 h-4 w-4" />
+                                                            <span
+                                                                onClick={() => {
+                                                                    setOpenFilterType('');
+                                                                }}
+                                                                className={"flex-1 w-full text-sm font-medium cursor-pointer flex gap-2 items-center"}
+                                                            >
+                                                                Back
+                                                            </span>
+                                                        </CommandItem>
+                                                        {(filterByStatus || []).map((x, i) => {
+                                                            return (
+                                                                <CommandItem key={i} value={x.value} className={"p-0 flex gap-1 items-center cursor-pointer"}>
+                                                                    <Checkbox className={'m-2'} checked={filter[x.value] === 1} onClick={() => {
+                                                                        handleChange({name: "status" , value: x.value});
+                                                                        setOpenFilter(true);
+                                                                        setOpenFilterType('status');
+                                                                    }}/>
+                                                                    <span onClick={() => {
+                                                                        handleChange({name: "status" , value: x.value});
+                                                                        setOpenFilter(true);
+                                                                        setOpenFilterType('status');
+                                                                    }} className={"flex-1 w-full text-sm font-medium cursor-pointer flex gap-2 items-center"}>{x.name}</span>
+                                                                </CommandItem>
+                                                            )
+                                                        })}
+                                                    </CommandGroup> :
+                                                        <CommandGroup>
+                                                            <CommandItem onSelect={() => {setOpenFilterType('status');}}>
+                                                                <span className={"text-sm font-medium cursor-pointer"}>Status</span>
+                                                            </CommandItem>  <CommandItem onSelect={() => {setOpenFilterType('topic');}}>
+                                                                <span className={"text-sm font-medium cursor-pointer"}>Topics</span>
                                                             </CommandItem>
-                                                        )
-                                                    })}
-                                                </CommandGroup> : <CommandGroup>
-                                                    <CommandItem onSelect={() => {
-                                                        setOpenFilterType('status');
-                                                    }}>
-                                                        <span className={"text-sm font-medium cursor-pointer"}>Status</span>
-                                                    </CommandItem>  <CommandItem onSelect={() => {
-                                                        setOpenFilterType('topic');
-                                                    }}>
-                                                        <span className={"text-sm font-medium cursor-pointer"}>Topics</span>
-                                                    </CommandItem>
-                                                    <CommandItem onSelect={() => {
-                                                        setOpenFilterType('roadmap');
-                                                    }}>
-                                                        <span className={"text-sm font-medium cursor-pointer"}>Roadmap</span>
-                                                    </CommandItem>
-                                                </CommandGroup>
+                                                            <CommandItem onSelect={() => {setOpenFilterType('roadmap');}}>
+                                                                <span className={"text-sm font-medium cursor-pointer"}>Roadmap</span>
+                                                            </CommandItem>
+                                                        </CommandGroup>
                                             }
                                         </CommandList>
                                     </Command>
                                 </PopoverContent>
                             </Popover>
-                            <Button size="sm" className="gap-2"
-                                    onClick={openCreateIdea}><Plus/>Create Idea</Button>
+                            <Button size="sm" className="gap-2" onClick={openCreateIdea}><Plus/>Create Idea</Button>
                         </div>
                     </div>
                     {
@@ -485,198 +493,200 @@ const Ideas = () => {
                                     return(
                                         <Badge key={`selected-${findRoadmap.id}`} variant="outline" className="rounded p-0">
                                             <span className="px-3 py-1.5 border-r flex gap-2 items-center">
-                                                <span
-                                            className={"w-2.5 h-2.5  rounded-full"} style={{backgroundColor: findRoadmap.color_code}}/> {findRoadmap.title}</span><span className="w-7 h-7 flex items-center justify-center cursor-pointer" onClick={() => handleChange({name: "roadmap" , value: data})}><X className='w-4 h-4'/></span></Badge>
+                                                <span className={"w-2.5 h-2.5  rounded-full"} style={{backgroundColor: findRoadmap.color_code}}/>
+                                                {findRoadmap.title}
+                                            </span>
+                                            <span className="w-7 h-7 flex items-center justify-center cursor-pointer" onClick={() => handleChange({name: "roadmap" , value: data})}>
+                                                <X className='w-4 h-4'/>
+                                            </span>
+                                        </Badge>
                                     )
                                 })
                             }
                             {
-                                filter.archive === 1 &&  <Badge key={`selected-${filter.archive}`} variant="outline" className="rounded p-0"><span className="px-3 py-1.5 border-r">Archived</span>
+                                filter.archive === 1 &&
+                                <Badge key={`selected-${filter.archive}`} variant="outline" className="rounded p-0">
+                                    <span className="px-3 py-1.5 border-r">Archived</span>
                                     <span className="w-7 h-7 flex items-center justify-center cursor-pointer" onClick={() =>  handleChange({name: "status" , value: "archive"})}>
-                                                <X className='w-4 h-4'/>
-                                            </span>
+                                        <X className='w-4 h-4'/>
+                                    </span>
                                 </Badge>
                             }
                             {
-                                filter.bug === 1 && <Badge key={`selected-${filter.bug}`} variant="outline" className="rounded p-0"><span className="px-3 py-1.5 border-r">Bugs</span>
-                                <span className="w-7 h-7 flex items-center justify-center cursor-pointer" onClick={() =>  handleChange({name: "status" , value: "bug"})}>
-                                <X className='w-4 h-4'/>
-                                </span>
+                                filter.bug === 1 &&
+                                <Badge key={`selected-${filter.bug}`} variant="outline" className="rounded p-0">
+                                    <span className="px-3 py-1.5 border-r">Bugs</span>
+                                    <span className="w-7 h-7 flex items-center justify-center cursor-pointer" onClick={() =>  handleChange({name: "status" , value: "bug"})}>
+                                        <X className='w-4 h-4'/>
+                                    </span>
                                 </Badge>
                             }
                         </div>
                     }
 
-                <div className={"mt-8"}>
-                    <Card>
-                        {
-                            (isLoading || isLoadingSearch) ? CommSkel.commonParagraphFourIdea : ideasList.length > 0 ?
-                                <CardContent className={"p-0"}>
-                                    {
-                                        (ideasList || []).map((x, i) => {
-                                            return (
-                                                <Fragment key={i}>
-                                                    <div className={"flex gap-[5px] md:gap-8 p-2 sm:p-3 md:py-6 md:px-16"}>
-                                                        <div className={"flex gap-1 md:gap-2"}>
-                                                            <Button
-                                                                className={"p-0 bg-white shadow border hover:bg-white w-[20px] h-[20px] md:w-[30px] md:h-[30px]"}
-                                                                variant={"outline"}
-                                                                onClick={() => giveVote(x, 1)}
-                                                            >
-                                                                <ArrowBigUp size={15}
-                                                                            className={"fill-primary stroke-primary"}/>
-                                                            </Button>
-                                                            <p className={"text-base md:text-xl font-medium"}>{x.vote}</p>
-                                                        </div>
-                                                        <div className={"flex flex-col w-full gap-6"}>
-                                                            <div className={"flex flex-col gap-[11px]"}>
-                                                                <div
-                                                                    className={"flex flex-wrap items-center justify-between gap-3 md:flex-nowrap"}>
-                                                                    <div
-                                                                        className={"flex flex-wrap items-center gap-1 cursor-pointer xl:gap-3"}
-                                                                        onClick={() => openDetailsSheet(x)}>
-                                                                        <h3 className={"text-base font-medium"}>{x.title}</h3>
-                                                                        <div className={"flex gap-2"}>
-                                                                            <h4 className={"text-sm font-medium"}>{x.name}</h4>
-                                                                            <p className={"text-xs font-normal flex items-center text-muted-foreground"}>
-                                                                                <Dot
-                                                                                    className={"fill-text-card-foreground stroke-text-card-foreground"}/>
-                                                                                {moment(x.created_at).format('D MMM')}
+                    <div className={"mt-8"}>
+                        <Card>
+                            {
+                                (isLoading || isLoadingSearch) ? CommSkel.commonParagraphFourIdea : ideasList.length > 0 ?
+                                    <CardContent className={"p-0"}>
+                                        {
+                                            (ideasList || []).map((x, i) => {
+                                                return (
+                                                    <Fragment key={i}>
+                                                        <div className={"flex gap-[5px] md:gap-8 p-2 sm:p-3 lg:py-6 lg:px-16"}>
+                                                            <div className={"flex gap-1 md:gap-2"}>
+                                                                <Button
+                                                                    className={"p-0 bg-white shadow border hover:bg-white w-[20px] h-[20px] md:w-[30px] md:h-[30px]"}
+                                                                    variant={"outline"}
+                                                                    onClick={() => giveVote(x, 1)}
+                                                                >
+                                                                    <ArrowBigUp size={15} className={"fill-primary stroke-primary"}/>
+                                                                </Button>
+                                                                <p className={"text-base md:text-xl font-medium"}>{x.vote}</p>
+                                                            </div>
+                                                            <div className={"flex flex-col w-full gap-6"}>
+                                                                <div className={"flex flex-col gap-[11px]"}>
+                                                                    <div className={"flex flex-wrap items-center justify-between gap-3 md:flex-nowrap"}>
+                                                                        <div
+                                                                            className={"flex flex-wrap items-center gap-1 cursor-pointer xl:gap-3"}
+                                                                            onClick={() => openDetailsSheet(x)}
+                                                                        >
+                                                                            <h3 className={"text-base font-medium"}>{x.title}</h3>
+                                                                            <div className={"flex gap-2"}>
+                                                                                <h4 className={"text-sm font-medium"}>{x.name}</h4>
+                                                                                <p className={"text-xs font-normal flex items-center text-muted-foreground"}>
+                                                                                    <Dot className={"fill-text-card-foreground stroke-text-card-foreground"}/>
+                                                                                    {moment(x.created_at).format('D MMM')}
+                                                                                </p>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div className={"flex gap-2 items-center"}>
+                                                                            {
+                                                                                x.is_active == 0 &&
+                                                                                <Badge
+                                                                                    variant={"outline"}
+                                                                                    className={`border border-red-500 text-red-500 bg-red-100 `}
+                                                                                >
+                                                                                    Bug
+                                                                                </Badge>
+                                                                            }
+                                                                            {
+                                                                                x.is_archive == 1 &&
+                                                                                <Badge
+                                                                                    variant={"outline"}
+                                                                                    className={`border border-green-500 text-green-500 bg-green-100
+                                                                               `}
+                                                                                >
+                                                                                    Archive
+                                                                                </Badge>
+                                                                            }
+                                                                            {x.pin_to_top === 1 && <Pin size={16} fill={"bg-card-foreground"}/>}
+                                                                            <DropdownMenu>
+                                                                                <DropdownMenuTrigger>
+                                                                                    <Ellipsis size={16}/>
+                                                                                </DropdownMenuTrigger>
+                                                                                <DropdownMenuContent align={"end"}>
+                                                                                    <DropdownMenuItem
+                                                                                        className={"cursor-pointer"}
+                                                                                        onClick={() => openDetailsSheet(x)}>Edit</DropdownMenuItem>
+                                                                                    <DropdownMenuItem
+                                                                                        className={"cursor-pointer"}
+                                                                                        onClick={() => handleStatusUpdate("is_archive", x.is_archive == 1 ? 0 : 1, i, x)}>
+                                                                                        {x?.is_archive === 1 ? "Unarchive" : "Archive"}
+                                                                                    </DropdownMenuItem>
+                                                                                    <DropdownMenuItem
+                                                                                        className={"cursor-pointer"}
+                                                                                        onClick={() => handleStatusUpdate("is_active", x.is_active === 1 ? 0 : 1, i, x)}>
+                                                                                        {x.is_active === 0 ? "Convert to Idea" : "Mark as bug"}
+                                                                                    </DropdownMenuItem>
+                                                                                    <DropdownMenuItem
+                                                                                        className={"cursor-pointer"}
+                                                                                        onClick={() => deleteIdea(x)}>Delete</DropdownMenuItem>
+                                                                                </DropdownMenuContent>
+                                                                            </DropdownMenu>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className={"description-container text-sm text-muted-foreground"}>
+                                                                        <ReadMoreText html={x.description}/>
+                                                                    </div>
+                                                                </div>
+                                                                <div className={`flex ${x.topic && x.topic.length > 0 ? "justify-between" : "sm:justify-between gap-0 justify-start"} items-center flex-wrap gap-2`}>
+                                                                    <div className={`flex flex-wrap gap-2`}>
+                                                                        {
+                                                                            (x.topic && x.topic.length > 0) &&
+                                                                            <div className={`flex flex-wrap gap-2`}>
+                                                                                {
+                                                                                    x.topic.map((y, i) => (
+                                                                                        <div className={"text-sm font-medium"} key={i}> {y?.title}</div>
+                                                                                    ))
+                                                                                }
+                                                                            </div>
+                                                                        }
+                                                                    </div>
+                                                                    <div className={"flex items-center md:gap-8 gap-1"}>
+                                                                        <Select
+                                                                            onValueChange={(value) => handleStatusUpdate("roadmap_id", value, i, x)}
+                                                                            value={x.roadmap_id}>
+                                                                            <SelectTrigger
+                                                                                className="md:w-[291px] w-[170px] bg-card">
+                                                                                <SelectValue/>
+                                                                            </SelectTrigger>
+                                                                            <SelectContent>
+                                                                                <SelectGroup>
+                                                                                    <SelectItem value={null}>
+                                                                                        <div
+                                                                                            className={"flex items-center gap-2"}>
+                                                                                            No status
+                                                                                        </div>
+                                                                                    </SelectItem>
+                                                                                    {
+                                                                                        (allStatusAndTypes.roadmap_status || []).map((x, i) => {
+                                                                                            return (
+                                                                                                <SelectItem key={i}
+                                                                                                            value={x.id}>
+                                                                                                    <div
+                                                                                                        className={"flex items-center gap-2"}>
+                                                                                                        <Circle
+                                                                                                            fill={x.color_code}
+                                                                                                            stroke={x.color_code}
+                                                                                                            className={` w-[10px] h-[10px]`}/>
+                                                                                                        {x.title || "No status"}
+                                                                                                    </div>
+                                                                                                </SelectItem>
+                                                                                            )
+                                                                                        })
+                                                                                    }
+                                                                                </SelectGroup>
+                                                                            </SelectContent>
+                                                                        </Select>
+                                                                        <div
+                                                                            className={"flex items-center gap-1 sm:gap-2 cursor-pointer"}
+                                                                            onClick={() => openDetailsSheet(x)}
+                                                                        >
+                                                                            <span>
+                                                                                <MessageCircleMore
+                                                                                    className={"stroke-primary w-[16px] h-[16px]"}/>
+                                                                            </span>
+                                                                            <p className={"text-base font-medium"}>
+                                                                                {x && x.comments && x.comments.length ? x.comments.length : 0}
                                                                             </p>
                                                                         </div>
                                                                     </div>
-                                                                    <div className={"flex gap-2 items-center"}>
-                                                                        {
-                                                                            x.is_active == 0 && <Badge
-                                                                                variant={"outline"}
-                                                                                className={`border border-red-500 text-red-500 bg-red-100 `}
-                                                                            >
-                                                                                Bug
-                                                                            </Badge>
-                                                                        }
-                                                                        {
-                                                                            x.is_archive == 1 && <Badge
-                                                                                variant={"outline"}
-                                                                                className={`border border-green-500 text-green-500 bg-green-100
-                                                                           `}
-                                                                            >
-
-                                                                                Archive
-                                                                            </Badge>
-                                                                        }
-                                                                        {x.pin_to_top === 1 &&
-                                                                        <Pin size={16} fill={"bg-card-foreground"}/>}
-                                                                        <DropdownMenu>
-                                                                            <DropdownMenuTrigger>
-                                                                                <Ellipsis size={16}/>
-                                                                            </DropdownMenuTrigger>
-                                                                            <DropdownMenuContent>
-                                                                                <DropdownMenuItem
-                                                                                    className={"cursor-pointer"}
-                                                                                    onClick={() => openDetailsSheet(x)}>Edit</DropdownMenuItem>
-                                                                                <DropdownMenuItem
-                                                                                    className={"cursor-pointer"}
-                                                                                    onClick={() => handleStatusUpdate("is_archive", x.is_archive == 1 ? 0 : 1, i, x)}>
-                                                                                    {x?.is_archive === 1 ? "Unarchive" : "Archive"}
-                                                                                </DropdownMenuItem>
-                                                                                <DropdownMenuItem
-                                                                                    className={"cursor-pointer"}
-                                                                                    onClick={() => handleStatusUpdate("is_active", x.is_active === 1 ? 0 : 1, i, x)}>
-                                                                                    {x.is_active === 0 ? "Convert to Idea" : "Mark as bug"}
-                                                                                </DropdownMenuItem>
-                                                                                <DropdownMenuItem
-                                                                                    className={"cursor-pointer"}
-                                                                                    onClick={() => deleteIdea(x)}>Delete</DropdownMenuItem>
-                                                                            </DropdownMenuContent>
-                                                                        </DropdownMenu>
-                                                                    </div>
-                                                                </div>
-                                                                <div
-                                                                    className={"description-container text-sm text-muted-foreground"}>
-                                                                    <ReadMoreText html={x.description}/>
-                                                                </div>
-                                                            </div>
-                                                            <div
-                                                                className={`flex ${x.topic && x.topic.length > 0 ? "justify-between" : "sm:justify-between gap-0 justify-start"} items-center flex-wrap gap-2`}>
-                                                                <div className={`flex flex-wrap gap-2`}>
-                                                                    {
-                                                                        (x.topic && x.topic.length > 0) &&
-                                                                        <div className={`flex flex-wrap gap-2`}>
-                                                                            {
-                                                                                x.topic.map((y, i) => (
-                                                                                    <div
-                                                                                        className={"text-sm font-medium"}
-                                                                                        key={i}> {y?.title}</div>
-                                                                                ))
-                                                                            }
-                                                                        </div>
-                                                                    }
-                                                                </div>
-                                                                <div className={"flex items-center md:gap-8 gap-1"}>
-                                                                    <Select
-                                                                        onValueChange={(value) => handleStatusUpdate("roadmap_id", value, i, x)}
-                                                                        value={x.roadmap_id}>
-                                                                        <SelectTrigger
-                                                                            className="md:w-[291px] w-[170px] bg-card">
-                                                                            <SelectValue/>
-                                                                        </SelectTrigger>
-                                                                        <SelectContent>
-                                                                            <SelectGroup>
-                                                                                <SelectItem value={null}>
-                                                                                    <div
-                                                                                        className={"flex items-center gap-2"}>
-                                                                                        No status
-                                                                                    </div>
-                                                                                </SelectItem>
-                                                                                {
-                                                                                    (allStatusAndTypes.roadmap_status || []).map((x, i) => {
-                                                                                        return (
-                                                                                            <SelectItem key={i}
-                                                                                                        value={x.id}>
-                                                                                                <div
-                                                                                                    className={"flex items-center gap-2"}>
-                                                                                                    <Circle
-                                                                                                        fill={x.color_code}
-                                                                                                        stroke={x.color_code}
-                                                                                                        className={` w-[10px] h-[10px]`}/>
-                                                                                                    {x.title || "No status"}
-                                                                                                </div>
-                                                                                            </SelectItem>
-                                                                                        )
-                                                                                    })
-                                                                                }
-                                                                            </SelectGroup>
-                                                                        </SelectContent>
-                                                                    </Select>
-                                                                    <div
-                                                                        className={"flex items-center gap-1 sm:gap-2 cursor-pointer"}
-                                                                        onClick={() => openDetailsSheet(x)}
-                                                                    >
-                                                                        <span>
-                                                                            <MessageCircleMore
-                                                                                className={"stroke-primary w-[16px] h-[16px]"}/>
-                                                                        </span>
-                                                                        <p className={"text-base font-medium"}>
-                                                                            {x && x.comments && x.comments.length ? x.comments.length : 0}
-                                                                        </p>
-                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                    <div className={"border-b"}/>
-                                                </Fragment>
-                                            )
-                                        })
-                                    }
-                                </CardContent> : <EmptyData/>
-                        }
+                                                        <div className={"border-b"}/>
+                                                    </Fragment>
+                                                )
+                                            })
+                                        }
+                                    </CardContent> : <EmptyData/>
+                            }
 
                         <CardFooter className={"p-0"}>
                             <div
                                 className={`w-full ${theme === "dark" ? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end p-2 md:p-4`}>
                                 <div className={"w-full flex gap-2 items-center justify-between sm:justify-end"}>
-                                    {/*<div className={"w-full flex justify-between gap-2 items-center"}>*/}
                                     <div>
                                         <h5 className={"text-sm font-semibold"}>Page {pageNo} of {totalPages}</h5>
                                     </div>

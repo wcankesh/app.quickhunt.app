@@ -1,21 +1,7 @@
-import React, {Fragment, useState, useRef, useEffect} from 'react';
+import React, {Fragment, useState, useEffect} from 'react';
 import {Sheet, SheetContent, SheetHeader, SheetOverlay} from "../ui/sheet";
 import {Button} from "../ui/button";
-import {
-    ArrowBigUp,
-    Check,
-    Circle,
-    CircleX,
-    Dot,
-    Ellipsis,
-    Loader2,
-    MessageCircleMore,
-    Paperclip,
-    Pencil,
-    Pin,
-    Trash2,
-    X
-} from "lucide-react";
+import {ArrowBigUp, Check, Circle, CircleX, Dot, Ellipsis, Loader2, MessageCircleMore, Paperclip, Pencil, Pin, Trash2, X} from "lucide-react";
 import {RadioGroup, RadioGroupItem} from "../ui/radio-group";
 import {Label} from "../ui/label";
 import {Input} from "../ui/input";
@@ -136,21 +122,21 @@ const SidebarSheet = ({
                             }
                         }
                         setIdeasList(clone);
-                        if (isRoadmap) {
-                            const cloneRoadmap = [...roadmapList]
-                            const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap.id);
-                            if (roadmapIndex !== -1) {
-                                cloneRoadmap[roadmapIndex].ideas = clone
-                                setRoadmapList(cloneRoadmap);
-                            }
-                            if (isNoStatus) {
-                                setNoStatus(clone)
-                            }
-                        }
+                        // if (isRoadmap) {
+                        //     const cloneRoadmap = [...roadmapList]
+                        //     const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap.id);
+                        //     if (roadmapIndex !== -1) {
+                        //         cloneRoadmap[roadmapIndex].ideas = clone
+                        //         setRoadmapList(cloneRoadmap);
+                        //     }
+                        //     if (isNoStatus) {
+                        //         setNoStatus(clone)
+                        //     }
+                        // }
                     }
-                    toast({description: 'Vote successfully'})
+                    toast({description: data.message})
                 } else {
-                    toast({description: data.error})
+                    toast({variant: "destructive", description: data.error})
                 }
             }
         } else {
@@ -189,25 +175,25 @@ const SidebarSheet = ({
             if (index !== -1) {
                 cloneIdea[index] = obj;
                 setIdeasList(cloneIdea)
-                if (isRoadmap) {
-                    const cloneRoadmap = [...roadmapList]
-                    const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap.id);
-                    if (roadmapIndex !== -1) {
-                        cloneRoadmap[roadmapIndex].ideas = cloneIdea
-                        setRoadmapList(cloneRoadmap);
-                    }
-                    if (isNoStatus) {
-                        setNoStatus(cloneIdea)
-                    }
-                }
+                // if (isRoadmap) {
+                //     const cloneRoadmap = [...roadmapList]
+                //     const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap.id);
+                //     if (roadmapIndex !== -1) {
+                //         cloneRoadmap[roadmapIndex].ideas = cloneIdea
+                //         setRoadmapList(cloneRoadmap);
+                //     }
+                //     if (isNoStatus) {
+                //         setNoStatus(cloneIdea)
+                //     }
+                // }
             }
-            toast({description: 'Comment create successfully'})
+            toast({description: data.message})
             setCommentText('');
             setCommentFiles([])
             setIsSaveComment(false)
         } else {
             setIsSaveComment(false)
-            toast({description: data.error})
+            toast({variant: "destructive", description: data.error})
         }
     }
 
@@ -237,25 +223,25 @@ const SidebarSheet = ({
             if (indexIdea !== -1) {
                 cloneIdea[indexIdea] = obj;
                 setIdeasList(cloneIdea);
-                if (isRoadmap) {
-                    const cloneRoadmap = [...roadmapList]
-                    const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap.id);
-                    if (roadmapIndex !== -1) {
-                        cloneRoadmap[roadmapIndex].ideas = cloneIdea
-                        setRoadmapList(cloneRoadmap);
-                    }
-                    if (isNoStatus) {
-                        setNoStatus(cloneIdea)
-                    }
-                }
+                // if (isRoadmap) {
+                //     const cloneRoadmap = [...roadmapList]
+                //     const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap.id);
+                //     if (roadmapIndex !== -1) {
+                //         cloneRoadmap[roadmapIndex].ideas = cloneIdea
+                //         setRoadmapList(cloneRoadmap);
+                //     }
+                //     if (isNoStatus) {
+                //         setNoStatus(cloneIdea)
+                //     }
+                // }
             }
             setSubCommentText('');
             setSubCommentFiles([])
             setIsSaveSubComment(false)
-            toast({description: 'Comment create successfully'})
+            toast({description: data.message})
         } else {
             setIsSaveSubComment(false)
-            toast({description: data.error})
+            toast({variant: "destructive", description: data.error})
         }
     }
 
@@ -270,7 +256,7 @@ const SidebarSheet = ({
             // setIdeasList(clone);
             setIsLoading(false)
             setIsEditIdea(false)
-            toast({description: "Idea Update successfully"})
+            toast({description: data.message})
         } else {
             setIsLoading(false)
             toast({variant: "destructive", description: data.error})
@@ -321,7 +307,7 @@ const SidebarSheet = ({
             setIsLoadingArchive(true)
         }
         setIsLoadingSidebar(name);
-       if(name === "delete_image[0]"){
+       if(name === "delete_cover_image"){
            setSelectedIdea({...selectedIdea, cover_image: ""})
        } else {
            setSelectedIdea({...selectedIdea, [name]: value})
@@ -351,7 +337,7 @@ const SidebarSheet = ({
             setIsLoadingArchive(false)
             setIsEditIdea(false)
             setIsLoadingSidebar('');
-            toast({description: "Idea Update successfully"})
+            toast({description: data.message})
         } else {
             setIsLoading(false)
             setIsLoadingArchive(false)
@@ -419,20 +405,21 @@ const SidebarSheet = ({
 
     const onUpdateComment = async () => {
         setIsSaveUpdateComment(true)
+        debugger
         let formData = new FormData();
         if (selectedComment && selectedComment.newImage && selectedComment.newImage.length) {
             for (let i = 0; i < selectedComment.newImage.length; i++) {
-                formData.append(`images[]`, selectedComment.newImage[i]);
+                formData.append(`images[${i}]`, selectedComment.newImage[i]);
             }
         }
         for (let i = 0; i < deletedCommentImage.length; i++) {
-            formData.append(`delete_image[]`, deletedCommentImage[i].replace('https://code.quickhunt.app/public/storage/feature_idea/', ''));
+            formData.append(`delete_image[${i}]`, deletedCommentImage[i].replace('https://code.quickhunt.app/public/storage/feature_idea/', ''));
         }
         formData.append('comment', selectedComment.comment);
         formData.append('id', selectedComment.id);
         const data = await apiSerVice.updateComment(formData)
         if (data.status === 200) {
-            let obj = {...selectedComment, images: data.data.images}
+            let obj = {...selectedComment, images: data.data.images, newImage: []}
             const cloneComment = [...selectedIdea.comments];
             cloneComment[selectedCommentIndex] = obj;
             let selectedIdeaObj = {...selectedIdea, comments: cloneComment}
@@ -442,26 +429,26 @@ const SidebarSheet = ({
                 const cloneIdea = [...ideasList];
                 cloneIdea[index] = selectedIdeaObj;
                 setIdeasList(cloneIdea)
-                if (isRoadmap) {
-                    const cloneRoadmap = [...roadmapList]
-                    const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap.id);
-                    if (roadmapIndex !== -1) {
-                        cloneRoadmap[roadmapIndex].ideas = cloneIdea
-                        setRoadmapList(cloneRoadmap);
-                    }
-                    if (isNoStatus) {
-                        setNoStatus(cloneIdea)
-                    }
-                }
+                // if (isRoadmap) {
+                //     const cloneRoadmap = [...roadmapList]
+                //     const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap.id);
+                //     if (roadmapIndex !== -1) {
+                //         cloneRoadmap[roadmapIndex].ideas = cloneIdea
+                //         setRoadmapList(cloneRoadmap);
+                //     }
+                //     if (isNoStatus) {
+                //         setNoStatus(cloneIdea)
+                //     }
+                // }
             }
             setSelectedCommentIndex(null)
             setSelectedComment(null);
             setIsEditComment(false)
             setDeletedCommentImage([])
             setIsSaveUpdateComment(false)
-            toast({description: 'Comment update successfully'})
+            toast({description: data.message})
         } else {
-            toast({description: data.error})
+            toast({variant: "destructive", description: data.error})
             setIsSaveUpdateComment(false)
         }
     }
@@ -492,17 +479,17 @@ const SidebarSheet = ({
                     const cloneIdea = [...ideasList];
                     cloneIdea[ideaIndex] = selectedIdeaObj;
                     setIdeasList(cloneIdea)
-                    if (isRoadmap) {
-                        const cloneRoadmap = [...roadmapList]
-                        const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap.id);
-                        if (roadmapIndex !== -1) {
-                            cloneRoadmap[roadmapIndex].ideas = cloneIdea
-                            setRoadmapList(cloneRoadmap);
-                        }
-                        if (isNoStatus) {
-                            setNoStatus(cloneIdea)
-                        }
-                    }
+                    // if (isRoadmap) {
+                    //     const cloneRoadmap = [...roadmapList]
+                    //     const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap.id);
+                    //     if (roadmapIndex !== -1) {
+                    //         cloneRoadmap[roadmapIndex].ideas = cloneIdea
+                    //         setRoadmapList(cloneRoadmap);
+                    //     }
+                    //     if (isNoStatus) {
+                    //         setNoStatus(cloneIdea)
+                    //     }
+                    // }
                 }
             }
             setSelectedCommentIndex(null)
@@ -511,9 +498,9 @@ const SidebarSheet = ({
             setSelectedSubCommentIndex(null);
             setDeletedSubCommentImage([]);
             setIsSaveUpdateSubComment(false)
-            toast({description: 'Comment update successfully'})
+            toast({description: data.message})
         } else {
-            toast({description: data.error})
+            toast({variant: "destructive", description: data.error})
             setIsSaveUpdateSubComment(false)
         }
     }
@@ -530,21 +517,21 @@ const SidebarSheet = ({
                 const cloneIdea = [...ideasList];
                 cloneIdea[index] = selectedIdeaObj;
                 setIdeasList(cloneIdea)
-                if (isRoadmap) {
-                    const cloneRoadmap = [...roadmapList]
-                    const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap.id);
-                    if (roadmapIndex !== -1) {
-                        cloneRoadmap[roadmapIndex].ideas = cloneIdea
-                        setRoadmapList(cloneRoadmap);
-                    }
-                    if (isNoStatus) {
-                        setNoStatus(cloneIdea)
-                    }
-                }
+                // if (isRoadmap) {
+                //     const cloneRoadmap = [...roadmapList]
+                //     const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap.id);
+                //     if (roadmapIndex !== -1) {
+                //         cloneRoadmap[roadmapIndex].ideas = cloneIdea
+                //         setRoadmapList(cloneRoadmap);
+                //     }
+                //     if (isNoStatus) {
+                //         setNoStatus(cloneIdea)
+                //     }
+                // }
             }
-            toast({description: 'Comment delete successfully'})
+            toast({description: data.message})
         } else {
-            toast({description: data.error})
+            toast({variant: "destructive", description: data.error})
         }
     }
 
@@ -560,21 +547,21 @@ const SidebarSheet = ({
                 const cloneIdea = [...ideasList];
                 cloneIdea[indexs] = selectedIdeaObj;
                 setIdeasList(cloneIdea)
-                if (isRoadmap) {
-                    const cloneRoadmap = [...roadmapList]
-                    const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap.id);
-                    if (roadmapIndex !== -1) {
-                        cloneRoadmap[roadmapIndex].ideas = cloneIdea
-                        setRoadmapList(cloneRoadmap);
-                    }
-                    if (isNoStatus) {
-                        setNoStatus(cloneIdea)
-                    }
-                }
+                // if (isRoadmap) {
+                //     const cloneRoadmap = [...roadmapList]
+                //     const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap.id);
+                //     if (roadmapIndex !== -1) {
+                //         cloneRoadmap[roadmapIndex].ideas = cloneIdea
+                //         setRoadmapList(cloneRoadmap);
+                //     }
+                //     if (isNoStatus) {
+                //         setNoStatus(cloneIdea)
+                //     }
+                // }
             }
-            toast({description: 'Comment delete successfully'})
+            toast({description: data.message})
         } else {
-            toast({description: data.error})
+            toast({variant: "destructive", description: data.error})
         }
     }
 
@@ -650,10 +637,10 @@ const SidebarSheet = ({
             setOldSelectedIdea({...data.data})
             setIsEditIdea(false)
             setIsLoadingCreateIdea(false)
-            toast({description: "Idea Update successfully"})
+            toast({description: data.message})
         } else {
             setIsLoadingCreateIdea(false)
-            toast({description: data.message,variant: "destructive" })
+            toast({description: data.message, variant: "destructive" })
         }
     }
 
@@ -738,18 +725,21 @@ const SidebarSheet = ({
                                                             <CircleX
                                                                 size={20}
                                                                 className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
-                                                                onClick={() => onChangeStatus('delete_image', selectedIdea && selectedIdea?.cover_image && selectedIdea.cover_image?.name ? "" : [selectedIdea.cover_image.replace("https://code.quickhunt.app/public/storage/feature_idea/", "")])}
+                                                                onClick={() => onChangeStatus('delete_cover_image', selectedIdea && selectedIdea?.cover_image && selectedIdea.cover_image?.name ? "" : [selectedIdea.cover_image.replace("https://code.quickhunt.app/public/storage/feature_idea/", "")])}
                                                             />
                                                         </div> : selectedIdea.cover_image ?
                                                             <div
                                                                 className={"w-[282px] h-[128px] relative border p-[5px]"}>
-                                                                <img className={"upload-img"}
-                                                                     src={selectedIdea.cover_image} alt=""
+                                                                <img
+                                                                    className={"upload-img"}
+                                                                    // src={selectedIdea.cover_image}
+                                                                    src={selectedIdea && selectedIdea.cover_image && selectedIdea.cover_image.name ? URL.createObjectURL(selectedIdea.cover_image) : selectedIdea.cover_image}
+                                                                    alt=""
                                                                 />
                                                                 <CircleX
                                                                     size={20}
                                                                     className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
-                                                                    onClick={() => onChangeStatus('delete_image[0]', selectedIdea && selectedIdea?.cover_image && selectedIdea.cover_image?.name ? "" : selectedIdea.cover_image.replace("https://code.quickhunt.app/public/storage/feature_idea/", ""))}
+                                                                    onClick={() => onChangeStatus('delete_cover_image', selectedIdea && selectedIdea?.cover_image && selectedIdea.cover_image?.name ? "" : selectedIdea.cover_image.replace("https://code.quickhunt.app/public/storage/feature_idea/", ""))}
                                                                 />
                                                             </div>
                                                             : ''}
@@ -822,8 +812,8 @@ const SidebarSheet = ({
                             {
                                 isEditIdea ?
                                     <div className={"pb-100px"}>
-                                        <div className={"py-6 px-8 flex flex-col gap-6 border-b"}>
-                                            <div className="items-center gap-1.5">
+                                        <div className={"px-4 py-3 lg:py-6 lg:px-8 flex flex-col gap-4 ld:gap-6 border-b"}>
+                                            <div className="space-y-2">
                                                 <Label htmlFor="text">Title</Label>
                                                 <Input type="text" id="text" placeholder="" value={selectedIdea.title}
                                                        name={"title"} onChange={onChangeText}/>
@@ -832,7 +822,7 @@ const SidebarSheet = ({
                                                     <span className="text-red-500 text-sm">{formError.title}</span>
                                                 }
                                             </div>
-                                            <div className="gap-1.5">
+                                            <div className="space-y-2">
                                                 <Label htmlFor="message">Description</Label>
                                                 <Textarea placeholder="Start writing..." id="message" className="bg-card" name={"description"}
                                                           value={selectedIdea.description}
@@ -841,7 +831,7 @@ const SidebarSheet = ({
                                                 {formError.description &&
                                                 <span className="text-red-500 text-sm">{formError.description}</span>}
                                             </div>
-                                            <div className={"gap-1.5"}>
+                                            <div className={"space-y-2"}>
                                                 <Label>Choose Board for this Idea</Label>
                                                 <Select
                                                     onValueChange={(value) => onChangeText({target:{name: "board", value}})}
@@ -868,7 +858,7 @@ const SidebarSheet = ({
                                                 {formError.board && <span className="text-red-500 text-sm">{formError.board}</span>}
                                             </div>
                                         </div>
-                                        <div className={"py-6 px-8 border-b"}>
+                                        <div className={"px-4 py-3 lg:py-6 lg:px-8 border-b space-y-2"}>
                                             <Label>Choose Topics for this Idea (optional)</Label>
                                             <Select onValueChange={handleChangeTopic}
                                                     value={selectedIdea.topic.map(x => x.id)}>
@@ -912,7 +902,7 @@ const SidebarSheet = ({
                                                 </SelectContent>
                                             </Select>
                                         </div>
-                                        <div className={"p-8 flex gap-3"}>
+                                        <div className={"p-4 lg:p-8 flex gap-3"}>
                                             <Button
                                                 className={`${isLoadingCreateIdea === true ? "w-[81px] py-2 px-6" : "py-2 px-6"} text-sm font-semibold`}
                                                 onClick={onCreateIdea}
@@ -952,7 +942,7 @@ const SidebarSheet = ({
                                                             <DropdownMenuTrigger>
                                                                 <Ellipsis size={16}/>
                                                             </DropdownMenuTrigger>
-                                                            <DropdownMenuContent>
+                                                            <DropdownMenuContent align={"end"}>
                                                                 <DropdownMenuItem className={"cursor-pointer"} onClick={() => setIsEditIdea(true)}>Edit</DropdownMenuItem>
                                                                 <DropdownMenuItem className={"cursor-pointer"} onClick={() => onChangeStatus("pin_to_top", selectedIdea.pin_to_top === 0 ? 1 : 0)}>
                                                                     {selectedIdea.pin_to_top == 0 ? "Pinned" : "Unpinned"}
@@ -1119,28 +1109,51 @@ const SidebarSheet = ({
                                                                         <PopoverTrigger asChild>
                                                                             <Button variant="ghost hover-none"
                                                                                     className={"rounded-full p-0 h-[24px]"}>
+                                                                                {/*{*/}
+                                                                                {/*    (selectedIdea.vote_list || []).map((x, i) => {*/}
+                                                                                {/*        return (*/}
+                                                                                {/*            <div className={"flex"} key={i}>*/}
+                                                                                {/*                <div*/}
+                                                                                {/*                    className={"relative"}>*/}
+                                                                                {/*                    <div*/}
+                                                                                {/*                        className={"update-idea text-sm rounded-full border text-center"}>*/}
+                                                                                {/*                        <Avatar>*/}
+                                                                                {/*                            {*/}
+                                                                                {/*                                i < 2 ? x.user_photo ?*/}
+                                                                                {/*                                    <AvatarImage*/}
+                                                                                {/*                                        src={x.user_photo}*/}
+                                                                                {/*                                        alt={x && x.name && x.name.substring(0, 1)}/> :*/}
+                                                                                {/*                                    <AvatarFallback>{x && x.name && x.name.substring(0, 1)}</AvatarFallback> : ""*/}
+                                                                                {/*                            }*/}
+                                                                                {/*                        </Avatar>*/}
+                                                                                {/*                    </div>*/}
+                                                                                {/*                </div>*/}
+                                                                                {/*                <div className={"update-idea  text-sm rounded-full border text-center ml-[-5px]"}>*/}
+                                                                                {/*                    <Avatar><AvatarFallback>+{selectedIdea.vote_list.length - 0}</AvatarFallback></Avatar>*/}
+                                                                                {/*                </div>*/}
+                                                                                {/*            </div>*/}
+                                                                                {/*        )*/}
+                                                                                {/*    })*/}
+                                                                                {/*}*/}
                                                                                 {
-                                                                                    (selectedIdea.vote_list || []).map((x, i) => {
+                                                                                    (selectedIdea.vote_list.slice(0, 1) || []).map((x, i) => {
                                                                                         return (
-                                                                                            <div className={"flex"}>
-                                                                                                <div
-                                                                                                    className={"relative"}>
-                                                                                                    <div
-                                                                                                        className={"update-idea text-sm rounded-full border text-center"}>
+                                                                                            <div className={"flex"} key={i}>
+                                                                                                <div className={"relative"}>
+                                                                                                    <div className={"update-idea text-sm rounded-full border text-center"}>
                                                                                                         <Avatar>
                                                                                                             {
-                                                                                                                i < 2 ? x.user_photo ?
+                                                                                                                x.user_photo ?
                                                                                                                     <AvatarImage
                                                                                                                         src={x.user_photo}
-                                                                                                                        alt={x && x.name && x.name.substring(0, 1)}/> :
-                                                                                                                    <AvatarFallback>{x && x.name && x.name.substring(0, 1)}</AvatarFallback> : ""
+                                                                                                                        alt={x && x.name && x.name.substring(0, 1)} /> :
+                                                                                                                    <AvatarFallback>{x && x.name && x.name.substring(0, 1)}</AvatarFallback>
                                                                                                             }
                                                                                                         </Avatar>
                                                                                                     </div>
                                                                                                 </div>
-                                                                                                <div
-                                                                                                    className={"update-idea  text-sm rounded-full border text-center ml-[-5px]"}>
-                                                                                                    <Avatar><AvatarFallback>+{selectedIdea.vote_list.length - 2}</AvatarFallback></Avatar>
+                                                                                                <div className={"update-idea text-sm rounded-full border text-center ml-[-5px]"}>
+                                                                                                    <Avatar><AvatarFallback>+{selectedIdea.vote_list.length}</AvatarFallback></Avatar>
                                                                                                 </div>
                                                                                             </div>
                                                                                         )
@@ -1148,7 +1161,7 @@ const SidebarSheet = ({
                                                                                 }
                                                                             </Button>
                                                                         </PopoverTrigger>
-                                                                        <PopoverContent className="p-0">
+                                                                    <PopoverContent className="p-0" align={"end"}>
                                                                             <div className="">
                                                                                 <div
                                                                                     className="space-y-2 px-4 py-[5px]">
@@ -1159,19 +1172,17 @@ const SidebarSheet = ({
                                                                                     {
                                                                                         (selectedIdea.vote_list || []).map((x, i) => {
                                                                                             return (
-                                                                                                <div
-                                                                                                    className={"flex gap-2"}>
-                                                                                                    <div
-                                                                                                        className={"update-idea text-sm rounded-full border text-center"}>
+                                                                                                <div className={"flex gap-2"} key={i}>
+                                                                                                    <div className={"update-idea text-sm rounded-full border text-center"}>
                                                                                                         <Avatar
                                                                                                             className={"w-[20px] h-[20px]"}>
                                                                                                             {
-                                                                                                                selectedIdea.user_photo ?
+                                                                                                                x.user_photo ?
                                                                                                                     <AvatarImage
-                                                                                                                        src={selectedIdea.user_photo}
-                                                                                                                        alt="@shadcn"/>
+                                                                                                                        src={x.user_photo}
+                                                                                                                        alt=""/>
                                                                                                                     :
-                                                                                                                    <AvatarFallback>{selectedIdea && selectedIdea.name && selectedIdea.name.substring(0, 1)}</AvatarFallback>
+                                                                                                                    <AvatarFallback>{x && x.name && x.name.substring(0, 1)}</AvatarFallback>
                                                                                                             }
                                                                                                         </Avatar>
                                                                                                     </div>
@@ -1333,7 +1344,7 @@ const SidebarSheet = ({
                                         </div>
                                         <div>
                                             <Tabs defaultValue="comment" className="">
-                                                <div className={"px-8"}>
+                                                <div className={"px-4 lg:px-8"}>
                                                     <TabsList
                                                         className="bg-transparent border-b-2 border-b-primary rounded-none">
                                                         <TabsTrigger value="comment">Comment</TabsTrigger>
@@ -1349,8 +1360,8 @@ const SidebarSheet = ({
                                                                 return (
                                                                     <Fragment>
                                                                         <div
-                                                                            className={"flex gap-2 p-[32px] pb-0 pt-3"}>
-                                                                            <div className={""}>
+                                                                            className={"flex gap-2 p-4 lg:p-8 lg:pb-0 pt-3 pb-0"}>
+                                                                            <div>
                                                                                 <div
                                                                                     className={"update-idea text-sm rounded-full border text-center"}>
                                                                                     <Avatar
@@ -1367,13 +1378,13 @@ const SidebarSheet = ({
                                                                                 </div>
                                                                             </div>
                                                                             <div
-                                                                                className={"w-full flex flex-col gap-3"}>
+                                                                                className={"w-full flex flex-col space-y-3"}>
                                                                                 <div className={"flex gap-1 flex-wrap justify-between"}>
                                                                                     <div
-                                                                                        className={"flex items-center"}>
+                                                                                        className={"flex items-start"}>
                                                                                         <h4 className={"text-sm font-medium"}>{x.name}</h4>
                                                                                         <p className={"text-sm font-normal flex items-center text-muted-foreground"}>
-                                                                                            <Dot
+                                                                                            <Dot size={20}
                                                                                                 className={"fill-text-card-foreground stroke-text-card-foreground"}/>
                                                                                             {moment.utc(x.created_at).local().startOf('seconds').fromNow()}
                                                                                         </p>
@@ -1543,7 +1554,6 @@ const SidebarSheet = ({
                                                                                             </div>
                                                                                         </div>
                                                                                 }
-                                                                                <div>
                                                                                     {
                                                                                         x.show_reply ?
                                                                                             <div
@@ -1563,7 +1573,7 @@ const SidebarSheet = ({
                                                                                                                     <div
                                                                                                                         className={"w-full space-y-2"}>
                                                                                                                         <div
-                                                                                                                            className={"flex justify-between items-center"}>
+                                                                                                                            className={"flex justify-between"}>
                                                                                                                             <div
                                                                                                                                 className={"flex gap-2"}>
                                                                                                                                 <h4 className={"text-sm font-medium"}>{y.name}</h4>
@@ -1788,7 +1798,6 @@ const SidebarSheet = ({
                                                                                                 </div>
                                                                                             </div> : ""
                                                                                     }
-                                                                                </div>
                                                                             </div>
                                                                         </div>
                                                                     </Fragment>

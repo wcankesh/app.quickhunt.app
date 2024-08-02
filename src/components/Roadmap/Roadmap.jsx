@@ -198,7 +198,7 @@ const Roadmap = () => {
                                                 </div>
                                             </CardHeader>
                                             <CardContent className={"px-[20px] pb-4"}>
-                                                <div className={"flex gap-1"}>
+                                                <div className={"flex flex-wrap gap-1"}>
                                                     {
                                                         ((y && y.topic) || []).map((x, i) => {
                                                             return (

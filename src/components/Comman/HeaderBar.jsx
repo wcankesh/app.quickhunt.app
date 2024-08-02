@@ -1,16 +1,9 @@
 import React, {Fragment, useEffect, useState} from 'react';
 import {Sheet, SheetContent, SheetHeader, SheetOverlay, SheetTitle, SheetTrigger} from "../ui/sheet";
 import {Button} from "../ui/button";
-import {ChevronsUpDown, Menu, Moon, Plus, Sun, X} from "lucide-react";
+import {ChevronsUpDown, Eye, Menu, Moon, Plus, Sun, X} from "lucide-react";
 import {Input} from "../ui/input";
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger
-} from "../ui/dropdown-menu";
+import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger} from "../ui/dropdown-menu";
 import {useTheme} from "../theme-provider";
 import {baseUrl, getProjectDetails, logout, removeProjectDetails, setProjectDetails} from "../../utils/constent";
 import {useNavigate} from "react-router-dom";
@@ -172,6 +165,8 @@ const HeaderBar = () => {
     const dispatch = useDispatch();
     const {toast} = useToast()
 
+    const viewLink = () => {window.open(`https://${projectDetailsReducer.domain}/ideas`, "_blank")}
+
     const openSheet = () => {
         let length = projectList?.length;
         if(userDetailsReducer.plan === 0){
@@ -185,9 +180,9 @@ const HeaderBar = () => {
             setSheetOpen(true);
             onProModal(false)
         }
-
     }
     const closeSheet = () => setSheetOpen(false);
+
     const openSheetMenu = () => setSheetOpenMenu(true);
     const closeSheetMenu = () => setSheetOpenMenu(false);
 
@@ -200,13 +195,8 @@ const HeaderBar = () => {
         loginUserDetails()
     }, []);
 
-    // useEffect(() => {
-    //     setSelectedUrl(newUrl)
-    // },[newUrl])
-
     useEffect(() => {
         getAllStatusAndTypes()
-
     },[projectDetailsReducer.id])
 
     const getAllStatusAndTypes = async () => {
@@ -238,7 +228,6 @@ const HeaderBar = () => {
                 } else{
                     dispatch(projectDetailsAction(getProjectDetails('')))
                 }
-
                 dispatch(allProjectAction({projectList: data.data}));
                 (data.data || []).map((x) => {
                     let obj = {
@@ -254,7 +243,6 @@ const HeaderBar = () => {
             } else {
                 // setSheetOpen(true)
             }
-
             setIsLoading(false)
         }
     }
@@ -332,13 +320,13 @@ const HeaderBar = () => {
             setProjectList(clone)
             setProjectDetails(obj);
             dispatch(projectDetailsAction(obj))
-            toast({description: "Project create successfully"})
+            toast({description: data.message})
             // setSheetOpen(false)
             setCreateProjectDetails(initialStateProject)
             navigate(`${baseUrl}/dashboard`);
             setIsSaveProject(false)
         } else {
-            toast({description: data.message})
+            toast({variant: "destructive" ,description: data.message})
             setIsSaveProject(false)
         }
     }
@@ -368,276 +356,273 @@ const HeaderBar = () => {
     }, []);
 
     return (
-        // <header className="flex h-14 items-center justify-between gap-4 px-4 lg:h-[60px] lg:px-6 w-full">
-        // <header className="z-50 ltr:xl:ml-[282px] rtl:xl:mr-[282px] sticky top-0">
-            <header className={`z-50 ltr:xl:ml-[282px] rtl:xl:mr-[282px] sticky top-0 pr-4 ${scrollingDown ? 'bg-background' : ''} ${theme === "dark" ? "border-b" : ""}`}>
-        {/*// <header className="z-50 ml-[282px] sticky top-0">*/}
+        <header className={`z-50 ltr:xl:ml-[282px] rtl:xl:mr-[282px] sticky top-0 pr-3 lg:pr-4 ${scrollingDown ? 'bg-background' : ''} ${theme === "dark" ? "border-b" : ""}`}>
             <div className={"w-full p-3 pr-0 lg:py-3"}>
-            <div className={"flex justify-between items-center h-full gap-2"}>
-            <div className={"flex gap-3 items-center"}>
-            {/*Mobile said bar start */}
-            <Sheet open={isSheetOpenMenu} onOpenChange={isSheetOpenMenu ? closeSheetMenu : openSheetMenu}>
-                <SheetTrigger asChild>
-                    <Button variant="outline" size="icon" className="shrink-0 xl:hidden">
-                        <Menu size={20}/>
-                    </Button>
-                </SheetTrigger>
-                <SheetOverlay className={"inset-0"} />
-                <SheetContent side="left" className="flex flex-col w-[280px] md:w-[340px]">
-                    <SheetHeader className={"flex flex-row justify-between items-center"}>
-                        <div className={"app-logo cursor-pointer"}  onClick={() => onRedirect("/dashboard")}>
-                            {
-                                theme === "dark" ? Icon.whiteLogo : Icon.blackLogo
-                            }
-                        </div>
-                        <X size={18} className={"fill-card-foreground stroke-card-foreground m-0"} onClick={closeSheetMenu}/>
-                    </SheetHeader>
-                    <div className={"sidebar-mobile-menu flex flex-col gap-3 overflow-y-auto"}>
-                        <div className="flex-1 pt-[4px]">
+                <div className={"flex justify-between items-center h-full gap-2"}>
+                    <div className={"flex gap-3 items-center"}>
 
-                            <nav className="grid items-start gap-3">
-                                {
-                                    (menuComponent || []).map((x, i) => {
-                                        return (
-                                            <div key={i} className={`flex flex-col ${x.dashBtn ? "" : "gap-1"}`}>
+                        {/*Mobile said bar start */}
+                            <Sheet open={isSheetOpenMenu} onOpenChange={isSheetOpenMenu ? closeSheetMenu : openSheetMenu}>
+                                <SheetTrigger asChild>
+                                    <Button variant="outline" size="icon" className="shrink-0 xl:hidden">
+                                        <Menu size={20}/>
+                                    </Button>
+                                </SheetTrigger>
+                                <SheetOverlay className={"inset-0"} />
+                                <SheetContent side="left" className="flex flex-col w-[280px] md:w-[340px] p-0">
+                                    <SheetHeader className={"flex flex-row justify-between items-center p-3 pb-0 md:p-6 md:pb-0"}>
+                                        <div className={"app-logo cursor-pointer"}  onClick={() => onRedirect("/dashboard")}>
+                                            {theme === "dark" ? Icon.whiteLogo : Icon.blackLogo}
+                                        </div>
+                                        <X size={18} className={"fill-card-foreground stroke-card-foreground m-0"} onClick={closeSheetMenu}/>
+                                    </SheetHeader>
+                                    <div className={"sidebar-mobile-menu flex flex-col gap-3 overflow-y-auto p-3 pt-0 md:p-6 md:pt-0"}>
+                                        <nav className="grid items-start gap-3">
+                                            {
+                                                (menuComponent || []).map((x, i) => {
+                                                    return (
+                                                        <div key={i} className={`flex flex-col ${x.dashBtn ? "" : "gap-1"}`}>
+                                                            {
+                                                                (x.dashBtn || []).map((z, i) => {
+                                                                    return (
+                                                                        <Button
+                                                                            key={i}
+                                                                            variant={"link hover:no-underline"}
+                                                                            className={`${isActive(z.selected) ? "flex justify-start gap-4 h-9 rounded-md bg-primary/15 transition-none" : 'flex items-center gap-4 h-9 justify-start transition-none'}`}
+                                                                            onClick={() => onRedirect(z.link)}
+                                                                        >
+                                                                            <div className={`${isActive(z.selected) ? "active-menu" : "menu-icon"}`}>{z.icon}</div>
+                                                                            <div className={`${isActive(z.selected) ? "text-primary text-sm font-medium" : "text-sm font-medium"}`}>{z.title}</div>
+                                                                        </Button>
+                                                                    )
+                                                                })
+                                                            }
+                                                            {
+                                                                x.dashBtn ? "" :
+                                                                    <Fragment>
+                                                                        <h3 className={"text-sm font-bold py-2 px-4"}>{x.mainTitle}</h3>
+                                                                        <div className={"flex flex-col gap-1"}>
+                                                                            {
+                                                                                (x.items || []).map((y, i) => {
+                                                                                    return (
+                                                                                        <Button
+                                                                                            key={i}
+                                                                                            variant={"link hover:no-underline"}
+                                                                                            className={`${isActive(y.selected) ? "flex justify-start gap-4 h-9 rounded-md bg-primary/15 transition-none" : 'flex items-center gap-4 h-9 justify-start transition-none'}`}
+                                                                                            onClick={() => onRedirect(y.link)}
+                                                                                        >
+                                                                                            <div className={`${isActive(y.selected) ? "active-menu" : "menu-icon"}`}>{y.icon}</div>
+                                                                                            <div className={`${isActive(y.selected) ? "text-primary text-sm font-medium" : "text-sm font-medium"}`}>{y.title}</div>
+                                                                                        </Button>
+                                                                                    )
+                                                                                })
+                                                                            }
+                                                                        </div>
+                                                                    </Fragment>
+                                                            }
+                                                        </div>
+                                                    )
+                                                })
+                                            }
+                                        </nav>
+                                        <div className="mt-auto ">
+                                            <nav className="grid gap-1">
                                                 {
-                                                    (x.dashBtn || []).map((z, i) => {
+                                                    (footerMenuComponent || []).map((x, i) => {
                                                         return (
                                                             <Button
                                                                 key={i}
                                                                 variant={"link hover:no-underline"}
-                                                                className={`${isActive(z.selected) ? "flex justify-start gap-4 h-9 rounded-md bg-primary/15 transition-none" : 'flex items-center gap-4 h-9 justify-start transition-none'}`}
-                                                                onClick={() => onRedirect(z.link)}
+                                                                className={`${isActive(x.selected)  ? "flex justify-start gap-4 h-9 rounded-md bg-primary/15 transition-none" : 'flex items-center gap-4 h-9 justify-start transition-none'}`}
+                                                                onClick={() => onRedirect(x.link)}
                                                             >
-                                                                <div className={`${isActive(z.selected) ? "active-menu" : "menu-icon"}`}>{z.icon}</div>
-                                                                <div className={`${isActive(z.selected) ? "text-primary text-sm font-medium" : "text-sm font-medium"}`}>{z.title}</div>
+                                                                <div className={`${isActive(x.selected) ? "active-menu" : "menu-icon"}`}>{x.icon}</div>
+                                                                <div className={`${isActive(x.selected) ? "text-primary text-sm font-medium" : "text-sm font-medium"}`}>{x.title}</div>
                                                             </Button>
                                                         )
                                                     })
                                                 }
-                                                {
-                                                    x.dashBtn ? "" :
-                                                        <Fragment>
-                                                            <h3 className={"text-sm font-bold py-2 px-4"}>{x.mainTitle}</h3>
-                                                            <div className={"flex flex-col gap-1"}>
-                                                                {
-                                                                    (x.items || []).map((y, i) => {
-                                                                        return (
-                                                                            <Button
-                                                                                key={i}
-                                                                                variant={"link hover:no-underline"}
-                                                                                className={`${isActive(y.selected) ? "flex justify-start gap-4 h-9 rounded-md bg-primary/15 transition-none" : 'flex items-center gap-4 h-9 justify-start transition-none'}`}
-                                                                                onClick={() => onRedirect(y.link)}
-                                                                            >
-                                                                                <div className={`${isActive(y.selected) ? "active-menu" : "menu-icon"}`}>{y.icon}</div>
-                                                                                <div className={`${isActive(y.selected) ? "text-primary text-sm font-medium" : "text-sm font-medium"}`}>{y.title}</div>
-                                                                            </Button>
-                                                                        )
-                                                                    })
-                                                                }
-                                                            </div></Fragment>
-                                                }
-                                            </div>
-                                        )
-                                    })
-                                }
-                            </nav>
-                        </div>
-                        <div className="mt-auto ">
-                            <nav className="grid gap-1">
-                                {
-                                    (footerMenuComponent || []).map((x, i) => {
-                                        return (
-                                            <Button
-                                                key={i}
-                                                variant={"link hover:no-underline"}
-                                                className={`${isActive(x.selected)  ? "flex justify-start gap-4 h-9 rounded-md bg-primary/15 transition-none" : 'flex items-center gap-4 h-9 justify-start transition-none'}`}
-                                                onClick={() => onRedirect(x.link)}
-                                            >
-                                                <div className={`${isActive(x.selected) ? "active-menu" : "menu-icon"}`}>{x.icon}</div>
-                                                <div className={`${isActive(x.selected) ? "text-primary text-sm font-medium" : "text-sm font-medium"}`}>{x.title}</div>
-                                            </Button>
-                                        )
-                                    })
-                                }
-                            </nav>
+                                            </nav>
+                                        </div>
+                                    </div>
+                                </SheetContent>
+                            </Sheet>
+                        {/*Mobile said bar End */}
+
+                        <div className="flex h-11 items-center xl:hidden md:block hidden">
+                            <div className={"app-logo cursor-pointer"}  onClick={() => onRedirect("/dashboard")}>
+                                {theme === "dark" ? Icon.whiteLogo : Icon.blackLogo}
+                            </div>
                         </div>
                     </div>
-                </SheetContent>
-            </Sheet>
-            {/*Mobile said bar End */}
 
-            <div className="flex h-11 items-center xl:hidden md:block hidden">
-                <div className={"app-logo cursor-pointer"}  onClick={() => onRedirect("/dashboard")}>
-                    {
-                        theme === "dark" ? Icon.whiteLogo : Icon.blackLogo
-                    }
-                </div>
-            </div>
-            </div>
-
-            <div className={"flex gap-1 md:gap-8"}>
-
-                <div className={"flex gap-6 items-center"}>
-                    <div className={"drop-option"}>
-                        <Popover open={open} onOpenChange={setOpen}>
-                            <PopoverTrigger asChild>
-                                <Button
-                                    variant="outline"
-                                    role="combobox"
-                                    aria-expanded={open}
-                                    className="min-w-[150px] md:w-[200px] h-[36px] justify-between bg-card"
-                                >
-                                    {projectDetailsReducer.id
-                                        ? projectDetailsReducer.project_name
-                                        : "Select framework..."}
-
-
-                                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50"/>
-                                </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-[200px] p-0">
-                                <Command>
-                                    <CommandInput placeholder="Search framework..."/>
-                                    <CommandList>
-                                        <CommandEmpty>No framework found.</CommandEmpty>
-                                        <CommandGroup>
-                                            {(projectList || []).map((x, i) => (
-                                                <Fragment key={i}>
-                                                    <CommandItem
-                                                        className={`${projectDetailsReducer.id === x.id ? `${theme === "dark" ? "text-card-foreground" : "text-card"} bg-primary hov-primary` : 'bg-card'}`}
-                                                        value={x.id}
-                                                        onSelect={() => {
-                                                            onChangeProject(x.id);
-                                                            setOpen(false)
-                                                        }}
-                                                    >
-                                                        <span className={"text-sm font-medium cursor-pointer"}>{x.project_name}</span>
-                                                    </CommandItem>
-                                                </Fragment>
-                                            ))}
-                                                <div className={"flex gap-2 items-center cursor-pointer py-[6px] px-3"} onClick={openSheet}>
-                                                    <Plus size={16}/>
-                                                    <h4 className={"text-sm font-medium"}>Create Project</h4>
-                                                </div>
-                                        </CommandGroup>
-                                    </CommandList>
-                                </Command>
-                            </PopoverContent>
-                        </Popover>
-                    </div>
-                </div>
-                <div className={"flex gap-4 items-center"}>
-                    <Button variant="ghost hover:none" size="icon" className="h-8 w-8" onClick={toggleTheme}>
-                        {theme === 'light' ? <Moon className="h-5 w-5 fill-black stroke-black"/> :
-                            <Sun className="h-5 w-5 fill-black "/>}
-                    </Button>
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="secondary" size="icon" className="rounded-full w-[30px] h-[30px]">
-                                <Avatar className={"w-[30px] h-[30px]"}>
-                                    {
-                                        userDetails.user_photo ?
-                                            <AvatarImage src={userDetails.user_photo} alt="@shadcn"/> :
-                                            <AvatarFallback>{userDetails.user_first_name.substring(0, 1)}{userDetails.user_last_name.substring(0, 1)}</AvatarFallback>
-                                    }
-                                </Avatar>
+                    <div className={"flex gap-1 md:gap-8"}>
+                        <div className={"flex gap-6 items-center"}>
+                            <div className={"drop-option"}>
+                                <Popover open={open} onOpenChange={setOpen}>
+                                    <PopoverTrigger asChild>
+                                        <Button
+                                            variant="outline"
+                                            role="combobox"
+                                            aria-expanded={open}
+                                            className="min-w-[150px] md:w-[200px] h-[36px] justify-between bg-card"
+                                        >
+                                            {projectDetailsReducer.id ? projectDetailsReducer.project_name : "Select framework..."}
+                                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50"/>
+                                        </Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-[200px] p-0">
+                                        <Command>
+                                            <CommandInput placeholder="Search framework..."/>
+                                            <CommandList>
+                                                <CommandEmpty>No framework found.</CommandEmpty>
+                                                <CommandGroup>
+                                                    {(projectList || []).map((x, i) => (
+                                                        <Fragment key={i}>
+                                                            <CommandItem
+                                                                className={`${projectDetailsReducer.id === x.id ? `${theme === "dark" ? "text-card-foreground" : "text-card"} bg-primary hov-primary` : 'bg-card'}`}
+                                                                value={x.id}
+                                                                onSelect={() => {
+                                                                    onChangeProject(x.id);
+                                                                    setOpen(false)
+                                                                }}
+                                                            >
+                                                                <span className={"text-sm font-medium cursor-pointer"}>{x.project_name}</span>
+                                                            </CommandItem>
+                                                        </Fragment>
+                                                    ))}
+                                                        <div className={"flex gap-2 items-center cursor-pointer py-[6px] px-3"} onClick={openSheet}>
+                                                            <Plus size={16}/>
+                                                            <h4 className={"text-sm font-medium"}>Create Project</h4>
+                                                        </div>
+                                                </CommandGroup>
+                                            </CommandList>
+                                        </Command>
+                                    </PopoverContent>
+                                </Popover>
+                            </div>
+                        </div>
+                        <div className={"flex gap-2 md:gap-4 items-center"}>
+                            <Button variant="ghost hover:none" size="icon" className="h-8 w-8" onClick={viewLink}>
+                                <Eye size={20} />
                             </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className={"w-56 rounded-md shadow"}>
-                            <DropdownMenuLabel className={"text-sm font-semibold"}>My Account</DropdownMenuLabel>
-                            <DropdownMenuSeparator/>
-                            <DropdownMenuItem className={"text-sm font-medium flex gap-2"}
-                                              onClick={() => navigate(`${baseUrl}/settings/profile`)}>
-                                <span
-                                    className={`${theme === "dark" ? "profile-menu-icon" : ""}`}>{Icon.accountUserIcon}</span>
-                                Profile
-                            </DropdownMenuItem>
-                            <DropdownMenuItem className={"text-sm font-medium flex gap-2"}
-                                              onClick={() => navigate(`${baseUrl}/pricing-plan`)}>
-                                <span
-                                    className={`${theme === "dark" ? "profile-menu-icon" : ""}`}>{Icon.bilingIcon}</span>
-                                Billing
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator/>
-                            <DropdownMenuItem className={"text-sm font-medium flex gap-2"} onClick={openSheet}>
-                                <span
-                                    className={`${theme === "dark" ? "profile-menu-icon" : ""}`}>{Icon.projectsIcon}</span>
-                                Projects
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator/>
-                            <DropdownMenuItem onClick={onLogout} className={"text-sm font-medium flex gap-2"}>
-                                <span
-                                    className={`${theme === "dark" ? "profile-menu-icon" : ""}`}>{Icon.logoutIcon}</span>
-                                Logout
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                </div>
-            </div>
+                            <Button variant="ghost hover:none" size="icon" className="h-8 w-8" onClick={toggleTheme}>
+                                {theme === 'light' ? <Moon size={20} className="fill-black stroke-black"/> :
+                                    <Sun size={20} className="fill-black "/>}
+                            </Button>
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="secondary" size="icon" className="rounded-full w-[30px] h-[30px]">
+                                        <Avatar className={"w-[30px] h-[30px]"}>
+                                            {
+                                                userDetails.user_photo ?
+                                                    <AvatarImage src={userDetails.user_photo} alt="@shadcn"/> :
+                                                    <AvatarFallback>{userDetails.user_first_name.substring(0, 1)}{userDetails.user_last_name.substring(0, 1)}</AvatarFallback>
+                                            }
+                                        </Avatar>
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end" className={"w-56 rounded-md shadow"}>
+                                    <DropdownMenuLabel className={"text-sm font-semibold"}>My Account</DropdownMenuLabel>
+                                    <DropdownMenuSeparator/>
+                                    <DropdownMenuItem
+                                        className={"text-sm font-medium flex gap-2"}
+                                        onClick={() => navigate(`${baseUrl}/settings/profile`)}
+                                    >
+                                        <span className={`${theme === "dark" ? "profile-menu-icon" : ""}`}>{Icon.accountUserIcon}</span>
+                                        Profile
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                        className={"text-sm font-medium flex gap-2"}
+                                        onClick={() => navigate(`${baseUrl}/pricing-plan`)}
+                                    >
+                                        <span className={`${theme === "dark" ? "profile-menu-icon" : ""}`}>{Icon.bilingIcon}</span>
+                                        Billing
+                                    </DropdownMenuItem>
+                                    <DropdownMenuSeparator/>
+                                    <DropdownMenuItem className={"text-sm font-medium flex gap-2"} onClick={openSheet}>
+                                        <span className={`${theme === "dark" ? "profile-menu-icon" : ""}`}>{Icon.projectsIcon}</span>
+                                        Projects
+                                    </DropdownMenuItem>
+                                    <DropdownMenuSeparator/>
+                                    <DropdownMenuItem onClick={onLogout} className={"text-sm font-medium flex gap-2"}>
+                                        <span className={`${theme === "dark" ? "profile-menu-icon" : ""}`}>{Icon.logoutIcon}</span>
+                                        Logout
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        </div>
+                    </div>
 
-            {isSheetOpen && (
-                <Sheet open={isSheetOpen} onOpenChange={isSheetOpen ? closeSheet : openSheet}>
-                    <SheetContent className={"sm:max-w-[662px] sm:overflow-auto p-0 bg-card"}>
-                        <SheetHeader className={"px-[32px] py-[22px] border-b flex"}>
-                            <SheetTitle className={"text-xl font-medium flex justify-between items-center"}>Create new
-                                Project
-                                <Button className={"bg-transparent hover:bg-transparent p-0 h-[24px]"}>
-                                    <X className={"stroke-card-foreground"} onClick={closeSheet}/>
-                                </Button>
-                            </SheetTitle>
-                        </SheetHeader>
-                        <div className="grid gap-[24px] px-[32px] pt-[24px] pb-[36px]">
-                            <div className="gap-2">
-                                <Label htmlFor="name" className="text-right">Project Name</Label>
-                                <Input
-                                    id="project_name"
-                                    placeholder="Project Name"
-                                    className={`${theme === "dark" ? "" : "placeholder:text-muted-foreground/75"}`}
-                                    value={createProjectDetails.project_name}
-                                    name="project_name"
-                                    onChange={onChangeText}
-                                />
-                                {
-                                    formError.project_name &&
-                                    <span className="text-red-500 text-sm">{formError.project_name}</span>
-                                }
-                            </div>
-                            <div className="gap-2">
-                                <Label htmlFor="website" className="text-right">Project website</Label>
-                                <Input
-                                    id="project_website"
-                                    placeholder="https://yourcompany.com"
-                                    className={`${theme === "dark" ? "placeholder:text-card-foreground/80" : "placeholder:text-muted-foreground/75"}`}
-                                    value={createProjectDetails.project_website}
-                                    name="project_website"
-                                    onChange={onChangeText}
-                                />
-                            </div>
-                            <div className="gap-2 relative">
-                                <Label htmlFor="domain" className="text-right">Project domain</Label>
-                                <Input
-                                    id="domain"
-                                    placeholder="https://projectname.quickhunt.io"
-                                    className={`${theme === "dark" ? "placeholder:text-muted-foreground/75 pr-[115px]" : "placeholder:text-muted-foreground/75 pr-[115px]"}`}
-                                    value={createProjectDetails.domain}
-                                    name="domain"
-                                    onChange={onChangeText}
-                                />
-                                <span className={"absolute top-[33px] right-[13px] text-sm font-medium"}>Project domain</span>
-                            </div>
-                        </div>
-                        <div className={"px-8 gap-4 flex sm:justify-start"}>
-                                <Button className={"text-sm font-semibold hover:bg-primary"}
-                                        onClick={onCreateProject} type="submit">Create Project</Button>
-                                <Button
-                                    className={"text-primary text-sm font-semibold hover:bg-card border border-primary bg-card"}
-                                    type="submit" onClick={onCancel}>Cancel</Button>
-                        </div>
-                    </SheetContent>
-                </Sheet>
-            )}
-            </div>
+                    {isSheetOpen && (
+                        <Sheet open={isSheetOpen} onOpenChange={isSheetOpen ? closeSheet : openSheet}>
+                            <SheetContent className={"sm:max-w-[662px] sm:overflow-auto p-0 bg-card"}>
+                                <SheetHeader className={"px-[32px] py-[22px] border-b flex"}>
+                                    <SheetTitle className={"text-xl font-medium flex justify-between items-center"}>
+                                        Create new Project
+                                        <Button className={"bg-transparent hover:bg-transparent p-0 h-[24px]"}>
+                                            <X className={"stroke-card-foreground"} onClick={closeSheet}/>
+                                        </Button>
+                                    </SheetTitle>
+                                </SheetHeader>
+                                <div className="grid gap-[24px] px-[32px] pt-[24px] pb-[36px]">
+                                    <div className="gap-2">
+                                        <Label htmlFor="name" className="text-right">Project Name</Label>
+                                        <Input
+                                            id="project_name"
+                                            placeholder="Project Name"
+                                            className={`${theme === "dark" ? "" : "placeholder:text-muted-foreground/75"}`}
+                                            value={createProjectDetails.project_name}
+                                            name="project_name"
+                                            onChange={onChangeText}
+                                        />
+                                        {
+                                            formError.project_name &&
+                                            <span className="text-destructive text-sm">{formError.project_name}</span>
+                                        }
+                                    </div>
+                                    <div className="gap-2">
+                                        <Label htmlFor="website" className="text-right">Project website</Label>
+                                        <Input
+                                            id="project_website"
+                                            placeholder="https://yourcompany.com"
+                                            className={`${theme === "dark" ? "placeholder:text-card-foreground/80" : "placeholder:text-muted-foreground/75"}`}
+                                            value={createProjectDetails.project_website}
+                                            name="project_website"
+                                            onChange={onChangeText}
+                                        />
+                                    </div>
+                                    <div className="gap-2 relative">
+                                        <Label htmlFor="domain" className="text-right">Project domain</Label>
+                                        <Input
+                                            id="domain"
+                                            placeholder="https://projectname.quickhunt.io"
+                                            className={`${theme === "dark" ? "placeholder:text-muted-foreground/75 pr-[115px]" : "placeholder:text-muted-foreground/75 pr-[115px]"}`}
+                                            value={createProjectDetails.domain}
+                                            name="domain"
+                                            onChange={onChangeText}
+                                        />
+                                        <span className={"absolute top-[33px] right-[13px] text-sm font-medium"}>Project domain</span>
+                                    </div>
+                                </div>
+                                <div className={"px-8 gap-4 flex sm:justify-start"}>
+                                        <Button
+                                            className={"text-sm font-semibold hover:bg-primary"}
+                                            onClick={onCreateProject} type="submit"
+                                        >
+                                            Create Project
+                                        </Button>
+                                        <Button
+                                            className={"text-primary text-sm font-semibold hover:bg-card border border-primary bg-card"}
+                                            type="submit" onClick={onCancel}
+                                        >
+                                            Cancel
+                                        </Button>
+                                </div>
+                            </SheetContent>
+                        </Sheet>
+                    )}
+                </div>
             </div>
         </header>
     );

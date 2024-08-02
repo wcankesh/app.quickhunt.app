@@ -173,14 +173,14 @@ const CreateIdea = ({
                     <div className={"w-full overflow-y-auto create-sheet-height"}>
                             <div className={""}>
                                 <div className={"px-4 py-3 lg:py-6 lg:px-8 flex flex-col gap-6 border-b"}>
-                                    <div className="flex flex-col gap-2">
+                                    <div className="space-y-2">
                                         <Label htmlFor="text">Title</Label>
                                         <Input type="text" id="text" placeholder="" value={ideaDetail.title} name={"title"} onChange={onChangeText} />
                                         {
                                             formError.title && <span className="text-red-500 text-sm">{formError.title}</span>
                                         }
                                     </div>
-                                    <div className="flex flex-col gap-2">
+                                    <div className="space-y-2">
                                         <Label htmlFor="message">Description</Label>
                                         <Textarea placeholder="Start writing..." id="message"
                                                   value={description}
@@ -189,7 +189,7 @@ const CreateIdea = ({
                                         {formError.description && <span className="text-red-500 text-sm">{formError.description}</span>}
                                     </div>
                                 </div>
-                                <div className={"px-4 py-3 lg:py-6 lg:px-8 border-b flex flex-col gap-2"}>
+                                <div className={"px-4 py-3 lg:py-6 lg:px-8 border-b space-y-2"}>
                                     <Label>Choose Topics for this Idea (optional)</Label>
                                     <Select onValueChange={handleChange} value={selectedValues}>
                                         <SelectTrigger className="">
