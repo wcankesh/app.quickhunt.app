@@ -385,7 +385,7 @@ const BannerSheet = ({isOpen,onClose,onOpen}) => {
 
                         <div className={"px-8 pt-6"}>
                             <h5 className={"text-base font-medium"}>Send more than once</h5>
-                            <RadioGroup defaultValue="default">
+                            <RadioGroup defaultValue="default" className={""}>
                                 <div className="flex items-center space-x-2">
                                     <RadioGroupItem value="default" id="r1" />
                                     <Label htmlFor="r1" className={"text-sm font-normal"}>Send once, first time the person matches the rules</Label>

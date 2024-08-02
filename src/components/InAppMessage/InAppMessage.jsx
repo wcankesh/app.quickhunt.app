@@ -2,14 +2,14 @@ import React, {useState, useEffect, Fragment} from 'react';
 import {Button} from "../ui/button";
 import {
     ArrowRight,
-    BookCheck, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight,
+    BookCheck, Calendar, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight,
     ChevronsUpDown,
     Circle,
     ClipboardList,
     Ellipsis, Loader2,
     Plus,
     ScrollText,
-    SquareMousePointer, X
+    SquareMousePointer, User, Users, X
 } from "lucide-react";
 import {Input} from "../ui/input";
 import {Popover, PopoverContent, PopoverTrigger} from "../ui/popover";
@@ -109,7 +109,7 @@ const filterType = [
     {
         label: "People",
         value: 0,
-        icon:<ScrollText size={16}/>,
+        icon:<Users  size={16}/>,
     },
     {
         label: "State",
@@ -120,12 +120,12 @@ const filterType = [
     {
         label: "Sender",
         value: 2,
-        icon:<BookCheck size={16}/>,
+        icon:<User  size={16}/>,
     },
     {
         label: "Date",
         value: 3,
-        icon:<SquareMousePointer size={16}/>,
+        icon:<Calendar  size={16}/>,
     }
 ]
 
@@ -173,7 +173,7 @@ const InAppMessage = () => {
     }
 
     return (
-        <div className={"pt-9  xl:container xl:max-w-[1590px] lg:container lg:max-w-[992px] md:container md:max-w-[768px] sm:container sm:max-w-[639px] m-0"}>
+        <div className={"pt-9  xl:container xl:max-w-[1630px] lg:container lg:max-w-[992px] md:container md:max-w-[768px] sm:container sm:max-w-[639px] m-0"}>
            <div className={"px-4"}>
                 <div className={"flex justify-between items-center"}>
                     <h4 className={"font-medium text-lg sm:text-2xl leading-8"}>In App Messages</h4>
@@ -239,7 +239,7 @@ const InAppMessage = () => {
                                             {
                                                 filterType.map((x)=>{
                                                     return(
-                                                        <CommandItem className={`font-medium ${theme === "dark" ? "" : "text-muted-foreground"} hover:none`} onSelect={()=>setOpen(false)}>{x.icon} <span className={"ml-2"}>{x.label}</span></CommandItem>
+                                                        <CommandItem className={`font-medium ${theme === "dark" ? "" : "text-muted-foreground"} hover:none`} onSelect={()=>setOpenFilter(false)}>{x.icon} <span className={"ml-2"}>{x.label}</span></CommandItem>
                                                     )
                                                 })
                                             }
@@ -369,7 +369,6 @@ const InAppMessage = () => {
            </div>
             {isSheetOpen && (
                 <Sheet open={isSheetOpen} onOpenChange={isSheetOpen ? closeSheet : openSheet}>
-
                     <SheetOverlay className={"inset-0"} />
                     <SheetContent className={"sm:max-w-[660px] sm:overflow-auto p-0"}>
                         <SheetHeader className={"px-3 py-4 sm:px-8 sm:py-6 border-b flex"}>

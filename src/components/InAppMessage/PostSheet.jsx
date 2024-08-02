@@ -149,7 +149,7 @@ const PostSheet = ({isOpen,onClose,onOpen}) => {
                             </Card>
                         </Card>
                     </div>
-                    <div className={"basis-[450px] h-[91.8vh] border-l border-l-[#E4E4E7] overflow-y-auto"}>
+                    <div className={"basis-[450px] h-[91.8vh] pb-[80px] border-l border-l-[#E4E4E7] overflow-y-auto"}>
                         <div className={"px-8 py-4"}>
                             <h5 className={"text-base font-medium leading-5"}>Content</h5>
                         </div>
@@ -158,7 +158,7 @@ const PostSheet = ({isOpen,onClose,onOpen}) => {
                             <div className={"space-y-1"}>
                                 <Label className={"font-medium"}>From</Label>
                                 <Select>
-                                    <SelectTrigger className="w-full">
+                                    <SelectTrigger className="w-full h-9">
                                         <SelectValue placeholder="Testingapp" />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -173,7 +173,7 @@ const PostSheet = ({isOpen,onClose,onOpen}) => {
                             <div className={"space-y-1"}>
                                 <Label className={"font-medium"}>Reply type</Label>
                                 <Select>
-                                    <SelectTrigger className="w-full">
+                                    <SelectTrigger className="w-full h-9">
                                         <SelectValue placeholder="Text" />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -241,7 +241,7 @@ const PostSheet = ({isOpen,onClose,onOpen}) => {
                             <div className={"space-y-1"}>
                                 <Label className={"font-medium"}>Where to send</Label>
                                 <Select>
-                                    <SelectTrigger className="w-full">
+                                    <SelectTrigger className="w-full h-9">
                                         <SelectValue placeholder="Set Where to send" />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -257,13 +257,13 @@ const PostSheet = ({isOpen,onClose,onOpen}) => {
                                 <h5 className={"text-sm font-medium"}>Start sending</h5>
                                 <div className={"flex flex-row gap-4"}>
                                     <div className={"basis-1/2"}>
-                                        <Popover >
+                                        <Popover>
                                             <PopoverTrigger asChild>
                                                 <Button
                                                     id="date"
                                                     variant={"outline"}
                                                     className={cn(
-                                                        "w-full justify-start text-left font-normal",
+                                                        "w-full h-9 justify-start text-left font-normal",
                                                         !date && "text-muted-foreground"
                                                     )}
                                                 >
@@ -292,7 +292,7 @@ const PostSheet = ({isOpen,onClose,onOpen}) => {
                                                     id="date"
                                                     variant={"outline"}
                                                     className={cn(
-                                                        "w-full justify-start text-left font-normal",
+                                                        "w-full h-9 justify-start text-left font-normal",
                                                         !date && "text-muted-foreground"
                                                     )}
                                                 >
@@ -318,7 +318,7 @@ const PostSheet = ({isOpen,onClose,onOpen}) => {
                                 <div className={"space-y-1 mt-2 w-2/5"}>
                                     <Label className={"font-medium"}>Add delay</Label>
                                     <Select>
-                                        <SelectTrigger className="w-full">
+                                        <SelectTrigger className="w-full h-9">
                                             <SelectValue placeholder="2 sec" />
                                         </SelectTrigger>
                                         <SelectContent>
@@ -338,7 +338,7 @@ const PostSheet = ({isOpen,onClose,onOpen}) => {
                                                     id="date"
                                                     variant={"outline"}
                                                     className={cn(
-                                                        "w-full justify-start text-left font-normal",
+                                                        "w-full h-9 justify-start text-left font-normal",
                                                         !date && "text-muted-foreground"
                                                     )}
                                                 >
@@ -367,7 +367,7 @@ const PostSheet = ({isOpen,onClose,onOpen}) => {
                                                     id="date"
                                                     variant={"outline"}
                                                     className={cn(
-                                                        "w-full justify-start text-left font-normal",
+                                                        "w-full h-9 justify-start text-left font-normal",
                                                         !date && "text-muted-foreground"
                                                     )}
                                                 >

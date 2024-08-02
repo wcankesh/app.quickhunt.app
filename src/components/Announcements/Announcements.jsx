@@ -9,7 +9,7 @@ import {
     ChevronsLeft,
     ChevronsRight,
     Circle,
-    Ellipsis,
+    Ellipsis, Filter,
     LayoutList,
     Plus,
     Text
@@ -25,10 +25,14 @@ import SidebarSheet from "./SidebarSheet";
 import {toast} from "../ui/use-toast";
 import {DropdownMenu, DropdownMenuTrigger} from "@radix-ui/react-dropdown-menu";
 import {DropdownMenuContent, DropdownMenuItem} from "../ui/dropdown-menu";
+import {Popover, PopoverTrigger} from "@radix-ui/react-popover";
+import {PopoverContent} from "../ui/popover";
+import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList} from "../ui/command";
+import {Checkbox} from "../ui/checkbox";
 
 const initialStateFilter = {
     l: "",
-    s: ""
+    s: "",
 }
 const perPageLimit = 15;
 
@@ -59,10 +63,11 @@ const Announcements = () => {
     const [pageNo, setPageNo] = useState(1);
     const [totalRecord, setTotalRecord] = useState(0);
     const [selectedRecord, setSelectedRecord] = useState({})
-    const [editIndex, setEditIndex] = useState(null);
     const [analyticsObj, setAnalyticsObj] = useState({})
     const apiService = new ApiService();
     const totalPages = Math.ceil(totalRecord / perPageLimit);
+    const [openFilterType, setOpenFilterType] = useState('');
+
 
     const openSheet = () => {
         setSelectedRecord({id: "new"})
@@ -108,7 +113,13 @@ const Announcements = () => {
     }
 
     useEffect(() => {
-        getAllPosts();
+        if(filter.l || filter.s){
+            let payload = {...filter, project_id: projectDetailsReducer.id, page: pageNo, limit: perPageLimit}
+            searchAnnouncement(payload);
+        }
+        else{
+            getAllPosts();
+        }
     }, [projectDetailsReducer.id, allStatusAndTypes, pageNo,]);
 
     const getAllPosts = async () => {
@@ -127,21 +138,29 @@ const Announcements = () => {
         }
     }
 
-    const filterPosts = async (event) => {
+    const filterPosts =  (event) => {
         setIsLoading(true)
         const payload = {
             ...filter,
             [event.name]: event.value,
             project_id: projectDetailsReducer.id,
-            q: ""
+            q: "",
+            page:1,
         }
-        setFilter({...filter, [event.name]: event.value,})
+        setFilter({...filter, [event.name]: event.value,});
+
+        searchAnnouncement(payload);
+    }
+
+    const searchAnnouncement = async (payload) => {
         const data = await apiService.filterPost(payload)
         if (data.status === 200) {
-            setIsLoading(false)
-            setAnnouncementList(data.data)
+            setIsLoading(false);
+            setAnnouncementList(data.data);
+            setPageNo(payload.page);
+            setTotalRecord(data.total);
         } else {
-            setIsLoading(false)
+            setIsLoading(false);
         }
     }
 
@@ -150,12 +169,13 @@ const Announcements = () => {
         localStorage.setItem("tabIndex", tabIndex);
     }
 
-
     const handlePaginationClick = (newPage) => {
         if (newPage >= 1 && newPage <= totalPages) {
             setPageNo(newPage);
         }
     };
+
+    console.log(allStatusAndTypes.labels);
 
     return (
         <div
@@ -200,6 +220,68 @@ const Announcements = () => {
                     <div className={"flex gap-6 items-center w-full md:w-auto"}>
                     <div className={"md:block hidden"}>
                         <div className={"flex gap-6 items-center"}>
+                            <Popover>
+                                <PopoverTrigger asChild>
+                                    <Button className={"h-9 w-9"} size={"icon"} variant="outline"><Filter fill="true" className='w-4 -h4' /></Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-full p-0" align={"end"}>
+                                    <Command className="w-full">
+                                        <CommandInput placeholder="Search filter..."/>
+                                        <CommandList className="w-full">
+                                            <CommandEmpty>No filter found.</CommandEmpty>
+                                            {
+                                                openFilterType === 'status' ?
+                                                                    <CommandGroup className={"w-full"}>
+                                                                        <CommandItem className={"p-0 flex gap-2 items-center cursor-pointer p-1"} onSelect={() => {setOpenFilterType('');}}>
+                                                                            <ChevronLeft className="mr-2 h-4 w-4"  />  <span className={"flex-1 w-full text-sm font-medium cursor-pointer flex gap-2 items-center"}>Back</span>
+                                                                        </CommandItem>
+                                                                        {
+                                                                            (status || []).map((x, index) => {
+                                                                                return (
+                                                                                    <CommandItem className={"p-0 flex gap-1 items-center cursor-pointer"}>
+                                                                                        <Checkbox className={'m-2'} checked={x.value === filter.s} onClick={(event) => filterPosts({name: "s", value: x.value })} />
+                                                                                        <span className={"flex-1 w-full text-sm font-medium cursor-pointer flex gap-2 items-center"} onClick={(event) => filterPosts({name: "s", value: x.value})} key={x.label}>{x.label}</span>
+                                                                                    </CommandItem>
+                                                                                )
+                                                                            })
+                                                                        }
+                                                                    </CommandGroup>
+                                                : openFilterType === 'label' ?
+                                                                    <CommandGroup className={"w-full"}>
+                                                                        <CommandItem className={"p-0 flex gap-2 items-center cursor-pointer p-1"} onSelect={() => {setOpenFilterType('');}}>
+                                                                            <ChevronLeft className="mr-2 h-4 w-4"  />  <span className={"flex-1 w-full text-sm font-medium cursor-pointer flex gap-2 items-center"}>Back</span>
+                                                                        </CommandItem>
+                                                                        {
+                                                                            (allStatusAndTypes.labels || []).map((x, i) => {
+                                                                                return (
+                                                                                    <CommandItem key={x.id}>
+                                                                                        <div className={"w-full flex items-center gap-1"}  key={x.label}>
+                                                                                            <Checkbox className={'m-2'} checked={x.id == filter.l} onClick={(event) => filterPosts({name: "l", value: x.id })} />
+                                                                                            <div className={"flex items-center gap-2 w-full"} onClick={(event) => filterPosts({name: "l", value: x.id })}>
+                                                                                                <Circle fill={x.label_color_code}
+                                                                                                        stroke={x.label_color_code}
+                                                                                                        className={`${theme === "dark" ? "" : "text-muted-foreground"} w-[10px] h-[10px]`}/>
+                                                                                                <span className={"flex-1 w-full text-sm font-medium cursor-pointer flex gap-2 items-center"}>{x.label_name}</span>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </CommandItem>
+                                                                                )
+                                                                            })
+                                                                        }
+                                                                    </CommandGroup>
+                                                                    :<CommandGroup>
+                                                                        <CommandItem onSelect={() => {setOpenFilterType('status');}}>
+                                                                            <span className={"text-sm font-medium cursor-pointer"}>Status</span>
+                                                                        </CommandItem>
+                                                                        <CommandItem onSelect={() => {setOpenFilterType('label');}}>
+                                                                            <span className={"text-sm font-medium cursor-pointer"}>Labels</span>
+                                                                        </CommandItem>
+                                                                    </CommandGroup>
+                                            }
+                                        </CommandList>
+                                    </Command>
+                                </PopoverContent>
+                            </Popover>
                         <Select value={filter.s} onValueChange={(select) => filterPosts({name: "s", value: select})}>
                             <SelectTrigger className="h-9 w-[115px]">
                                 <SelectValue placeholder="All"/>
@@ -253,6 +335,8 @@ const Announcements = () => {
                                     type="search"
                                     placeholder="Search..."
                                     className="w-full pl-4 pr-14 text-sm font-normal h-9"
+                                    // onChange={(event) => filterPosts({name: "q", value: x.value})}
+
                                 />
                             </div>
 
@@ -273,11 +357,13 @@ const Announcements = () => {
                     </div>
                 </div>
             </div>
+
+
+
             <Card className={"mt-8"}>
                 {tab == 0 && <AnnouncementsTable
                     setAnalyticsObj={setAnalyticsObj}
                     handleDelete={handleDelete}
-                    setEditIndex={setEditIndex}
                     data={announcementList}
                     setSelectedRecord={setSelectedRecord}
                     isLoading={isLoading}/>

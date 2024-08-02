@@ -2,12 +2,11 @@ import React, {useState, Fragment, useEffect} from 'react';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "../ui/table";
 import {Badge} from "../ui/badge";
 import {Button} from "../ui/button";
-import {BarChart, Circle, Ellipsis, Eye,} from "lucide-react";
+import {BarChart, Circle, Ellipsis, Eye, Loader2,} from "lucide-react";
 import {useTheme} from "../theme-provider"
-import { Card, CardContent} from "../ui/card";
+import {CardContent} from "../ui/card";
 import {DropdownMenu, DropdownMenuTrigger} from "@radix-ui/react-dropdown-menu";
 import {DropdownMenuContent, DropdownMenuItem} from "../ui/dropdown-menu";
-import {Separator} from "../ui/separator";
 import {Select, SelectItem, SelectGroup, SelectContent, SelectTrigger, SelectValue} from "../ui/select";
 import moment from "moment";
 import NoDataThumbnail from "../../img/Frame.png"
@@ -15,17 +14,19 @@ import {apiService} from "../../utils/constent";
 import {Toaster} from "../ui/toaster";
 import {toast} from "../ui/use-toast";
 import {Skeleton} from "../ui/skeleton";
-import {AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogFooter, AlertDialogTitle, AlertDialogDescription, AlertDialogAction, AlertDialogCancel,} from "../ui/alert-dialog";
+import {Dialog} from "@radix-ui/react-dialog";
+import {DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "../ui/dialog";
 
 const status = [
     {name: "Publish", value: 0, fillColor: "#389E0D", strokeColor: "#389E0D",},
     {name: "Draft", value: 1, fillColor: "#CF1322", strokeColor: "#CF1322",},
 ]
 
-const AnnouncementsTable = ({data,isLoading ,setSelectedRecord,setEditIndex ,handleDelete,handleAnalyticRow,setAnalyticsObj,}) => {
+const AnnouncementsTable = ({data,isLoading ,setSelectedRecord,setEditIndex ,handleDelete,setAnalyticsObj,}) => {
     const [announcementData,setAnnouncementData]=useState(data);
     const [isOpenDeleteAlert,setIsOpenDeleteAlert]= useState(false);
     const [idToDelete,setIdToDelete]=useState(null);
+    const [openDelete, setOpenDelete] = useState(false);
     const { theme }= useTheme();
 
     useEffect(()=>{
@@ -34,7 +35,6 @@ const AnnouncementsTable = ({data,isLoading ,setSelectedRecord,setEditIndex ,han
 
     const openSheet = (x) => {
         setAnalyticsObj(x);
-        handleAnalyticRow(x);
     };
 
     const handleStatusChange = async (object, value) => {
@@ -64,32 +64,46 @@ const AnnouncementsTable = ({data,isLoading ,setSelectedRecord,setEditIndex ,han
     }
 
     const deleteRow =(id)=>{
-        setIsOpenDeleteAlert(true);
         setIdToDelete(id);
+        setOpenDelete(true);
     }
 
     const deleteParticularRow = ()=>{
         handleDelete(idToDelete);
+        setOpenDelete(false);
     }
 
     return (
         <Fragment>
             <Toaster/>
-            <AlertDialog open={isOpenDeleteAlert} onOpenChange={setIsOpenDeleteAlert}>
-                <AlertDialogContent className={"w-[310px] md:w-auto rounded-lg p-3"}>
-                    <AlertDialogHeader className={"text-left gap-2"}>
-                        <AlertDialogTitle className={"text-sm md:text-xl"}>You really want delete this announcement?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            This action can't be undone.
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter className={"flex flex-row justify-end gap-2"}>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction className={"bg-red-600 hover:bg-red-600 m-0"} onClick={deleteParticularRow}>Delete</AlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
-            {/*<Card className={"rounded-none"}>*/}
+
+            {
+                openDelete &&
+                <Fragment>
+                    <Dialog open onOpenChange={()=> setOpenDelete(false)}>
+                        <DialogContent className="sm:max-w-[425px]">
+                            <DialogHeader className={"flex flex-col gap-2"}>
+                                <DialogTitle>You really want delete this announcement?</DialogTitle>
+                                <DialogDescription>This action can't be undone.</DialogDescription>
+                            </DialogHeader>
+                            <DialogFooter>
+                                <Button variant={"outline hover:none"}
+                                        className={"text-sm font-semibold border"}
+                                        onClick={() => setOpenDelete(false)}>Cancel</Button>
+                                <Button
+                                    variant={"hover:bg-destructive"}
+                                    className={`${theme === "dark" ? "text-card-foreground" : "text-card"} ${isLoading === true ? "py-2 px-6" : "py-2 px-6"} w-[76px] text-sm font-semibold bg-destructive`}
+                                    onClick={deleteParticularRow}
+                                >
+                                    {isLoading ? <Loader2 size={16} className={"animate-spin"}/> : "Delete"}
+                                </Button>
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
+                </Fragment>
+            }
+
+
             <CardContent className={"p-0 overflow-auto"}>
                 <Table className={""}>
                         <TableHeader className={"p-0"}>

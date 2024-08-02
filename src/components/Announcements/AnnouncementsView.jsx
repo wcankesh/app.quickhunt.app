@@ -88,7 +88,7 @@ const AnnouncementsView = ({data,isLoading,setSelectedRecord,handleDelete,setAna
         <div className={""}>
             <Toaster/>
             <AlertDialog open={isOpenDeleteAlert} onOpenChange={setIsOpenDeleteAlert}>
-                <AlertDialogContent className={"w-[310px] md:w-auto rounded-lg p-3"}>
+                <AlertDialogContent className={"w-[310px] md:w-auto rounded-lg"}>
                     <AlertDialogHeader className={"text-left gap-2"}>
                         <AlertDialogTitle className={"text-sm md:text-xl"}>You really want delete this announcement?</AlertDialogTitle>
                         <AlertDialogDescription>
