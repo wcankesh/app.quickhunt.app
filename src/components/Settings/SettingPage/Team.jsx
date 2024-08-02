@@ -37,7 +37,7 @@ const initialStateError = {
 }
 
 const Team = () => {
-    const {theme} = useTheme();
+    const {theme,onProModal} = useTheme();
     const [isSheetOpen, setSheetOpen] = useState(false);
     const [inviteTeamDetails, setInviteTeamDetails] = useState(initialState)
     const [formError, setFormError] = useState(initialStateError);
@@ -49,6 +49,7 @@ const Team = () => {
     const [isOpenDeleteAlert, setIsOpenDeleteAlert] = useState(false);
     const apiService = new ApiService();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
+    const userDetailsReducer = useSelector(state => state.userDetailsReducer);
 
     useEffect(() => {
         getMember()
@@ -77,7 +78,21 @@ const Team = () => {
         }
     }
 
-    const openSheet = () => setSheetOpen(true);
+    const openSheet = () => {
+        let length = memberList?.length;
+        if(userDetailsReducer.plan === 0){
+            if(length < 1){
+                setSheetOpen(true)
+                onProModal(false)
+            }  else{
+                onProModal(true)
+            }
+        } else if(userDetailsReducer.plan === 1){
+            setSheetOpen(true)
+            onProModal(false)
+        }
+
+    };
 
     const closeSheet = () => {
         setSheetOpen(false);

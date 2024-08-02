@@ -181,6 +181,7 @@ const HeaderBar = () => {
             onProModal(false)
         }
     }
+
     const closeSheet = () => setSheetOpen(false);
 
     const openSheetMenu = () => setSheetOpenMenu(true);

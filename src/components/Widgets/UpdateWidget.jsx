@@ -61,7 +61,7 @@ const UpdateWidget = ({ isOpen, onOpen, onClose,  }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [index, setIndex] = useState(0);
     const [editWidgetName, setEditWidgetName] = useState(false);
-    const [toggle, setToggle] = useState(false);
+    const [toggle, setToggle] = useState(true);
     useEffect(() => {
        setTimeout(() => {
            document.body.style.pointerEvents = 'auto';
@@ -128,7 +128,18 @@ const UpdateWidget = ({ isOpen, onOpen, onClose,  }) => {
             setIsLoading(false)
         }
     }
+    const handleEsc = (event) => {
+        if (event.keyCode === 27) {
+            setToggle(false);
+        }
+    }
 
+    useEffect(() => {
+        window.addEventListener("keydown", handleEsc);
+        return () => {
+            window.removeEventListener("keydown", handleEsc);
+        };
+    }, []);
     const onUpdateWidgets = async () => {
         setIsLoading(true)
 
@@ -651,17 +662,20 @@ const UpdateWidget = ({ isOpen, onOpen, onClose,  }) => {
                     </SheetContent>
             </Sheet>
             <div className={"xl:container xl:max-w-[1200px] lg:container lg:max-w-[992px]  md:container md:max-w-[768px] sm:container sm:max-w-[639px] pt-8 pb-5 px-4 h-full relative"}>
-                <div className={widgetsSetting.type === "popover" ? "border h-full rounded-lg" : ""}>
-                    <div className='QH-floating-trigger' onClick={onToggle} style={{
-                        backgroundColor: widgetsSetting.launcher_icon_bg_color,
-                        left: widgetsSetting.launcher_position === 1 ?widgetsSetting.type === "popover" ? "40px" : 355 : "inherit",
-                        right: widgetsSetting.launcher_position === 2 ? "40px" : "inherit",
-                        position: widgetsSetting.type === "popover" ? "absolute" : "fixed"
-                    }}>
-                        {
-                            launcherIcon[widgetsSetting.launcher_icon]
-                        }
-                    </div>
+                <div className={widgetsSetting.type === "popover" || widgetsSetting.type === "embed" ? "border h-full rounded-lg" : ""}>
+                    {
+                        widgetsSetting.type !== "embed" && <div className='QH-floating-trigger' onClick={onToggle} style={{
+                            backgroundColor: widgetsSetting.launcher_icon_bg_color,
+                            left: widgetsSetting.launcher_position === 1 ?widgetsSetting.type === "popover" ? "40px" : 355 : "inherit",
+                            right: widgetsSetting.launcher_position === 2 ? "40px" : "inherit",
+                            position: widgetsSetting.type === "popover" ? "absolute" : "fixed"
+                        }}>
+                            {
+                                launcherIcon[widgetsSetting.launcher_icon]
+                            }
+                        </div>
+                    }
+
                     {
                         widgetsSetting.type === "popover" &&
                         <div className={`QH-popover ${toggle ? "QH-popover-open" : ""}`} style={{
@@ -670,8 +684,7 @@ const UpdateWidget = ({ isOpen, onOpen, onClose,  }) => {
                             width: `${widgetsSetting.popover_width}px`, height: `${widgetsSetting.popover_height}px`
                         }}>
                             <iframe className='QH-frame'
-                                    sandbox='allow-same-origin allow-scripts allow-top-navigation allow-popups allow-forms allow-presentation allow-popups-to-escape-sandbox'
-                                    src='https://testingapp.quickhunt.app/ideas'/>
+                                    src={`https://${projectDetailsReducer.domain}/ideas?widget=${id}`}/>
                         </div>
                     }
 
@@ -688,12 +701,36 @@ const UpdateWidget = ({ isOpen, onOpen, onClose,  }) => {
                                 width: `${widgetsSetting.sidebar_width}px`,
                             }}>
                                 <iframe className='QH-frame'
-                                        sandbox='allow-same-origin allow-scripts allow-top-navigation allow-popups allow-forms allow-presentation allow-popups-to-escape-sandbox'
-                                        src='https://testingapp.quickhunt.app/ideas'/>
+                                        src={`https://${projectDetailsReducer.domain}/ideas?widget=${id}`}/>
                             </div>
                             <div className="QH-sidebar-shadow" onClick={onToggle}>&nbsp;</div>
 
                         </div>
+                    }
+
+                    {
+                        widgetsSetting.type === "modal" &&
+                        <div className={`QH-modal ${toggle ? "QH-modal-open" : ""}`}>
+                            <div className={"QH-modal-content"}
+                                 style={{
+                                     width: `${widgetsSetting.modal_width}px`,
+                                     height: `${widgetsSetting.modal_height}px`,
+                                 }}>
+                                <iframe className='QH-frame'
+                                        src={`https://${projectDetailsReducer.domain}/ideas?widget=${id}`}/>
+                            </div>
+                        </div>
+                    }
+
+                    {
+                        widgetsSetting.type === "embed" &&
+                        <div className={"QH-widget-embed"}>
+                            <div className={"QH-embed"}>
+                                <iframe className='QH-frame rounded-lg'
+                                        src={`https://${projectDetailsReducer.domain}/ideas?widget=${id}`}/>
+                            </div>
+                        </div>
+
                     }
 
                 </div>

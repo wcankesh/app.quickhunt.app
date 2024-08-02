@@ -176,21 +176,22 @@ const PricingPlans = () => {
     const dispatch = useDispatch();
     const userDetailsReducer = useSelector(state => state.userDetailsReducer);
 
-    const plans = [{
-        name: "Free",
-        price: 0,
-        description: "Essential features you need to get started",
-        features: ["Example Feature Number 1", "Example Feature Number 1", "Example Feature Number 1"],
-        planType: 0,
-        productId: "",
-        disabled: userDetailsReducer.plan === 0,
-        btnText: userDetailsReducer.plan > 0 ? "Downgrade" : "Activated"
-    },
+    const plans = [
+        {
+            name: "Free",
+            price: 0,
+            description: "Essential features you need to get started",
+            features: ["Unlimited posts", "1 Ideas board", "Public Roadmap", "1 Project", "1 Manager","All core features" ],
+            planType: 0,
+            productId: "",
+            disabled: userDetailsReducer.plan === 0,
+            btnText: userDetailsReducer.plan > 0 ? "Downgrade" : "Activated"
+         },
         {
             name: "Startup",
             price: 19,
             description: "Perfect for owners of small & medium businesses",
-            features: ["Example Feature Number 1", "Example Feature Number 1", "Example Feature Number 1"],
+            features: ["Unlimited Ideas board", "Unlimited Project","Public Roadmap", "Unlimited Manager", "All core features", "Custom Domain"],
             planType: 1,
             productId: "price_1Pi8vSKS40mIQp5T8LrFd5QC",
             disabled: userDetailsReducer.plan === 1 && userDetailsReducer.final_expiration_time !== "" ? false : userDetailsReducer.plan === 1,

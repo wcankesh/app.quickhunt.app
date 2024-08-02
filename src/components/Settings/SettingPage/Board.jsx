@@ -37,11 +37,14 @@ const Board = () => {
     const dispatch = useDispatch();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
+    const userDetailsReducer = useSelector(state => state.userDetailsReducer);
     let apiService = new ApiService();
-    const {theme}=useTheme();
+    const {theme, onProModal} = useTheme();
 
     useEffect(()=>{
-        getBoardList();
+        if(projectDetailsReducer?.id){
+            getBoardList();
+        }
     },[projectDetailsReducer.id])
 
     const getBoardList = async () => {
@@ -63,7 +66,7 @@ const Board = () => {
         switch (name) {
             case "title":
                 if (!value || value.trim() === "") {
-                    return "Title is required";
+                    return "Board name is required";
                 }else {
                     return "";
                 }
@@ -123,7 +126,7 @@ const Board = () => {
             setShowNewBoard(null);
             dispatch(allStatusAndTypesAction({...allStatusAndTypes, boards: clone}));
             toast({
-                description:"Board inserted successfully"
+                description:"Board created successfully"
             });
         }
         else{
@@ -150,7 +153,7 @@ const Board = () => {
         if (!boardToSave.title || boardToSave.title.trim() === "") {
             setFormError({
                 ...formError,
-                title: "Label name is required."
+                title: "Board name is required."
             });
             return;
         }
@@ -205,6 +208,21 @@ const Board = () => {
         }
     }
 
+    const createNewBoard = () => {
+        let length = boardList?.length;
+        if(userDetailsReducer.plan === 0){
+            if(length < 1){
+                setShowNewBoard(true)
+                onProModal(false)
+            }  else{
+                onProModal(true)
+            }
+        } else if(userDetailsReducer.plan === 1){
+            setShowNewBoard(true)
+            onProModal(false)
+        }
+    }
+
     return (
         <Fragment>
             <AlertDialog open={deleteId} onOpenChange={setDeleteId}>
@@ -231,7 +249,7 @@ const Board = () => {
                         <Button
                             disabled={showNewBoard}
                             className="flex gap-1 items-center text-sm font-semibold m-0"
-                            onClick={()=>setShowNewBoard(true)}
+                            onClick={createNewBoard}
                         >
                             <div><Plus size={20} /></div>New Board
                         </Button>

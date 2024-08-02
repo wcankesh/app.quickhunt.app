@@ -7,15 +7,15 @@ import {
     DialogTitle,
 } from "./ui/dialog";
 import {Button} from "./ui/button";
-// import {useNavigate} from "react-router-dom";
-// import {baseUrl} from "../utils/constent";
+import {useNavigate} from "react-router-dom";
+import {baseUrl} from "../utils/constent";
 const ThemeProviderContext = createContext();
 
 
 export function ThemeProvider({children, defaultTheme = "system", storageKey = "vite-ui-theme", ...props}) {
     const [theme, setTheme] = useState(() => (localStorage.getItem(storageKey)) || defaultTheme)
     const [isProModal, setIsProModal] = useState(false);
-   // let navigate = useNavigate();
+    let navigate = useNavigate();
     useEffect(() => {
         const root = window.document.documentElement;
         root.classList.remove('light', 'dark');
@@ -39,8 +39,8 @@ export function ThemeProvider({children, defaultTheme = "system", storageKey = "
         },
     }
     const onRedirect = () => {
-        // navigate(`${baseUrl}/pricing-plan`);
-        // setIsProModal(false)
+        navigate(`${baseUrl}/pricing-plan`);
+        setIsProModal(false)
 
 
     }

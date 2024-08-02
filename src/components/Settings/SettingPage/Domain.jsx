@@ -7,6 +7,7 @@ import {ApiService} from "../../../utils/ApiService";
 import {useSelector} from "react-redux";
 import {toast} from "../../ui/use-toast";
 import {Loader2} from "lucide-react";
+import {useTheme} from "../../theme-provider";
 
 const initialState = {
     accent_color: '#8b54f3',
@@ -27,6 +28,7 @@ const initialState = {
 
 const Domain = () => {
     const apiService = new ApiService();
+    const {onProModal} = useTheme()
     const [settingData, setSettingData] = useState(initialState);
     const [isSave, setIsSave] = useState(false);
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
@@ -53,28 +55,33 @@ const Domain = () => {
     }
 
     const onUpdatePortal = async () => {
-        setIsSave(true)
-        const payload = {
-            project_id: projectDetailsReducer.id,
-            custom_domain: settingData.custom_domain,
-            google_analytics_id: settingData.google_analytics_id,
-            private_mode: settingData.private_mode,
-            hide_from_search_engine: settingData.hide_from_search_engine,
-            is_login: settingData.is_login,
-        }
-        const data = await apiService.updatePortalSetting(settingData.id, payload)
-        if(data.status === 200){
-            setIsSave(false)
-           toast({
-               description:"Domain update successfully"
-           })
+        if(userDetailsReducer.plan === 0){
+            onProModal(true)
         } else {
-            setIsSave(false);
-            toast({
-                description:"Something went wrong",
-                variant: "destructive"
-            })
+            setIsSave(true)
+            const payload = {
+                project_id: projectDetailsReducer.id,
+                custom_domain: settingData.custom_domain,
+                google_analytics_id: settingData.google_analytics_id,
+                private_mode: settingData.private_mode,
+                hide_from_search_engine: settingData.hide_from_search_engine,
+                is_login: settingData.is_login,
+            }
+            const data = await apiService.updatePortalSetting(settingData.id, payload)
+            if(data.status === 200){
+                setIsSave(false)
+                toast({
+                    description:"Domain update successfully"
+                })
+            } else {
+                setIsSave(false);
+                toast({
+                    description:"Something went wrong",
+                    variant: "destructive"
+                })
+            }
         }
+
     }
 
 

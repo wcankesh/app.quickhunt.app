@@ -8,8 +8,6 @@ import {ApiService} from "../../../utils/ApiService";
 import {useSelector} from "react-redux"
 import {toast} from "../../ui/use-toast";
 import {Loader2} from "lucide-react";
-import {Alert, AlertDescription, AlertTitle} from "../../ui/alert";
-import {ExclamationTriangleIcon} from "@radix-ui/react-icons";
 
 const initialState = {
     facebook:"",
@@ -72,15 +70,7 @@ const Social = () => {
     return (
         <Card>
             <CardHeader className={"p-4 sm:p-6"}>
-                <h2 className={`text-lg sm:text-2xl font-medium leading-8 ${userDetailsReducer.plan === 0 ? "mb-3" : ""}`}>Social links</h2>
-                {userDetailsReducer.plan === 0 && <div className={"mt-3"}>
-                    <Alert variant="destructive">
-                        <ExclamationTriangleIcon className="h-4 w-4"/>
-                        <AlertDescription>
-                            You must upgrade your plan with any paid plan to enable this feature.
-                        </AlertDescription>
-                    </Alert>
-                </div>}
+                <h2 className={`text-lg sm:text-2xl font-medium leading-8`}>Social links</h2>
             </CardHeader>
             <Separator/>
             <CardContent className={"p-0"}>

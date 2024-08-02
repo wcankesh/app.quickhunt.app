@@ -1,4 +1,4 @@
-import React, {useState, Fragment, useEffect} from 'react';
+import React, {Fragment, useEffect, useState} from 'react';
 import {Button} from "../ui/button";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow,} from "../ui/table";
 import {BarChart, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Copy, Ellipsis, Loader2} from "lucide-react";
@@ -7,10 +7,8 @@ import {useSelector} from "react-redux";
 import {Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "../ui/dialog";
 import {DropdownMenu, DropdownMenuTrigger} from "@radix-ui/react-dropdown-menu";
 import {DropdownMenuContent, DropdownMenuItem} from "../ui/dropdown-menu";
-import { Input } from "../ui/input";
 import {Tabs, TabsContent, TabsList, TabsTrigger,} from "../ui/tabs";
-import {Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter} from "../ui/card";
-import {Icon} from "../../utils/Icon";
+import {Card, CardContent, CardFooter} from "../ui/card";
 import {useNavigate} from "react-router-dom";
 import {baseUrl} from "../../utils/constent";
 import {ApiService} from "../../utils/ApiService";
@@ -19,17 +17,17 @@ import WidgetAnalyticsSideBarSheet from "./WidgetAnalyticsSideBarSheet";
 import {Skeleton} from "../ui/skeleton";
 import EmptyData from "../Comman/EmptyData";
 import moment from "moment";
-import {Textarea} from "../ui/textarea";
 
 const perPageLimit = 10;
 
 const Widgets = () => {
-    const {theme} = useTheme()
+    const {theme, onProModal} = useTheme()
     const navigate = useNavigate();
     let apiSerVice = new ApiService();
     const {toast} = useToast()
     const [widgetsSetting, setWidgetsSetting] = useState([])
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
+    const userDetailsReducer = useSelector(state => state.userDetailsReducer);
     const [isLoading, setIsLoading] = useState(false);
     const [isSheetOpen, setSheetOpen] = useState(false);
     const [pageNo, setPageNo] = useState(1);
@@ -37,8 +35,8 @@ const Widgets = () => {
     const [openDelete, setOpenDelete] = useState(false);
     const [openCopyCode, setOpenCopyCode] = useState(false);
     const [selectedId, setSelectedId] = useState("");
+    const [selectedType, setSelectedType] = useState("");
     const [deleteRecord, setDeleteRecord] = useState(null);
-    const [copySuccess, setCopySuccess] = useState(false);
     const [analyticsObj, setAnalyticsObj] = useState({});
     const [selectedRecordAnalytics, setSelectedRecordAnalytics] = useState({})
 
@@ -70,7 +68,19 @@ const Widgets = () => {
     }
 
     const handleCreateNew = (id) => {
-        navigate(`${baseUrl}/widget/${id}`);
+        let length = widgetsSetting?.length;
+        if(userDetailsReducer.plan === 0 && id === "new"){
+            if(length < 1){
+                navigate(`${baseUrl}/widget/${id}`);
+                onProModal(false)
+            }  else{
+                onProModal(true)
+            }
+        } else{
+            navigate(`${baseUrl}/widget/${id}`);
+            onProModal(false)
+        }
+
     };
 
     const onDeleteIdea = async (id) => {
@@ -96,9 +106,10 @@ const Widgets = () => {
         setOpenDelete(true)
     }
 
-    const getCodeCopy = (id) => {
+    const getCodeCopy = (id, type) => {
         setOpenCopyCode(!openCopyCode)
         setSelectedId(id)
+        setSelectedType(type)
     }
 
     const totalPages = Math.ceil(totalRecord / perPageLimit);
@@ -116,12 +127,15 @@ const Widgets = () => {
             console.error('Failed to copy text: ', err);
         });
     };
-    const codeString = `<script>
+    const codeString = selectedType === "embed" ? `
+    <div class="quickhunt-widget-embed" Quickhunt_Widget_Key=${selectedId} widget-width="740px" widget-height="460px"></div>
+    <script src="https://quickhunt.app/widgetScript.js"></script>
+    ` : `<script>
     window.Quickhunt_Config = window.Quickhunt_Config || {};
-    window.Quickhunt_Config = { Quickhunt_Widget_Key:  "${selectedId}"};
+    window.Quickhunt_Config = { Quickhunt_Widget_Key:  ${selectedId}};
 </script>
 <script src="https://quickhunt.app/widgetScript.js"></script>`;
-    const embedLink = `https://${projectDetailsReducer.domain}/ideas?widget="${selectedId}"`
+    const embedLink = `https://${projectDetailsReducer.domain}/ideas?widget=${selectedId}`
     const iFrame = `<iframe src="${embedLink}" style="border: 0px; outline: 0px; width: 450px; height: 400px;"></iframe>`
     return (
         <Fragment>
@@ -354,7 +368,7 @@ const Widgets = () => {
                                                         <TableCell className={" p-2 lg:p-4"}>
                                                             <Button
                                                                 className={"py-[6px] px-3 h-auto text-xs font-semibold hover:bg-primary"}
-                                                                onClick={() => getCodeCopy(x.id)}>Get code</Button>
+                                                                onClick={() => getCodeCopy(x.id, x.type)}>Get code</Button>
                                                         </TableCell>
                                                         <TableCell className={"font-medium p-2 lg:p-4"}>
                                                             <BarChart
