@@ -1,4 +1,4 @@
-import React, {Fragment, useState, useEffect,} from 'react';
+import React, {useState, useEffect, useRef,} from 'react';
 import {Button} from "../ui/button";
 import {Input} from "../ui/input";
 import AnnouncementsView from "./AnnouncementsView";
@@ -12,14 +12,12 @@ import {
     Ellipsis, Filter,
     LayoutList,
     Plus,
-    Text
+    Text, X
 } from "lucide-react";
 import CreateAnnouncementsLogSheet from "./CreateAnnouncementsLogSheet";
-import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "../ui/select";
 import {useTheme} from "../theme-provider";
 import {useSelector} from "react-redux";
 import {ApiService} from "../../utils/ApiService";
-import {getProjectDetails} from "../../utils/constent";
 import {Card, CardFooter} from "../ui/card";
 import SidebarSheet from "./SidebarSheet";
 import {toast} from "../ui/use-toast";
@@ -29,18 +27,16 @@ import {Popover, PopoverTrigger} from "@radix-ui/react-popover";
 import {PopoverContent} from "../ui/popover";
 import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList} from "../ui/command";
 import {Checkbox} from "../ui/checkbox";
+import {Badge} from "../ui/badge";
 
 const initialStateFilter = {
     l: "",
     s: "",
+    q:""
 }
 const perPageLimit = 15;
 
 const status = [
-    {
-        label: "All",
-        value: 0
-    },
     {
         label: "Draft",
         value: 1
@@ -67,7 +63,8 @@ const Announcements = () => {
     const apiService = new ApiService();
     const totalPages = Math.ceil(totalRecord / perPageLimit);
     const [openFilterType, setOpenFilterType] = useState('');
-
+    const timeoutHandler = useRef(null);
+    const [openFilter, setOpenFilter] = useState('');
 
     const openSheet = () => {
         setSelectedRecord({id: "new"})
@@ -113,13 +110,9 @@ const Announcements = () => {
     }
 
     useEffect(() => {
-        if(filter.l || filter.s){
-            let payload = {...filter, project_id: projectDetailsReducer.id, page: pageNo, limit: perPageLimit}
-            searchAnnouncement(payload);
-        }
-        else{
-            getAllPosts();
-        }
+            if(projectDetailsReducer.id){
+                getAllPosts();
+            }
     }, [projectDetailsReducer.id, allStatusAndTypes, pageNo,]);
 
     const getAllPosts = async () => {
@@ -138,18 +131,37 @@ const Announcements = () => {
         }
     }
 
-    const filterPosts =  (event) => {
-        setIsLoading(true)
+
+    const onChange = async (event) => {
         const payload = {
             ...filter,
-            [event.name]: event.value,
             project_id: projectDetailsReducer.id,
-            q: "",
             page:1,
+            [event.target.name]: event.target.value,
         }
-        setFilter({...filter, [event.name]: event.value,});
+        setFilter({...filter, [event.target.name]: event.target.value,});
+        setIsLoading(true);
 
-        searchAnnouncement(payload);
+        if (timeoutHandler.current) {
+            clearTimeout(timeoutHandler.current);
+        }
+        timeoutHandler.current = setTimeout(() => {
+             searchAnnouncement(payload);
+        }, 2000);
+    }
+
+    const filterPosts = async  (event) => {
+
+        setIsLoading(true)
+        setFilter({...filter, [event.name]: event.value,});
+        const payload = {
+            ...filter,
+            project_id: projectDetailsReducer.id,
+            page:1,
+            [event.name]: event.value,
+        }
+
+        await searchAnnouncement(payload);
     }
 
     const searchAnnouncement = async (payload) => {
@@ -175,7 +187,20 @@ const Announcements = () => {
         }
     };
 
-    console.log(allStatusAndTypes.labels);
+    const handleBadge = (obj) =>{
+        const payload={
+            ...filter,
+            project_id: projectDetailsReducer.id,
+            page:1,
+            [obj.value]:""
+        }
+        setFilter({...filter, [obj.value]:"",});
+        searchAnnouncement(payload);
+    }
+
+    const matchedObject = allStatusAndTypes.labels ? allStatusAndTypes.labels.find(x => x.id === filter.l) : null;
+
+    console.log(filter,"filter")
 
     return (
         <div
@@ -192,35 +217,26 @@ const Announcements = () => {
                                               onClose={onCloseAnalyticsSheet}/>}
             <div className={"flex items-center justify-between flex-wrap gap-6"}>
                 <div className={"flex justify-between items-center w-full md:w-auto"}>
-                    <h3 className={"text-2xl font-medium leading-8"}>{getProjectDetails('project_name')}</h3>
-                    <div className={"md:hidden"}>
-                    <DropdownMenu>
-                        <DropdownMenuTrigger>
-                            <Ellipsis size={16}/>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent>
-                            <DropdownMenuItem className={"cursor-pointer p-0"}>
-                                <div className={"w-full"}>
-                                    {
-                                        (status || []).map((x, index) => {
-                                            return (
-                                                <div className={"p-2"} onClick={(event) => filterPosts({name: "s", value: x.value})}>
-                                                    <span key={x.label}>{x.label}</span>
-                                                </div>
-                                            )
-                                        })
-                                    }
-                                </div>
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                    </div>
+                    <h3 className={"text-2xl font-medium leading-8"}>Announcement</h3>
+
                 </div>
-                <div className={"flex gap-6 flex-wrap items-center"}>
-                    <div className={"flex gap-6 items-center w-full md:w-auto"}>
-                    <div className={"md:block hidden"}>
-                        <div className={"flex gap-6 items-center"}>
-                            <Popover>
+                <div className={"flex gap-2 flex-wrap items-center"}>
+                    <div className={"flex gap-2 items-center w-full md:w-auto"}>
+                        <div className={"w-full"}>
+                            <Input
+                                type="search"
+                                placeholder="Search..."
+                                className="w-full pl-4 pr-14 text-sm font-normal h-9"
+                                name={"q"}
+                                onChange={onChange}
+                            />
+                        </div>
+                        <div className={"flex items-center"}>
+                            <Popover open={openFilter}
+                                     onOpenChange={() => {
+                                         setOpenFilter(!openFilter);
+                                         setOpenFilterType('');
+                                     }}>
                                 <PopoverTrigger asChild>
                                     <Button className={"h-9 w-9"} size={"icon"} variant="outline"><Filter fill="true" className='w-4 -h4' /></Button>
                                 </PopoverTrigger>
@@ -231,114 +247,60 @@ const Announcements = () => {
                                             <CommandEmpty>No filter found.</CommandEmpty>
                                             {
                                                 openFilterType === 'status' ?
-                                                                    <CommandGroup className={"w-full"}>
-                                                                        <CommandItem className={"p-0 flex gap-2 items-center cursor-pointer p-1"} onSelect={() => {setOpenFilterType('');}}>
-                                                                            <ChevronLeft className="mr-2 h-4 w-4"  />  <span className={"flex-1 w-full text-sm font-medium cursor-pointer flex gap-2 items-center"}>Back</span>
-                                                                        </CommandItem>
-                                                                        {
-                                                                            (status || []).map((x, index) => {
-                                                                                return (
-                                                                                    <CommandItem className={"p-0 flex gap-1 items-center cursor-pointer"}>
-                                                                                        <Checkbox className={'m-2'} checked={x.value === filter.s} onClick={(event) => filterPosts({name: "s", value: x.value })} />
-                                                                                        <span className={"flex-1 w-full text-sm font-medium cursor-pointer flex gap-2 items-center"} onClick={(event) => filterPosts({name: "s", value: x.value})} key={x.label}>{x.label}</span>
-                                                                                    </CommandItem>
-                                                                                )
-                                                                            })
-                                                                        }
-                                                                    </CommandGroup>
-                                                : openFilterType === 'label' ?
-                                                                    <CommandGroup className={"w-full"}>
-                                                                        <CommandItem className={"p-0 flex gap-2 items-center cursor-pointer p-1"} onSelect={() => {setOpenFilterType('');}}>
-                                                                            <ChevronLeft className="mr-2 h-4 w-4"  />  <span className={"flex-1 w-full text-sm font-medium cursor-pointer flex gap-2 items-center"}>Back</span>
-                                                                        </CommandItem>
-                                                                        {
-                                                                            (allStatusAndTypes.labels || []).map((x, i) => {
-                                                                                return (
-                                                                                    <CommandItem key={x.id}>
-                                                                                        <div className={"w-full flex items-center gap-1"}  key={x.label}>
-                                                                                            <Checkbox className={'m-2'} checked={x.id == filter.l} onClick={(event) => filterPosts({name: "l", value: x.id })} />
-                                                                                            <div className={"flex items-center gap-2 w-full"} onClick={(event) => filterPosts({name: "l", value: x.id })}>
-                                                                                                <Circle fill={x.label_color_code}
-                                                                                                        stroke={x.label_color_code}
-                                                                                                        className={`${theme === "dark" ? "" : "text-muted-foreground"} w-[10px] h-[10px]`}/>
-                                                                                                <span className={"flex-1 w-full text-sm font-medium cursor-pointer flex gap-2 items-center"}>{x.label_name}</span>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                    </CommandItem>
-                                                                                )
-                                                                            })
-                                                                        }
-                                                                    </CommandGroup>
-                                                                    :<CommandGroup>
-                                                                        <CommandItem onSelect={() => {setOpenFilterType('status');}}>
-                                                                            <span className={"text-sm font-medium cursor-pointer"}>Status</span>
-                                                                        </CommandItem>
-                                                                        <CommandItem onSelect={() => {setOpenFilterType('label');}}>
-                                                                            <span className={"text-sm font-medium cursor-pointer"}>Labels</span>
-                                                                        </CommandItem>
-                                                                    </CommandGroup>
+                                                    <CommandGroup className={"w-full"}>
+                                                        <CommandItem className={"p-0 flex gap-2 items-center cursor-pointer p-1"} onSelect={() => {setOpenFilterType('');}}>
+                                                            <ChevronLeft className="mr-2 h-4 w-4"  />  <span className={"flex-1 w-full text-sm font-medium cursor-pointer flex gap-2 items-center"}>Back</span>
+                                                        </CommandItem>
+                                                        {
+                                                            (status || []).map((x, index) => {
+                                                                return (
+                                                                    <CommandItem className={"p-0 flex gap-1 items-center cursor-pointer"}>
+                                                                        <Checkbox className={'m-2'} checked={x.value === filter.s} onClick={(event) => filterPosts({name: "s", value: x.value == filter.s ? "" :x.value })} />
+                                                                        <span className={"flex-1 w-full text-sm font-medium cursor-pointer flex gap-2 items-center"} onClick={(event) => filterPosts({name: "s", value: x.value == filter.s ? "" :x.value })} key={x.label}>{x.label}</span>
+                                                                    </CommandItem>
+                                                                )
+                                                            })
+                                                        }
+                                                    </CommandGroup>
+                                                    : openFilterType === 'label' ?
+                                                    <CommandGroup className={"w-full"}>
+                                                        <CommandItem className={"p-0 flex gap-2 items-center cursor-pointer p-1"} onSelect={() => {setOpenFilterType('');}}>
+                                                            <ChevronLeft className="mr-2 h-4 w-4"  />  <span className={"flex-1 w-full text-sm font-medium cursor-pointer flex gap-2 items-center"}>Back</span>
+                                                        </CommandItem>
+                                                        {
+                                                            (allStatusAndTypes.labels || []).map((x, i) => {
+                                                                return (
+                                                                    <CommandItem key={x.id}>
+                                                                        <div className={"w-full flex items-center gap-1"}  key={x.label}>
+                                                                            <Checkbox className={'m-2'} checked={x.id == filter.l} onClick={(event) => filterPosts({name: "l", value: x.id == filter.l ? "" : x.id })} />
+                                                                            <div className={"flex items-center gap-2 w-full"} onClick={(event) => filterPosts({name: "l", value: x.id == filter.l ? "" : x.id })}>
+                                                                                <Circle fill={x.label_color_code}
+                                                                                        stroke={x.label_color_code}
+                                                                                        className={`${theme === "dark" ? "" : "text-muted-foreground"} w-[10px] h-[10px]`}/>
+                                                                                <span className={"flex-1 w-full text-sm font-medium cursor-pointer flex gap-2 items-center"}>{x.label_name}</span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </CommandItem>
+                                                                )
+                                                            })
+                                                        }
+                                                    </CommandGroup>
+                                                    :<CommandGroup>
+                                                        <CommandItem onSelect={() => {setOpenFilterType('status');}}>
+                                                            <span className={"text-sm font-medium cursor-pointer"}>Status</span>
+                                                        </CommandItem>
+                                                        <CommandItem onSelect={() => {setOpenFilterType('label');}}>
+                                                            <span className={"text-sm font-medium cursor-pointer"}>Labels</span>
+                                                        </CommandItem>
+                                                    </CommandGroup>
                                             }
                                         </CommandList>
                                     </Command>
                                 </PopoverContent>
                             </Popover>
-                        <Select value={filter.s} onValueChange={(select) => filterPosts({name: "s", value: select})}>
-                            <SelectTrigger className="h-9 w-[115px]">
-                                <SelectValue placeholder="All"/>
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectGroup>
-                                    {
-                                        (status || []).map((x, index) => {
-                                            return (
-                                                <SelectItem key={x.label} value={x.value}>{x.label}</SelectItem>
-                                            )
-                                        })
-                                    }
-                                </SelectGroup>
-                            </SelectContent>
-                        </Select>
-                        {/*<ComboBox items={items2} isSearchBox={true}  classNames={"w-[165px] custom-shadow"} value={selected} setValue={setSelected} onSelect={handleSelect} placeholder={"All Updates"}/>*/}
-                        <Select value={filter.l} placeholder="Publish"
-                                onValueChange={(select) => filterPosts({name: "l", value: select})} className={""}>
-                            <SelectTrigger className="w-[165px] h-9">
-                                <SelectValue placeholder="Publish"/>
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectGroup>
-                                    <SelectItem>All Updates</SelectItem>
-                                </SelectGroup>
-                                <SelectGroup>
-                                    {
-                                        (allStatusAndTypes.labels || []).map((x, i) => {
-                                            return (
-                                                <Fragment key={x.id}>
-                                                    <SelectItem value={x.id}>
-                                                        <div className={"flex items-center gap-2"}>
-                                                            <Circle fill={x.label_color_code}
-                                                                    stroke={x.label_color_code}
-                                                                    className={`${theme === "dark" ? "" : "text-muted-foreground"} w-[10px] h-[10px]`}/>
-                                                            {x.label_name}
-                                                        </div>
-                                                    </SelectItem>
-                                                </Fragment>
-                                            )
-                                        })
-                                    }
-                                </SelectGroup>
-                            </SelectContent>
-                        </Select>
-                        </div>
-                    </div>
-                            <div className={"w-full"}>
-                                <Input
-                                    type="search"
-                                    placeholder="Search..."
-                                    className="w-full pl-4 pr-14 text-sm font-normal h-9"
-                                    // onChange={(event) => filterPosts({name: "q", value: x.value})}
 
-                                />
-                            </div>
+                        </div>
+
 
                     </div>
                     <div className={"flex flex-grow gap-2 items-center"}>
@@ -358,6 +320,33 @@ const Announcements = () => {
                 </div>
             </div>
 
+            {(filter.s  || filter.l) && <div className={"flex flex-wrap gap-2 mt-6"}>
+                {
+                    filter.s &&
+                    <Badge variant="outline" className="rounded p-0">
+                        <span
+                            className="px-3 py-1.5 border-r">{filter.s == 0 ? "All" : filter.s === 1 ? "Draft" : filter.s == 2 ? "Published" : ""}</span>
+                        <span className="w-7 h-7 flex items-center justify-center cursor-pointer"
+                              onClick={() => handleBadge({name: "status", value: "s"})}>
+                                            <X className='w-4 h-4'/>
+                        </span>
+                    </Badge>
+                }
+                {
+                    filter.l && <Badge variant="outline" className="rounded p-0">
+                        <span className="px-3 py-1.5 border-r flex gap-2 items-center">
+                                                <span className={"w-2.5 h-2.5  rounded-full"}
+                                                      style={{backgroundColor: matchedObject.label_color_code}}/>
+                            {matchedObject?.label_name}
+                                            </span>
+                        <span className="w-7 h-7 flex items-center justify-center cursor-pointer"
+                              onClick={() => handleBadge({name: "label", value: "l"})}>
+                                            <X className='w-4 h-4'/>
+                        </span>
+                    </Badge>
+                }
+            </div>}
+
 
 
             <Card className={"mt-8"}>
@@ -375,7 +364,7 @@ const Announcements = () => {
                     setSelectedRecord={setSelectedRecord}
                     data={announcementList}/>
                 }
-                <CardFooter className={"p-0"}>
+                { totalPages > 0 && <CardFooter className={"p-0"}>
                     <div
                         className={`w-full p-5 ${theme === "dark" ? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end px-4 py-4 md:px-16 md:py-15px`}>
                         <div className={"w-full flex gap-8 items-center justify-between sm:justify-end"}>
@@ -410,7 +399,7 @@ const Announcements = () => {
                             </div>
                         </div>
                     </div>
-                </CardFooter>
+                </CardFooter>}
             </Card>
 
         </div>
