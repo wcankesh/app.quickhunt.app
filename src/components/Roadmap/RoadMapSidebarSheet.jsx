@@ -6,14 +6,11 @@ import {RadioGroup, RadioGroupItem} from "../ui/radio-group";
 import {Label} from "../ui/label";
 import {Input} from "../ui/input";
 import {Avatar, AvatarFallback, AvatarImage} from "../ui/avatar";
-import {DialogTrigger, Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader,DialogTitle} from "../ui/dialog";
 import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "../ui/select";
 import {Popover, PopoverTrigger, PopoverContent} from "../ui/popover";
 import {Textarea} from "../ui/textarea";
-import {Switch} from "../ui/switch";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "../ui/tabs";
 import {useTheme} from "../theme-provider";
-import {Card} from "../ui/card";
 import {useToast} from "../ui/use-toast";
 import {ApiService} from "../../utils/ApiService";
 import {useSelector} from "react-redux";
@@ -29,11 +26,8 @@ const RoadMapSidebarSheet = ({
                                  isOpen,
                                  onOpen,
                                  onClose,
-                                 isUpdateIdea,
-                                 setIsUpdateIdea,
                                  selectedIdea,
                                  setSelectedIdea,
-                                 onUpdateIdeaClose,
                                  setSelectedRoadmap,
                                  selectedRoadmap,
                                  roadmapList,
@@ -984,7 +978,7 @@ const RoadMapSidebarSheet = ({
                                                     </div>
                                                 </div>
                                                 {
-                                                    selectedIdea && selectedIdea?.images ?
+                                                    selectedIdea && selectedIdea?.images && selectedIdea?.images.length > 0 ?
                                                         <div className={"flex gap-2 flex-wrap"}>
                                                             {
                                                                 (selectedIdea?.images || []).map((x, i) => {

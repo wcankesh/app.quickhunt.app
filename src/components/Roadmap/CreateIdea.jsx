@@ -1,33 +1,28 @@
-import React, {useRef, useState, Fragment, useEffect} from 'react';
+import React, {useRef, useState, useEffect} from 'react';
 import {Button} from "../ui/button";
 import {Label} from "../ui/label";
 import {Input} from "../ui/input";
-import {useNavigate} from "react-router";
 import {ApiService} from "../../utils/ApiService";
 import {useSelector} from "react-redux";
-import {baseUrl, urlParams} from "../../utils/constent";
-import moment from "moment";
 import {Check, Loader2, X} from "lucide-react";
-import {RadioGroup, RadioGroupItem} from "../ui/radio-group";
-import {useTheme} from "../theme-provider";
 import {Sheet, SheetContent, SheetHeader, SheetOverlay} from "../ui/sheet";
-import {Avatar, AvatarFallback, AvatarImage} from "../ui/avatar";
 import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "../ui/select";
 import {Textarea} from "../ui/textarea";
 import {useToast} from "../ui/use-toast";
-import {Badge} from "../ui/badge";
 
 const initialState = {
     title: "",
     images: [],
     topic: [],
     project_id: "",
-    description: null,
+    description: "",
+    board: ""
 }
 
 const initialStateError = {
     title: "",
-    description: null,
+    description: "",
+    board: ""
 
 }
 
@@ -37,12 +32,9 @@ const CreateIdea = ({
                         onClose,
                         closeCreateIdea,
                         selectedRoadmap,
-                        setSelectedRoadmap,
                         roadmapList,
                         setRoadmapList,
                     }) => {
-    const { theme } = useTheme()
-    let navigate = useNavigate();
     let apiSerVice = new ApiService();
     const { toast } = useToast()
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
@@ -57,6 +49,7 @@ const CreateIdea = ({
 
     useEffect(() => {
         setTopicLists(allStatusAndTypes.topics)
+        setIdeaDetail({...initialState, board: allStatusAndTypes?.boards[0]?.id})
     }, [projectDetailsReducer.id, allStatusAndTypes]);
 
     const handleUpdate = (event) => {
@@ -108,13 +101,12 @@ const CreateIdea = ({
         formData.append('slug_url', ideaDetail.title ? ideaDetail.title.replace(/ /g,"-").replace(/\?/g, "-") :"");
         formData.append('description', description);
         formData.append('project_id', projectDetailsReducer.id);
+        formData.append('board', ideaDetail.board);
         formData.append('topic', ideaDetail.topic.join());
         formData.append('roadmap_id', selectedRoadmap && selectedRoadmap ? selectedRoadmap : "");
         const data = await apiSerVice.createIdea(formData)
         if(data.status === 200){
-            debugger
             let cloneRoadmap = [...roadmapList.columns];
-            // cloneRoadmap.push(data.data);
             // cloneRoadmap.push(data.data);
             const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap);
             if(roadmapIndex !== -1) {
@@ -127,10 +119,10 @@ const CreateIdea = ({
             setDescription("")
             setRoadmapList({columns: cloneRoadmap});
             closeCreateIdea()
-            toast({description: "Idea create successfully"})
+            toast({description: data.message})
         } else {
             setIsLoading(false)
-            toast({description: data.error})
+            toast({description: data.message,variant: "destructive" })
         }
     }
 
@@ -148,6 +140,12 @@ const CreateIdea = ({
                 } else {
                     return "";
                 }
+            case "board":
+                if (!value || value.toString().trim() === "") {
+                    return "Board is required";
+                } else {
+                    return "";
+                }
             default: {
                 return "";
             }
@@ -155,6 +153,7 @@ const CreateIdea = ({
     };
 
     const onCancel = () => {
+        setIdeaDetail(initialState);
         setFormError(initialStateError);
         onClose();
     }
@@ -183,10 +182,36 @@ const CreateIdea = ({
                                     <div className="space-y-2">
                                         <Label htmlFor="message">Description</Label>
                                         <Textarea placeholder="Start writing..." id="message"
-                                                  value={description}
+                                                  value={ideaDetail?.description}
                                                   onChange={handleUpdate}
                                         />
                                         {formError.description && <span className="text-red-500 text-sm">{formError.description}</span>}
+                                    </div>
+                                    <div className={"space-y-2"}>
+                                        <Label>Choose Board for this Idea</Label>
+                                        <Select
+                                            onValueChange={(value) => onChangeText({target:{name: "board", value}})}
+                                            value={ideaDetail.board}>
+                                            <SelectTrigger className="bg-card">
+                                                <SelectValue/>
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectGroup>
+                                                    {
+                                                        (allStatusAndTypes?.boards || []).map((x, i) => {
+                                                            return (
+                                                                <SelectItem key={i} value={x.id}>
+                                                                    <div className={"flex items-center gap-2"}>
+                                                                        {x.title}
+                                                                    </div>
+                                                                </SelectItem>
+                                                            )
+                                                        })
+                                                    }
+                                                </SelectGroup>
+                                            </SelectContent>
+                                        </Select>
+                                        {formError.board && <span className="text-red-500 text-sm">{formError.board}</span>}
                                     </div>
                                 </div>
                                 <div className={"px-4 py-3 lg:py-6 lg:px-8 border-b space-y-2"}>

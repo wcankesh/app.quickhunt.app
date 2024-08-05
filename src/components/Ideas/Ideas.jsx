@@ -314,27 +314,20 @@ const Ideas = () => {
                     isOpen={isSheetOpen}
                     onOpen={openSheet}
                     onClose={closeSheet}
-                    isRoadmap={false}
-                    isUpdateIdea={isUpdateIdea}
-                    setIsUpdateIdea={setIsUpdateIdea}
-                    setIdeasList={setIdeasList}
-                    ideasList={ideasList}
                     selectedIdea={selectedIdea}
                     setSelectedIdea={setSelectedIdea}
-                    oldSelectedIdea={oldSelectedIdea}
+                    ideasList={ideasList}
+                    setIdeasList={setIdeasList}
                     setOldSelectedIdea={setOldSelectedIdea}
-                    onUpdateIdeaClose={onUpdateIdeaClose}
-                    isNoStatus={false}
+                    oldSelectedIdea={oldSelectedIdea}
                 />
                 <CreateIdea
                     isOpen={isSheetOpenCreate}
                     onOpen={openCreateIdea}
                     onClose={closeCreateIdea}
-                    isRoadmap={false}
                     closeCreateIdea={closeCreateIdea}
                     setIdeasList={setIdeasList}
                     ideasList={ideasList}
-                    isNoStatus={false}
                 />
 
                     <div className="flex items-center gap-4 mb-6 justify-between">

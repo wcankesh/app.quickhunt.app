@@ -1,21 +1,14 @@
-import React, {useRef, useState, Fragment, useEffect} from 'react';
+import React, {useState, useEffect} from 'react';
 import {Button} from "../ui/button";
 import {Label} from "../ui/label";
 import {Input} from "../ui/input";
-import {useNavigate} from "react-router";
 import {ApiService} from "../../utils/ApiService";
 import {useSelector} from "react-redux";
-import {baseUrl, urlParams} from "../../utils/constent";
-import moment from "moment";
-import {Check, Circle, Loader2, X} from "lucide-react";
-import {RadioGroup, RadioGroupItem} from "../ui/radio-group";
-import {useTheme} from "../theme-provider";
+import {Check, Loader2, X} from "lucide-react";
 import {Sheet, SheetContent, SheetHeader, SheetOverlay} from "../ui/sheet";
-import {Avatar, AvatarFallback, AvatarImage} from "../ui/avatar";
 import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "../ui/select";
 import {Textarea} from "../ui/textarea";
 import {useToast} from "../ui/use-toast";
-import {Badge} from "../ui/badge";
 
 const initialState = {
     title: "",
@@ -38,15 +31,8 @@ const CreateIdea = ({
                         onOpen,
                         onClose,
                         closeCreateIdea,
-                        ideasList,
                         setIdeasList,
-                        isRoadmap,
-                        selectedRoadmap,
-                        setNoStatus,
-                        roadmapList,
-                        setRoadmapList,
-                        isNoStatus,
-                        setIsNoStatus,
+                        ideasList,
                     }) => {
     let apiSerVice = new ApiService();
     const { toast } = useToast()
@@ -111,24 +97,10 @@ const CreateIdea = ({
             const clone = [...ideasList];
             const newArray = [data.data].concat(clone)
             setIdeasList(newArray);
-            if(isRoadmap){
-                const cloneRoadmap = [...roadmapList]
-                const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap.id);
-                if(roadmapIndex !== -1){
-                    cloneRoadmap[roadmapIndex].ideas = newArray
-                    setRoadmapList(cloneRoadmap);
-                }
-                if(isNoStatus){
-                    setNoStatus(newArray)
-                }
-            }
             setIsLoading(false)
             setIdeaDetail(initialState)
             closeCreateIdea()
-            if(isNoStatus) {
-                setIsNoStatus(false)
-            }
-            toast({description: "Idea create successfully"})
+            toast({description: data.message})
         } else {
             setIsLoading(false)
             toast({description: data.message,variant: "destructive" })
@@ -181,14 +153,14 @@ const CreateIdea = ({
                     <div className={"w-full overflow-y-auto create-sheet-height"}>
                             <div className={""}>
                                 <div className={"px-4 py-3 lg:py-6 lg:px-8 flex flex-col gap-6 border-b"}>
-                                    <div className="flex flex-col gap-2">
+                                    <div className="space-y-2">
                                         <Label htmlFor="text">Title</Label>
                                         <Input type="text" id="text" placeholder="" value={ideaDetail.title} name={"title"} onChange={onChangeText} />
                                         {
                                             formError.title && <span className="text-red-500 text-sm">{formError.title}</span>
                                         }
                                     </div>
-                                    <div className="flex flex-col gap-2">
+                                    <div className="space-y-2">
                                         <Label htmlFor="message">Description</Label>
                                         <Textarea placeholder="Start writing..." name={"description"} id="message" className="bg-card"
                                                   value={ideaDetail.description}
@@ -196,7 +168,7 @@ const CreateIdea = ({
                                         />
                                         {formError.description && <span className="text-red-500 text-sm">{formError.description}</span>}
                                     </div>
-                                    <div className={"flex flex-col gap-2"}>
+                                    <div className={"space-y-2"}>
                                         <Label>Choose Board for this Idea</Label>
                                         <Select
                                             onValueChange={(value) => onChangeText({target:{name: "board", value}})}
@@ -224,8 +196,8 @@ const CreateIdea = ({
                                     </div>
                                 </div>
 
-                                <div className={"px-4 py-3 lg:py-6 lg:px-8 border-b flex flex-col gap-2"}>
-                                    <Label>Choose tags for this Idea (optional)</Label>
+                                <div className={"px-4 py-3 lg:py-6 lg:px-8 border-b space-y-2"}>
+                                    <Label>Choose Topics for this Idea (optional)</Label>
                                         <Select onValueChange={handleChange} value={selectedValues}>
                                             <SelectTrigger className="bg-card">
                                                 <SelectValue className={"text-muted-foreground text-sm"} placeholder="Assign to">

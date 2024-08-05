@@ -34,12 +34,6 @@ const SidebarSheet = ({
                           setSelectedIdea,
                           ideasList,
                           setIdeasList,
-                          isRoadmap,
-                          selectedRoadmap,
-                          roadmapList,
-                          setRoadmapList,
-                          isNoStatus,
-                          setNoStatus,
                           setOldSelectedIdea,
                           oldSelectedIdea,
                       }) => {
@@ -122,17 +116,6 @@ const SidebarSheet = ({
                             }
                         }
                         setIdeasList(clone);
-                        // if (isRoadmap) {
-                        //     const cloneRoadmap = [...roadmapList]
-                        //     const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap.id);
-                        //     if (roadmapIndex !== -1) {
-                        //         cloneRoadmap[roadmapIndex].ideas = clone
-                        //         setRoadmapList(cloneRoadmap);
-                        //     }
-                        //     if (isNoStatus) {
-                        //         setNoStatus(clone)
-                        //     }
-                        // }
                     }
                     toast({description: data.message})
                 } else {
@@ -175,17 +158,6 @@ const SidebarSheet = ({
             if (index !== -1) {
                 cloneIdea[index] = obj;
                 setIdeasList(cloneIdea)
-                // if (isRoadmap) {
-                //     const cloneRoadmap = [...roadmapList]
-                //     const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap.id);
-                //     if (roadmapIndex !== -1) {
-                //         cloneRoadmap[roadmapIndex].ideas = cloneIdea
-                //         setRoadmapList(cloneRoadmap);
-                //     }
-                //     if (isNoStatus) {
-                //         setNoStatus(cloneIdea)
-                //     }
-                // }
             }
             toast({description: data.message})
             setCommentText('');
@@ -223,17 +195,6 @@ const SidebarSheet = ({
             if (indexIdea !== -1) {
                 cloneIdea[indexIdea] = obj;
                 setIdeasList(cloneIdea);
-                // if (isRoadmap) {
-                //     const cloneRoadmap = [...roadmapList]
-                //     const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap.id);
-                //     if (roadmapIndex !== -1) {
-                //         cloneRoadmap[roadmapIndex].ideas = cloneIdea
-                //         setRoadmapList(cloneRoadmap);
-                //     }
-                //     if (isNoStatus) {
-                //         setNoStatus(cloneIdea)
-                //     }
-                // }
             }
             setSubCommentText('');
             setSubCommentFiles([])
@@ -428,17 +389,6 @@ const SidebarSheet = ({
                 const cloneIdea = [...ideasList];
                 cloneIdea[index] = selectedIdeaObj;
                 setIdeasList(cloneIdea)
-                // if (isRoadmap) {
-                //     const cloneRoadmap = [...roadmapList]
-                //     const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap.id);
-                //     if (roadmapIndex !== -1) {
-                //         cloneRoadmap[roadmapIndex].ideas = cloneIdea
-                //         setRoadmapList(cloneRoadmap);
-                //     }
-                //     if (isNoStatus) {
-                //         setNoStatus(cloneIdea)
-                //     }
-                // }
             }
             setSelectedCommentIndex(null)
             setSelectedComment(null);
@@ -478,17 +428,6 @@ const SidebarSheet = ({
                     const cloneIdea = [...ideasList];
                     cloneIdea[ideaIndex] = selectedIdeaObj;
                     setIdeasList(cloneIdea)
-                    // if (isRoadmap) {
-                    //     const cloneRoadmap = [...roadmapList]
-                    //     const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap.id);
-                    //     if (roadmapIndex !== -1) {
-                    //         cloneRoadmap[roadmapIndex].ideas = cloneIdea
-                    //         setRoadmapList(cloneRoadmap);
-                    //     }
-                    //     if (isNoStatus) {
-                    //         setNoStatus(cloneIdea)
-                    //     }
-                    // }
                 }
             }
             setSelectedCommentIndex(null)
@@ -516,17 +455,6 @@ const SidebarSheet = ({
                 const cloneIdea = [...ideasList];
                 cloneIdea[index] = selectedIdeaObj;
                 setIdeasList(cloneIdea)
-                // if (isRoadmap) {
-                //     const cloneRoadmap = [...roadmapList]
-                //     const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap.id);
-                //     if (roadmapIndex !== -1) {
-                //         cloneRoadmap[roadmapIndex].ideas = cloneIdea
-                //         setRoadmapList(cloneRoadmap);
-                //     }
-                //     if (isNoStatus) {
-                //         setNoStatus(cloneIdea)
-                //     }
-                // }
             }
             toast({description: data.message})
         } else {
@@ -546,17 +474,6 @@ const SidebarSheet = ({
                 const cloneIdea = [...ideasList];
                 cloneIdea[indexs] = selectedIdeaObj;
                 setIdeasList(cloneIdea)
-                // if (isRoadmap) {
-                //     const cloneRoadmap = [...roadmapList]
-                //     const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap.id);
-                //     if (roadmapIndex !== -1) {
-                //         cloneRoadmap[roadmapIndex].ideas = cloneIdea
-                //         setRoadmapList(cloneRoadmap);
-                //     }
-                //     if (isNoStatus) {
-                //         setNoStatus(cloneIdea)
-                //     }
-                // }
             }
             toast({description: data.message})
         } else {
@@ -1069,7 +986,7 @@ const SidebarSheet = ({
                                                     </div>
                                                 </div>
                                                 {
-                                                    selectedIdea && selectedIdea.images ?
+                                                    selectedIdea && selectedIdea.images && selectedIdea.images.length > 0 ?
                                                         <div className={"flex gap-2 flex-wrap"}>
                                                             {
                                                                 (selectedIdea.images || []).map((x, i) => {
@@ -1341,8 +1258,8 @@ const SidebarSheet = ({
                                                 <TabsContent value="comment"
                                                              className={`${theme === "dark" ? "" : "bg-muted"}`}>
                                                     {
-                                                        selectedIdea && selectedIdea.comments && selectedIdea.comments.length > 0 ?
-                                                            (selectedIdea.comments || []).map((x, i) => {
+                                                        selectedIdea && selectedIdea?.comments && selectedIdea?.comments.length > 0 ?
+                                                            (selectedIdea?.comments || []).map((x, i) => {
                                                                 return (
                                                                     <Fragment>
                                                                         <div
@@ -1353,12 +1270,12 @@ const SidebarSheet = ({
                                                                                     <Avatar
                                                                                         className={"w-[20px] h-[20px]"}>
                                                                                         {
-                                                                                            x.user_photo ?
+                                                                                            x?.user_photo ?
                                                                                                 <AvatarImage
-                                                                                                    src={x.user_photo}
+                                                                                                    src={x?.user_photo}
                                                                                                     alt="@shadcn"/>
                                                                                                 :
-                                                                                                <AvatarFallback>{x && x.name && x.name.substring(0, 1)}</AvatarFallback>
+                                                                                                <AvatarFallback>{x && x?.name && x?.name.substring(0, 1)}</AvatarFallback>
                                                                                         }
                                                                                     </Avatar>
                                                                                 </div>
@@ -1538,7 +1455,7 @@ const SidebarSheet = ({
                                                                                             <div
                                                                                                 className={"space-y-2"}>
                                                                                                 {
-                                                                                                    (x.reply || []).map((y, j) => {
+                                                                                                    (x?.reply || []).map((y, j) => {
                                                                                                         return (
                                                                                                             <Fragment>
                                                                                                                 <div
@@ -1546,7 +1463,7 @@ const SidebarSheet = ({
                                                                                                                     <div>
                                                                                                                         <div
                                                                                                                             className={"update-idea text-sm rounded-full border text-center"}>
-                                                                                                                            <Avatar><AvatarFallback>{y.name.substring(0, 1)}</AvatarFallback></Avatar>
+                                                                                                                            <Avatar><AvatarFallback>{y?.name?.substring(0, 1)}</AvatarFallback></Avatar>
                                                                                                                         </div>
                                                                                                                     </div>
                                                                                                                     <div

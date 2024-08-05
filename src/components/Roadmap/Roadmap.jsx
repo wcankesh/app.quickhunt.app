@@ -89,7 +89,7 @@ const Roadmap = () => {
         formData.append("roadmap_id", columnId);
         const data = await apiService.updateIdea(formData, payload)
         if (data.status === 200) {
-            toast({description: "Roadmap Update successfully"})
+            toast({description: data.message})
         } else {
 
         }
@@ -101,13 +101,6 @@ const Roadmap = () => {
         setRoadmapList(updatedBoard)
     }
 
-    const onUpdateIdeaClose = () => {
-        setIsUpdateIdea(false);
-        setSelectedRoadmap({});
-        setSelectedIdea({});
-        setIdeasList([]);
-        setIsNoStatus(false)
-    }
     const onCreateIdea = (mainRecord) => {
         setIsCreateIdea(true);
         setIdeasList(mainRecord.ideas || []);
@@ -123,27 +116,22 @@ const Roadmap = () => {
                 isOpen={isSheetOpen}
                 onOpen={openSheet}
                 onClose={closeSheet}
-                isUpdateIdea={isUpdateIdea}
-                setIsUpdateIdea={setIsUpdateIdea}
                 selectedIdea={selectedIdea}
                 setSelectedIdea={setSelectedIdea}
-                onUpdateIdeaClose={onUpdateIdeaClose}
                 setSelectedRoadmap={setSelectedRoadmap}
                 selectedRoadmap={selectedRoadmap}
                 roadmapList={roadmapList}
                 setRoadmapList={setRoadmapList}
-
             />
             <CreateIdea
                 isOpen={isSheetOpenCreate}
                 onOpen={openCreateIdea}
                 onClose={closeCreateIdea}
-
                 closeCreateIdea={closeCreateIdea}
                 selectedRoadmap={selectedRoadmap}
-                setSelectedRoadmap={setSelectedRoadmap}
                 roadmapList={roadmapList}
                 setRoadmapList={setRoadmapList}
+
             />
             <div className={"p-4"}><h1 className={"text-2xl font-medium"}>Roadmap</h1></div>
             <div className={"p-[11px] pt-[3px]"}>

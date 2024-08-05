@@ -661,7 +661,8 @@ const UpdateWidget = ({ isOpen, onOpen, onClose,  }) => {
                         </div>
                     </SheetContent>
             </Sheet>
-            <div className={"xl:container xl:max-w-[1200px] lg:container lg:max-w-[992px]  md:container md:max-w-[768px] sm:container sm:max-w-[639px] pt-8 pb-5 px-4 h-full relative"}>
+            {/*<div className={"container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-4 h-full relative xl:m-auto ml-[338px]"}>*/}
+            <div className={"md:container xl:max-w-[1005px] lg:max-w-[768px] md:max-w-[639px] md:block hidden pt-8 pb-5 px-4 h-full relative xl:m-auto md:ml-[338px]"}>
                 <div className={widgetsSetting.type === "popover" || widgetsSetting.type === "embed" ? "border h-full rounded-lg" : ""}>
                     {
                         widgetsSetting.type !== "embed" && <div className='QH-floating-trigger' onClick={onToggle} style={{
