@@ -22,6 +22,8 @@ import {
     AlertDialogTitle
 } from "../ui/alert-dialog";
 import {Skeleton} from "../ui/skeleton";
+import NoDataThumbnail from "../../img/Frame.png";
+import EmptyData from "../Comman/EmptyData";
 
 const tableHeadingsArray = [
     {label:"Name"},
@@ -208,6 +210,9 @@ const Customers = () => {
                                             }
 
                                     </Table>
+                                        {isLoading ? null : (isLoading === false && customerList?.length > 0 ? "" : <EmptyData/>)}
+
+
                                     </div>
                                 </CardContent>
                                 <Separator/>

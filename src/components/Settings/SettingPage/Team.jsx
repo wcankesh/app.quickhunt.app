@@ -28,6 +28,7 @@ import {
 } from "../../ui/alert-dialog"
 import NoDataThumbnail from "../../../img/Frame.png";
 import {Separator} from "../../ui/separator";
+import EmptyData from "../../Comman/EmptyData";
 
 const initialState = {
     email: "",
@@ -358,6 +359,9 @@ const Team = () => {
                                         ))}
                                     </TableBody>
                                 </Table>
+                                {isLoading ? null : (isLoading === false && invitationList?.length > 0 ? "" :
+                                        <EmptyData/>
+                                )}
                             </div>
                         </TabsContent>
                     </Tabs>
