@@ -220,7 +220,7 @@ const HeaderBar = () => {
     const getAllProjects = async () => {
         const data = await apiSerVice.getAllProjects()
         if (data.status === 200) {
-            if(data && data.data && data.data.length){
+            if(data && data.data && data.data.length > 0){
                 const array = [];
                 let responseObj = data.data[0];
                 if (!getProjectDetails('id')) {
@@ -241,8 +241,9 @@ const HeaderBar = () => {
                     array.push(obj);
                 })
                 setProjectList(array)
+
             } else {
-                // setSheetOpen(true)
+                 setSheetOpen(true)
             }
             setIsLoading(false)
         }
@@ -257,6 +258,7 @@ const HeaderBar = () => {
     const onLogout = async () => {
         logout();
         removeProjectDetails();
+        setTheme("light")
         navigate(`${baseUrl}/login`);
     }
 
@@ -468,15 +470,15 @@ const HeaderBar = () => {
                                             aria-expanded={open}
                                             className="min-w-[150px] md:w-[200px] h-[36px] justify-between bg-card"
                                         >
-                                            {projectDetailsReducer.id ? projectDetailsReducer.project_name : "Select framework..."}
+                                            {projectDetailsReducer.id ? projectDetailsReducer.project_name : "Select project"}
                                             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50"/>
                                         </Button>
                                     </PopoverTrigger>
                                     <PopoverContent className="w-[200px] p-0">
                                         <Command>
-                                            <CommandInput placeholder="Search framework..."/>
+                                            <CommandInput placeholder="Search project"/>
                                             <CommandList>
-                                                <CommandEmpty>No framework found.</CommandEmpty>
+                                                <CommandEmpty>No project found.</CommandEmpty>
                                                 <CommandGroup>
                                                     {(projectList || []).map((x, i) => (
                                                         <Fragment key={i}>
@@ -518,7 +520,7 @@ const HeaderBar = () => {
                                             {
                                                 userDetails.user_photo ?
                                                     <AvatarImage src={userDetails.user_photo} alt="@shadcn"/> :
-                                                    <AvatarFallback>{userDetails.user_first_name.substring(0, 1)}{userDetails.user_last_name.substring(0, 1)}</AvatarFallback>
+                                                    <AvatarFallback>{userDetails?.user_first_name?.substring(0, 1)?.toUpperCase()}{userDetails?.user_last_name?.substring(0, 1)?.toUpperCase()}</AvatarFallback>
                                             }
                                         </Avatar>
                                     </Button>

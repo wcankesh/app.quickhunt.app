@@ -109,9 +109,9 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
 
     const onChangeText = (event) => {
         if(event.target.name === "post_title"){
-            setChangeLogDetails({...changeLogDetails, [event.target.name]: event.target.value, post_slug_url: event.target.value.replace(/ /g,"-").replace(/\?/g, "-")})
+            setChangeLogDetails({...changeLogDetails, [event.target.name]: event.target.value, post_slug_url: event.target.value.replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-').replace(/\//g, "-").toLowerCase()})
         } else if(event.target.name === "post_slug_url"){
-            setChangeLogDetails({...changeLogDetails, post_slug_url: event.target.value.replace(/ /g,"-").replace(/\?/g, "-")})
+            setChangeLogDetails({...changeLogDetails, post_slug_url: event.target.value.replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-').replace(/\//g, "-").toLowerCase()})
         }else {
             setChangeLogDetails({...changeLogDetails, [event.target.name]: event.target.value})
         }
@@ -423,6 +423,7 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
                                         mode="single"
                                         selected={changeLogDetails.post_published_at}
                                         onSelect={(date) => onDateChange("post_published_at", date)}
+                                        captionLayout="dropdown-buttons" fromYear={2024} toYear={2050}
                                     />
                                 </PopoverContent>
                             </Popover>
@@ -450,7 +451,7 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
                     </div>
                         <div className={"flex flex-col gap-[18px]"}>
                             <div className={"announce-create-switch flex gap-6"}>
-                                <Switch className={"w-[38px] h-[20px]"} disabled={userDetailsReducer.plan == 0} checked={changeLogDetails.post_nodify_customer ===  1} onCheckedChange={(checked)=>onChangeText({target:{name: "post_nodify_customer", value: checked === true ? 1 : 0}})} />
+                                <Switch className={"w-[38px] h-[20px]"} checked={changeLogDetails.post_nodify_customer ===  1} onCheckedChange={(checked)=>onChangeText({target:{name: "post_nodify_customer", value: checked === true ? 1 : 0}})} />
                                 <p className={"text-sm text-muted-foreground font-medium"}>Notify Customers</p>
                             </div>
                             <div className={"announce-create-switch flex gap-6"}>
@@ -458,7 +459,7 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
                                 <p className={"text-sm text-muted-foreground font-medium"}>Save as Draft</p>
                             </div>
                             <div className={"announce-create-switch flex gap-6"}>
-                                <Switch className={"w-[38px] h-[20px]"} disabled={userDetailsReducer.plan == 0} checked={changeLogDetails.post_expired_boolean ===  1} onCheckedChange={(checked)=>onChangeText({target:{name: "post_expired_boolean", value: checked === true ? 1 : 0}})} />
+                                <Switch className={"w-[38px] h-[20px]"}  checked={changeLogDetails.post_expired_boolean ===  1} onCheckedChange={(checked)=>onChangeText({target:{name: "post_expired_boolean", value: checked === true ? 1 : 0}})} />
                                 <p className={"text-sm text-muted-foreground font-medium"}>Expire At</p>
                             </div>
 
@@ -480,6 +481,7 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
                                                 mode="single"
                                                 selected={changeLogDetails.post_expired_datetime}
                                                 onSelect={(date) => onDateChange("post_expired_datetime", date)}
+                                                captionLayout="dropdown-buttons" fromYear={2024} toYear={2050}
                                             />
                                         </PopoverContent>
                                     </Popover>

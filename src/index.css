@@ -476,3 +476,6 @@ span.LinesEllipsis-ellipsis {color: hsl(var(--primary)) !important;font-weight: 
   -ms-overflow-style: none;
   scrollbar-width: none
 }
+.rdp-caption_dropdowns{
+  display: flex; gap: 25px;
+}
