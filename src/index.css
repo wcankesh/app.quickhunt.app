@@ -205,7 +205,7 @@ button.inline-flex.items-center.justify-center.whitespace-nowrap.rounded-md.text
 .m-inline-0{margin-inline: 0 !important}
 
 /*Dialog Close Button*/
-button.absolute.right-4.top-4.rounded-sm.opacity-70.ring-offset-background.transition-opacity.hover\:opacity-100.focus\:outline-none.focus\:ring-2.focus\:ring-ring.focus\:ring-offset-2.disabled\:pointer-events-none.data-\[state\=open\]\:bg-accent.data-\[state\=open\]\:text-muted-foreground{top: 12px; right: 12px}
+button.absolute.right-4.top-4.rounded-sm.opacity-70.ring-offset-background.transition-opacity.hover\:opacity-100.focus\:outline-none.focus\:ring-2.focus\:ring-ring.focus\:ring-offset-2.disabled\:pointer-events-none.data-\[state\=open\]\:bg-accent.data-\[state\=open\]\:text-muted-foreground{top: 12px; right: 12px; display: none}
 
 /*Widget Color Picker*/
 .widget-color-picker .color_picker{ width: 100%; gap: 8px}

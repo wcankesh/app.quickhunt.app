@@ -1,7 +1,17 @@
 import React, {Fragment, useEffect, useState} from 'react';
 import {Button} from "../ui/button";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow,} from "../ui/table";
-import {BarChart, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Copy, Ellipsis, Loader2} from "lucide-react";
+import {
+    BarChart,
+    ChevronLeft,
+    ChevronRight,
+    ChevronsLeft,
+    ChevronsRight,
+    Copy,
+    Ellipsis,
+    Loader2,
+    X
+} from "lucide-react";
 import {useTheme} from "../theme-provider";
 import {useSelector} from "react-redux";
 import {Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "../ui/dialog";
@@ -28,6 +38,8 @@ const Widgets = () => {
     const [widgetsSetting, setWidgetsSetting] = useState([])
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const userDetailsReducer = useSelector(state => state.userDetailsReducer);
+    const [isDeleteLoading, setDeleteIsLoading] = useState(false);
+    const [isCopyLoading, setCopyIsLoading] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [isSheetOpen, setSheetOpen] = useState(false);
     const [pageNo, setPageNo] = useState(1);
@@ -83,8 +95,8 @@ const Widgets = () => {
 
     };
 
-    const onDeleteIdea = async (id) => {
-        setIsLoading(true);
+    const deleteWidget = async (id) => {
+        setDeleteIsLoading(true);
         const data = await apiSerVice.onDeleteWidget(id, deleteRecord)
         if (data.status === 200) {
             const clone = [...widgetsSetting];
@@ -93,7 +105,7 @@ const Widgets = () => {
                 clone.splice(index, 1)
                 setWidgetsSetting(clone);
                 setOpenDelete(false);
-                setIsLoading(false);
+                setDeleteIsLoading(false);
                 toast({description: data.message});
             } else {
                     toast({variant: "destructive", description: data.message});
@@ -101,7 +113,7 @@ const Widgets = () => {
         }
     };
 
-    const deleteWidget = (id) => {
+    const openDeleteWidget = (id) => {
         setDeleteRecord(id)
         setOpenDelete(true)
     }
@@ -121,7 +133,9 @@ const Widgets = () => {
     };
 
     const handleCopyCode = (id) => {
+        setCopyIsLoading(true)
         navigator.clipboard.writeText(id).then(() => {
+            setCopyIsLoading(false)
             toast({description: "Copied to clipboard"})
         }).catch(err => {
             console.error('Failed to copy text: ', err);
@@ -143,21 +157,24 @@ const Widgets = () => {
                 openDelete &&
                 <Fragment>
                     <Dialog open onOpenChange={() => setOpenDelete(!openDelete)}>
-                        <DialogContent className="sm:max-w-[425px]">
-                            <DialogHeader className={"flex flex-col gap-2"}>
-                                <DialogTitle>Delete widget?</DialogTitle>
-                                <DialogDescription>Are you sure? This cannot be undone.</DialogDescription>
+                        <DialogContent className={"max-w-[350px] w-full sm:max-w-[425px] p-3 md:p-6 rounded-lg"}>
+                            <DialogHeader className={"flex flex-row justify-between gap-2"}>
+                                <div className={"flex flex-col gap-2"}>
+                                    <DialogTitle className={"text-left"}>Delete widget?</DialogTitle>
+                                    <DialogDescription className={"text-left"}>Are you sure? This cannot be undone.</DialogDescription>
+                                </div>
+                                <X size={16} className={"m-0 cursor-pointer"} onClick={() => setOpenDelete(false)}/>
                             </DialogHeader>
-                            <DialogFooter>
+                            <DialogFooter className={"flex-row justify-end space-x-2"}>
                                 <Button variant={"outline hover:none"}
                                         className={"text-sm font-semibold border"}
                                         onClick={() => setOpenDelete(false)}>Cancel</Button>
                                 <Button
                                     variant={"hover:bg-destructive"}
-                                    className={`${theme === "dark" ? "text-card-foreground" : "text-card"} ${isLoading === true ? "py-2 px-6" : "py-2 px-6"} w-[76px] text-sm font-semibold bg-destructive`}
-                                    onClick={() => onDeleteIdea(deleteRecord)}
+                                    className={`${theme === "dark" ? "text-card-foreground" : "text-card"} ${isDeleteLoading === true ? "py-2 px-6" : "py-2 px-6"} w-[76px] text-sm font-semibold bg-destructive`}
+                                    onClick={() => deleteWidget(deleteRecord)}
                                 >
-                                    {isLoading ? <Loader2 size={16} className={"animate-spin"}/> : "Delete"}
+                                    {isDeleteLoading ? <Loader2 size={16} className={"animate-spin"}/> : "Delete"}
                                 </Button>
                             </DialogFooter>
                         </DialogContent>
@@ -168,25 +185,28 @@ const Widgets = () => {
                 openCopyCode &&
                 <Fragment>
                     <Dialog open onOpenChange={() => getCodeCopy("")}>
-                        <DialogContent className="sm:max-w-[580px] bg-white">
-                            <DialogHeader className={"flex flex-col gap-2"}>
-                                <DialogTitle>Embed Widget</DialogTitle>
-                                <DialogDescription>Choose how you would like to embed your widget.</DialogDescription>
+                        <DialogContent className="max-w-[350px] w-full sm:max-w-[580px] bg-white rounded-lg p-3 md:p-6">
+                            <DialogHeader className={"flex flex-row justify-between gap-2"}>
+                                <div className={"flex flex-col gap-2"}>
+                                    <DialogTitle className={`text-left ${theme === "dark" ? "text-card" : ""}`}>Embed Widget</DialogTitle>
+                                    <DialogDescription className={"text-left"}>Choose how you would like to embed your widget.</DialogDescription>
+                                </div>
+                                <X size={16} className={`${theme === "dark" ? "text-card" : ""} m-0 cursor-pointer`} onClick={() => getCodeCopy("")}/>
                             </DialogHeader>
                             <Tabs defaultValue="script">
-                                <TabsList className="grid w-full grid-cols-3 bg-white">
+                                <TabsList className="grid grid-cols-3 w-full bg-white">
                                     <TabsTrigger value="script">Script</TabsTrigger>
                                     <TabsTrigger value="embedlink">Embed Link</TabsTrigger>
                                     <TabsTrigger value="iframe">iFrame</TabsTrigger>
                                 </TabsList>
                                 <TabsContent value="script" className={"flex flex-col gap-2"}>
-                                    <div className={"text-muted-foreground text-sm"}>
+                                    <h4 className={`${theme === "dark" ? "text-muted-foreground" : "text-muted-foreground"} text-sm`}>
                                         Place the code below before the closing body tag on your site.
-                                    </div>
+                                    </h4>
                                     <div>
-                                        <div className={"relative px-6 rounded-md bg-black"}>
+                                        <div className={"relative px-6 rounded-md bg-black mb-2"}>
                                             <div className={"relative"}>
-                                                <pre id="text"  className={"py-4 whitespace-pre overflow-x-auto scrollbars-none text-[10px] text-text-invert text-white max-w-[450px]"}>
+                                                <pre id="text"  className={"py-4 whitespace-pre overflow-x-auto scrollbars-none text-[10px] text-text-invert text-white max-w-[230px] w-full md:max-w-[450px]"}>
                                                       {codeString}
                                                   </pre>
 
@@ -195,75 +215,79 @@ const Widgets = () => {
                                                     className={`absolute top-0 right-0 px-0`}
                                                     onClick={() => handleCopyCode(codeString)}
                                                 >
-                                                    {isLoading ? <Loader2 size={16} className={"animate-spin"} color={"white"}/> : <Copy size={16} color={"white"}/>}
+                                                    {isCopyLoading ? <Loader2 size={16} className={"animate-spin"} color={"white"}/> : <Copy size={16} color={"white"}/>}
                                                 </Button>
 
                                             </div>
                                         </div>
 
-                                        <p className={"text-xs"}>Read the {" "}
-                                            <Button variant={"ghost hover:none"} className={"p-0 text-xs text-primary font-semibold"}>
+                                        <p className={`${theme === "dark" ? "text-muted-foreground" : "text-muted-foreground"} text-xs`}>Read the {" "}
+                                            <Button variant={"ghost hover:none"} className={"p-0 h-auto text-xs text-primary font-semibold"}>
                                                 Setup Guide
                                             </Button>
                                             {" "}for more information or {" "}
                                             <Button
                                                 variant={"ghost hover:none"}
-                                                className={"p-0 text-xs text-primary font-semibold"}
+                                                className={"p-0 h-auto text-xs text-primary font-semibold"}
                                             >
                                                 download the HTML example.
                                             </Button>
                                         </p>
                                     </div>
                                 </TabsContent>
-                                <TabsContent value="embedlink">
-                                    <div className={"text-muted-foreground text-sm"}>
-                                        Follow these simple steps to embed the widget on any {" "}
-                                        <Button
-                                            variant={"ghost hover:none"}
-                                            className={"p-0 text-xs text-primary font-semibold"}
-                                        >
-                                            supported website.
-                                        </Button>
+                                <TabsContent value="embedlink" className={"space-y-2"}>
+                                    <div className={"space-y-2"}>
+                                        <div className={`${theme === "dark" ? "text-muted-foreground" : "text-muted-foreground"} text-sm`}>
+                                            Follow these simple steps to embed the widget on any {" "}
+                                            <Button
+                                                variant={"ghost hover:none"}
+                                                className={"p-0 h-auto text-xs text-primary font-semibold"}
+                                            >
+                                                supported website.
+                                            </Button>
+                                        </div>
+                                        <div>
+                                            <p className={`text-xs ${theme === "dark" ? "text-muted-foreground" : "text-muted-foreground"} pb-1`}>1. Copy the link below</p>
+                                            <p className={`text-xs ${theme === "dark" ? "text-muted-foreground" : "text-muted-foreground"} pb-1`}>2. Paste the link on any site where you want the widget to show.</p>
+                                            <p className={`text-xs ${theme === "dark" ? "text-muted-foreground" : "text-muted-foreground"} pb-1`}>3. That's it!</p>
+                                        </div>
                                     </div>
                                     <div>
-                                        <p className={"text-xs text-muted-foreground pb-1"}>1. Copy the link below</p>
-                                        <p className={"text-xs text-muted-foreground pb-1"}>2. Paste the link on any site where you want the widget to show.</p>
-                                        <p className={"text-xs text-muted-foreground pb-1"}>3. That's it!</p>
-                                    </div>
-                                    <div className={"relative px-6 rounded-md bg-black"}>
-                                        <div className={"relative"}>
-                                                <pre id="text"  className={"py-4 whitespace-pre overflow-x-auto scrollbars-none text-[10px] text-text-invert text-white"}>
+                                        <div className={"relative px-6 rounded-md bg-black mb-2"}>
+                                            <div className={"relative"}>
+                                                <pre id="text" className={"py-4 whitespace-pre overflow-x-auto scrollbars-none text-[10px] text-text-invert text-white max-w-[230px] w-full md:max-w-[450px]"}>
                                                     {embedLink}
                                                   </pre>
 
+                                                <Button
+                                                    variant={"ghost hover:none"}
+                                                    className={`absolute top-0 right-0 px-0`}
+                                                    onClick={() => handleCopyCode(embedLink)}
+                                                >
+                                                    {isCopyLoading ? <Loader2 size={16} className={"animate-spin"} color={"white"}/> : <Copy size={16} color={"white"}/>}
+                                                </Button>
+
+                                            </div>
+                                        </div>
+                                        <p className={`text-xs ${theme === "dark" ? "text-muted-foreground" : "text-muted-foreground"}`}>Read the {" "}
                                             <Button
                                                 variant={"ghost hover:none"}
-                                                className={`absolute top-0 right-0 px-0`}
-                                                onClick={() => handleCopyCode(embedLink)}
+                                                className={"p-0 h-auto text-xs text-primary font-semibold"}
                                             >
-                                                {isLoading ? <Loader2 size={16} className={"animate-spin"} color={"white"}/> : <Copy size={16} color={"white"}/>}
+                                                Setup Guide
                                             </Button>
-
-                                        </div>
+                                            {" "}for more information.
+                                        </p>
                                     </div>
-                                    <p className={"text-xs"}>Read the {" "}
-                                        <Button
-                                            variant={"ghost hover:none"}
-                                            className={"p-0 text-xs text-primary font-semibold"}
-                                        >
-                                            Setup Guide
-                                        </Button>
-                                        {" "}for more information.
-                                    </p>
                                 </TabsContent>
                                 <TabsContent value="iframe"  className={"flex flex-col gap-2"}>
-                                    <div className={"text-muted-foreground text-sm"}>
+                                    <div className={`${theme === "dark" ? "text-muted-foreground" : "text-muted-foreground"} text-sm`}>
                                         Place the code below before the closing body tag on your site.
                                     </div>
                                     <div>
                                         <div className={"relative px-6 rounded-md bg-black"}>
                                             <div className={"relative"}>
-                                                <pre id="text"  className={"py-4 whitespace-pre overflow-x-auto scrollbars-none text-[10px] text-text-invert text-white max-w-[450px]"}>
+                                                <pre id="text"  className={"py-4 whitespace-pre overflow-x-auto scrollbars-none text-[10px] text-text-invert text-white max-w-[230px] w-full md:max-w-[450px]"}>
                                                       {iFrame}
                                                   </pre>
 
@@ -272,16 +296,16 @@ const Widgets = () => {
                                                     className={`absolute top-0 right-0 px-0`}
                                                     onClick={() => handleCopyCode(iFrame)}
                                                 >
-                                                    {isLoading ? <Loader2 size={16} className={"animate-spin"} color={"white"}/> : <Copy size={16} color={"white"}/>}
+                                                    {isCopyLoading ? <Loader2 size={16} className={"animate-spin"} color={"white"}/> : <Copy size={16} color={"white"}/>}
                                                 </Button>
 
                                             </div>
                                         </div>
                                     </div>
-                                    <p className={"text-xs text-muted-foreground"}>Read the {" "}
+                                    <p className={`text-xs ${theme === "dark" ? "text-muted-foreground" : "text-muted-foreground"}`}>Read the {" "}
                                         <Button
                                             variant={"ghost hover:none"}
-                                            className={"p-0 text-xs text-primary font-semibold"}
+                                            className={"p-0 h-auto text-xs text-primary font-semibold"}
                                         >
                                             Setup Guide
                                         </Button>
@@ -292,7 +316,7 @@ const Widgets = () => {
                             </Tabs>
                             <DialogFooter>
                                 <Button variant={"outline hover:none"}
-                                        className={"text-sm font-semibold border"}
+                                        className={`text-sm font-semibold border ${theme === "dark" ? "text-card" : "text-card-foreground"}`}
                                         onClick={() => getCodeCopy("")}>Cancel</Button>
                             </DialogFooter>
                         </DialogContent>
@@ -339,9 +363,9 @@ const Widgets = () => {
                                         }
                                     </TableRow>
                                 </TableHeader>
-                                {
-                                    isLoading ? <TableBody>
-                                        {
+                                <TableBody>
+                                    {
+                                        isLoading ? (
                                             [...Array(10)].map((_, index) => {
                                                 return (
                                                     <TableRow key={index}>
@@ -357,43 +381,45 @@ const Widgets = () => {
                                                     </TableRow>
                                                 )
                                             })
-                                        }
-                                    </TableBody> : widgetsSetting.length > 0 ?
-                                            <TableBody>
-                                                {widgetsSetting.map((x, i) => (
-                                                    <TableRow key={i}>
-                                                        <TableCell className={"font-medium p-2 lg:p-4"}>{x.name}</TableCell>
-                                                        <TableCell className={"font-medium p-2 lg:p-4"}>{x.type}</TableCell>
-                                                        <TableCell className={"font-medium p-2 lg:p-4"}>{moment(x.created_at).format('D MMM, YYYY')}</TableCell>
-                                                        <TableCell className={" p-2 lg:p-4"}>
-                                                            <Button
-                                                                className={"py-[6px] px-3 h-auto text-xs font-semibold hover:bg-primary"}
-                                                                onClick={() => getCodeCopy(x.id, x.type)}>Get code</Button>
-                                                        </TableCell>
-                                                        <TableCell className={"font-medium p-2 lg:p-4"}>
-                                                            <BarChart
-                                                                onClick={() => openSheet(x.id)} size={16}
-                                                                className={"cursor-pointer"}
-                                                            />
-                                                        </TableCell>
-                                                        <TableCell className={" p-2 lg:p-4"}>
-                                                            <DropdownMenu>
-                                                                <DropdownMenuTrigger>
-                                                                    <Ellipsis size={16} className={"cursor-pointer"}/>
-                                                                </DropdownMenuTrigger>
-                                                                <DropdownMenuContent>
-                                                                    <DropdownMenuItem
-                                                                        className={"cursor-pointer"} onClick={() => handleCreateNew(x.id)}>Edit</DropdownMenuItem>
-                                                                    <DropdownMenuItem className={"cursor-pointer"}
-                                                                                      onClick={() => deleteWidget(x.id)}>Delete</DropdownMenuItem>
-                                                                </DropdownMenuContent>
-                                                            </DropdownMenu>
-                                                        </TableCell>
-                                                    </TableRow>
-                                                ))}
-                                            </TableBody>
-                                       : <EmptyData/>
-                                }
+                                        ) : widgetsSetting.length > 0 ? <>
+                                            {widgetsSetting.map((x, i) => (
+                                                <TableRow key={i}>
+                                                    <TableCell className={"font-medium p-2 lg:p-4"}>{x.name}</TableCell>
+                                                    <TableCell className={"font-medium p-2 lg:p-4"}>{x.type}</TableCell>
+                                                    <TableCell className={"font-medium p-2 lg:p-4"}>{moment(x.created_at).format('D MMM, YYYY')}</TableCell>
+                                                    <TableCell className={" p-2 lg:p-4"}>
+                                                        <Button
+                                                            className={"py-[6px] px-3 h-auto text-xs font-semibold hover:bg-primary"}
+                                                            onClick={() => getCodeCopy(x.id)}>Get code</Button>
+                                                    </TableCell>
+                                                    <TableCell className={"font-medium p-2 lg:p-4"}>
+                                                        <BarChart
+                                                            onClick={() => openSheet(x.id)} size={16}
+                                                            className={"cursor-pointer"}
+                                                        />
+                                                    </TableCell>
+                                                    <TableCell className={" p-2 lg:p-4"}>
+                                                        <DropdownMenu>
+                                                            <DropdownMenuTrigger>
+                                                                <Ellipsis size={16} className={"cursor-pointer"}/>
+                                                            </DropdownMenuTrigger>
+                                                            <DropdownMenuContent align={"end"}>
+                                                                <DropdownMenuItem
+                                                                    className={"cursor-pointer"} onClick={() => handleCreateNew(x.id)}>Edit</DropdownMenuItem>
+                                                                <DropdownMenuItem className={"cursor-pointer"}
+                                                                                  onClick={() => openDeleteWidget(x.id)}>Delete</DropdownMenuItem>
+                                                            </DropdownMenuContent>
+                                                        </DropdownMenu>
+                                                    </TableCell>
+                                                </TableRow>
+                                            ))}
+                                        </>: <TableRow>
+                                            <TableCell colSpan={6}>
+                                                <EmptyData />
+                                            </TableCell>
+                                        </TableRow>
+                                    }
+                                </TableBody>
                             </Table>
                         </CardContent>
                         <CardFooter className={"p-0"}>

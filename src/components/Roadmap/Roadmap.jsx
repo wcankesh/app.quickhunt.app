@@ -11,6 +11,7 @@ import "@asseinfo/react-kanban/dist/styles.css";
 import CreateIdea from "./CreateIdea";
 import {useToast} from "../ui/use-toast";
 import {CommSkel} from "../Comman/CommSkel";
+import EmptyData from "../Comman/EmptyData";
 
 const loading = {
     columns: Array.from({ length: 5 }, (_, index) => ({
@@ -175,7 +176,7 @@ const Roadmap = () => {
                     >
                         {loading}
                     </Board>
-                    : roadmapList.columns.length > 0 && <Board
+                    : roadmapList.columns.length > 0 ? <Board
                     allowAddColumn
                     disableColumnDrag
                     onCardDragEnd={handleCardMove}
@@ -238,7 +239,7 @@ const Roadmap = () => {
 
                 >
                     {roadmapList}
-                </Board>
+                </Board> : <EmptyData />
             }
             </div>
 

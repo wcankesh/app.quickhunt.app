@@ -171,7 +171,7 @@ const SaidBarDesktop = () => {
                             })
                         }
                     </nav>
-                    <div className="mt-auto px-4">
+                    <div className="mt-auto px-4 pb-4">
                         <nav className="grid gap-1">
                             {
                                 (footerMenuComponent || []).map((x, i) => {

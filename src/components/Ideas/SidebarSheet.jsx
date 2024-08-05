@@ -405,7 +405,6 @@ const SidebarSheet = ({
 
     const onUpdateComment = async () => {
         setIsSaveUpdateComment(true)
-        debugger
         let formData = new FormData();
         if (selectedComment && selectedComment.newImage && selectedComment.newImage.length) {
             for (let i = 0; i < selectedComment.newImage.length; i++) {
@@ -606,6 +605,26 @@ const SidebarSheet = ({
         }));
     }
 
+    const handleUpdate = (event) => {
+        const {value} = event.target;
+        setDescription(value);
+        setSelectedIdea(selectedIdea => ({...selectedIdea, description: value}));
+        setFormError(formError => ({
+            ...formError,
+            description: formValidate("description", value)
+        }));
+    };
+
+    const handleChange = (tag) => {
+        const clone = selectedIdea && selectedIdea.topic && selectedIdea.topic.length ? [...selectedIdea.topic] : [];
+        let index = clone.findIndex((t) => t.id === tag.id);
+        if (index === -1) {
+            clone.push(tag);
+        } else {
+            clone.splice(index, 1);
+        }
+        setSelectedIdea({...selectedIdea, topic: clone})
+    }
 
     const onCreateIdea = async () => {
         setIsLoadingCreateIdea(true)
@@ -718,7 +737,6 @@ const SidebarSheet = ({
                                                         <div className={"w-[282px] h-[128px] relative border p-[5px]"}>
                                                             <img
                                                                 className={"upload-img"}
-                                                                // src={selectedIdea && selectedIdea.cover_image && selectedIdea.cover_image.name ? URL.createObjectURL(selectedIdea.cover_image) : selectedIdea.cover_image}
                                                                 src={selectedIdea && selectedIdea.cover_image && selectedIdea.cover_image.name ? URL.createObjectURL(selectedIdea.cover_image) : selectedIdea.cover_image}
                                                                 alt=""
                                                             />
@@ -728,14 +746,8 @@ const SidebarSheet = ({
                                                                 onClick={() => onChangeStatus('delete_cover_image', selectedIdea && selectedIdea?.cover_image && selectedIdea.cover_image?.name ? "" : [selectedIdea.cover_image.replace("https://code.quickhunt.app/public/storage/feature_idea/", "")])}
                                                             />
                                                         </div> : selectedIdea.cover_image ?
-                                                            <div
-                                                                className={"w-[282px] h-[128px] relative border p-[5px]"}>
-                                                                <img
-                                                                    className={"upload-img"}
-                                                                    // src={selectedIdea.cover_image}
-                                                                    src={selectedIdea && selectedIdea.cover_image && selectedIdea.cover_image.name ? URL.createObjectURL(selectedIdea.cover_image) : selectedIdea.cover_image}
-                                                                    alt=""
-                                                                />
+                                                            <div className={"w-[282px] h-[128px] relative border p-[5px]"}>
+                                                                <img className={"upload-img"} src={selectedIdea.cover_image} alt=""/>
                                                                 <CircleX
                                                                     size={20}
                                                                     className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
@@ -1109,32 +1121,6 @@ const SidebarSheet = ({
                                                                         <PopoverTrigger asChild>
                                                                             <Button variant="ghost hover-none"
                                                                                     className={"rounded-full p-0 h-[24px]"}>
-                                                                                {/*{*/}
-                                                                                {/*    (selectedIdea.vote_list || []).map((x, i) => {*/}
-                                                                                {/*        return (*/}
-                                                                                {/*            <div className={"flex"} key={i}>*/}
-                                                                                {/*                <div*/}
-                                                                                {/*                    className={"relative"}>*/}
-                                                                                {/*                    <div*/}
-                                                                                {/*                        className={"update-idea text-sm rounded-full border text-center"}>*/}
-                                                                                {/*                        <Avatar>*/}
-                                                                                {/*                            {*/}
-                                                                                {/*                                i < 2 ? x.user_photo ?*/}
-                                                                                {/*                                    <AvatarImage*/}
-                                                                                {/*                                        src={x.user_photo}*/}
-                                                                                {/*                                        alt={x && x.name && x.name.substring(0, 1)}/> :*/}
-                                                                                {/*                                    <AvatarFallback>{x && x.name && x.name.substring(0, 1)}</AvatarFallback> : ""*/}
-                                                                                {/*                            }*/}
-                                                                                {/*                        </Avatar>*/}
-                                                                                {/*                    </div>*/}
-                                                                                {/*                </div>*/}
-                                                                                {/*                <div className={"update-idea  text-sm rounded-full border text-center ml-[-5px]"}>*/}
-                                                                                {/*                    <Avatar><AvatarFallback>+{selectedIdea.vote_list.length - 0}</AvatarFallback></Avatar>*/}
-                                                                                {/*                </div>*/}
-                                                                                {/*            </div>*/}
-                                                                                {/*        )*/}
-                                                                                {/*    })*/}
-                                                                                {/*}*/}
                                                                                 {
                                                                                     (selectedIdea.vote_list.slice(0, 1) || []).map((x, i) => {
                                                                                         return (
@@ -1426,8 +1412,7 @@ const SidebarSheet = ({
                                                                                                 />
                                                                                                 {
                                                                                                     selectedComment && selectedComment.images && selectedComment.images.length ?
-                                                                                                        <div
-                                                                                                            className={"flex gap-2"}>
+                                                                                                        <div className={"flex gap-2"}>
                                                                                                             {
                                                                                                                 (selectedComment.images || []).map((x, i) => {
                                                                                                                     return (
@@ -1500,15 +1485,11 @@ const SidebarSheet = ({
                                                                                                     </div>
                                                                                                 </div>
                                                                                             </div>
-                                                                                            : <div
-                                                                                                className={"space-y-2"}>
+                                                                                            : <div className={"space-y-2"}>
                                                                                                 <p className={"text-xs"}>
-                                                                                                    <ReadMoreText
-                                                                                                        className={"text-xs"}
-                                                                                                        html={x.comment}/>
+                                                                                                    <ReadMoreText className={"text-xs"} html={x.comment}/>
                                                                                                 </p>
-                                                                                                <div
-                                                                                                    className={"flex gap-2 flex-wrap"}>
+                                                                                                <div className={"flex gap-2"}>
                                                                                                     {
                                                                                                         ((x && x.images) || []).map((img, ind) => {
                                                                                                             return (
@@ -1528,22 +1509,20 @@ const SidebarSheet = ({
                                                                                     }
                                                                                 </div>
 
-                                                                                {
-                                                                                    selectedCommentIndex === i ? "" :
-                                                                                        <div
-                                                                                            className={"flex justify-between"}>
-                                                                                            <Button
-                                                                                                className="p-0 text-sm font-semibold text-primary"
-                                                                                                variant={"ghost hover-none"}
-                                                                                                onClick={() => onShowSubComment(i)}
-                                                                                                key={`comment-nested-reply-to-${i}`}
-                                                                                            >
-                                                                                                Reply
-                                                                                            </Button>
-                                                                                            <div
-                                                                                                className={"flex items-center gap-2 cursor-pointer"}
-                                                                                                onClick={() => onShowSubComment(i)}
-                                                                                            >
+                                                                                    {
+                                                                                        selectedCommentIndex === i ? "" :
+                                                                                            <div className={"flex justify-between"}>
+                                                                                                <Button
+                                                                                                    className="p-0 text-sm font-semibold text-primary"
+                                                                                                    variant={"ghost hover-none"}
+                                                                                                    onClick={() => onShowSubComment(i)}
+                                                                                                    key={`comment-nested-reply-to-${i}`}
+                                                                                                >
+                                                                                                    Reply
+                                                                                                </Button>
+                                                                                                <div className={"flex items-center gap-2 cursor-pointer"}
+                                                                                                     onClick={() => onShowSubComment(i)}
+                                                                                                >
                                                                                                     <span>
                                                                                                         <MessageCircleMore
                                                                                                             className={"stroke-primary w-[16px] h-[16px]"}/>
