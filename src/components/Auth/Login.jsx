@@ -210,7 +210,7 @@ const Login = () => {
                                                     <Button variant={"ghost hover:none"}
                                                             onClick={togglePasswordVisibility}
                                                             className={"absolute top-0 right-0"}>
-                                                        {showPassword ? <Eye size={16}/> : <EyeOff size={16}/>}
+                                                        {showPassword ? <Eye size={16} stroke={`${theme === "dark" ? "white" : "black"}`}/> : <EyeOff size={16} stroke={`${theme === "dark" ? "white" : "black"}`}/>}
                                                     </Button>
                                                 </div>
                                                 <div className={"flex justify-between"}>

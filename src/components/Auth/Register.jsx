@@ -282,7 +282,7 @@ const Register = () => {
                                                             onClick={() => togglePasswordVisibility('user_password')}
                                                             className={"absolute top-0 right-0"}
                                                         >
-                                                            {passwordVisibility.user_password ? <Eye size={16}/> : <EyeOff size={16}/>}
+                                                            {passwordVisibility.user_password ? <Eye size={16} stroke={`${theme === "dark" ? "white" : "black"}`}/> : <EyeOff size={16} stroke={`${theme === "dark" ? "white" : "black"}`}/>}
                                                         </Button>
                                                     </div>
                                                     {
@@ -308,7 +308,7 @@ const Register = () => {
                                                             onClick={() => togglePasswordVisibility('user_confirm_password')}
                                                             className={"absolute top-0 right-0"}
                                                         >
-                                                            {passwordVisibility.user_confirm_password ? <Eye size={16}/> : <EyeOff size={16}/>}
+                                                            {passwordVisibility.user_confirm_password ? <Eye size={16} stroke={`${theme === "dark" ? "white" : "black"}`} /> : <EyeOff size={16} stroke={`${theme === "dark" ? "white" : "black"}`}/>}
                                                         </Button>
                                                     </div>
                                                     {
