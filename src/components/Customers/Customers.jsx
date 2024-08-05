@@ -8,8 +8,6 @@ import {useTheme} from "../theme-provider";
 import {Separator} from "../ui/separator";
 import {ApiService} from "../../utils/ApiService";
 import {useSelector} from "react-redux";
-import EmptyDataTable from "../Comman/EmptyDataTable";
-import SkeletonTable from "../Comman/SkeletonTable";
 import {toast} from "../ui/use-toast";
 import {
     AlertDialog,
@@ -17,12 +15,10 @@ import {
     AlertDialogCancel,
     AlertDialogContent,
     AlertDialogDescription,
-    AlertDialogFooter,
     AlertDialogHeader,
     AlertDialogTitle
 } from "../ui/alert-dialog";
 import {Skeleton} from "../ui/skeleton";
-import NoDataThumbnail from "../../img/Frame.png";
 import EmptyData from "../Comman/EmptyData";
 
 const tableHeadingsArray = [
@@ -54,8 +50,10 @@ const Customers = () => {
     const [deleteIndex,setDeleteIndex]=useState(null);
 
     useEffect(() => {
-        getAllCustomers();
-    }, [projectDetailsReducer.id])
+        if(projectDetailsReducer.id){
+            getAllCustomers();
+        }
+    }, [projectDetailsReducer.id,pageNo])
 
     const openSheet = () => setSheetOpen(true);
     const closeSheet = (createRecord) => {
@@ -212,30 +210,43 @@ const Customers = () => {
                                     </Table>
                                         {isLoading ? null : (isLoading === false && customerList?.length > 0 ? "" : <EmptyData/>)}
 
-
                                     </div>
                                 </CardContent>
                                 <Separator/>
                                 <CardFooter className={"p-0"}>
-                                        <div className={`w-full p-5 rounded-b-lg rounded-t-none flex justify-end px-8 py-4 md:px-16 md:py-15px ${theme === "dark"? "" : "bg-muted"}`}>
-                                            <div className={"w-full flex gap-8 items-center justify-between sm:justify-end"}>
-                                                <h5 className={"text-sm font-semibold"}>Page {pageNo} of 10</h5>
-                                                <div className={"flex flex-row gap-2 items-center"}>
-                                                    <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"} onClick={() => handlePaginationClick(1)} disabled={pageNo === 1}>
-                                                        <ChevronsLeft className={pageNo === 1 ? "stroke-muted-foreground" : "stroke-primary"}/>
-                                                    </Button>
-                                                    <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"} onClick={() => handlePaginationClick(pageNo - 1)} disabled={pageNo === 1}>
-                                                        <ChevronLeft className={pageNo === 1 ? "stroke-muted-foreground" : "stroke-primary"}/>
-                                                    </Button>
-                                                    <Button variant={"outline"} className={" h-[30px] w-[30px] p-1.5"} onClick={() => handlePaginationClick(pageNo + 1)} disabled={pageNo === totalPages}>
-                                                        <ChevronRight className={pageNo === totalPages ? "stroke-muted-foreground" : "stroke-primary"}/>
-                                                    </Button>
-                                                    <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"} onClick={() => handlePaginationClick(totalPages)} disabled={pageNo === totalPages}>
-                                                        <ChevronsRight className={pageNo === totalPages ? "stroke-muted-foreground" : "stroke-primary"}/>
-                                                    </Button>
-                                                </div>
+                                    <div
+                                        className={`w-full p-5 ${theme === "dark" ? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end px-4 py-4 md:px-16 md:py-15px`}>
+                                        <div className={"w-full flex gap-8 items-center justify-between sm:justify-end"}>
+                                            <div>
+                                                <h5 className={"text-xs md:text-sm font-semibold"}>Page {pageNo} of {totalPages}</h5>
+                                            </div>
+                                            <div className={"flex flex-row gap-2 items-center"}>
+                                                <Button variant={"outline"}
+                                                        className={"h-[30px] w-[30px] p-1.5"}
+                                                        onClick={() => handlePaginationClick(1)} disabled={pageNo === 1}>
+                                                    <ChevronsLeft className={pageNo === 1 ? "stroke-muted-foreground" : "stroke-primary"}/>
+                                                </Button>
+                                                <Button variant={"outline"}
+                                                        className={"h-[30px] w-[30px] p-1.5"}
+                                                        onClick={() => handlePaginationClick(pageNo - 1)}
+                                                        disabled={pageNo === 1}>
+                                                    <ChevronLeft className={pageNo === 1 ? "stroke-muted-foreground" : "stroke-primary"}/>
+                                                </Button>
+                                                <Button variant={"outline"}
+                                                        className={" h-[30px] w-[30px] p-1.5"}
+                                                        onClick={() => handlePaginationClick(pageNo + 1)}
+                                                        disabled={pageNo === totalPages}>
+                                                    <ChevronRight className={pageNo === totalPages ? "stroke-muted-foreground" : "stroke-primary"}/>
+                                                </Button>
+                                                <Button variant={"outline"}
+                                                        className={"h-[30px] w-[30px] p-1.5"}
+                                                        onClick={() => handlePaginationClick(totalPages)}
+                                                        disabled={pageNo === totalPages}>
+                                                    <ChevronsRight className={pageNo === totalPages ? "stroke-muted-foreground" : "stroke-primary"}/>
+                                                </Button>
                                             </div>
                                         </div>
+                                    </div>
                                     </CardFooter>
                             </Card>
                 </div>

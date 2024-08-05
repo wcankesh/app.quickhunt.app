@@ -24,7 +24,6 @@ const status = [
 
 const AnnouncementsTable = ({data,isLoading ,setSelectedRecord,setEditIndex ,handleDelete,setAnalyticsObj,}) => {
     const [announcementData,setAnnouncementData]=useState(data);
-    const [isOpenDeleteAlert,setIsOpenDeleteAlert]= useState(false);
     const [idToDelete,setIdToDelete]=useState(null);
     const [openDelete, setOpenDelete] = useState(false);
     const { theme }= useTheme();
@@ -114,7 +113,6 @@ const AnnouncementsTable = ({data,isLoading ,setSelectedRecord,setEditIndex ,han
                                             <TableHead className={`text-sm lg:text-base font-semibold px-2 md:py-4 md:px-3 lg:py-5 lg:px-4 ${theme === "dark" ? "text-[]" : "bg-muted"}`}>
                                                 {x}
                                             </TableHead>
-                                        // <TableHead className={`text-base font-semibold py-5 rounded-tl-sm ${theme === "dark" ? "text-[]" : "bg-muted"} ${i === 0 ? "max-w-[375px] rounded-lg" :""} ${i === 6 ? "rounded-lg" :""}`}>{x}</TableHead>
                                         )
                                     })
                                 }
@@ -231,8 +229,6 @@ const AnnouncementsTable = ({data,isLoading ,setSelectedRecord,setEditIndex ,han
                     </TableBody> }
                              </Table>
             </CardContent>
-            {/*</Card>*/}
-            {/*{announcementData.length > 0 &&  <Separator/>}*/}
             {isLoading ? null : (isLoading === false && announcementData?.length > 0 ? "" :
                     <div className={"flex flex-row justify-center py-[45px]"}>
                         <div className={"flex flex-col items-center gap-2"}>
