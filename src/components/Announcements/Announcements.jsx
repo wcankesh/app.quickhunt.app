@@ -188,7 +188,7 @@ const Announcements = () => {
     };
 
     const handleBadge = (obj) =>{
-        const payload={
+        const payload = {
             ...filter,
             project_id: projectDetailsReducer.id,
             page:1,
@@ -312,7 +312,7 @@ const Announcements = () => {
                                 className={`h-9 w-9 p-2 ${tab == 1 ? "bg-primary hover:bg-primary" : ""} `}>
                             <LayoutList color={`${tab == 1 ? "#FFFFFF" : "#5F5F5F"}`}/>
                         </Button>
-                        <Button onClick={openSheet} className={"flex gap-2 px-3 md:px-6 w-[195px] md:w-auto hover:bg-primary"}>
+                        <Button onClick={openSheet} className={"flex gap-2 px-3 md:px-6 md:w-auto hover:bg-primary"}>
                             <Plus className={"w-[15px] h-[15px] md:w-[20px] md:h-[20px]"}/>
                             <span className={"text-xs md:text-sm font-semibold"}>New Announcement</span>
                         </Button>
