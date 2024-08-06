@@ -16,10 +16,12 @@ import {ApiService} from "../../utils/ApiService";
 import {useSelector} from "react-redux";
 import ReadMoreText from "../Comman/ReadMoreText";
 import moment from "moment";
+import ReactQuillEditor from "../Comman/ReactQuillEditor";
 
 const initialStateError = {
     title: "",
-    description: null,
+    description: "",
+    board: "",
 }
 
 const RoadMapSidebarSheet = ({
@@ -124,9 +126,9 @@ const RoadMapSidebarSheet = ({
                     }
                     setRoadmapList({columns: cloneRoadmap})
 
-                    toast({description: 'Vote successfully'})
+                    toast({description: data.message})
                 } else {
-                    toast({description: data.error})
+                    toast({variant: "destructive", description: data.error})
                 }
             }
         } else {
@@ -174,12 +176,12 @@ const RoadMapSidebarSheet = ({
                 }
             }
             setRoadmapList({columns: cloneRoadmap});
-            toast({description: 'Comment create successfully'})
+            toast({description: data.message})
             setCommentText('');
             setCommentFiles([])
         } else {
             setIsSaveComment(false)
-            toast({description: data.error})
+            toast({variant: "destructive", description: data.error})
         }
     }
 
@@ -223,10 +225,10 @@ const RoadMapSidebarSheet = ({
             setSubCommentText('');
             setSubCommentFiles([])
             setIsSaveSubComment(false)
-            toast({description: 'Comment create successfully'})
+            toast({description: data.message})
         } else {
             setIsSaveSubComment(false)
-            toast({description: data.error})
+            toast({variant: "destructive", description: data.error})
         }
     }
 
@@ -248,7 +250,7 @@ const RoadMapSidebarSheet = ({
             setRoadmapList({columns: cloneRoadmap})
             setIsLoading(false)
             setIsEditIdea(false)
-            toast({description: "Idea Update successfully"})
+            toast({description: data.message})
         } else {
             setIsLoading(false)
             toast({variant: "destructive", description: data.error})
@@ -295,6 +297,11 @@ const RoadMapSidebarSheet = ({
     const onChangeStatus = async (name, value) => {
         setIsLoadingSidebar(name);
         setSelectedIdea({...selectedIdea, [name]: value})
+        if(name === "delete_cover_image"){
+            setSelectedIdea({...selectedIdea, cover_image: ""})
+        } else {
+            setSelectedIdea({...selectedIdea, [name]: value})
+        }
         let formData = new FormData();
         formData.append(name, value);
         const data = await apiSerVice.updateIdea(formData, selectedIdea?.id)
@@ -347,7 +354,7 @@ const RoadMapSidebarSheet = ({
 
             setIsEditIdea(false)
             setIsLoadingSidebar('');
-            toast({description: "Idea Update successfully"})
+            toast({description: data.message})
         } else {
             setIsLoading(false)
 
@@ -418,11 +425,11 @@ const RoadMapSidebarSheet = ({
         let formData = new FormData();
         if (selectedComment && selectedComment.newImage && selectedComment.newImage.length) {
             for (let i = 0; i < selectedComment.newImage.length; i++) {
-                formData.append(`images[]`, selectedComment.newImage[i]);
+                formData.append(`images[${i}]`, selectedComment.newImage[i]);
             }
         }
         for (let i = 0; i < deletedCommentImage.length; i++) {
-            formData.append(`delete_image[]`, deletedCommentImage[i].replace('https://code.quickhunt.app/public/storage/feature_idea/', ''));
+            formData.append(`delete_image[${i}]`, deletedCommentImage[i].replace('https://code.quickhunt.app/public/storage/feature_idea/', ''));
         }
         formData.append('comment', selectedComment.comment);
         formData.append('id', selectedComment.id);
@@ -450,9 +457,9 @@ const RoadMapSidebarSheet = ({
             setIsEditComment(false)
             setDeletedCommentImage([])
             setIsSaveUpdateComment(false)
-            toast({description: 'Comment update successfully'})
+            toast({description: data.message})
         } else {
-            toast({description: data.error})
+            toast({variant: "destructive", description: data.error})
             setIsSaveUpdateComment(false)
         }
     }
@@ -496,9 +503,9 @@ const RoadMapSidebarSheet = ({
             setSelectedSubCommentIndex(null);
             setDeletedSubCommentImage([]);
             setIsSaveUpdateSubComment(false)
-            toast({description: 'Comment update successfully'})
+            toast({description: data.message})
         } else {
-            toast({description: data.error})
+            toast({variant: "destructive", description: data.error})
             setIsSaveUpdateSubComment(false)
         }
     }
@@ -522,9 +529,9 @@ const RoadMapSidebarSheet = ({
                 }
             }
             setRoadmapList({columns: cloneRoadmap});
-            toast({description: 'Comment delete successfully'})
+            toast({description: data.message})
         } else {
-            toast({description: data.error})
+            toast({variant: "destructive", description: data.error})
         }
     }
 
@@ -549,9 +556,9 @@ const RoadMapSidebarSheet = ({
                 }
             }
             setRoadmapList({columns: cloneRoadmap})
-            toast({description: 'Comment delete successfully'})
+            toast({description: data.message})
         } else {
-            toast({description: data.error})
+            toast({variant: "destructive", description: data.error})
         }
     }
 
@@ -573,6 +580,12 @@ const RoadMapSidebarSheet = ({
             case "description":
                 if (!value || value.trim() === "") {
                     return "Description is required";
+                } else {
+                    return "";
+                }
+            case "board":
+                if (!value || value?.toString()?.trim() === "") {
+                    return "Board is required";
                 } else {
                     return "";
                 }
@@ -632,6 +645,7 @@ const RoadMapSidebarSheet = ({
             topics.push(x.id)
         })
         formData.append('title', selectedIdea?.title);
+        formData.append('board', selectedIdea.board);
         formData.append('slug_url', selectedIdea?.title ? selectedIdea?.title.replace(/ /g, "-").replace(/\?/g, "-") : "");
         formData.append('description', selectedIdea?.description?.trim() === '' ? "" : selectedIdea?.description);
         formData.append('topic', topics.join(","));
@@ -640,10 +654,10 @@ const RoadMapSidebarSheet = ({
             setSelectedIdea({...data.data})
             setIsEditIdea(false)
             setIsLoadingCreateIdea(false)
-            toast({description: "Idea Update successfully"})
+            toast({description: data.message})
         } else {
             setIsLoadingCreateIdea(false)
-            toast({description: data.error})
+            toast({variant: "destructive", description: data.error})
         }
     }
 
@@ -798,7 +812,7 @@ const RoadMapSidebarSheet = ({
                                                             <CircleX
                                                                 size={20}
                                                                 className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
-                                                                onClick={() => onChangeStatus('cover_image', "")}
+                                                                onClick={() => onChangeStatus('delete_cover_image', selectedIdea && selectedIdea?.cover_image && selectedIdea?.cover_image?.name ? "" : [selectedIdea?.cover_image.replace("https://code.quickhunt.app/public/storage/feature_idea/", "")])}
                                                             />
                                                         </div> : selectedIdea?.cover_image ?
                                                             <div className={"w-[282px] h-[128px] relative border p-[5px]"}>
@@ -806,7 +820,7 @@ const RoadMapSidebarSheet = ({
                                                                 <CircleX
                                                                     size={20}
                                                                     className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
-                                                                    onClick={() => onChangeStatus('cover_image', "")}
+                                                                    onClick={() => onChangeStatus('delete_cover_image', selectedIdea && selectedIdea?.cover_image && selectedIdea?.cover_image?.name ? "" : selectedIdea?.cover_image.replace("https://code.quickhunt.app/public/storage/feature_idea/", ""))}
                                                                 />
                                                             </div>
                                                             : ''}
@@ -837,7 +851,7 @@ const RoadMapSidebarSheet = ({
                             {
                                 isEditIdea ?
                                     <div className={"pb-100px"}>
-                                        <div className={"px-4 py-3 lg:py-6 lg:px-8 flex flex-col gap-6 border-b"}>
+                                        <div className={"px-4 py-3 lg:py-6 lg:px-8 flex flex-col gap-4 ld:gap-6 border-b"}>
                                             <div className="space-y-2">
                                                 <Label htmlFor="text">Title</Label>
                                                 <Input type="text" id="text" placeholder="" value={selectedIdea?.title}
@@ -849,13 +863,35 @@ const RoadMapSidebarSheet = ({
                                             </div>
                                             <div className="space-y-2">
                                                 <Label htmlFor="message">Description</Label>
-                                                <Textarea placeholder="Start writing..." id="message"
-                                                          value={selectedIdea?.description}
-                                                          onChange={handleUpdate}
-                                                />
-                                                {formError.description &&
-                                                <span className="text-red-500 text-sm">{formError.description}</span>}
+                                                <ReactQuillEditor value={selectedIdea?.description} name={"description"} onChange={handleUpdate}/>
+                                                {formError.description && <span className="text-red-500 text-sm">{formError.description}</span>}
                                             </div>
+                                        <div className={"space-y-2"}>
+                                            <Label>Choose Board for this Idea</Label>
+                                            <Select
+                                                onValueChange={(value) => onChangeText({target:{name: "board", value}})}
+                                                value={selectedIdea.board}>
+                                                <SelectTrigger className="bg-card">
+                                                    <SelectValue/>
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectGroup>
+                                                        {
+                                                            (allStatusAndTypes?.boards || []).map((x, i) => {
+                                                                return (
+                                                                    <SelectItem key={i} value={x.id}>
+                                                                        <div className={"flex items-center gap-2"}>
+                                                                            {x.title}
+                                                                        </div>
+                                                                    </SelectItem>
+                                                                )
+                                                            })
+                                                        }
+                                                    </SelectGroup>
+                                                </SelectContent>
+                                            </Select>
+                                            {formError.board && <span className="text-red-500 text-sm">{formError.board}</span>}
+                                        </div>
                                         </div>
                                         <div className={"px-4 py-3 lg:py-6 lg:px-8 border-b space-y-2"}>
                                             <Label>Choose Topics for this Idea (optional)</Label>
@@ -903,7 +939,7 @@ const RoadMapSidebarSheet = ({
                                         </div>
                                         <div className={"p-4 lg:p-8 flex gap-3"}>
                                             <Button
-                                                className={`${isLoadingCreateIdea === true ? "w-[81px] py-2 px-6" : "py-2 px-6"} text-sm font-semibold`}
+                                                className={`${isLoadingCreateIdea === true ? "py-2 px-6" : "py-2 px-6"} w-[81px] text-sm font-semibold`}
                                                 onClick={onCreateIdea}
                                             >
                                                 {
@@ -1044,7 +1080,7 @@ const RoadMapSidebarSheet = ({
                                                                                                                     <AvatarImage
                                                                                                                         src={x.user_photo}
                                                                                                                         alt={x && x.name && x.name.substring(0, 1)} /> :
-                                                                                                                    <AvatarFallback>{x && x.name && x.name.substring(0, 1)}</AvatarFallback>
+                                                                                                                    <AvatarFallback>{x && x.name && x.name.substring(0, 1).toUpperCase()}</AvatarFallback>
                                                                                                             }
                                                                                                         </Avatar>
                                                                                                     </div>
@@ -1082,7 +1118,7 @@ const RoadMapSidebarSheet = ({
                                                                                                                         src={selectedIdea?.user_photo}
                                                                                                                         alt="@shadcn"/>
                                                                                                                     :
-                                                                                                                    <AvatarFallback>{selectedIdea && selectedIdea?.name && selectedIdea?.name.substring(0, 1)}</AvatarFallback>
+                                                                                                                    <AvatarFallback>{selectedIdea && selectedIdea?.name && selectedIdea?.name?.substring(0, 1).toUpperCase()}</AvatarFallback>
                                                                                                             }
                                                                                                         </Avatar>
                                                                                                     </div>
@@ -1272,7 +1308,7 @@ const RoadMapSidebarSheet = ({
                                                                                                     src={x.user_photo}
                                                                                                     alt="@shadcn"/>
                                                                                                 :
-                                                                                                <AvatarFallback>{x && x.name && x.name.substring(0, 1)}</AvatarFallback>
+                                                                                                <AvatarFallback>{x && x.name && x.name.substring(0, 1).toUpperCase()}</AvatarFallback>
                                                                                         }
                                                                                     </Avatar>
                                                                                 </div>
@@ -1418,7 +1454,7 @@ const RoadMapSidebarSheet = ({
                                                                                     selectedCommentIndex === i ? "" :
                                                                                         <div className={"flex justify-between"}>
                                                                                             <Button
-                                                                                                className="p-0 text-sm font-semibold text-primary"
+                                                                                                className="p-0 text-sm h-auto font-semibold text-primary"
                                                                                                 variant={"ghost hover-none"}
                                                                                                 onClick={() => onShowSubComment(i)}
                                                                                                 key={`comment-nested-reply-to-${i}`}
@@ -1451,7 +1487,7 @@ const RoadMapSidebarSheet = ({
                                                                                                                     <div>
                                                                                                                         <div
                                                                                                                             className={"update-idea text-sm rounded-full border text-center"}>
-                                                                                                                            <Avatar><AvatarFallback>{y.name.substring(0, 1)}</AvatarFallback></Avatar>
+                                                                                                                            <Avatar><AvatarFallback>{y.name.substring(0, 1).toUpperCase()}</AvatarFallback></Avatar>
                                                                                                                         </div>
                                                                                                                     </div>
                                                                                                                     <div

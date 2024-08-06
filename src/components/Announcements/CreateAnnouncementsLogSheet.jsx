@@ -17,6 +17,7 @@ import {cn} from "../../lib/utils";
 import {Calendar} from "../ui/calendar";
 import {toast} from "../ui/use-toast";
 import {Badge} from "../ui/badge";
+import ReactQuillEditor from "../Comman/ReactQuillEditor";
  //post_status: 1=Publish/active,2=Scheduled/unpublished,3=Draft,4=Expired
 const initialState = {
     post_description:'',
@@ -295,7 +296,7 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
                         </div>
                         <div className="grid w-full gap-2">
                             <Label htmlFor="description">Description</Label>
-                            <Textarea className={`min-h-[100px]`} type="text" id="description" placeholder={"Start writing..."} name={"post_description"} value={changeLogDetails.post_description} onChange={onChangeText}/>
+                            <ReactQuillEditor value={changeLogDetails.post_description} onChange={onChangeText} name={"post_description"}/>
                             {formError.post_description && <span className="text-sm text-red-500">{formError.post_description}</span>}
                         </div>
                     </div>

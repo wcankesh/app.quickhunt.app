@@ -18,6 +18,7 @@ import ReadMoreText from "../Comman/ReadMoreText";
 import moment from "moment";
 import {DropdownMenu, DropdownMenuTrigger} from "@radix-ui/react-dropdown-menu";
 import {DropdownMenuContent, DropdownMenuItem} from "../ui/dropdown-menu";
+import ReactQuillEditor from "../Comman/ReactQuillEditor";
 
 
 const initialStateError = {
@@ -504,7 +505,7 @@ const SidebarSheet = ({
                 }
             case "board":
                 if (!value || value?.toString()?.trim() === "") {
-                    return "Description is required";
+                    return "Board is required";
                 } else {
                     return "";
                 }
@@ -753,12 +754,8 @@ const SidebarSheet = ({
                                             </div>
                                             <div className="space-y-2">
                                                 <Label htmlFor="message">Description</Label>
-                                                <Textarea placeholder="Start writing..." id="message" className="bg-card" name={"description"}
-                                                          value={selectedIdea.description}
-                                                          onChange={onChangeText}
-                                                />
-                                                {formError.description &&
-                                                <span className="text-red-500 text-sm">{formError.description}</span>}
+                                                <ReactQuillEditor value={selectedIdea.description} name={"description"} onChange={onChangeText}/>
+                                                {formError.description && <span className="text-red-500 text-sm">{formError.description}</span>}
                                             </div>
                                             <div className={"space-y-2"}>
                                                 <Label>Choose Board for this Idea</Label>
@@ -833,7 +830,7 @@ const SidebarSheet = ({
                                         </div>
                                         <div className={"p-4 lg:p-8 flex gap-3"}>
                                             <Button
-                                                className={`${isLoadingCreateIdea === true ? "w-[81px] py-2 px-6" : "py-2 px-6"} text-sm font-semibold`}
+                                                className={`${isLoadingCreateIdea === true ? "py-2 px-6" : "py-2 px-6"} w-[81px] text-sm font-semibold`}
                                                 onClick={onCreateIdea}
                                             >
                                                 {
@@ -1050,7 +1047,7 @@ const SidebarSheet = ({
                                                                                                                     <AvatarImage
                                                                                                                         src={x.user_photo}
                                                                                                                         alt={x && x.name && x.name.substring(0, 1)} /> :
-                                                                                                                    <AvatarFallback>{x && x.name && x.name.substring(0, 1)}</AvatarFallback>
+                                                                                                                    <AvatarFallback>{x && x.name && x.name.substring(0, 1).toUpperCase()}</AvatarFallback>
                                                                                                             }
                                                                                                         </Avatar>
                                                                                                     </div>
@@ -1085,7 +1082,7 @@ const SidebarSheet = ({
                                                                                                                         src={x.user_photo}
                                                                                                                         alt=""/>
                                                                                                                     :
-                                                                                                                    <AvatarFallback>{x && x.name && x.name.substring(0, 1)}</AvatarFallback>
+                                                                                                                    <AvatarFallback>{x && x.name && x.name.substring(0, 1).toUpperCase()}</AvatarFallback>
                                                                                                             }
                                                                                                         </Avatar>
                                                                                                     </div>
@@ -1275,7 +1272,7 @@ const SidebarSheet = ({
                                                                                                     src={x?.user_photo}
                                                                                                     alt="@shadcn"/>
                                                                                                 :
-                                                                                                <AvatarFallback>{x && x?.name && x?.name.substring(0, 1)}</AvatarFallback>
+                                                                                                <AvatarFallback>{x && x?.name && x?.name?.substring(0, 1).toUpperCase()}</AvatarFallback>
                                                                                         }
                                                                                     </Avatar>
                                                                                 </div>
@@ -1430,7 +1427,7 @@ const SidebarSheet = ({
                                                                                         selectedCommentIndex === i ? "" :
                                                                                             <div className={"flex justify-between"}>
                                                                                                 <Button
-                                                                                                    className="p-0 text-sm font-semibold text-primary"
+                                                                                                    className="p-0 text-sm h-auto font-semibold text-primary"
                                                                                                     variant={"ghost hover-none"}
                                                                                                     onClick={() => onShowSubComment(i)}
                                                                                                     key={`comment-nested-reply-to-${i}`}
@@ -1463,7 +1460,7 @@ const SidebarSheet = ({
                                                                                                                     <div>
                                                                                                                         <div
                                                                                                                             className={"update-idea text-sm rounded-full border text-center"}>
-                                                                                                                            <Avatar><AvatarFallback>{y?.name?.substring(0, 1)}</AvatarFallback></Avatar>
+                                                                                                                            <Avatar><AvatarFallback>{y?.name?.substring(0, 1).toUpperCase()}</AvatarFallback></Avatar>
                                                                                                                         </div>
                                                                                                                     </div>
                                                                                                                     <div

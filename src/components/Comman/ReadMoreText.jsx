@@ -29,7 +29,7 @@ const ReadMoreText = ({ html }) => {
                     {isTruncated && (
                         <Button
                             variant={"ghost hover:bg-none"}
-                            className={"p-0 h-0 text-primary font-semibold text-xs"}
+                            className={"p-0 h-0 text-primary font-semibold"}
                             onClick={() => setIsExpanded(!isExpanded)}
                         >
                             Read less

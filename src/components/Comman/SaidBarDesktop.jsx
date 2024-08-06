@@ -56,7 +56,7 @@ const SaidBarDesktop = () => {
                 {
                     title: 'In App Message',
                     link: '/in-app-message',
-                    icon: Icon.widgetsIcon,
+                    icon: Icon.inAppMessage,
                     selected: `${baseUrl}/in-app-message`,
                 },
                 {

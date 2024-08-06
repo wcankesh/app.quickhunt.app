@@ -9,6 +9,7 @@ import {Sheet, SheetContent, SheetHeader, SheetOverlay} from "../ui/sheet";
 import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "../ui/select";
 import {Textarea} from "../ui/textarea";
 import {useToast} from "../ui/use-toast";
+import ReactQuillEditor from "../Comman/ReactQuillEditor";
 
 const initialState = {
     title: "",
@@ -105,7 +106,9 @@ const CreateIdea = ({
         formData.append('topic', ideaDetail.topic.join());
         formData.append('roadmap_id', selectedRoadmap && selectedRoadmap ? selectedRoadmap : "");
         const data = await apiSerVice.createIdea(formData)
+        debugger
         if(data.status === 200){
+            debugger
             let cloneRoadmap = [...roadmapList.columns];
             // cloneRoadmap.push(data.data);
             const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap);
@@ -181,10 +184,7 @@ const CreateIdea = ({
                                     </div>
                                     <div className="space-y-2">
                                         <Label htmlFor="message">Description</Label>
-                                        <Textarea placeholder="Start writing..." id="message"
-                                                  value={ideaDetail?.description}
-                                                  onChange={handleUpdate}
-                                        />
+                                        <ReactQuillEditor value={ideaDetail?.description} name={"description"} onChange={onChangeText}/>
                                         {formError.description && <span className="text-red-500 text-sm">{formError.description}</span>}
                                     </div>
                                     <div className={"space-y-2"}>
@@ -258,7 +258,7 @@ const CreateIdea = ({
                                     </Select>
                                 </div>
                                 <div className={"p-4 lg:p-8 flex gap-6"}>
-                                    <Button className={`${isLoading === true ? "w-[126px] py-2 px-6" : "py-2 px-6"} text-sm font-semibold`} onClick={onCreateIdea}>
+                                    <Button className={`${isLoading === true ? "py-2 px-6" : "py-2 px-6"} w-[126px] text-sm font-semibold`} onClick={onCreateIdea}>
                                         {
                                             isLoading ? <Loader2 className="h-4 w-4 animate-spin"/> : "Create Idea"
                                         }

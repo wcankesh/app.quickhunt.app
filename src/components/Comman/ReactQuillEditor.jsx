@@ -13,8 +13,8 @@ const ReactQuillEditor = ({name, value, onChange}) => {
                             ["bold", "italic", "underline", "strike", "blockquote"],
                             [{ align: [] }],
                             [{ list: "ordered" }, { list: "bullet" }],
-                            [{ "color": [] }, { 'background': [] }],
-                            ["link", "image"],
+                            [{ "color": [] }],
+                            ["link"],
 
                         ]
                     }

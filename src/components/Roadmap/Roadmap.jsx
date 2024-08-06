@@ -27,6 +27,7 @@ const loading = {
 const Roadmap = () => {
     const {theme} = useTheme()
     const {toast} = useToast()
+    const apiService = new ApiService();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const [isSheetOpen, setSheetOpen] = useState(false);
     const [isSheetOpenCreate, setSheetOpenCreate] = useState(false);
@@ -39,9 +40,6 @@ const Roadmap = () => {
     const [selectedRoadmap, setSelectedRoadmap] = useState({});
     const [isCreateIdea, setIsCreateIdea] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-
-
-    const apiService = new ApiService();
 
     const openSheet = () => setSheetOpen(true);
     const closeSheet = () => setSheetOpen(false);
@@ -111,7 +109,7 @@ const Roadmap = () => {
     return (
         <div
             // className={"roadmap-container height-inherit h-svh  overflow-y-auto xl:container-secondary xl:max-w-[1605px] lg:container lg:max-w-[992px] md:container md:max-w-[768px] sm:container max-w-[639px]"}>
-            className={"roadmap-container height-inherit h-svh  overflow-y-auto xl:container-secondary xl:max-w-[1605px] lg:container lg:max-w-[1230px] md:container md:max-w-[960px] sm:container max-w-[639px]"}>
+            className={"roadmap-container height-inherit h-svh overflow-y-auto container-secondary xl:max-w-[1605px] lg:max-w-[1230px] md:max-w-[960px] max-w-[639px]"}>
             <RoadMapSidebarSheet
                 isOpen={isSheetOpen}
                 onOpen={openSheet}

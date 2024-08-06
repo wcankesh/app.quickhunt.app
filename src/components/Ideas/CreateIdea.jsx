@@ -7,9 +7,7 @@ import {useSelector} from "react-redux";
 import {Check, Loader2, X} from "lucide-react";
 import {Sheet, SheetContent, SheetHeader, SheetOverlay} from "../ui/sheet";
 import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "../ui/select";
-import {Textarea} from "../ui/textarea";
 import {useToast} from "../ui/use-toast";
-import ReactQuill from 'react-quill'
 import ReactQuillEditor from "../Comman/ReactQuillEditor";
 
 const initialState = {
@@ -95,6 +93,7 @@ const CreateIdea = ({
         formData.append('topic', ideaDetail.topic.join());
         const data = await apiSerVice.createIdea(formData)
         if(data.status === 200){
+            debugger
             const clone = [...ideasList];
             const newArray = [data.data].concat(clone)
             setIdeasList(newArray);
@@ -240,7 +239,7 @@ const CreateIdea = ({
                                         </Select>
                                 </div>
                                 <div className={"p-4 lg:p-8 flex gap-6"}>
-                                    <Button className={`${isLoading === true ? "w-[126px] py-2 px-6" : "py-2 px-6"} text-sm font-semibold`} onClick={onCreateIdea}>
+                                    <Button className={`${isLoading === true ? "py-2 px-6" : "py-2 px-6"} w-[126px] text-sm font-semibold`} onClick={onCreateIdea}>
                                         {
                                             isLoading ? <Loader2 className="h-4 w-4 animate-spin"/> : "Create Idea"
                                         }

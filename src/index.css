@@ -165,7 +165,8 @@ p {margin: 0 !important;}
 .sidebar-mobile-menu{height: calc(100vh - 52px);}
 .create-sheet-height{height: calc(100vh - 69px);}
 
-.hov-primary.data-\[selected\=true\]\:bg-accent[data-selected=true]{background-color: hsl(var(--primary));color: hsl(var(--card))}
+.hov-primary.data-\[selected\=true\]\:bg-accent[data-selected=true]{background-color: hsl(var(--primary));color: hsl(var(--card-foreground))}
+/*.hov-primary.data-\[selected\=true\]\:bg-accent[data-selected=true]:hover{background-color: hsl(var(--primary));color: hsl(var(--card-foreground))}*/
 
 .widget-switch .data-\[state\=checked\]\:translate-x-5[data-state=checked]{width: 14px;height: 14px;--tw-translate-x: 11px}
 .widget-switch .data-\[state\=unchecked\]\:translate-x-0[data-state=unchecked]{width: 14px;height: 14px;}
@@ -357,7 +358,8 @@ span.LinesEllipsis-ellipsis {color: hsl(var(--primary)) !important;font-weight: 
 .QH-sidebar-shadow{
   background-color: #28313a;
   height: 100%;
-  left: 350px;
+  /*left: 350px;*/
+  left: 282px;
   opacity: .4;
   position: fixed;
   top: 0;
@@ -371,7 +373,8 @@ span.LinesEllipsis-ellipsis {color: hsl(var(--primary)) !important;font-weight: 
 
 .QH-modal{
   display: none;
-  left: 0;
+  left: 282px;
+  right: 0;
   margin: 0;
   min-height: 100%;
   opacity: 0;
@@ -383,7 +386,6 @@ span.LinesEllipsis-ellipsis {color: hsl(var(--primary)) !important;font-weight: 
   top: 0;
   -webkit-transition: opacity .3s ease-in-out;
   transition: opacity .3s ease-in-out;
-  width: 100%;
   z-index: 99999;
 }
 .QH-modal-open{
@@ -496,3 +498,14 @@ span.LinesEllipsis-ellipsis {color: hsl(var(--primary)) !important;font-weight: 
 .ql-toolbar.ql-snow .ql-picker-label{
   color: var(--quill-icon)
 }
+.ql-snow .ql-editor img {
+  max-width: 50px;
+  width: 100%;
+  height: 50px;
+  border: 1px solid;
+  border-color: var(--border-color);
+  padding: 3px;
+}
+/*.ql-editor p {display: flex; gap: 8px}*/
+.description-container div p span {color: var(--muted-foreground) !important;}
+.description-container div p span span .LinesEllipsis-ellipsis {color: var(--primary) !important;}
