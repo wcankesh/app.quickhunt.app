@@ -507,5 +507,9 @@ span.LinesEllipsis-ellipsis {color: hsl(var(--primary)) !important;font-weight: 
   padding: 3px;
 }
 /*.ql-editor p {display: flex; gap: 8px}*/
-.description-container div p span {color: var(--muted-foreground) !important;}
-.description-container div p span span .LinesEllipsis-ellipsis {color: var(--primary) !important;}
+/*.description-container div p span {color: var(--muted-foreground) !important;}*/
+/*.description-container .LinesEllipsis .LinesEllipsis--clamped div p span .LinesEllipsis-ellipsis {color: var(--primary) !important;}*/
+em {color: var(--muted-foreground) !important;}
+.description-container div div div p span {color: var(--muted-foreground) !important;}
+.description-container div div div p span span span {color: var(--primary) !important;}
+.ql-snow .ql-editor p span {color: var(--card) !important}

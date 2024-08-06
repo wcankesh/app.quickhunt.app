@@ -10,6 +10,7 @@ import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVal
 import {Textarea} from "../ui/textarea";
 import {useToast} from "../ui/use-toast";
 import ReactQuillEditor from "../Comman/ReactQuillEditor";
+import {useTheme} from "../theme-provider";
 
 const initialState = {
     title: "",
@@ -36,6 +37,7 @@ const CreateIdea = ({
                         roadmapList,
                         setRoadmapList,
                     }) => {
+    const {theme} = useTheme()
     let apiSerVice = new ApiService();
     const { toast } = useToast()
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
@@ -225,7 +227,7 @@ const CreateIdea = ({
                                                             const findObj = topicLists.find((y) => y.id === x);
                                                             return(
                                                                 <>
-                                                                    <div key={index} className={"text-sm flex gap-[2px] bg-slate-300 items-center rounded py-0 px-2"} >
+                                                                    <div key={index} className={`text-xs flex gap-[2px] ${theme === "dark" ? "text-card" : ""} bg-slate-300 items-center rounded py-0 px-2`}>
                                                                         {findObj?.title}
                                                                     </div>
                                                                 </>

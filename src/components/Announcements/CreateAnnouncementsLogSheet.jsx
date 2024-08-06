@@ -44,6 +44,7 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
     const [previewImage,setPreviewImage] = useState("");
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
+    const userDetailsReducer = useSelector(state => state.userDetailsReducer);
     const [changeLogDetails, setChangeLogDetails] = useState(initialState);
     const [labelList, setLabelList] = useState([]);
     const [memberList, setMemberList] = useState([])
@@ -59,7 +60,7 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
         setLabelList(allStatusAndTypes.labels);
         setMemberList(allStatusAndTypes.members);
         setCategoriesList(allStatusAndTypes.categories);
-    },[projectDetailsReducer.id,allStatusAndTypes])
+    },[projectDetailsReducer.id,allStatusAndTypes,userDetailsReducer.id])
 
     const getSinglePosts = () => {
         const labelId = selectedRecord.labels.map(x => x?.id?.toString());
@@ -120,6 +121,7 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
             [event.target.name]: formValidate(event.target.name, event.target.value)
         }));
     }
+
     const onChangeCategory = (selectedItems ) =>{
         setChangeLogDetails({...changeLogDetails, category_id: selectedItems})
     }
@@ -241,6 +243,13 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
         onClose(data.data);
     }
 
+    const loggedInUser = memberList.find(member => member.user_id === userDetailsReducer.id);
+    const loggedInUserId = loggedInUser ? loggedInUser.user_id.toString() : null;
+
+    const defaultAssignTo = (changeLogDetails.post_assign_to || []).includes(loggedInUserId)
+        ? changeLogDetails.post_assign_to
+        : [...(changeLogDetails.post_assign_to || []), loggedInUserId];
+
     const handleValueChange = (value) => {
         const clone = [...changeLogDetails.post_assign_to]
         const index = clone.indexOf(value);
@@ -288,11 +297,11 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
                         </div>
                         <div className="grid w-full gap-2">
                             <Label htmlFor="link">Permalink / Slug</Label>
-                            <Input type="text" className={"h-9"} id="link" name={"post_slug_url"} value={changeLogDetails.post_slug_url} onChange={onChangeText}/>
-                            <p className={"text-sm font-normal text-muted-foreground"}>This release will be available at {projectDetailsReducer.domain ? <a
+                            <Input type="text" className={"h-9 max-w-[593px] w-full"} id="link" name={"post_slug_url"} value={changeLogDetails.post_slug_url} onChange={onChangeText}/>
+                            <p className={"text-sm font-normal text-muted-foreground break-words"}>This release will be available at {projectDetailsReducer.domain ? <a
                                 href={`https://${projectDetailsReducer.domain}/announcements/${changeLogDetails.post_slug_url}`}
                                 target={"_blank"}
-                                className={"text-primary text-sm"}>{`https://${projectDetailsReducer.domain}/announcements/${changeLogDetails.post_slug_url}`}</a> : ""}</p>
+                                className={"text-primary max-w-[593px] w-full break-words text-sm"}>{`https://${projectDetailsReducer.domain}/announcements/${changeLogDetails.post_slug_url}`}</a> : ""}</p>
                         </div>
                         <div className="grid w-full gap-2">
                             <Label htmlFor="description">Description</Label>
@@ -352,20 +361,21 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
                         <div className="grid w-full gap-2 md:basis-1/2">
                             <Label htmlFor="label">Assign to</Label>
                             <Select onValueChange={handleValueChange} value={[]}>
+                            {/*<Select onValueChange={handleValueChange} value={defaultAssignTo}>*/}
                                 <SelectTrigger className={"h-9"}>
                                     <SelectValue className={"text-muted-foreground text-sm"} placeholder="Assign to">
                                         <div className={"flex gap-[2px]"}>
                                             {
-                                                (changeLogDetails.post_assign_to || []).slice(0,2).map((x,index)=>{
+                                                (defaultAssignTo || []).slice(0,2).map((x,index)=>{
                                                     const findObj = memberList.find((y,) => y.user_id == x);
                                                     return(
                                                         <div key={index} className={"text-sm flex gap-[2px] bg-slate-300 items-center rounded py-0 px-2"} onClick={(e)=>deleteAssignTo(e,index)}>
-                                                            {findObj.user_first_name ? findObj.user_first_name : ''}
+                                                            {findObj?.user_first_name ? findObj?.user_first_name : ''}
                                                         </div>
                                                     )
                                                 })
                                             }
-                                            {(changeLogDetails.post_assign_to || []).length > 2 && <div>...</div>}
+                                            {(defaultAssignTo || []).length > 2 && <div>...</div>}
                                         </div>
                                     </SelectValue>
                                 </SelectTrigger>
@@ -375,7 +385,7 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
                                             <SelectItem className={"p-2"} key={i} value={x.user_id.toString()}>
                                                 <div className={"flex gap-2"}>
                                                     <div onClick={() => handleValueChange(x.user_id.toString())} className="checkbox-icon">
-                                                        {changeLogDetails.post_assign_to.includes(x.user_id.toString()) ? <Check size={18} />: <div className={"h-[18px] w-[18px]"}></div>}
+                                                        {defaultAssignTo?.includes(x.user_id.toString()) ? <Check size={18} />: <div className={"h-[18px] w-[18px]"}></div>}
                                                     </div>
                                                     <span>{x.user_first_name ? x.user_first_name : ''} {x.user_last_name ? x.user_last_name : ''}</span>
                                                 </div>
@@ -417,13 +427,16 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
                                         className={cn("justify-between text-left font-normal d-flex", "text-muted-foreground")}
                                     >
                                         {moment(changeLogDetails.post_published_at).format("LL")}
-                                        <CalendarIcon className="mr-2 h-4 w-4" />
+                                        {/*{changeLogDetails.post_published_at*/}
+                                        {/*? moment(changeLogDetails.post_published_at).format("LL")*/}
+                                        {/*: moment().format("LL")}*/}
+                                        {/*<CalendarIcon className="mr-2 h-4 w-4" />*/}
                                     </Button>
                                 </PopoverTrigger>
                                 <PopoverContent className="w-auto p-0" align="start">
                                     <Calendar
                                         mode="single"
-                                        selected={changeLogDetails.post_published_at}
+                                        selected={changeLogDetails.post_published_at || new Date()}
                                         onSelect={(date) => onDateChange("post_published_at", date)}
                                         captionLayout="dropdown-buttons" fromYear={2024} toYear={2050}
                                     />
@@ -489,7 +502,7 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
                         variant={"outline "}
                         disabled={isSave}
                         onClick={selectedRecord?.post_slug_url ? updatePost : createPosts}
-                        className={` bg-primary ${theme === "dark" ? "text-card-foreground" : "text-card"} font-semibold`}
+                        className={` bg-primary ${theme === "dark" ? "text-card-foreground" : "text-card"} w-[115px] font-semibold`}
                     >
                         { isSave ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : selectedRecord?.post_slug_url ? "Update Post" : "Publish Post"}
                     </Button>

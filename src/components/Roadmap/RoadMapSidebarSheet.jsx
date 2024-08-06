@@ -905,7 +905,7 @@ const RoadMapSidebarSheet = ({
                                                                 const findObj = (topicLists || []).find((y) => y.id === x?.id);
                                                                 return (
                                                                     <div key={index}
-                                                                         className={"text-xs flex gap-[2px] bg-slate-300 items-center rounded py-0 px-2"}>
+                                                                         className={`text-xs flex gap-[2px] ${theme === "dark" ? "text-card" : ""} bg-slate-300 items-center rounded py-0 px-2`}>
                                                                         {findObj?.title}
                                                                     </div>
                                                                 );

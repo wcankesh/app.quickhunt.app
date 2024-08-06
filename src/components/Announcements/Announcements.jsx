@@ -34,7 +34,7 @@ const initialStateFilter = {
     s: "",
     q:""
 }
-const perPageLimit = 15;
+const perPageLimit = 10;
 
 const status = [
     {
@@ -340,11 +340,10 @@ const Announcements = () => {
                     isLoading={isLoading}/>
                 { totalPages > 0 && <CardFooter className={"p-0"}>
                     <div
-                        className={`w-full p-5 ${theme === "dark" ? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end px-4 py-4 md:px-16 md:py-15px`}>
-                        <div className={"w-full flex gap-8 items-center justify-between sm:justify-end"}>
-                            {/*<div className={"w-full flex justify-between gap-2 items-center"}>*/}
+                        className={`w-full ${theme === "dark" ? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end p-2 md:px-3 md:py-[10px]`}>
+                        <div className={"w-full flex gap-2 items-center justify-between sm:justify-end"}>
                             <div>
-                                <h5 className={"text-xs md:text-sm font-semibold"}>Page {pageNo} of {totalPages}</h5>
+                                <h5 className={"text-sm font-semibold"}>Page {pageNo} of {totalPages}</h5>
                             </div>
                             <div className={"flex flex-row gap-2 items-center"}>
                                 <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}

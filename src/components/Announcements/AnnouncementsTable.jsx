@@ -43,7 +43,7 @@ const AnnouncementsTable = ({data,isLoading ,setSelectedRecord,setEditIndex ,han
         const data = await apiService.updatePosts(payload,object.id);
         if(data.status === 200){
             toast({
-                description: "Status updated successfully",
+                description: data.message,
             });
         } else {
             toast({
@@ -105,13 +105,13 @@ const AnnouncementsTable = ({data,isLoading ,setSelectedRecord,setEditIndex ,han
 
 
             <CardContent className={"p-0 overflow-auto"}>
-                <Table className={""}>
-                        <TableHeader className={"p-0"}>
-                            <TableRow className={""}>
+                <Table>
+                    <TableHeader className={`${theme === "dark" ? "" : "bg-muted"}`}>
+                            <TableRow>
                                 {
                                     ["Title","Last Updated","Published At","Status","","",""].map((x,i)=>{
                                         return(
-                                            <TableHead className={`text-sm lg:text-base font-semibold px-2 md:py-4 md:px-3 lg:py-5 lg:px-4 ${theme === "dark" ? "text-[]" : "bg-muted"}`}>
+                                            <TableHead className={`font-semibold px-2 py-[10px] md:px-3 `}>
                                                 {x}
                                             </TableHead>
                                         )
@@ -121,14 +121,14 @@ const AnnouncementsTable = ({data,isLoading ,setSelectedRecord,setEditIndex ,han
                         </TableHeader>
                     {isLoading ? <TableBody>
                         {
-                            [...Array(4)].map((_, index) => {
+                            [...Array(10)].map((_, index) => {
                                 return (
                                     <TableRow key={index}>
                                         {
                                             [...Array(7)].map((_, i) => {
                                                 return (
-                                                    <TableCell className={"max-w-[373px]"}>
-                                                        <Skeleton className={"rounded-md  w-full h-[40px]"}/>
+                                                    <TableCell className={"max-w-[373px] px-2 py-[10px] md:px-3"}>
+                                                        <Skeleton className={"rounded-md  w-full h-8"}/>
                                                     </TableCell>
                                                 )
                                             })
@@ -141,34 +141,39 @@ const AnnouncementsTable = ({data,isLoading ,setSelectedRecord,setEditIndex ,han
                     <TableBody>
                            {(announcementData || []).map((x, index) => {
                                                 return (
-                                                    <TableRow key={x?.id} className={"font-medium"}>
+                                                    <TableRow key={x?.id} className={""}>
                                                         <TableCell
-                                                            className={`inline-flex gap-2 md:gap-3 flex-wrap items-center px-2 md:py-4 md:px-3 lg:py-5 lg:px-4 ${theme === "dark" ? "" : "text-muted-foreground"}`}>
-                                                            <span className={""}>{x?.post_title}</span>
-                                                            <div className={"flex flex-wrap gap-1"}>
+                                                            className={`inline-flex gap-2 md:gap-3 flex-wrap items-center px-2 py-[10px] md:px-3 font-medium h-12`}>
+                                                            <span className={"cursor-pointer"} onClick={() => onEdit(x,index)}>{x?.post_title}</span>
                                                                 {
-                                                                    (x.labels || []).map((y,index) => {
-                                                                        return (
-                                                                            <Badge variant={"outline"} key={index} style={{
-                                                                                color: y.label_color_code,
-                                                                                borderColor: y.label_color_code,
-                                                                                textTransform: "capitalize"
-                                                                            }}
-                                                                                   className={`h-[20px] py-0 px-2 text-xs rounded-[5px]  font-medium text-[${y.label_color_code}] border-[${y.label_color_code}] capitalize`}>{y.label_name}</Badge>
-                                                                        )
-                                                                    })
-                                                                }
-                                                            </div>
+                                                                    x.labels && x.labels.length > 0 ?
+                                                            <div className={"flex flex-wrap gap-1"}>
+                                                                        <Fragment>
+                                                                            {
+                                                                                (x.labels || []).map((y,index) => {
+                                                                                    return (
+                                                                                        <Badge variant={"outline"} key={index} style={{
+                                                                                            color: y.label_color_code,
+                                                                                            borderColor: y.label_color_code,
+                                                                                            textTransform: "capitalize"
+                                                                                        }}
+                                                                                               className={`h-[20px] py-0 px-2 text-xs rounded-[5px]  font-medium text-[${y.label_color_code}] border-[${y.label_color_code}] capitalize`}>{y.label_name}</Badge>
+                                                                                    )
+                                                                                })
+                                                                            }
+                                                                        </Fragment>
+                                                            </div> : "" }
                                                         </TableCell>
                                                         <TableCell
-                                                            className={`${theme === "dark" ? "" : "text-muted-foreground"} px-2 md:py-4 md:px-3 lg:py-5 lg:px-4`}>{x?.post_modified_date ? moment.utc(x.post_modified_date).local().startOf('seconds').fromNow() : "-"}</TableCell>
-                                                        <TableCell
-                                                            className={`${theme === "dark" ? "" : "text-muted-foreground"} px-2 md:py-4 md:px-3 lg:py-5 lg:px-4`}>{x?.post_published_at ? moment.utc(x.post_published_at).local().startOf('seconds').fromNow() : "-"}</TableCell>
-                                                        <TableCell className={"px-2 md:py-4 md:px-3 lg:py-5 lg:px-4"}>
+                                                            className={`font-medium px-2 py-[10px] md:px-3`}>{x?.post_modified_date ? moment.utc(x.post_modified_date).local().startOf('seconds').fromNow() : "-"}</TableCell>
+                                                        {/*<TableCell className={`font-medium px-2 py-[10px] md:px-3`}>{x?.post_published_at ? moment.utc(x.post_published_at).local().startOf('seconds').fromNow() : "-"}</TableCell>*/}
+                                                        <TableCell className={`font-medium px-2 py-[10px] md:px-3`}>{moment(x.post_published_at).format('D MMM, YYYY')}</TableCell>
+                                                        {console.log("status", status)}
+                                                        <TableCell className={"px-2 py-[10px] md:px-3"}>
                                                             <Select value={x.post_status}
                                                                     onValueChange={(value) => handleStatusChange(x, value)}>
                                                                 <SelectTrigger className="w-[137px] h-7">
-                                                                    <SelectValue placeholder="Publish"/>
+                                                                    <SelectValue placeholder={x.post_status ? status.find(s => s.value === x.post_status)?.name : "Publish"}/>
                                                                 </SelectTrigger>
                                                                 <SelectContent>
                                                                     <SelectGroup>
@@ -178,7 +183,7 @@ const AnnouncementsTable = ({data,isLoading ,setSelectedRecord,setEditIndex ,han
                                                                                     <Fragment key={i}>
                                                                                         <SelectItem value={x.value} disabled={x.value === 2}>
                                                                                             <div className={"flex items-center gap-2"}>
-                                                                                                <Circle fill={x.fillColor} stroke={x.strokeColor} className={`${theme === "dark" ? "" : "text-muted-foreground"} w-2 h-2`}/>
+                                                                                                <Circle fill={x.fillColor} stroke={x.strokeColor} className={`font-medium w-2 h-2`}/>
                                                                                                 {x.name}
                                                                                             </div>
                                                                                         </SelectItem>
@@ -190,31 +195,31 @@ const AnnouncementsTable = ({data,isLoading ,setSelectedRecord,setEditIndex ,han
                                                                 </SelectContent>
                                                             </Select>
                                                         </TableCell>
-                                                        <TableCell className={"px-2 md:py-4 md:px-3 lg:py-5 lg:px-4"}>
+                                                        <TableCell className={"px-2 py-[10px] md:px-3"}>
                                                             <Button
                                                                 disabled={x.post_status !== 1}
                                                                 variant={"ghost"}
                                                                 onClick={() => shareFeedback(x.domain,x.post_slug_url)}
                                                                 className={"p-0 h-auto"}
                                                             >
-                                                                <Eye size={18} className={`${theme === "dark" ? "" : "text-muted-foreground"}`}/>
+                                                                <Eye size={18} className={`font-medium`}/>
                                                             </Button>
                                                         </TableCell>
-                                                        <TableCell className={"px-2 md:py-4 md:px-3 lg:py-5 lg:px-4"}>
+                                                        <TableCell className={"px-2 py-[10px] md:px-3"}>
                                                             <Button
                                                                 onClick={() => openSheet(x)}
                                                                 variant={"ghost"}
                                                                 className={"p-0 h-auto"}
                                                             >
-                                                                <BarChart size={18} className={`${theme === "dark" ? "" : "text-muted-foreground"}`}/>
+                                                                <BarChart size={18} className={`font-medium`}/>
                                                             </Button>
                                                         </TableCell>
-                                                        <TableCell className={"px-2 md:py-4 md:px-3 lg:py-5 lg:px-4"}>
+                                                        <TableCell className={"px-2 py-[10px] md:px-3"}>
                                                             <DropdownMenu>
                                                                 <DropdownMenuTrigger>
-                                                                    <Ellipsis className={`${theme === "dark" ? "" : "text-muted-foreground"}`} size={18}/>
+                                                                    <Ellipsis className={`font-medium`} size={18}/>
                                                                 </DropdownMenuTrigger>
-                                                                <DropdownMenuContent>
+                                                                <DropdownMenuContent align={"end"}>
                                                                     <DropdownMenuItem
                                                                         onClick={() => onEdit(x,index)}>Edit</DropdownMenuItem>
                                                                     <DropdownMenuItem onClick={()=>deleteRow(x.id)}>Delete</DropdownMenuItem>
