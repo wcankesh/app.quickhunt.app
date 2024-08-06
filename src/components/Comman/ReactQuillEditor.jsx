@@ -26,7 +26,11 @@ const ReactQuillEditor = ({name, value, onChange}) => {
                     "link", "image", "align", "size",
                 ]}
                 value={value}
-                onChange={(value) => onChange({target: {name: name, value}})}
+                onChange={(newValue, delta, source, editor) => {
+                    if (source === "user") {
+                        onChange({target: {name: name, value: newValue}})
+                    }
+                }}
             />
         </div>
     );
