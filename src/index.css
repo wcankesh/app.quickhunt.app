@@ -24,7 +24,8 @@
     --input: 214.3 31.8% 91.4%;
     --ring: 221.2 83.2% 53.3%;
     --radius: 0.5rem;
-    --border-color: #e5ebf2
+    --border-color: #e5ebf2;
+    --quill-icon: #444
   }
 
   .dark {
@@ -47,7 +48,8 @@
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 224.3 76.3% 48%;
-    --border-color: #192535
+    --border-color: #192535;
+    --quill-icon: #e5ebf2
   }
 }
 
@@ -478,4 +480,19 @@ span.LinesEllipsis-ellipsis {color: hsl(var(--primary)) !important;font-weight: 
 }
 .rdp-caption_dropdowns{
   display: flex; gap: 25px;
+}
+.ql-toolbar.ql-snow, .ql-container.ql-snow{
+  border: 0;
+}
+.ql-container.ql-snow{
+  border-top: 1px solid var(--border-color)!important;
+}
+.ql-snow .ql-stroke {
+  stroke: var(--quill-icon)
+}
+.ql-snow .ql-fill {
+  fill: var(--quill-icon)
+}
+.ql-toolbar.ql-snow .ql-picker-label{
+  color: var(--quill-icon)
 }

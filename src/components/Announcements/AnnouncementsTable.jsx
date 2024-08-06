@@ -18,13 +18,14 @@ import {Dialog} from "@radix-ui/react-dialog";
 import {DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "../ui/dialog";
 
 const status = [
-    {name: "Publish", value: 0, fillColor: "#389E0D", strokeColor: "#389E0D",},
-    {name: "Draft", value: 1, fillColor: "#CF1322", strokeColor: "#CF1322",},
+    {name: "Publish", value: 1, fillColor: "#389E0D", strokeColor: "#389E0D",},
+    {name: "Scheduled", value: 2, fillColor: "#63C8D9", strokeColor: "#63C8D9", },
+    {name: "Draft", value: 3, fillColor: "#CF1322", strokeColor: "#CF1322",},
 ]
 
 const AnnouncementsTable = ({data,isLoading ,setSelectedRecord,setEditIndex ,handleDelete,setAnalyticsObj,}) => {
-    const [announcementData,setAnnouncementData]=useState(data);
-    const [idToDelete,setIdToDelete]=useState(null);
+    const [announcementData,setAnnouncementData] = useState(data);
+    const [idToDelete,setIdToDelete] = useState(null);
     const [openDelete, setOpenDelete] = useState(false);
     const { theme }= useTheme();
 
@@ -37,8 +38,8 @@ const AnnouncementsTable = ({data,isLoading ,setSelectedRecord,setEditIndex ,han
     };
 
     const handleStatusChange = async (object, value) => {
-        setAnnouncementData(announcementData.map(x => x.id === object.id ? { ...x, post_save_as_draft: value } : x));
-        const payload = {...object,post_save_as_draft:value}
+        setAnnouncementData(announcementData.map(x => x.id === object.id ? {...x, post_status: value} : x));
+        const payload = {...object,post_status:value}
         const data = await apiService.updatePosts(payload,object.id);
         if(data.status === 200){
             toast({
@@ -46,7 +47,7 @@ const AnnouncementsTable = ({data,isLoading ,setSelectedRecord,setEditIndex ,han
             });
         } else {
             toast({
-                description: "Something went wrong.",
+                description: data.message,
                 variant: "destructive",
             });
         }
@@ -164,23 +165,20 @@ const AnnouncementsTable = ({data,isLoading ,setSelectedRecord,setEditIndex ,han
                                                         <TableCell
                                                             className={`${theme === "dark" ? "" : "text-muted-foreground"} px-2 md:py-4 md:px-3 lg:py-5 lg:px-4`}>{x?.post_published_at ? moment.utc(x.post_published_at).local().startOf('seconds').fromNow() : "-"}</TableCell>
                                                         <TableCell className={"px-2 md:py-4 md:px-3 lg:py-5 lg:px-4"}>
-                                                            <Select value={x.post_save_as_draft}
+                                                            <Select value={x.post_status}
                                                                     onValueChange={(value) => handleStatusChange(x, value)}>
-                                                                <SelectTrigger className="w-[114px] h-7">
+                                                                <SelectTrigger className="w-[137px] h-7">
                                                                     <SelectValue placeholder="Publish"/>
                                                                 </SelectTrigger>
                                                                 <SelectContent>
                                                                     <SelectGroup>
                                                                         {
-                                                                            (   status || []).map((x, i) => {
+                                                                            (status || []).map((x, i) => {
                                                                                 return (
                                                                                     <Fragment key={i}>
-                                                                                        <SelectItem value={x.value}>
-                                                                                            <div
-                                                                                                className={"flex items-center gap-2"}>
-                                                                                                <Circle fill={x.fillColor}
-                                                                                                        stroke={x.strokeColor}
-                                                                                                        className={`${theme === "dark" ? "" : "text-muted-foreground"} w-2 h-2`}/>
+                                                                                        <SelectItem value={x.value} disabled={x.value === 2}>
+                                                                                            <div className={"flex items-center gap-2"}>
+                                                                                                <Circle fill={x.fillColor} stroke={x.strokeColor} className={`${theme === "dark" ? "" : "text-muted-foreground"} w-2 h-2`}/>
                                                                                                 {x.name}
                                                                                             </div>
                                                                                         </SelectItem>
@@ -194,7 +192,7 @@ const AnnouncementsTable = ({data,isLoading ,setSelectedRecord,setEditIndex ,han
                                                         </TableCell>
                                                         <TableCell className={"px-2 md:py-4 md:px-3 lg:py-5 lg:px-4"}>
                                                             <Button
-                                                                disabled={x.post_save_as_draft == 1 ? true : false}
+                                                                disabled={x.post_status !== 1}
                                                                 variant={"ghost"}
                                                                 onClick={() => shareFeedback(x.domain,x.post_slug_url)}
                                                                 className={"p-0 h-auto"}

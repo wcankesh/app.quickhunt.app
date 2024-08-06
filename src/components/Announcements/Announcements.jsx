@@ -38,18 +38,20 @@ const perPageLimit = 15;
 
 const status = [
     {
-        label: "Draft",
+        label: "Published",
         value: 1
     },
     {
-        label: "Published",
+        label: "Scheduled",
         value: 2
-    }
+    },
+    {
+        label: "Draft",
+        value: 3
+    },
 ];
 
 const Announcements = () => {
-    const activeTab = localStorage.getItem("tabIndex") || 0;
-    const [tab, setTab] = useState(Number(activeTab));
     const {theme} = useTheme();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
@@ -151,7 +153,6 @@ const Announcements = () => {
     }
 
     const filterPosts = async  (event) => {
-
         setIsLoading(true)
         setFilter({...filter, [event.name]: event.value,});
         const payload = {
@@ -176,11 +177,6 @@ const Announcements = () => {
         }
     }
 
-    const handleTab = (tabIndex) => {
-        setTab(tabIndex);
-        localStorage.setItem("tabIndex", tabIndex);
-    }
-
     const handlePaginationClick = (newPage) => {
         if (newPage >= 1 && newPage <= totalPages) {
             setPageNo(newPage);
@@ -200,7 +196,6 @@ const Announcements = () => {
 
     const matchedObject = allStatusAndTypes.labels ? allStatusAndTypes.labels.find(x => x.id === filter.l) : null;
 
-    console.log(filter,"filter")
 
     return (
         <div
@@ -304,14 +299,6 @@ const Announcements = () => {
 
                     </div>
                     <div className={"flex flex-grow gap-2 items-center"}>
-                        <Button onClick={() => handleTab(0)} variant={"outline"}
-                                className={`h-9 w-9 p-2 ${tab == 0 ? "bg-primary hover:bg-primary" : ""} `}>
-                            <Text color={`${tab == 0 ? "#FFFFFF" : "#5F5F5F"}`}/>
-                        </Button>
-                        <Button onClick={() => handleTab(1)} variant={"outline"}
-                                className={`h-9 w-9 p-2 ${tab == 1 ? "bg-primary hover:bg-primary" : ""} `}>
-                            <LayoutList color={`${tab == 1 ? "#FFFFFF" : "#5F5F5F"}`}/>
-                        </Button>
                         <Button onClick={openSheet} className={"flex gap-2 px-3 md:px-6 md:w-auto hover:bg-primary"}>
                             <Plus className={"w-[15px] h-[15px] md:w-[20px] md:h-[20px]"}/>
                             <span className={"text-xs md:text-sm font-semibold"}>New Announcement</span>
@@ -335,14 +322,9 @@ const Announcements = () => {
                 {
                     filter.l && <Badge variant="outline" className="rounded p-0">
                         <span className="px-3 py-1.5 border-r flex gap-2 items-center">
-                                                <span className={"w-2.5 h-2.5  rounded-full"}
-                                                      style={{backgroundColor: matchedObject.label_color_code}}/>
-                            {matchedObject?.label_name}
-                                            </span>
-                        <span className="w-7 h-7 flex items-center justify-center cursor-pointer"
-                              onClick={() => handleBadge({name: "label", value: "l"})}>
-                                            <X className='w-4 h-4'/>
+                            <span className={"w-2.5 h-2.5  rounded-full"} style={{backgroundColor: matchedObject.label_color_code}}/>{matchedObject?.label_name}
                         </span>
+                        <span className="w-7 h-7 flex items-center justify-center cursor-pointer" onClick={() => handleBadge({name: "label", value: "l"})}><X className='w-4 h-4'/></span>
                     </Badge>
                 }
             </div>}
@@ -350,20 +332,12 @@ const Announcements = () => {
 
 
             <Card className={"mt-8"}>
-                {tab == 0 && <AnnouncementsTable
+                <AnnouncementsTable
                     setAnalyticsObj={setAnalyticsObj}
                     handleDelete={handleDelete}
                     data={announcementList}
                     setSelectedRecord={setSelectedRecord}
                     isLoading={isLoading}/>
-                }
-                {tab == 1 && <AnnouncementsView
-                    setAnalyticsObj={setAnalyticsObj}
-                    handleDelete={handleDelete}
-                    isLoading={isLoading}
-                    setSelectedRecord={setSelectedRecord}
-                    data={announcementList}/>
-                }
                 { totalPages > 0 && <CardFooter className={"p-0"}>
                     <div
                         className={`w-full p-5 ${theme === "dark" ? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end px-4 py-4 md:px-16 md:py-15px`}>

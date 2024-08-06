@@ -9,6 +9,8 @@ import PublicRoutes from "./components/Auth/PublicRoutes";
 import Register from "./components/Auth/Register";
 import Login from "./components/Auth/Login";
 import Forgot from "./components/Auth/Forgot";
+import RestPassword from "./components/Auth/RestPassword";
+import 'quill/dist/quill.snow.css'
 
 function App() {
 
@@ -34,6 +36,7 @@ function App() {
                     <Route path={`${baseUrl}/register`} element={<Register/>}/>
                     <Route path={`${baseUrl}/login`} element={<Login/>}/>
                     <Route path={`${baseUrl}/forgot-password`} element={<Forgot/>}/>
+                    <Route path={`${baseUrl}/reset-verify`} element={<RestPassword/>}/>
                 </Route>
                 {/*<Route path="*" element={<PageNotFound/>}/>*/}
             </Routes>

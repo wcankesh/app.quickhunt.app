@@ -17,22 +17,16 @@ import {cn} from "../../lib/utils";
 import {Calendar} from "../ui/calendar";
 import {toast} from "../ui/use-toast";
 import {Badge} from "../ui/badge";
-
+ //post_status: 1=Publish/active,2=Scheduled/unpublished,3=Draft,4=Expired
 const initialState = {
     post_description:'',
     post_slug_url:'',
     post_title: '',
-    post_save_as_draft: 0,
     post_published_at: moment(new Date()),
     post_assign_to: [],
     post_pin_to_top: 0,
-    post_override_url_boolean: 0,
-    post_override_url: '',
     post_expired_boolean: 0,
-    post_expired_datetime: undefined,
-    post_override_thumbnail_boolean: 0,
-    post_override_thumbnail: '',
-    post_nodify_customer: 0,
+    post_expired_at: undefined,
     post_browser: '',
     post_ip_address: '',
     category_id: '',
@@ -42,21 +36,19 @@ const initialState = {
 const initialStateError = {
     post_title: "",
     post_description: "",
+    post_slug_url: "",
 }
 
 const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) => {
     const [previewImage,setPreviewImage] = useState("");
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
-    const userDetailsReducer = useSelector(state => state.userDetailsReducer);
     const [changeLogDetails, setChangeLogDetails] = useState(initialState);
     const [labelList, setLabelList] = useState([]);
     const [memberList, setMemberList] = useState([])
     const [categoriesList, setCategoriesList] = useState([])
     const [isSave, setIsSave] = useState(false)
     const [formError, setFormError] = useState(initialStateError);
-    const [selectedValues, setSelectedValues] = useState([]);
-    const [selectedLabels, setSelectedLabels] = useState([]);
     const {theme} = useTheme();
     let apiService = new ApiService();
     useEffect(()=>{
@@ -75,7 +67,7 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
             image: selectedRecord.feature_image,
             post_assign_to: selectedRecord.post_assign_to !== null ? selectedRecord.post_assign_to.split(',') : [],
             post_published_at: selectedRecord.post_published_at ? moment(selectedRecord.post_published_at).format('YYYY-MM-DD') : moment(new Date()),
-            post_expired_datetime: selectedRecord.post_expired_datetime ? moment(selectedRecord.post_expired_datetime).format('YYYY-MM-DD') : undefined,
+            post_expired_at: selectedRecord.post_expired_at ? moment(selectedRecord.post_expired_at).format('YYYY-MM-DD') : undefined,
             category_id: selectedRecord.category_id == "0" ? "" : selectedRecord.category_id,
             labels: labelId
         });
@@ -92,6 +84,12 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
             case "post_title":
                 if (!value || value.trim() === "") {
                     return "Title is required.";
+                } else {
+                    return "";
+                }
+            case "post_slug_url":
+                if (!value || value.trim() === "") {
+                    return "Permalink / Slug is required.";
                 } else {
                     return "";
                 }
@@ -127,7 +125,13 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
 
     const onDateChange = (name, date) => {
         if (date) {
-            setChangeLogDetails({...changeLogDetails,[name]: date});
+            let obj = {...changeLogDetails,[name]: date};
+            if(name === "post_published_at"){
+                if(date > new Date()){
+                    obj = {...obj, post_status: 2}
+                }
+            }
+            setChangeLogDetails(obj);
         }
     };
 
@@ -146,27 +150,24 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
         setIsSave(true)
         let formData = new FormData();
         formData.append("post_project_id",projectDetailsReducer.id);
-        formData.append("post_title",changeLogDetails.post_title);
-        formData.append("post_assign_to",changeLogDetails.post_assign_to.join());
-        formData.append("post_slug_url",changeLogDetails.post_slug_url ? changeLogDetails.post_slug_url : changeLogDetails.post_title.replace(/ /g,"-").replace(/\?/g, "-"));
-        formData.append("post_published_at",moment(changeLogDetails.post_published_at).format("YYYY-MM-DD"));
-        formData.append("post_save_as_draft",changeLogDetails.post_save_as_draft );
-        formData.append("post_pin_to_top",changeLogDetails.post_pin_to_top );
-        formData.append("post_override_url_boolean",changeLogDetails.post_override_url_boolean );
-        formData.append("post_override_url",changeLogDetails.post_override_url );
-        formData.append("post_expired_boolean",changeLogDetails.post_expired_boolean );
-        formData.append("post_expired_datetime",changeLogDetails.post_expired_boolean === 1 ? moment(changeLogDetails.post_expired_datetime).format("YYYY-MM-DD") : "" );
-        formData.append("post_override_thumbnail_boolean",changeLogDetails.post_override_thumbnail_boolean);
-        formData.append("post_override_thumbnail",changeLogDetails.post_override_thumbnail );
-        formData.append("post_nodify_customer",changeLogDetails.post_nodify_customer );
-        formData.append("post_browser",changeLogDetails.post_browser );
-        formData.append("post_ip_address",changeLogDetails.post_ip_address );
-        formData.append("category_id",changeLogDetails.category_id);
+        Object.keys(changeLogDetails).map((x) => {
+            if(x !== "labels"){
+                if(x === "post_assign_to"){
+                    formData.append(x ,changeLogDetails[x].join());
+                } else if(x === "post_slug_url"){
+                    formData.append("post_slug_url",changeLogDetails.post_slug_url ? changeLogDetails.post_slug_url : changeLogDetails.post_title.replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-').replace(/\//g, "-").toLowerCase());
+                } else if(x === "post_published_at"){
+                    formData.append("post_published_at",moment(changeLogDetails.post_published_at).format("YYYY-MM-DD") );
+                } else if(x === "post_expired_at"){
+                    formData.append("post_expired_at",changeLogDetails.post_expired_boolean === 1 ? moment(changeLogDetails.post_expired_at).format("YYYY-MM-DD") : "");
+                } else {
+                    formData.append(x,changeLogDetails[x]);
+                }
+            }
+        })
         for (var i = 0; i < changeLogDetails.labels.length; i++) {
             formData.append('labels[]', changeLogDetails.labels[i]);
         }
-        formData.append("post_description", changeLogDetails.post_description);
-        formData.append("image", changeLogDetails.image);
         const data = await apiService.createPosts(formData);
         if(data.status === 200){
             setChangeLogDetails(initialState)
@@ -177,7 +178,7 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
         } else {
             setIsSave(false);
             toast({
-                description: "Something went wrong",
+                description: data.message,
                 variant: "destructive",
             });
         }
@@ -199,27 +200,27 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
         setIsSave(true)
         let formData = new FormData();
         formData.append("post_project_id",projectDetailsReducer.id);
-        formData.append("post_title",changeLogDetails.post_title);
-        formData.append("post_assign_to",changeLogDetails.post_assign_to.join());
-        formData.append("post_slug_url",changeLogDetails.post_slug_url ? changeLogDetails.post_slug_url : changeLogDetails.post_title.replace(/ /g,"-").replace(/\?/g, "-"));
-        formData.append("post_published_at",moment(changeLogDetails.post_published_at).format("YYYY-MM-DD") );
-        formData.append("post_save_as_draft",changeLogDetails.post_save_as_draft );
-        formData.append("post_pin_to_top",changeLogDetails.post_pin_to_top);
-        formData.append("post_override_url_boolean",changeLogDetails.post_override_url_boolean);
-        formData.append("post_override_url",changeLogDetails.post_override_url);
-        formData.append("post_expired_boolean",changeLogDetails.post_expired_boolean);
-        formData.append("post_expired_datetime",changeLogDetails.post_expired_boolean === 1 ? moment(changeLogDetails.post_expired_datetime).format("YYYY-MM-DD") : "");
-        formData.append("post_override_thumbnail_boolean",changeLogDetails.post_override_thumbnail_boolean);
-        formData.append("post_override_thumbnail",changeLogDetails.post_override_thumbnail);
-        formData.append("post_nodify_customer",changeLogDetails.post_nodify_customer);
-        formData.append("post_browser",changeLogDetails.post_browser);
-        formData.append("post_ip_address",changeLogDetails.post_ip_address)
-        formData.append("category_id",changeLogDetails.category_id)
+        Object.keys(changeLogDetails).map((x) => {
+            if(x !== "labels"){
+                if(x === "post_assign_to"){
+                    formData.append(x ,changeLogDetails[x].join());
+                } else if(x === "post_slug_url"){
+                    formData.append("post_slug_url",changeLogDetails.post_slug_url ? changeLogDetails.post_slug_url : changeLogDetails.post_title.replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-').replace(/\//g, "-").toLowerCase());
+                } else if(x === "post_published_at"){
+                    formData.append("post_published_at",moment(changeLogDetails.post_published_at).format("YYYY-MM-DD") );
+                } else if(x === "post_expired_at"){
+                    formData.append("post_expired_at",changeLogDetails.post_expired_boolean === 1 ? moment(changeLogDetails.post_expired_at).format("YYYY-MM-DD") : "");
+                } else {
+                    formData.append(x,changeLogDetails[x]);
+                }
+            }
+
+        })
+
         for (var i = 0; i < changeLogDetails.labels.length; i++) {
             formData.append('labels[]', changeLogDetails.labels[i]);
         }
-        formData.append("post_description", changeLogDetails.post_description);
-        formData.append("image", changeLogDetails.image);
+
         const data = await apiService.updatePosts(formData, changeLogDetails.id)
         if(data.status === 200){
           //  message.success("Post update successfully")
@@ -232,7 +233,7 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
         } else {
             setIsSave(false)
             toast({
-                description: "Something went wrong.",
+                description: data.message,
                 variant: "destructive"
             });
         }
@@ -263,7 +264,6 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
 
     const deleteAssignTo = (e,index)=> {
         e.stopPropagation();
-        console.log("delete",index);
     }
 
     return (
@@ -304,7 +304,7 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
                     <div className={"px-3 lg:px-8 flex flex-wrap md:flex-nowrap gap-4 items-start"}>
                         <div className="grid w-full gap-2 md:basis-1/2">
                             <Label htmlFor="label">Label</Label>
-                            <Select   value={selectedLabels} onValueChange={onChangeLabel}>
+                            <Select  value={[]} onValueChange={onChangeLabel}>
                                 <SelectTrigger className="h-9">
                                     <SelectValue className={"text-muted-foreground text-sm"} placeholder="Nothing selected">
                                         <div className={"flex gap-[2px]"}>
@@ -330,7 +330,7 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
                                         {
                                             (labelList || []).map((x, i) => {
                                                 return (
-                                                        <SelectItem key={i} value={x.id.toString()}>
+                                                        <SelectItem className={"p-2"} key={i} value={x.id.toString()}>
                                                             <div className={"flex gap-1"}>
                                                                 <div onClick={() => onChangeLabel(x.id.toString())} className="checkbox-icon">
                                                                     {changeLogDetails.labels.includes(x.id.toString()) ? <Check size={18} />: <div className={"h-[18px] w-[18px]"}></div>}
@@ -350,7 +350,7 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
                         </div>
                         <div className="grid w-full gap-2 md:basis-1/2">
                             <Label htmlFor="label">Assign to</Label>
-                            <Select value={selectedValues} onValueChange={handleValueChange}>
+                            <Select onValueChange={handleValueChange} value={[]}>
                                 <SelectTrigger className={"h-9"}>
                                     <SelectValue className={"text-muted-foreground text-sm"} placeholder="Assign to">
                                         <div className={"flex gap-[2px]"}>
@@ -369,9 +369,9 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
                                     </SelectValue>
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectGroup>
+                                    <SelectGroup >
                                         {(memberList || []).map((x, i) => (
-                                            <SelectItem className={""} key={i} value={x.user_id.toString()}>
+                                            <SelectItem className={"p-2"} key={i} value={x.user_id.toString()}>
                                                 <div className={"flex gap-2"}>
                                                     <div onClick={() => handleValueChange(x.user_id.toString())} className="checkbox-icon">
                                                         {changeLogDetails.post_assign_to.includes(x.user_id.toString()) ? <Check size={18} />: <div className={"h-[18px] w-[18px]"}></div>}
@@ -380,6 +380,7 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
                                                 </div>
                                             </SelectItem>
                                         ))}
+
                                     </SelectGroup>
                                 </SelectContent>
                             </Select>
@@ -451,14 +452,6 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
                     </div>
                         <div className={"flex flex-col gap-[18px]"}>
                             <div className={"announce-create-switch flex gap-6"}>
-                                <Switch className={"w-[38px] h-[20px]"} checked={changeLogDetails.post_nodify_customer ===  1} onCheckedChange={(checked)=>onChangeText({target:{name: "post_nodify_customer", value: checked === true ? 1 : 0}})} />
-                                <p className={"text-sm text-muted-foreground font-medium"}>Notify Customers</p>
-                            </div>
-                            <div className={"announce-create-switch flex gap-6"}>
-                                <Switch className={"w-[38px] h-[20px]"} checked={changeLogDetails.post_save_as_draft ===  1} onCheckedChange={(checked)=>onChangeText({target:{name: "post_save_as_draft", value: checked === true ? 1 : 0}})} />
-                                <p className={"text-sm text-muted-foreground font-medium"}>Save as Draft</p>
-                            </div>
-                            <div className={"announce-create-switch flex gap-6"}>
                                 <Switch className={"w-[38px] h-[20px]"}  checked={changeLogDetails.post_expired_boolean ===  1} onCheckedChange={(checked)=>onChangeText({target:{name: "post_expired_boolean", value: checked === true ? 1 : 0}})} />
                                 <p className={"text-sm text-muted-foreground font-medium"}>Expire At</p>
                             </div>
@@ -472,15 +465,15 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
                                                 variant={"outline"}
                                                 className={cn("justify-between text-left font-normal d-flex", "text-muted-foreground")}
                                             >
-                                                {moment(changeLogDetails.post_expired_datetime).format("LL")}
+                                                {moment(changeLogDetails.post_expired_at).format("LL")}
                                                 <CalendarIcon className="mr-2 h-4 w-4" />
                                             </Button>
                                         </PopoverTrigger>
                                         <PopoverContent className="w-auto p-0" align="start">
                                             <Calendar
                                                 mode="single"
-                                                selected={changeLogDetails.post_expired_datetime}
-                                                onSelect={(date) => onDateChange("post_expired_datetime", date)}
+                                                selected={changeLogDetails.post_expired_at}
+                                                onSelect={(date) => onDateChange("post_expired_at", date)}
                                                 captionLayout="dropdown-buttons" fromYear={2024} toYear={2050}
                                             />
                                         </PopoverContent>

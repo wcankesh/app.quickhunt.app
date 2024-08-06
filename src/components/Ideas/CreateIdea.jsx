@@ -9,6 +9,8 @@ import {Sheet, SheetContent, SheetHeader, SheetOverlay} from "../ui/sheet";
 import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "../ui/select";
 import {Textarea} from "../ui/textarea";
 import {useToast} from "../ui/use-toast";
+import ReactQuill from 'react-quill'
+import ReactQuillEditor from "../Comman/ReactQuillEditor";
 
 const initialState = {
     title: "",
@@ -42,7 +44,6 @@ const CreateIdea = ({
     const [isLoading, setIsLoading] = useState(false);
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const [formError, setFormError] = useState(initialStateError);
-    const [selectedValues, setSelectedValues] = useState([]);
 
     useEffect(() => {
         setTopicLists(allStatusAndTypes.topics)
@@ -162,10 +163,9 @@ const CreateIdea = ({
                                     </div>
                                     <div className="space-y-2">
                                         <Label htmlFor="message">Description</Label>
-                                        <Textarea placeholder="Start writing..." name={"description"} id="message" className="bg-card"
-                                                  value={ideaDetail.description}
-                                                  onChange={(e) => onChangeText(e)}
-                                        />
+
+                                        <ReactQuillEditor value={ideaDetail.description} name={"description"} onChange={onChangeText}/>
+
                                         {formError.description && <span className="text-red-500 text-sm">{formError.description}</span>}
                                     </div>
                                     <div className={"space-y-2"}>
@@ -198,7 +198,7 @@ const CreateIdea = ({
 
                                 <div className={"px-4 py-3 lg:py-6 lg:px-8 border-b space-y-2"}>
                                     <Label>Choose Topics for this Idea (optional)</Label>
-                                        <Select onValueChange={handleChange} value={selectedValues}>
+                                        <Select onValueChange={handleChange} value={[]}>
                                             <SelectTrigger className="bg-card">
                                                 <SelectValue className={"text-muted-foreground text-sm"} placeholder="Assign to">
                                                     <div className={"flex gap-[2px]"}>
