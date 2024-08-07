@@ -225,7 +225,7 @@ const Roadmap = () => {
 
                 >
                     {roadmapList}
-                </Board> : <EmptyData />
+                </Board> : <span className={"font-medium"}>No Data</span>
             }
             </div>
 

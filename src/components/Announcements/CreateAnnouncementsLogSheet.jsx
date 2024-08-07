@@ -87,52 +87,13 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
         setPreviewImage(selectedRecord.feature_image);
     }
 
-    console.log("changeLogDetails", changeLogDetails)
-
     const handleFileChange = (file) => {
         setChangeLogDetails({...changeLogDetails, image : file.target.files[0]});
         setPreviewImage(URL.createObjectURL(file.target.files[0]));
     };
 
-    const handleFeatureImgUpload = async (event) => {
-        const file = event.target?.files[0];
-        setChangeLogDetails({...changeLogDetails, image: file})
-        let formData = new FormData();
-        formData.append("image", file);
-        const data = await apiService.deletePostsImage(formData, changeLogDetails.id)
-        if (data.status === 200) {
-            setChangeLogDetails({...data.data})
-            // setIdeasList(clone);
-            setIsLoading(false)
-            setIsEditIdea(false)
-            toast({description: data.message})
-        } else {
-            setIsLoading(false)
-            toast({variant: "destructive", description: data.error})
-        }
-    };
-
     const onChangeStatus = async (name, value) => {
-        debugger
-        if(name === "image"){
-            setChangeLogDetails({...changeLogDetails, image: ""})
-        } else {
-            setChangeLogDetails({...changeLogDetails, [name]: value})
-        }
-        let formData = new FormData();
-        formData.append(name, value);
-        const data = await apiService.updatePosts(formData, changeLogDetails.id)
-        if (data.status === 200) {
-            setChangeLogDetails({
-                ...data.data,
-            })
-            setIsLoading(false)
-            setIsEditIdea(false)
-            toast({description: data.message})
-        } else {
-            setIsLoading(false)
-            toast({variant: "destructive", description: data.message})
-        }
+        setChangeLogDetails({...changeLogDetails, [name]: value, image: ""})
     }
 
     const formValidate = (name, value) => {
@@ -251,6 +212,8 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
                     formData.append("post_published_at",moment(changeLogDetails.post_published_at).format("YYYY-MM-DD") );
                 } else if(x === "post_expired_at"){
                     formData.append("post_expired_at",changeLogDetails.post_expired_boolean === 1 ? moment(changeLogDetails.post_expired_at).format("YYYY-MM-DD") : "");
+                } else if(x === "delete_image" && changeLogDetails[x] !== ""){
+                    formData.append(x,changeLogDetails[x]);
                 } else {
                     formData.append(x,changeLogDetails[x]);
                 }
@@ -301,6 +264,8 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
                     formData.append("post_published_at",moment(changeLogDetails.post_published_at).format("YYYY-MM-DD") );
                 } else if(x === "post_expired_at"){
                     formData.append("post_expired_at",changeLogDetails.post_expired_boolean === 1 ? moment(changeLogDetails.post_expired_at).format("YYYY-MM-DD") : "");
+                } else if(x === "delete_image" && changeLogDetails[x] !== ""){
+                    formData.append(x,changeLogDetails[x]);
                 } else {
                     formData.append(x,changeLogDetails[x]);
                 }
@@ -314,7 +279,6 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
 
         const data = await apiService.updatePosts(formData, changeLogDetails.id)
         if(data.status === 200){
-          //  message.success("Post update successfully")
             setChangeLogDetails(initialState)
             setIsSave(false)
             toast({
@@ -532,23 +496,7 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
                 <div className={"px-3 lg:px-8 flex flex-wrap items-center gap-4 md:flex-nowrap border-b py-6"}>
                     <div className={"space-y-3"}>
                         <h5 className={"text-sm font-medium"}>Featured Image</h5>
-                        {/*<div>*/}
-                        {/*    <label*/}
-                        {/*        htmlFor="upload_image"*/}
-                        {/*        className="flex w-[250px] md:w-[282px] h-[128px] py-0 justify-center items-center flex-shrink-0 border-dashed border-[1px] border-gray-300 rounded cursor-pointer"*/}
-                        {/*    >*/}
-                        {/*        {previewImage ? <img className={"h-[70px] w-[70px] rounded-md object-cover"} src={previewImage} alt={"not_found"} /> : <span className="text-center text-muted-foreground font-semibold text-[14px]">Upload Image</span>}*/}
-                        {/*        <input*/}
-                        {/*            id="upload_image"*/}
-                        {/*            type="file"*/}
-                        {/*            className="hidden"*/}
-                        {/*            onChange={handleFileChange}*/}
-                        {/*            accept="image/*"*/}
-                        {/*        />*/}
-                        {/*    </label>*/}
-                        {/*</div>*/}
                         <div className="w-[282px] h-[128px] flex gap-1">
-                            {console.log("changeLogDetails", changeLogDetails)}
                             {
                                 changeLogDetails?.image ?
                                     <div>
@@ -562,7 +510,7 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
                                                 <CircleX
                                                     size={20}
                                                     className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
-                                                    onClick={() => onChangeStatus('image', changeLogDetails && changeLogDetails?.image && changeLogDetails.image?.name ? "" : [changeLogDetails.image.replace("https://code.quickhunt.app/public/storage/remove_image/", "")])}
+                                                    onClick={() => onChangeStatus('delete_image', changeLogDetails && changeLogDetails?.image && changeLogDetails.image?.name ? "" : changeLogDetails.image.replace("https://code.quickhunt.app/public/storage/post/", ""))}
                                                 />
                                             </div> : changeLogDetails.image ?
                                                 <div className={"w-[282px] h-[128px] relative border p-[5px]"}>
@@ -570,7 +518,7 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
                                                     <CircleX
                                                         size={20}
                                                         className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
-                                                        onClick={() => onChangeStatus('image', changeLogDetails && changeLogDetails?.image && changeLogDetails.image?.name ? "" : changeLogDetails.image.replace("https://code.quickhunt.app/public/storage/remove_image/", ""))}
+                                                        onClick={() => onChangeStatus('delete_image', changeLogDetails && changeLogDetails?.image && changeLogDetails.image?.name ? "" : changeLogDetails.image.replace("https://code.quickhunt.app/public/storage/post/", ""))}
                                                     />
                                                 </div>
                                                 : ''}
@@ -582,7 +530,7 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
                                             type="file"
                                             className="hidden"
                                             multiple
-                                            onChange={handleFeatureImgUpload}
+                                            onChange={handleFileChange}
                                         />
                                         <label
                                             htmlFor="pictureInput"

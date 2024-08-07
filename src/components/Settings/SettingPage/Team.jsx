@@ -4,7 +4,7 @@ import {Button} from "../../ui/button";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "../../ui/tabs";
 import {Label} from "../../ui/label";
 import {Input} from "../../ui/input";
-import {Avatar, AvatarFallback} from "../../ui/avatar";
+import {Avatar, AvatarFallback, AvatarImage} from "../../ui/avatar";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "../../ui/table";
 import {Ellipsis, Loader2, X} from "lucide-react";
 import {useTheme} from "../../theme-provider";
@@ -292,13 +292,20 @@ const Team = () => {
                                         </TableBody>:<TableBody>
                                             {
                                                 (memberList || []).map((x) => {
+                                                    {console.log("memberList", memberList)}
                                                     return (
                                                         <TableRow key={x.id}>
                                                             <TableCell className={"py-[10px]"}>
                                                                 <div className={"flex gap-2 items-center"}>
                                                                     <Avatar className={"w-[30px] h-[30px]"}>
-                                                                        <AvatarFallback
-                                                                            className={"bg-primary/10 border-primary border text-sm text-primary font-semibold"}>{x.user_first_name.substring(0, 1)}</AvatarFallback>
+                                                                        {
+                                                                            x.user_photo ?
+                                                                                <AvatarImage src={x.user_photo}
+                                                                                             alt={x && x?.user_first_name?.substring(0, 1)?.toUpperCase() && x?.user_last_name?.substring(0, 1)?.toUpperCase()}
+                                                                                />
+                                                                                :
+                                                                                <AvatarFallback className={"bg-primary/10 border-primary border text-sm text-primary font-semibold"}>{x?.user_first_name?.substring(0, 1)?.toUpperCase()}{x?.user_last_name?.substring(0, 1)?.toUpperCase()}</AvatarFallback>
+                                                                        }
                                                                     </Avatar>
                                                                     <div>
                                                                         <h3 className={"text-sm font-medium"}>{x.user_first_name} {x.user_last_name}</h3>
