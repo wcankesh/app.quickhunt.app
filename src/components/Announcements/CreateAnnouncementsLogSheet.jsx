@@ -51,8 +51,6 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
     const [categoriesList, setCategoriesList] = useState([])
     const [isSave, setIsSave] = useState(false)
     const [formError, setFormError] = useState(initialStateError);
-    const [isLoading, setIsLoading] = useState(false);
-    const [isEditIdea, setIsEditIdea] = useState(false);
     const [popoverOpen, setPopoverOpen] = useState(false);
     const [popoverOpenExpired, setPopoverOpenExpired] = useState(false);
 
@@ -93,7 +91,12 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
     };
 
     const onChangeStatus = async (name, value) => {
-        setChangeLogDetails({...changeLogDetails, [name]: value, image: ""})
+        if(changeLogDetails && changeLogDetails?.image && changeLogDetails.image?.name){
+            setChangeLogDetails({...changeLogDetails, image: ""})
+        } else {
+            setChangeLogDetails({...changeLogDetails, [name]: value, image: ""})
+        }
+
     }
 
     const formValidate = (name, value) => {
@@ -212,9 +215,9 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
                     formData.append("post_published_at",moment(changeLogDetails.post_published_at).format("YYYY-MM-DD") );
                 } else if(x === "post_expired_at"){
                     formData.append("post_expired_at",changeLogDetails.post_expired_boolean === 1 ? moment(changeLogDetails.post_expired_at).format("YYYY-MM-DD") : "");
-                } else if(x === "delete_image" && changeLogDetails[x] !== ""){
-                    formData.append(x,changeLogDetails[x]);
-                } else {
+                }else if(x === "delete_image" && changeLogDetails?.image?.name){
+
+                }  else {
                     formData.append(x,changeLogDetails[x]);
                 }
             }
@@ -264,8 +267,8 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
                     formData.append("post_published_at",moment(changeLogDetails.post_published_at).format("YYYY-MM-DD") );
                 } else if(x === "post_expired_at"){
                     formData.append("post_expired_at",changeLogDetails.post_expired_boolean === 1 ? moment(changeLogDetails.post_expired_at).format("YYYY-MM-DD") : "");
-                } else if(x === "delete_image" && changeLogDetails[x] !== ""){
-                    formData.append(x,changeLogDetails[x]);
+                } else if(x === "delete_image" && changeLogDetails?.image?.name){
+
                 } else {
                     formData.append(x,changeLogDetails[x]);
                 }
@@ -529,7 +532,7 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
                                             id="pictureInput"
                                             type="file"
                                             className="hidden"
-                                            multiple
+                                            accept="image/*"
                                             onChange={handleFileChange}
                                         />
                                         <label

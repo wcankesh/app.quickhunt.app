@@ -226,9 +226,8 @@ const AnnouncementsTable = ({data,isLoading ,setSelectedRecord,setEditIndex ,han
                                                                     <Ellipsis className={`font-medium`} size={18}/>
                                                                 </DropdownMenuTrigger>
                                                                 <DropdownMenuContent align={"end"}>
-                                                                    <DropdownMenuItem
-                                                                        onClick={() => onEdit(x,index)}>Edit</DropdownMenuItem>
-                                                                    <DropdownMenuItem onClick={()=>deleteRow(x.id)}>Delete</DropdownMenuItem>
+                                                                    <DropdownMenuItem  className={"cursor-pointer"} onClick={() => onEdit(x,index)}>Edit</DropdownMenuItem>
+                                                                    <DropdownMenuItem   className={"cursor-pointer"} onClick={()=>deleteRow(x.id)}>Delete</DropdownMenuItem>
                                                                 </DropdownMenuContent>
                                                             </DropdownMenu>
                                                         </TableCell>
