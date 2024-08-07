@@ -19,8 +19,10 @@ const ColorInput = ({ value, name, onChange,style}) => {
     return (
         <Fragment>
             <div className="color_picker py-2 px-3 bg-card border border-border rounded-lg" style={style} onClick={handleClickInside} ref={myRef}>
-                <div style={{background: value}} className="color_picker_color"></div>
-                <span id={name}>{value ? value: "#000000"}</span>
+                <div className={"flex gap-1 items-center"}>
+                    <div style={{background: value}} className="color_picker_color"></div>
+                    <span id={name}>{value ? value: "#000000"}</span>
+                </div>
                 {
                     clickedOutside &&
                     <SketchPicker

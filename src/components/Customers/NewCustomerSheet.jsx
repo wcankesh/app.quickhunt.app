@@ -24,17 +24,55 @@ const initialState = {
     user_browser: '',
     user_ip_address : '',
 }
+const initialStateError = {
+    customer_name: "",
+    customer_email_id: "",
+}
 
 const NewCustomerSheet = ({isOpen,onOpen,onClose}) => {
     const [customerDetails, setCustomerDetails] = useState(initialState);
     const [isSave,setIsSave]=useState(false);
     const apiService = new ApiService();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
+    const [formError, setFormError] = useState(initialStateError);
+
+    const formValidate = (name, value) => {
+        switch (name) {
+            case "customer_name":
+                if (!value || value.trim() === "") {
+                    return "Customer name is required.";
+                } else {
+                    return "";
+                }
+            case "customer_email_id":
+                if (!value || value.trim() === "") {
+                    return "Customer e-mail is required.";
+                } else {
+                    return "";
+                }
+            default: {
+                return "";
+            }
+        }
+    };
+
     const onChangeText = (event) => {
-        setCustomerDetails({...customerDetails, [event.target.name]: event.target.value})
+        setCustomerDetails({...customerDetails, [event.target.name]: event.target.value});
+        setFormError(formError => ({...formError, [event.target.name]: formValidate(event.target.name, event.target.value)}));
     }
 
     const createCustomers = async () => {
+        let validationErrors = {};
+        Object.keys(customerDetails).forEach(name => {
+            const error = formValidate(name, customerDetails[name]);
+            if (error && error.length > 0) {
+                validationErrors[name] = error;
+            }
+        });
+        if (Object.keys(validationErrors).length > 0) {
+            setFormError(validationErrors);
+            return;
+        }
         setIsSave(true);
         const payload = {
             ...customerDetails,
@@ -71,12 +109,15 @@ const NewCustomerSheet = ({isOpen,onOpen,onClose}) => {
                  <div className={"sm:px-8 sm:py-6 px-3 py-4"}>
                      <div className="grid w-full gap-2">
                          <Label htmlFor="name">Name</Label>
-                         <Input value={customerDetails.customer_name} name="customer_name" onChange={onChangeText} type="text" id="name" className={"h-9 text-muted-foreground"} placeholder={"Enter the full name of customer..."}/>
+                         <Input value={customerDetails.customer_name} name="customer_name" onChange={onChangeText} type="text" id="name" className={"h-9"} placeholder={"Enter the full name of customer..."}/>
+                         {formError.customer_name && <span className="text-sm text-red-500">{formError.customer_name}</span>}
                      </div>
 
                      <div className="grid w-full gap-2 mt-6">
                          <Label htmlFor="email">E-mail</Label>
-                         <Input value={customerDetails.customer_email_id} name="customer_email_id" onChange={onChangeText} type="email" id="email" className={"h-9 text-muted-foreground"} placeholder={"Enter the email of customer"}/>
+                         <Input value={customerDetails.customer_email_id} name="customer_email_id" onChange={onChangeText} type="email" id="email" className={"h-9"} placeholder={"Enter the email of customer"}/>
+                         {formError.customer_email_id && <span className="text-sm text-red-500">{formError.customer_email_id}</span>}
+
                      </div>
 
                      <div className={"mt-6 flex"}>

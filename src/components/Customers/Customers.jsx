@@ -1,6 +1,6 @@
-import React, {useState,useEffect} from 'react';
+import React, {useState, useEffect, Fragment} from 'react';
 import {Button} from "../ui/button";
-import {ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Plus, Trash2} from "lucide-react";
+import {ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Loader2, Plus, Trash2, X} from "lucide-react";
 import {Card, CardContent, CardFooter} from "../ui/card";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "../ui/table";
 import NewCustomerSheet from "./NewCustomerSheet";
@@ -20,6 +20,8 @@ import {
 } from "../ui/alert-dialog";
 import {Skeleton} from "../ui/skeleton";
 import EmptyData from "../Comman/EmptyData";
+import {Dialog} from "@radix-ui/react-dialog";
+import {DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "../ui/dialog";
 
 const tableHeadingsArray = [
     {label:"Name"},
@@ -43,6 +45,7 @@ const Customers = () => {
     const [totalRecord, setTotalRecord] = useState(0);
     const [deleteId,setDeleteId]=useState(null);
     const [deleteIndex,setDeleteIndex]=useState(null);
+    const [openDelete,setOpenDelete]=useState(false);
 
     useEffect(() => {
         if(projectDetailsReducer.id){
@@ -88,9 +91,11 @@ const Customers = () => {
     const deleteCustomer =  (id,index) => {
         setDeleteId(id);
         setDeleteIndex(index);
+        setOpenDelete(true);
     }
 
     const handleDelete = async () =>{
+        setIsLoading(true);
         const data = await apiService.deleteCustomers(deleteId);
         if(data.status === 200) {
             const clone = [...customerList];
@@ -98,35 +103,68 @@ const Customers = () => {
             setCustomerList(clone);
             toast({
                 description: "Customer deleted successfully"
-            })
+            });
+            setOpenDelete(false);
+            setIsLoading(false);
         }
         else{
             toast({
                 description:"Something went wrong",
                 variant: "destructive",
-            })
+            });
+            setOpenDelete(false);
+            setIsLoading(false);
         };
         setDeleteId(null);
         setDeleteIndex(null);
     }
 
     return (
-        <div className={"pt-8  xl:container xl:max-w-[1622px] lg:container lg:max-w-[992px] md:container md:max-w-[768px] sm:container sm:max-w-[639px] px-4"}>
+        <div className={"pt-8 container xl:max-w-[1574px]  lg:max-w-[992px]  md:max-w-[768px] sm:max-w-[639px] px-4"}>
             <NewCustomerSheet isOpen={isSheetOpen} onOpen={openSheet} callback={getAllCustomers} onClose={closeSheet}/>
-            <AlertDialog open={deleteId} onOpenChange={() => setDeleteId(null)}>
-                <AlertDialogContent className={"w-[310px] md:w-full rounded-lg"}>
-                    <AlertDialogHeader>
-                        <AlertDialogTitle>You really want delete customer ?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            This action can't be undone.
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <div className={"flex justify-end gap-2"}>
-                        <AlertDialogCancel onClick={() => setDeleteId(null)}>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleDelete} className={"bg-red-600 hover:bg-red-600"}>Delete</AlertDialogAction>
-                    </div>
-                </AlertDialogContent>
-            </AlertDialog>
+            {
+                openDelete &&
+                <Fragment>
+                    <Dialog open onOpenChange={()=> setOpenDelete(false)}>
+                        <DialogContent className="sm:max-w-[425px]">
+                            <DialogHeader className={"flex flex-row justify-between gap-2"}>
+                                <div className={"flex flex-col gap-2"}>
+                                    <DialogTitle className={"text-start"}>You really want delete this customer ?</DialogTitle>
+                                    <DialogDescription className={"text-start"}>This action can't be undone.</DialogDescription>
+                                </div>
+                                <X size={16} className={"m-0 cursor-pointer"} onClick={() => setOpenDelete(false)}/>
+                            </DialogHeader>
+                            <DialogFooter>
+                                <Button variant={"outline hover:none"}
+                                        className={"text-sm font-semibold border"}
+                                        onClick={() => setOpenDelete(false)}>Cancel</Button>
+                                <Button
+                                    variant={"hover:bg-destructive"}
+                                    className={`${theme === "dark" ? "text-card-foreground" : "text-card"} ${isLoading === true ? "py-2 px-6" : "py-2 px-6"} w-[76px] text-sm font-semibold bg-destructive`}
+                                    onClick={handleDelete}
+                                >
+                                    {isLoading ? <Loader2 size={16} className={"animate-spin"}/> : "Delete"}
+                                </Button>
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
+                </Fragment>
+            }
+
+            {/*<AlertDialog open={deleteId} onOpenChange={() => setDeleteId(null)}>*/}
+            {/*    <AlertDialogContent className={"w-[310px] md:w-full rounded-lg"}>*/}
+            {/*        <AlertDialogHeader>*/}
+            {/*            <AlertDialogTitle>You really want delete customer ?</AlertDialogTitle>*/}
+            {/*            <AlertDialogDescription>*/}
+            {/*                This action can't be undone.*/}
+            {/*            </AlertDialogDescription>*/}
+            {/*        </AlertDialogHeader>*/}
+            {/*        <div className={"flex justify-end gap-2"}>*/}
+            {/*            <AlertDialogCancel onClick={() => setDeleteId(null)}>Cancel</AlertDialogCancel>*/}
+            {/*            <AlertDialogAction onClick={handleDelete} className={"bg-red-600 hover:bg-red-600"}>Delete</AlertDialogAction>*/}
+            {/*        </div>*/}
+            {/*    </AlertDialogContent>*/}
+            {/*</AlertDialog>*/}
             <div className={""}>
                 <div className={"flex flex-row gap-x-4 flex-wrap justify-between gap-y-2 items-center"}>
                     <div>

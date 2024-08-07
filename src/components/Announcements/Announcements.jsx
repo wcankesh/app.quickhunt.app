@@ -8,8 +8,7 @@ import {
     ChevronRight,
     ChevronsLeft,
     ChevronsRight,
-    Circle,
-    Ellipsis, Filter,
+    Circle, Filter,
     LayoutList,
     Plus,
     Text, X
@@ -21,8 +20,6 @@ import {ApiService} from "../../utils/ApiService";
 import {Card, CardFooter} from "../ui/card";
 import SidebarSheet from "./SidebarSheet";
 import {toast} from "../ui/use-toast";
-import {DropdownMenu, DropdownMenuTrigger} from "@radix-ui/react-dropdown-menu";
-import {DropdownMenuContent, DropdownMenuItem} from "../ui/dropdown-menu";
 import {Popover, PopoverTrigger} from "@radix-ui/react-popover";
 import {PopoverContent} from "../ui/popover";
 import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList} from "../ui/command";
@@ -199,7 +196,7 @@ const Announcements = () => {
 
     return (
         <div
-            className={"xl:container xl:max-w-[1200px] lg:container lg:max-w-[992px] md:container md:max-w-[768px] sm:container sm:max-w-[639px] pt-8 pb-5 px-4"}>
+            className={"container xl:max-w-[1200px]  lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-4"}>
             {selectedRecord.id &&
             <CreateAnnouncementsLogSheet isOpen={selectedRecord.id}
                                          selectedRecord={selectedRecord}
@@ -213,7 +210,6 @@ const Announcements = () => {
             <div className={"flex items-center justify-between flex-wrap gap-6"}>
                 <div className={"flex justify-between items-center w-full md:w-auto"}>
                     <h3 className={"text-2xl font-medium leading-8"}>Announcement</h3>
-
                 </div>
                 <div className={"flex gap-2 flex-wrap items-center"}>
                     <div className={"flex gap-2 items-center w-full md:w-auto"}>

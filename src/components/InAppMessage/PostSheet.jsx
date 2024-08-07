@@ -1,4 +1,4 @@
-import React,{Fragment,useState} from 'react';
+import React, {Fragment, useEffect, useState} from 'react';
 import {Sheet, SheetContent, SheetHeader} from "../ui/sheet";
 import {Button} from "../ui/button";
 import {
@@ -25,7 +25,33 @@ import {cn} from "../../lib/utils";
 import {format,addDays} from "date-fns";
 import {Calendar} from "../ui/calendar";
 import {RadioGroup, RadioGroupItem} from "../ui/radio-group";
+import {useSelector} from "react-redux";
 
+const whereToSend = [
+    {
+        label:"where to send",
+        id:0
+    },
+    {
+        label:"where to send 1",
+        id:1
+    }
+]
+
+const delay = [
+    {
+        label:"sec 1",
+        value:1
+    },
+    {
+        label:"sec 2",
+        value:2
+    },
+    {
+        label:"sec 3",
+        value:3
+    }
+]
 
 const status = [
     {name: "Any", value: 0, fillColor: "", strokeColor: "",},
@@ -38,7 +64,12 @@ const status = [
 const initialState = {
     bg_color:"#ffffff",
     text_color:"#000000",
-    icon_color:"#B58FF6"
+    icon_color:"#B58FF6",
+    post_status:"0",
+    from:0,
+    btn_color:"",
+    where_to_send:"",
+    delay:""
 }
 
 
@@ -46,11 +77,29 @@ const PostSheet = ({isOpen,onClose,onOpen}) => {
     const {theme}= useTheme();
     const [contentDetail,setContentDetail]=useState(initialState);
     const [date, setDate] = useState([new Date(),addDays(new Date(), 4)]);
+    const [from,setFrom]=useState([]);
+    const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
+    const userDetailsReducer = useSelector(state => state.userDetailsReducer);
+    const fromObj = from.find((x)=> x.id === contentDetail.from);
+
+    useEffect(()=>{
+        setFrom(allStatusAndTypes.members);
+        const matchObj = allStatusAndTypes.members.find((x)=> x.user_id == userDetailsReducer.id);
+        setContentDetail({...contentDetail,from:matchObj?.id});
+    },[userDetailsReducer]);
 
 
+    const handleStatusChange = (value,name) => {
+        if(name == "from" || name == "where_to_send" || name == "delay") {
+            setContentDetail({...contentDetail,[name]:value});
+        }
+        else{
+            setContentDetail({...contentDetail,[name]:value.toString()});
+        }
+    }
 
-    const handleStatusChange = () => {
-
+    const onChange = (e) => {
+       setContentDetail({...contentDetail,[e.target.name]:e.target.value});
     }
 
     return (
@@ -66,17 +115,17 @@ const PostSheet = ({isOpen,onClose,onOpen}) => {
                             </div>
                         </div>
                         <div className={"flex flex-row gap-4 items-center"}>
-                            <Select value={1} onValueChange={(value) => handleStatusChange()}>
+                            <Select value={contentDetail && contentDetail.post_status.toString()} name={"post_status"} onValueChange={(value)=>handleStatusChange(value,"post_status")}>
                                 <SelectTrigger className="w-[135px] h-7">
                                     <SelectValue placeholder="Publish"/>
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectGroup>
                                         {
-                                            (   status || []).map((x, i) => {
+                                            (status || []).map((x, i) => {
                                                 return (
                                                     <Fragment key={i}>
-                                                        <SelectItem value={x.value}>
+                                                        <SelectItem value={x.value.toString()}>
                                                             <div
                                                                 className={"flex items-center gap-2"}>
                                                                 {x.fillColor && <Circle fill={x.fillColor}
@@ -126,7 +175,7 @@ const PostSheet = ({isOpen,onClose,onOpen}) => {
                                             <img className={"h-8 w-8 rounded-full mr-2"} src={"https://avatars.githubusercontent.com/u/124599?v=4&size=40"} alt={"not_found"}/>
                                             <div className={""}>
                                                 <div className={"flex flex-row gap-1"}>
-                                                    <h5 className={"text-xs leading-5 font-medium"}>Testingapp</h5>
+                                                    <h5 className={"text-xs leading-5 font-medium"}>{fromObj?.user_first_name} {fromObj?.user_last_name}</h5>
                                                     <h5 className={`text-xs leading-5 font-medium ${theme === "dark" ? "" : "text-muted-foreground"}`}>from webcontrive</h5>
                                                 </div>
                                                 <h5 className={`text-xs leading-5 font-medium ${theme === "dark" ? "" : "text-muted-foreground"}`}>Active</h5>
@@ -157,14 +206,20 @@ const PostSheet = ({isOpen,onClose,onOpen}) => {
                         <div className={"pt-4 px-8 py-8 space-y-6"}>
                             <div className={"space-y-1"}>
                                 <Label className={"font-medium"}>From</Label>
-                                <Select>
+                                <Select value={contentDetail.from} name={"from"} onValueChange={(value)=>handleStatusChange(value,"from")}>
                                     <SelectTrigger className="w-full h-9">
                                         <SelectValue placeholder="Testingapp" />
                                     </SelectTrigger>
                                     <SelectContent>
                                         <SelectGroup>
-                                            <SelectItem value="apple">Testingapp</SelectItem>
-                                            <SelectItem value="banana">Testingapp 1</SelectItem>
+                                            {
+                                                (from || []).map((x)=>{
+                                                    return(
+                                                        <SelectItem key={x.id} value={x.id}>{x.user_first_name} {x.user_last_name}</SelectItem>
+                                                    )
+                                                })
+                                            }
+
                                         </SelectGroup>
                                     </SelectContent>
                                 </Select>
@@ -178,7 +233,6 @@ const PostSheet = ({isOpen,onClose,onOpen}) => {
                                     </SelectTrigger>
                                     <SelectContent>
                                         <SelectGroup>
-                                            <SelectItem value="apple">Text</SelectItem>
                                             <SelectItem value="banana">Number</SelectItem>
                                         </SelectGroup>
                                     </SelectContent>
@@ -190,7 +244,7 @@ const PostSheet = ({isOpen,onClose,onOpen}) => {
                                 <div className={"space-y-4"}>
                                     <div className="grid w-full max-w-sm items-center gap-2">
                                         <Label className={"font-normal"} htmlFor="email">Background Color</Label>
-                                        <div className={"w-full"}>
+                                        <div className={"w-full text-sm"}>
                                             <ColorInput style={{width:'100%',height:"36px"}} value={contentDetail.bg_color}
                                                         onChange={(color) => setContentDetail((prevState) => ({
                                                             ...prevState,
@@ -202,7 +256,7 @@ const PostSheet = ({isOpen,onClose,onOpen}) => {
 
                                     <div className="grid w-full max-w-sm items-center gap-2">
                                         <Label className={"font-normal"} htmlFor="email">Text Color</Label>
-                                        <div className={"w-full"}>
+                                        <div className={"w-full text-sm"}>
                                             <ColorInput style={{width:'100%',height:"36px"}} value={contentDetail.text_color}
                                                         onChange={(color) => setContentDetail((prevState) => ({
                                                             ...prevState,
@@ -213,7 +267,7 @@ const PostSheet = ({isOpen,onClose,onOpen}) => {
 
                                     <div className="grid w-full max-w-sm items-center gap-2">
                                         <Label className={"font-normal"} htmlFor="email">Icon Color </Label>
-                                        <div className={"w-full"}>
+                                        <div className={"w-full text-sm"}>
                                             <ColorInput style={{width:'100%',height:"36px"}} value={contentDetail.icon_color}
                                                         onChange={(color) => setContentDetail((prevState) => ({
                                                             ...prevState,
@@ -224,7 +278,7 @@ const PostSheet = ({isOpen,onClose,onOpen}) => {
 
                                     <div className="grid w-full max-w-sm items-center gap-2">
                                         <Label className={"font-normal"} htmlFor="btn_color">Button Color</Label>
-                                        <Input type="text" id="btn_color" className={"h-9"} placeholder="Button Color" />
+                                        <Input value={contentDetail.btn_color} name={"btn_color"} onChange={onChange} type="text" id="btn_color"  className={"h-9"} placeholder="Button Color" />
                                     </div>
 
 
@@ -240,14 +294,22 @@ const PostSheet = ({isOpen,onClose,onOpen}) => {
                             <h5 className={"text-base font-medium mb-2"}>Triggers</h5>
                             <div className={"space-y-1"}>
                                 <Label className={"font-medium"}>Where to send</Label>
-                                <Select>
+                                <Select value={contentDetail.where_to_send} onValueChange={(value)=>handleStatusChange(value,"where_to_send")}>
                                     <SelectTrigger className="w-full h-9">
                                         <SelectValue placeholder="Set Where to send" />
                                     </SelectTrigger>
                                     <SelectContent>
                                         <SelectGroup>
-                                            <SelectItem value="apple">Where to send</SelectItem>
-                                            <SelectItem value="banana">Where to send 1</SelectItem>
+                                            {
+                                                (whereToSend || []).map((x)=>{
+                                                    return(
+                                                        <SelectItem value={x.id}>{x.label}</SelectItem>
+
+                                                    )
+                                                })
+                                            }
+                                            {/*<SelectItem value="apple">Where to send</SelectItem>
+                                            <SelectItem value="banana">Where to send 1</SelectItem>*/}
                                         </SelectGroup>
                                     </SelectContent>
                                 </Select>
@@ -317,14 +379,19 @@ const PostSheet = ({isOpen,onClose,onOpen}) => {
                                 </div>
                                 <div className={"space-y-1 mt-2 w-2/5"}>
                                     <Label className={"font-medium"}>Add delay</Label>
-                                    <Select>
+                                    <Select value={contentDetail.delay} defaultValue={1} onValueChange={(value)=>handleStatusChange(value,"delay")}>
                                         <SelectTrigger className="w-full h-9">
-                                            <SelectValue placeholder="2 sec" />
+                                            <SelectValue defaultValue={1} placeholder="Add Delay" />
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectGroup>
-                                                <SelectItem value="apple">2 sec</SelectItem>
-                                                <SelectItem value="banana">3 sec</SelectItem>
+                                                {
+                                                    (delay || []).map((x)=>{
+                                                        return(
+                                                            <SelectItem key={x.value} value={x.value}>{x.label}</SelectItem>
+                                                        )
+                                                    })
+                                                }
                                             </SelectGroup>
                                         </SelectContent>
                                     </Select>

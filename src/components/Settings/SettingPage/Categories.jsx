@@ -37,7 +37,7 @@ const Categories = () => {
     const { theme } = useTheme();
     const [categoryDetails,setCategoryDetails] =useState(initialState);
     const [formError, setFormError] = useState(initialState);
-    const [isLoading,setIsLoading]= useState(false);
+    const [isLoading,setIsLoading]= useState(true);
     const [categoriesList,setCategoriesList]=useState([]);
     const [isSave,setIsSave]=useState(false);
     const [isOpenDeleteAlert,setIsOpenDeleteAlert] =useState(false);
@@ -49,18 +49,15 @@ const Categories = () => {
     const dispatch = useDispatch();
 
     useEffect(() => {
-        getAllCategory();
-    }, [projectDetailsReducer.id])
+        if(allStatusAndTypes.categories){
+            getAllCategory();
+        }
+    }, [allStatusAndTypes.categories]);
 
     const getAllCategory = async () => {
-        setIsLoading(true)
-        const data = await apiService.getAllCategory(projectDetailsReducer.id)
-        if(data.status === 200){
-            setCategoriesList(data.data);
-            setIsLoading(false);
-        } else {
-            setIsLoading(false);
-        }
+        setIsLoading(true);
+        setCategoriesList(allStatusAndTypes.categories);
+        setIsLoading(false);
     }
 
     const onEditOption = (record) => {

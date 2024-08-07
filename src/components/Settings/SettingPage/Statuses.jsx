@@ -21,6 +21,7 @@ import {
 } from "../../ui/alert-dialog";
 import {Skeleton} from "../../ui/skeleton";
 import NoDataThumbnail from "../../../img/Frame.png";
+import EmptyData from "../../Comman/EmptyData";
 
 const initialStatus = {
     title: '',
@@ -29,7 +30,7 @@ const initialStatus = {
 
 const Statuses = () => {
     const {theme} = useTheme();
-    const [isLoading,setIsLoading]=useState(false);
+    const [isLoading,setIsLoading]=useState(true);
     const [showColorInput, setShowColorInput] = useState(false);
     const [newStatus, setNewStatus] = useState({...initialStatus });
     const [labelError, setLabelError] = useState(initialStatus);
@@ -38,6 +39,7 @@ const Statuses = () => {
     const [isSave,setIsSave]= useState(false);
     const [deleteId,setDeleteId]=useState(null);
     const [deleteIndex,setDeleteIndex] =useState(null);
+    const [disableStatusBtn,setDisableStatusBtn]=useState(false);
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
     const dispatch = useDispatch();
@@ -71,6 +73,7 @@ const Statuses = () => {
 
     const handleShowInput = () => {
         setShowColorInput(true);
+        setDisableStatusBtn(true);
     };
 
     const handleInputChange = (event, index) => {
@@ -126,6 +129,7 @@ const Statuses = () => {
                 variant: "destructive",
             })
         }
+        setDisableStatusBtn(false);
     };
 
     const onBlur = (event) => {
@@ -196,6 +200,7 @@ const Statuses = () => {
         updatedColors[index] = { ...labelToSave };
         setStatusList(updatedColors);
         setIsEdit(null);
+        setDisableStatusBtn(false);
     };
 
     const handleDeleteStatus = (id,index) => {
@@ -253,7 +258,7 @@ const Statuses = () => {
                         </CardDescription>
                     </div>
                     <Button
-                        disabled={showColorInput}
+                        disabled={disableStatusBtn}
                         className="flex gap-1 items-center text-sm font-semibold m-0"
                         onClick={handleShowInput}
                     >
@@ -274,9 +279,10 @@ const Statuses = () => {
                                 }
                             </TableRow>
                         </TableHeader>
-                        {isLoading ? <TableBody>
+
+                        <TableBody>
                             {
-                                [...Array(5)].map((_, index) => {
+                                isLoading ? [...Array(5)].map((_, index) => {
                                     return (
                                         <TableRow key={index}>
                                             {
@@ -290,24 +296,109 @@ const Statuses = () => {
                                             }
                                         </TableRow>
                                     )
-                                })
-                            }
-                        </TableBody>
-                         :
-                            <TableBody>
-                                {(statusList || []).map((x, i) => (
-                                    <TableRow key={i}>
-                                        <TableCell><Menu className={"cursor-grab"} size={16}/></TableCell>
-                                        {
-                                            isEdit === i ?
-                                                <TableCell className={"py-[8.5px] pl-0 py-[11px]"}>
+                                }) :
+                                    statusList.length > 0 ? <>
+                                        {(statusList || []).map((x, i) => (
+                                            <TableRow key={i}>
+                                                <TableCell><Menu className={"cursor-grab"} size={16}/></TableCell>
+                                                {
+                                                    isEdit === i ?
+                                                        <TableCell className={"py-[8.5px] pl-0 py-[11px]"}>
+                                                            <Input
+                                                                className={"bg-card h-9"}
+                                                                type="title"
+                                                                value={x.title}
+                                                                name={"title"}
+                                                                onBlur={onBlur}
+                                                                onChange={(e) => handleInputChange(e, i)}
+                                                            />
+                                                            <div className="grid gap-2">
+                                                                {
+                                                                    labelError.title &&
+                                                                    <span className="text-red-500 text-sm">{labelError.title}</span>
+                                                                }
+                                                            </div>
+                                                        </TableCell>
+                                                        : <TableCell
+                                                            className={`font-medium text-xs py-[8.5px] pl-0 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.title}</TableCell>
+                                                }
+                                                {isEdit === i ?
+                                                    <TableCell
+                                                        className={`font-medium text-xs ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                                        <div className={"flex justify-center items-center"}>
+                                                            <ColorInput name={"color_code"} value={x.color_code} onChange={(color) => onChangeColorColor(color, i)}/>
+                                                        </div>
+                                                    </TableCell> :
+                                                    <TableCell
+                                                        className={`font-medium text-xs ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                                        <div className={"flex justify-center items-center gap-1"}>
+                                                            <Square size={16} strokeWidth={1} fill={x.color_code} stroke={x.color_code}/>
+                                                            <p>{x.color_code}</p>
+                                                        </div>
+                                                    </TableCell>
+                                                }
+                                                <TableCell className="flex justify-end gap-2 pr-4">
+                                                    {isEdit === i ? (
+                                                        <Fragment>
+                                                            <Button
+                                                                variant="outline hover:bg-transparent"
+                                                                className={`p-1 border w-[30px] h-[30px] ${isSave ? "justify-center items-center" : ""}`}
+                                                                onClick={() => handleSaveStatus(i)}
+                                                            >
+                                                                {isSave ? <Loader2 className="mr-1 h-4 w-4 animate-spin justify-center"/> : <Check size={16}/>}
+                                                            </Button>
+                                                            <Button
+                                                                variant="outline hover:bg-transparent"
+                                                                className="p-1 border w-[30px] h-[30px]"
+                                                                onClick={() => {
+                                                                    setIsEdit(null);
+                                                                    setDisableStatusBtn(false);
+                                                                }}
+                                                            >
+                                                                <X size={16}/>
+                                                            </Button>
+                                                        </Fragment>
+                                                    ) : (
+                                                        <Fragment>
+                                                            <Button
+                                                                variant="outline hover:bg-transparent"
+                                                                className="p-1 border w-[30px] h-[30px]"
+                                                                onClick={() => {
+                                                                    setIsEdit(i);
+                                                                    setDisableStatusBtn(true);
+                                                                    setShowColorInput(false);
+                                                                }}
+                                                            >
+                                                                <Pencil size={16}/>
+                                                            </Button>
+                                                            <Button
+                                                                variant="outline hover:bg-transparent"
+                                                                className="p-1 border w-[30px] h-[30px]"
+                                                                onClick={() => handleDeleteStatus(x.id, i)}
+                                                            >
+                                                                <Trash2 size={16}/>
+                                                            </Button>
+                                                        </Fragment>
+                                                    )}
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                        {showColorInput && (
+                                            <TableRow>
+                                                <TableCell className={`${labelError ? "align-top" : ""}`}>
+                                                    <Button variant={"ghost hover:bg-transparent"}
+                                                            className={"p-0 cursor-grab"}><Menu size={16}/></Button>
+                                                </TableCell>
+                                                <TableCell className={"p-0 py-4 pr-4"}>
                                                     <Input
-                                                        className={"bg-card h-9"}
-                                                        type="title"
-                                                        value={x.title}
-                                                        name={"title"}
+                                                        className={"bg-card"}
+                                                        type="text"
+                                                        id="title"
+                                                        name="title"
+                                                        value={newStatus.title}
+                                                        onChange={handleInputChange}
+                                                        placeholder="Enter Status Name"
                                                         onBlur={onBlur}
-                                                        onChange={(e) => handleInputChange(e, i)}
                                                     />
                                                     <div className="grid gap-2">
                                                         {
@@ -316,119 +407,47 @@ const Statuses = () => {
                                                         }
                                                     </div>
                                                 </TableCell>
-                                                : <TableCell
-                                                    className={`font-medium text-xs py-[8.5px] pl-0 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.title}</TableCell>
-                                        }
-                                        {isEdit === i ?
-                                            <TableCell
-                                                className={`font-medium text-xs ${theme === "dark" ? "" : "text-muted-foreground"}`}>
-                                                <div className={"flex justify-center items-center"}>
-                                                    <ColorInput name={"color_code"} value={x.color_code} onChange={(color) => onChangeColorColor(color, i)}/>
-                                                </div>
-                                            </TableCell> :
-                                            <TableCell
-                                                className={`font-medium text-xs ${theme === "dark" ? "" : "text-muted-foreground"}`}>
-                                                <div className={"flex justify-center items-center gap-1"}>
-                                                    <Square size={16} strokeWidth={1} fill={x.color_code} stroke={x.color_code}/>
-                                                    <p>{x.color_code}</p>
-                                                </div>
-                                            </TableCell>
-                                        }
-                                        <TableCell className="flex justify-end gap-2 pr-4">
-                                            {isEdit === i ? (
-                                                <Fragment>
+                                                <TableCell className={`${labelError ? "align-top" : ""} p-0 py-4 text-xs ${theme === "dark" ? "" : "text-muted-foreground"} `}>
+                                                    <div className={"flex justify-center items-center"}>
+                                                        <ColorInput
+                                                            name="color_code"
+                                                            value={newStatus.color_code}
+                                                            onChange={(color) => setNewStatus((prevState) => ({
+                                                                ...prevState,
+                                                                color_code: color.color_code
+                                                            }))}
+                                                        />
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell className="flex justify-end gap-2 pr-6 pt-[21px]">
                                                     <Button
-                                                        variant="outline hover:bg-transparent"
-                                                        className={`p-1 border w-[30px] h-[30px] ${isSave ? "justify-center items-center" : ""}`}
-                                                        onClick={() => handleSaveStatus(i)}
+                                                        variant=""
+                                                        className="text-sm font-semibold h-[30px]"
+                                                        onClick={handleAddNewStatus}
                                                     >
-                                                        {isSave ? <Loader2 className="mr-1 h-4 w-4 animate-spin justify-center"/> : <Check size={16}/>}
+                                                        {isSave ? <Loader2 className={"mr-2  h-4 w-4 animate-spin"}/> : "Add Status"}
                                                     </Button>
                                                     <Button
                                                         variant="outline hover:bg-transparent"
                                                         className="p-1 border w-[30px] h-[30px]"
-                                                        onClick={() => setIsEdit(null)}
+                                                        onClick={()=> {
+                                                            setShowColorInput(false);
+                                                            setDisableStatusBtn(false);
+                                                        }}
                                                     >
                                                         <X size={16}/>
                                                     </Button>
-                                                </Fragment>
-                                            ) : (
-                                                <Fragment>
-                                                    <Button
-                                                        variant="outline hover:bg-transparent"
-                                                        className="p-1 border w-[30px] h-[30px]"
-                                                        onClick={() => setIsEdit(i)}
-                                                    >
-                                                        <Pencil size={16}/>
-                                                    </Button>
-                                                    <Button
-                                                        variant="outline hover:bg-transparent"
-                                                        className="p-1 border w-[30px] h-[30px]"
-                                                        onClick={() => handleDeleteStatus(x.id, i)}
-                                                    >
-                                                        <Trash2 size={16}/>
-                                                    </Button>
-                                                </Fragment>
-                                            )}
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                                {showColorInput && (
-                                    <TableRow>
-                                        <TableCell className={`${labelError ? "align-top" : ""}`}>
-                                            <Button variant={"ghost hover:bg-transparent"}
-                                                    className={"p-0 cursor-grab"}><Menu size={16}/></Button>
-                                        </TableCell>
-                                        <TableCell className={"p-0 py-4 pr-4"}>
-                                            <Input
-                                                className={"bg-card"}
-                                                type="text"
-                                                id="title"
-                                                name="title"
-                                                value={newStatus.title}
-                                                onChange={handleInputChange}
-                                                placeholder="Enter Status Name"
-                                                onBlur={onBlur}
-                                            />
-                                            <div className="grid gap-2">
-                                                {
-                                                    labelError.title &&
-                                                    <span className="text-red-500 text-sm">{labelError.title}</span>
-                                                }
-                                            </div>
-                                        </TableCell>
-                                        <TableCell className={`${labelError ? "align-top" : ""} p-0 py-4`}>
-                                            <div className={"flex justify-center items-center"}>
-                                                <ColorInput
-                                                    name="color_code"
-                                                    value={newStatus.color_code}
-                                                    onChange={(color) => setNewStatus((prevState) => ({
-                                                        ...prevState,
-                                                        color_code: color.color_code
-                                                    }))}
-                                                />
-                                            </div>
-                                        </TableCell>
-                                        <TableCell className="flex justify-end gap-2 pr-6">
-                                            <Button
-                                                variant=""
-                                                className="text-sm font-semibold"
-                                                onClick={handleAddNewStatus}
-                                            >
-                                                {isSave ? <Loader2 className={"mr-2 h-4 w-4 animate-spin"}/> : "Add Status"}
-                                            </Button>
-                                        </TableCell>
-                                    </TableRow>
-                                )}
-                            </TableBody>
-                        }
+                                                </TableCell>
+                                            </TableRow>
+                                        )}
+                                    </> :  <TableRow>
+                                                <TableCell colSpan={6}>
+                                                    <EmptyData />
+                                                </TableCell>
+                                            </TableRow>
+                            }
+                        </TableBody>
                     </Table>
-                        {isLoading === false && statusList.length === 0 && <div className={"flex flex-row justify-center py-[45px]"}>
-                            <div className={"flex flex-col items-center gap-2"}>
-                                <img src={NoDataThumbnail} className={"flex items-center"}/>
-                                <h5 className={`text-center text-2xl font-medium leading-8 ${theme === "dark" ? "" : "text-[#A4BBDB]"}`}>No Data</h5>
-                            </div>
-                        </div>}
                     </div>
                 </CardContent>
         </Card>

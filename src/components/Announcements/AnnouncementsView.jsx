@@ -7,8 +7,8 @@ import {
     ChevronLeft,
     ChevronRight,
     ChevronsLeft,
-    ChevronsRight, Circle, Dot, Ellipsis,
-    MessageCircleMore
+    ChevronsRight, Circle, Dot, Ellipsis, Loader2,
+    MessageCircleMore, X
 } from "lucide-react";
 import {Card, CardContent, CardFooter} from "../ui/card";
 import { DropdownMenu,
@@ -25,16 +25,8 @@ import {toast} from "../ui/use-toast";
 import ReadMoreText from "../Comman/ReadMoreText";
 import {Toaster} from "../ui/toaster";
 import {CommSkel} from "../Comman/CommSkel";
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle
-} from "../ui/alert-dialog";
+// import {Dialog} from "@radix-ui/react-dialog";
+import {Dialog,DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "../ui/dialog";
 
 const status = [
     {name: "Publish", value: 0, fillColor: "#389E0D", strokeColor: "#389E0D",},
@@ -43,8 +35,8 @@ const status = [
 
 const AnnouncementsView = ({data,isLoading,setSelectedRecord,handleDelete,setAnalyticsObj}) => {
     const [announcementList,setAnnouncementList]=useState([]);
-    const [isOpenDeleteAlert,setIsOpenDeleteAlert]= useState(false);
     const [idToDelete,setIdToDelete]=useState(null);
+    const [openDelete,setOpenDelete]=useState(false);
     const {theme} =useTheme();
 
     useEffect(()=>{
@@ -76,31 +68,46 @@ const AnnouncementsView = ({data,isLoading,setSelectedRecord,handleDelete,setAna
     };
 
     const deleteRow =(id)=>{
-        setIsOpenDeleteAlert(true);
         setIdToDelete(id);
+        setOpenDelete(true);
     }
 
     const deleteParticularRow = ()=>{
         handleDelete(idToDelete);
+        setOpenDelete(false);
     }
 
     return (
         <div className={""}>
             <Toaster/>
-            <AlertDialog open={isOpenDeleteAlert} onOpenChange={setIsOpenDeleteAlert}>
-                <AlertDialogContent className={"w-[310px] md:w-auto rounded-lg"}>
-                    <AlertDialogHeader className={"text-left gap-2"}>
-                        <AlertDialogTitle className={"text-sm md:text-xl"}>You really want delete this announcement?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            This action can't be undone.
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter className={"flex flex-row justify-end gap-2"}>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction className={"bg-red-600 hover:bg-red-600 m-0"} onClick={deleteParticularRow}>Delete</AlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
+            {
+                openDelete &&
+                <Fragment>
+                    <Dialog open onOpenChange={()=> setOpenDelete(false)}>
+                        <DialogContent className="max-w-[350px] w-full sm:max-w-[525px] p-3 md:p-6 rounded-lg">
+                            <DialogHeader className={"flex flex-row justify-between gap-2"}>
+                                <div className={"flex flex-col gap-2"}>
+                                    <DialogTitle>You really want delete this announcement?</DialogTitle>
+                                    <DialogDescription>This action can't be undone.</DialogDescription>
+                                </div>
+                                <X size={16} className={"m-0 cursor-pointer"} onClick={() => setOpenDelete(false)}/>
+                            </DialogHeader>
+                            <DialogFooter className={"flex-row justify-end space-x-2"}>
+                                <Button variant={"outline hover:none"}
+                                        className={"text-sm font-semibold border"}
+                                        onClick={() => setOpenDelete(false)}>Cancel</Button>
+                                <Button
+                                    variant={"hover:bg-destructive"}
+                                    className={`${theme === "dark" ? "text-card-foreground" : "text-card"} ${isLoading === true ? "py-2 px-6" : "py-2 px-6"} w-[76px] text-sm font-semibold bg-destructive`}
+                                    onClick={deleteParticularRow}
+                                >
+                                    {isLoading ? <Loader2 size={16} className={"animate-spin"}/> : "Delete"}
+                                </Button>
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
+                </Fragment>
+            }
             {
                 isLoading ? <Card><CardContent className={"p-0"}>{CommSkel.commonParagraphFourIdea}</CardContent></Card> :
                     <div className={"flex flex-col px-3 lg:px-[33px] pt-[9px] pb-0"}>
@@ -153,7 +160,7 @@ const AnnouncementsView = ({data,isLoading,setSelectedRecord,handleDelete,setAna
                                                         <DropdownMenuContent>
                                                             <DropdownMenuItem onClick={() => openSheetSidebar(x)}>Analytics</DropdownMenuItem>
                                                             <DropdownMenuItem onClick={() => onEdit(x)}>Edit</DropdownMenuItem>
-                                                            <DropdownMenuItem onClick={() => deleteRow(x.id)}>Delete</DropdownMenuItem>
+                                                            <DropdownMenuItem onClick={()=>deleteRow(x.id)}>Delete</DropdownMenuItem>
                                                         </DropdownMenuContent>
                                                     </DropdownMenu>
                                             </div>
@@ -226,6 +233,6 @@ const AnnouncementsView = ({data,isLoading,setSelectedRecord,handleDelete,setAna
 
         </div>
     );
-};
+}
 
 export default AnnouncementsView;

@@ -2,7 +2,7 @@ import React, {useState, Fragment, useEffect} from 'react';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "../ui/table";
 import {Badge} from "../ui/badge";
 import {Button} from "../ui/button";
-import {BarChart, Circle, Ellipsis, Eye, Loader2,} from "lucide-react";
+import {BarChart, Circle, Ellipsis, Eye, Loader2, X,} from "lucide-react";
 import {useTheme} from "../theme-provider"
 import {CardContent} from "../ui/card";
 import {DropdownMenu, DropdownMenuTrigger} from "@radix-ui/react-dropdown-menu";
@@ -81,18 +81,21 @@ const AnnouncementsTable = ({data,isLoading ,setSelectedRecord,setEditIndex ,han
                 openDelete &&
                 <Fragment>
                     <Dialog open onOpenChange={()=> setOpenDelete(false)}>
-                        <DialogContent className="sm:max-w-[425px]">
-                            <DialogHeader className={"flex flex-col gap-2"}>
-                                <DialogTitle>You really want delete this announcement?</DialogTitle>
-                                <DialogDescription>This action can't be undone.</DialogDescription>
+                        <DialogContent className="max-w-[350px] w-full sm:max-w-[525px] p-3 md:p-6 rounded-lg">
+                            <DialogHeader className={"flex flex-row justify-between gap-2"}>
+                                <div className={"flex flex-col gap-2"}>
+                                    <DialogTitle>You really want delete this announcement?</DialogTitle>
+                                    <DialogDescription>This action can't be undone.</DialogDescription>
+                                </div>
+                                <X size={16} className={"m-0 cursor-pointer"} onClick={() => setOpenDelete(false)}/>
                             </DialogHeader>
-                            <DialogFooter>
+                            <DialogFooter className={"flex-row justify-end space-x-2"}>
                                 <Button variant={"outline hover:none"}
                                         className={"text-sm font-semibold border"}
                                         onClick={() => setOpenDelete(false)}>Cancel</Button>
                                 <Button
                                     variant={"hover:bg-destructive"}
-                                    className={`${theme === "dark" ? "text-card-foreground" : "text-card"} ${isLoading === true ? "py-2 px-6" : "py-2 px-6"} w-[76px] text-sm font-semibold bg-destructive`}
+                                    className={` ${theme === "dark" ? "text-card-foreground" : "text-card"} ${isLoading === true ? "py-2 px-6" : "py-2 px-6"} w-[76px] text-sm font-semibold bg-destructive`}
                                     onClick={deleteParticularRow}
                                 >
                                     {isLoading ? <Loader2 size={16} className={"animate-spin"}/> : "Delete"}

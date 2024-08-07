@@ -20,6 +20,7 @@ import {allStatusAndTypesAction} from "../../../redux/action/AllStatusAndTypesAc
 import {toast} from "../../ui/use-toast";
 import NoDataThumbnail from "../../../img/Frame.png";
 import {Separator} from "../../ui/separator";
+import EmptyData from "../../Comman/EmptyData";
 
 const initialState ={
     title:""
@@ -27,13 +28,14 @@ const initialState ={
 
 const Board = () => {
     const [boardList,setBoardList]=useState([]);
-    const [isLoading,setIsLoading]=useState(false);
+    const [isLoading,setIsLoading]=useState(true);
     const [isSave,setIsSave]= useState(false);
     const [boardDetail,setBoardDetail]=useState(initialState);
     const [formError, setFormError] = useState(initialState);
     const [showNewBoard, setShowNewBoard] = useState(false);
     const [isEdit,setIsEdit]=useState(null)
     const [deleteId,setDeleteId]=useState(null);
+    const [disabledBoardBtn,setDisabledBoardBtn]=useState(false);
     const dispatch = useDispatch();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
@@ -42,24 +44,15 @@ const Board = () => {
     const {theme, onProModal} = useTheme();
 
     useEffect(()=>{
-        if(projectDetailsReducer?.id){
+        if(allStatusAndTypes?.boards){
             getBoardList();
         }
-    },[projectDetailsReducer.id])
+    },[allStatusAndTypes?.boards])
 
     const getBoardList = async () => {
-        setIsLoading(true);
-        const payload ={
-            project_id:projectDetailsReducer.id,
-            search:""
-        }
-        const data = await apiService.getAllBoards(payload);
-        if(data.status === 200){
-           setBoardList(data.data);
-           setIsLoading(false);
-        }else{
-            setIsLoading(false);
-        }
+       setIsLoading(true);
+       setBoardList(allStatusAndTypes.boards);
+       setIsLoading(false);
     }
 
     const formValidate = (name, value) => {
@@ -136,6 +129,7 @@ const Board = () => {
                 variant: "destructive"
             });
         }
+        setDisabledBoardBtn(false);
     }
 
     const deleteTopic =(id) =>{
@@ -143,7 +137,9 @@ const Board = () => {
     }
 
     const handleEditBoard = (index) => {
-        setIsEdit(index)
+        setIsEdit(index);
+        setDisabledBoardBtn(true);
+        setShowNewBoard(false);
     }
 
     const updateBoard = async (record,index)=>{
@@ -214,14 +210,17 @@ const Board = () => {
             if(length < 1){
                 setShowNewBoard(true)
                 onProModal(false)
+                setDisabledBoardBtn(true);
             }  else{
                 onProModal(true)
             }
         } else if(userDetailsReducer.plan === 1){
             setShowNewBoard(true)
             onProModal(false)
+            setDisabledBoardBtn(true);
         }
     }
+
 
     return (
         <Fragment>
@@ -247,7 +246,7 @@ const Board = () => {
                     </div>
                     <div className={"mt-1 md:m-0"}>
                         <Button
-                            disabled={showNewBoard}
+                            disabled={disabledBoardBtn}
                             className="flex gap-1 items-center text-sm font-semibold m-0"
                             onClick={createNewBoard}
                         >
@@ -270,28 +269,26 @@ const Board = () => {
                                     }
                                 </TableRow>
                             </TableHeader>
-                            {
-                                isLoading ? <TableBody>
-                                    {
-                                        [...Array(4)].map((_, index) => {
-                                            return (
-                                                <TableRow key={index}>
-                                                    {
-                                                        [...Array(3)].map((_, i) => {
-                                                            return (
-                                                                <TableCell key={i} className={"px-2"}>
-                                                                    <Skeleton className={"rounded-md  w-full h-[24px]"}/>
-                                                                </TableCell>
-                                                            )
-                                                        })
-                                                    }
-                                                </TableRow>
-                                            )
-                                        })
-                                    }
-                                </TableBody>
-                                    :
-                                <TableBody>
+
+                            <TableBody>
+                                {
+                                    isLoading ? [...Array(4)].map((_, index) => {
+                                        return (
+                                            <TableRow key={index}>
+                                                {
+                                                    [...Array(3)].map((_, i) => {
+                                                        return (
+                                                            <TableCell key={i} className={"px-2"}>
+                                                                <Skeleton className={"rounded-md  w-full h-[24px]"}/>
+                                                            </TableCell>
+                                                        )
+                                                    })
+                                                }
+                                            </TableRow>
+                                        )
+                                    }) :
+                                    boardList.length > 0 ?
+                                    <>
                                         {
                                             (boardList || []).map((x,i)=>{
                                                 return(
@@ -318,8 +315,12 @@ const Board = () => {
                                                                         </Button>
                                                                     </div>
                                                                     <div className="pl-2">
-                                                                        <Button variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px]`}>
-                                                                            <X onClick={()=>setIsEdit(null)} size={16}/>
+                                                                        <Button onClick={()=> {
+                                                                            setIsEdit(null);
+                                                                            setDisabledBoardBtn(false);
+                                                                        }}
+                                                                                variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px]`}>
+                                                                            <X size={16}/>
                                                                         </Button>
                                                                     </div>
                                                                 </Fragment>
@@ -358,20 +359,29 @@ const Board = () => {
                                                 <TableCell className={"text-center"}>
 
                                                 </TableCell>
-                                                <TableCell className={"flex justify-end"}>
-                                                    <Button onClick={addBoard}>{isSave ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : "Add Board"}</Button>
+                                                <TableCell className={"flex justify-end gap-2 pr-6 pt-[21px]"}>
+                                                    <Button className={"h-[30px]"} onClick={addBoard}>{isSave ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : "Add Board"}</Button>
+                                                    <Button
+                                                        variant="outline hover:bg-transparent"
+                                                        className="p-1 border w-[30px] h-[30px]"
+                                                        onClick={()=> {
+                                                            setShowNewBoard(false);
+                                                            setDisabledBoardBtn(false);
+                                                        }}
+                                                    >
+                                                        <X size={16}/>
+                                                    </Button>
                                                 </TableCell>
                                             </TableRow>
                                         }
-                                    </TableBody>
-                            }
+                                    </> :  <TableRow>
+                                            <TableCell colSpan={6}>
+                                                <EmptyData />
+                                            </TableCell>
+                                        </TableRow>
+                                }
+                            </TableBody>
                         </Table>
-                        {isLoading === false && boardList.length === 0 && <div className={"flex flex-row justify-center py-[45px]"}>
-                            <div className={"flex flex-col items-center gap-2"}>
-                                <img src={NoDataThumbnail} className={"flex items-center"}/>
-                                <h5 className={`text-center text-2xl font-medium leading-8 ${theme === "dark" ? "" : "text-[#A4BBDB]"}`}>No Data</h5>
-                            </div>
-                        </div>}
                     </div>
                 </CardContent>
             </Card>

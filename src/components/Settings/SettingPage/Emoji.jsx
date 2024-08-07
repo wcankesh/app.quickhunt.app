@@ -9,7 +9,9 @@ import { Popover, PopoverContent } from "../../ui/popover";
 import { PopoverTrigger } from "@radix-ui/react-popover";
 import { Input } from "../../ui/input";
 import {
-    AlertDialog, AlertDialogAction, AlertDialogCancel,
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
     AlertDialogContent,
     AlertDialogDescription,
     AlertDialogHeader,
@@ -22,6 +24,7 @@ import {toast} from "../../ui/use-toast";
 import {useDispatch} from "react-redux";
 import {allStatusAndTypesAction} from "../../../redux/action/AllStatusAndTypesAction";
 import NoDataThumbnail from "../../../img/Frame.png";
+import EmptyData from "../../Comman/EmptyData";
 
 const Emoji = () => {
     const [showEmojiInput, setShowEmojiList] = useState(false);
@@ -30,11 +33,12 @@ const Emoji = () => {
     const [deleteId, setDeleteId] = useState(null);
     const [deleteIndex, setDeleteIndex] = useState(null);
     const [editIndex, setEditIndex] = useState(null);
-    const [isLoading,setIsLoading] = useState(false);
+    const [isLoading,setIsLoading] = useState(true);
     const [isSave,setIsSave]=useState(false);
     const [isEdit,setIsEdit]=useState(false)
     const [isChangeEditEmoji,setIsChangeEditEmoji]=useState(false);
     const [validationError, setValidationError] = useState('');
+    const [disabledEmojiBtn,setDisabledEmojiBtn]=useState(false);
     const apiService = new ApiService();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
@@ -42,18 +46,15 @@ const Emoji = () => {
     const theme = useTheme();
 
     useEffect(()=>{
-        getAllEmoji();
-    },[projectDetailsReducer.id])
+        if(allStatusAndTypes.emoji){
+            getAllEmoji();
+        }
+    },[allStatusAndTypes.emoji])
 
     const getAllEmoji = async () => {
         setIsLoading(true);
-        const data = await apiService.getAllEmoji(projectDetailsReducer.id)
-        if(data.status === 200){
-          setEmojiList(data.data);
-          setIsLoading(false)
-        } else {
-            setIsLoading(false)
-        }
+       setEmojiList(allStatusAndTypes.emoji);
+       setIsLoading(false)
     }
 
     const handleEmojiSelect = (event) => {
@@ -95,6 +96,7 @@ const Emoji = () => {
         }
         setShowEmojiList(false);
         setSelectedEmoji({});
+        setDisabledEmojiBtn(false);
     }
 
     const handleDeleteEmoji = (id, index) => {
@@ -125,6 +127,8 @@ const Emoji = () => {
         setEditIndex(index);
         setSelectedEmoji(record);
         setIsEdit(true);
+        setShowEmojiList(false);
+        setDisabledEmojiBtn(true);
     }
 
     const handleSaveEmoji = async (record,index) => {
@@ -182,7 +186,10 @@ const Emoji = () => {
                         <CardDescription className={"text-sm text-muted-foreground p-0 mt-1 leading-5"}>Use Emoji to organise your Changelog</CardDescription>
                     </div>
                     <div className={"m-0"}>
-                        <Button onClick={()=>setShowEmojiList(true)} disabled={showEmojiInput} className={"text-sm font-semibold"}><Plus size={16} className={"mr-1 text-[#f9fafb]"} /> New Emoji</Button>
+                        <Button onClick={()=> {
+                            setShowEmojiList(true);
+                            setDisabledEmojiBtn(true);
+                        }} disabled={disabledEmojiBtn} className={"text-sm font-semibold"}><Plus size={16} className={"mr-1 text-[#f9fafb]"} /> New Emoji</Button>
                     </div>
                 </CardHeader>
                 <CardContent className={"p-0"}>
@@ -193,28 +200,23 @@ const Emoji = () => {
                                 <TableHead className={`pl-4 text-end ${theme === "dark" ? "" : "text-card-foreground"}`}>Action</TableHead>
                             </TableRow>
                         </TableHeader>
-                        {
-                            isLoading ? <TableBody>
-                                {
-                                    [...Array(5)].map((_, index) => {
-                                        return (
-                                            <TableRow key={index}>
-                                                {
-                                                    [...Array(2)].map((_, i) => {
-                                                        return (
-                                                            <TableCell key={i} className={"px-2"}>
-                                                                <Skeleton className={`rounded-md  w-full h-[24px] ${i == 0 ? "w-full" : ""}`}/>
-                                                            </TableCell>
-                                                        )
-                                                    })
-                                                }
-                                            </TableRow>
-                                        )
-                                    })
-                                }
-                            </TableBody>
-                                :
-                            <TableBody>
+                        <TableBody>
+                            {
+                                isLoading ? [...Array(5)].map((_, index) => {
+                                    return (
+                                        <TableRow key={index}>
+                                            {
+                                                [...Array(2)].map((_, i) => {
+                                                    return (
+                                                        <TableCell key={i} className={"px-2"}>
+                                                            <Skeleton className={`rounded-md  w-full h-[24px] ${i == 0 ? "w-full" : ""}`}/>
+                                                        </TableCell>
+                                                    )
+                                                })
+                                            }
+                                        </TableRow>
+                                    )
+                                }) : emojiList.length > 0 ? <>
                                     {
                                         (emojiList || []).map((x, index) => {
                                             return (
@@ -251,7 +253,10 @@ const Emoji = () => {
                                                                     {isSave ? <Loader2 className="mr-1 h-4 w-4 animate-spin justify-center"/> : <Check size={16}/>}
                                                                 </Button>
                                                                 <div className={"pl-2"}>
-                                                                    <Button onClick={() => setEditIndex(null)} variant={"outline hover:bg-transparent"} className={`p-1 mt-[6px] border w-[30px] h-[30px] `}>
+                                                                    <Button onClick={() => {
+                                                                        setEditIndex(null);
+                                                                        setDisabledEmojiBtn(false);
+                                                                    }} variant={"outline hover:bg-transparent"} className={`p-1 mt-[6px] border w-[30px] h-[30px] `}>
                                                                         <X size={16}/>
                                                                     </Button>
                                                                 </div>
@@ -294,24 +299,32 @@ const Emoji = () => {
                                                         </PopoverContent>
                                                     </Popover>
                                                 </TableCell>
-                                                <TableCell className={"text-end"}>
-                                                    <Button onClick={addEmoji}>
+                                                <TableCell className={"pt-[21px] text-end flex flex-row justify-end gap-2"}>
+                                                    <Button className={"h-[30px]"} onClick={addEmoji}>
                                                         {isSave ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> :"Add Emoji"}
+                                                    </Button>
+                                                    <Button
+                                                        variant="outline hover:bg-transparent"
+                                                        className="p-1 border w-[30px] h-[30px]"
+                                                        onClick={()=> {
+                                                            setShowEmojiList(false);
+                                                            setDisabledEmojiBtn(false);
+                                                        }}
+                                                    >
+                                                        <X size={16}/>
                                                     </Button>
                                                 </TableCell>
                                             </TableRow>
                                         )
                                     }
-                                </TableBody>
-                        }
-
+                                                            </> : <TableRow>
+                                    <TableCell colSpan={6}>
+                                        <EmptyData />
+                                    </TableCell>
+                                </TableRow>
+                            }
+                        </TableBody>
                     </Table>
-                    {isLoading === false && emojiList.length === 0 && <div className={"flex flex-row justify-center py-[45px]"}>
-                        <div className={"flex flex-col items-center gap-2"}>
-                            <img src={NoDataThumbnail} className={"flex items-center"}/>
-                            <h5 className={`text-center text-2xl font-medium leading-8 ${theme === "dark" ? "" : "text-[#A4BBDB]"}`}>No Data</h5>
-                        </div>
-                    </div>}
                 </CardContent>
             </Card>
         </Fragment>
