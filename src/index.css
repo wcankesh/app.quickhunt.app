@@ -499,14 +499,7 @@ span.LinesEllipsis-ellipsis {color: hsl(var(--primary)) !important;font-weight: 
 .ql-toolbar.ql-snow .ql-picker-label{
   color: var(--quill-icon)
 }
-.ql-snow .ql-editor img {
-  max-width: 50px;
-  width: 100%;
-  height: 50px;
-  border: 1px solid;
-  border-color: var(--border-color);
-  padding: 3px;
-}
+
 /*.ql-editor p {display: flex; gap: 8px}*/
 /*.description-container div p span {color: var(--muted-foreground) !important;}*/
 /*.description-container .LinesEllipsis .LinesEllipsis--clamped div p span .LinesEllipsis-ellipsis {color: var(--primary) !important;}*/
