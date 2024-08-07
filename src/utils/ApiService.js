@@ -159,6 +159,9 @@ export class ApiService{
     async createPosts (payload){
         return await this.postData(`${baseUrlApi}/posts`,payload, true)
     }
+    async deletePostsImage (payload){
+        return await this.postData(`${baseUrlApi}/remove-image`,payload, true)
+    }
     async filterPost (payload){
         return await this.postData(`${baseUrlApi}/search`,payload)
     }

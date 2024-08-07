@@ -483,7 +483,7 @@ const HeaderBar = () => {
                                                     {(projectList || []).map((x, i) => (
                                                         <Fragment key={i}>
                                                             <CommandItem
-                                                                className={`${projectDetailsReducer.id === x.id ? `${theme === "dark" ? "text-card-foreground" : "text-card"} bg-primary hov-primary` : 'bg-card'}`}
+                                                                className={`${projectDetailsReducer.id === x.id ? `${theme === "dark" ? "text-card-foreground  hov-primary-dark" : "text-card hov-primary"} bg-primary` : 'bg-card'}`}
                                                                 value={x.id}
                                                                 onSelect={() => {
                                                                     onChangeProject(x.id);
@@ -519,7 +519,10 @@ const HeaderBar = () => {
                                         <Avatar className={"w-[30px] h-[30px]"}>
                                             {
                                                 userDetails.user_photo ?
-                                                    <AvatarImage src={userDetails.user_photo} alt="@shadcn"/> :
+                                                    <AvatarImage src={userDetails.user_photo}
+                                                                 alt={userDetails && userDetails?.user_first_name?.substring(0, 1)?.toUpperCase() && userDetails?.user_last_name?.substring(0, 1)?.toUpperCase()}
+                                                    />
+                                                    :
                                                     <AvatarFallback>{userDetails?.user_first_name?.substring(0, 1)?.toUpperCase()}{userDetails?.user_last_name?.substring(0, 1)?.toUpperCase()}</AvatarFallback>
                                             }
                                         </Avatar>

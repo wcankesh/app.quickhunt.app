@@ -166,8 +166,8 @@ p {margin: 0 !important;}
 .create-sheet-height{height: calc(100vh - 69px);}
 .das-reaction-height{height: calc(100% - 79px);}
 
-.hov-primary.data-\[selected\=true\]\:bg-accent[data-selected=true]{background-color: hsl(var(--primary));color: hsl(var(--card-foreground))}
-/*.hov-primary.data-\[selected\=true\]\:bg-accent[data-selected=true]:hover{background-color: hsl(var(--primary));color: hsl(var(--card-foreground))}*/
+.hov-primary.data-\[selected\=true\]\:bg-accent[data-selected=true]{background-color: hsl(var(--primary));color: hsl(var(--card))}
+.hov-primary-dark.data-\[selected\=true\]\:bg-accent[data-selected=true]{background-color: hsl(var(--primary));color: hsl(var(--card-foreground))}
 
 .widget-switch .data-\[state\=checked\]\:translate-x-5[data-state=checked]{width: 14px;height: 14px;--tw-translate-x: 11px}
 .widget-switch .data-\[state\=unchecked\]\:translate-x-0[data-state=unchecked]{width: 14px;height: 14px;}

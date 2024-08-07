@@ -10,11 +10,11 @@ const ReactQuillEditor = ({name, value, onChange}) => {
                     {
                         toolbar: [
                             [{ size: [] }],
-                            ["bold", "italic", "underline", "strike", "blockquote"],
+                            ["bold", "italic", "underline"],
                             [{ align: [] }],
                             [{ list: "ordered" }, { list: "bullet" }],
                             [{ "color": [] }],
-                            ["link"],
+                            ["link", 'image'],
 
                         ]
                     }

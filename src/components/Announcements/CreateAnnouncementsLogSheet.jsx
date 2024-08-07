@@ -1,7 +1,7 @@
 import React, { useEffect, useState} from 'react';
 import {Sheet, SheetContent, SheetHeader, SheetOverlay,} from "../ui/sheet";
 import {Separator} from "../ui/separator";
-import {CalendarIcon, Check, Circle, Pin, X, Loader2} from "lucide-react";
+import {CalendarIcon, Check, Circle, Pin, X, Loader2, CircleX} from "lucide-react";
 import {Label} from "../ui/label";
 import {Input} from "../ui/input";
 import {Textarea} from "../ui/textarea";
@@ -51,6 +51,11 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
     const [categoriesList, setCategoriesList] = useState([])
     const [isSave, setIsSave] = useState(false)
     const [formError, setFormError] = useState(initialStateError);
+    const [isLoading, setIsLoading] = useState(false);
+    const [isEditIdea, setIsEditIdea] = useState(false);
+    const [popoverOpen, setPopoverOpen] = useState(false);
+    const [popoverOpenExpired, setPopoverOpenExpired] = useState(false);
+
     const {theme} = useTheme();
     let apiService = new ApiService();
     useEffect(()=>{
@@ -82,10 +87,53 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
         setPreviewImage(selectedRecord.feature_image);
     }
 
+    console.log("changeLogDetails", changeLogDetails)
+
     const handleFileChange = (file) => {
         setChangeLogDetails({...changeLogDetails, image : file.target.files[0]});
         setPreviewImage(URL.createObjectURL(file.target.files[0]));
     };
+
+    const handleFeatureImgUpload = async (event) => {
+        const file = event.target?.files[0];
+        setChangeLogDetails({...changeLogDetails, image: file})
+        let formData = new FormData();
+        formData.append("image", file);
+        const data = await apiService.deletePostsImage(formData, changeLogDetails.id)
+        if (data.status === 200) {
+            setChangeLogDetails({...data.data})
+            // setIdeasList(clone);
+            setIsLoading(false)
+            setIsEditIdea(false)
+            toast({description: data.message})
+        } else {
+            setIsLoading(false)
+            toast({variant: "destructive", description: data.error})
+        }
+    };
+
+    const onChangeStatus = async (name, value) => {
+        debugger
+        if(name === "image"){
+            setChangeLogDetails({...changeLogDetails, image: ""})
+        } else {
+            setChangeLogDetails({...changeLogDetails, [name]: value})
+        }
+        let formData = new FormData();
+        formData.append(name, value);
+        const data = await apiService.updatePosts(formData, changeLogDetails.id)
+        if (data.status === 200) {
+            setChangeLogDetails({
+                ...data.data,
+            })
+            setIsLoading(false)
+            setIsEditIdea(false)
+            toast({description: data.message})
+        } else {
+            setIsLoading(false)
+            toast({variant: "destructive", description: data.message})
+        }
+    }
 
     const formValidate = (name, value) => {
         switch (name) {
@@ -112,21 +160,6 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
             }
         }
     };
-
-    // const onChangeText = (event) => {
-    //     if(event.target.name === "post_title"){
-    //         setChangeLogDetails({...changeLogDetails, [event.target.name]: event.target.value, post_slug_url: event.target.value.replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-').replace(/\//g, "-").toLowerCase()})
-    //     } else if(event.target.name === "post_slug_url"){
-    //         setChangeLogDetails({...changeLogDetails, post_slug_url: event.target.value.replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-').replace(/\//g, "-").toLowerCase()})
-    //     }else {
-    //         setChangeLogDetails({...changeLogDetails, [event.target.name]: event.target.value})
-    //     }
-    //
-    //     setFormError(formError => ({
-    //         ...formError,
-    //         [event.target.name]: formValidate(event.target.name, event.target.value)
-    //     }));
-    // }
 
     const onChangeText = (event) => {
         const { name, value } = event.target;
@@ -188,6 +221,8 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
                 }
             }
             setChangeLogDetails(obj);
+            setPopoverOpen(false);
+            setPopoverOpenExpired(false);
         }
     };
 
@@ -296,12 +331,12 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
         onClose(data.data);
     }
 
-    const loggedInUser = memberList.find(member => member.user_id === userDetailsReducer.id);
-    const loggedInUserId = loggedInUser ? loggedInUser.user_id.toString() : null;
-
-    const defaultAssignTo = (changeLogDetails.post_assign_to || []).includes(loggedInUserId)
-        ? changeLogDetails.post_assign_to
-        : [...(changeLogDetails.post_assign_to || []), loggedInUserId];
+    // const loggedInUser = memberList.find(member => member.user_id === userDetailsReducer.id);
+    // const loggedInUserId = loggedInUser ? loggedInUser.user_id.toString() : null;
+    //
+    // const defaultAssignTo = (changeLogDetails.post_assign_to || []).includes(loggedInUserId)
+    //     ? changeLogDetails.post_assign_to
+    //     : [...(changeLogDetails.post_assign_to || []), loggedInUserId];
 
     const handleValueChange = (value) => {
         const clone = [...changeLogDetails.post_assign_to]
@@ -472,7 +507,7 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
                         </div>
                         <div className="grid w-full gap-2 md:basis-1/2">
                             <Label htmlFor="date">Published at</Label>
-                            <Popover>
+                            <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
                                 <PopoverTrigger asChild>
                                     <Button
                                         id="date"
@@ -480,10 +515,6 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
                                         className={cn("justify-between text-left font-normal d-flex", "text-muted-foreground")}
                                     >
                                         {moment(changeLogDetails.post_published_at).format("LL")}
-                                        {/*{changeLogDetails.post_published_at*/}
-                                        {/*? moment(changeLogDetails.post_published_at).format("LL")*/}
-                                        {/*: moment().format("LL")}*/}
-                                        {/*<CalendarIcon className="mr-2 h-4 w-4" />*/}
                                     </Button>
                                 </PopoverTrigger>
                                 <PopoverContent className="w-auto p-0" align="start">
@@ -501,23 +532,69 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
                 <div className={"px-3 lg:px-8 flex flex-wrap items-center gap-4 md:flex-nowrap border-b py-6"}>
                     <div className={"space-y-3"}>
                         <h5 className={"text-sm font-medium"}>Featured Image</h5>
-                        <div>
-                            <label
-                                htmlFor="upload_image"
-                                className="flex w-[250px] md:w-[282px] h-[128px] py-0 justify-center items-center flex-shrink-0 border-dashed border-[1px] border-gray-300 rounded cursor-pointer"
-                            >
-                                {previewImage ? <img className={"h-[70px] w-[70px] rounded-md object-cover"} src={previewImage} alt={"not_found"} /> : <span className="text-center text-muted-foreground font-semibold text-[14px]">Upload Image</span>}
-                                <input
-                                    id="upload_image"
-                                    type="file"
-                                    className="hidden"
-                                    onChange={handleFileChange}
-                                    accept="image/*"
-                                />
-                            </label>
+                        {/*<div>*/}
+                        {/*    <label*/}
+                        {/*        htmlFor="upload_image"*/}
+                        {/*        className="flex w-[250px] md:w-[282px] h-[128px] py-0 justify-center items-center flex-shrink-0 border-dashed border-[1px] border-gray-300 rounded cursor-pointer"*/}
+                        {/*    >*/}
+                        {/*        {previewImage ? <img className={"h-[70px] w-[70px] rounded-md object-cover"} src={previewImage} alt={"not_found"} /> : <span className="text-center text-muted-foreground font-semibold text-[14px]">Upload Image</span>}*/}
+                        {/*        <input*/}
+                        {/*            id="upload_image"*/}
+                        {/*            type="file"*/}
+                        {/*            className="hidden"*/}
+                        {/*            onChange={handleFileChange}*/}
+                        {/*            accept="image/*"*/}
+                        {/*        />*/}
+                        {/*    </label>*/}
+                        {/*</div>*/}
+                        <div className="w-[282px] h-[128px] flex gap-1">
+                            {console.log("changeLogDetails", changeLogDetails)}
+                            {
+                                changeLogDetails?.image ?
+                                    <div>
+                                        {changeLogDetails && changeLogDetails.image && changeLogDetails.image.name ?
+                                            <div className={"w-[282px] h-[128px] relative border p-[5px]"}>
+                                                <img
+                                                    className={"upload-img"}
+                                                    src={changeLogDetails && changeLogDetails.image && changeLogDetails.image.name ? URL.createObjectURL(changeLogDetails.image) : changeLogDetails.image}
+                                                    alt=""
+                                                />
+                                                <CircleX
+                                                    size={20}
+                                                    className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
+                                                    onClick={() => onChangeStatus('image', changeLogDetails && changeLogDetails?.image && changeLogDetails.image?.name ? "" : [changeLogDetails.image.replace("https://code.quickhunt.app/public/storage/remove_image/", "")])}
+                                                />
+                                            </div> : changeLogDetails.image ?
+                                                <div className={"w-[282px] h-[128px] relative border p-[5px]"}>
+                                                    <img className={"upload-img"} src={changeLogDetails.image} alt=""/>
+                                                    <CircleX
+                                                        size={20}
+                                                        className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
+                                                        onClick={() => onChangeStatus('image', changeLogDetails && changeLogDetails?.image && changeLogDetails.image?.name ? "" : changeLogDetails.image.replace("https://code.quickhunt.app/public/storage/remove_image/", ""))}
+                                                    />
+                                                </div>
+                                                : ''}
+                                    </div> :
+                                    <div>
+
+                                        <input
+                                            id="pictureInput"
+                                            type="file"
+                                            className="hidden"
+                                            multiple
+                                            onChange={handleFeatureImgUpload}
+                                        />
+                                        <label
+                                            htmlFor="pictureInput"
+                                            className="border-dashed w-[282px] h-[128px] py-[52px] flex items-center justify-center bg-muted border border-muted-foreground rounded cursor-pointer"
+                                        >
+                                            <h4 className="text-xs font-semibold">Upload</h4>
+                                        </label>
+                                    </div>
+                            }
                         </div>
                     </div>
-                        <div className={"flex flex-col gap-[18px]"}>
+                        <div className={"flex flex-col gap-[18px] w-full"}>
                             <div className={"announce-create-switch flex gap-6"}>
                                 <Switch className={"w-[38px] h-[20px]"}  checked={changeLogDetails.post_expired_boolean ===  1} onCheckedChange={(checked)=>onChangeText({target:{name: "post_expired_boolean", value: checked === true ? 1 : 0}})} />
                                 <p className={"text-sm text-muted-foreground font-medium"}>Expire At</p>
@@ -525,7 +602,7 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
 
                             {
                                 changeLogDetails.post_expired_boolean ===  1 ?  <div className="grid w-full gap-2 basis-1/2">
-                                    <Popover>
+                                    <Popover open={popoverOpenExpired} onOpenChange={setPopoverOpenExpired}>
                                         <PopoverTrigger asChild>
                                             <Button
                                                 id="date"
