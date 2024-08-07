@@ -64,13 +64,13 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
         } else {
             setChangeLogDetails({
                 ...changeLogDetails,
-                post_assign_to:  [userDetailsReducer.id],
+                post_assign_to:  [userDetailsReducer.id.toString()],
             });
         }
         setLabelList(allStatusAndTypes.labels);
         setMemberList(allStatusAndTypes.members);
         setCategoriesList(allStatusAndTypes.categories);
-    },[projectDetailsReducer.id,allStatusAndTypes,userDetailsReducer.id])
+    },[projectDetailsReducer.id, allStatusAndTypes, userDetailsReducer.id])
 
     const getSinglePosts = () => {
         const labelId = selectedRecord.labels.map(x => x?.id?.toString());
