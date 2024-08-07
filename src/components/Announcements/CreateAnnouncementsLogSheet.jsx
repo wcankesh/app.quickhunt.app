@@ -56,6 +56,11 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
     useEffect(()=>{
         if(selectedRecord?.post_slug_url){
              getSinglePosts();
+        } else {
+            setChangeLogDetails({
+                ...changeLogDetails,
+                post_assign_to:  [userDetailsReducer.id],
+            });
         }
         setLabelList(allStatusAndTypes.labels);
         setMemberList(allStatusAndTypes.members);
@@ -71,7 +76,8 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
             post_published_at: selectedRecord.post_published_at ? moment(selectedRecord.post_published_at).format('YYYY-MM-DD') : moment(new Date()),
             post_expired_at: selectedRecord.post_expired_at ? moment(selectedRecord.post_expired_at).format('YYYY-MM-DD') : undefined,
             category_id: selectedRecord.category_id == "0" ? "" : selectedRecord.category_id,
-            labels: labelId
+            labels: labelId,
+
         });
         setPreviewImage(selectedRecord.feature_image);
     }
@@ -107,20 +113,65 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
         }
     };
 
-    const onChangeText = (event) => {
-        if(event.target.name === "post_title"){
-            setChangeLogDetails({...changeLogDetails, [event.target.name]: event.target.value, post_slug_url: event.target.value.replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-').replace(/\//g, "-").toLowerCase()})
-        } else if(event.target.name === "post_slug_url"){
-            setChangeLogDetails({...changeLogDetails, post_slug_url: event.target.value.replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-').replace(/\//g, "-").toLowerCase()})
-        }else {
-            setChangeLogDetails({...changeLogDetails, [event.target.name]: event.target.value})
-        }
+    // const onChangeText = (event) => {
+    //     if(event.target.name === "post_title"){
+    //         setChangeLogDetails({...changeLogDetails, [event.target.name]: event.target.value, post_slug_url: event.target.value.replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-').replace(/\//g, "-").toLowerCase()})
+    //     } else if(event.target.name === "post_slug_url"){
+    //         setChangeLogDetails({...changeLogDetails, post_slug_url: event.target.value.replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-').replace(/\//g, "-").toLowerCase()})
+    //     }else {
+    //         setChangeLogDetails({...changeLogDetails, [event.target.name]: event.target.value})
+    //     }
+    //
+    //     setFormError(formError => ({
+    //         ...formError,
+    //         [event.target.name]: formValidate(event.target.name, event.target.value)
+    //     }));
+    // }
 
-        setFormError(formError => ({
+    const onChangeText = (event) => {
+        const { name, value } = event.target;
+        let updatedDetails = { ...changeLogDetails };
+        if (name === "post_title") {
+            const slug = value
+                .replace(/[^a-z0-9\s]/gi, '')
+                .replace(/\s+/g, '-')
+                .toLowerCase();
+
+            if(updatedDetails.post_title.replace(/[^a-z0-9\s]/gi, '')
+                .replace(/\s+/g, '-')
+                .toLowerCase() === updatedDetails.post_slug_url){
+                updatedDetails = {
+                    ...updatedDetails,
+                    post_title: value,
+                    post_slug_url: slug
+                };
+            } else {
+                updatedDetails = {
+                    ...updatedDetails,
+                    post_title: value,
+                };
+            }
+
+        } else if (name === "post_slug_url") {
+            const slug = value
+                .replace(/[^a-z0-9\s-]/gi, '')
+                .replace(/\s+/g, '-')
+                .toLowerCase();
+
+            updatedDetails = {
+                ...updatedDetails,
+                post_slug_url: slug
+            };
+        } else {
+            updatedDetails[name] = value;
+        }
+        setChangeLogDetails(updatedDetails);
+        setFormError((formError) => ({
             ...formError,
-            [event.target.name]: formValidate(event.target.name, event.target.value)
+            [name]: formValidate(name, value)
         }));
-    }
+    };
+
 
     const onChangeCategory = (selectedItems ) =>{
         setChangeLogDetails({...changeLogDetails, category_id: selectedItems})
@@ -132,6 +183,8 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
             if(name === "post_published_at"){
                 if(date > new Date()){
                     obj = {...obj, post_status: 2}
+                } else {
+                    obj = {...obj, post_status: 1}
                 }
             }
             setChangeLogDetails(obj);
@@ -366,7 +419,7 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
                                     <SelectValue className={"text-muted-foreground text-sm"} placeholder="Assign to">
                                         <div className={"flex gap-[2px]"}>
                                             {
-                                                (defaultAssignTo || []).slice(0,2).map((x,index)=>{
+                                                (changeLogDetails.post_assign_to || []).slice(0,2).map((x,index)=>{
                                                     const findObj = memberList.find((y,) => y.user_id == x);
                                                     return(
                                                         <div key={index} className={"text-sm flex gap-[2px] bg-slate-300 items-center rounded py-0 px-2"} onClick={(e)=>deleteAssignTo(e,index)}>
@@ -375,7 +428,7 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
                                                     )
                                                 })
                                             }
-                                            {(defaultAssignTo || []).length > 2 && <div>...</div>}
+                                            {(changeLogDetails.post_assign_to || []).length > 2 && <div>...</div>}
                                         </div>
                                     </SelectValue>
                                 </SelectTrigger>
@@ -385,7 +438,7 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
                                             <SelectItem className={"p-2"} key={i} value={x.user_id.toString()}>
                                                 <div className={"flex gap-2"}>
                                                     <div onClick={() => handleValueChange(x.user_id.toString())} className="checkbox-icon">
-                                                        {defaultAssignTo?.includes(x.user_id.toString()) ? <Check size={18} />: <div className={"h-[18px] w-[18px]"}></div>}
+                                                        {changeLogDetails.post_assign_to?.includes(x.user_id.toString()) ? <Check size={18} />: <div className={"h-[18px] w-[18px]"}></div>}
                                                     </div>
                                                     <span>{x.user_first_name ? x.user_first_name : ''} {x.user_last_name ? x.user_last_name : ''}</span>
                                                 </div>
@@ -436,7 +489,7 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
                                 <PopoverContent className="w-auto p-0" align="start">
                                     <Calendar
                                         mode="single"
-                                        selected={changeLogDetails.post_published_at || new Date()}
+                                        selected={changeLogDetails.post_published_at ? new Date(changeLogDetails.post_published_at) : new Date()    }
                                         onSelect={(date) => onDateChange("post_published_at", date)}
                                         captionLayout="dropdown-buttons" fromYear={2024} toYear={2050}
                                     />

@@ -19,6 +19,10 @@ import {DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitl
 
 const status = [
     {name: "Publish", value: 1, fillColor: "#389E0D", strokeColor: "#389E0D",},
+    {name: "Draft", value: 3, fillColor: "#CF1322", strokeColor: "#CF1322",},
+];
+const status2 = [
+    {name: "Publish", value: 1, fillColor: "#389E0D", strokeColor: "#389E0D",},
     {name: "Scheduled", value: 2, fillColor: "#63C8D9", strokeColor: "#63C8D9", },
     {name: "Draft", value: 3, fillColor: "#CF1322", strokeColor: "#CF1322",},
 ]
@@ -38,8 +42,8 @@ const AnnouncementsTable = ({data,isLoading ,setSelectedRecord,setEditIndex ,han
     };
 
     const handleStatusChange = async (object, value) => {
-        setAnnouncementData(announcementData.map(x => x.id === object.id ? {...x, post_status: value} : x));
-        const payload = {...object,post_status:value}
+        setAnnouncementData(announcementData.map(x => x.id === object.id ? {...x, post_status: value, post_published_at: value === 1 ? moment(new Date()).format("YYYY-MM-DD"): object.post_published_at} : x));
+        const payload = {...object,post_status: value , post_published_at: value === 1 ? moment(new Date()).format("YYYY-MM-DD") : object.post_published_at}
         const data = await apiService.updatePosts(payload,object.id);
         if(data.status === 200){
             toast({
@@ -171,7 +175,6 @@ const AnnouncementsTable = ({data,isLoading ,setSelectedRecord,setEditIndex ,han
                                                             className={`font-medium px-2 py-[10px] md:px-3`}>{x?.post_modified_date ? moment.utc(x.post_modified_date).local().startOf('seconds').fromNow() : "-"}</TableCell>
                                                         {/*<TableCell className={`font-medium px-2 py-[10px] md:px-3`}>{x?.post_published_at ? moment.utc(x.post_published_at).local().startOf('seconds').fromNow() : "-"}</TableCell>*/}
                                                         <TableCell className={`font-medium px-2 py-[10px] md:px-3`}>{moment(x.post_published_at).format('D MMM, YYYY')}</TableCell>
-                                                        {console.log("status", status)}
                                                         <TableCell className={"px-2 py-[10px] md:px-3"}>
                                                             <Select value={x.post_status}
                                                                     onValueChange={(value) => handleStatusChange(x, value)}>
@@ -181,7 +184,7 @@ const AnnouncementsTable = ({data,isLoading ,setSelectedRecord,setEditIndex ,han
                                                                 <SelectContent>
                                                                     <SelectGroup>
                                                                         {
-                                                                            (status || []).map((x, i) => {
+                                                                            (x.post_status === 2 ? status2 : status || []).map((x, i) => {
                                                                                 return (
                                                                                     <Fragment key={i}>
                                                                                         <SelectItem value={x.value} disabled={x.value === 2}>

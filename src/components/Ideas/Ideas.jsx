@@ -251,9 +251,10 @@ const Ideas = () => {
                 clone[index].roadmap_id = value;
             }
             setIdeasList(clone);
-            toast({description: `${name.replace('_', ' ')} status updated successfully`});
+            toast({description: `${name.replace('_', ' ')} ${data.message}`});
         } else {
-            toast({variant: "destructive", description: `Failed to update ${name.replace('_', ' ')} status`});
+            // toast({variant: "destructive", description: `Failed to update ${name.replace('_', ' ')} status`});
+            toast({variant: "destructive", description: data.message});
         }
     };
 

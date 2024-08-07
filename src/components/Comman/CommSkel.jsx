@@ -54,17 +54,19 @@ export const CommSkel = {
             })
         }
     </div>,
-    commonParagraphFourIdea: <div className={"flex flex-col gap-8"}>
+    commonParagraphFourIdea: <div className={"flex flex-col"}>
         {
             Array.from(Array(4)).map((_, r) => {
                 return (
                     // <div className={"flex gap-8 py-6 px-16 border-b "} key={r}>
                     <div className={"flex gap-[5px] md:gap-8 md:py-6 md:px-16 p-3 border-b "} key={r}>
                             <Skeleton className="h-[30px] w-[30px] rounded-full"/>
-                        <div className="space-y-2 w-full">
+                        <div className="flex flex-col w-full gap-6">
+                            <div className="space-y-2 w-full">
                             <Skeleton className="h-4"/>
                             <Skeleton className="h-4"/>
                             <Skeleton className="h-4"/>
+                            </div>
                             <Skeleton className="h-4"/>
                         </div>
                     </div>
@@ -103,7 +105,7 @@ export const CommSkel = {
             })
         }
     </div>,
-    commonParagraphTwo: <div className={"flex flex-col gap-2 p-6"}>
+    commonParagraphTwo: <div className={"flex flex-col gap-2 p-2 pl-6 pr-4"}>
         {
             Array.from(Array(1)).map((_, r) => {
                 return (
@@ -117,7 +119,7 @@ export const CommSkel = {
             })
         }
     </div>,
-    commonParagraphTwoAvatar: <div className={"flex gap-2 py-6"}>
+    commonParagraphTwoAvatar: <div className={"flex gap-2 py-[10px]"}>
         {
             Array.from(Array(1)).map((_, r) => {
                 return (

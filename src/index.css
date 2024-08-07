@@ -164,6 +164,7 @@ p {margin: 0 !important;}
 .sidebar-dek-menu{height: calc(100vh - 60px);}
 .sidebar-mobile-menu{height: calc(100vh - 52px);}
 .create-sheet-height{height: calc(100vh - 69px);}
+.das-reaction-height{height: calc(100% - 79px);}
 
 .hov-primary.data-\[selected\=true\]\:bg-accent[data-selected=true]{background-color: hsl(var(--primary));color: hsl(var(--card-foreground))}
 /*.hov-primary.data-\[selected\=true\]\:bg-accent[data-selected=true]:hover{background-color: hsl(var(--primary));color: hsl(var(--card-foreground))}*/

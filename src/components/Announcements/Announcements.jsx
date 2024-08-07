@@ -308,7 +308,7 @@ const Announcements = () => {
                     filter.s &&
                     <Badge variant="outline" className="rounded p-0">
                         <span
-                            className="px-3 py-1.5 border-r">{filter.s == 0 ? "All" : filter.s === 1 ? "Draft" : filter.s == 2 ? "Published" : ""}</span>
+                            className="px-3 py-1.5 border-r">{filter.s == 1 ? "Published" : filter.s === 2 ? "Scheduled" : filter.s == 3 ? "Draft" : ""}</span>
                         <span className="w-7 h-7 flex items-center justify-center cursor-pointer"
                               onClick={() => handleBadge({name: "status", value: "s"})}>
                                             <X className='w-4 h-4'/>
