@@ -382,7 +382,7 @@ const Profile = () => {
                 </CardContent>
                 <CardFooter className={"flex items-center p-4 sm:p-6 justify-end"}>
                     <Button onClick={onUpdateUser}
-                            className={`${isLoading === true ? "py-2 px-6" : "py-2 px-6"} w-[128px] text-sm font-semibold`}
+                            className={`${isLoading === true ? "py-2 px-4" : "py-2 px-4 w-[128px]"} text-sm font-semibold`}
                     >
                         {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Save Changes"}</Button>
                 </CardFooter>
@@ -468,7 +468,8 @@ const Profile = () => {
                     </div>
                 </CardContent>
                 <CardFooter className={"justify-end sm:pt-0 pt-0 px-4 pt-0 pb-4 sm:px-6"}>
-                    <Button className={"text-sm font-semibold"} onClick={changePassword}>{isLoadingPass ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Update Password"}</Button>
+                    <Button className={`${isLoadingPass === true ? "py-2 px-4" : "py-2 px-4 w-[150px]"} text-sm font-semibold`}
+                            onClick={changePassword}>{isLoadingPass ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Update Password"}</Button>
                 </CardFooter>
             </Card>
         </div>

@@ -310,13 +310,15 @@ const Categories = () => {
             {isSheetOpen && (
                 <Sheet open={isSheetOpen} onOpenChange={isSheetOpen ? closeSheet : openSheet}>
                     <SheetOverlay className={"inset-0"} />
-                    <SheetContent className={"sm:max-w-[662px] sm:overflow-auto p-0"}>
-                        <SheetHeader className={"sm:px-8 sm:py-6 py-4 px-3 border-b flex"}>
-                            <SheetTitle className={"text-sm md:text-xl font-medium flex justify-between items-center"}>{editRecord.id ? "Edit New Category" : "New Category"}
-                                <Button className={"h-5 w-5 p-0"} onClick={closeSheet}  variant={"ghost"}><X size={18} className={"h-5 w-5"}/></Button>
+                    <SheetContent className={"sm:max-w-[662px] p-0"}>
+                        <SheetHeader className={"px-4 py-3 md:py-5 lg:px-8 lg:py-[20px] border-b flex flex-row justify-between items-center"}>
+                            <SheetTitle className={"text-sm md:text-xl font-medium flex justify-between items-center"}>
+                                {editRecord.id ? "Edit New Category" : "New Category"}
                             </SheetTitle>
+                            <X className={"cursor-pointer m-0"} onClick={closeSheet}/>
                         </SheetHeader>
-                        <div className={"py-4 px-3 sm:px-8 sm:py-6"}>
+                        <div className="overflow-auto comm-sheet-height">
+                            <div className="grid gap-6 px-3 py-4 sm:px-8 sm:py-6 border-b">
                             <div className={"flex flex-col gap-6"}>
                                 <div className="grid w-full gap-2">
                                     <Label htmlFor="name">Name</Label>
@@ -330,9 +332,14 @@ const Categories = () => {
                                 </div>
                             </div>
                         </div>
-                        <Separator/>
                         <div className={"sm:px-8 sm:py-6 py-4 px-3"}>
-                            <Button onClick={editRecord?.id ? updateCategory : addCategory}>{isSave ? <Loader2 className={"mr-2 h-4 w-4 animate-spin"}/> : editRecord.id ? "Update Category" : "Add Category" }</Button>
+                            <Button
+                                className={`${isSave === true ? "py-2 px-4" : "py-2 px-4 w-[147px]"} text-sm font-semibold`}
+                                onClick={editRecord?.id ? updateCategory : addCategory}
+                            >
+                                {isSave ? <Loader2 className={"mr-2 h-4 w-4 animate-spin"}/> : editRecord.id ? "Update Category" : "Add Category" }
+                            </Button>
+                        </div>
                         </div>
                     </SheetContent>
                 </Sheet>

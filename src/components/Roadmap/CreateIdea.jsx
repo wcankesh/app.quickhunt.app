@@ -165,13 +165,13 @@ const CreateIdea = ({
 
     return (
         <div>
-            <Sheet open={isOpen} onOpenChange={isOpen ? onClose : onOpen} closeCreateIdea={closeCreateIdea}>
+            <Sheet open={isOpen} onOpenChange={isOpen ? onCancel : onOpen} closeCreateIdea={closeCreateIdea}>
                 <SheetOverlay className={"inset-0"} />
                 <SheetContent className={"lg:max-w-[800px] md:max-w-full sm:max-w-full p-0"}>
                     <SheetHeader className={"px-4 py-5 lg:px-8 lg:py-[20px] border-b"}>
                         <div className={"flex justify-between items-center w-full"}>
                             <h2 className={"text-xl font-medium"}>Tell us your Idea!</h2>
-                            <X onClick={onClose} className={"cursor-pointer"}/>
+                            <X onClick={onCancel} className={"cursor-pointer"}/>
                         </div>
                     </SheetHeader>
                     <div className={"w-full overflow-y-auto create-sheet-height"}>

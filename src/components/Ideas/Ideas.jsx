@@ -608,7 +608,7 @@ const Ideas = () => {
                                                                         <ReadMoreText html={x.description}/>
                                                                     </div>
                                                                 </div>
-                                                                <div className={`flex ${x.topic && x.topic.length > 0 ? "justify-between" : "sm:justify-between gap-0 justify-start"} items-center flex-wrap gap-2`}>
+                                                                <div className={`flex ${x.topic && x.topic.length > 0 ? "justify-between gap-2" : "sm:justify-between gap-0 justify-start"} items-center flex-wrap`}>
                                                                     <div className={`flex flex-wrap gap-2`}>
                                                                         {
                                                                             (x.topic && x.topic.length > 0) &&
@@ -662,8 +662,8 @@ const Ideas = () => {
                                                                             onClick={() => openDetailsSheet(x)}
                                                                         >
                                                                             <span>
-                                                                                <MessageCircleMore
-                                                                                    className={"stroke-primary w-[16px] h-[16px]"}/>
+                                                                                <MessageCircleMore size={16}
+                                                                                    className={"stroke-primary"}/>
                                                                             </span>
                                                                             <p className={"text-base font-medium"}>
                                                                                 {x && x.comments && x.comments.length ? x.comments.length : 0}

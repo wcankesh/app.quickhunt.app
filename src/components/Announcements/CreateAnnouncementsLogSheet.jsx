@@ -327,14 +327,14 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
         <Sheet open={isOpen} onOpenChange={isOpen ? onClose : onOpen}>
             <SheetOverlay className={"inset-0"} />
             <SheetContent className={"pt-6 p-0 lg:max-w-[663px] md:max-w-[720px] sm:max-w-[520px]"}>
-                    <SheetHeader className={`px-3 py-4 lg:px-8 lg:py-6 flex flex-row justify-between items-center sticky top-0 z-10 border-b`}>
+                    <SheetHeader className={`px-3 py-4 lg:px-8 lg:py-[20px] flex flex-row justify-between items-center sticky top-0 z-10 border-b`}>
                         <h5 className={"text-sm md:text-xl font-medium"}>{ selectedRecord?.post_slug_url ? "Update Announcement" :"Create New Announcements"}</h5>
                         <div className={"flex items-center gap-6 m-0"}>
                             <Button className={"h-5 w-5 p-0"} onClick={() => onChangeText({target:{name: "post_pin_to_top", value: changeLogDetails.post_pin_to_top === 1 ? 0 : 1}}) } variant={"ghost"} >{changeLogDetails.post_pin_to_top === 1 ? <Pin fill={"bg-card-foreground"} className={"h-4 w-4"}  size={18}/> : <Pin className={"h-4 w-4"}  size={18}/>}</Button>
                             <Button className={"h-5 w-5 p-0"} onClick={onClose}  variant={"ghost"}><X size={18} className={"h-5 w-5"}/></Button>
                         </div>
                     </SheetHeader>
-                <div className={"side-sheet-height overflow-y-auto"}>
+                <div className={"comm-sheet-height overflow-y-auto"}>
                 <div className={"px-3 lg:px-8 border-b py-6"}>
                     <div className={"flex flex-col gap-6"}>
                         <div className="grid w-full gap-2">

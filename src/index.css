@@ -158,8 +158,10 @@ p {margin: 0 !important;}
 
 /*.bodyScreenHeight{height: calc(100vh - 60px);}*/
 .bodyScreenHeight{height: calc(100vh - 64px);}
-.side-sheet-height{height: calc(100vh - 53px);}
+.comm-sheet-height{height: calc(100vh - 69px);}
+
 .idea-sheet-height{height: calc(100vh - 65px);}
+
 .widget-update-sheet-height{height: calc(100vh - 61px);}
 .sidebar-dek-menu{height: calc(100vh - 60px);}
 .sidebar-mobile-menu{height: calc(100vh - 52px);}

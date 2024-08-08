@@ -45,6 +45,7 @@ const Project = () => {
     const [createProjectDetails, setCreateProjectDetails] = useState(initialState);
     const [formError, setFormError] = useState(initialStateError);
     const [isSave, setIsSave] = useState(false);
+    const [isDelete, setIsDelete] = useState(false);
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const allProjectReducer = useSelector(state => state.allProjectReducer);
     const [previewImageFav,setPreviewImageFav]=useState("");
@@ -170,6 +171,7 @@ const Project = () => {
 
     const deleteAlert =()=>{
         setIsOpenDeleteAlert(true);
+        setIsDelete(false)
     }
     const onDelete = async () => {
         const data = await apiService.deleteProjects(projectDetailsReducer.id)
@@ -357,9 +359,11 @@ const Project = () => {
             </CardContent>
             <CardFooter className={"pt-4 flex flex-wrap justify-end sm:justify-end gap-4 sm:p-5 p-4"}>
                 <Button
-                    variant={"outline hover:bg-transparent"} onClick={deleteAlert} className={`text-sm font-semibold ${theme === "dark" ? "text-card-foreground" : "text-primary border-primary"} border `}>Delete project</Button>
+                    variant={"outline hover:bg-transparent"} onClick={deleteAlert}
+                    className={`text-sm font-semibold ${theme === "dark" ? "text-card-foreground" : "text-primary border-primary"} border ${isDelete === true ? "py-2 px-4" : "py-2 px-4 w-[130px]"}  text-sm font-semibold`}
+                >{isDelete ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Delete project"}</Button>
                 <Button
-                    className={`${isSave === true ? "py-2 px-6" : "py-2 px-6"} w-[132px] text-sm font-semibold`}
+                    className={`${isSave === true ? "py-2 px-4" : "py-2 px-4 w-[132px]"} text-sm font-semibold`}
                     onClick={() => updateProjects('')}>{isSave ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Update project"}</Button>
             </CardFooter>
         </Card>

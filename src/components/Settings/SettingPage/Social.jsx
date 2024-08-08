@@ -109,7 +109,10 @@ const Social = () => {
                 <Separator className={""}/>
 
                 <div className={"px-6 pt-4 pb-6 flex flex-row justify-end"}>
-                    <Button onClick={onUpdateSocialSetting}>{isSave ? <Loader2 className="mr-1 h-4 w-4 animate-spin justify-center"/> : "Update Social"}</Button>
+                    <Button
+                        className={`${isSave === true ? "py-2 px-6" : "py-2 px-6 w-[142px]"} text-sm font-semibold`}
+                        onClick={onUpdateSocialSetting}>
+                        {isSave ? <Loader2 className="mr-1 h-4 w-4 animate-spin justify-center"/> : "Update Social"}</Button>
                 </div>
 
 

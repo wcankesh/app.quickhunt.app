@@ -68,11 +68,11 @@ const SidebarSheet = ({ isOpen, onOpen, onClose ,selectedViewAnalyticsRecord}) =
             <Sheet open={isOpen} onOpenChange={isOpen ? onClose : onOpen}>
                 <SheetOverlay className={"inset-0"} />
                     <SheetContent className={"pt-6 p-0 lg:max-w-[504px]"} >
-                        <SheetHeader className={`px-4 py-4 md:px-8 md:py-6 flex flex-row justify-between items-center border-b` }>
+                        <SheetHeader className={`px-4 py-4 md:px-8 md:py-[20px] flex flex-row justify-between items-center border-b` }>
                             <h5 className={"text-sm md:text-xl font-medium"}>{selectedViewAnalyticsRecord?.post_title}</h5>
                             <Button className={"h-5 w-5 p-0"} variant={"ghost"}  onClick={onClose}><X className={"h-4 w-4"} size={18} /></Button>
                         </SheetHeader>
-                        <div className={"overflow-auto h-[100vh] pb-[100px]"}>
+                        <div className={"overflow-auto comm-sheet-height pb-2"}>
                             <div className={"pt-4 px-4 pb-3 pr-8 md:pt-8 md:px-8 md:pb-6 md:pr-16 flex flex-row justify-between gap-2 border-b "}>
                                 <div className={"flex flex-col gap-2"}>
                                     <h5 className={"text-sm md:text-base font-semibold"}>Total Views</h5>

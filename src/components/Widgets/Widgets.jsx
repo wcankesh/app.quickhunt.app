@@ -1,17 +1,7 @@
 import React, {Fragment, useEffect, useState} from 'react';
 import {Button} from "../ui/button";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow,} from "../ui/table";
-import {
-    BarChart,
-    ChevronLeft,
-    ChevronRight,
-    ChevronsLeft,
-    ChevronsRight,
-    Copy,
-    Ellipsis,
-    Loader2,
-    X
-} from "lucide-react";
+import {BarChart, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Copy, Ellipsis, Loader2, X} from "lucide-react";
 import {useTheme} from "../theme-provider";
 import {useSelector} from "react-redux";
 import {Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "../ui/dialog";
@@ -145,8 +135,8 @@ const Widgets = () => {
     <div class="quickhunt-widget-embed" Quickhunt_Widget_Key=${selectedId} widget-width="740px" widget-height="460px"></div>
     <script src="https://quickhunt.app/widgetScript.js"></script>
     ` : `<script>
-    window.Quickhunt_Config = window.Quickhunt_Config || {};
-    window.Quickhunt_Config = { Quickhunt_Widget_Key:  ${selectedId}};
+    window.Quickhunt_Config = window.Quickhunt_Config || [];
+    window.Quickhunt_Config.push({ Quickhunt_Widget_Key:  ${selectedId}});
 </script>
 <script src="https://quickhunt.app/widgetScript.js"></script>`;
     const embedLink = `https://${projectDetailsReducer.domain}/ideas?widget=${selectedId}`
@@ -357,7 +347,7 @@ const Widgets = () => {
                                         {
                                             ["Name", "Sections", "Last Updated", "", "Analytics", "Actions"].map((x, i) => {
                                                 return (
-                                                    <TableHead className={"px-2 lg:px-4 font-semibold"}>{x}</TableHead>
+                                                    <TableHead className={"px-2 py-[10px] md:px-3 font-semibold"}>{x}</TableHead>
                                                 )
                                             })
                                         }
@@ -384,21 +374,21 @@ const Widgets = () => {
                                         ) : widgetsSetting.length > 0 ? <>
                                             {widgetsSetting.map((x, i) => (
                                                 <TableRow key={i}>
-                                                    <TableCell className={"font-medium p-2 lg:p-4"}>{x.name}</TableCell>
-                                                    <TableCell className={"font-medium p-2 lg:p-4"}>{x.type}</TableCell>
-                                                    <TableCell className={"font-medium p-2 lg:p-4"}>{moment(x.created_at).format('D MMM, YYYY')}</TableCell>
-                                                    <TableCell className={" p-2 lg:p-4"}>
+                                                    <TableCell className={"font-medium p-2 px-2 py-[10px] md:px-3 cursor-pointer"} onClick={() => handleCreateNew(x.id)}>{x.name}</TableCell>
+                                                    <TableCell className={"font-medium p-2 px-2 py-[10px] md:px-3"}>{x.type}</TableCell>
+                                                    <TableCell className={"font-medium p-2 px-2 py-[10px] md:px-3"}>{moment(x.created_at).format('D MMM, YYYY')}</TableCell>
+                                                    <TableCell className={" p-2 px-2 py-[10px] md:px-3"}>
                                                         <Button
                                                             className={"py-[6px] px-3 h-auto text-xs font-semibold hover:bg-primary"}
                                                             onClick={() => getCodeCopy(x.id)}>Get code</Button>
                                                     </TableCell>
-                                                    <TableCell className={"font-medium p-2 lg:p-4"}>
+                                                    <TableCell className={"font-medium p-2 px-2 py-[10px] md:px-3"}>
                                                         <BarChart
                                                             onClick={() => openSheet(x.id)} size={16}
                                                             className={"cursor-pointer"}
                                                         />
                                                     </TableCell>
-                                                    <TableCell className={" p-2 lg:p-4"}>
+                                                    <TableCell className={" p-2 px-2 py-[10px] md:px-3"}>
                                                         <DropdownMenu>
                                                             <DropdownMenuTrigger>
                                                                 <Ellipsis size={16} className={"cursor-pointer"}/>
@@ -424,9 +414,8 @@ const Widgets = () => {
                         </CardContent>
                         <CardFooter className={"p-0"}>
                             <div
-                                className={`w-full ${theme === "dark" ? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end p-2 md:p-4`}>
+                                className={`w-full ${theme === "dark" ? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end p-2 md:px-3 md:py-[10px]`}>
                                 <div className={"w-full flex gap-2 items-center justify-between sm:justify-end"}>
-                                    {/*<div className={"w-full flex justify-between gap-2 items-center"}>*/}
                                     <div>
                                         <h5 className={"text-sm font-semibold"}>Page {pageNo} of {totalPages}</h5>
                                     </div>

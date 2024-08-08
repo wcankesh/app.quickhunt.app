@@ -14,21 +14,12 @@ import {Popover, PopoverContent, PopoverTrigger} from "../ui/popover";
 import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList} from "../ui/command";
 import {Label} from "../ui/label";
 import {useDispatch, useSelector} from "react-redux";
-import {toast, useToast} from "../ui/use-toast";
+import {useToast} from "../ui/use-toast";
 import {projectDetailsAction} from "../../redux/action/ProjectDetailsAction";
 import {allProjectAction} from "../../redux/action/AllProjectAction";
 import {userDetailsAction} from "../../redux/action/UserDetailAction";
 import {allStatusAndTypesAction} from "../../redux/action/AllStatusAndTypesAction";
 import {useLocation} from "react-router";
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogHeader,
-    AlertDialogTitle
-} from "../ui/alert-dialog";
 import {Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "../ui/dialog";
 
 const initialState = {
@@ -168,9 +159,7 @@ const HeaderBar = () => {
     const [isSheetOpenMenu, setSheetOpenMenu] = useState(false);
     const [createProjectDetails, setCreateProjectDetails] = useState(initialStateProject);
     const [formError, setFormError] = useState(initialStateErrorProject);
-    const [isSaveProject, setIsSaveProject] = useState(false);
     const [projectList, setProjectList] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
     const [scrollingDown, setScrollingDown] = useState(false);
     const [isOpenDeleteAlert,setIsOpenDeleteAlert]=useState(false);
     const [isDeleteLoading, setDeleteIsLoading] = useState(false);
@@ -194,8 +183,11 @@ const HeaderBar = () => {
             onProModal(false)
         }
     }
-
-    const closeSheet = () => setSheetOpen(false);
+    const closeSheet = () => {
+        setSheetOpen(false)
+        setCreateProjectDetails(initialStateProject)
+        setFormError(initialStateErrorProject)
+    };
 
     const openSheetMenu = () => setSheetOpenMenu(true);
     const closeSheetMenu = () => setSheetOpenMenu(false);
@@ -218,7 +210,6 @@ const HeaderBar = () => {
             const data = await apiSerVice.getAllStatusAndTypes(projectDetailsReducer.id)
             if(data.status === 200){
                 dispatch(allStatusAndTypesAction({...data.data}));
-                setIsLoading(false)
             }
         }
     }
@@ -258,7 +249,6 @@ const HeaderBar = () => {
             } else {
                  setSheetOpen(true)
             }
-            setIsLoading(false)
         }
     }
 
@@ -284,12 +274,28 @@ const HeaderBar = () => {
     };
 
     const onChangeText = (event) => {
-        setCreateProjectDetails({...createProjectDetails, [event.target.name]: event.target.value})
+        const { name, value } = event.target;
+        const removeCharacter = (input) => input.replace(/[^a-zA-Z0-9]/g, '');
+        const newValue = name === 'domain' ? removeCharacter(value) : value;
+
+        setCreateProjectDetails({
+            ...createProjectDetails,
+            [name]: newValue
+        });
+
         setFormError(formError => ({
             ...formError,
-            [event.target.name]: ""
+            [name]: ""
         }));
-    }
+    };
+
+    const onBlur = (event) => {
+        const {name, value} = event.target;
+        setFormError({
+            ...formError,
+            [name]: formValidate(name, value)
+        });
+    };
 
     const formValidate = (name, value) => {
         switch (name) {
@@ -317,11 +323,21 @@ const HeaderBar = () => {
             setFormError(validationErrors);
             return;
         }
-        setIsSaveProject(true)
+
+        // const payload = {
+        //     ...createProjectDetails,
+        //     domain: createProjectDetails.domain ? `${createProjectDetails.domain}.quickhunt.app` : `${createProjectDetails.project_name.replace(' ', '-')}.quickhunt.app`
+        // }
+
+        const cleanDomain = (name) => name.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+        const sanitizedProjectName = cleanDomain(createProjectDetails.project_name);
+        const domain = `${cleanDomain(createProjectDetails.domain || sanitizedProjectName)}.quickhunt.app`;
+
         const payload = {
             ...createProjectDetails,
-            domain: createProjectDetails.domain ? `${createProjectDetails.domain}.quickhunt.app` : `${createProjectDetails.project_name.replace(' ', '-')}.quickhunt.app`
-        }
+            domain
+        };
+
         const data = await apiSerVice.createProjects(payload)
         if (data.status === 200) {
             const clone = [...projectList];
@@ -340,10 +356,8 @@ const HeaderBar = () => {
             // setSheetOpen(false)
             setCreateProjectDetails(initialStateProject)
             navigate(`${baseUrl}/dashboard`);
-            setIsSaveProject(false)
         } else {
             toast({variant: "destructive" ,description: data.message})
-            setIsSaveProject(false)
         }
     }
 
@@ -388,6 +402,7 @@ const HeaderBar = () => {
                 dispatch(allProjectAction({projectList: cloneProject}))
             }
             setDeleteIsLoading(false)
+            setIsOpenDeleteAlert(false)
             toast({description: data.message})
             setTimeout(() => {
                 history.push('/')
@@ -639,17 +654,16 @@ const HeaderBar = () => {
                     {isSheetOpen && (
                         <Sheet open={isSheetOpen} onOpenChange={isSheetOpen ? closeSheet : openSheet}>
                             <SheetOverlay className={"inset-0"} />
-                            <SheetContent className={"sm:max-w-[662px] sm:overflow-auto p-0 bg-card"}>
-                                <SheetHeader className={"px-[32px] py-[22px] border-b flex"}>
+                            <SheetContent className={"sm:max-w-[662px] p-0"}>
+                                <SheetHeader className={"px-4 py-3 md:py-5 lg:px-8 lg:py-[20px] border-b flex flex-row justify-between items-center"}>
                                     <SheetTitle className={"text-xl font-medium flex justify-between items-center"}>
                                         Create new Project
-                                        <Button className={"bg-transparent hover:bg-transparent p-0 h-[24px]"}>
-                                            <X className={"stroke-card-foreground"} onClick={closeSheet}/>
-                                        </Button>
                                     </SheetTitle>
+                                    <X className={"cursor-pointer m-0"} onClick={closeSheet}/>
                                 </SheetHeader>
-                                <div className="grid gap-[24px] px-[32px] pt-[24px] pb-[36px]">
-                                    <div className="gap-2">
+                                <div className="overflow-auto comm-sheet-height">
+                                <div className="space-y-6 px-4 py-3 md:py-5 lg:px-8 lg:py-[20px]">
+                                    <div className="space-y-1">
                                         <Label htmlFor="name" className="text-right">Project Name</Label>
                                         <Input
                                             id="project_name"
@@ -658,13 +672,14 @@ const HeaderBar = () => {
                                             value={createProjectDetails.project_name}
                                             name="project_name"
                                             onChange={onChangeText}
+                                            onBlur={onBlur}
                                         />
                                         {
                                             formError.project_name &&
                                             <span className="text-destructive text-sm">{formError.project_name}</span>
                                         }
                                     </div>
-                                    <div className="gap-2">
+                                    <div className="space-y-1">
                                         <Label htmlFor="website" className="text-right">Project website</Label>
                                         <Input
                                             id="project_website"
@@ -675,7 +690,7 @@ const HeaderBar = () => {
                                             onChange={onChangeText}
                                         />
                                     </div>
-                                    <div className="gap-2 relative">
+                                    <div className="space-y-1">
                                         <Label htmlFor="domain" className="text-right">Project domain</Label>
                                         <Input
                                             id="domain"
@@ -685,10 +700,8 @@ const HeaderBar = () => {
                                             name="domain"
                                             onChange={onChangeText}
                                         />
-                                        <span className={"absolute top-[33px] right-[13px] text-sm font-medium"}>Project domain</span>
                                     </div>
-                                </div>
-                                <div className={"px-8 gap-4 flex sm:justify-start"}>
+                                <div className={"gap-4 flex sm:justify-start"}>
                                         <Button
                                             className={"text-sm font-semibold hover:bg-primary"}
                                             onClick={onCreateProject} type="submit"
@@ -701,6 +714,8 @@ const HeaderBar = () => {
                                         >
                                             Cancel
                                         </Button>
+                                </div>
+                                </div>
                                 </div>
                             </SheetContent>
                         </Sheet>

@@ -17,17 +17,8 @@ import {DropdownMenu, DropdownMenuTrigger} from "@radix-ui/react-dropdown-menu";
 import {DropdownMenuContent, DropdownMenuItem} from "../../ui/dropdown-menu";
 import {toast} from "../../ui/use-toast";
 import {Skeleton} from "../../ui/skeleton";
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogHeader,
-    AlertDialogTitle,
-} from "../../ui/alert-dialog"
+import {AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle,} from "../../ui/alert-dialog"
 import NoDataThumbnail from "../../../img/Frame.png";
-import {Separator} from "../../ui/separator";
 import EmptyData from "../../Comman/EmptyData";
 
 const initialState = {
@@ -96,6 +87,8 @@ const Team = () => {
     };
 
     const closeSheet = () => {
+        setInviteTeamDetails(initialState)
+        setFormError(initialStateError)
         setSheetOpen(false);
     };
 
@@ -377,13 +370,15 @@ const Team = () => {
             {isSheetOpen && (
                 <Sheet open={isSheetOpen} onOpenChange={isSheetOpen ? closeSheet : openSheet}>
                     <SheetOverlay className={"inset-0"} />
-                    <SheetContent className={"sm:max-w-[662px] sm:overflow-auto p-0"}>
-                        <SheetHeader className={"px-3 py-4 sm:px-[32px] sm:py-[22px] border-b flex"}>
-                            <SheetTitle className={"text-sm md:text-xl font-medium flex justify-between items-center"}>Invite Users
-                                <Button className={"h-5 w-5 p-0"} onClick={closeSheet}  variant={"ghost"}><X size={18} className={"h-5 w-5"}/></Button>
+                    <SheetContent className={"sm:max-w-[662px] p-0"}>
+                        <SheetHeader className={"px-4 py-3 md:py-5 lg:px-8 lg:py-[20px] border-b flex flex-row justify-between items-center"}>
+                            <SheetTitle className={"text-sm md:text-xl font-medium flex justify-between items-center"}>
+                                Invite Users
                             </SheetTitle>
+                            <X className={"cursor-pointer m-0"} onClick={closeSheet}/>
                         </SheetHeader>
-                        <div className="grid gap-[24px] px-3 py-4 sm:px-[32px] sm:pt-[24px] ">
+                        <div className="overflow-auto comm-sheet-height">
+                        <div className="grid gap-6 px-3 py-4 sm:px-8 sm:py-6 border-b">
                             <div className="flex flex-col gap-2">
                                 <div>
                                     <Label htmlFor="name" className="text-right">Add emails of users you want to invite to test, and click on Invite</Label>
@@ -402,13 +397,20 @@ const Team = () => {
                                 {formError.email && <p className="text-red-500 text-xs mt-1">{formError.email}</p>}
                             </div>
                         </div>
-                        <Separator/>
                         <div className={"flex px-3 py-4 sm:px-[32px] gap-[16px] sm:justify-start"}>
-                            <Button className={"text-card text-sm font-semibold hover:bg-primary bg-primary"} type="submit" onClick={onInviteUser}>{isSave ?
-                                <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : "Invite"}</Button>
-                            <SheetClose asChild onClick={closeSheet}>
-                                <Button className={"text-primary text-sm font-semibold hover:bg-card border border-primary bg-card ml-0 m-inline-0"} type="submit">Cancel</Button>
-                            </SheetClose>
+                            <Button
+                                className={`${isSave === true ? "py-2 px-4" : "py-2 px-4 w-[69px]"} text-sm font-semibold`}
+                                type="submit" onClick={onInviteUser}
+                            >
+                                {isSave ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : "Invite"}
+                            </Button>
+                                <Button
+                                    onClick={closeSheet}
+                                    className={"text-primary text-sm font-semibold hover:bg-card border border-primary bg-card ml-0 m-inline-0"}
+                                    type="submit"
+                                >Cancel</Button>
+
+                        </div>
                         </div>
                     </SheetContent>
                 </Sheet>

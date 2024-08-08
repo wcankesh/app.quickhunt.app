@@ -133,45 +133,46 @@ const Roadmap = () => {
             />
             <div className={"p-4"}><h1 className={"text-2xl font-medium"}>Roadmap</h1></div>
             <div className={"p-[11px] pt-[3px]"}>
-            {
-                isLoading ?
-                     <Board
-                        allowAddColumn
-                        disableColumnDrag
-                        allowAddCard={{on: "bottom"}}
-                        addCard={{on: "bottom"}}
-                        renderCard={(y) => {
-                            return (
-                                <Card  className={"mb-3"}>
-                                    {CommSkel.commonParagraphThreeIcon}
-                                </Card>
-                            )
-                        }}
+                {
+                    isLoading ?
+                        <Board
+                            allowAddColumn
+                            disableColumnDrag
+                            allowAddCard={{on: "bottom"}}
+                            addCard={{on: "bottom"}}
+                            renderCard={(y) => {
+                                return (
+                                    <Card  className={"mb-3"}>
+                                        {CommSkel.commonParagraphThreeIcon}
+                                    </Card>
+                                )
+                            }}
 
-                        renderColumnHeader={({ id}) => {
-                            return (
-                                <React.Fragment>
-                                    {CommSkel.commonParagraphOne}
-                                    <div className={"add-idea"}>
+                            renderColumnHeader={({ id}) => {
+                                return (
+                                    <React.Fragment>
                                         {CommSkel.commonParagraphOne}
-                                    </div>
-                                </React.Fragment>
+                                        <div className={"add-idea"}>
+                                            {CommSkel.commonParagraphOne}
+                                        </div>
+                                    </React.Fragment>
 
-                            )
-                        }}
-                    >
-                        {loading}
-                    </Board>
-                    : roadmapList.columns.length > 0 ? <Board
-                    allowAddColumn
-                    disableColumnDrag
-                    onCardDragEnd={handleCardMove}
-                    // onColumnDragEnd={handleColumnMove}
-                    allowAddCard={{on: "bottom"}}
-                    addCard={{on: "bottom"}}
-                    renderCard={(y) => {
-                        return (
-                            <Card onClick={() => openDetailsSheet(y)} className={"mb-3"}>
+                                )
+                            }}
+                        >
+                            {loading}
+                        </Board>
+                        :  <Board
+                            allowAddColumn
+                            disableColumnDrag
+                            onCardDragEnd={handleCardMove}
+                            // onColumnDragEnd={handleColumnMove}
+                            allowAddCard={{on: "bottom"}}
+                            addCard={{on: "bottom"}}
+                            renderCard={(y) => {
+                                return (
+                                    <Fragment>
+                                        <Card onClick={() => openDetailsSheet(y)} className={"mb-3"}>
                                             <CardHeader className={"gap-2 p-2 pb-3"}>
                                                 {
                                                     y && y?.cover_image &&
@@ -196,20 +197,22 @@ const Roadmap = () => {
                                                 </div>
 
                                             </CardContent>
-                            </Card>
-                        )
-                    }}
+                                        </Card>
+                                    </Fragment>
 
-                    renderColumnHeader={({title, color_code, id}) => {
-                        return (
-                            <React.Fragment>
+                                )
+                            }}
+
+                            renderColumnHeader={({title, color_code, id}) => {
+                                return (
+                                    <React.Fragment>
                                         <CardTitle
                                             className={"flex items-center gap-2 text-sm font-semibold px-[7px] mb-[16px]"}>
                                             <Circle fill={color_code} stroke={color_code}
                                                     className={"w-[10px] h-[10px]"}/>
                                             {title}
                                         </CardTitle>
-                                <div className={"add-idea"}>
+                                        <div className={"add-idea"}>
                                             <Button
                                                 variant={"ghost hover:bg-transparent"}
                                                 className={`gap-2 p-0 ${theme === "dark" ? "" : "text-muted-foreground"} text-sm font-semibold h-auto`}
@@ -217,16 +220,16 @@ const Roadmap = () => {
                                             >
                                                 <Plus className={"w-[20px] h-[20px]"}/>Create Idea
                                             </Button>
-                                </div>
-                            </React.Fragment>
+                                        </div>
+                                    </React.Fragment>
 
-                        )
-                    }}
+                                )
+                            }}
 
-                >
-                    {roadmapList}
-                </Board> : <span className={"font-medium"}>No Data</span>
-            }
+                        >
+                            {roadmapList}
+                        </Board>
+                }
             </div>
 
             {/*<div className={"flex gap-[18px] flex-col  items-start "}>*/}
