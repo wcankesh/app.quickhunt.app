@@ -225,7 +225,7 @@ const Project = () => {
                                             createProjectDetails?.project_logo ?
                                                 <div>
                                                     {createProjectDetails && createProjectDetails.project_logo && createProjectDetails.project_logo.name ?
-                                                        <div className={"h-[50px] w-[50px] relative"}>
+                                                        <div className={"h-[50px] w-[50px] relative border rounded-lg"}>
                                                             <img
                                                                 // className={"upload-img"}
                                                                 className="h-full w-full rounded-md object-cover"
@@ -238,7 +238,7 @@ const Project = () => {
                                                                 onClick={() => onDeleteImgLogo('delete_logo', createProjectDetails && createProjectDetails?.project_logo && createProjectDetails.project_logo?.name ? "" : createProjectDetails.project_logo.replace("https://code.quickhunt.app/public/storage/project/", ""))}
                                                             />
                                                         </div> : createProjectDetails.project_logo ?
-                                                            <div className={"h-[50px] w-[50px] relative"}>
+                                                            <div className={"h-[50px] w-[50px] relative border rounded-lg"}>
                                                                 <img
                                                                     // className={"upload-img"}
                                                                     className="h-full w-full rounded-md object-cover"
@@ -283,7 +283,7 @@ const Project = () => {
                                     createProjectDetails?.project_favicon ?
                                         <div>
                                             {createProjectDetails && createProjectDetails.project_favicon && createProjectDetails.project_favicon.name ?
-                                                <div className={"h-[50px] w-[50px] relative"}>
+                                                <div className={"h-[50px] w-[50px] relative border rounded-lg"}>
                                                     <img
                                                         // className={"upload-img"}
                                                         className="h-full w-full rounded-md object-cover"
@@ -296,7 +296,7 @@ const Project = () => {
                                                         onClick={() => onDeleteImgFav('delete_favicon', createProjectDetails && createProjectDetails?.project_favicon && createProjectDetails.project_favicon?.name ? "" : createProjectDetails.project_favicon.replace("https://code.quickhunt.app/public/storage/project/", ""))}
                                                     />
                                                 </div> : createProjectDetails.project_favicon ?
-                                                    <div className={"h-[50px] w-[50px] relative"}>
+                                                    <div className={"h-[50px] w-[50px] relative border rounded-lg"}>
                                                         <img
                                                             // className={"upload-img"}
                                                             className="h-full w-full rounded-md object-cover"

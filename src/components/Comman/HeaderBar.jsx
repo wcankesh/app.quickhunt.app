@@ -1,7 +1,7 @@
 import React, {Fragment, useEffect, useState} from 'react';
 import {Sheet, SheetContent, SheetHeader, SheetOverlay, SheetTitle, SheetTrigger} from "../ui/sheet";
 import {Button} from "../ui/button";
-import {ChevronsUpDown, Eye, Menu, Moon, Plus, Sun, X} from "lucide-react";
+import {ChevronsUpDown, Eye, Loader2, Menu, Moon, Plus, Sun, Trash2, X} from "lucide-react";
 import {Input} from "../ui/input";
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger} from "../ui/dropdown-menu";
 import {useTheme} from "../theme-provider";
@@ -14,12 +14,22 @@ import {Popover, PopoverContent, PopoverTrigger} from "../ui/popover";
 import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList} from "../ui/command";
 import {Label} from "../ui/label";
 import {useDispatch, useSelector} from "react-redux";
-import {useToast} from "../ui/use-toast";
+import {toast, useToast} from "../ui/use-toast";
 import {projectDetailsAction} from "../../redux/action/ProjectDetailsAction";
 import {allProjectAction} from "../../redux/action/AllProjectAction";
 import {userDetailsAction} from "../../redux/action/UserDetailAction";
 import {allStatusAndTypesAction} from "../../redux/action/AllStatusAndTypesAction";
 import {useLocation} from "react-router";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogHeader,
+    AlertDialogTitle
+} from "../ui/alert-dialog";
+import {Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "../ui/dialog";
 
 const initialState = {
     id: "",
@@ -150,6 +160,7 @@ const HeaderBar = () => {
 
     const userDetailsReducer = useSelector(state => state.userDetailsReducer);
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
+    const allProjectReducer = useSelector(state => state.allProjectReducer);
     const [userDetails, setUserDetails] = useState(initialState)
     const [selectedUrl, setSelectedUrl] = useState(newUrl === "/" ? "/dashboard": newUrl);
     const [open, setOpen] = useState(false)
@@ -161,6 +172,8 @@ const HeaderBar = () => {
     const [projectList, setProjectList] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [scrollingDown, setScrollingDown] = useState(false);
+    const [isOpenDeleteAlert,setIsOpenDeleteAlert]=useState(false);
+    const [isDeleteLoading, setDeleteIsLoading] = useState(false);
 
     const dispatch = useDispatch();
     const {toast} = useToast()
@@ -358,8 +371,64 @@ const HeaderBar = () => {
         };
     }, []);
 
+    const deleteAlert =()=>{
+        setIsOpenDeleteAlert(true);
+    }
+
+    const onDelete = async () => {
+        setDeleteIsLoading(true)
+        const data = await apiSerVice.deleteProjects(projectDetailsReducer.id)
+        if(data.status === 200){
+            const cloneProject = [...allProjectReducer.projectList]
+            const index = cloneProject.findIndex((x) => x.id === projectDetailsReducer.id)
+            if(index !== -1){
+                cloneProject.splice(index, 1)
+                setProjectDetails(cloneProject[0]);
+                dispatch(projectDetailsAction(cloneProject[0]))
+                dispatch(allProjectAction({projectList: cloneProject}))
+            }
+            setDeleteIsLoading(false)
+            toast({description: data.message})
+            setTimeout(() => {
+                history.push('/')
+            },2000)
+        } else {
+
+        }
+    }
+
     return (
         <header className={`z-50 ltr:xl:ml-[282px] rtl:xl:mr-[282px] sticky top-0 pr-3 lg:pr-4 ${scrollingDown ? 'bg-background' : ''} ${theme === "dark" ? "border-b" : ""}`}>
+
+            {
+                isOpenDeleteAlert &&
+                <Fragment>
+                    <Dialog open onOpenChange={deleteAlert}>
+                        <DialogContent className={"max-w-[350px] w-full sm:max-w-[425px] p-3 md:p-6 rounded-lg"}>
+                            <DialogHeader className={"flex flex-row justify-between gap-2"}>
+                                <div className={"flex flex-col gap-2"}>
+                                    <DialogTitle className={"text-start"}>You really want delete project?</DialogTitle>
+                                    <DialogDescription className={"text-start"}>This action can't be undone.</DialogDescription>
+                                </div>
+                                <X size={16} className={"m-0 cursor-pointer"} onClick={() => setIsOpenDeleteAlert(false)}/>
+                            </DialogHeader>
+                            <DialogFooter className={"flex-row justify-end space-x-2"}>
+                                <Button variant={"outline hover:none"}
+                                        className={"text-sm font-semibold border"}
+                                        onClick={() => setIsOpenDeleteAlert(false)}>Cancel</Button>
+                                <Button
+                                    variant={"hover:bg-destructive"}
+                                    className={`${theme === "dark" ? "text-card-foreground" : "text-card"} ${isDeleteLoading === true ? "py-2 px-6" : "py-2 px-6"} w-[76px] text-sm font-semibold bg-destructive`}
+                                    onClick={onDelete}
+                                >
+                                    {isDeleteLoading ? <Loader2 size={16} className={"animate-spin"}/> : "Delete"}
+                                </Button>
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
+                </Fragment>
+            }
+
             <div className={"w-full p-3 pr-0 lg:py-3"}>
                 <div className={"flex justify-between items-center h-full gap-2"}>
                     <div className={"flex gap-3 items-center"}>
@@ -490,7 +559,10 @@ const HeaderBar = () => {
                                                                     setOpen(false)
                                                                 }}
                                                             >
-                                                                <span className={"text-sm font-medium cursor-pointer"}>{x.project_name}</span>
+                                                                <span className={"flex justify-between items-center w-full text-sm font-medium cursor-pointer"}>
+                                                                    {x.project_name}
+                                                                    <Trash2 className={"cursor-pointer"} size={16} onClick={deleteAlert}/>
+                                                                </span>
                                                             </CommandItem>
                                                         </Fragment>
                                                     ))}

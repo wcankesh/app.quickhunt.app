@@ -21,7 +21,7 @@ const ColorInput = ({ value, name, onChange,style}) => {
             <div className="color_picker py-2 px-3 bg-card border border-border rounded-lg" style={style} onClick={handleClickInside} ref={myRef}>
                 <div className={"flex gap-1 items-center"}>
                     <div style={{background: value}} className="color_picker_color"></div>
-                    <span id={name}>{value ? value: "#000000"}</span>
+                    <span className={"text-sm"} id={name}>{value ? value: "#000000"}</span>
                 </div>
                 {
                     clickedOutside &&

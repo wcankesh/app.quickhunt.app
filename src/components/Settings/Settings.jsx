@@ -17,6 +17,7 @@ import Emoji from "./SettingPage/Emoji";
 import {Kanban, Menu, SmilePlus} from "lucide-react";
 import {  Popover, PopoverContent, PopoverTrigger} from "../ui/popover";
 import Board from "./SettingPage/Board";
+import GeneralSettings from "./SettingPage/GeneralSettings";
 
 const Settings = () => {
     let navigate = useNavigate();
@@ -66,6 +67,12 @@ const Settings = () => {
             link: 'domain',
             icon: Icon.setDomainIcon,
             selected: `${baseUrl}/domain`,
+        },
+        {
+            title: 'General Settings',
+            link: 'general-settings',
+            icon: Icon.settingIcon,
+            selected: `${baseUrl}/general-settings`,
         },
         {
             title: 'Labels',
@@ -132,6 +139,8 @@ const Settings = () => {
                 return <Project />;
             case 'domain':
                 return <Domain />;
+            case 'general-settings':
+                return <GeneralSettings />;
             case 'labels':
                 return <Labels />;
             case 'categories':
@@ -184,13 +193,13 @@ const Settings = () => {
                 </Popover>}
             </div>
             {/*<div className="mx-auto grid w-full max-w-6xl items-start gap-6 md:grid-cols-[180px_1fr] lg:grid-cols-[250px_1fr]">*/}
-            <div className="w-full flex lg:flex-nowrap flex-wrap items-start lg:gap-4 gap-6 pt-6 pb-[58px]">
+            <div className="w-full flex lg:flex-nowrap flex-wrap items-start lg:gap-4 gap-6 pt-6">
                 {windowSize.width > 768 ? <div className="w-full lg:max-w-[350px]">
                     <Card>
                         <CardHeader className={"p-4 pb-0"}>
                             <CardTitle className={"text-base font-medium"}>General Settings</CardTitle>
                         </CardHeader>
-                        <CardContent className={"flex flex-col gap-1 pt-[14px] px-4 pb-8"}>
+                        <CardContent className={"flex flex-col gap-1 p-4"}>
                             {
                                 (settingsLinksList || []).map((x, i) => {
                                     return (
