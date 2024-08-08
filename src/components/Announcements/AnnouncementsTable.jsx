@@ -2,7 +2,7 @@ import React, {useState, Fragment, useEffect} from 'react';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "../ui/table";
 import {Badge} from "../ui/badge";
 import {Button} from "../ui/button";
-import {BarChart, Circle, Ellipsis, Eye, Loader2, X,} from "lucide-react";
+import {BarChart, ChevronDown, ChevronUp, Circle, Ellipsis, Eye, Loader2, X,} from "lucide-react";
 import {useTheme} from "../theme-provider"
 import {CardContent} from "../ui/card";
 import {DropdownMenu, DropdownMenuTrigger} from "@radix-ui/react-dropdown-menu";
@@ -27,15 +27,35 @@ const status2 = [
     {name: "Draft", value: 3, fillColor: "#CF1322", strokeColor: "#CF1322",},
 ]
 
-const AnnouncementsTable = ({data,isLoading ,setSelectedRecord,setEditIndex ,handleDelete,setAnalyticsObj,}) => {
+const AnnouncementsTable = ({data,isLoading ,setSelectedRecord,handleDelete,setAnalyticsObj,}) => {
+    const { theme }= useTheme();
     const [announcementData,setAnnouncementData] = useState(data);
     const [idToDelete,setIdToDelete] = useState(null);
     const [openDelete, setOpenDelete] = useState(false);
-    const { theme }= useTheme();
+    const [sortOrder, setSortOrder] = useState('asc');
+    const [sortedColumn, setSortedColumn] = useState('');
 
     useEffect(()=>{
         setAnnouncementData(data);
     },[data]);
+
+    const toggleSort = (column) => {
+        let sortedData = [...announcementData];
+        if (sortedColumn === column) {
+            setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+        } else {
+            setSortedColumn(column);
+            setSortOrder('asc');
+        }
+        if (column === "Published At") {
+            sortedData.sort((a, d) => {
+                const dateA = new Date(a.post_published_at);
+                const dateD = new Date(d.post_published_at);
+                return sortOrder === 'asc' ? dateA - dateD : dateD - dateA;
+            });
+        }
+        setAnnouncementData(sortedData);
+    };
 
     const openSheet = (x) => {
         setAnalyticsObj(x);
@@ -58,9 +78,13 @@ const AnnouncementsTable = ({data,isLoading ,setSelectedRecord,setEditIndex ,han
 
     };
 
-    const onEdit = (record,index)=> {
+    // const onEdit = (record,index)=> {
+    //    setSelectedRecord(record);
+    //    setEditIndex(index);
+    // };
+
+    const onEdit = (record)=> {
        setSelectedRecord(record);
-       setEditIndex(index);
     };
 
     const shareFeedback = (domain,slug)=>{
@@ -118,8 +142,13 @@ const AnnouncementsTable = ({data,isLoading ,setSelectedRecord,setEditIndex ,han
                                 {
                                     ["Title","Last Updated","Published At","Status","","",""].map((x,i)=>{
                                         return(
-                                            <TableHead className={`font-semibold px-2 py-[10px] md:px-3 `}>
+                                            <TableHead className={`font-semibold px-2 py-[10px] md:px-3 `} onClick={() => x === "Published At" && toggleSort("Published At")}>
                                                 {x}
+                                                {x === "Published At"  && (
+                                                    sortOrder === 'asc' ?
+                                                        <ChevronUp size={18} className="inline ml-1" /> :
+                                                        <ChevronDown size={18} className="inline ml-1" /> )
+                                                }
                                             </TableHead>
                                         )
                                     })

@@ -517,14 +517,18 @@ const HeaderBar = () => {
                                 <DropdownMenuTrigger asChild>
                                     <Button variant="secondary" size="icon" className="rounded-full w-[30px] h-[30px]">
                                         <Avatar className={"w-[30px] h-[30px]"}>
-                                            {
-                                                userDetails.user_photo ?
-                                                    <AvatarImage src={userDetails.user_photo}
-                                                                 alt={userDetails && userDetails?.user_first_name?.substring(0, 1)?.toUpperCase() && userDetails?.user_last_name?.substring(0, 1)?.toUpperCase()}
-                                                    />
-                                                    :
-                                                    <AvatarFallback>{userDetails?.user_first_name?.substring(0, 1)?.toUpperCase()}{userDetails?.user_last_name?.substring(0, 1)?.toUpperCase()}</AvatarFallback>
-                                            }
+                                            {/*{*/}
+                                            {/*    userDetails && userDetails.user_photo  ?*/}
+                                            {/*        <AvatarImage src={userDetails.user_photo}*/}
+                                            {/*                     alt={userDetails && userDetails?.user_first_name?.substring(0, 1)?.toUpperCase() && userDetails?.user_last_name?.substring(0, 1)?.toUpperCase()}*/}
+                                            {/*        />*/}
+                                            {/*        :*/}
+                                            {/*        <AvatarFallback>{userDetails?.user_first_name?.substring(0, 1)?.toUpperCase()}{userDetails?.user_last_name?.substring(0, 1)?.toUpperCase()}</AvatarFallback>*/}
+                                            {/*}*/}
+                                            <AvatarImage src={userDetails.user_photo}
+                                                         alt={userDetails && userDetails?.user_first_name?.substring(0, 1)?.toUpperCase() && userDetails?.user_last_name?.substring(0, 1)?.toUpperCase()}
+                                            />
+                                            <AvatarFallback>{userDetails?.user_first_name?.substring(0, 1)?.toUpperCase()}{userDetails?.user_last_name?.substring(0, 1)?.toUpperCase()}</AvatarFallback>
                                         </Avatar>
                                     </Button>
                                 </DropdownMenuTrigger>
@@ -562,6 +566,7 @@ const HeaderBar = () => {
 
                     {isSheetOpen && (
                         <Sheet open={isSheetOpen} onOpenChange={isSheetOpen ? closeSheet : openSheet}>
+                            <SheetOverlay className={"inset-0"} />
                             <SheetContent className={"sm:max-w-[662px] sm:overflow-auto p-0 bg-card"}>
                                 <SheetHeader className={"px-[32px] py-[22px] border-b flex"}>
                                     <SheetTitle className={"text-xl font-medium flex justify-between items-center"}>

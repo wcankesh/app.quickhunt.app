@@ -55,6 +55,7 @@ const Profile = () => {
     const dispatch = useDispatch();
     const apiSerVice = new ApiService();
     const [previewImage,setPreviewImage] = useState("");
+    // const [userImage,setUserImage] = useState("");
     const {theme} = useTheme();
 
     useEffect(() => {
@@ -151,6 +152,14 @@ const Profile = () => {
         setPreviewImage(URL.createObjectURL(file.target.files[0]));
     };
 
+    const onDeleteImg = async (name, value) => {
+        if(userDetails && userDetails?.user_photo && userDetails.user_photo?.name){
+            setUserDetails({...userDetails, user_photo: ""})
+        } else {
+            setUserDetails({...userDetails, [name]: value, user_photo: ""})
+        }
+    }
+
     const onUpdateUser = async () => {
         let validationErrors = {};
         Object.keys(userDetails).forEach(name => {
@@ -165,11 +174,22 @@ const Profile = () => {
         }
         setIsLoading(true)
         let formData = new FormData();
-        formData.append("user_first_name", userDetails.user_first_name);
-        formData.append("user_last_name", userDetails.user_last_name);
-        formData.append("user_email_id", userDetails.user_email_id);
-        formData.append("user_photo", userDetails.user_photo);
-        formData.append("user_job_title", userDetails.user_job_title);
+        const obj = {
+            user_first_name: userDetails.user_first_name,
+            user_last_name: userDetails.user_last_name,
+            user_email_id: userDetails.user_email_id,
+            user_photo: userDetails.user_photo,
+            user_job_title: userDetails.user_job_title,
+            delete_image: userDetails?.delete_image || '',
+        }
+        Object.keys(obj).map((x) => {
+            if(x === "delete_image" && obj?.user_photo?.name){
+
+            }  else {
+                formData.append(x,obj[x]);
+            }
+        })
+
         const data = await apiSerVice.updateLoginUserDetails(formData, userDetailsReducer.id);
         if(data.status === 200){
             dispatch(userDetailsAction({...data.data}));
@@ -180,7 +200,7 @@ const Profile = () => {
         } else {
             setIsLoading(false);
             toast({
-                description: "Something went wrong!!!",
+                description: data.message,
                 variant:"destructive"
             });
         }
@@ -231,32 +251,55 @@ const Profile = () => {
                 <CardContent className={"py-4 px-4 sm:py-6 border-b"}>
                     <div className={"flex gap-4 flex-wrap lg:flex-nowrap md:flex-nowrap sm:flex-wrap"}>
                         <div className="flex justify-center mt-2 relative">
-                            <label
-                                htmlFor="upload_image"
-                                className="flex w-[80px] h-[80px] sm:w-[132px] sm:h-[128px] py-0 justify-center items-center flex-shrink-0 border-dashed border-[1px] border-gray-300 rounded cursor-pointer"
-                            >
-                                {previewImage ? (
-                                    <img
-                                        className="h-full w-full rounded-md object-cover"
-                                        src={previewImage}
-                                        alt="not_found"
-                                    />
-                                ) : (
-                                    <span className="text-center text-muted-foreground font-semibold text-[14px]">
-                                        Upload Image
-                                    </span>
-                                )}
-                                <input
-                                    id="upload_image"
-                                    type="file"
-                                    className="hidden"
-                                    onChange={handleFileChange}
-                                    accept="image/*"
-                                />
-                            </label>
-                            {previewImage && (
-                                    <CircleX size={20} className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`} onClick={removePreviewImage}/>
-                            )}
+                            {
+                                userDetails?.user_photo ?
+                                    <div>
+                                        {userDetails && userDetails.user_photo && userDetails.user_photo.name ?
+                                            <div className={"w-[80px] h-[80px] sm:w-[132px] sm:h-[128px] relative border"}>
+                                                <img
+                                                    // className={"upload-img"}
+                                                    className="h-full w-full rounded-md object-cover"
+                                                    src={userDetails && userDetails.user_photo && userDetails.user_photo.name ? URL.createObjectURL(userDetails.user_photo) : userDetails.user_photo}
+                                                    alt=""
+                                                />
+                                                <CircleX
+                                                    size={20}
+                                                    className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
+                                                    onClick={() => onDeleteImg('delete_image', userDetails && userDetails?.user_photo && userDetails.user_photo?.name ? "" : userDetails.user_photo.replace("https://code.quickhunt.app/public/storage/user/", ""))}
+                                                />
+                                            </div> : userDetails.user_photo ?
+                                                <div className={"w-[80px] h-[80px] sm:w-[132px] sm:h-[128px] relative border"}>
+                                                    <img
+                                                        // className={"upload-img"}
+                                                        className="h-full w-full rounded-md object-cover"
+                                                        src={userDetails.user_photo}
+                                                        alt=""/>
+                                                    <CircleX
+                                                        size={20}
+                                                        className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
+                                                        onClick={() => onDeleteImg('delete_image', userDetails && userDetails?.user_photo && userDetails.user_photo?.name ? "" : userDetails.user_photo.replace("https://code.quickhunt.app/public/storage/user/", ""))}
+                                                    />
+                                                </div>
+                                                : ''}
+                                    </div> :
+                                    <div>
+
+                                        <input
+                                            id="pictureInput"
+                                            type="file"
+                                            className="hidden"
+                                            accept="image/*"
+                                            onChange={handleFileChange}
+                                        />
+                                        <label
+                                            htmlFor="pictureInput"
+                                            // className="border-dashed w-[80px] h-[80px] sm:w-[132px] sm:h-[128px] py-[52px] flex items-center justify-center bg-muted border border-muted-foreground rounded cursor-pointer"
+                                            className="flex w-[80px] h-[80px] sm:w-[132px] sm:h-[128px] py-0 justify-center items-center flex-shrink-0 border-dashed border-[1px] border-gray-300 rounded cursor-pointer"
+                                        >
+                                            <h4 className="text-xs font-semibold">Upload</h4>
+                                        </label>
+                                    </div>
+                            }
                         </div>
 
                         <div className={"flex flex-col gap-4 w-full sm:w-full"}>

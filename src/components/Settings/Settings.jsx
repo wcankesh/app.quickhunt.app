@@ -152,8 +152,8 @@ const Settings = () => {
     };
 
     return (
-        <div className='xl:container xl:max-w-[1200px] lg:container lg:max-w-[992px] md:container md:max-w-[768px] sm:container sm:max-w-[639px] xs:container xs:max-w-[475px] px-4'>
-            <div className={"pt-8 flex flex-row justify-between items-center px-1 relative"}>
+        <div className='container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-3 md:px-4'>
+            <div className={"flex flex-row justify-between items-center px-1 relative"}>
                 <h1 className="text-lg sm:text-2xl font-medium">Settings</h1>
                 {windowSize.width <= 768 && <Popover open={open} onOpenChange={setOpen}>
                     <PopoverTrigger>
@@ -184,8 +184,8 @@ const Settings = () => {
                 </Popover>}
             </div>
             {/*<div className="mx-auto grid w-full max-w-6xl items-start gap-6 md:grid-cols-[180px_1fr] lg:grid-cols-[250px_1fr]">*/}
-            <div className="w-full flex lg:flex-nowrap md:flex-wrap sm:flex-wrap items-start gap-4 pt-6 pb-[58px]">
-                {windowSize.width > 768 ? <div className="lg:w-[320px] md:w-full sm:w-full">
+            <div className="w-full flex lg:flex-nowrap flex-wrap items-start lg:gap-4 gap-6 pt-6 pb-[58px]">
+                {windowSize.width > 768 ? <div className="w-full lg:max-w-[350px]">
                     <Card>
                         <CardHeader className={"p-4 pb-0"}>
                             <CardTitle className={"text-base font-medium"}>General Settings</CardTitle>

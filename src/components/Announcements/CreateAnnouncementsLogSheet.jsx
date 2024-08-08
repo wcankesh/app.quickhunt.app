@@ -90,7 +90,7 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
         setPreviewImage(URL.createObjectURL(file.target.files[0]));
     };
 
-    const onChangeStatus = async (name, value) => {
+    const onDeleteImg = async (name, value) => {
         if(changeLogDetails && changeLogDetails?.image && changeLogDetails.image?.name){
             setChangeLogDetails({...changeLogDetails, image: ""})
         } else {
@@ -169,7 +169,6 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
         }));
     };
 
-
     const onChangeCategory = (selectedItems ) =>{
         setChangeLogDetails({...changeLogDetails, category_id: selectedItems})
     }
@@ -230,7 +229,7 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
             setChangeLogDetails(initialState)
             setIsSave(false)
             toast({
-                description: "Announcement created successfully",
+                description: data.message,
             });
         } else {
             setIsSave(false);
@@ -285,7 +284,7 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
             setChangeLogDetails(initialState)
             setIsSave(false)
             toast({
-                description: "Announcement updated successfully",
+                description: data.message,
             });
 
         } else {
@@ -297,13 +296,6 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
         }
         onClose(data.data);
     }
-
-    // const loggedInUser = memberList.find(member => member.user_id === userDetailsReducer.id);
-    // const loggedInUserId = loggedInUser ? loggedInUser.user_id.toString() : null;
-    //
-    // const defaultAssignTo = (changeLogDetails.post_assign_to || []).includes(loggedInUserId)
-    //     ? changeLogDetails.post_assign_to
-    //     : [...(changeLogDetails.post_assign_to || []), loggedInUserId];
 
     const handleValueChange = (value) => {
         const clone = [...changeLogDetails.post_assign_to]
@@ -513,7 +505,7 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
                                                 <CircleX
                                                     size={20}
                                                     className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
-                                                    onClick={() => onChangeStatus('delete_image', changeLogDetails && changeLogDetails?.image && changeLogDetails.image?.name ? "" : changeLogDetails.image.replace("https://code.quickhunt.app/public/storage/post/", ""))}
+                                                    onClick={() => onDeleteImg('delete_image', changeLogDetails && changeLogDetails?.image && changeLogDetails.image?.name ? "" : changeLogDetails.image.replace("https://code.quickhunt.app/public/storage/post/", ""))}
                                                 />
                                             </div> : changeLogDetails.image ?
                                                 <div className={"w-[282px] h-[128px] relative border p-[5px]"}>
@@ -521,7 +513,7 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
                                                     <CircleX
                                                         size={20}
                                                         className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
-                                                        onClick={() => onChangeStatus('delete_image', changeLogDetails && changeLogDetails?.image && changeLogDetails.image?.name ? "" : changeLogDetails.image.replace("https://code.quickhunt.app/public/storage/post/", ""))}
+                                                        onClick={() => onDeleteImg('delete_image', changeLogDetails && changeLogDetails?.image && changeLogDetails.image?.name ? "" : changeLogDetails.image.replace("https://code.quickhunt.app/public/storage/post/", ""))}
                                                     />
                                                 </div>
                                                 : ''}
