@@ -391,7 +391,7 @@ const Team = () => {
                                         onKeyDown={handleKeyDown}
                                         onChange={onChange}
                                         name={"email"}
-                                        onBlur={onBlur}
+                                        // onBlur={onBlur}
                                     />
                                 </div>
                                 {formError.email && <p className="text-red-500 text-xs mt-1">{formError.email}</p>}

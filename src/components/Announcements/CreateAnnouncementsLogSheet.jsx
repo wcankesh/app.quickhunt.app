@@ -327,30 +327,30 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
         <Sheet open={isOpen} onOpenChange={isOpen ? onClose : onOpen}>
             <SheetOverlay className={"inset-0"} />
             <SheetContent className={"pt-6 p-0 lg:max-w-[663px] md:max-w-[720px] sm:max-w-[520px]"}>
-                    <SheetHeader className={`px-3 py-4 lg:px-8 lg:py-[20px] flex flex-row justify-between items-center sticky top-0 z-10 border-b`}>
+                    <SheetHeader className={`px-3 py-4 lg:px-8 lg:py-[20px] flex flex-row justify-between items-center border-b`}>
                         <h5 className={"text-sm md:text-xl font-medium"}>{ selectedRecord?.post_slug_url ? "Update Announcement" :"Create New Announcements"}</h5>
                         <div className={"flex items-center gap-6 m-0"}>
-                            <Button className={"h-5 w-5 p-0"} onClick={() => onChangeText({target:{name: "post_pin_to_top", value: changeLogDetails.post_pin_to_top === 1 ? 0 : 1}}) } variant={"ghost"} >{changeLogDetails.post_pin_to_top === 1 ? <Pin fill={"bg-card-foreground"} className={"h-4 w-4"}  size={18}/> : <Pin className={"h-4 w-4"}  size={18}/>}</Button>
-                            <Button className={"h-5 w-5 p-0"} onClick={onClose}  variant={"ghost"}><X size={18} className={"h-5 w-5"}/></Button>
+                            <Button className={"h-5 w-5 p-0"} onClick={() => onChangeText({target:{name: "post_pin_to_top", value: changeLogDetails.post_pin_to_top === 1 ? 0 : 1}}) } variant={"ghost"} >{changeLogDetails.post_pin_to_top === 1 ? <Pin fill={"bg-card-foreground"} size={15}/> : <Pin size={15}/>}</Button>
+                            <X onClick={onClose} size={18} className={"cursor-pointer"}/>
                         </div>
                     </SheetHeader>
                 <div className={"comm-sheet-height overflow-y-auto"}>
                 <div className={"px-3 lg:px-8 border-b py-6"}>
                     <div className={"flex flex-col gap-6"}>
-                        <div className="grid w-full gap-2">
+                        <div className="w-full flex flex-col gap-2">
                             <Label htmlFor="title">Title</Label>
                             <Input type="text" id="title" className={"h-9"} name={"post_title"} value={changeLogDetails.post_title} onChange={onChangeText}/>
                             {formError.post_title && <span className="text-sm text-red-500">{formError.post_title}</span>}
                         </div>
-                        <div className="grid w-full gap-2">
+                        <div className="w-full flex flex-col gap-2">
                             <Label htmlFor="link">Permalink / Slug</Label>
-                            <Input type="text" className={"h-9 max-w-[593px] w-full"} id="link" name={"post_slug_url"} value={changeLogDetails.post_slug_url} onChange={onChangeText}/>
+                            <Input type="text" className={"h-9"} id="link" name={"post_slug_url"} value={changeLogDetails.post_slug_url} onChange={onChangeText}/>
                             <p className={"text-sm font-normal text-muted-foreground break-words"}>This release will be available at {projectDetailsReducer.domain ? <a
                                 href={`https://${projectDetailsReducer.domain}/announcements/${changeLogDetails.post_slug_url}`}
                                 target={"_blank"}
                                 className={"text-primary max-w-[593px] w-full break-words text-sm"}>{`https://${projectDetailsReducer.domain}/announcements/${changeLogDetails.post_slug_url}`}</a> : ""}</p>
                         </div>
-                        <div className="grid w-full gap-2">
+                        <div className="w-full flex flex-col gap-2">
                             <Label htmlFor="description">Description</Label>
                             <ReactQuillEditor value={changeLogDetails.post_description} onChange={onChangeText} name={"post_description"}/>
                             {formError.post_description && <span className="text-sm text-red-500">{formError.post_description}</span>}

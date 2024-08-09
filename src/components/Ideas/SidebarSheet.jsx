@@ -1024,7 +1024,7 @@ const SidebarSheet = ({
                                                             <div className={"flex items-center"}>
                                                                 <h4 className={"text-sm font-medium"}>{selectedIdea.name}</h4>
                                                                 <p className={"text-sm font-normal flex items-center text-muted-foreground"}>
-                                                                    <Dot
+                                                                    <Dot size={20}
                                                                         className={"fill-text-card-foreground stroke-text-card-foreground"}/>
                                                                     {moment(selectedIdea.created_at).format('D MMM')}
                                                                 </p>
@@ -1661,7 +1661,7 @@ const SidebarSheet = ({
                                                                                                     <div
                                                                                                         className={"flex gap-2"}>
                                                                                                         <Button
-                                                                                                            className={`${isSaveSubComment === true ? "py-2 px-6" : "w-[86px] py-2 px-6"} h-[30px] text-sm font-semibold`}
+                                                                                                            className={`${isSaveSubComment === true ? "py-2 px-6" : "py-2 px-6"} w-[86px] h-[30px] text-sm font-semibold`}
                                                                                                             disabled={subCommentText.trim() === "" || subCommentText === ""}
                                                                                                             onClick={() => onCreateSubComment(x, i)}
                                                                                                         >

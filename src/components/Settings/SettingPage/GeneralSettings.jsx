@@ -226,7 +226,7 @@ const GeneralSettings = () => {
                         }
                     </div>
                     <div className={"space-y-3 p-4 px-6 border-b"}>
-                        <h3 className={"font-medium"}>Header Color</h3>
+                        <h3 className={"font-medium"}>Setting Color</h3>
                             <div className={"flex items-center gap-3 flex-wrap md:flex-nowrap"}>
                         <div className={"widget-color-picker space-y-2 w-full md:basis-1/2"}>
                             <Label className={"text-sm font-normal"}>Header Background Color</Label>

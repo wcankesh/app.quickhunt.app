@@ -377,6 +377,9 @@ export class ApiService{
     async cancelPlan (){
         return await this.getData(`${baseUrlApi}/cancel`,)
     }
+    async manageSubscription (){
+        return await this.getData(`${baseUrlApi}/manage-subscription`,)
+    }
     async paymentStatus (payload){
         return await this.postData(`${baseUrlApi}/payment-status`,payload)
     }

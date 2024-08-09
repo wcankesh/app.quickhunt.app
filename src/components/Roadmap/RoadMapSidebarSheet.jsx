@@ -1497,7 +1497,9 @@ const RoadMapSidebarSheet = ({
                                                                                                                             <div
                                                                                                                                 className={"flex gap-2"}>
                                                                                                                                 <h4 className={"text-sm font-medium"}>{y.name}</h4>
-                                                                                                                                <p className={"text-sm font-normal text-muted-foreground"}>
+                                                                                                                                <p className={"text-sm font-normal flex items-center text-muted-foreground"}>
+                                                                                                                                    <Dot size={20}
+                                                                                                                                         className={"fill-text-card-foreground stroke-text-card-foreground"}/>
                                                                                                                                     {moment.utc(y.created_at).local().startOf('seconds').fromNow()}
                                                                                                                                 </p>
                                                                                                                             </div>

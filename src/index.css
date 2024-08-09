@@ -274,11 +274,13 @@ span.LinesEllipsis-ellipsis {color: hsl(var(--primary)) !important;font-weight: 
 
 @media (max-width: 767px) {
   .idea-sheet-height{height: calc(100vh - 65px);}
+  .container-secondary{padding-left: 12px; padding-right: 12px}
 }
 
 @media (max-width: 640px) {
   .bodyScreenHeight {height: auto;}
   .idea-sheet-height{height: calc(100vh - 95px);}
+
 }
 
 @media (max-width: 329px) {
@@ -509,3 +511,12 @@ em {color: var(--muted-foreground) !important;}
 .description-container div div div p span {color: var(--muted-foreground) !important;}
 .description-container div div div p span span span {color: var(--primary) !important;}
 .ql-snow .ql-editor p span {color: var(--card) !important}
+
+input:-webkit-autofill {
+  background-color: transparent !important; /* Change background */
+  color: #fff !important; /* Change text color if needed */
+}
+
+input:-webkit-autofill::first-line {
+  color: #fff !important; /* Ensure text color remains visible */
+}

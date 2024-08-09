@@ -112,8 +112,8 @@ const AnnouncementsTable = ({data,isLoading ,setSelectedRecord,handleDelete,setA
                         <DialogContent className="max-w-[350px] w-full sm:max-w-[525px] p-3 md:p-6 rounded-lg">
                             <DialogHeader className={"flex flex-row justify-between gap-2"}>
                                 <div className={"flex flex-col gap-2"}>
-                                    <DialogTitle>You really want delete this announcement?</DialogTitle>
-                                    <DialogDescription>This action can't be undone.</DialogDescription>
+                                    <DialogTitle className={"text-start"}>You really want delete this announcement?</DialogTitle>
+                                    <DialogDescription className={"text-start"}>This action can't be undone.</DialogDescription>
                                 </div>
                                 <X size={16} className={"m-0 cursor-pointer"} onClick={() => setOpenDelete(false)}/>
                             </DialogHeader>
@@ -180,7 +180,7 @@ const AnnouncementsTable = ({data,isLoading ,setSelectedRecord,handleDelete,setA
                                                     <TableRow key={x?.id} className={""}>
                                                         <TableCell
                                                             className={`inline-flex gap-2 md:gap-3 flex-wrap items-center px-2 py-[10px] md:px-3 font-medium h-12`}>
-                                                            <span className={"cursor-pointer"} onClick={() => onEdit(x,index)}>{x?.post_title}</span>
+                                                            <span className={"cursor-pointer text-ellipsis overflow-hidden whitespace-nowrap"} onClick={() => onEdit(x,index)}>{x?.post_title}</span>
                                                                 {
                                                                     x.labels && x.labels.length > 0 ?
                                                             <div className={"flex flex-wrap gap-1"}>
