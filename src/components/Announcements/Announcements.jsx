@@ -64,6 +64,7 @@ const Announcements = () => {
     const [openFilterType, setOpenFilterType] = useState('');
     const timeoutHandler = useRef(null);
     const [openFilter, setOpenFilter] = useState('');
+    const [isFilter, setIsFilter] = useState(false);
 
     const openSheet = () => {
         setSelectedRecord({id: "new"})
@@ -110,9 +111,17 @@ const Announcements = () => {
 
     useEffect(() => {
             if(projectDetailsReducer.id){
-                getAllPosts();
+                if(filter.l || filter.s || filter.q){
+                    searchAnnouncement({...filter, page: pageNo, project_id: projectDetailsReducer.id,})
+                } else {
+                    if(!isFilter){
+                        getAllPosts()
+                    }
+
+                }
+
             }
-    }, [projectDetailsReducer.id, allStatusAndTypes, pageNo,]);
+    }, [projectDetailsReducer.id, allStatusAndTypes, pageNo]);
 
     const getAllPosts = async () => {
         setIsLoading(true)
@@ -125,6 +134,7 @@ const Announcements = () => {
             setIsLoading(false)
             setAnnouncementList(data.data)
             setTotalRecord(data.total)
+            setIsFilter(true)
         } else {
             setIsLoading(false)
         }
@@ -158,7 +168,6 @@ const Announcements = () => {
             page:1,
             [event.name]: event.value,
         }
-
         await searchAnnouncement(payload);
     }
 

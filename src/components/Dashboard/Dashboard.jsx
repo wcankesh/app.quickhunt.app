@@ -11,12 +11,15 @@ import { addDays, format } from "date-fns"
 import { cn } from "../../lib/utils";
 import {ApiService} from "../../utils/ApiService";
 import {useSelector} from "react-redux";
-import Highcharts from 'highcharts'
-import HighchartsReact from 'highcharts-react-official'
 import {useTheme} from "../theme-provider";
 import EmptyData from "../Comman/EmptyData";
 import {CommSkel} from "../Comman/CommSkel";
-
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts"
+import {
+    ChartContainer,
+    ChartTooltip,
+    ChartTooltipContent,
+} from "../ui/chart"
 const programAnalytics = [
     {
         id: 1,
@@ -44,6 +47,17 @@ const emoji = {
     29 : Icon.emojiLaugh,
     54 : Icon.emojiSad,
     55 : Icon.emojiSmile,
+}
+const chartConfig = {
+
+    totalView: {
+        label: "Total View",
+        color: "#7c3bed80",
+    },
+    uniqueView: {
+        label: "Unique View",
+        color: "#7c3aed",
+    },
 }
 
 export function Dashboard() {
@@ -113,21 +127,7 @@ export function Dashboard() {
         }
         const data = await apiSerVice.dashboardData(payload)
         if(data.status === 200){
-            const uniqueViewList = [];
-            const totalViewViewList = [];
             const feedbackAnalytics = [];
-            data.data.viewsAnalytic.map((j, i) => {
-                let obj = {
-                    x: new Date(j.x),
-                    y: parseInt(j.uniqueView)
-                }
-                let obj1 = {
-                    x: new Date(j.x),
-                    y: parseInt(j.totalView)
-                }
-                uniqueViewList.push(obj)
-                totalViewViewList.push(obj1)
-            })
             data.data.feedbackAnalytics.map((j, i) => {
                 let obj = {
                     x: new Date(j.x),
@@ -136,12 +136,9 @@ export function Dashboard() {
 
                 feedbackAnalytics.push(obj)
             })
-            setChartList({...data.data,uniqueViewList:uniqueViewList,totalViewViewList: totalViewViewList, feedbackAnalytics:feedbackAnalytics})
+            setChartList({...data.data,totalViewViewList: data.data.viewsAnalytic, feedbackAnalytics:feedbackAnalytics})
             setIsLoading(false)
-            if (
-                uniqueViewList.length === 0 &&
-                totalViewViewList.length === 0
-            ) {
+            if (data.data.viewsAnalytic.length === 0) {
                 setDataAvailable(false);
             } else {
                 setDataAvailable(true);
@@ -158,72 +155,6 @@ export function Dashboard() {
     };
 
     const [date, setDate] = useState([new Date(),addDays(new Date(), 4)]);
-
-    const options = {
-        chart: {
-            borderWidth: 0,
-            type: 'column',
-        },
-        tooltip: {
-            formatter: function () {
-                return '<div>' + moment(this.x).format("ll") + ' </div><br/><br/>' +
-                    '<b>'+this.series.name+':</b> ' + this.y + ''
-            }
-        },
-        title: "",
-        yAxis: {
-            type: 'logarithmic',
-            // max: data ? Math.max.apply(Math, data.map((o) => {
-            //     return o.y;
-            // })) : 0,
-            tickInterval: 1,
-            title: {
-                text: ''
-            }
-        },
-        xAxis: {
-            type: 'datetime',
-            //tickInterval: 24 * 25200 * 1000,
-        },
-        credits: {
-            enabled: false
-        },
-        series: [{
-            name: "Unique View",
-            data: chartList.uniqueViewList,
-            color: "#7c3aed"
-        },{
-            name: "Total View",
-            data: chartList.totalViewViewList,
-            color: "#7c3bed80"
-        },],
-        plotOptions: {
-            line: {
-                dataLabels: {
-                    enabled: false
-                },
-                enableMouseTracking: true
-            },
-            /*series: {
-                animation: true,
-                marker: {
-                    radius: 4,
-                    fillColor: '#008060',
-                    states: {
-                        hover: {
-                            backgroundColor: '#008060',
-                            radius: 4,
-                            fillColor: '#008060',
-                        }
-                    }
-                },
-                fillColor: '#e0f5f5',
-                lineColor: '#008060',
-                fillOpacity: 0.25
-            },*/
-        }
-
-    };
 
     return (
         <Fragment>
@@ -367,7 +298,41 @@ export function Dashboard() {
                                     </CardHeader>
                                     {dataAvailable ? (
                                         <CardContent className={"pb-10 px-4 pt-8 m-0 md:px-7"}>
-                                            <HighchartsReact highcharts={Highcharts} options={options}/>
+                                            <ChartContainer config={chartConfig} className="aspect-auto h-[250px] w-full">
+                                                <BarChart accessibilityLayer data={chartList.totalViewViewList}>
+                                                    <CartesianGrid vertical={false} />
+                                                    <XAxis
+                                                        dataKey="x"
+                                                        tickLine={false}
+                                                        tickMargin={10}
+                                                        axisLine={false}
+
+                                                        tickFormatter={(value) => {
+                                                            const date = new Date(value)
+                                                            return date.toLocaleDateString("en-US", {
+                                                                month: "short",
+                                                                day: "numeric",
+                                                            })
+                                                        }}
+                                                    />
+                                                    <YAxis tickLine={false}   axisLine={false} />
+
+                                                    <ChartTooltip
+                                                        cursor={false}
+                                                        labelFormatter={(value) => {
+                                                            return new Date(value).toLocaleDateString("en-US", {
+                                                                month: "short",
+                                                                day: "numeric",
+                                                                year: "numeric",
+                                                            })
+                                                        }}
+                                                        content={<ChartTooltipContent  indicator="line" />}
+                                                    />
+                                                    <Bar dataKey="uniqueView"  fill="var(--color-uniqueView)" className={"cursor-pointer"} radius={4} />
+                                                    <Bar dataKey="totalView" fill="var(--color-totalView)" className={"cursor-pointer"} radius={4} />
+                                                </BarChart>
+                                            </ChartContainer>
+                                            {/*<HighchartsReact highcharts={Highcharts} options={options}/>*/}
                                         </CardContent>
                                     ) : <EmptyData/>
                                     }

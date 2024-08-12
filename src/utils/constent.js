@@ -37,4 +37,16 @@ export const isLogin = () => {
     return false;
 }
 
+// Check if the token is about to expire (within the next minute)
+export const isTokenAboutToExpire = () => {
+    const token = localStorage.getItem(TOKEN_KEY);
+    if (!token) return true;
+
+    const tokenParts = JSON.parse(atob(token.split('.')[1]));
+    const exp = tokenParts.exp;
+    if (!exp) return true;
+    return Date.now() >= exp * 1000;
+};
+
+
 export const apiService = new ApiService();

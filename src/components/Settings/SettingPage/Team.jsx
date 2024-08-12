@@ -44,8 +44,10 @@ const Team = () => {
     const userDetailsReducer = useSelector(state => state.userDetailsReducer);
 
     useEffect(() => {
-        getMember()
-        getInvitations(true)
+        if(projectDetailsReducer.id){
+            getMember()
+            getInvitations(true)
+        }
     }, [projectDetailsReducer.id]);
 
     const getMember = async () => {
@@ -285,7 +287,6 @@ const Team = () => {
                                         </TableBody>:<TableBody>
                                             {
                                                 (memberList || []).map((x) => {
-                                                    {console.log("memberList", memberList)}
                                                     return (
                                                         <TableRow key={x.id}>
                                                             <TableCell className={"py-[10px]"}>
@@ -306,8 +307,7 @@ const Team = () => {
                                                                     </div>
                                                                 </div>
                                                             </TableCell>
-                                                            <TableCell
-                                                                className={"flex justify-end items-center py-[10px] py-[17px]"}>
+                                                            <TableCell className={"flex justify-end items-center py-[10px] py-[17px]"}>
                                                                 <Badge variant={"outline"} className={`h-[20px] py-0 px-2 text-xs rounded-[5px] ${x.role === 1 ? "text-[#63c8d9] border-[#63c8d9]" : "text-[#694949] border-[#694949]"}`}>{x?.role === 1 ? "Admin" : "Member"}</Badge>
                                                             </TableCell>
                                                         </TableRow>
