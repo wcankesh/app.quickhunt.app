@@ -11,6 +11,7 @@ import PricingPlans from "../components/PricingPlan/PricingPlans";
 import HelpSupport from "../components/HelpSupport/HelpSupport";
 import InAppMessage from "../components/InAppMessage/InAppMessage";
 import UpdateWidget from "../components/Widgets/UpdateWidget";
+import UpdateInAppMessage from "../components/InAppMessage/UpdateInAppMessage";
 
 export const routes = [
      {path: `${baseUrl}/dashboard`, component: <Dashboard/>},
@@ -25,4 +26,5 @@ export const routes = [
      {path: `${baseUrl}/pricing-plan`, component: <PricingPlans/>},
      {path: `${baseUrl}/settings/:type`, component: <Settings/>},
      {path: `${baseUrl}/in-app-message`, component: <InAppMessage/>},
+     {path: `${baseUrl}/in-app-message/:id`, component: <UpdateInAppMessage/>},
 ]

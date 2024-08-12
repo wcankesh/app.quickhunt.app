@@ -47,22 +47,16 @@ const Statuses = () => {
 
     useEffect(() => {
         getAllRoadmapStatus()
-    },[projectDetailsReducer.id])
+    },[allStatusAndTypes.roadmap_status])
 
     const getAllRoadmapStatus = async () => {
-        setIsLoading(true)
-        const data = await apiService.getAllRoadmapStatus(projectDetailsReducer.id)
-        if(data.status === 200){
-            const clone = [];
-            data.data.map((x, i) => {
-                let obj = {...x,index: i}
-                clone.push(obj)
-            })
-            setStatusList(clone);
-            setIsLoading(false);
-        } else {
-            setIsLoading(false);
-        }
+        const clone = [];
+        allStatusAndTypes.roadmap_status.map((x,i)=>{
+            let obj ={...x,index:i};
+            clone.push(obj);
+        });
+        setStatusList(clone);
+        setIsLoading(false)
     }
 
     const onChangeColorColor = (newColor, index) => {
