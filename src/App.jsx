@@ -22,7 +22,6 @@ function App() {
                 <Route element={
                     <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
                         <ProtectedRoutes/>
-
                     </ThemeProvider>
                    }>
                     <Route exact path={`${baseUrl}/`} element={<DefaultLayout/>}>

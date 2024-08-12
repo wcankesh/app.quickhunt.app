@@ -27,7 +27,7 @@ const PricingPlans = () => {
             planType: 0,
             productId: "",
             disabled: userDetailsReducer.plan === 0,
-            btnText: userDetailsReducer.plan > 0 ? "Downgrade" : "Activated"
+            btnText: userDetailsReducer.plan <= 0 ? "Downgrade" : "Activated"
         },
         {
             name: "Startup",
@@ -37,52 +37,65 @@ const PricingPlans = () => {
             planType: 1,
             productId: "price_1Pi8vSKS40mIQp5T8LrFd5QC",
             disabled: userDetailsReducer.plan === 1 && userDetailsReducer.final_expiration_time !== "" ? false : userDetailsReducer.plan === 1,
-            btnText: userDetailsReducer.plan === 1 && userDetailsReducer.final_expiration_time !== "" ? "Resubscribe" : userDetailsReducer.plan === 1 ? "Activated" : userDetailsReducer.plan > 1 ? "Downgrade" : "Upgrade"
+            btnText: userDetailsReducer.plan === 1 && userDetailsReducer.final_expiration_time !== "" ? "Upgrade" : userDetailsReducer.plan === 1 ? "Activated" : userDetailsReducer.plan > 1 ? "Downgrade" : "Upgrade"
         },
     ];
 
     const redirectToCheckout = async (price, id) => {
         setLoading(price);
-        if (userDetailsReducer.plan === id && userDetailsReducer.final_expiration_time !== "") {
-            const data = await apiService.resubscribe({ plan: id });
+        if(price === ""){
+            console.log("das")
+            const data = await apiService.cancelPlan()
             if (data.status === 200) {
-                setLoading("");
                 dispatch(userDetailsAction({ ...data.data.user_detail }));
-                toast({ description: data.success });
+                toast({ description: data.message });
             } else {
-                toast({ variant: "destructive", description: data.error });
+                toast({ variant: "destructive", description: data.message });
                 setLoading("");
             }
         } else {
-            if (userDetailsReducer.plan === 0) {
-                const data = await apiService.checkout({ plan: id });
+            if (userDetailsReducer.plan === id && userDetailsReducer.final_expiration_time !== "") {
+                const data = await apiService.resubscribe({ plan: id });
                 if (data.status === 200) {
-                    window.open(data.url, "_self");
                     setLoading("");
+                    dispatch(userDetailsAction({ ...data.data.user_detail }));
+                    toast({ description: data.message });
                 } else {
+                    toast({ variant: "destructive", description: data.message });
                     setLoading("");
                 }
             } else {
-                const data = await apiService.upcomingInvoice({ plan: id });
-                if (data.status === 201) {
-                    setLoading("");
-                } else {
-                    const res = await apiService.changePlan({ plan: id });
-                    if (res.status === 436) {
-                        toast({ description: data.message });
+                if (userDetailsReducer.plan === 0) {
+                    const data = await apiService.checkout({ plan: id });
+                    if (data.status === 200) {
+                        window.open(data.url, "_self");
                         setLoading("");
                     } else {
                         setLoading("");
                     }
+                } else {
+                    const data = await apiService.upcomingInvoice({ plan: id });
+                    if (data.status === 201) {
+                        setLoading("");
+                    } else {
+                        const res = await apiService.changePlan({ plan: id });
+                        if (res.status === 436) {
+                            toast({ description: data.message });
+                            setLoading("");
+                        } else {
+                            setLoading("");
+                        }
+                    }
                 }
             }
         }
+
     };
 
     const manageSub = async () => {
         const data = await apiService.manageSubscription();
         if (data.status === 200) {
-            window.open(`https://code.quickhunt.app/public/api/manage-subscription`, "top");
+            window.open(data.url, "top");
         }
     }
 
@@ -136,16 +149,12 @@ const PricingPlans = () => {
                             <Button
                                 className={`w-full font-semibold`}
                                 disabled={isActivated && x.disabled}
-                                variant={x.disabled ? "outline" : ""}
-                                onClick={() => {
-                                    if (!isActivated) {
-                                        redirectToCheckout(x.productId, x.planType);
-                                    }
-                                }}
+                                variant={isActivated ? "outline" : ""}
+                                onClick={() =>redirectToCheckout(x.productId, x.planType)}
                             >
                                 {x.btnText}
                             </Button>
-                            {isActivated && (
+                            {isActivated && userDetailsReducer.plan !== 0 && (
                                 <div className={"text-center text-sm mt-5"}>
                                     <Button variant={"link"} className={"h-auto p-0"} onClick={manageSub}>Manage your Subscription</Button>
                                 </div>

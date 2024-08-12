@@ -35,7 +35,10 @@ const Domain = () => {
     const userDetailsReducer = useSelector(state => state.userDetailsReducer);
 
     useEffect(() =>{
-        getPortalSetting()
+        if(projectDetailsReducer.id){
+            getPortalSetting()
+        }
+
     },[projectDetailsReducer.id]);
 
     const onChange = (event) => {
@@ -59,6 +62,7 @@ const Domain = () => {
             onProModal(true)
         } else {
             setIsSave(true)
+            debugger
             const payload = {
                 project_id: projectDetailsReducer.id,
                 custom_domain: settingData.custom_domain,
@@ -94,12 +98,12 @@ const Domain = () => {
             <CardContent className={"p-4 sm:p-6 flex flex-col gap-6 border-b"}>
                 <div className="gap-2 relative">
                     <Label htmlFor="domain" className="text-right">Subdomain</Label>
-                    <Input disabled  value={settingData.domain.replace('.quickhunt.io', '')} id="domain" placeholder="https://" className={"pr-[115px] bg-card mt-1"} />
-                    <span className={"absolute top-[38px] right-[13px] text-sm font-medium"}>.quickhunt.app</span>
+                    <Input disabled  value={settingData?.domain?.replace('.quickhunt.io', '')} id="domain" placeholder="example.com" className={"pr-[115px] bg-card mt-1"} />
+
                 </div>
                 <div className="">
                     <Label htmlFor="text">Custom Domain</Label>
-                    <Input disabled={userDetailsReducer.plan === 0} value={settingData.custom_domain} onChange={onChange}  type="text" id="text" placeholder="https://" className={"mt-1 bg-card"} />
+                    <Input disabled={userDetailsReducer.plan === 0} value={settingData.custom_domain} name={"custom_domain"} onChange={onChange}  type="text" id="text" placeholder="example.com" className={"mt-1 bg-card"} />
                 </div>
                 <p className={"text-sm font-medium text-muted-foreground"}>
                     <span className={"font-bold"}>Note:</span> Add a new
