@@ -301,7 +301,7 @@ const Ideas = () => {
                                 <Button
                                     variant={"hover:bg-destructive"}
                                     className={`${theme === "dark" ? "text-card-foreground" : "text-card"} ${isDeleteLoading === true ? "py-2 px-6" : "py-2 px-6"} w-[76px] text-sm font-semibold bg-destructive`}
-                                    onClick={() => onDeleteIdea(deleteRecord)}
+                                        onClick={() => onDeleteIdea(deleteRecord)}
                                 >
                                     {isDeleteLoading ? <Loader2 size={16} className={"animate-spin"}/> : "Delete"}
                                 </Button>
@@ -553,7 +553,7 @@ const Ideas = () => {
                                                                             <div className={"flex gap-2"}>
                                                                                 <h4 className={"text-sm font-medium"}>{x.name}</h4>
                                                                                 <p className={"text-xs font-normal flex items-center text-muted-foreground"}>
-                                                                                    <Dot className={"fill-text-card-foreground stroke-text-card-foreground"}/>
+                                                                                    <Dot size={20} className={"fill-text-card-foreground stroke-text-card-foreground"}/>
                                                                                     {moment(x.created_at).format('D MMM')}
                                                                                 </p>
                                                                             </div>

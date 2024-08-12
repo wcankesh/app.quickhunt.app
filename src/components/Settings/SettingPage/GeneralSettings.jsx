@@ -35,9 +35,6 @@ const GeneralSettings = () => {
     const userDetailsReducer = useSelector(state => state.userDetailsReducer);
     const [generalSettingData, setGeneralSettingData] = useState(initialState);
     const [isSave, setIsSave] = useState(false);
-    const [openAnnounce, setOpenAnnounce] = useState(false);
-    const [openRoadmap, setOpenRoadmap] = useState(false);
-    const [openIdeas, setOpenIdeas] = useState(false);
 
     useEffect(() => {
         getPortalSetting()
@@ -131,7 +128,7 @@ const GeneralSettings = () => {
                         {
                             generalSettingData.is_announcement === 1 &&
                                 <Fragment>
-                                    <div className={"flex items-center gap-3 flex-wrap md:flex-nowrap"}>
+                                    <div className={"space-y-3"}>
                                         <div className="space-y-1 w-full md:basis-1/2">
                                             <Label className="text-sm font-normal">Title</Label>
                                             <Input value={generalSettingData.announcement_title}  onChange={(e) => onChange('announcement_title', e.target.value )} />

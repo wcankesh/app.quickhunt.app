@@ -32,6 +32,8 @@ const initialState = {
     is_navigate: true,
     header_bg_color: "#FD6B65",
     header_text_color: "#ffffff",
+    btn_background_color: "#FFFFFF",
+    btn_text_color: "#194cdb",
     popover_offset: "20",
     modal_width: "640",
     modal_height: "500",
@@ -292,7 +294,7 @@ const UpdateWidget = ({ isOpen, onOpen, onClose,  }) => {
                                             </Select>
                                         </div>
                                         <div className={"widget-color-picker space-y-2"}>
-                                            <Label className={"text-sm font-medium"}>Background color</Label>
+                                            <Label className={"text-sm font-medium"}>Background Color</Label>
                                             <ColorInput name="launcher_icon_bg_color"
                                                         value={widgetsSetting.launcher_icon_bg_color}
                                                         onChange={(color) => onChange("launcher_icon_bg_color", color?.launcher_icon_bg_color)}
@@ -473,7 +475,7 @@ const UpdateWidget = ({ isOpen, onOpen, onClose,  }) => {
                                                 </div>
                                             )}
                                             <div className="flex flex-col gap-3">
-                                                <Label className="text-sm font-medium">Button label</Label>
+                                                <Label className="text-sm font-medium">Button Label</Label>
                                                 <Input value={widgetsSetting.idea_button_label} name="idea_button_label" onChange={(e) => onChange("idea_button_label", e.target.value)} />
                                             </div>
                                             <div className="announce-create-switch flex gap-4">
@@ -491,219 +493,6 @@ const UpdateWidget = ({ isOpen, onOpen, onClose,  }) => {
                                             </div>
                                         </div>
                                     )}
-
-                                    {/*<Tabs defaultValue="changelog" className="w-[282px]">*/}
-                                    {/*<Tabs defaultValue="announcement" className={"flex flex-col gap-4"}>*/}
-                                    {/*    <TabsList className="grid w-full grid-cols-3">*/}
-                                    {/*        <TabsTrigger value="announcement"*/}
-                                    {/*                     className={"px-0 text-[12px]"}>Announcement</TabsTrigger>*/}
-                                    {/*        <TabsTrigger value="roadmap"*/}
-                                    {/*                     className={"px-0 text-[12px]"}>Roadmap</TabsTrigger>*/}
-                                    {/*        <TabsTrigger value="ideas"*/}
-                                    {/*                     className={"px-0 text-[12px]"}>Ideas</TabsTrigger>*/}
-                                    {/*    </TabsList>*/}
-                                    {/*    <TabsContent value="announcement" className={"m-0 space-y-4"}>*/}
-                                    {/*        <div className={"space-y-2"}>*/}
-                                    {/*            <Label className={"text-sm font-medium"}>Title</Label>*/}
-                                    {/*            <Input value={widgetsSetting.changelog_title}*/}
-                                    {/*                   onChange={(e) => onChange("changelog_title", e.target.value)}/>*/}
-                                    {/*        </div>*/}
-                                    {/*        <div className={"flex flex-col gap-2"}>*/}
-                                    {/*            <Label className={"text-sm font-medium"}>Display</Label>*/}
-                                    {/*            <Select*/}
-                                    {/*                value={widgetsSetting.changelog_display}*/}
-                                    {/*                onValueChange={(value) => onChange("changelog_display", value)}*/}
-                                    {/*            >*/}
-                                    {/*                <SelectTrigger className="">*/}
-                                    {/*                    <SelectValue placeholder={1}/>*/}
-                                    {/*                </SelectTrigger>*/}
-                                    {/*                <SelectContent>*/}
-                                    {/*                    <SelectItem value={1}>In Widget</SelectItem>*/}
-                                    {/*                    <SelectItem value={2}>Link to Platform</SelectItem>*/}
-                                    {/*                </SelectContent>*/}
-                                    {/*            </Select>*/}
-                                    {/*            <p className={"text-xs font-medium text-muted-foreground"}>How should*/}
-                                    {/*                Announcement be displayed?</p>*/}
-                                    {/*        </div>*/}
-                                    {/*        {*/}
-                                    {/*            widgetsSetting.changelog_display === 2 &&*/}
-                                    {/*            <div className={"flex flex-col gap-2"}>*/}
-                                    {/*                <Label className={"text-sm font-medium"}>Ideas</Label>*/}
-                                    {/*                <Select*/}
-                                    {/*                    value={widgetsSetting.changelog_open}*/}
-                                    {/*                    onValueChange={(value) => onChange("changelog_open", value)}*/}
-                                    {/*                >*/}
-                                    {/*                    <SelectTrigger className="">*/}
-                                    {/*                        <SelectValue placeholder={1}/>*/}
-                                    {/*                    </SelectTrigger>*/}
-                                    {/*                    <SelectContent>*/}
-                                    {/*                        <SelectItem value={1}>Open in Widget</SelectItem>*/}
-                                    {/*                        <SelectItem value={2}>Link to platform</SelectItem>*/}
-                                    {/*                        <SelectItem value={3}>Do not open</SelectItem>*/}
-                                    {/*                    </SelectContent>*/}
-                                    {/*                </Select>*/}
-                                    {/*                <p className={"text-xs font-medium text-muted-foreground"}>How*/}
-                                    {/*                    should Ideas open in the Announcement?</p>*/}
-                                    {/*            </div>*/}
-                                    {/*        }*/}
-                                    {/*        <div className={"flex flex-col gap-2"}>*/}
-                                    {/*            <Label className={"text-sm font-medium"}>Reactions</Label>*/}
-                                    {/*            <Select value={widgetsSetting.changelog_reaction}*/}
-                                    {/*                    onValueChange={(value) => onChange("changelog_reaction", value)}*/}
-                                    {/*            >*/}
-                                    {/*                <SelectTrigger className="">*/}
-                                    {/*                    <SelectValue placeholder={1}/>*/}
-                                    {/*                </SelectTrigger>*/}
-                                    {/*                <SelectContent>*/}
-                                    {/*                    <SelectItem value={1}>Enable Reactions</SelectItem>*/}
-                                    {/*                    <SelectItem value={2}>Disable Reactions</SelectItem>*/}
-                                    {/*                </SelectContent>*/}
-                                    {/*            </Select>*/}
-                                    {/*            <p className={"text-xs font-medium text-muted-foreground"}>Choose*/}
-                                    {/*                whether or not reaction are shown</p>*/}
-                                    {/*        </div>*/}
-                                    {/*        <div>*/}
-                                    {/*            <div className={"announce-create-switch flex gap-4"}>*/}
-                                    {/*                <Switch className={"w-[38px] h-[20px]"}*/}
-                                    {/*                        checked={widgetsSetting.is_announcement === 1}*/}
-                                    {/*                        onCheckedChange={(checked, event) => onChangeSwitch({*/}
-                                    {/*                            event1: {*/}
-                                    {/*                                name: "is_announcement",*/}
-                                    {/*                                value: checked ? 1 : 0*/}
-                                    {/*                            }*/}
-                                    {/*                        }, event)}*/}
-                                    {/*                />*/}
-                                    {/*                <p className={"text-sm text-muted-foreground font-medium"}>Show Your*/}
-                                    {/*                    Announcement</p>*/}
-                                    {/*            </div>*/}
-                                    {/*        </div>*/}
-                                    {/*    </TabsContent>*/}
-                                    {/*    <TabsContent value="roadmap" className={"m-0 space-y-4"}>*/}
-                                    {/*        <div className={"space-y-2"}>*/}
-                                    {/*            <Label className={"text-sm font-medium"}>Title</Label>*/}
-                                    {/*            <Input value={widgetsSetting.roadmap_title}*/}
-                                    {/*                   onChange={(e) => onChange("roadmap_title", e.target.value)}*/}
-                                    {/*            />*/}
-                                    {/*        </div>*/}
-                                    {/*        <div className={"flex flex-col gap-3"}>*/}
-                                    {/*            <Label className={"text-sm font-medium"}>Display</Label>*/}
-                                    {/*            <Select value={widgetsSetting.roadmap_display}*/}
-                                    {/*                    onValueChange={(value) => onChange("roadmap_display", value)}*/}
-                                    {/*            >*/}
-                                    {/*                <SelectTrigger>*/}
-                                    {/*                    <SelectValue placeholder={1}/>*/}
-                                    {/*                </SelectTrigger>*/}
-                                    {/*                <SelectContent>*/}
-                                    {/*                    <SelectItem value={1}>In Widget</SelectItem>*/}
-                                    {/*                    <SelectItem value={2}>Link to Platform</SelectItem>*/}
-                                    {/*                </SelectContent>*/}
-                                    {/*            </Select>*/}
-                                    {/*            <p className={"text-xs font-medium text-muted-foreground"}>How should*/}
-                                    {/*                the Roadmap be displayed?</p>*/}
-                                    {/*        </div>*/}
-                                    {/*        {*/}
-                                    {/*            widgetsSetting.roadmap_display === 2 &&*/}
-                                    {/*            <div className={"flex flex-col gap-2"}>*/}
-                                    {/*                <Label className={"text-sm font-medium"}>Ideas</Label>*/}
-                                    {/*                <Select value={widgetsSetting.roadmap_open}*/}
-                                    {/*                        onValueChange={(value) => onChange("roadmap_open", value)}*/}
-                                    {/*                >*/}
-                                    {/*                    <SelectTrigger className="">*/}
-                                    {/*                        <SelectValue placeholder={1}/>*/}
-                                    {/*                    </SelectTrigger>*/}
-                                    {/*                    <SelectContent>*/}
-                                    {/*                        <SelectItem value={1}>Open in Widget</SelectItem>*/}
-                                    {/*                        <SelectItem value={2}>Link to platform</SelectItem>*/}
-                                    {/*                        <SelectItem value={3}>Do not open</SelectItem>*/}
-                                    {/*                    </SelectContent>*/}
-                                    {/*                </Select>*/}
-                                    {/*                <p className={"text-xs font-medium text-muted-foreground"}>How*/}
-                                    {/*                    should the Ideas open in the Roadmap?</p>*/}
-                                    {/*            </div>*/}
-                                    {/*        }*/}
-                                    {/*        <div>*/}
-                                    {/*            <div className={"announce-create-switch flex gap-4"}>*/}
-                                    {/*                <Switch className={"w-[38px] h-[20px]"}*/}
-                                    {/*                        checked={widgetsSetting.is_roadmap === 1}*/}
-                                    {/*                        onCheckedChange={(checked, event) => onChangeSwitch({*/}
-                                    {/*                            event1: {*/}
-                                    {/*                                name: "is_roadmap",*/}
-                                    {/*                                value: checked ? 1 : 0*/}
-                                    {/*                            }*/}
-                                    {/*                        }, event)}*/}
-                                    {/*                />*/}
-                                    {/*                <p className={"text-sm text-muted-foreground font-medium"}>Show Your*/}
-                                    {/*                    Roadmap</p>*/}
-                                    {/*            </div>*/}
-                                    {/*        </div>*/}
-                                    {/*    </TabsContent>*/}
-                                    {/*    <TabsContent value="ideas" className={"m-0 space-y-4"}>*/}
-                                    {/*        <div className={"space-y-2"}>*/}
-                                    {/*            <Label className={"text-sm font-medium"}>Title</Label>*/}
-                                    {/*            <Input value={widgetsSetting.idea_title}*/}
-                                    {/*                   onChange={(e) => onChange("idea_title", e.target.value)}*/}
-                                    {/*            />*/}
-                                    {/*        </div>*/}
-                                    {/*        <div className={"flex flex-col gap-3"}>*/}
-                                    {/*            <Label className={"text-sm font-medium"}>Display</Label>*/}
-                                    {/*            <Select value={widgetsSetting.idea_display}*/}
-                                    {/*                    onValueChange={(value) => onChange("idea_display", value)}*/}
-                                    {/*            >*/}
-                                    {/*                <SelectTrigger className="">*/}
-                                    {/*                    <SelectValue placeholder={1}/>*/}
-                                    {/*                </SelectTrigger>*/}
-                                    {/*                <SelectContent>*/}
-                                    {/*                    <SelectItem value={1}>In Widget</SelectItem>*/}
-                                    {/*                    <SelectItem value={2}>Link to Platform</SelectItem>*/}
-                                    {/*                </SelectContent>*/}
-                                    {/*            </Select>*/}
-                                    {/*            <p className={"text-xs font-medium text-muted-foreground"}>How should*/}
-                                    {/*                Ideas be displayed?</p>*/}
-                                    {/*        </div>*/}
-                                    {/*        {*/}
-                                    {/*            widgetsSetting.idea_display === 2 &&*/}
-                                    {/*            <div className={"flex flex-col gap-2"}>*/}
-                                    {/*                <Label className={"text-sm font-medium"}>Ideas</Label>*/}
-                                    {/*                <Select value={widgetsSetting.idea_open}*/}
-                                    {/*                        onValueChange={(value) => onChange("idea_open", value)}*/}
-                                    {/*                >*/}
-                                    {/*                    <SelectTrigger className="">*/}
-                                    {/*                        <SelectValue placeholder="Popover"/>*/}
-                                    {/*                    </SelectTrigger>*/}
-                                    {/*                    <SelectContent>*/}
-                                    {/*                        <SelectItem value={1}>Open in Widget</SelectItem>*/}
-                                    {/*                        <SelectItem value={2}>Link to platform</SelectItem>*/}
-                                    {/*                        <SelectItem value={3}>Do not open</SelectItem>*/}
-                                    {/*                    </SelectContent>*/}
-                                    {/*                </Select>*/}
-                                    {/*                <p className={"text-xs font-medium text-muted-foreground"}>How*/}
-                                    {/*                    should the Ideas open?</p>*/}
-                                    {/*            </div>*/}
-                                    {/*        }*/}
-                                    {/*        <div className={"flex flex-col gap-3"}>*/}
-                                    {/*            <Label className={"text-sm font-medium"}>Button label</Label>*/}
-                                    {/*            <Input value={widgetsSetting.idea_button_label}*/}
-                                    {/*                   name="idea_button_label"*/}
-                                    {/*                   onChange={(e) => onChange("idea_button_label", e.target.value)}*/}
-                                    {/*            />*/}
-                                    {/*        </div>*/}
-                                    {/*        <div>*/}
-                                    {/*            <div className={"announce-create-switch flex gap-4"}>*/}
-                                    {/*                <Switch className={"w-[38px] h-[20px]"}*/}
-                                    {/*                        checked={widgetsSetting.is_idea === 1}*/}
-                                    {/*                        onCheckedChange={(checked, event) => onChangeSwitch({*/}
-                                    {/*                            event1: {*/}
-                                    {/*                                name: "is_idea",*/}
-                                    {/*                                value: checked ? 1 : 0*/}
-                                    {/*                            }*/}
-                                    {/*                        }, event)}*/}
-                                    {/*                />*/}
-                                    {/*                <p className={"text-sm text-muted-foreground font-medium"}>Show Your*/}
-                                    {/*                    Ideas</p>*/}
-                                    {/*            </div>*/}
-                                    {/*        </div>*/}
-                                    {/*    </TabsContent>*/}
-                                    {/*</Tabs>*/}
                                 </AccordionContent>
                             </AccordionItem>
                         </Fragment>
@@ -713,17 +502,31 @@ const UpdateWidget = ({ isOpen, onOpen, onClose,  }) => {
                             className={"hover:no-underline text-[15px] font-medium border-b px-4 py-3"}>Advanced</AccordionTrigger>
                         <AccordionContent className={"px-4 py-3 space-y-4"}>
                             <div className={"widget-color-picker space-y-2"}>
-                                <Label className={"text-sm font-medium"}>Header background color</Label>
+                                <Label className={"text-sm font-medium"}>Header Background Color</Label>
                                 <ColorInput name="header_bg_color"
                                             onChange={(color) => onChange("header_bg_color", color?.header_bg_color)}
                                             value={widgetsSetting.header_bg_color}
                                 />
                             </div>
                             <div className={"widget-color-picker space-y-2"}>
-                                <Label className={"text-sm font-medium"}>Header text color</Label>
+                                <Label className={"text-sm font-medium"}>Header Text Color</Label>
                                 <ColorInput type="color" name="header_text_color"
                                             onChange={(color) => onChange("header_text_color", color?.header_text_color)}
                                             value={widgetsSetting.header_text_color}
+                                />
+                            </div>
+                            <div className={"widget-color-picker space-y-2"}>
+                                <Label className={"text-sm font-medium"}>Button Background Color</Label>
+                                <ColorInput name="btn_background_color"
+                                            onChange={(color) => onChange("btn_background_color", color?.btn_background_color)}
+                                            value={widgetsSetting.btn_background_color}
+                                />
+                            </div>
+                            <div className={"widget-color-picker space-y-2"}>
+                                <Label className={"text-sm font-medium"}>Button Text Color</Label>
+                                <ColorInput type="color" name="btn_text_color"
+                                            onChange={(color) => onChange("btn_text_color", color?.btn_text_color)}
+                                            value={widgetsSetting.btn_text_color}
                                 />
                             </div>
                             {

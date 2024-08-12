@@ -74,7 +74,7 @@ const SaidBarDesktop = () => {
             title: '14 days trial left',
             link: '/pricing-plan',
             icon: Icon.trialPlanIcon,
-            selected: `/pricing-plan`,
+            selected: `pricing-plan`,
         },
         {
             title: 'What’s New',
