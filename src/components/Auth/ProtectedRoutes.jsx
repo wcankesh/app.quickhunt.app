@@ -6,7 +6,6 @@ import {Toaster} from "../ui/toaster";
 
 const ProtectedRoutes = () => {
     const Token = isTokenAboutToExpire()
-    console.log("Token", Token)
    useEffect(() => {
        if(Token){
            removeProjectDetails()

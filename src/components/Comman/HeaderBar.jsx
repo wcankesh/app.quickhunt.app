@@ -54,98 +54,7 @@ const initialStateErrorProject = {
     project_name: '',
 }
 
-const menuComponent = [
-    {
-        dashBtn: [
-            {
-                title: 'Dashboard',
-                link: '/dashboard',
-                icon: Icon.homeIcon,
-                selected: `${baseUrl}/dashboard`,
-            }
-        ]
-    },
-    {
-        mainTitle: 'Modules',
-        items: [
-            {
-                title: 'Ideas',
-                link: '/ideas',
-                icon: Icon.ideasIcon,
-                selected: `${baseUrl}/ideas`,
-            },
-            {
-                title: 'Roadmap',
-                link: '/roadmap',
-                icon: Icon.roadmapIcon,
-                selected: `${baseUrl}/roadmap`,
-            },
-            {
-                title: 'Announcements',
-                link: '/announcements',
-                icon: Icon.announcement,
-                selected: `${baseUrl}/announcements`,
-            },
-            {
-                title: 'Customers',
-                link: '/customers',
-                icon: Icon.userIcon,
-                selected: `${baseUrl}/customers`,
-            },
-            {
-                title: 'In App Message',
-                link: '/in-app-message',
-                icon: Icon.inAppMessage,
-                selected: `${baseUrl}/in-app-message`,
-            },
-            {
-                title: 'Widget',
-                link: '/widget',
-                icon: Icon.widgetsIcon,
-                selected: `${baseUrl}/widget`,
-            },
-        ]
-    },
-];
 
-const footerMenuComponent = [
-    {
-        title: '14 days trial left',
-        link: '/pricing-plan',
-        icon: Icon.trialPlanIcon,
-        selected: `pricing-plan`,
-    },
-    {
-        title: 'What’s New',
-        link: '/notification',
-        icon: Icon.notificationIcon,
-        selected: `${baseUrl}/notification`,
-    },
-    {
-        title: 'Invite Team',
-        link: '/settings/team',
-        icon: Icon.inviteTeamIcon,
-        selected: `team`,
-    },
-    {
-        title: 'Help & Support',
-        link: '/help-support',
-        icon: Icon.helpSupportIcon,
-        selected: `${baseUrl}/help-support`,
-    },
-    {
-        title: "Pricing & Plan",
-        link: '/pricing-plan',
-        icon: Icon.pricingIcon,
-        selected: `${baseUrl}/pricing-plan`,
-    },
-    {
-        title: 'Settings',
-        link: '/settings/profile',
-        icon: Icon.settingIcon,
-        selected: `${baseUrl}/profile`,
-    }
-];
 
 const HeaderBar = () => {
     const {setTheme, theme, onProModal} = useTheme()
@@ -415,6 +324,99 @@ const HeaderBar = () => {
         }
     }
 
+    const menuComponent = [
+        {
+            dashBtn: [
+                {
+                    title: 'Dashboard',
+                    link: '/dashboard',
+                    icon: Icon.homeIcon,
+                    selected: `${baseUrl}/dashboard`,
+                }
+            ]
+        },
+        {
+            mainTitle: 'Modules',
+            items: [
+                {
+                    title: 'Ideas',
+                    link: '/ideas',
+                    icon: Icon.ideasIcon,
+                    selected: `${baseUrl}/ideas`,
+                },
+                {
+                    title: 'Roadmap',
+                    link: '/roadmap',
+                    icon: Icon.roadmapIcon,
+                    selected: `${baseUrl}/roadmap`,
+                },
+                {
+                    title: 'Announcements',
+                    link: '/announcements',
+                    icon: Icon.announcement,
+                    selected: `${baseUrl}/announcements`,
+                },
+                {
+                    title: 'Customers',
+                    link: '/customers',
+                    icon: Icon.userIcon,
+                    selected: `${baseUrl}/customers`,
+                },
+                {
+                    title: 'Widget',
+                    link: '/widget',
+                    icon: Icon.widgetsIcon,
+                    selected: `${baseUrl}/widget`,
+                },
+            ]
+        },
+    ];
+
+    const footerMenuComponent = [
+        {
+            title: `${userDetailsReducer.trial_days} days trial left`,
+            link: '/pricing-plan',
+            icon: Icon.trialPlanIcon,
+            selected: `${baseUrl}/pricing-plan`,
+            isDisplay: userDetailsReducer?.trial_days > 0 && userDetailsReducer.plan === 1,
+        },
+        {
+            title: 'What’s New',
+            link: '/notification',
+            icon: Icon.notificationIcon,
+            selected: `${baseUrl}/notification`,
+            isDisplay: true,
+        },
+        {
+            title: 'Invite Team',
+            link: '/invite-team',
+            icon: Icon.userIcon,
+            selected: `${baseUrl}/invite-team`,
+            isDisplay: true,
+        },
+        {
+            title: 'Help & Support',
+            link: '/help-support',
+            icon: Icon.helpSupportIcon,
+            selected: `${baseUrl}/help-support`,
+            isDisplay: true,
+        },
+        {
+            title: "Pricing & Plan",
+            link: '/pricing-plan',
+            icon: Icon.pricingIcon,
+            selected: `${baseUrl}/pricing-plan`,
+            isDisplay: true,
+        },
+        {
+            title: 'Settings',
+            link: '/settings/profile',
+            icon: Icon.settingIcon,
+            selected: `${baseUrl}/profile`,
+            isDisplay: true,
+        }
+    ];
+
     return (
         <header className={`z-50 ltr:xl:ml-[282px] rtl:xl:mr-[282px] sticky top-0 pr-3 lg:pr-4 ${scrollingDown ? 'bg-background' : ''} ${theme === "dark" ? "border-b" : ""}`}>
 
@@ -520,6 +522,7 @@ const HeaderBar = () => {
                                                 {
                                                     (footerMenuComponent || []).map((x, i) => {
                                                         return (
+                                                            x.isDisplay ?
                                                             <Button
                                                                 key={i}
                                                                 variant={"link hover:no-underline"}
@@ -528,7 +531,7 @@ const HeaderBar = () => {
                                                             >
                                                                 <div className={`${isActive(x.selected) ? "active-menu" : "menu-icon"}`}>{x.icon}</div>
                                                                 <div className={`${isActive(x.selected) ? "text-primary text-sm font-medium" : "text-sm font-medium"}`}>{x.title}</div>
-                                                            </Button>
+                                                            </Button> : ''
                                                         )
                                                     })
                                                 }

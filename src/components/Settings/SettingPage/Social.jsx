@@ -29,7 +29,9 @@ const Social = () => {
     };
 
     useEffect(() => {
-        getSocialSetting()
+        if(projectDetailsReducer.id){
+            getSocialSetting()
+        }
     },[projectDetailsReducer.id])
 
     const getSocialSetting = async () => {

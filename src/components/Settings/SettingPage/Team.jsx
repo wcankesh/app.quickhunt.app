@@ -6,7 +6,7 @@ import {Label} from "../../ui/label";
 import {Input} from "../../ui/input";
 import {Avatar, AvatarFallback, AvatarImage} from "../../ui/avatar";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "../../ui/table";
-import {Ellipsis, Loader2, X} from "lucide-react";
+import {Ellipsis, Loader2, Trash2, X} from "lucide-react";
 import {useTheme} from "../../theme-provider";
 import {Sheet, SheetClose, SheetContent, SheetFooter, SheetHeader, SheetOverlay, SheetTitle} from "../../ui/sheet";
 import {ApiService} from "../../../utils/ApiService";
@@ -39,6 +39,7 @@ const Team = () => {
     const [isSave, setIsSave] = useState(false);
     const [deleteObj, setDeleteObj] = useState({});
     const [isOpenDeleteAlert, setIsOpenDeleteAlert] = useState(false);
+    const [isAdmin, setIsAdmin] = useState(false)
     const apiService = new ApiService();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const userDetailsReducer = useSelector(state => state.userDetailsReducer);
@@ -55,6 +56,7 @@ const Team = () => {
         const data = await apiService.getMember({project_id: projectDetailsReducer.id})
         if (data.status === 200) {
             setMemberList(data.data);
+            setIsAdmin(data.is_admin)
             setIsLoading(false);
         } else {
             setIsLoading(false);
@@ -209,7 +211,26 @@ const Team = () => {
         }
 
     }
+    const removeMember = async (id) => {
+        const data = await apiService.removeMember({id: id})
+        if (data.status === 200) {
+            const clone = [...memberList];
+            const index = clone.findIndex((x) => x.id === id)
+            if (index !== -1) {
+                clone.splice(index, 1)
+                setMemberList(clone)
+            }
+            toast({
+                description: data.message,
+            });
 
+        } else {
+            toast({
+                variant: "destructive",
+                description: data.message,
+            });
+        }
+    }
     const revokePopup = (record) => {
         setDeleteObj(record);
         setIsOpenDeleteAlert(true);
@@ -258,9 +279,9 @@ const Team = () => {
                                         <TableHeader className={"p-0"}>
                                             <TableRow className={""}>
                                                 {
-                                                    ["Team", "Role"].map((x, i) => {
+                                                    ["Team", "Role" ,isAdmin === true ? "Action" : ""].map((x, i) => {
                                                         return (
-                                                            <TableHead key={x} className={`h-[22px] sm:pl-6 pb-2 text-sm font-medium ${i === 1 ? "text-end" : ""} ${theme === "dark" ? "" : "text-card-foreground"}`}>{x}</TableHead>
+                                                           x?  <TableHead key={x} className={`h-[22px] sm:pl-6 pb-2 text-sm font-medium ${ isAdmin === true && i === 2 ? "text-end" : isAdmin === false && i === 1 ? "text-end" : ""} ${theme === "dark" ? "" : "text-card-foreground"}`}>{x}</TableHead> :""
                                                         )
                                                     })
                                                 }
@@ -307,9 +328,26 @@ const Team = () => {
                                                                     </div>
                                                                 </div>
                                                             </TableCell>
-                                                            <TableCell className={"flex justify-end items-center py-[10px] py-[17px]"}>
+                                                            <TableCell className={`${isAdmin === true ? "" : "flex justify-end"} py-[10px] py-[17px]`}>
                                                                 <Badge variant={"outline"} className={`h-[20px] py-0 px-2 text-xs rounded-[5px] ${x.role === 1 ? "text-[#63c8d9] border-[#63c8d9]" : "text-[#694949] border-[#694949]"}`}>{x?.role === 1 ? "Admin" : "Member"}</Badge>
+
                                                             </TableCell>
+
+                                                                {
+                                                                   isAdmin === true ? <TableCell className={"flex justify-end py-[10px] py-[17px]"}>
+                                                                       {
+                                                                           x.role === 2 ? <Button
+                                                                               variant="outline hover:bg-transparent"
+                                                                               className="p-1 border w-[30px] h-[30px]"
+                                                                               onClick={() => removeMember(x.id)}
+                                                                           >
+                                                                               <Trash2 size={16}/>
+                                                                           </Button> : ""
+                                                                       }
+                                                                   </TableCell> : ""
+                                                                }
+
+
                                                         </TableRow>
                                                     )
                                                 })
@@ -332,7 +370,7 @@ const Team = () => {
                                             {
                                                 ["Email", "Status", "Invited", "Action"].map((x, i) => {
                                                     return (
-                                                        <TableHead key={i} className={`h-[22px] b-2 text-sm font-medium ${i === 0 ? "sm:pl-6" : i === 3 ? "pr-3" : ""} ${theme === "dark" ? "" : "text-card-foreground"}`}>{x}</TableHead>
+                                                        <TableHead key={i} className={`h-[22px] pb-2 text-sm font-medium ${i === 0 ? "sm:pl-6" : i === 3 ? "pr-3" : ""} ${theme === "dark" ? "" : "text-card-foreground"}`}>{x}</TableHead>
                                                     )
                                                 })
                                             }

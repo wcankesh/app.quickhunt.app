@@ -12,6 +12,7 @@ import {baseUrl} from "../../utils/constent";
 import {Eye, EyeOff, Loader2} from "lucide-react";
 import {useToast} from "../ui/use-toast";
 import {useTheme} from "../theme-provider";
+import WithGoogle from "./WithGoogle";
 
 const initialState = {
     user_first_name: '',
@@ -331,12 +332,8 @@ const Register = () => {
                                                     </p>
                                                     <div className={"border-t basis-4/12 border-muted-foreground"}/>
                                                 </div>
-                                                <Button variant="outline" className="w-full border border-primary">
-                                                    <span className={"font-normal flex gap-x-1 text-primary font-semibold"}>
-                                                        {Icon.googleIcon}
-                                                        Login With Google
-                                                    </span>
-                                                </Button>
+                                                <WithGoogle title={"Signup with Google"}/>
+
                                                 <p className='text-xs text-center'>
                                                     By registering you agree to our{" "}
                                                     <Button

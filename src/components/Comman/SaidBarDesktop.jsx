@@ -4,13 +4,14 @@ import {Icon} from "../../utils/Icon";
 import {baseUrl} from "../../utils/constent";
 import {useNavigate, useLocation, useParams} from "react-router-dom";
 import {useTheme} from "../theme-provider";
+import {useSelector} from "react-redux";
 
 const SaidBarDesktop = () => {
     const {theme} = useTheme()
     let navigate = useNavigate();
     let location = useLocation();
     const {type} = useParams();
-
+    const userDetailsReducer = useSelector(state => state.userDetailsReducer);
     const onRedirect = (link) => {
         navigate(`${baseUrl}${link}`);
     };
@@ -71,40 +72,46 @@ const SaidBarDesktop = () => {
 
     const footerMenuComponent = [
         {
-            title: '14 days trial left',
+            title: `${userDetailsReducer.trial_days} days trial left`,
             link: '/pricing-plan',
             icon: Icon.trialPlanIcon,
             selected: `pricing-plan`,
+            isDisplay: userDetailsReducer?.trial_days > 0 && userDetailsReducer.plan === 1,
         },
         {
             title: 'What’s New',
             link: '/notification',
             icon: Icon.notificationIcon,
             selected: `/notification`,
+            isDisplay: true,
         },
         {
             title: 'Invite Team',
             link: '/settings/team',
             icon: Icon.inviteTeamIcon,
             selected: `team`,
+            isDisplay: true,
         },
         {
             title: 'Help & Support',
             link: '/help-support',
             icon: Icon.helpSupportIcon,
             selected: `/help-support`,
+            isDisplay: true,
         },
         {
             title: "Pricing & Plan",
             link: '/pricing-plan',
             icon: Icon.pricingIcon,
             selected: `/pricing-plan`,
+            isDisplay: true,
         },
         {
             title: 'Settings',
             link: `/settings/${type??"profile"}`,
             icon: Icon.settingIcon,
             selected: `/settings/${type??"profile"}`,
+            isDisplay: true,
         }
     ];
 
@@ -176,6 +183,7 @@ const SaidBarDesktop = () => {
                             {
                                 (footerMenuComponent || []).map((x, i) => {
                                     return (
+                                        x.isDisplay ?
                                         <Button
                                             key={i}
                                             variant={"link hover:no-underline"}
@@ -184,7 +192,7 @@ const SaidBarDesktop = () => {
                                             >
                                             <div className={`${isActive(x.selected) ? "active-menu" : "menu-icon"}`}>{x.icon}</div>
                                             <div className={`${isActive(x.selected) ? "text-primary text-sm font-medium" : "text-sm font-medium"}`}>{x.title}</div>
-                                        </Button>
+                                        </Button> : ''
                                     )
                                 })
                             }

@@ -2,7 +2,7 @@ import {ApiService} from "./ApiService";
 
 export const baseUrl = '';
 export const urlParams = new URLSearchParams(window.location.search);
-
+export const googleClientId = "637779819102-5mjjs6cdp723t5cm8nsb7vrop370sam2.apps.googleusercontent.com";
 const TOKEN_KEY = 'token';
 const PROJECT_KEY = 'currentProject';
 

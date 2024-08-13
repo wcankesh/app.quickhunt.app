@@ -6,7 +6,6 @@ import {Calendar} from "../ui/calendar";
 import {PopoverTrigger, Popover, PopoverContent} from "../ui/popover";
 import { CalendarIcon} from "lucide-react";
 import moment from "moment";
-//import { DateRange } from "react-day-picker";
 import { addDays, format } from "date-fns"
 import { cn } from "../../lib/utils";
 import {ApiService} from "../../utils/ApiService";
@@ -19,36 +18,9 @@ import {
     ChartTooltip,
     ChartTooltipContent,
 } from "../ui/chart"
-const programAnalytics = [
-    {
-        id: 1,
-        title: "Total Views",
-        compareText: "from last month",
-    },
-    {
-        id: 2,
-        title: "Unique Views",
-        compareText: "from last month",
-    },
-    {
-        id: 3,
-        title: "Feedback",
-        compareText: "from last month",
-    },
-    {
-        id: 4,
-        title: "Total Reaction",
-        compareText: "since last hour",
-    },
-]
+import {Avatar, AvatarImage} from "../ui/avatar";
 
-const emoji = {
-    29 : Icon.emojiLaugh,
-    54 : Icon.emojiSad,
-    55 : Icon.emojiSmile,
-}
 const chartConfig = {
-
     totalView: {
         label: "Total View",
         color: "#7c3bed80",
@@ -64,7 +36,7 @@ export function Dashboard() {
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
     const [isLoading, setIsLoading] = useState(false);
-    const [state, setState] = useState({startDate: moment().subtract(29, 'days'), endDate: moment(),});
+    const [state, setState] = useState({from: new Date(new Date().setDate(new Date().getDate() - 29)), to: new Date(),});
     const [chartList, setChartList] = useState({
         reactionAnalytic: [],
         guest: [],
@@ -102,29 +74,19 @@ export function Dashboard() {
 
     const [dataAvailable, setDataAvailable] = useState(true);
 
-    // useEffect(() => {
-    //     if (
-    //         chartList.uniqueViewList.length === 0 &&
-    //         chartList.totalViewViewList.length === 0
-    //     ) {
-    //         setDataAvailable(false);
-    //     } else {
-    //         setDataAvailable(true);
-    //     }
-    // }, [chartList.uniqueViewList, chartList.totalViewViewList]);
-
     useEffect(() => {
         if(projectDetailsReducer.id){
             dashboardData()
         }
-    },[projectDetailsReducer.id])
+
+    },[projectDetailsReducer.id, state])
 
     const dashboardData = async () => {
         setIsLoading(true)
         const payload = {
             project_id:projectDetailsReducer.id,
-            start_date: state.startDate,
-            end_date: state.endDate,
+            start_date: moment(state.from).format("DD-MM-YYYY"),
+            end_date:moment(state.to).format("DD-MM-YYYY"),
         }
         const data = await apiSerVice.dashboardData(payload)
         if(data.status === 200){
@@ -149,13 +111,45 @@ export function Dashboard() {
         }
     }
 
-  //  const dates = DateRange()
-    const initialRange = {
-        from: new Date(),
-        to: addDays(new Date(), 4)
-    };
 
-    const [date, setDate] = useState([new Date(),addDays(new Date(), 4)]);
+    const onChangeDate = (selected, triggerDate, modifiers, e) => {
+       // debugger
+        if (selected && selected.from && selected.to) {
+            setState({
+                from: selected.from,
+                to: selected.to,
+            });
+        }
+        //setState({...state, ...selected})
+    }
+    console.log(state)
+
+    const programAnalytics = [
+        {
+            id: 1,
+            title: "Total Views",
+            compareText: `${chartList.totalViewCountDiff} from last month`,
+            count : chartList.totalViewCount || 0,
+        },
+        {
+            id: 2,
+            title: "Unique Views",
+            compareText: `${chartList.uniqueViewDiff} from last month`,
+            count : chartList.uniqueViewCount || 0,
+        },
+        {
+            id: 3,
+            title: "Feedback",
+            compareText: `${chartList.feedbackCountDiff} from last month`,
+            count : chartList.feedbackCount || 0,
+        },
+        {
+            id: 4,
+            title: "Total Reaction",
+            compareText: `${chartList.reactionCountDiff} from last month`,
+            count : chartList.reactionCount || 0,
+        },
+    ]
 
     return (
         <Fragment>
@@ -174,24 +168,25 @@ export function Dashboard() {
                                         variant={"outline"}
                                         className={cn(
                                             "w-[300px] justify-start text-left font-normal",
-                                            !date && "text-muted-foreground"
+
                                         )}
                                     >
                                         <CalendarIcon className="mr-2 h-4 w-4" />
                                         <>
-                                            {format(date[0], "LLL dd, y")} -{" "}
-                                            {format(date[1], "LLL dd, y")}
+                                            {moment(state.from).format("LL")} -{" "}
+                                            {moment(state.to).format("LL")}
                                         </>
                                     </Button>
                                 </PopoverTrigger>
                                 <PopoverContent className="w-auto p-0" align="start">
                                     <Calendar
-                                        initialfocus={"true"}
                                         mode="range"
-                                        defaultmonth={date?.from}
-                                        selected={date}
-                                        onSelect={(dates) => setDate(dates)}
-                                        numberofmonths={2}
+                                        selected={{from: state.from, to:state.to}}
+                                        numberOfMonths={2}
+                                        startMonth={new Date(2024, 0)}
+                                        endMonth={new Date(2050, 12)}
+                                        showOutsideDays={false}
+                                        onSelect={(selected, triggerDate, modifiers, e) => onChangeDate(selected, triggerDate, modifiers, e)}
                                     />
                                 </PopoverContent>
                             </Popover>
@@ -211,16 +206,10 @@ export function Dashboard() {
                                                                 </CardTitle>
                                                                 <CardContent className={"p-0 flex flex-col gap-2"}>
                                                                     <h3 className={"text-primary text-2xl font-bold"}>
-                                                                        {x.title === "Total Views" ? chartList.totalViewCount :
-                                                                            x.title === "Unique Views" ? chartList.uniqueViewCount :
-                                                                                x.title === "Feedback" ? chartList.feedbackCount :
-                                                                                    x.title === "Total Reaction" ? chartList.reactionCount : ""}
+                                                                        {x.count}
                                                                     </h3>
                                                                     <p className={"text-xs font-medium"}>
-                                                                        {x.title === "Total Views" ? <>{chartList.totalViewCountDiff} {x.compareText}</> :
-                                                                            x.title === "Unique Views" ? <>{chartList.uniqueViewDiff} {x.compareText}</> :
-                                                                                x.title === "Feedback" ? <>{chartList.feedbackCountDiff} {x.compareText}</> :
-                                                                                    x.title === "Total Reaction" ? <>{chartList.reactionCountDiff} {x.compareText}</> : ""}
+                                                                        {x.compareText}
                                                                     </p>
                                                                 </CardContent>
                                                             </CardHeader>
@@ -266,33 +255,30 @@ export function Dashboard() {
                                     </CardHeader>
                                     {
                                         (chartList.reactions && chartList.reactions.length > 0) ? (
-                                                (chartList.reactions || []).map((x, i) => (
-                                                    <Fragment>
-                                                        {
-                                                            isLoading ? CommSkel.commonParagraphTwoAvatar :
-                                                                <CardContent className={"py-2.5 px-0"} key={i}>
-                                                                    <div className={"flex gap-4"}>
-                                                                        <div>
-                                                                            {allStatusAndTypes.emoji.find(e => e.id === x.reaction_id) && (
-                                                                                <img
-                                                                                    src={allStatusAndTypes.emoji.find(e => e.id === x.reaction_id).emoji_url}
-                                                                                    alt={x.reaction_id}
-                                                                                    className={"w-8 h-8"}
-                                                                                />
-                                                                            )}
-                                                                        </div>
-                                                                        <div className={"flex flex-col gap-1"}>
-                                                                            <div className="flex gap-1 items-center">
-                                                                                <h4 className="text-sm font-semibold">{x.customer_name}</h4>
-                                                                                <p className="text-xs font-medium text-muted-foreground">Reacted To</p>
+                                                (chartList.reactions || []).map((x, i) => {
+                                                    const emoji = allStatusAndTypes.emoji.find((e) => e.id === x.reaction_id) || {emoji_url: ""}
+                                                    return(
+                                                        <Fragment>
+                                                            {
+                                                                isLoading ? CommSkel.commonParagraphTwoAvatar :
+                                                                    <CardContent className={"py-2.5 px-0"} key={i}>
+                                                                        <div className={"flex gap-4"}>
+                                                                            <Avatar className={"w-[35px] h-[35px]"}>
+                                                                                <AvatarImage src={emoji.emoji_url}/>
+                                                                            </Avatar>
+                                                                            <div className={"flex flex-col gap-1"}>
+                                                                                <div className="flex gap-1 items-center">
+                                                                                    <h4 className="text-sm font-semibold">{x.customer_name}</h4>
+                                                                                    <p className="text-xs font-medium text-muted-foreground">Reacted To</p>
+                                                                                </div>
+                                                                                <p className="text-xs font-medium text-foreground">"{x.post_title}"</p>
                                                                             </div>
-                                                                            <p className="text-xs font-medium text-foreground">"{x.post_title}"</p>
                                                                         </div>
-                                                                    </div>
-                                                                </CardContent>
-                                                        }
-                                                    </Fragment>
-                                                ))
+                                                                    </CardContent>
+                                                            }
+                                                        </Fragment>
+                                                    )
+                                                })
                                             ) : <EmptyData />
                                     }
                                     <CardFooter className={"p-0 pt-4 justify-end"}>
@@ -341,7 +327,6 @@ export function Dashboard() {
                                                     <Bar dataKey="totalView" fill="var(--color-totalView)" className={"cursor-pointer"} radius={4} />
                                                 </BarChart>
                                             </ChartContainer>
-                                            {/*<HighchartsReact highcharts={Highcharts} options={options}/>*/}
                                         </CardContent>
                                     ) : <EmptyData/>
                                     }
