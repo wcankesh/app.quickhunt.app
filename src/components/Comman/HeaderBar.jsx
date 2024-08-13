@@ -93,6 +93,12 @@ const menuComponent = [
                 selected: `${baseUrl}/customers`,
             },
             {
+                title: 'In App Message',
+                link: '/in-app-message',
+                icon: Icon.inAppMessage,
+                selected: `${baseUrl}/in-app-message`,
+            },
+            {
                 title: 'Widget',
                 link: '/widget',
                 icon: Icon.widgetsIcon,
