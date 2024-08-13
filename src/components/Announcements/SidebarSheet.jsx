@@ -11,7 +11,8 @@ import {ChevronLeft, ChevronRight, X} from "lucide-react";
 import {ApiService} from "../../utils/ApiService";
 import {Skeleton} from "../ui/skeleton";
 import {useSelector} from "react-redux";
-const perPageLimit = 15;
+
+const perPageLimit = 10;
 
 const SidebarSheet = ({ isOpen, onOpen, onClose ,selectedViewAnalyticsRecord}) => {
     const apiService = new ApiService();
@@ -24,8 +25,6 @@ const SidebarSheet = ({ isOpen, onOpen, onClose ,selectedViewAnalyticsRecord}) =
     const [pageNo, setPageNo] = useState(1);
     const allEmoji = useSelector(state => state.allStatusAndTypes.emoji);
     const [totalRecord, setTotalRecord] = useState(0);
-    const totalPages = Math.ceil(totalRecord / perPageLimit);
-
 
     useEffect(() => {
         getReaction();
@@ -57,6 +56,8 @@ const SidebarSheet = ({ isOpen, onOpen, onClose ,selectedViewAnalyticsRecord}) =
             setIsLoadingReaction(false)
         }
     }
+
+    const totalPages = Math.ceil(totalRecord / perPageLimit);
 
     const handlePaginationClick = (newPage) => {
         if (newPage >= 1 && newPage <= totalPages) {

@@ -54,7 +54,6 @@ const Ideas = () => {
     const [isLoadingSearch, setIsLoadingSearch] = useState(false);
     const [selectedIdea, setSelectedIdea] = useState({}); // update idea
     const [oldSelectedIdea, setOldSelectedIdea] = useState({});
-    const [isUpdateIdea, setIsUpdateIdea] = useState(false); // update idea close
     const [topicLists, setTopicLists] = useState([]);
     const [pageNo, setPageNo] = useState(1);
     const [totalRecord, setTotalRecord] = useState(0);
@@ -110,7 +109,6 @@ const Ideas = () => {
         if (data.status === 200) {
             setSelectedIdea(data.data)
             setOldSelectedIdea(data.data)
-            setIsUpdateIdea(true)
             navigate(`${baseUrl}/ideas`)
         }
     }
@@ -218,17 +216,12 @@ const Ideas = () => {
                     }
                     toast({description: data.message})
                 } else {
-                    toast({variant: "destructive", description: data.error})
+                    toast({variant: "destructive", description: data.message})
                 }
             }
         } else {
             toast({variant: "destructive", description: "Login user can not use upvote or down vote"})
         }
-    }
-
-    const onUpdateIdeaClose = () => {
-        setIsUpdateIdea(false);
-        setSelectedIdea({})
     }
 
     const totalPages = Math.ceil(totalRecord / perPageLimit);
@@ -301,7 +294,7 @@ const Ideas = () => {
                                 <Button
                                     variant={"hover:bg-destructive"}
                                     className={`${theme === "dark" ? "text-card-foreground" : "text-card"} ${isDeleteLoading === true ? "py-2 px-6" : "py-2 px-6"} w-[76px] text-sm font-semibold bg-destructive`}
-                                        onClick={() => onDeleteIdea(deleteRecord)}
+                                    onClick={() => onDeleteIdea(deleteRecord)}
                                 >
                                     {isDeleteLoading ? <Loader2 size={16} className={"animate-spin"}/> : "Delete"}
                                 </Button>
@@ -468,7 +461,7 @@ const Ideas = () => {
                                     </Command>
                                 </PopoverContent>
                             </Popover>
-                            <Button size="sm" className="gap-2" onClick={openCreateIdea}><Plus/>Create Idea</Button>
+                            <Button size="sm" className={"gap-2 font-semibold"} onClick={openCreateIdea}><Plus/>Create Idea</Button>
                         </div>
                     </div>
                     {

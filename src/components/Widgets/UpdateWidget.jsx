@@ -32,6 +32,8 @@ const initialState = {
     is_navigate: true,
     header_bg_color: "#FD6B65",
     header_text_color: "#ffffff",
+    header_btn_background_color: "#FD6B65",
+    header_btn_text_color: "#FFFFFF",
     btn_background_color: "#FFFFFF",
     btn_text_color: "#194cdb",
     popover_offset: "20",
@@ -527,6 +529,20 @@ const UpdateWidget = ({ isOpen, onOpen, onClose,  }) => {
                                 <ColorInput type="color" name="btn_text_color"
                                             onChange={(color) => onChange("btn_text_color", color?.btn_text_color)}
                                             value={widgetsSetting.btn_text_color}
+                                />
+                            </div>
+                            <div className={"widget-color-picker space-y-2"}>
+                                <Label className={"text-sm font-medium"}>Header Button Background Color</Label>
+                                <ColorInput name="header_btn_background_color"
+                                            onChange={(color) => onChange("header_btn_background_color", color?.header_btn_background_color)}
+                                            value={widgetsSetting.header_btn_background_color}
+                                />
+                            </div>
+                            <div className={"widget-color-picker space-y-2"}>
+                                <Label className={"text-sm font-medium"}>Header Button Text Color</Label>
+                                <ColorInput type="color" name="header_btn_text_color"
+                                            onChange={(color) => onChange("header_btn_text_color", color?.header_btn_text_color)}
+                                            value={widgetsSetting.header_btn_text_color}
                                 />
                             </div>
                             {

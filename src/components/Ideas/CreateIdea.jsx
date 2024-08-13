@@ -46,11 +46,11 @@ const CreateIdea = ({
     const [formError, setFormError] = useState(initialStateError);
 
     useEffect(() => {
-        setTopicLists(allStatusAndTypes.topics)
-        setIdeaDetail({...initialState, board: allStatusAndTypes?.boards[0]?.id})
+        if(projectDetailsReducer.id){
+            setTopicLists(allStatusAndTypes.topics)
+            setIdeaDetail({...initialState, board: allStatusAndTypes?.boards[0]?.id})
+        }
     }, [projectDetailsReducer.id, allStatusAndTypes]);
-
-
 
     const handleChange = (id) => {
         const clone = [...ideaDetail.topic];
@@ -62,7 +62,6 @@ const CreateIdea = ({
         }
         setIdeaDetail({ ...ideaDetail, topic: clone });
     };
-
 
     const onChangeText = (event) => {
         setIdeaDetail(ideaDetail => ({...ideaDetail, [event.target.name]:event.target.value}))

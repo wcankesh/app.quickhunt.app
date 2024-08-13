@@ -60,54 +60,10 @@ const Announcements = () => {
     const [selectedRecord, setSelectedRecord] = useState({})
     const [analyticsObj, setAnalyticsObj] = useState({})
     const apiService = new ApiService();
-    const totalPages = Math.ceil(totalRecord / perPageLimit);
     const [openFilterType, setOpenFilterType] = useState('');
     const timeoutHandler = useRef(null);
     const [openFilter, setOpenFilter] = useState('');
     const [isFilter, setIsFilter] = useState(false);
-
-    const openSheet = () => {
-        setSelectedRecord({id: "new"})
-    };
-
-    const onCloseAnalyticsSheet = () => {
-        setAnalyticsObj({})
-    }
-    const closeSheet = (record,addRecord) => {
-        if (record) {
-            const updatedItems = announcementList.map((x) => x.id === record.id ? {...x, ...record} : x);
-            setAnnouncementList(updatedItems);
-            setSelectedRecord({});
-        } else if (addRecord) {
-           const clone = [...announcementList];
-           clone.unshift(addRecord);
-           setAnnouncementList(clone);
-           setSelectedRecord({});
-        }
-        else {
-            setSelectedRecord({});
-        }
-    };
-
-    const handleDelete = async (id) => {
-        const data = await apiService.deletePosts(id, pageNo)
-        if (data.status === 200) {
-            const clone = [...announcementList];
-            const index = clone.findIndex((x) => x.id === id)
-            if (index !== -1) {
-                clone.splice(index, 1)
-                setAnnouncementList(clone);
-            }
-            toast({
-                description: data.message,
-            })
-        } else {
-            toast({
-                description: data.message,
-                variant: "destructive"
-            })
-        }
-    }
 
     useEffect(() => {
             if(projectDetailsReducer.id){
@@ -140,6 +96,60 @@ const Announcements = () => {
         }
     }
 
+    const searchAnnouncement = async (payload) => {
+        const data = await apiService.filterPost(payload)
+        if (data.status === 200) {
+            setIsLoading(false);
+            setAnnouncementList(data.data);
+            setPageNo(payload.page);
+            setTotalRecord(data.total);
+        } else {
+            setIsLoading(false);
+        }
+    }
+
+    const openSheet = () => {
+        setSelectedRecord({id: "new"})
+    };
+
+    const onCloseAnalyticsSheet = () => {
+        setAnalyticsObj({})
+    }
+    const closeSheet = (record,addRecord) => {
+        if (record) {
+            const updatedItems = announcementList.map((x) => x.id === record.id ? {...x, ...record} : x);
+            setAnnouncementList(updatedItems);
+            setSelectedRecord({});
+        } else if (addRecord) {
+            const clone = [...announcementList];
+            clone.unshift(addRecord);
+            setAnnouncementList(clone);
+            setSelectedRecord({});
+        }
+        else {
+            setSelectedRecord({});
+        }
+    };
+
+    const handleDelete = async (id) => {
+        const data = await apiService.deletePosts(id, pageNo)
+        if (data.status === 200) {
+            const clone = [...announcementList];
+            const index = clone.findIndex((x) => x.id === id)
+            if (index !== -1) {
+                clone.splice(index, 1)
+                setAnnouncementList(clone);
+            }
+            toast({
+                description: data.message,
+            })
+        } else {
+            toast({
+                description: data.message,
+                variant: "destructive"
+            })
+        }
+    }
 
     const onChange = async (event) => {
         const payload = {
@@ -171,17 +181,7 @@ const Announcements = () => {
         await searchAnnouncement(payload);
     }
 
-    const searchAnnouncement = async (payload) => {
-        const data = await apiService.filterPost(payload)
-        if (data.status === 200) {
-            setIsLoading(false);
-            setAnnouncementList(data.data);
-            setPageNo(payload.page);
-            setTotalRecord(data.total);
-        } else {
-            setIsLoading(false);
-        }
-    }
+    const totalPages = Math.ceil(totalRecord / perPageLimit);
 
     const handlePaginationClick = (newPage) => {
         if (newPage >= 1 && newPage <= totalPages) {
@@ -205,7 +205,7 @@ const Announcements = () => {
 
     return (
         <div
-            className={"container xl:max-w-[1200px]  lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-4"}>
+            className={"container xl:max-w-[1200px]  lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-3 md:px-4"}>
             {selectedRecord.id &&
             <CreateAnnouncementsLogSheet isOpen={selectedRecord.id}
                                          selectedRecord={selectedRecord}
@@ -343,7 +343,7 @@ const Announcements = () => {
                     data={announcementList}
                     setSelectedRecord={setSelectedRecord}
                     isLoading={isLoading}/>
-                { totalPages > 0 && <CardFooter className={"p-0"}>
+                <CardFooter className={"p-0"}>
                     <div
                         className={`w-full ${theme === "dark" ? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end p-2 md:px-3 md:py-[10px]`}>
                         <div className={"w-full flex gap-2 items-center justify-between sm:justify-end"}>
@@ -377,7 +377,7 @@ const Announcements = () => {
                             </div>
                         </div>
                     </div>
-                </CardFooter>}
+                </CardFooter>
             </Card>
 
         </div>

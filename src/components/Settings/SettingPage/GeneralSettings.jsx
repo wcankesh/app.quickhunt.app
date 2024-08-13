@@ -17,6 +17,8 @@ const initialState = {
     btn_text_color: "",
     header_bg_color: "#FFFFFF",
     header_text_color: "#030712",
+    header_btn_background_color: "#FD6B65",
+    header_btn_text_color: "#FFFFFF",
     idea_title: "",
     is_announcement: 1,
     is_branding: 1,
@@ -37,7 +39,9 @@ const GeneralSettings = () => {
     const [isSave, setIsSave] = useState(false);
 
     useEffect(() => {
-        getPortalSetting()
+        if(projectDetailsReducer.id){
+            getPortalSetting()
+        }
     }, [projectDetailsReducer.id])
 
     const getPortalSetting = async () => {
@@ -76,6 +80,8 @@ const GeneralSettings = () => {
                 btn_text_color: generalSettingData.btn_text_color,
                 header_bg_color: generalSettingData.header_bg_color,
                 header_text_color: generalSettingData.header_text_color,
+                header_btn_background_color: generalSettingData.header_btn_background_color,
+                header_btn_text_color: generalSettingData.header_btn_text_color,
                 idea_title: generalSettingData.idea_title,
                 is_announcement: generalSettingData.is_announcement,
                 is_branding: generalSettingData.is_branding,
@@ -103,8 +109,7 @@ const GeneralSettings = () => {
     }
 
     return (
-        <div>
-            <Card>
+        <Card>
                 <CardHeader className={"gap-1 border-b p-4 sm:p-6"}>
                     <h3 className={"font-medium text-lg sm:text-2xl"}>General Settings</h3>
                 </CardHeader>
@@ -223,17 +228,17 @@ const GeneralSettings = () => {
                         }
                     </div>
                     <div className={"space-y-3 p-4 px-6 border-b"}>
-                        <h3 className={"font-medium"}>Setting Color</h3>
+                        <h3 className={"font-medium"}>Header Color</h3>
                             <div className={"flex items-center gap-3 flex-wrap md:flex-nowrap"}>
                         <div className={"widget-color-picker space-y-2 w-full md:basis-1/2"}>
-                            <Label className={"text-sm font-normal"}>Header Background Color</Label>
+                            <Label className={"text-sm font-normal"}>Background Color</Label>
                             <ColorInput name="header_bg_color"
                                         value={generalSettingData.header_bg_color}
                                         onChange={(color) => onChange("header_bg_color", color?.header_bg_color)}
                             />
                         </div>
                         <div className={"widget-color-picker space-y-2 w-full md:basis-1/2"}>
-                            <Label className={"text-sm font-normal"}>Header Text Color</Label>
+                            <Label className={"text-sm font-normal"}>Text Color</Label>
                             <ColorInput name="header_text_color"
                                         value={generalSettingData.header_text_color}
                                         onChange={(color) => onChange("header_text_color", color?.header_text_color)}
@@ -244,19 +249,40 @@ const GeneralSettings = () => {
                         <div className={"widget-color-picker space-y-2 w-full md:basis-1/2"}>
                             <Label className={"text-sm font-normal"}>Button Background Color</Label>
                             <ColorInput
-                                name="btn_background_color"
-                                value={generalSettingData.btn_background_color}
-                                onChange={(color) => onChange("btn_background_color", color?.btn_background_color)}
+                                name="header_btn_background_color"
+                                value={generalSettingData.header_btn_background_color}
+                                onChange={(color) => onChange("header_btn_background_color", color?.header_btn_background_color)}
                             />
                         </div>
                         <div className={"widget-color-picker space-y-2 w-full md:basis-1/2"}>
                             <Label className={"text-sm font-normal"}>Button Text Color</Label>
                             <ColorInput
-                                name="btn_text_color"
-                                value={generalSettingData.btn_text_color}
-                                onChange={(color) => onChange("btn_text_color", color?.btn_text_color)}
+                                name="header_btn_text_color"
+                                value={generalSettingData.header_btn_text_color}
+                                onChange={(color) => onChange("header_btn_text_color", color?.header_btn_text_color)}
                             />
                         </div>
+                        </div>
+                    </div>
+                    <div className={"space-y-3 p-4 px-6 border-b"}>
+                        <h3 className={"font-medium"}>Global Color</h3>
+                        <div className={"flex items-center gap-3 flex-wrap md:flex-nowrap"}>
+                            <div className={"widget-color-picker space-y-2 w-full md:basis-1/2"}>
+                                <Label className={"text-sm font-normal"}>Button Background Color</Label>
+                                <ColorInput
+                                    name="btn_background_color"
+                                    value={generalSettingData.btn_background_color}
+                                    onChange={(color) => onChange("btn_background_color", color?.btn_background_color)}
+                                />
+                            </div>
+                            <div className={"widget-color-picker space-y-2 w-full md:basis-1/2"}>
+                                <Label className={"text-sm font-normal"}>Button Text Color</Label>
+                                <ColorInput
+                                    name="btn_text_color"
+                                    value={generalSettingData.btn_text_color}
+                                    onChange={(color) => onChange("btn_text_color", color?.btn_text_color)}
+                                />
+                            </div>
                         </div>
                     </div>
                     <div className={"space-y-3 p-4 px-6 border-b"}>
@@ -283,7 +309,6 @@ const GeneralSettings = () => {
                         onClick={onUpdatePortal}>{isSave ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Update General Settings"} </Button>
                 </CardFooter>
             </Card>
-        </div>
     );
 };
 

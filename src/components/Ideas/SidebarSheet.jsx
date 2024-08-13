@@ -68,8 +68,10 @@ const SidebarSheet = ({
     const [formError, setFormError] = useState(initialStateError);
 
     useEffect(() => {
-        setTopicLists(allStatusAndTypes.topics)
-        setRoadmapStatus(allStatusAndTypes.roadmap_status)
+        if(projectDetailsReducer.id){
+            setTopicLists(allStatusAndTypes.topics)
+            setRoadmapStatus(allStatusAndTypes.roadmap_status)
+        }
     }, [projectDetailsReducer.id, allStatusAndTypes]);
 
     const handleChangeTopic = (id) => {
@@ -120,7 +122,7 @@ const SidebarSheet = ({
                     }
                     toast({description: data.message})
                 } else {
-                    toast({variant: "destructive", description: data.error})
+                    toast({variant: "destructive", description: data.message})
                 }
             }
         } else {
@@ -166,7 +168,7 @@ const SidebarSheet = ({
             setIsSaveComment(false)
         } else {
             setIsSaveComment(false)
-            toast({variant: "destructive", description: data.error})
+            toast({variant: "destructive", description: data.message})
         }
     }
 
@@ -203,7 +205,7 @@ const SidebarSheet = ({
             toast({description: data.message})
         } else {
             setIsSaveSubComment(false)
-            toast({variant: "destructive", description: data.error})
+            toast({variant: "destructive", description: data.message})
         }
     }
 
@@ -221,7 +223,7 @@ const SidebarSheet = ({
             toast({description: data.message})
         } else {
             setIsLoading(false)
-            toast({variant: "destructive", description: data.error})
+            toast({variant: "destructive", description: data.message})
         }
     };
 
@@ -398,7 +400,7 @@ const SidebarSheet = ({
             setIsSaveUpdateComment(false)
             toast({description: data.message})
         } else {
-            toast({variant: "destructive", description: data.error})
+            toast({variant: "destructive", description: data.message})
             setIsSaveUpdateComment(false)
         }
     }
@@ -439,7 +441,7 @@ const SidebarSheet = ({
             setIsSaveUpdateSubComment(false)
             toast({description: data.message})
         } else {
-            toast({variant: "destructive", description: data.error})
+            toast({variant: "destructive", description: data.message})
             setIsSaveUpdateSubComment(false)
         }
     }
@@ -459,7 +461,7 @@ const SidebarSheet = ({
             }
             toast({description: data.message})
         } else {
-            toast({variant: "destructive", description: data.error})
+            toast({variant: "destructive", description: data.message})
         }
     }
 
@@ -478,7 +480,7 @@ const SidebarSheet = ({
             }
             toast({description: data.message})
         } else {
-            toast({variant: "destructive", description: data.error})
+            toast({variant: "destructive", description: data.message})
         }
     }
 
@@ -1065,7 +1067,7 @@ const SidebarSheet = ({
                                                                             <div className="">
                                                                                 <div
                                                                                     className="space-y-2 px-4 py-[5px]">
-                                                                                    <h4 className="font-medium leading-none text-sm">{`Voters (${selectedIdea.vote})`}</h4>
+                                                                                    <h4 className="font-medium leading-none text-sm">{`Voters (${selectedIdea.vote_list.length})`}</h4>
                                                                                 </div>
                                                                                 <div
                                                                                     className="border-t px-4 py-3 space-y-2">

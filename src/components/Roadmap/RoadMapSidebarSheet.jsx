@@ -68,9 +68,11 @@ const RoadMapSidebarSheet = ({
     const [deleteRecord, setDeleteRecord] = useState(null);
 
     useEffect(() => {
-        setTopicLists(allStatusAndTypes.topics)
-        setDescription(selectedIdea?.description)
-        setRoadmapStatus(allStatusAndTypes.roadmap_status)
+        if(projectDetailsReducer.id){
+            setTopicLists(allStatusAndTypes.topics)
+            setDescription(selectedIdea?.description)
+            setRoadmapStatus(allStatusAndTypes.roadmap_status)
+        }
     }, [projectDetailsReducer.id, allStatusAndTypes]);
 
     const handleChangeTopic = (id) => {
@@ -128,7 +130,7 @@ const RoadMapSidebarSheet = ({
 
                     toast({description: data.message})
                 } else {
-                    toast({variant: "destructive", description: data.error})
+                    toast({variant: "destructive", description: data.message})
                 }
             }
         } else {
@@ -181,7 +183,7 @@ const RoadMapSidebarSheet = ({
             setCommentFiles([])
         } else {
             setIsSaveComment(false)
-            toast({variant: "destructive", description: data.error})
+            toast({variant: "destructive", description: data.message})
         }
     }
 
@@ -228,7 +230,7 @@ const RoadMapSidebarSheet = ({
             toast({description: data.message})
         } else {
             setIsSaveSubComment(false)
-            toast({variant: "destructive", description: data.error})
+            toast({variant: "destructive", description: data.message})
         }
     }
 
@@ -253,7 +255,7 @@ const RoadMapSidebarSheet = ({
             toast({description: data.message})
         } else {
             setIsLoading(false)
-            toast({variant: "destructive", description: data.error})
+            toast({variant: "destructive", description: data.message})
         }
     };
 
@@ -359,7 +361,7 @@ const RoadMapSidebarSheet = ({
             setIsLoading(false)
 
             setIsLoadingSidebar('');
-            toast({variant: "destructive", description: data.error})
+            toast({variant: "destructive", description: data.message})
         }
     }
 
@@ -459,7 +461,7 @@ const RoadMapSidebarSheet = ({
             setIsSaveUpdateComment(false)
             toast({description: data.message})
         } else {
-            toast({variant: "destructive", description: data.error})
+            toast({variant: "destructive", description: data.message})
             setIsSaveUpdateComment(false)
         }
     }
@@ -505,7 +507,7 @@ const RoadMapSidebarSheet = ({
             setIsSaveUpdateSubComment(false)
             toast({description: data.message})
         } else {
-            toast({variant: "destructive", description: data.error})
+            toast({variant: "destructive", description: data.message})
             setIsSaveUpdateSubComment(false)
         }
     }
@@ -531,7 +533,7 @@ const RoadMapSidebarSheet = ({
             setRoadmapList({columns: cloneRoadmap});
             toast({description: data.message})
         } else {
-            toast({variant: "destructive", description: data.error})
+            toast({variant: "destructive", description: data.message})
         }
     }
 
@@ -558,7 +560,7 @@ const RoadMapSidebarSheet = ({
             setRoadmapList({columns: cloneRoadmap})
             toast({description: data.message})
         } else {
-            toast({variant: "destructive", description: data.error})
+            toast({variant: "destructive", description: data.message})
         }
     }
 
@@ -657,7 +659,7 @@ const RoadMapSidebarSheet = ({
             toast({description: data.message})
         } else {
             setIsLoadingCreateIdea(false)
-            toast({variant: "destructive", description: data.error})
+            toast({variant: "destructive", description: data.message})
         }
     }
 
@@ -720,7 +722,7 @@ const RoadMapSidebarSheet = ({
     //         setIsLoadingSidebar("")
     //     } else {
     //         setIsLoadingSidebar("")
-    //         toast({description: data.error})
+    //         toast({description: data.message})
     //     }
     // }
     //

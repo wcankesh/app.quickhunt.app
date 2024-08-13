@@ -100,13 +100,11 @@ const PricingPlans = () => {
     }
 
     return (
-        <div className={"xl:container xl:max-w-[1130px] lg:container lg:max-w-[992px] md:container md:max-w-[768px] sm:container sm:max-w-[639px] xs:container xs:max-w-[475px] max-[639px]:container max-[639px]:max-w-[639px]"}>
-            <div className={"py-8"}>
-                <div className={"flex justify-center items-center"}>
-                    <div>
+        <div className={"container xl:max-w-[1130px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-3 md:px-4 space-y-8"}>
+            <div>
+                <div className={"flex flex-col justify-center items-center"}>
                         <h3 className={"text-center text-2xl font-medium leading-8"}>Pricing & Plan</h3>
-                        <p className={`pt-2 text-center flex items-center w-[256px] capitalize text-sm ${theme === "dark" ? "" : "text-muted-foreground"}`}>Perfect for owners of small & medium businesses</p>
-                    </div>
+                        <p className={`pt-2 text-center flex items-center max-w-[256px] w-full capitalize text-sm ${theme === "dark" ? "" : "text-muted-foreground"}`}>Perfect for owners of small & medium businesses</p>
                 </div>
                 <div className={"flex justify-center pt-6"}>
                     <div className={"flex px-[5px] py-1 border rounded-md gap-1"}>

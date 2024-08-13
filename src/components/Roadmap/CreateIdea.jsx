@@ -51,8 +51,10 @@ const CreateIdea = ({
     const [selectedValues, setSelectedValues] = useState([]);
 
     useEffect(() => {
-        setTopicLists(allStatusAndTypes.topics)
-        setIdeaDetail({...initialState, board: allStatusAndTypes?.boards[0]?.id})
+        if(projectDetailsReducer.id){
+            setTopicLists(allStatusAndTypes.topics)
+            setIdeaDetail({...initialState, board: allStatusAndTypes?.boards[0]?.id})
+        }
     }, [projectDetailsReducer.id, allStatusAndTypes]);
 
     const handleUpdate = (event) => {

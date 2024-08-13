@@ -141,6 +141,7 @@ const Widgets = () => {
 <script src="https://quickhunt.app/widgetScript.js"></script>`;
     const embedLink = `https://${projectDetailsReducer.domain}/ideas?widget=${selectedId}`
     const iFrame = `<iframe src="${embedLink}" style="border: 0px; outline: 0px; width: 450px; height: 400px;"></iframe>`
+
     return (
         <Fragment>
             {
@@ -314,7 +315,7 @@ const Widgets = () => {
                 </Fragment>
             }
             <div
-                className={"xl:container xl:max-w-[1200px] lg:container lg:max-w-[992px] md:container md:max-w-[768px] sm:container sm:max-w-[639px] pt-8 pb-5 px-4"}>
+                className={"container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-3 md:px-4"}>
 
               <WidgetAnalyticsSideBarSheet
                     isOpen={isSheetOpen}
@@ -362,8 +363,8 @@ const Widgets = () => {
                                                         {
                                                             [...Array(6)].map((_, i) => {
                                                                 return (
-                                                                    <TableCell className={"p-2 lg:p-4"}>
-                                                                        <Skeleton className={"rounded-md  w-full h-[40px]"}/>
+                                                                    <TableCell className={"max-w-[373px] px-2 py-[10px] md:px-3"}>
+                                                                        <Skeleton className={"rounded-md  w-full h-8"}/>
                                                                     </TableCell>
                                                                 )
                                                             })

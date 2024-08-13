@@ -107,7 +107,7 @@ const footerMenuComponent = [
         title: '14 days trial left',
         link: '/pricing-plan',
         icon: Icon.trialPlanIcon,
-        selected: `${baseUrl}/pricing-plan`,
+        selected: `pricing-plan`,
     },
     {
         title: 'What’s New',
@@ -117,9 +117,9 @@ const footerMenuComponent = [
     },
     {
         title: 'Invite Team',
-        link: '/invite-team',
-        icon: Icon.userIcon,
-        selected: `${baseUrl}/invite-team`,
+        link: '/settings/team',
+        icon: Icon.inviteTeamIcon,
+        selected: `team`,
     },
     {
         title: 'Help & Support',
@@ -156,7 +156,7 @@ const HeaderBar = () => {
     const [selectedUrl, setSelectedUrl] = useState(newUrl === "/" ? "/dashboard": newUrl);
     const [open, setOpen] = useState(false)
     const [isSheetOpen, setSheetOpen] = useState(false);
-    const [isSheetOpenMenu, setSheetOpenMenu] = useState(false);
+    const [isSheetOpenMobileMenu, setSheetOpenMobileMenu] = useState(false);
     const [createProjectDetails, setCreateProjectDetails] = useState(initialStateProject);
     const [formError, setFormError] = useState(initialStateErrorProject);
     const [projectList, setProjectList] = useState([]);
@@ -189,8 +189,8 @@ const HeaderBar = () => {
         setFormError(initialStateErrorProject)
     };
 
-    const openSheetMenu = () => setSheetOpenMenu(true);
-    const closeSheetMenu = () => setSheetOpenMenu(false);
+    const openMobileSheet = () => setSheetOpenMobileMenu(true);
+    const closeMobileSheet = () => setSheetOpenMobileMenu(false);
 
     useEffect(() => {
         setUserDetails(userDetailsReducer)
@@ -202,7 +202,9 @@ const HeaderBar = () => {
     }, []);
 
     useEffect(() => {
-        getAllStatusAndTypes()
+        if(projectDetailsReducer.id){
+            getAllStatusAndTypes()
+        }
     },[projectDetailsReducer.id])
 
     const getAllStatusAndTypes = async () => {
@@ -254,7 +256,7 @@ const HeaderBar = () => {
 
     const onRedirect = (link) => {
         setSelectedUrl(link)
-        closeSheetMenu()
+        closeMobileSheet()
         navigate(`${baseUrl}${link}`);
     };
 
@@ -323,11 +325,6 @@ const HeaderBar = () => {
             setFormError(validationErrors);
             return;
         }
-
-        // const payload = {
-        //     ...createProjectDetails,
-        //     domain: createProjectDetails.domain ? `${createProjectDetails.domain}.quickhunt.app` : `${createProjectDetails.project_name.replace(' ', '-')}.quickhunt.app`
-        // }
 
         const cleanDomain = (name) => name.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
         const sanitizedProjectName = cleanDomain(createProjectDetails.project_name);
@@ -449,7 +446,7 @@ const HeaderBar = () => {
                     <div className={"flex gap-3 items-center"}>
 
                         {/*Mobile said bar start */}
-                            <Sheet open={isSheetOpenMenu} onOpenChange={isSheetOpenMenu ? closeSheetMenu : openSheetMenu}>
+                            <Sheet open={isSheetOpenMobileMenu} onOpenChange={isSheetOpenMobileMenu ? closeMobileSheet : openMobileSheet}>
                                 <SheetTrigger asChild>
                                     <Button variant="outline" size="icon" className="shrink-0 xl:hidden">
                                         <Menu size={20}/>
@@ -461,7 +458,7 @@ const HeaderBar = () => {
                                         <div className={"app-logo cursor-pointer"}  onClick={() => onRedirect("/dashboard")}>
                                             {theme === "dark" ? Icon.whiteLogo : Icon.blackLogo}
                                         </div>
-                                        <X size={18} className={"fill-card-foreground stroke-card-foreground m-0"} onClick={closeSheetMenu}/>
+                                        <X size={18} className={"fill-card-foreground stroke-card-foreground m-0"} onClick={closeMobileSheet}/>
                                     </SheetHeader>
                                     <div className={"sidebar-mobile-menu flex flex-col gap-3 overflow-y-auto p-3 pt-0 md:p-6 md:pt-0"}>
                                         <nav className="grid items-start gap-3">
@@ -672,7 +669,7 @@ const HeaderBar = () => {
                                             value={createProjectDetails.project_name}
                                             name="project_name"
                                             onChange={onChangeText}
-                                            onBlur={onBlur}
+                                            // onBlur={onBlur}
                                         />
                                         {
                                             formError.project_name &&

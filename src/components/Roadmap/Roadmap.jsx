@@ -56,7 +56,9 @@ const Roadmap = () => {
     };
 
     useEffect(() => {
-        getRoadmapIdea()
+        if(projectDetailsReducer.id){
+            getRoadmapIdea()
+        }
     }, [projectDetailsReducer.id])
 
     const getRoadmapIdea = async () => {

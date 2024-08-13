@@ -11,7 +11,6 @@ import { addDays, format } from "date-fns"
 import { cn } from "../../lib/utils";
 import {ApiService} from "../../utils/ApiService";
 import {useSelector} from "react-redux";
-import {useTheme} from "../theme-provider";
 import EmptyData from "../Comman/EmptyData";
 import {CommSkel} from "../Comman/CommSkel";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts"
@@ -61,9 +60,9 @@ const chartConfig = {
 }
 
 export function Dashboard() {
-    const {theme} = useTheme();
     let apiSerVice = new ApiService();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
+    const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
     const [isLoading, setIsLoading] = useState(false);
     const [state, setState] = useState({startDate: moment().subtract(29, 'days'), endDate: moment(),});
     const [chartList, setChartList] = useState({
@@ -115,7 +114,9 @@ export function Dashboard() {
     // }, [chartList.uniqueViewList, chartList.totalViewViewList]);
 
     useEffect(() => {
-        dashboardData()
+        if(projectDetailsReducer.id){
+            dashboardData()
+        }
     },[projectDetailsReducer.id])
 
     const dashboardData = async () => {
@@ -255,7 +256,7 @@ export function Dashboard() {
                                             <EmptyData />
                                         )
                                     }
-                                    <CardFooter className={"pt-4 px-0 pb-0 justify-end"}>
+                                    <CardFooter className={"p-0 pt-4 justify-end"}>
                                         <Button className={"text-primary p-0 h-[20px] text-sm font-semibold"} variant={"ghost hover:none"}>View More Feedbacks</Button>
                                     </CardFooter>
                                 </Card>
@@ -271,7 +272,15 @@ export function Dashboard() {
                                                             isLoading ? CommSkel.commonParagraphTwoAvatar :
                                                                 <CardContent className={"py-2.5 px-0"} key={i}>
                                                                     <div className={"flex gap-4"}>
-                                                                        <div>{emoji[x.reaction_id]}</div>
+                                                                        <div>
+                                                                            {allStatusAndTypes.emoji.find(e => e.id === x.reaction_id) && (
+                                                                                <img
+                                                                                    src={allStatusAndTypes.emoji.find(e => e.id === x.reaction_id).emoji_url}
+                                                                                    alt={x.reaction_id}
+                                                                                    className={"w-8 h-8"}
+                                                                                />
+                                                                            )}
+                                                                        </div>
                                                                         <div className={"flex flex-col gap-1"}>
                                                                             <div className="flex gap-1 items-center">
                                                                                 <h4 className="text-sm font-semibold">{x.customer_name}</h4>
@@ -286,14 +295,14 @@ export function Dashboard() {
                                                 ))
                                             ) : <EmptyData />
                                     }
-                                    <CardFooter className={"pt-4 px-0 pb-0 justify-end"}>
+                                    <CardFooter className={"p-0 pt-4 justify-end"}>
                                         <Button className={"text-primary text-sm p-0 h-[20px] font-semibold"} variant={"ghost hover:none"}>View More Reactions</Button>
                                     </CardFooter>
                                 </Card>
                             </div>
                             <div>
                                 <Card className={"shadow border"}>
-                                    <CardHeader className={"p-4 pb-0 md:p-6"}>
+                                    <CardHeader className={"p-4 pb-0 md:p-6 md:pb-0"}>
                                         <CardTitle className={"text-base font-bold"}>Overview</CardTitle>
                                     </CardHeader>
                                     {dataAvailable ? (
