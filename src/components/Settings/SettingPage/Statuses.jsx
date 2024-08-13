@@ -10,18 +10,12 @@ import {useSelector,useDispatch} from "react-redux";
 import {ApiService} from "../../../utils/ApiService";
 import {toast} from "../../ui/use-toast";
 import {allStatusAndTypesAction} from "../../../redux/action/AllStatusAndTypesAction";
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogHeader,
-    AlertDialogTitle
-} from "../../ui/alert-dialog";
 import {Skeleton} from "../../ui/skeleton";
-import NoDataThumbnail from "../../../img/Frame.png";
 import EmptyData from "../../Comman/EmptyData";
+import {Dialog} from "@radix-ui/react-dialog";
+import {DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "../../ui/dialog";
+import randomColor from 'randomcolor';
+
 
 const initialStatus = {
     title: '',
@@ -40,6 +34,8 @@ const Statuses = () => {
     const [deleteId,setDeleteId]=useState(null);
     const [deleteIndex,setDeleteIndex] =useState(null);
     const [disableStatusBtn,setDisableStatusBtn]=useState(false);
+    const [openDelete,setOpenDelete]=useState(false);
+    const [isDeleteLoading,setIsDeleteLoading]=useState(false);
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
     const dispatch = useDispatch();
@@ -56,7 +52,7 @@ const Statuses = () => {
             clone.push(obj);
         });
         setStatusList(clone);
-        setIsLoading(false)
+        setIsLoading(false);
     }
 
     const onChangeColorColor = (newColor, index) => {
@@ -68,6 +64,10 @@ const Statuses = () => {
     const handleShowInput = () => {
         setShowColorInput(true);
         setDisableStatusBtn(true);
+        setNewStatus(prevState => ({
+            ...prevState,
+            color_code: randomColor()
+        }));
     };
 
     const handleInputChange = (event, index) => {
@@ -114,12 +114,12 @@ const Statuses = () => {
             setShowColorInput(false);
             setNewStatus(initialStatus);
             toast({
-                description:"Status added successfully"
+                description:data.message
             })
         } else {
             setIsSave(false)
             toast({
-                description:"Something went wrong",
+                description:data.message,
                 variant: "destructive",
             })
         }
@@ -181,12 +181,12 @@ const Statuses = () => {
             }
             setIsSave(false)
             toast({
-                description:"Status update successfully"
+                description:data.message
             })
         } else {
             setIsSave(false)
             toast({
-                description:"Something went wrong",
+                description:data.message,
                 variant: "destructive"
             })
         }
@@ -199,11 +199,13 @@ const Statuses = () => {
 
     const handleDeleteStatus = (id,index) => {
         setDeleteId(id);
-        setDeleteIndex(index)
+        setDeleteIndex(index);
+        setOpenDelete(true);
     };
 
-    const onDelete = async () => {
+    const deleteParticularRow = async () => {
         if (deleteId) {
+            setIsDeleteLoading(true);
             const data = await apiService.deleteRoadmapStatus(deleteId)
             if (data.status === 200) {
                 const clone = [...statusList];
@@ -211,38 +213,56 @@ const Statuses = () => {
                 setStatusList(clone)
                 dispatch(allStatusAndTypesAction({...allStatusAndTypes, roadmap_status: clone}))
                 toast({
-                    description:"Status deleted successfully"
+                    description:data.message
                 })
             } else if(data.status === 201){
                 toast({
-                    description:data.success,
+                    description:data.message,
                     variant: "destructive"
-                })
+                });
             } else {
                 toast({
                     description:data.message,
                     variant: "destructive"
-                })
+                });
             }
+        setOpenDelete(false);
+        setIsDeleteLoading(false);
         }
     }
 
     return (
         <Fragment>
-            <AlertDialog open={deleteId} onOpenChange={setDeleteId}>
-                <AlertDialogContent className={"w-[310px] md:w-full rounded-lg"}>
-                    <AlertDialogHeader>
-                        <AlertDialogTitle>You really want delete Status?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            This action can't be undone.
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <div className={"flex justify-end gap-2"}>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction className={"bg-red-600 hover:bg-red-600"} onClick={onDelete}>Delete</AlertDialogAction>
-                    </div>
-                </AlertDialogContent>
-            </AlertDialog>
+
+            {
+                openDelete &&
+                <Fragment>
+                    <Dialog open onOpenChange={()=> setOpenDelete(false)}>
+                        <DialogContent className="max-w-[350px] w-full sm:max-w-[525px] p-3 md:p-6 rounded-lg">
+                            <DialogHeader className={"flex flex-row justify-between gap-2"}>
+                                <div className={"flex flex-col gap-2"}>
+                                    <DialogTitle className={"text-start"}>You really want delete this status ?</DialogTitle>
+                                    <DialogDescription className={"text-start"}>This action can't be undone.</DialogDescription>
+                                </div>
+                                <X size={16} className={"m-0 cursor-pointer"} onClick={() => setOpenDelete(false)}/>
+                            </DialogHeader>
+                            <DialogFooter className={"flex-row justify-end space-x-2"}>
+                                <Button variant={"outline hover:none"}
+                                        className={"text-sm font-semibold border"}
+                                        onClick={() => setOpenDelete(false)}>Cancel</Button>
+                                <Button
+                                    variant={"hover:bg-destructive"}
+                                    className={` ${theme === "dark" ? "text-card-foreground" : "text-card"} ${isLoading === true ? "py-2 px-6" : "py-2 px-6"} w-[76px] text-sm font-semibold bg-destructive`}
+                                    onClick={deleteParticularRow}
+                                >
+                                    {isDeleteLoading ? <Loader2 size={16} className={"animate-spin"}/> : "Delete"}
+                                </Button>
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
+                </Fragment>
+            }
+
             <Card>
                 <CardHeader className="flex flex-row flex-wrap gap-y-2 justify-between items-center border-b p-4 sm:p-6">
                     <div>
@@ -260,7 +280,7 @@ const Statuses = () => {
                     </Button>
                 </CardHeader>
                 <CardContent className="p-0">
-                    <div className={"grid grid-cols-1 overflow-auto whitespace-nowrap"}>
+                    <div className={"grid grid-cols-1 overflow-visible whitespace-nowrap"}>
                         <Table>
                         <TableHeader className={"p-0"}>
                             <TableRow>
@@ -294,10 +314,10 @@ const Statuses = () => {
                                     statusList.length > 0 ? <>
                                         {(statusList || []).map((x, i) => (
                                             <TableRow key={i}>
-                                                <TableCell><Menu className={"cursor-grab"} size={16}/></TableCell>
+                                                <TableCell className={"px-2 py-[10px] md:px-3"}><Menu className={"cursor-grab"} size={16}/></TableCell>
                                                 {
                                                     isEdit === i ?
-                                                        <TableCell className={"py-[8.5px] pl-0 py-[11px]"}>
+                                                        <TableCell className={"px-2 py-[10px] md:px-3"}>
                                                             <Input
                                                                 className={"bg-card h-9"}
                                                                 type="title"
@@ -314,24 +334,24 @@ const Statuses = () => {
                                                             </div>
                                                         </TableCell>
                                                         : <TableCell
-                                                            className={`font-medium text-xs py-[8.5px] pl-0 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.title}</TableCell>
+                                                            className={`font-medium text-xs px-2 py-[10px] md:px-3 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.title}</TableCell>
                                                 }
                                                 {isEdit === i ?
                                                     <TableCell
-                                                        className={`font-medium text-xs ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                                        className={`px-2 py-[10px] md:px-3 font-medium text-xs ${theme === "dark" ? "" : "text-muted-foreground"}`}>
                                                         <div className={"flex justify-center items-center"}>
-                                                            <ColorInput name={"color_code"} value={x.color_code} onChange={(color) => onChangeColorColor(color, i)}/>
+                                                            <ColorInput style={{width:"102px"}}  name={"color_code"} value={x.color_code} onChange={(color) => onChangeColorColor(color, i)}/>
                                                         </div>
                                                     </TableCell> :
                                                     <TableCell
-                                                        className={`font-medium text-xs ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                                        className={`px-2 py-[10px] md:px-3 font-medium text-xs ${theme === "dark" ? "" : "text-muted-foreground"}`}>
                                                         <div className={"flex justify-center items-center gap-1"}>
                                                             <Square size={16} strokeWidth={1} fill={x.color_code} stroke={x.color_code}/>
                                                             <p>{x.color_code}</p>
                                                         </div>
                                                     </TableCell>
                                                 }
-                                                <TableCell className="flex justify-end gap-2 pr-4">
+                                                <TableCell className="px-2 py-[10px] md:px-3 flex justify-end gap-2 pr-4">
                                                     {isEdit === i ? (
                                                         <Fragment>
                                                             <Button
@@ -379,11 +399,11 @@ const Statuses = () => {
                                         ))}
                                         {showColorInput && (
                                             <TableRow>
-                                                <TableCell className={`${labelError ? "align-top" : ""}`}>
+                                                <TableCell className={`px-2 py-[10px] md:px-3 ${labelError ? "align-top" : ""}`}>
                                                     <Button variant={"ghost hover:bg-transparent"}
                                                             className={"p-0 cursor-grab"}><Menu size={16}/></Button>
                                                 </TableCell>
-                                                <TableCell className={"p-0 py-4 pr-4"}>
+                                                <TableCell className={"px-2 py-[10px] md:px-3"}>
                                                     <Input
                                                         className={"bg-card"}
                                                         type="text"
@@ -401,9 +421,10 @@ const Statuses = () => {
                                                         }
                                                     </div>
                                                 </TableCell>
-                                                <TableCell className={`${labelError ? "align-top" : ""} p-0 py-4 text-xs ${theme === "dark" ? "" : "text-muted-foreground"} `}>
+                                                <TableCell className={`px-2 py-[10px] md:px-3 ${labelError ? "align-top" : ""} text-xs ${theme === "dark" ? "" : "text-muted-foreground"} `}>
                                                     <div className={"flex justify-center items-center"}>
                                                         <ColorInput
+                                                            style={{width:"102px"}}
                                                             name="color_code"
                                                             value={newStatus.color_code}
                                                             onChange={(color) => setNewStatus((prevState) => ({
@@ -413,10 +434,10 @@ const Statuses = () => {
                                                         />
                                                     </div>
                                                 </TableCell>
-                                                <TableCell className="flex justify-end gap-2 pr-6 pt-[21px]">
+                                                <TableCell className="flex justify-end gap-2 px-2 py-[15px] md:px-3">
                                                     <Button
                                                         variant=""
-                                                        className="text-sm font-semibold h-[30px]"
+                                                        className={`${!isSave === true ? "py-2 px-4" : "py-2 px-4"} h-[30px] w-[100px] text-sm font-semibold`}
                                                         onClick={handleAddNewStatus}
                                                     >
                                                         {isSave ? <Loader2 className={"mr-2  h-4 w-4 animate-spin"}/> : "Add Status"}
@@ -427,6 +448,7 @@ const Statuses = () => {
                                                         onClick={()=> {
                                                             setShowColorInput(false);
                                                             setDisableStatusBtn(false);
+                                                            setNewStatus(initialStatus)
                                                         }}
                                                     >
                                                         <X size={16}/>

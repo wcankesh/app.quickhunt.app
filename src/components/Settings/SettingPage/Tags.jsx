@@ -11,17 +11,9 @@ import moment from "moment";
 import {Skeleton} from "../../ui/skeleton";
 import {allStatusAndTypesAction} from "../../../redux/action/AllStatusAndTypesAction";
 import {toast} from "../../ui/use-toast";
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogHeader,
-    AlertDialogTitle
-} from "../../ui/alert-dialog";
-import NoDataThumbnail from "../../../img/Frame.png"
 import EmptyData from "../../Comman/EmptyData";
+import {Dialog} from "@radix-ui/react-dialog";
+import {DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "../../ui/dialog";
 
 const initialState ={
     title:""
@@ -34,9 +26,10 @@ const Tags = () => {
     const [isLoading,setIsLoading]=useState(true);
     const [isSave,setIsSave]= useState(false);
     const [deleteId,setDeleteId]=useState(null);
-    const [showNewTopics, setShowNewTopics] = useState(false);
     const [isEdit,setIsEdit] =useState(null);
-    const [disableTagBtn,setDisableTagBtn]=useState(false);
+    const [openDelete,setOpenDelete] = useState(false);
+    const [isLoadingDelete,setIsLoadingDelete] = useState(false);
+
     let apiService = new ApiService();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
@@ -50,9 +43,8 @@ const Tags = () => {
     }, [allStatusAndTypes.topics]);
 
     const getAllTopics = async () => {
-        setIsLoading(true)
         setTopicLists(allStatusAndTypes.topics);
-        setIsLoading(false)
+        setIsLoading(false);
     }
 
     const formValidate = (name, value) => {
@@ -69,7 +61,7 @@ const Tags = () => {
         }
     };
 
-    const addTopic = async () => {
+    const addTopic = async (index) => {
         let validationErrors = {};
         Object.keys(topicDetails).forEach(name => {
             const error = formValidate(name, topicDetails[name]);
@@ -87,18 +79,20 @@ const Tags = () => {
             project_id: projectDetailsReducer.id
         }
         const data = await apiService.createTopics(payload);
+        const clone = [...topicLists];
+
         if(data.status === 200){
-            const clone = [...topicLists];
+
             clone.push(data.data);
+            clone.splice(index,1);
             dispatch(allStatusAndTypesAction({...allStatusAndTypes, topics: clone}))
             setTopicLists(clone);
             setIsSave(false);
             dispatch(allStatusAndTypesAction({...allStatusAndTypes, topics: clone}));
             toast({
-                description:"Topic create successfully"
+                description:data.message
             });
             setTopicDetails(initialState);
-            setShowNewTopics(false);
         } else {
             setIsSave(false);
             toast({
@@ -106,7 +100,7 @@ const Tags = () => {
                 variant: "destructive",
             });
         }
-        setDisableTagBtn(false);
+        setIsEdit(null);
     };
 
     const updateTopic = async (record,index) => {
@@ -136,25 +130,22 @@ const Tags = () => {
             }
             setIsSave(false);
             toast({
-                description:"Topic update successfully"
+                description:data.message
             });
             setIsEdit(null);
             setTopicDetails(initialState);
         } else {
             setIsSave(false);
             toast({
-                description:"Something went wrong",
+                description:data.message,
                 variant: "destructive"
             });
         }
     }
 
-    const deleteTopic = (id) => {
-        setDeleteId(id);
-    }
-
     const onDelete = async ()=> {
-        const data = await apiService.deleteTopics(deleteId)
+        setIsLoadingDelete(true);
+        const data = await apiService.deleteTopics(deleteId);
         if(data.status === 200){
             const clone = [...topicLists];
             const index = clone.findIndex((x) => x.id === deleteId)
@@ -165,19 +156,25 @@ const Tags = () => {
                 setDeleteId(null);
             }
             toast({
-                description:"Topic deleted successfully"
+                description:data.message
             });
+            setIsLoadingDelete(false);
+            setOpenDelete(false);
         } else {
             toast({
-                description:"Something went wrong",
+                description:data.message,
                 variant: "destructive"
-            })
+            });
+            setIsLoadingDelete(false);
+            setOpenDelete(false);
         }
     }
 
     const handleNewTopics = () => {
-        setShowNewTopics(true);
-        setDisableTagBtn(true);
+       const clone = [...topicLists];
+       clone.push(initialState);
+       setTopicLists(clone);
+       setIsEdit(clone.length-1);
     }
 
     const handleInputChange = (e,index) => {
@@ -203,25 +200,54 @@ const Tags = () => {
     };
 
     const handleEditTopic = (index) => {
+        const findIndex = topicLists.findIndex((x)=> !x.id);
+        if(findIndex != -1){
+            const clone = [...topicLists];
+            clone.splice(findIndex,1);
+            setTopicLists(clone);
+        }
         setIsEdit(index);
+    }
+
+    const handleAddCancel = (index) => {
+        const clone = [...topicLists];
+        clone.splice(index,1);
+        setTopicLists(clone);
+        setTopicDetails(initialState);
+        setIsEdit(null);
     }
 
     return (
         <Fragment>
-            <AlertDialog open={deleteId} onOpenChange={setDeleteId}>
-                <AlertDialogContent className={"w-[310px] md:w-full rounded-lg"}>
-                    <AlertDialogHeader>
-                        <AlertDialogTitle>You really want delete tag?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            This action can't be undone.
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <div className={"flex justify-end gap-2"}>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction className={"bg-red-600 hover:bg-red-600"} onClick={onDelete}>Delete</AlertDialogAction>
-                    </div>
-                </AlertDialogContent>
-            </AlertDialog>
+            {
+                openDelete &&
+                <Fragment>
+                    <Dialog open onOpenChange={()=> setOpenDelete(false)}>
+                        <DialogContent className="max-w-[350px] w-full sm:max-w-[525px] p-3 md:p-6 rounded-lg">
+                            <DialogHeader className={"flex flex-row justify-between gap-2"}>
+                                <div className={"flex flex-col gap-2"}>
+                                    <DialogTitle className={"text-start"}>You really want delete this tag?</DialogTitle>
+                                    <DialogDescription className={"text-start"}>This action can't be undone.</DialogDescription>
+                                </div>
+                                <X size={16} className={"m-0 cursor-pointer"} onClick={() => setOpenDelete(false)}/>
+                            </DialogHeader>
+                            <DialogFooter className={"flex-row justify-end space-x-2"}>
+                                <Button variant={"outline hover:none"}
+                                        className={"text-sm font-semibold border"}
+                                        onClick={() => setOpenDelete(false)}>Cancel</Button>
+                                <Button
+                                    variant={"hover:bg-destructive"}
+                                    className={` ${theme === "dark" ? "text-card-foreground" : "text-card"} ${isLoading === true ? "py-2 px-6" : "py-2 px-6"} w-[76px] text-sm font-semibold bg-destructive`}
+                                    onClick={onDelete}
+                                >
+                                    {isLoadingDelete ? <Loader2 size={16} className={"animate-spin"}/> : "Delete"}
+                                </Button>
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
+                </Fragment>
+            }
+
             <Card>
                 <CardHeader className={"p-4 sm:p-6 gap-1 border-b flex flex-row flex-wrap justify-between items-center gap-y-2"}>
                     <div>
@@ -229,7 +255,7 @@ const Tags = () => {
                         <CardDescription className={"text-sm text-muted-foreground p-0 mt-1 leading-5"}>Add Tags so that users can tag them when creating Ideas.</CardDescription>
                     </div>
                     <div className={"m-0"}>
-                        <Button onClick={handleNewTopics} disabled={disableTagBtn} className={"text-sm font-semibold"}><Plus size={16} className={"mr-1 text-[#f9fafb]"} />New Tags</Button>
+                        <Button onClick={handleNewTopics} disabled={isEdit != null} className={"text-sm font-semibold"}><Plus size={16} className={"mr-1 text-[#f9fafb]"} />New Tags</Button>
                     </div>
                 </CardHeader>
                 <CardContent className={"p-0"}>
@@ -240,7 +266,7 @@ const Tags = () => {
                                     {
                                         ["Tag Name","Last Update","Action"].map((x,i)=>{
                                             return(
-                                                <TableHead className={`${i === 0 ? "w-2/5" : i === 1 ? "text-center" : i === 2 ? "text-end" :""} ${theme === "dark" ? "" : "text-card-foreground"}`}>{x}</TableHead>
+                                                <TableHead className={`px-2 py-[10px] md:px-3 ${i === 0 ? "w-2/5" : i === 1 ? "text-center" : i === 2 ? "text-end" :""} ${theme === "dark" ? "" : "text-card-foreground"}`}>{x}</TableHead>
                                             )
                                         })
                                     }
@@ -249,107 +275,98 @@ const Tags = () => {
 
                             <TableBody>
                                 {
-                                    isLoading ? [...Array(4)].map((_, index) => {
-                                        return (
-                                            <TableRow key={index}>
-                                                {
-                                                    [...Array(3)].map((_, i) => {
-                                                        return (
-                                                            <TableCell key={i} className={"px-2"}>
-                                                                <Skeleton className={"rounded-md  w-full h-[24px]"}/>
-                                                            </TableCell>
-                                                        )
-                                                    })
-                                                }
-                                            </TableRow>
-                                        )
-                                    }) :
                                         topicLists.length > 0 ?
                                         <>
                                             {
                                                 (topicLists || []).map((x,index)=>{
                                                     return(
+
                                                         <TableRow key={x.id}>
-                                                            {isEdit === index ?
-                                                                <TableCell className={`font-medium text-xs pl-4 ${theme === "dark" ? "" : "text-muted-foreground"}`}>
-                                                                    <Input value={x.title} placeholder="Enter Topic Name" onChange={(e) => handleInputChange(e, index)} name="title" type={"text"}/>
-                                                                    {formError?.title && <span className={"text-red-500 text-sm"}>{formError?.title}</span>}
-                                                                </TableCell>
-                                                                :
-                                                                <TableCell className={`font-medium text-xs pl-4 ${theme === "dark" ? "" : "text-muted-foreground"}`}>
-                                                                    {x.title}
-                                                                </TableCell>
-                                                            }
-                                                            <TableCell className={`font-medium text-xs text-center ${theme === "dark" ? "" : "text-muted-foreground"}`}>{moment.utc(x.updated_at).local().startOf('seconds').fromNow()}</TableCell>
-                                                            <TableCell className={"flex justify-end "}>
-                                                                {isEdit === index ?
+                                                            {
+                                                                isEdit == index && x.id ?
                                                                     <Fragment>
-                                                                        <div className="pr-0">
-                                                                            <Button variant={"outline hover:bg-transparent"} onClick={()=>updateTopic(x,index)} className={`p-1 border w-[30px] h-[30px]`}>
-                                                                                {isSave ? <Loader2 className="mr-1 h-4 w-4 animate-spin justify-center"/> :<Check size={16}/>}
-                                                                            </Button>
-                                                                        </div>
-                                                                        <div className="pl-2">
-                                                                            <Button variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px]`}>
-                                                                                <X onClick={()=>setIsEdit(null)} size={16}/>
-                                                                            </Button>
-                                                                        </div>
+                                                                        <TableCell className={`px-2 py-[10px] md:px-3 font-medium text-xs ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                                                            <Input value={x.title} placeholder="Enter Topic Name" onChange={(e) => handleInputChange(e, index)} name="title" type={"text"}/>
+                                                                            {formError?.title && <span className={"text-red-500 text-sm"}>{formError?.title}</span>}
+                                                                        </TableCell>
+                                                                        <TableCell/>
+                                                                        <TableCell className={"flex justify-end px-2 py-[10px] md:px-3"}>
+                                                                                <div className="pr-0">
+                                                                                    <Button variant={"outline hover:bg-transparent"} onClick={()=>updateTopic(x,index)} className={`p-1 border w-[30px] h-[30px]`}>
+                                                                                        {isSave ? <Loader2 className="mr-1 h-4 w-4 animate-spin justify-center"/> :<Check size={16}/>}
+                                                                                    </Button>
+                                                                                </div>
+                                                                                <div className="pl-2">
+                                                                                    <Button variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px]`}>
+                                                                                        <X onClick={()=>setIsEdit(null)} size={16}/>
+                                                                                    </Button>
+                                                                                </div>
+                                                                        </TableCell>
                                                                     </Fragment>
                                                                     :
                                                                     <Fragment>
-                                                                        <div className="pr-0">
-                                                                            <Button onClick={() => handleEditTopic(index)} variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px] `}>
-                                                                                <Pencil size={16}/>
-                                                                            </Button>
-                                                                        </div>
-                                                                        <div className="pl-2">
-                                                                            <Button onClick={() => deleteTopic(x.id)} variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px]`}>
-                                                                                <Trash2 size={16}/>
-                                                                            </Button>
-                                                                        </div>
-                                                                    </Fragment>}
-                                                            </TableCell>
+                                                                        {
+                                                                            x.id ? <Fragment>
+                                                                                        <TableCell className={`px-2 py-[10px] md:px-3 font-medium text-xs  ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                                                                            {x.title}
+                                                                                        </TableCell>
+                                                                                        <TableCell className={`px-2 py-[10px] md:px-3 font-medium text-xs text-center ${theme === "dark" ? "" : "text-muted-foreground"}`}>{moment.utc(x.updated_at).local().startOf('seconds').fromNow()}</TableCell>
+                                                                                        <TableCell className={"flex justify-end px-2 py-[10px] md:px-3"}>
+                                                                                            <Fragment>
+                                                                                                <div className="pr-0">
+                                                                                                    <Button onClick={() => handleEditTopic(index)} variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px] `}>
+                                                                                                        <Pencil size={16}/>
+                                                                                                    </Button>
+                                                                                                </div>
+                                                                                                <div className="pl-2">
+                                                                                                    <Button onClick={() => {
+                                                                                                        setDeleteId(x.id);
+                                                                                                        setOpenDelete(true);
+                                                                                                    }} variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px]`}>
+                                                                                                        <Trash2 size={16}/>
+                                                                                                    </Button>
+                                                                                                </div>
+                                                                                            </Fragment>
+                                                                                        </TableCell>
+                                                                                </Fragment>
+                                                                                 :
+                                                                                    <Fragment>
+                                                                                            <TableCell className={"px-2 py-[10px] md:px-3"}>
+                                                                                                <Input
+                                                                                                    value={topicDetails.title}
+                                                                                                    type={"text"}
+                                                                                                    id={"title"}
+                                                                                                    onChange={(e)=>handleInputChange(e)}
+                                                                                                    name={"title"}
+                                                                                                    onBlur={onBlur}
+                                                                                                    placeholder={"Enter topic name"}
+                                                                                                />
+                                                                                                {formError?.title && <span className={"text-red-500 text-sm"}>{formError?.title}</span>}
+                                                                                            </TableCell>
+                                                                                            <TableCell className={"text-center px-2 py-[10px] md:px-3"}/>
+                                                                                            <TableCell className={"px-2 py-[15px] md:px-3 text-end flex flex-row justify-end gap-2"}>
+                                                                                                <Button className={`${isSave === true ? "py-2 px-4" : "py-2 px-4"} w-[100px] h-[30px] text-sm font-semibold`} onClick={()=>addTopic(index)}>{isSave ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : "Add Tag"}</Button>
+                                                                                                <Button
+                                                                                                    variant="outline hover:bg-transparent"
+                                                                                                    className="p-1 border w-[30px] h-[30px]"
+                                                                                                    onClick={()=>handleAddCancel(index)}
+                                                                                                >
+                                                                                                    <X size={16}/>
+                                                                                                </Button>
+                                                                                            </TableCell>
+                                                                                    </Fragment>
+                                                                        }
+                                                                    </Fragment>
+                                                            }
                                                         </TableRow>
                                                     )
                                                 })
                                             }
-                                            {
-                                                showNewTopics && <TableRow>
-                                                    <TableCell>
-                                                        <Input
-                                                            value={topicDetails.title}
-                                                            type={"text"}
-                                                            id={"title"}
-                                                            onChange={(e)=>handleInputChange(e)}
-                                                            name={"title"}
-                                                            onBlur={onBlur}
-                                                            placeholder={"Enter topic name"}
-                                                        />
-                                                        {formError?.title && <span className={"text-red-500 text-sm"}>{formError?.title}</span>}
-                                                    </TableCell>
-                                                    <TableCell className={"text-center"}>
-
-                                                    </TableCell>
-                                                    <TableCell className={"pt-[21px] text-end flex flex-row justify-end gap-2"}>
-                                                        <Button className={"h-[30px]"} onClick={addTopic}>{isSave ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : "Add Topic"}</Button>
-                                                        <Button
-                                                            variant="outline hover:bg-transparent"
-                                                            className="p-1 border w-[30px] h-[30px]"
-                                                            onClick={()=> {
-                                                                setShowNewTopics(false);
-                                                                setDisableTagBtn(false);
-                                                            }}
-                                                        >
-                                                            <X size={16}/>
-                                                        </Button>
-                                                    </TableCell>
-                                                </TableRow>
-                                            }
-                                        </> : <TableRow>
+                                        </> : (topicLists.length == 0 && isLoading == false) ? <TableRow>
                                                 <TableCell colSpan={6}>
                                                     <EmptyData />
                                                 </TableCell>
-                                            </TableRow>
+                                            </TableRow> : null
                                 }
                             </TableBody>
                         </Table>
@@ -358,7 +375,7 @@ const Tags = () => {
                 </CardContent>
             </Card>
         </Fragment>
-    )
+    );
 };
 
 export default Tags;

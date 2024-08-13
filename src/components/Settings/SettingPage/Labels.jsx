@@ -8,41 +8,34 @@ import {Input} from "../../ui/input";
 import {useTheme} from "../../theme-provider";
 import {ApiService} from "../../../utils/ApiService";
 import {useDispatch, useSelector} from "react-redux";
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogHeader,
-    AlertDialogTitle
-} from "../../ui/alert-dialog";
 import {allStatusAndTypesAction} from "../../../redux/action/AllStatusAndTypesAction";
 import {toast} from "../../ui/use-toast";
-import {Skeleton} from "../../ui/skeleton";
 import EmptyData from "../../Comman/EmptyData";
+import {Dialog} from "@radix-ui/react-dialog";
+import {DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "../../ui/dialog";
+import randomColor from 'randomcolor';
+
 
 const initialNewLabel = {
     label_name: '',
-    label_color_code: '#000000',
+    label_color_code:"",
 };
 
 const Labels = () => {
     const {theme} = useTheme();
-    const [showColorInput, setShowColorInput] = useState(false);
     const [newLabel, setNewLabel] = useState({...initialNewLabel });
     const [labelError, setLabelError] = useState(initialNewLabel);
     const [isEdit,setIsEdit]= useState(null);
     const [isLoading,setIsLoading]=useState(true);
-    const apiService = new ApiService();
     const [labelList, setLabelList] = useState([]);
-    const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
-    const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
-    const [isOpenDeleteAlert,setIsOpenDeleteAlert] =useState(false);
-    const [deleteIndex,setDeleteIndex] = useState(null);
     const [deleteId,setDeleteId]=useState(null);
     const [isSave,setIsSave]=useState(false);
-    const [disableLabelBtn,setDisableLabelBtn]=useState(false);
+    const [openDelete,setOpenDelete] = useState(false);
+    const [isLoadingDelete,setIsLoadingDelete] = useState(false);
+
+    const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
+    const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
+    const apiService = new ApiService();
     const dispatch = useDispatch();
 
     useEffect(() => {
@@ -52,7 +45,6 @@ const Labels = () => {
     }, [allStatusAndTypes.labels]);
 
     const getAllLabels = async () => {
-        setIsLoading(true);
         setLabelList(allStatusAndTypes.labels);
         setIsLoading(false);
     }
@@ -64,8 +56,15 @@ const Labels = () => {
     };
 
     const handleShowInput = () => {
-        setShowColorInput(true);
-        setDisableLabelBtn(true);
+        const clone = [...labelList];
+        clone.push(initialNewLabel);
+        setLabelList(clone);
+        setIsEdit(clone.length - 1);
+        setNewLabel(prevState => ({
+            ...prevState,
+            label_color_code: randomColor()
+        }));
+
     };
 
     const handleInputChange = (event, index) => {
@@ -109,24 +108,22 @@ const Labels = () => {
         if (data.status === 200) {
             let clone = [...labelList];
             clone.push(data.data);
+            clone.splice(index, 1);
             setLabelList(clone);
             dispatch(allStatusAndTypesAction({...allStatusAndTypes, labels: clone}))
             setIsSave(false);
             toast({
-                description:"Label added successfully"
+                description:data.message
             })
         } else {
             setIsSave(false);
             toast({
-                description:"Something went wrong",
+                description:data.message,
                 variant: "destructive"
             })
         }
-
         setNewLabel({ ...initialNewLabel });
-        setShowColorInput(false);
-        setDisableLabelBtn(false);
-
+        setIsEdit(null);
     };
 
     const onBlur = (event) => {
@@ -152,12 +149,13 @@ const Labels = () => {
     }
 
     const handleEditLabel = (index) => {
-        const updatedColors = [...labelList];
-        updatedColors[index] = { ...updatedColors[index]};
-        setLabelList(updatedColors);
+        const findIndex = labelList.findIndex((x)=> !x.id);
+        if(findIndex != -1){
+            const clone = [...labelList];
+            clone.splice(findIndex,1);
+            setLabelList(clone);
+        }
         setIsEdit(index);
-        setShowColorInput(false);
-        setDisableLabelBtn(true);
     };
 
     const handleSaveLabel = async (index) => {
@@ -191,12 +189,12 @@ const Labels = () => {
             }
             setIsSave(false)
             toast({
-                description:"Label updated successfully"
+                description:data.message
             })
         } else {
             setIsSave(false);
             toast({
-                description:"Something went wrong",
+                description:data.message,
                 variant: "destructive"
             })
         }
@@ -206,29 +204,21 @@ const Labels = () => {
         });
         updatedColors[index] = { ...labelToSave };
         setIsEdit(null);
-        setDisableLabelBtn(false);
     };
 
-    const handleCancelEdit = (index) => {
-        const updatedColors = [...labelList];
-        updatedColors[index] = { ...updatedColors[index],};
-        setLabelList(updatedColors);
-        setIsEdit(null);
-        setDisableLabelBtn(false);
-    };
-
-    const handleDeleteLabel = (id,index) => {
-        setIsOpenDeleteAlert(true);
-        setDeleteIndex(index);
+    const handleDeleteLabel = (id) => {
         setDeleteId(id);
+        setOpenDelete(true);
     };
 
     const onDelete =async () =>{
+        setIsLoadingDelete(true);
+        const clone = [...labelList];
+        const indexToDelete = clone.findIndex((x)=>x.id == deleteId);
         if (deleteId) {
             const data = await apiService.deleteLabels(deleteId)
             if (data.status === 200) {
-                const clone = [...labelList];
-                clone.splice(deleteIndex, 1);
+                clone.splice(indexToDelete,1);
                 setLabelList(clone);
                 dispatch(allStatusAndTypesAction({...allStatusAndTypes, labels: clone}));
                 toast({
@@ -242,27 +232,52 @@ const Labels = () => {
             }
         } else {
             const clone = [...labelList];
-            clone.splice(deleteIndex, 1);
+            clone.splice(indexToDelete, 1);
             setLabelList(clone);
         }
+        setOpenDelete(false);
+        setIsLoadingDelete(false);
+    }
+
+    const handleAddCancel = (index) => {
+        const clone = [...labelList];
+        clone.splice(index,1);
+        setLabelList(clone);
+        setNewLabel(initialNewLabel);
+        setIsEdit(null);
     }
 
     return (
         <Card>
-            <AlertDialog open={isOpenDeleteAlert} onOpenChange={setIsOpenDeleteAlert}>
-                <AlertDialogContent className={"w-[310px] md:w-full rounded-lg"}>
-                    <AlertDialogHeader>
-                        <AlertDialogTitle>You really want delete label?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            This action can't be undone.
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <div className={"flex justify-end gap-2"}>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction className={"bg-red-600 hover:bg-red-600"} onClick={onDelete}>Delete</AlertDialogAction>
-                    </div>
-                </AlertDialogContent>
-            </AlertDialog>
+            {
+                openDelete &&
+                <Fragment>
+                    <Dialog open onOpenChange={()=> setOpenDelete(false)}>
+                        <DialogContent className="max-w-[350px] w-full sm:max-w-[525px] p-3 md:p-6 rounded-lg">
+                            <DialogHeader className={"flex flex-row justify-between gap-2"}>
+                                <div className={"flex flex-col gap-2"}>
+                                    <DialogTitle className={"text-start"}>You really want delete this label?</DialogTitle>
+                                    <DialogDescription className={"text-start"}>This action can't be undone.</DialogDescription>
+                                </div>
+                                <X size={16} className={"m-0 cursor-pointer"} onClick={() => setOpenDelete(false)}/>
+                            </DialogHeader>
+                            <DialogFooter className={"flex-row justify-end space-x-2"}>
+                                <Button variant={"outline hover:none"}
+                                        className={"text-sm font-semibold border"}
+                                        onClick={() => setOpenDelete(false)}>Cancel</Button>
+                                <Button
+                                    variant={"hover:bg-destructive"}
+                                    className={` ${theme === "dark" ? "text-card-foreground" : "text-card"} ${isLoadingDelete === true ? "py-2 px-6" : "py-2 px-6"} w-[76px] text-sm font-semibold bg-destructive`}
+                                    onClick={onDelete}
+                                >
+                                    {isLoadingDelete ? <Loader2 size={16} className={"animate-spin"}/> : "Delete"}
+                                </Button>
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
+                </Fragment>
+            }
+
             <CardHeader className="flex flex-row justify-between items-center border-b p-4 flex-wrap md:flex-nowrap sm:p-6 gap-y-2">
                 <div>
                     <CardTitle className="text-lg sm:text-2xl font-medium">Labels</CardTitle>
@@ -271,7 +286,7 @@ const Labels = () => {
                     </CardDescription>
                 </div>
                 <Button
-                    disabled={disableLabelBtn}
+                    disabled={isEdit != null}
                     className="flex gap-1 items-center text-sm font-semibold m-0"
                     onClick={handleShowInput}
                 >
@@ -279,14 +294,14 @@ const Labels = () => {
                 </Button>
             </CardHeader>
             <CardContent className="p-0">
-                <div className={"grid grid-cols-1 overflow-auto whitespace-nowrap"}>
+                <div className={"grid grid-cols-1 overflow-visible whitespace-nowrap"}>
                     <Table>
                     <TableHeader className="p-0">
                         <TableRow>
                             {
                                 ["Label Name","Label Color","Action"].map((x,i)=>{
                                     return(
-                                        <TableHead key={i} className={`${i === 0 ? "w-2/5" : i === 1 ? "w-1/5 text-center" : "pr-[39px] text-end"} pl-4 ${theme === "dark" ? "" : "text-card-foreground"}`}>{x}</TableHead>
+                                        <TableHead key={i} className={`px-2 py-[10px] md:px-3 ${i === 0 ? "w-2/5" : i === 1 ? "w-1/5 text-center" : "pr-[39px] text-end"} pl-4 ${theme === "dark" ? "" : "text-card-foreground"}`}>{x}</TableHead>
                                     )
                                 })
                             }
@@ -294,162 +309,154 @@ const Labels = () => {
                     </TableHeader>
                     <TableBody>
                         {
-                            isLoading ? [...Array(4)].map((_, index) => {
-                                return (
-                                    <TableRow key={index}>
-                                        {
-                                            [...Array(3)].map((_, i) => {
-                                                return (
-                                                    <TableCell className={"px-2"} key={i}>
-                                                        <Skeleton className={"rounded-md  w-full h-[24px]"}/>
-                                                    </TableCell>
-                                                )
-                                            })
-                                        }
-                                    </TableRow>
-                                )
-                            }) : labelList.length > 0 ? <>
+                             labelList.length > 0 ? <>
                                 {(labelList || []).map((x, i) => (
-                                    <TableRow key={i}>
+
+                                    <TableRow key={x.id}>
                                         {
-                                            isEdit === i ?
-                                                <TableCell className={"py-[8.5px] pl-4 py-[11px] "}>
-                                                    <Input
-                                                        className={"bg-card h-9 "}
-                                                        type="text"
-                                                        value={x.label_name}
-                                                        name={"label_name"}
-                                                        onBlur={onBlur}
-                                                        onChange={(e) => handleInputChange(e, i)}
-                                                    />
-                                                    <div className="grid gap-2">
-                                                        {
-                                                            labelError.label_name &&
-                                                            <span
-                                                                className="text-red-500 text-sm">{labelError.label_name}</span>
-                                                        }
-                                                    </div>
-                                                </TableCell>
-                                                : <TableCell
-                                                    className={`font-medium text-xs py-[8.5px] pl-4 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.label_name}</TableCell>
+                                            isEdit == i && x.id ?  <Fragment>
+                                                                <TableCell className={"px-2 py-[10px] md:px-3"}>
+                                                                    <Input
+                                                                        className={"bg-card h-9 "}
+                                                                        type="text"
+                                                                        value={x.label_name}
+                                                                        name={"label_name"}
+                                                                        onBlur={onBlur}
+                                                                        onChange={(e) => handleInputChange(e, i)}
+                                                                    />
+                                                                    <div className="grid gap-2">
+                                                                        {
+                                                                            labelError.label_name && <span className="text-red-500 text-sm">{labelError.label_name}</span>
+                                                                        }
+                                                                    </div>
+                                                                </TableCell>
+
+                                                                <TableCell
+                                                                    className={`px-2 py-[10px] md:px-3 font-medium text-xs ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                                                    <div className={"flex justify-center items-center"}>
+                                                                        <ColorInput style={{width:"102px"}} name={"clr"} value={x.label_color_code}
+                                                                                    onChange={(color) => onChangeColorColor(color, i)}/>
+                                                                    </div>
+                                                                </TableCell>
+
+                                                                <TableCell
+                                                                    className={`flex justify-end gap-2 px-2 py-[10px] md:px-3 font-medium text-xs ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                                                    <Button
+                                                                        variant="outline hover:bg-transparent"
+                                                                        className={`p-1 border w-[30px] h-[30px] ${isSave ? "justify-center items-center" : ""}`}
+                                                                        onClick={() => handleSaveLabel(i)}
+                                                                    >
+                                                                        {isSave ?
+                                                                            <Loader2 className="mr-1 h-4 w-4 animate-spin justify-center"/> :
+                                                                            <Check size={16}/>}
+                                                                    </Button>
+                                                                    <Button
+                                                                        variant="outline hover:bg-transparent"
+                                                                        className="p-1 border w-[30px] h-[30px]"
+                                                                        onClick={() => {
+                                                                            setIsEdit(null);
+                                                                            setNewLabel(initialNewLabel)
+                                                                        }}
+                                                                    >
+                                                                        <X size={16}/>
+                                                                    </Button>
+                                                                </TableCell>
+                                                           </Fragment> :
+
+                                                            <Fragment>
+                                                                {x.id ? <Fragment>
+                                                                    <TableCell
+                                                                        className={`px-2 py-[10px] md:px-3 font-medium text-xs ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.label_name}</TableCell>
+
+                                                                    <TableCell
+                                                                        className={`px-2 py-[10px] md:px-3 font-medium text-xs ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                                                        <div
+                                                                            className={"flex justify-center items-center gap-1"}>
+                                                                            <Square size={16} strokeWidth={1}
+                                                                                    fill={x.label_color_code}
+                                                                                    stroke={x.label_color_code}/>
+                                                                            <p>{x.label_color_code}</p>
+                                                                        </div>
+                                                                    </TableCell>
+
+                                                                    <TableCell
+                                                                        className={`flex justify-end gap-2 px-2 py-[10px] md:px-3 font-medium text-xs ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                                                        <Button
+                                                                            variant="outline hover:bg-transparent"
+                                                                            className="p-1 border w-[30px] h-[30px]"
+                                                                            onClick={() => handleEditLabel(i)}
+                                                                        >
+                                                                            <Pencil size={16}/>
+                                                                        </Button>
+                                                                        <Button
+                                                                            variant="outline hover:bg-transparent"
+                                                                            className="p-1 border w-[30px] h-[30px]"
+                                                                            onClick={() => handleDeleteLabel(x.id, i)}
+                                                                        >
+                                                                            <Trash2 size={16}/>
+                                                                        </Button>
+                                                                    </TableCell>
+                                                                </Fragment> :
+                                                                <Fragment>
+                                                                        <TableCell className={"px-2 py-[10px] md:px-3"}>
+                                                                            <Input
+                                                                                className={"bg-card"}
+                                                                                type="text"
+                                                                                id="labelName"
+                                                                                name="label_name"
+                                                                                value={newLabel.label_name}
+                                                                                onChange={handleInputChange}
+                                                                                placeholder="Enter Label Name"
+                                                                                onBlur={onBlur}
+                                                                            />
+                                                                            <div className="grid gap-2">
+                                                                                {
+                                                                                    labelError.label_name &&
+                                                                                    <span className="text-red-500 text-sm">{labelError.label_name}</span>
+                                                                                }
+                                                                            </div>
+                                                                        </TableCell>
+                                                                        <TableCell className={`${labelError ? "align-top" : ""} px-2 py-[10px] md:px-3 text-xs ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                                                            <div className={"flex justify-center items-center"}>
+                                                                                <ColorInput
+                                                                                    className={"w-[98px]"}
+                                                                                    name="label_color_code"
+                                                                                    value={newLabel.label_color_code}
+                                                                                    onChange={(color) => setNewLabel((prevState) => ({
+                                                                                        ...prevState,
+                                                                                        label_color_code: color.label_color_code
+                                                                                    }))}
+                                                                                />
+                                                                            </div>
+                                                                        </TableCell>
+                                                                        <TableCell className="flex justify-end gap-2 px- py-[15px] md:px-3 items-center">
+                                                                            <Button
+                                                                                variant=""
+                                                                                className={`${isSave === true ? "py-2 px-4" : "py-2 px-4"} w-[100px] h-[30px] text-sm font-semibold`}
+                                                                                onClick={() => handleAddNewLabel(newLabel,i)}
+                                                                            >
+                                                                                {isSave ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : "Add Label"}
+                                                                            </Button>
+                                                                            <Button
+                                                                                variant="outline hover:bg-transparent"
+                                                                                className="p-1 border w-[30px] h-[30px]"
+                                                                                onClick={()=> {
+                                                                                   handleAddCancel(i)
+                                                                                }}
+                                                                            >
+                                                                                <X size={16}/>
+                                                                            </Button>
+                                                                        </TableCell>
+                                                                </Fragment>}
+                                                            </Fragment>
                                         }
-                                        {isEdit === i ?
-                                            <TableCell
-                                                className={`font-medium text-xs ${theme === "dark" ? "" : "text-muted-foreground"}`}>
-                                                <div className={"flex justify-center items-center"}>
-                                                    <ColorInput style={{width:"98px"}} name={"clr"} value={x.label_color_code}
-                                                                onChange={(color) => onChangeColorColor(color, i)}/>
-                                                </div>
-                                            </TableCell> :
-                                            <TableCell
-                                                className={`font-medium text-xs ${theme === "dark" ? "" : "text-muted-foreground"}`}>
-                                                <div className={"flex justify-center items-center gap-1"}>
-                                                    <Square size={16} strokeWidth={1} fill={x.label_color_code}
-                                                            stroke={x.label_color_code}/>
-                                                    <p>{x.label_color_code}</p>
-                                                </div>
-                                            </TableCell>
-                                        }
-                                        <TableCell className="flex justify-end gap-2 pr-6">
-                                            {isEdit === i ? (
-                                                <Fragment>
-                                                    <Button
-                                                        variant="outline hover:bg-transparent"
-                                                        className={`p-1 border w-[30px] h-[30px] ${isSave ? "justify-center items-center" : ""}`}
-                                                        onClick={() => handleSaveLabel(i)}
-                                                    >
-                                                        {isSave ?
-                                                            <Loader2 className="mr-1 h-4 w-4 animate-spin justify-center"/> :
-                                                            <Check size={16}/>}
-                                                    </Button>
-                                                    <Button
-                                                        variant="outline hover:bg-transparent"
-                                                        className="p-1 border w-[30px] h-[30px]"
-                                                        onClick={() => handleCancelEdit(i)}
-                                                    >
-                                                        <X size={16}/>
-                                                    </Button>
-                                                </Fragment>
-                                            ) : (
-                                                <Fragment>
-                                                    <Button
-                                                        variant="outline hover:bg-transparent"
-                                                        className="p-1 border w-[30px] h-[30px]"
-                                                        onClick={() => handleEditLabel(i)}
-                                                    >
-                                                        <Pencil size={16}/>
-                                                    </Button>
-                                                    <Button
-                                                        variant="outline hover:bg-transparent"
-                                                        className="p-1 border w-[30px] h-[30px]"
-                                                        onClick={() => handleDeleteLabel(x.id, i)}
-                                                    >
-                                                        <Trash2 size={16}/>
-                                                    </Button>
-                                                </Fragment>
-                                            )}
-                                        </TableCell>
                                     </TableRow>
                                 ))}
-                                {showColorInput && (
-                                    <TableRow>
-                                        <TableCell className={"p-0 py-4 pl-4 pr-4"}>
-                                            <Input
-                                                className={"bg-card"}
-                                                type="text"
-                                                id="labelName"
-                                                name="label_name"
-                                                value={newLabel.label_name}
-                                                onChange={handleInputChange}
-                                                placeholder="Enter Label Name"
-                                                onBlur={onBlur}
-                                            />
-                                            <div className="grid gap-2">
-                                                {
-                                                    labelError.label_name &&
-                                                    <span className="text-red-500 text-sm">{labelError.label_name}</span>
-                                                }
-                                            </div>
-                                        </TableCell>
-                                        <TableCell className={`${labelError ? "align-top" : ""} p-0 py-4 text-xs ${theme === "dark" ? "" : "text-muted-foreground"}`}>
-                                            <div className={"flex justify-center items-center"}>
-                                                <ColorInput
-                                                    className={"w-[98px]"}
-                                                    name="label_color_code"
-                                                    value={newLabel.label_color_code}
-                                                    onChange={(color) => setNewLabel((prevState) => ({
-                                                        ...prevState,
-                                                        label_color_code: color.label_color_code
-                                                    }))}
-                                                />
-                                            </div>
-                                        </TableCell>
-                                        <TableCell className="flex justify-end gap-2 pr-6 items-center pt-[21px]">
-                                            <Button
-                                                variant=""
-                                                className="text-sm font-semibold h-[30px]"
-                                                onClick={() => handleAddNewLabel(newLabel)}
-                                            >
-                                                {isSave ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : "Add Label"}
-                                            </Button>
-                                            <Button
-                                                variant="outline hover:bg-transparent"
-                                                className="p-1 border w-[30px] h-[30px]"
-                                                onClick={()=> {
-                                                    setShowColorInput(false);
-                                                    setDisableLabelBtn(false);
-                                                }}
-                                            >
-                                                <X size={16}/>
-                                            </Button>
-                                        </TableCell>
-                                    </TableRow>
-                                )}
-                                                        </> : <TableRow>
+                                </> : (labelList.length == 0 && isLoading == false) ? <TableRow>
                                 <TableCell colSpan={6}>
                                     <EmptyData />
                                 </TableCell>
-                            </TableRow>
+                            </TableRow> :null
                         }
                     </TableBody>
              </Table>

@@ -8,19 +8,12 @@ import {ApiService} from "../../../utils/ApiService";
 import {useTheme} from "../../theme-provider";
 import {Input} from "../../ui/input";
 import moment from "moment";
-import {
-    AlertDialog, AlertDialogAction, AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogHeader,
-    AlertDialogTitle
-} from "../../ui/alert-dialog";
-import {Skeleton} from "../../ui/skeleton";
 import {allStatusAndTypesAction} from "../../../redux/action/AllStatusAndTypesAction";
 import {toast} from "../../ui/use-toast";
-import NoDataThumbnail from "../../../img/Frame.png";
 import {Separator} from "../../ui/separator";
 import EmptyData from "../../Comman/EmptyData";
+import {Dialog} from "@radix-ui/react-dialog";
+import {DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "../../ui/dialog";
 
 const initialState ={
     title:""
@@ -32,10 +25,10 @@ const Board = () => {
     const [isSave,setIsSave]= useState(false);
     const [boardDetail,setBoardDetail]=useState(initialState);
     const [formError, setFormError] = useState(initialState);
-    const [showNewBoard, setShowNewBoard] = useState(false);
     const [isEdit,setIsEdit]=useState(null)
     const [deleteId,setDeleteId]=useState(null);
-    const [disabledBoardBtn,setDisabledBoardBtn]=useState(false);
+    const [openDelete,setOpenDelete] =useState(false);
+    const [isLoadingDelete,setIsLoadingDelete]=useState(false);
     const dispatch = useDispatch();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
@@ -50,7 +43,6 @@ const Board = () => {
     },[allStatusAndTypes?.boards])
 
     const getBoardList = async () => {
-       setIsLoading(true);
        setBoardList(allStatusAndTypes.boards);
        setIsLoading(false);
     }
@@ -91,7 +83,7 @@ const Board = () => {
         setFormError(formError => ({...formError, [e.target.name]: ""}));
     }
 
-    const addBoard = async () => {
+    const addBoard = async (index) => {
         let validationErrors = {};
         Object.keys(boardDetail).forEach(name => {
             const error = formValidate(name, boardDetail[name]);
@@ -109,37 +101,40 @@ const Board = () => {
             title:boardDetail.title
         }
         const data = await apiService.createBoard(payload);
+        const clone = [...boardList];
         if(data.status === 200){
             setIsSave(false)
-            const clone = [...boardList];
             clone.push(data.data);
+            clone.splice(index,1);
             setBoardList(clone);
             setBoardDetail(initialState);
             setIsEdit(null);
-            setShowNewBoard(null);
             dispatch(allStatusAndTypesAction({...allStatusAndTypes, boards: clone}));
             toast({
-                description:"Board created successfully"
+                description:data.message
             });
         }
         else{
             setIsSave(false)
             toast({
-                description:"Something went wrong",
+                description:data.message,
                 variant: "destructive"
             });
         }
-        setDisabledBoardBtn(false);
     }
 
     const deleteTopic =(id) =>{
-        setDeleteId(id)
+        setDeleteId(id);
     }
 
     const handleEditBoard = (index) => {
+        const clone = [...boardList];
+        const findIndex = clone.findIndex((x)=> !x.id);
+        if(findIndex != -1){
+            clone.splice(findIndex,1);
+            setBoardList(clone);
+        }
         setIsEdit(index);
-        setDisabledBoardBtn(true);
-        setShowNewBoard(false);
     }
 
     const updateBoard = async (record,index)=>{
@@ -169,20 +164,21 @@ const Board = () => {
             }
             setIsSave(false);
             toast({
-                description:"Board updated successfully"
+                description:data.message
             });
             setIsEdit(null);
             setBoardDetail(initialState);
         } else {
             setIsSave(false);
             toast({
-                description:"Something went wrong",
+                description:data.message,
                 variant: "destructive"
             });
         }
     }
 
     const onDelete = async ()=> {
+        setIsLoadingDelete(true);
         const data = await apiService.deleteBoard(deleteId);
         if(data.status === 200){
             const clone = [...boardList];
@@ -194,50 +190,79 @@ const Board = () => {
                 setDeleteId(null);
             }
             toast({
-                description:"Board deleted successfully"
+                description:data.message
             });
+            setOpenDelete(false)
+            setIsLoadingDelete(false);
         } else {
             toast({
-                description:"Something went wrong",
+                description:data.message,
                 variant: "destructive"
             });
+            setOpenDelete(false);
+            setIsLoadingDelete(false);
         }
     }
 
     const createNewBoard = () => {
+        const clone = [...boardList];
+        clone.push(initialState);
+        setBoardList(clone);
+        setIsEdit(clone.length - 1);
+
         let length = boardList?.length;
         if(userDetailsReducer.plan === 0){
             if(length < 1){
-                setShowNewBoard(true)
                 onProModal(false)
-                setDisabledBoardBtn(true);
             }  else{
                 onProModal(true)
             }
         } else if(userDetailsReducer.plan === 1){
-            setShowNewBoard(true)
             onProModal(false)
-            setDisabledBoardBtn(true);
         }
+    }
+
+    const handleAddCancel = (index) => {
+        const clone = [...boardList];
+        clone.splice(index,1);
+        setBoardList(clone);
+        setBoardDetail(initialState);
+        setIsEdit(null);
     }
 
 
     return (
         <Fragment>
-            <AlertDialog open={deleteId} onOpenChange={setDeleteId}>
-                <AlertDialogContent className={"w-[310px] md:w-full rounded-lg"}>
-                    <AlertDialogHeader>
-                        <AlertDialogTitle>You really want delete board?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            This action can't be undone.
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <div className={"flex justify-end gap-2"}>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction className={"bg-red-600 hover:bg-red-600"} onClick={onDelete}>Delete</AlertDialogAction>
-                    </div>
-                </AlertDialogContent>
-            </AlertDialog>
+
+            {
+                openDelete &&
+                <Fragment>
+                    <Dialog open onOpenChange={()=> setOpenDelete(false)}>
+                        <DialogContent className="max-w-[350px] w-full sm:max-w-[525px] p-3 md:p-6 rounded-lg">
+                            <DialogHeader className={"flex flex-row justify-between gap-2"}>
+                                <div className={"flex flex-col gap-2"}>
+                                    <DialogTitle className={"text-start"}>You really want delete this board?</DialogTitle>
+                                    <DialogDescription className={"text-start"}>This action can't be undone.</DialogDescription>
+                                </div>
+                                <X size={16} className={"m-0 cursor-pointer"} onClick={() => setOpenDelete(false)}/>
+                            </DialogHeader>
+                            <DialogFooter className={"flex-row justify-end space-x-2"}>
+                                <Button variant={"outline hover:none"}
+                                        className={"text-sm font-semibold border"}
+                                        onClick={() => setOpenDelete(false)}>Cancel</Button>
+                                <Button
+                                    variant={"hover:bg-destructive"}
+                                    className={` ${theme === "dark" ? "text-card-foreground" : "text-card"} ${isLoading === true ? "py-2 px-6" : "py-2 px-6"} w-[76px] text-sm font-semibold bg-destructive`}
+                                    onClick={onDelete}
+                                >
+                                    {isLoadingDelete ? <Loader2 size={16} className={"animate-spin"}/> : "Delete"}
+                                </Button>
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
+                </Fragment>
+            }
+
             <Card>
                 <CardHeader className={"flex flex-row flex-wrap md:flex-nowrap justify-between gap-x-6 items-center p-4 sm:p-6 "}>
                     <div>
@@ -246,7 +271,7 @@ const Board = () => {
                     </div>
                     <div className={"mt-1 md:m-0"}>
                         <Button
-                            disabled={disabledBoardBtn}
+                            disabled={isEdit != null}
                             className="flex gap-1 items-center text-sm font-semibold m-0"
                             onClick={createNewBoard}
                         >
@@ -263,7 +288,7 @@ const Board = () => {
                                     {
                                         ["Board name","Last Update","Action"].map((x,i)=>{
                                             return(
-                                                <TableHead key={i} className={` pl-4 ${i === 0 ? "pl-4 w-2/5" : i === 1 ? "text-center" : "pr-[39px] text-end "} ${theme === "dark" ? "" : "text-card-foreground"}`}>{x}</TableHead>
+                                                <TableHead key={i} className={` px-2 py-[10px] md:px-3 ${i === 0 ? "w-2/5" : i === 1 ? "text-center" : "text-end "} ${theme === "dark" ? "" : "text-card-foreground"}`}>{x}</TableHead>
                                             )
                                         })
                                     }
@@ -272,113 +297,105 @@ const Board = () => {
 
                             <TableBody>
                                 {
-                                    isLoading ? [...Array(4)].map((_, index) => {
-                                        return (
-                                            <TableRow key={index}>
-                                                {
-                                                    [...Array(3)].map((_, i) => {
-                                                        return (
-                                                            <TableCell key={i} className={"px-2"}>
-                                                                <Skeleton className={"rounded-md  w-full h-[24px]"}/>
-                                                            </TableCell>
-                                                        )
-                                                    })
-                                                }
-                                            </TableRow>
-                                        )
-                                    }) :
                                     boardList.length > 0 ?
                                     <>
                                         {
                                             (boardList || []).map((x,i)=>{
                                                 return(
                                                     <TableRow key={x.id}>
-                                                        {isEdit == i ?
-                                                            <TableCell className={`font-medium text-xs pl-4 ${theme === "dark" ? "" : "text-muted-foreground"}`}>
-                                                                <Input value={x.title} placeholder="Enter Board Name" onChange={(e) => handleInputChange(e, i)} name="title" type={"text"}/>
-                                                                {formError?.title && <span className={"text-red-500 text-sm"}>{formError?.title}</span>}
-                                                            </TableCell>
-                                                            :
-                                                            <TableCell className={`font-medium text-xs pl-4 ${theme === "dark" ? "" : "text-muted-foreground"}`}>
-                                                                {x.title}
-                                                            </TableCell>
-                                                        }
-                                                        <TableCell className={`font-medium text-xs text-center ${theme === "dark" ? "" : "text-muted-foreground"}`}>
-                                                            {moment.utc(x?.updated_at).local().startOf('seconds').fromNow()}
-                                                        </TableCell>
-                                                        <TableCell className={"flex justify-end "}>
-                                                            {isEdit == i ?
+                                                        {
+                                                            isEdit == i && x.id ?
                                                                 <Fragment>
-                                                                    <div className="pr-0">
-                                                                        <Button variant={"outline hover:bg-transparent"} onClick={()=>updateBoard(x,i)} className={`p-1 border w-[30px] h-[30px]`}>
-                                                                            {isSave ? <Loader2 className="mr-1 h-4 w-4 animate-spin justify-center"/> :<Check size={16}/>}
-                                                                        </Button>
-                                                                    </div>
-                                                                    <div className="pl-2">
-                                                                        <Button onClick={()=> {
-                                                                            setIsEdit(null);
-                                                                            setDisabledBoardBtn(false);
-                                                                        }}
-                                                                                variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px]`}>
-                                                                            <X size={16}/>
-                                                                        </Button>
-                                                                    </div>
+                                                                    <TableCell className={`font-medium text-xs px-2 py-[10px] md:px-3 ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                                                        <Input value={x.title} placeholder="Enter Board Name" onChange={(e) => handleInputChange(e, i)} name="title" type={"text"}/>
+                                                                        {formError?.title && <span className={"text-red-500 text-sm"}>{formError?.title}</span>}
+                                                                    </TableCell>
+                                                                    <TableCell/>
+                                                                    <TableCell className={"px-2 py-[10px] md:px-3 flex justify-end "}>
+                                                                            <div className="pr-0">
+                                                                                <Button variant={"outline hover:bg-transparent"} onClick={()=>updateBoard(x,i)} className={`p-1 border w-[30px] h-[30px]`}>
+                                                                                    {isSave ? <Loader2 className="mr-1 h-4 w-4 animate-spin justify-center"/> :<Check size={16}/>}
+                                                                                </Button>
+                                                                            </div>
+                                                                            <div className="pl-2">
+                                                                                <Button variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px]`}>
+                                                                                    <X onClick={()=>setIsEdit(null)} size={16}/>
+                                                                                </Button>
+                                                                            </div>
+                                                                    </TableCell>
+
                                                                 </Fragment>
                                                                 :
                                                                 <Fragment>
-                                                                    <div className="pr-0">
-                                                                        <Button onClick={() => handleEditBoard(i)} variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px] `}>
-                                                                            <Pencil size={16}/>
-                                                                        </Button>
-                                                                    </div>
-                                                                    <div className="pl-2">
-                                                                        <Button onClick={() => deleteTopic(x.id)} variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px]`}>
-                                                                            <Trash2 size={16}/>
-                                                                        </Button>
-                                                                    </div>
-                                                                </Fragment>}
-                                                        </TableCell>
+                                                                    {
+                                                                        x.id ?
+                                                                            <Fragment>
+                                                                                <TableCell className={`font-medium text-xs px-2 py-[10px] md:px-3 ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                                                                    {x.title}
+                                                                                </TableCell>
+                                                                                <TableCell className={`px-2 py-[10px] md:px-3 font-medium text-xs text-center ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                                                                    {moment.utc(x?.updated_at).local().startOf('seconds').fromNow()}
+                                                                                </TableCell>
+                                                                                <TableCell className={"px-2 py-[10px] md:px-3 flex justify-end"}>
+                                                                                    <div className="pr-0">
+                                                                                        <Button onClick={() => handleEditBoard(i)} variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px] `}>
+                                                                                            <Pencil size={16}/>
+                                                                                        </Button>
+                                                                                    </div>
+                                                                                    <div className="pl-2">
+                                                                                        <Button onClick={() => {
+                                                                                            deleteTopic(x.id);
+                                                                                            setOpenDelete(true);
+                                                                                        }} variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px]`}>
+                                                                                            <Trash2 size={16}/>
+                                                                                        </Button>
+                                                                                    </div>
+                                                                                </TableCell>
+                                                                            </Fragment>
+                                                                            :
+                                                                            <Fragment>
+                                                                                <TableCell className={"px-2 py-[10px] md:px-3"}>
+                                                                                    <Input
+                                                                                        value={boardDetail.title}
+                                                                                        type={"text"}
+                                                                                        id={"title"}
+                                                                                        onChange={(e)=>handleInputChange(e)}
+                                                                                        name={"title"}
+                                                                                        onBlur={onBlur}
+                                                                                        placeholder={"Enter board name"}
+                                                                                    />
+                                                                                    {formError?.title && <span className={"text-red-500 text-sm"}>{formError?.title}</span>}
+                                                                                </TableCell>
+                                                                                <TableCell className={"text-center px-2 py-[10px] md:px-3"}>
+
+                                                                                </TableCell>
+                                                                                <TableCell className={"flex justify-end gap-2 pr-6 px-2 py-[15px] md:px-3]"}>
+                                                                                    <Button className={`${isSave === true ? "py-2 px-4" : "py-2 px-4"} w-[100px] h-[30px] text-sm font-semibold`} onClick={()=>addBoard(i)}>{isSave ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : "Add Board"}</Button>
+                                                                                    <Button
+                                                                                        variant="outline hover:bg-transparent"
+                                                                                        className="p-1 border w-[30px] h-[30px]"
+                                                                                        onClick={()=>handleAddCancel(i)}
+                                                                                    >
+                                                                                        <X size={16}/>
+                                                                                    </Button>
+                                                                                </TableCell>
+                                                                            </Fragment>
+
+                                                                    }
+                                                                </Fragment>
+                                                        }
                                                     </TableRow>
+
+
+
                                                 )
                                             })
                                         }
-                                        {
-                                            showNewBoard && <TableRow>
-                                                <TableCell>
-                                                    <Input
-                                                        value={boardDetail.title}
-                                                        type={"text"}
-                                                        id={"title"}
-                                                        onChange={(e)=>handleInputChange(e)}
-                                                        name={"title"}
-                                                        onBlur={onBlur}
-                                                        placeholder={"Enter board name"}
-                                                    />
-                                                    {formError?.title && <span className={"text-red-500 text-sm"}>{formError?.title}</span>}
-                                                </TableCell>
-                                                <TableCell className={"text-center"}>
-
-                                                </TableCell>
-                                                <TableCell className={"flex justify-end gap-2 pr-6 pt-[21px]"}>
-                                                    <Button className={"h-[30px]"} onClick={addBoard}>{isSave ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : "Add Board"}</Button>
-                                                    <Button
-                                                        variant="outline hover:bg-transparent"
-                                                        className="p-1 border w-[30px] h-[30px]"
-                                                        onClick={()=> {
-                                                            setShowNewBoard(false);
-                                                            setDisabledBoardBtn(false);
-                                                        }}
-                                                    >
-                                                        <X size={16}/>
-                                                    </Button>
-                                                </TableCell>
-                                            </TableRow>
-                                        }
-                                    </> :  <TableRow>
+                                    </> : (boardList.length == 0 && isLoading == false) ? <TableRow>
                                             <TableCell colSpan={6}>
                                                 <EmptyData />
                                             </TableCell>
-                                        </TableRow>
+                                        </TableRow> :null
                                 }
                             </TableBody>
                         </Table>
@@ -386,8 +403,7 @@ const Board = () => {
                 </CardContent>
             </Card>
         </Fragment>
-
-    );
-};
+    )
+}
 
 export default Board;

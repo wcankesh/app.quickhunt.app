@@ -7,24 +7,14 @@ import {useTheme} from "../../theme-provider";
 import {Input} from "../../ui/input";
 import {Sheet, SheetContent, SheetHeader, SheetOverlay, SheetTitle} from "../../ui/sheet";
 import {Label} from "../../ui/label";
-import {Separator} from "../../ui/separator";
 import {ApiService} from "../../../utils/ApiService";
 import {useSelector,useDispatch} from "react-redux";
 import moment from "moment";
 import {allStatusAndTypesAction} from "../../../redux/action/AllStatusAndTypesAction";
 import {toast} from "../../ui/use-toast";
-import {Skeleton} from "../../ui/skeleton";
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle
-} from "../../ui/alert-dialog";
 import NoDataThumbnail from "../../../img/Frame.png";
+import {Dialog} from "@radix-ui/react-dialog";
+import {DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "../../ui/dialog";
 
 const initialState = {
     name:"",
@@ -40,9 +30,9 @@ const Categories = () => {
     const [isLoading,setIsLoading]= useState(true);
     const [categoriesList,setCategoriesList]=useState([]);
     const [isSave,setIsSave]=useState(false);
-    const [isOpenDeleteAlert,setIsOpenDeleteAlert] =useState(false);
     const [deleteId,setDeleteId]= useState(null);
-    const [deleteIndex,setDeleteIndex]=useState(null);
+    const [openDelete,setOpenDelete] = useState(false);
+    const [isLoadingDelete,setIsLoadingDelete] = useState(false);
     const apiService = new ApiService();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
@@ -55,7 +45,6 @@ const Categories = () => {
     }, [allStatusAndTypes.categories]);
 
     const getAllCategory = async () => {
-        setIsLoading(true);
         setCategoriesList(allStatusAndTypes.categories);
         setIsLoading(false);
     }
@@ -136,7 +125,7 @@ const Categories = () => {
             setIsSave(false);
             closeSheet();
             toast({
-                description:"Category added successfully."
+                description:data.message
             });
             setCategoryDetails({
                 name:"",
@@ -144,36 +133,40 @@ const Categories = () => {
             })
         } else {
             toast({
-                description:"Something went wrong.",
-                variant: "destructive"
-            })
-        }
-    }
-
-    const onDelete = async () => {
-        const data = await apiService.deleteCategories(deleteId)
-        if(data.status === 200) {
-            const clone = [...categoriesList];
-            setCategoriesList(clone);
-            clone.splice(deleteIndex,1);
-            dispatch(allStatusAndTypesAction({...allStatusAndTypes, categories: clone}));
-            setCategoriesList(clone);
-            toast({
-                description:"Category delete successfully"
-            })
-        }
-        else{
-            toast({
                 description:data.message,
                 variant: "destructive"
             })
         }
     }
 
-    const deleteCategory = (id,index) => {
-        setIsOpenDeleteAlert(true);
+    const onDelete = async () => {
+        setIsLoadingDelete(true)
+        const data = await apiService.deleteCategories(deleteId);
+        const clone = [...categoriesList];
+        const deleteToIndex = clone.findIndex((x)=> x.id == deleteId);
+        if(data.status === 200) {
+
+            setCategoriesList(clone);
+            clone.splice(deleteToIndex,1);
+            dispatch(allStatusAndTypesAction({...allStatusAndTypes, categories: clone}));
+            setCategoriesList(clone);
+            toast({
+                description:data.message
+            });
+        }
+        else{
+            toast({
+                description:data.message,
+                variant: "destructive"
+            });
+        }
+        setIsLoadingDelete(false);
+        setOpenDelete(false);
+    }
+
+    const deleteCategory = (id) => {
         setDeleteId(id);
-        setDeleteIndex(index);
+        setOpenDelete(true);
     }
 
     const updateCategory = async () => {
@@ -208,7 +201,7 @@ const Categories = () => {
             setCategoryDetails(initialState);
             setIsSave(false);
             toast({
-                description:"Category update successfully",
+                description:data.message,
             })
         } else {
             setIsSave(false);
@@ -223,21 +216,36 @@ const Categories = () => {
 
     return (
         <Fragment>
-            <AlertDialog open={isOpenDeleteAlert} onOpenChange={setIsOpenDeleteAlert}>
-                <AlertDialogContent className={"w-[310px] md:w-full rounded-lg"}>
-                    <AlertDialogHeader>
-                        <AlertDialogTitle>You really want delete Category?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            This action can't be undone.
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
 
-                    <div className={"flex justify-end gap-2"}>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction className={"bg-red-600 hover:bg-red-600"} onClick={onDelete}>Delete</AlertDialogAction>
-                    </div>
-                </AlertDialogContent>
-            </AlertDialog>
+            {
+                openDelete &&
+                <Fragment>
+                    <Dialog open onOpenChange={()=> setOpenDelete(false)}>
+                        <DialogContent className="max-w-[350px] w-full sm:max-w-[525px] p-3 md:p-6 rounded-lg">
+                            <DialogHeader className={"flex flex-row justify-between gap-2"}>
+                                <div className={"flex flex-col gap-2"}>
+                                    <DialogTitle className={"text-start"}>You really want delete this Category?</DialogTitle>
+                                    <DialogDescription className={"text-start"}>This action can't be undone.</DialogDescription>
+                                </div>
+                                <X size={16} className={"m-0 cursor-pointer"} onClick={() => setOpenDelete(false)}/>
+                            </DialogHeader>
+                            <DialogFooter className={"flex-row justify-end space-x-2"}>
+                                <Button variant={"outline hover:none"}
+                                        className={"text-sm font-semibold border"}
+                                        onClick={() => setOpenDelete(false)}>Cancel</Button>
+                                <Button
+                                    variant={"hover:bg-destructive"}
+                                    className={` ${theme === "dark" ? "text-card-foreground" : "text-card"} ${isLoading === true ? "py-2 px-6" : "py-2 px-6"} w-[76px] text-sm font-semibold bg-destructive`}
+                                    onClick={onDelete}
+                                >
+                                    {isLoadingDelete ? <Loader2 size={16} className={"animate-spin"}/> : "Delete"}
+                                </Button>
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
+                </Fragment>
+            }
+
             <Card>
                 <CardHeader className={"p-6 gap-1 border-b flex flex-row flex-wrap justify-between items-center p-4 sm:p-6 gap-y-2"}>
                     <div>
@@ -252,45 +260,26 @@ const Categories = () => {
                                     <Table>
                                         <TableHeader className={""}>
                                             <TableRow>
-                                                <TableHead className={`w-2/5 pl-4 ${theme === "dark" ? "" : "text-card-foreground"}`}>Label Name</TableHead>
-                                                <TableHead className={`text-center ${theme === "dark" ? "" : "text-card-foreground"}`}>Last Update</TableHead>
-                                                <TableHead className={`pr-[39px] text-end ${theme === "dark" ? "" : "text-card-foreground"}`}>Action</TableHead>
+                                                <TableHead className={`w-2/5 px-2 py-[10px] md:px-3 ${theme === "dark" ? "" : "text-card-foreground"}`}>Label Name</TableHead>
+                                                <TableHead className={`text-center px-2 py-[10px] md:px-3 ${theme === "dark" ? "" : "text-card-foreground"}`}>Last Update</TableHead>
+                                                <TableHead className={`px-2 py-[10px] md:px-3 text-end ${theme === "dark" ? "" : "text-card-foreground"}`}>Action</TableHead>
                                             </TableRow>
                                         </TableHeader>
                                         {
-                                            isLoading ? <TableBody>
-                                                    {
-                                                        [...Array(5)].map((_, index) => {
-                                                            return (
-                                                                <TableRow key={index}>
-                                                                    {
-                                                                        [...Array(3)].map((_, i) => {
-                                                                            return (
-                                                                                <TableCell key={i} className={"px-2"}>
-                                                                                    <Skeleton className={`rounded-md  w-full h-[24px] ${i == 0 ? "w-full" : ""}`}/>
-                                                                                </TableCell>
-                                                                            )
-                                                                        })
-                                                                    }
-                                                                </TableRow>
-                                                            )
-                                                        })
-                                                    }
-                                                </TableBody> :
                                             <TableBody>
                                                     {
                                                         (categoriesList || []).map((x,index)=>{
                                                             return(
                                                                 <TableRow key={x.id}>
-                                                                    <TableCell className={`font-medium text-xs py-[8.5px] pl-4 ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                                                    <TableCell className={`font-medium text-xs px-2 py-[10px] md:px-3 ${theme === "dark" ? "" : "text-muted-foreground"}`}>
                                                                         {x.name}
                                                                     </TableCell>
-                                                                    <TableCell className={`font-medium text-xs leading-normal text-center ${theme === "dark" ? "" : "text-muted-foreground"}`}>{moment.utc(x.updated_at).local().startOf('seconds').fromNow()}</TableCell>
-                                                                    <TableCell className={"flex justify-end"}>
+                                                                    <TableCell className={`px-2 py-[10px] md:px-3 font-medium text-xs leading-normal text-center ${theme === "dark" ? "" : "text-muted-foreground"}`}>{moment.utc(x.updated_at).local().startOf('seconds').fromNow()}</TableCell>
+                                                                    <TableCell className={"px-2 py-[10px] md:px-3 flex justify-end"}>
                                                                         <div className="pr-0">
                                                                             <Button onClick={() => onEditOption(x,index)} variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px]`}><Pencil size={16}/></Button>
                                                                         </div>
-                                                                        <div className="pl-2"><Button onClick={()=>deleteCategory(x.id,index)} variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px]`}><Trash2 size={16} /></Button></div>
+                                                                        <div className="pl-2"><Button onClick={()=>deleteCategory(x.id)} variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px]`}><Trash2 size={16} /></Button></div>
                                                                     </TableCell>
                                                                 </TableRow>
                                                             )
@@ -334,7 +323,7 @@ const Categories = () => {
                         </div>
                         <div className={"sm:px-8 sm:py-6 py-4 px-3"}>
                             <Button
-                                className={`${isSave === true ? "py-2 px-4" : "py-2 px-4 w-[147px]"} text-sm font-semibold`}
+                                className={`${isSave === true ? "py-2 px-4" : "py-2 px-4"} w-[147px] text-sm font-semibold`}
                                 onClick={editRecord?.id ? updateCategory : addCategory}
                             >
                                 {isSave ? <Loader2 className={"mr-2 h-4 w-4 animate-spin"}/> : editRecord.id ? "Update Category" : "Add Category" }
