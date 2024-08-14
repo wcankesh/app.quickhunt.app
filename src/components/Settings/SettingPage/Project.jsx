@@ -52,6 +52,7 @@ const Project = () => {
     const [previewImageFav,setPreviewImageFav]=useState("");
     const [openDelete,setOpenDelete] = useState(false);
     const [isLoadingDelete,setIsLoadingDelete]= useState(false);
+    const [isDelete, setIsDelete] = useState(false);
     const dispatch = useDispatch();
     const apiService = new ApiService();
 
@@ -115,8 +116,19 @@ const Project = () => {
         const payload = {...createProjectDetails, ...record}
         let formData = new FormData()
         Object.keys(payload).forEach((key) => {
-            formData.append(key, payload[key] || '')
+            // formData.append(key, payload[key] || '')
+            if(key === "delete_logo" && createProjectDetails?.project_logo?.name){
+
+            }  else {
+                formData.append(key,createProjectDetails[key] || '');
+            }
+            if(key === "delete_favicon" && createProjectDetails?.project_favicon?.name){
+
+            }  else {
+                formData.append(key,createProjectDetails[key] || '');
+            }
         })
+
         setIsSave(true)
         const data = await apiService.updateProjects(formData, projectDetailsReducer.id)
         if(data.status === 200){
@@ -124,24 +136,39 @@ const Project = () => {
             dispatch(projectDetailsAction(data.data))
             setIsSave(false)
             toast({
-                description :"Project update successfully"
+                description: data.message
             })
         } else {
             setIsSave(false);
             toast({
-                description :"Something went wrong",
+                description: data.message,
                 variant: "destructive"
             })
         }
     }
 
-    const handleFileChange = (file,name) => {
-        if(name == "logo"){
-            setPreviewImage(URL.createObjectURL(file.target.files[0]));
-            setCreateProjectDetails({...createProjectDetails, project_logo: file.target.files[0]});
-        } else if (name == "favicon"){
-            setPreviewImageFav(URL.createObjectURL(file.target.files[0]));
-            setCreateProjectDetails({...createProjectDetails, project_favicon: file.target.files[0]});
+    const handleFileChange =(file)=>{
+        setPreviewImage(URL.createObjectURL(file.target.files[0]));
+        setCreateProjectDetails({...createProjectDetails, project_logo: file.target.files[0]})
+    }
+    const handleFileChangeFav =(file)=>{
+        setPreviewImageFav(URL.createObjectURL(file.target.files[0]));
+        setCreateProjectDetails({...createProjectDetails, project_favicon: file.target.files[0]})
+    }
+
+    const onDeleteImgLogo = async (name, value) => {
+        if(createProjectDetails && createProjectDetails?.project_logo && createProjectDetails.project_logo?.name){
+            setCreateProjectDetails({...createProjectDetails, project_logo: ""})
+        } else {
+            setCreateProjectDetails({...createProjectDetails, [name]: value, project_logo: ""})
+        }
+    }
+
+    const onDeleteImgFav = async (name, value) => {
+        if(createProjectDetails && createProjectDetails?.project_favicon && createProjectDetails.project_favicon?.name){
+            setCreateProjectDetails({...createProjectDetails, project_favicon: ""})
+        } else {
+            setCreateProjectDetails({...createProjectDetails, [name]: value, project_favicon: ""})
         }
     }
 
@@ -220,23 +247,56 @@ const Project = () => {
                         <div className={"flex flex-wrap sm:flex-nowrap gap-4 gap-x-[94px]"}>
                             <div className={"flex gap-2"}>
                                 <div className="w-[50px] h-[50px] relative">
-                                    <div className="flex gap-2 basis-1/2 items-center justify-center relative">
-                                        <label
-                                            htmlFor="upload_image"
-                                            className="flex w-[50px] bg-muted h-[50px] py-0 justify-center items-center flex-shrink-0 rounded cursor-pointer"
-                                        >
-                                            {previewImage ? <img className={"h-[50px] w-[50px] rounded-md object-cover"} src={previewImage} alt={"not_found"} /> : <span className="text-center text-muted-foreground font-semibold text-[14px]">{Icon.editImgLogo}</span>}
-                                            <input
-                                                id="upload_image"
-                                                type="file"
-                                                className="hidden"
-                                                onChange={(file)=>handleFileChange(file,"logo")}
-                                                accept="image/*"
-                                            />
-                                        </label>
-                                        {previewImage && (
-                                            <CircleX size={20} className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`} onClick={removePreviewImage}/>
-                                        )}
+                                    <div className="flex gap-2 basis-1/2 items-center justify-center">
+                                        {
+                                            createProjectDetails?.project_logo ?
+                                                <div>
+                                                    {createProjectDetails && createProjectDetails.project_logo && createProjectDetails.project_logo.name ?
+                                                        <div className={"h-[50px] w-[50px] relative border rounded-lg"}>
+                                                            <img
+                                                                // className={"upload-img"}
+                                                                className="h-full w-full rounded-md object-cover"
+                                                                src={createProjectDetails && createProjectDetails.project_logo && createProjectDetails.project_logo.name ? URL.createObjectURL(createProjectDetails.project_logo) : createProjectDetails.project_logo}
+                                                                alt=""
+                                                            />
+                                                            <CircleX
+                                                                size={20}
+                                                                className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
+                                                                onClick={() => onDeleteImgLogo('delete_logo', createProjectDetails && createProjectDetails?.project_logo && createProjectDetails.project_logo?.name ? "" : createProjectDetails.project_logo.replace("https://code.quickhunt.app/public/storage/project/", ""))}
+                                                            />
+                                                        </div> : createProjectDetails.project_logo ?
+                                                            <div className={"h-[50px] w-[50px] relative border rounded-lg"}>
+                                                                <img
+                                                                    // className={"upload-img"}
+                                                                    className="h-full w-full rounded-md object-cover"
+                                                                    src={createProjectDetails.project_logo}
+                                                                    alt=""/>
+                                                                <CircleX
+                                                                    size={20}
+                                                                    className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
+                                                                    onClick={() => onDeleteImgLogo('delete_logo', createProjectDetails && createProjectDetails?.project_logo && createProjectDetails.project_logo?.name ? "" : createProjectDetails.project_logo.replace("https://code.quickhunt.app/public/storage/project/", ""))}
+                                                                />
+                                                            </div>
+                                                            : ''}
+                                                </div> :
+                                                <div>
+
+                                                    <input
+                                                        id="pictureInput"
+                                                        type="file"
+                                                        className="hidden"
+                                                        accept="image/*"
+                                                        onChange={handleFileChange}
+                                                    />
+                                                    <label
+                                                        htmlFor="pictureInput"
+                                                        // className="border-dashed w-[80px] h-[80px] sm:w-[132px] sm:h-[128px] py-[52px] flex items-center justify-center bg-muted border border-muted-foreground rounded cursor-pointer"
+                                                        className="flex w-[50px] bg-muted h-[50px] py-0 justify-center items-center flex-shrink-0 rounded cursor-pointer"
+                                                    >
+                                                        <span className="text-center text-muted-foreground font-semibold text-[14px]">{Icon.editImgLogo}</span>
+                                                    </label>
+                                                </div>
+                                        }
                                     </div>
 
                                 </div>
@@ -246,26 +306,55 @@ const Project = () => {
                                 </div>
                             </div>
                             <div className={"flex gap-2"}>
-                                <div className="w-[50px] h-[50px] relative">
-                                    <label
-                                        htmlFor="upload_image_fav"
-                                        className="flex w-[50px] bg-muted h-[50px] py-0 justify-center items-center flex-shrink-0 rounded cursor-pointer"
-                                    >
-                                        {previewImageFav ? <img className={"h-[50px] w-[50px] rounded-md object-cover"} src={previewImageFav} alt={"not_found"} /> : <span className="text-center text-muted-foreground font-semibold text-[14px]">{Icon.editImgLogo}</span>}
-                                        <input
-                                            id="upload_image_fav"
-                                            type="file"
-                                            className="hidden"
-                                            onChange={(file)=>handleFileChange(file,"favicon")}
-                                            accept="image/*"
-                                        />
-                                    </label>
-                                    {previewImageFav && (
-                                        <CircleX size={20} className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`} onClick={()=>setPreviewImageFav("")}/>
-                                    )}
+                                {
+                                    createProjectDetails?.project_favicon ?
+                                        <div>
+                                            {createProjectDetails && createProjectDetails.project_favicon && createProjectDetails.project_favicon.name ?
+                                                <div className={"h-[50px] w-[50px] relative border rounded-lg"}>
+                                                    <img
+                                                        // className={"upload-img"}
+                                                        className="h-full w-full rounded-md object-cover"
+                                                        src={createProjectDetails && createProjectDetails.project_favicon && createProjectDetails.project_favicon.name ? URL.createObjectURL(createProjectDetails.project_favicon) : createProjectDetails.project_favicon}
+                                                        alt=""
+                                                    />
+                                                    <CircleX
+                                                        size={20}
+                                                        className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
+                                                        onClick={() => onDeleteImgFav('delete_favicon', createProjectDetails && createProjectDetails?.project_favicon && createProjectDetails.project_favicon?.name ? "" : createProjectDetails.project_favicon.replace("https://code.quickhunt.app/public/storage/project/", ""))}
+                                                    />
+                                                </div> : createProjectDetails.project_favicon ?
+                                                    <div className={"h-[50px] w-[50px] relative border rounded-lg"}>
+                                                        <img
+                                                            // className={"upload-img"}
+                                                            className="h-full w-full rounded-md object-cover"
+                                                            src={createProjectDetails.project_favicon}
+                                                            alt=""/>
+                                                        <CircleX
+                                                            size={20}
+                                                            className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
+                                                            onClick={() => onDeleteImgFav('delete_favicon', createProjectDetails && createProjectDetails?.project_favicon && createProjectDetails.project_favicon?.name ? "" : createProjectDetails.project_favicon.replace("https://code.quickhunt.app/public/storage/project/", ""))}
+                                                        />
+                                                    </div>
+                                                    : ''}
+                                        </div> :
+                                        <div>
 
-
-                                </div>
+                                            <input
+                                                id="pictureInput"
+                                                type="file"
+                                                className="hidden"
+                                                accept="image/*"
+                                                onChange={handleFileChangeFav}
+                                            />
+                                            <label
+                                                htmlFor="pictureInput"
+                                                // className="border-dashed w-[80px] h-[80px] sm:w-[132px] sm:h-[128px] py-[52px] flex items-center justify-center bg-muted border border-muted-foreground rounded cursor-pointer"
+                                                className="flex w-[50px] bg-muted h-[50px] py-0 justify-center items-center flex-shrink-0 rounded cursor-pointer"
+                                            >
+                                                <span className="text-center text-muted-foreground font-semibold text-[14px]">{Icon.editImgLogo}</span>
+                                            </label>
+                                        </div>
+                                }
                                 <div className={"flex flex-col gap-1"}>
                                     <h4 className={"text-sm font-medium"}>Favicon</h4>
                                     <p className={"text-xs font-medium text-muted-foreground"}>64px By 64px</p>
@@ -294,8 +383,13 @@ const Project = () => {
                 </div>
             </CardContent>
             <CardFooter className={"pt-4 flex flex-wrap justify-end sm:justify-end gap-4 sm:p-5 p-4"}>
-                <Button variant={"outline hover:bg-transparent"} onClick={deleteAlert} className={`text-sm font-semibold ${theme === "dark" ? "text-card-foreground" : "text-primary"} border border-primary`}>Delete project</Button>
-                <Button className={"text-sm font-semibold"} onClick={() => updateProjects('')}>{isSave ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Update project"}</Button>
+                <Button
+                    variant={"outline hover:bg-transparent"} onClick={deleteAlert}
+                    className={`text-sm font-semibold ${theme === "dark" ? "text-card-foreground" : "text-primary border-primary"} border ${isDelete === true ? "py-2 px-4" : "py-2 px-4 w-[130px]"}  text-sm font-semibold`}
+                >{isDelete ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Delete project"}</Button>
+                <Button
+                    className={`${isSave === true ? "py-2 px-4" : "py-2 px-4 w-[132px]"} text-sm font-semibold`}
+                    onClick={() => updateProjects('')}>{isSave ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Update project"}</Button>
             </CardFooter>
         </Card>
     );

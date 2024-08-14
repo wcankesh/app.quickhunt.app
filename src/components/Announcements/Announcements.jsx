@@ -67,7 +67,7 @@ const Announcements = () => {
 
     useEffect(() => {
             if(projectDetailsReducer.id){
-                if(filter.l || filter.s || filter.q){
+                if(filter.l || filter.s || filter.q || isFilter){
                     searchAnnouncement({...filter, page: pageNo, project_id: projectDetailsReducer.id,})
                 } else {
                     if(!isFilter){
@@ -97,6 +97,7 @@ const Announcements = () => {
     }
 
     const searchAnnouncement = async (payload) => {
+        setIsLoading(true);
         const data = await apiService.filterPost(payload)
         if (data.status === 200) {
             setIsLoading(false);

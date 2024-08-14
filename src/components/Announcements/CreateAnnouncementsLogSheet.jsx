@@ -298,14 +298,14 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
     }
 
     const handleValueChange = (value) => {
-        const clone = [...changeLogDetails.post_assign_to]
-        const index = clone.indexOf(value);
-        if (index > -1) {
-            clone.splice(index, 1);
-        } else {
-            clone.push(value);
-        }
-        setChangeLogDetails({...changeLogDetails,post_assign_to: clone});
+        // const clone = [...changeLogDetails.post_assign_to]
+        // const index = clone.indexOf(value);
+        // if (index > -1) {
+        //     clone.splice(index, 1);
+        // } else {
+        //     clone.push(value);
+        // }
+        setChangeLogDetails({...changeLogDetails,post_assign_to: [value]});
     };
 
     const onChangeLabel = (value) => {
