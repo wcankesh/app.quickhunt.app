@@ -10,6 +10,7 @@ import {useSelector} from "react-redux";
 import {Button} from "../../ui/button";
 import {Loader2} from "lucide-react";
 import ColorInput from "../../Comman/ColorPicker";
+import {Checkbox} from "../../ui/checkbox";
 
 const initialState = {
     announcement_title: "",
@@ -139,9 +140,9 @@ const GeneralSettings = () => {
                                             <Input value={generalSettingData.announcement_title}  onChange={(e) => onChange('announcement_title', e.target.value )} />
                                         </div>
                                         <div className={"flex flex-col flex-wrap w-full md:basis-1/2 gap-2"}>
-                                            <div className="announce-create-switch flex gap-4">
-                                                <Switch
-                                                    className="w-[38px] h-[20px]"
+                                            <div className="flex items-center gap-4">
+                                                <Checkbox
+                                                    id="reaction"
                                                     checked={generalSettingData.is_reaction === 1}
                                                     onCheckedChange={(checked, event) => onChangeSwitch({
                                                         event1: {
@@ -150,11 +151,16 @@ const GeneralSettings = () => {
                                                         }
                                                     }, event)}
                                                 />
-                                                <p className="text-sm text-muted-foreground font-medium">Reactions</p>
+                                                <label
+                                                    htmlFor="reaction"
+                                                    className="text-sm text-muted-foreground font-medium"
+                                                >
+                                                    Reactions
+                                                </label>
                                             </div>
-                                            <div className="announce-create-switch flex gap-4">
-                                                <Switch
-                                                    className="w-[38px] h-[20px]"
+                                            <div className="flex items-center gap-4">
+                                                <Checkbox
+                                                    id="reaction"
                                                     checked={generalSettingData.is_comment === 1}
                                                     onCheckedChange={(checked, event) => onChangeSwitch({
                                                         event1: {
@@ -163,7 +169,12 @@ const GeneralSettings = () => {
                                                         }
                                                     }, event)}
                                                 />
-                                                <p className="text-sm text-muted-foreground font-medium">Show Your Comment</p>
+                                                <label
+                                                    htmlFor="reaction"
+                                                    className="text-sm text-muted-foreground font-medium"
+                                                >
+                                                    Show Comment
+                                                </label>
                                             </div>
                                         </div>
                                     </div>

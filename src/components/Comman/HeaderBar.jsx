@@ -715,7 +715,7 @@ const HeaderBar = () => {
                                             Create Project
                                         </Button>
                                         <Button
-                                            className={"text-primary text-sm font-semibold hover:bg-card border border-primary bg-card"}
+                                            className={`${theme === "dark" ? "" : "text-primary"} text-sm font-semibold hover:bg-card border border-primary bg-card`}
                                             type="submit" onClick={onCancel}
                                         >
                                             Cancel

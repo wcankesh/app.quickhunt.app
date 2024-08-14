@@ -527,3 +527,7 @@ input:-webkit-autofill {
 input:-webkit-autofill::first-line {
   color: #fff !important; /* Ensure text color remains visible */
 }
+
+/*Calender css*/
+td.h-9.w-9.text-center.text-sm.p-0.relative.\[\&\:has\(\[aria-selected\]\.range_end\)\]\:rounded-r-md.\[\&\:has\(\[aria-selected\]\.day-outside\)\]\:bg-accent\/50.\[\&\:has\(\[aria-selected\]\)\]\:bg-accent.first\:\[\&\:has\(\[aria-selected\]\.range_start\)\]\:rounded-l-md.last\:\[\&\:has\(\[aria-selected\]\)\]\:rounded-r-md.focus-within\:relative.focus-within\:z-20.rdp-range_middle.rdp-selected {color: black}
+.calendar-das .rdp-button_previous svg, .calendar-das .rdp-button_next svg{fill: white}

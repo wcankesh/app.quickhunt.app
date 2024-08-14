@@ -587,7 +587,7 @@ const CreateAnnouncementsLogSheet = ({isOpen, onOpen, onClose,selectedRecord}) =
                         { isSave ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : selectedRecord?.post_slug_url ? "Update Post" : "Publish Post"}
                     </Button>
                     <Button onClick={onClose} variant={"outline "}
-                            className={"border border-primary text-primary text-sm font-semibold"}>Cancel</Button>
+                            className={`border border-primary ${theme === "dark" ? "" : "text-primary"} text-sm font-semibold`}>Cancel</Button>
                 </div>
                 </div>
             </SheetContent>

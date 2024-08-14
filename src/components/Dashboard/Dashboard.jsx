@@ -19,6 +19,7 @@ import {
     ChartTooltipContent,
 } from "../ui/chart"
 import {Avatar, AvatarImage} from "../ui/avatar";
+import {useTheme} from "../theme-provider";
 
 const chartConfig = {
     totalView: {
@@ -32,6 +33,7 @@ const chartConfig = {
 }
 
 export function Dashboard() {
+    const {theme} = useTheme()
     let apiSerVice = new ApiService();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
@@ -90,29 +92,37 @@ export function Dashboard() {
         }
         const data = await apiSerVice.dashboardData(payload)
         if(data.status === 200){
-            const feedbackAnalytics = [];
-            data.data.feedbackAnalytics.map((j, i) => {
-                let obj = {
-                    x: new Date(j.x),
-                    y: parseInt(j.y)
-                }
+            // const feedbackAnalytics = [];
+            // data.data.feedbackAnalytics.map((j, i) => {
+            //     let obj = {
+            //         x: new Date(j.x),
+            //         y: parseInt(j.y)
+            //     }
+            //
+            //     feedbackAnalytics.push(obj)
+            // })
 
-                feedbackAnalytics.push(obj)
-            })
+            const feedbackAnalytics = data.data.feedbackAnalytics.map((j) => ({
+                x: new Date(j.x),
+                y: parseInt(j.y),
+            }));
+
             setChartList({...data.data,totalViewViewList: data.data.viewsAnalytic, feedbackAnalytics:feedbackAnalytics})
             setIsLoading(false)
-            if (data.data.viewsAnalytic.length === 0) {
-                setDataAvailable(false);
-            } else {
-                setDataAvailable(true);
-            }
+            // if (data.data.viewsAnalytic.length === 0) {
+            //     setDataAvailable(false);
+            // } else {
+            //     setDataAvailable(true);
+            // }
+
+            setDataAvailable(data.data.viewsAnalytic.length > 0);
         } else {
 
         }
     }
 
 
-    const onChangeDate = (selected, triggerDate, modifiers, e) => {
+    const onChangeDate = (selected) => {
        // debugger
         if (selected && selected.from && selected.to) {
             setState({
@@ -178,15 +188,16 @@ export function Dashboard() {
                                         </>
                                     </Button>
                                 </PopoverTrigger>
-                                <PopoverContent className="w-auto p-0" align="start">
-                                    <Calendar
+                                <PopoverContent className={"md:w-auto p-0"} align="end">
+                                    <Calendar className={`${theme === 'dark' ? 'calendar-das' : ''}`}
                                         mode="range"
                                         selected={{from: state.from, to:state.to}}
                                         numberOfMonths={2}
                                         startMonth={new Date(2024, 0)}
                                         endMonth={new Date(2050, 12)}
                                         showOutsideDays={false}
-                                        onSelect={(selected, triggerDate, modifiers, e) => onChangeDate(selected, triggerDate, modifiers, e)}
+                                        // onSelect={(selected, triggerDate, modifiers, e) => onChangeDate(selected, triggerDate, modifiers, e)}
+                                        onSelect={onChangeDate}
                                     />
                                 </PopoverContent>
                             </Popover>
@@ -196,7 +207,7 @@ export function Dashboard() {
                                 {
                                     (programAnalytics || []).map((x, i) => {
                                         return (
-                                            <Fragment>
+                                            <Fragment key={i}>
                                                 {
                                                     isLoading ? <Card><CardContent className={"p-0"}> {CommSkel.commonParagraphThree} </CardContent></Card> :
                                                         <Card className={"rounded-lg border bg-card text-card-foreground shadow-sm"} x-chunk={"dashboard-05-chunk-0"} key={i}>
