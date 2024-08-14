@@ -8,10 +8,8 @@ import {Input} from "../../ui/input";
 import {ApiService} from "../../../utils/ApiService";
 import {useSelector,useDispatch} from "react-redux";
 import moment from "moment";
-import {Skeleton} from "../../ui/skeleton";
 import {allStatusAndTypesAction} from "../../../redux/action/AllStatusAndTypesAction";
 import {toast} from "../../ui/use-toast";
-import EmptyData from "../../Comman/EmptyData";
 import {Dialog} from "@radix-ui/react-dialog";
 import {DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "../../ui/dialog";
 
@@ -200,21 +198,17 @@ const Tags = () => {
     };
 
     const handleEditTopic = (index) => {
-        const findIndex = topicLists.findIndex((x)=> !x.id);
-        if(findIndex != -1){
-            const clone = [...topicLists];
-            clone.splice(findIndex,1);
-            setTopicLists(clone);
-        }
         setIsEdit(index);
     }
 
-    const handleAddCancel = (index) => {
+    const handleCancel = (index) => {
         const clone = [...topicLists];
         clone.splice(index,1);
         setTopicLists(clone);
         setTopicDetails(initialState);
+        setTopicLists(clone);
         setIsEdit(null);
+        setTopicDetails(initialState);
     }
 
     return (
@@ -297,8 +291,12 @@ const Tags = () => {
                                                                                     </Button>
                                                                                 </div>
                                                                                 <div className="pl-2">
-                                                                                    <Button variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px]`}>
-                                                                                        <X onClick={()=>setIsEdit(null)} size={16}/>
+                                                                                    <Button onClick={()=>{
+                                                                                     setIsEdit(null);
+                                                                                     setTopicLists(allStatusAndTypes.topics);
+                                                                                     setTopicDetails(initialState);
+                                                                                    }} variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px]`}>
+                                                                                        <X  size={16}/>
                                                                                     </Button>
                                                                                 </div>
                                                                         </TableCell>
@@ -349,7 +347,7 @@ const Tags = () => {
                                                                                                 <Button
                                                                                                     variant="outline hover:bg-transparent"
                                                                                                     className="p-1 border w-[30px] h-[30px]"
-                                                                                                    onClick={()=>handleAddCancel(index)}
+                                                                                                    onClick={()=>handleCancel(index)}
                                                                                                 >
                                                                                                     <X size={16}/>
                                                                                                 </Button>

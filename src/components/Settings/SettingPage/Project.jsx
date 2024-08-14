@@ -1,4 +1,4 @@
-import React, {useState,useEffect,} from 'react';
+import React, {useState, useEffect, Fragment,} from 'react';
 import {Card, CardContent, CardHeader, CardTitle, CardFooter, CardDescription} from "../../ui/card";
 import {Label} from "../../ui/label";
 import {Button} from "../../ui/button";
@@ -20,7 +20,9 @@ import {projectDetailsAction} from "../../../redux/action/ProjectDetailsAction";
 import {allProjectAction} from "../../../redux/action/AllProjectAction";
 import {setProjectDetails} from "../../../utils/constent";
 import {toast} from "../../ui/use-toast";
-import {CircleX, Loader2} from "lucide-react";
+import {CircleX, Loader2, X} from "lucide-react";
+import {Dialog} from "@radix-ui/react-dialog";
+import {DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "../../ui/dialog";
 
 const initialState = {
     project_name: '',
@@ -48,7 +50,8 @@ const Project = () => {
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const allProjectReducer = useSelector(state => state.allProjectReducer);
     const [previewImageFav,setPreviewImageFav]=useState("");
-    const [isOpenDeleteAlert,setIsOpenDeleteAlert]=useState(false);
+    const [openDelete,setOpenDelete] = useState(false);
+    const [isLoadingDelete,setIsLoadingDelete]= useState(false);
     const dispatch = useDispatch();
     const apiService = new ApiService();
 
@@ -143,9 +146,10 @@ const Project = () => {
     }
 
     const deleteAlert =()=>{
-        setIsOpenDeleteAlert(true);
+        setOpenDelete(true);
     }
     const onDelete = async () => {
+        setIsLoadingDelete(true);
         const data = await apiService.deleteProjects(projectDetailsReducer.id)
         if(data.status === 200){
             const cloneProject = [...allProjectReducer.projectList]
@@ -165,30 +169,46 @@ const Project = () => {
         } else {
 
         }
+        setOpenDelete(false);
     }
 
     const removePreviewImage = () => {
         setPreviewImage("");
     }
 
-    console.log(createProjectDetails.project_logo);
 
     return (
         <Card>
-            <AlertDialog open={isOpenDeleteAlert} onOpenChange={setIsOpenDeleteAlert}>
-                <AlertDialogContent className={"w-[310px] md:w-full rounded-lg"}>
-                    <AlertDialogHeader>
-                        <AlertDialogTitle>You really want delete project?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            This action can't be undone.
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <div className={"flex justify-end gap-2"}>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction className={"bg-red-600 hover:bg-red-600"} onClick={onDelete}>Delete</AlertDialogAction>
-                    </div>
-                </AlertDialogContent>
-            </AlertDialog>
+
+            {
+                openDelete &&
+                <Fragment>
+                    <Dialog open onOpenChange={()=> setOpenDelete(false)}>
+                        <DialogContent className="max-w-[350px] w-full sm:max-w-[525px] p-3 md:p-6 rounded-lg">
+                            <DialogHeader className={"flex flex-row justify-between gap-2"}>
+                                <div className={"flex flex-col gap-2"}>
+                                    <DialogTitle className={"text-start"}>You really want delete this project?</DialogTitle>
+                                    <DialogDescription className={"text-start"}>This action can't be undone.</DialogDescription>
+                                </div>
+                                <X size={16} className={"m-0 cursor-pointer"} onClick={() => setOpenDelete(false)}/>
+                            </DialogHeader>
+                            <DialogFooter className={"flex-row justify-end space-x-2"}>
+                                <Button variant={"outline hover:none"}
+                                        className={"text-sm font-semibold border"}
+                                        onClick={() => setOpenDelete(false)}>Cancel</Button>
+                                <Button
+                                    variant={"hover:bg-destructive"}
+                                    className={` ${theme === "dark" ? "text-card-foreground" : "text-card"} ${isLoadingDelete === true ? "py-2 px-6" : "py-2 px-6"} w-[76px] text-sm font-semibold bg-destructive`}
+                                    onClick={onDelete}
+                                >
+                                    {isLoadingDelete ? <Loader2 size={16} className={"animate-spin"}/> : "Delete"}
+                                </Button>
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
+                </Fragment>
+            }
+
             <CardHeader className={"p-6 gap-1 border-b p-4 sm:p-6"}>
                 <CardTitle className={"text-lg sm:text-2xl font-medium"}>Project Setting</CardTitle>
                 <CardDescription className={"text-sm text-muted-foreground p-0"}>Manage your project settings.</CardDescription>

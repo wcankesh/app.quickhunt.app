@@ -127,14 +127,9 @@ const Board = () => {
         setDeleteId(id);
     }
 
-    const handleEditBoard = (index) => {
-        const clone = [...boardList];
-        const findIndex = clone.findIndex((x)=> !x.id);
-        if(findIndex != -1){
-            clone.splice(findIndex,1);
-            setBoardList(clone);
-        }
+    const handleEditBoard = (index,record) => {
         setIsEdit(index);
+        // setOriginalObj(record);
     }
 
     const updateBoard = async (record,index)=>{
@@ -222,12 +217,12 @@ const Board = () => {
         }
     }
 
-    const handleAddCancel = (index) => {
-        const clone = [...boardList];
-        clone.splice(index,1);
-        setBoardList(clone);
-        setBoardDetail(initialState);
-        setIsEdit(null);
+    const handleCancel = (index) => {
+       const clone = [...boardList];
+       clone.splice(index,1);
+       setBoardList(clone);
+       setIsEdit(null);
+       setBoardDetail(initialState);
     }
 
 
@@ -318,8 +313,12 @@ const Board = () => {
                                                                                 </Button>
                                                                             </div>
                                                                             <div className="pl-2">
-                                                                                <Button variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px]`}>
-                                                                                    <X onClick={()=>setIsEdit(null)} size={16}/>
+                                                                                <Button onClick={()=> {
+                                                                                    setIsEdit(null);
+                                                                                    setBoardList(allStatusAndTypes?.boards);
+                                                                                    setBoardDetail(initialState)
+                                                                                }} variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px]`}>
+                                                                                    <X  size={16}/>
                                                                                 </Button>
                                                                             </div>
                                                                     </TableCell>
@@ -338,7 +337,7 @@ const Board = () => {
                                                                                 </TableCell>
                                                                                 <TableCell className={"px-2 py-[10px] md:px-3 flex justify-end"}>
                                                                                     <div className="pr-0">
-                                                                                        <Button onClick={() => handleEditBoard(i)} variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px] `}>
+                                                                                        <Button onClick={() => handleEditBoard(i,x)} variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px] `}>
                                                                                             <Pencil size={16}/>
                                                                                         </Button>
                                                                                     </div>
@@ -374,7 +373,7 @@ const Board = () => {
                                                                                     <Button
                                                                                         variant="outline hover:bg-transparent"
                                                                                         className="p-1 border w-[30px] h-[30px]"
-                                                                                        onClick={()=>handleAddCancel(i)}
+                                                                                        onClick={()=>handleCancel(i)}
                                                                                     >
                                                                                         <X size={16}/>
                                                                                     </Button>

@@ -86,7 +86,6 @@ const Emoji = () => {
                 variant: "destructive"
             });
         }
-        // setShowEmojiList(false);
         setSelectedEmoji({});
         setEditIndex(null);
     }
@@ -122,14 +121,10 @@ const Emoji = () => {
     }
 
     const handleEditEmoji = (record, index) => {
-        const findIndex = emojiList.findIndex((x)=> !x.id);
-        if(findIndex != -1 ){
-            const clone = [...emojiList];
-            clone.splice(findIndex,1);
-            setEmojiList(clone);
-        }
-        setEditIndex(index);
         setSelectedEmoji(record);
+        setEditIndex(index);
+        setIsEdit(true);
+
     }
 
     const handleSaveEmoji = async (record,index) => {
@@ -253,7 +248,7 @@ const Emoji = () => {
                                                                                             <img className={"cursor-pointer h-[25px] w-[25px]"} alt={"not-found"} src={selectedEmoji?.imageUrl}/>
                                                                                         </div>
                                                                                         :
-                                                                                        <Input placeholder="Choose Emoji"/>}
+                                                                                        <Input placeholder="Choose Emoji 123"/>}
                                                                             </div>
                                                                         </PopoverTrigger>
                                                                         <PopoverContent className="w-full p-0 border-none w-[310px]]">

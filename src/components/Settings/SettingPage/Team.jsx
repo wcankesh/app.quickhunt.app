@@ -444,7 +444,7 @@ const Team = () => {
                             </Button>
                                 <Button
                                     onClick={closeSheet}
-                                    className={"text-primary text-sm font-semibold hover:bg-card border border-primary bg-card ml-0 m-inline-0"}
+                                    className={`text-sm font-semibold hover:bg-card border border-primary bg-card ml-0 m-inline-0 ${theme === "dark" ? "" : "text-primary"}`}
                                     type="submit"
                                 >Cancel</Button>
 

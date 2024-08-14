@@ -54,7 +54,10 @@ const Categories = () => {
             setSheetOpen(true);
             setCategoryDetails({...record});
     }
-    const openSheet = () => setSheetOpen(true);
+    const openSheet = () => {
+        setSheetOpen(true);
+        setCategoryDetails(initialState);
+    };
     const closeSheet = () => {
         setSheetOpen(false);
         setEditRecord({});

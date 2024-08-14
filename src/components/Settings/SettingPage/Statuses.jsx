@@ -19,7 +19,7 @@ import randomColor from 'randomcolor';
 
 const initialStatus = {
     title: '',
-    color_code: randomColor(),
+    color_code: '',
 };
 
 const initialDnDState = {
@@ -64,7 +64,7 @@ const Statuses = () => {
 
     const handleShowInput = () => {
         const clone = [...statusList];
-        clone.push(initialStatus);
+        clone.push({title: '', color_code: randomColor(),});
         setIsEdit(clone.length - 1);
         setStatusList(clone)
     };
