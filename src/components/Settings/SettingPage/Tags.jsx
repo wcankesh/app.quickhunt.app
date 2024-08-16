@@ -12,6 +12,8 @@ import {allStatusAndTypesAction} from "../../../redux/action/AllStatusAndTypesAc
 import {toast} from "../../ui/use-toast";
 import {Dialog} from "@radix-ui/react-dialog";
 import {DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "../../ui/dialog";
+import EmptyData from "../../Comman/EmptyData";
+
 
 const initialState ={
     title:""
@@ -198,17 +200,24 @@ const Tags = () => {
     };
 
     const handleEditTopic = (index) => {
-        setIsEdit(index);
+        setFormError(initialState);
+        const clone =[...topicLists];
+        if(isEdit !== null && !clone[isEdit]?.id){
+            clone.splice(isEdit, 1)
+            setIsEdit(index)
+            setTopicLists(clone);
+        } else {
+            setIsEdit(index)
+        }
     }
 
     const handleCancel = (index) => {
         const clone = [...topicLists];
         clone.splice(index,1);
         setTopicLists(clone);
-        setTopicDetails(initialState);
-        setTopicLists(clone);
         setIsEdit(null);
         setTopicDetails(initialState);
+        setFormError(initialState);
     }
 
     return (

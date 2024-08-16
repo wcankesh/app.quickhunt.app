@@ -8,7 +8,7 @@ import {Avatar, AvatarFallback, AvatarImage} from "../../ui/avatar";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "../../ui/table";
 import {Ellipsis, Loader2, Trash2, X} from "lucide-react";
 import {useTheme} from "../../theme-provider";
-import {Sheet, SheetClose, SheetContent, SheetFooter, SheetHeader, SheetOverlay, SheetTitle} from "../../ui/sheet";
+import {Sheet,SheetContent, SheetHeader, SheetOverlay, SheetTitle} from "../../ui/sheet";
 import {ApiService} from "../../../utils/ApiService";
 import {useSelector} from "react-redux";
 import {Badge} from "../../ui/badge";
@@ -20,6 +20,8 @@ import {Skeleton} from "../../ui/skeleton";
 import {AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle,} from "../../ui/alert-dialog"
 import NoDataThumbnail from "../../../img/Frame.png";
 import EmptyData from "../../Comman/EmptyData";
+import {Dialog} from "@radix-ui/react-dialog";
+import {DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "../../ui/dialog";
 
 const initialState = {
     email: "",
@@ -38,8 +40,9 @@ const Team = () => {
     const [isLoading, setIsLoading] = useState(false)
     const [isSave, setIsSave] = useState(false);
     const [deleteObj, setDeleteObj] = useState({});
-    const [isOpenDeleteAlert, setIsOpenDeleteAlert] = useState(false);
-    const [isAdmin, setIsAdmin] = useState(false)
+    const [isAdmin, setIsAdmin] = useState(false);
+    const [openDelete,setOpenDelete] =useState(false);
+    const [isLoadingDelete,setIsLoadingDelete] = useState(false);
     const apiService = new ApiService();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const userDetailsReducer = useSelector(state => state.userDetailsReducer);
@@ -135,14 +138,14 @@ const Team = () => {
             setInviteTeamDetails(initialState)
             setIsSave(false);
             toast({
-                description: "Invitation sent successfully.",
+                description: data.message,
             });
             await getInvitations(true);
             closeSheet();
         } else {
             setIsSave(false);
             toast({
-                description: data.error,
+                description: data.message,
                 variant: "destructive"
             })
 
@@ -187,6 +190,7 @@ const Team = () => {
     };
 
     const onDelete = async () => {
+        setIsLoadingDelete(true);
         const payload = {
             project_id: deleteObj.project_id,
             email: deleteObj.member_email,
@@ -204,12 +208,14 @@ const Team = () => {
             toast({
                 description: "Revoke invitation successfully"
             });
+            setIsLoadingDelete(false);
         } else {
             toast({
                 description: "Something went wrong."
             });
+            setIsLoadingDelete(false);
         }
-
+        setOpenDelete(false);
     }
     const removeMember = async (id) => {
         const data = await apiService.removeMember({id: id})
@@ -231,27 +237,57 @@ const Team = () => {
             });
         }
     }
-    const revokePopup = (record) => {
+    const revokePopup = (record,id) => {
         setDeleteObj(record);
-        setIsOpenDeleteAlert(true);
+        setOpenDelete(true);
     }
 
     return (
         <Fragment>
-            <AlertDialog open={isOpenDeleteAlert} onOpenChange={setIsOpenDeleteAlert}>
-                <AlertDialogContent className={"w-[310px] md:w-full rounded-lg"}>
-                    <AlertDialogHeader>
-                        <AlertDialogTitle>You really want revoke invitation?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            This action can't be undone.
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <div className={"flex justify-end gap-2"}>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction className={"bg-red-600 hover:bg-red-600"} onClick={onDelete}>Revoke</AlertDialogAction>
-                    </div>
-                </AlertDialogContent>
-            </AlertDialog>
+            {/*<AlertDialog open={isOpenDeleteAlert} onOpenChange={setIsOpenDeleteAlert}>*/}
+            {/*    <AlertDialogContent className={"w-[310px] md:w-full rounded-lg"}>*/}
+            {/*        <AlertDialogHeader>*/}
+            {/*            <AlertDialogTitle>You really want revoke invitation?</AlertDialogTitle>*/}
+            {/*            <AlertDialogDescription>*/}
+            {/*                This action can't be undone.*/}
+            {/*            </AlertDialogDescription>*/}
+            {/*        </AlertDialogHeader>*/}
+            {/*        <div className={"flex justify-end gap-2"}>*/}
+            {/*            <AlertDialogCancel>Cancel</AlertDialogCancel>*/}
+            {/*            <AlertDialogAction className={"bg-red-600 hover:bg-red-600"} onClick={onDelete}>Revoke</AlertDialogAction>*/}
+            {/*        </div>*/}
+            {/*    </AlertDialogContent>*/}
+            {/*</AlertDialog>*/}
+
+            {
+                openDelete &&
+                <Fragment>
+                    <Dialog open onOpenChange={()=> setOpenDelete(false)}>
+                        <DialogContent className="max-w-[350px] w-full sm:max-w-[525px] p-3 md:p-6 rounded-lg">
+                            <DialogHeader className={"flex flex-row justify-between gap-2"}>
+                                <div className={"flex flex-col gap-2"}>
+                                    <DialogTitle className={"text-start"}>You really want delete this board?</DialogTitle>
+                                    <DialogDescription className={"text-start"}>This action can't be undone.</DialogDescription>
+                                </div>
+                                <X size={16} className={"m-0 cursor-pointer"} onClick={() => setOpenDelete(false)}/>
+                            </DialogHeader>
+                            <DialogFooter className={"flex-row justify-end space-x-2"}>
+                                <Button variant={"outline hover:none"}
+                                        className={"text-sm font-semibold border"}
+                                        onClick={() => setOpenDelete(false)}>Cancel</Button>
+                                <Button
+                                    variant={"hover:bg-destructive"}
+                                    className={` ${theme === "dark" ? "text-card-foreground" : "text-card"} ${isLoading === true ? "py-2 px-6" : "py-2 px-6"} w-[76px] text-sm font-semibold bg-destructive`}
+                                    onClick={onDelete}
+                                >
+                                    {isLoadingDelete ? <Loader2 size={16} className={"animate-spin"}/> : "Delete"}
+                                </Button>
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
+                </Fragment>
+            }
+
             <Card>
                 <CardHeader className={"flex flex-row flex-wrap md:flex-nowrap justify-between gap-x-6 items-center p-4 sm:p-6"}>
                     <div>
@@ -377,24 +413,48 @@ const Team = () => {
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
-                                        {(invitationList || []).map((x, i) => (
-                                            <TableRow key={i}>
-                                                <TableCell className="font-medium sm:pl-6">{x?.member_email}</TableCell>
-                                                <TableCell>Expires in {moment(x?.expire_at).diff(moment(new Date()), 'days')} days</TableCell>
-                                                <TableCell>Invited about {moment.utc(x.created_at).local().startOf('seconds').fromNow()}</TableCell>
-                                                <TableCell className="pr-6 text-right">
-                                                    <DropdownMenu className={"relative"} >
-                                                        <DropdownMenuTrigger>
-                                                            <Ellipsis className={`${theme === "dark" ? "" : "text-muted-foreground"}`} size={18}/>
-                                                        </DropdownMenuTrigger>
-                                                        <DropdownMenuContent className={"hover:none absolute right-[-20px]"}>
-                                                            <DropdownMenuItem className={"w-[130px]"} onClick={() => onResendUser(x)}>Resend Invitation</DropdownMenuItem>
-                                                            <DropdownMenuItem className={"w-[130px]"} onClick={() => revokePopup(x)}>Revoke Invitation</DropdownMenuItem>
-                                                        </DropdownMenuContent>
-                                                    </DropdownMenu>
-                                                </TableCell>
-                                            </TableRow>
-                                        ))}
+                                    {
+                                        isLoading ? <Fragment>
+                                            {
+                                                [...Array(4)].map((_, index) => {
+                                                    return (
+                                                        <TableRow key={index}>
+                                                            {
+                                                                [...Array(4)].map((_, i) => {
+                                                                    return (
+                                                                        <TableCell key={i} className={""}>
+                                                                            <Skeleton className={"rounded-md  w-full h-[24px]"}/>
+                                                                        </TableCell>
+                                                                    )
+                                                                })
+                                                            }
+                                                        </TableRow>
+                                                    )
+                                                })
+                                            }
+                                        </Fragment>
+                                        :
+                                        <Fragment>
+                                            {(invitationList || []).map((x, i) => (
+                                                <TableRow key={i}>
+                                                    <TableCell className="font-medium sm:pl-6">{x?.member_email}</TableCell>
+                                                    <TableCell>Expires in {moment(x?.expire_at).diff(moment(new Date()), 'days')} days</TableCell>
+                                                    <TableCell>Invited about {moment.utc(x.created_at).local().startOf('seconds').fromNow()}</TableCell>
+                                                    <TableCell className="pr-6 text-right">
+                                                        <DropdownMenu className={"relative"} >
+                                                            <DropdownMenuTrigger>
+                                                                <Ellipsis className={`${theme === "dark" ? "" : "text-muted-foreground"}`} size={18}/>
+                                                            </DropdownMenuTrigger>
+                                                            <DropdownMenuContent className={"hover:none absolute right-[-20px]"}>
+                                                                <DropdownMenuItem className={"w-[130px]"} onClick={() => onResendUser(x)}>Resend Invitation</DropdownMenuItem>
+                                                                <DropdownMenuItem className={"w-[130px]"} onClick={() => revokePopup(x,x.id)}>Revoke Invitation</DropdownMenuItem>
+                                                            </DropdownMenuContent>
+                                                        </DropdownMenu>
+                                                    </TableCell>
+                                                </TableRow>
+                                            ))}
+                                        </Fragment>
+                                    }
                                     </TableBody>
                                 </Table>
                                 {isLoading ? null : (isLoading === false && invitationList?.length > 0 ? "" :
@@ -437,7 +497,7 @@ const Team = () => {
                         </div>
                         <div className={"flex px-3 py-4 sm:px-[32px] gap-[16px] sm:justify-start"}>
                             <Button
-                                className={`${isSave === true ? "py-2 px-4" : "py-2 px-4 w-[69px]"} text-sm font-semibold`}
+                                className={`${isSave === true ? "py-2 px-4" : "py-2 px-4 "} w-[69px] text-sm font-semibold`}
                                 type="submit" onClick={onInviteUser}
                             >
                                 {isSave ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : "Invite"}

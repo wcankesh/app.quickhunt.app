@@ -172,7 +172,7 @@ const SidebarSheet = ({ isOpen, onOpen, onClose ,selectedViewAnalyticsRecord}) =
                                         <ChevronLeft className={"stroke-primary"} />
                                     </Button>
                                     <h5 className={"text-[14px] font-bold"}>{pageNo}</h5>
-                                    <Button disabled={pageNo === totalPages} variant={"outline"} className={" h-[30px] w-[30px] p-1.5"} onClick={() => handlePaginationClick(pageNo + 1)}>
+                                    <Button disabled={pageNo === totalPages || totalPages == 0} variant={"outline"} className={" h-[30px] w-[30px] p-1.5"} onClick={() => handlePaginationClick(pageNo + 1)}>
                                         <ChevronRight className={"stroke-primary"} />
                                     </Button>
                                 </div>

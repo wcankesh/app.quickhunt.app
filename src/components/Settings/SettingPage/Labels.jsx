@@ -59,10 +59,9 @@ const Labels = () => {
         clone.push(initialNewLabel);
         setLabelList(clone);
         setIsEdit(clone.length - 1);
-        setNewLabel(prevState => ({
-            ...prevState,
+        setNewLabel({...newLabel,
             label_color_code: randomColor()
-        }));
+        });
 
     };
 
@@ -145,7 +144,15 @@ const Labels = () => {
     }
 
     const handleEditLabel = (index) => {
-        setIsEdit(index);
+        setLabelError(initialNewLabel);
+        const clone = [...labelList]
+        if(isEdit !== null && !clone[isEdit]?.id){
+            clone.splice(isEdit, 1)
+            setIsEdit(index)
+            setLabelList(clone)
+        } else {
+            setIsEdit(index)
+        }
     };
 
     const handleSaveLabel = async (index) => {
@@ -235,6 +242,7 @@ const Labels = () => {
         setLabelList(clone);
         setNewLabel(initialNewLabel);
         setIsEdit(null);
+        setLabelError(initialNewLabel);
     }
 
     return (
@@ -434,7 +442,7 @@ const Labels = () => {
                                                                                     variant="outline hover:bg-transparent"
                                                                                     className="p-1 border w-[30px] h-[30px]"
                                                                                     onClick={()=> {
-                                                                                       handleCancel(i,"add")
+                                                                                       handleCancel(i)
                                                                                     }}
                                                                                 >
                                                                                     <X size={16}/>

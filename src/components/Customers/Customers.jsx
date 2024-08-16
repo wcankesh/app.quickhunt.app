@@ -3,25 +3,19 @@ import {Button} from "../ui/button";
 import {ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Loader2, Plus, Trash2, X} from "lucide-react";
 import {Card, CardContent, CardFooter} from "../ui/card";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "../ui/table";
-import NewCustomerSheet from "./NewCustomerSheet";
 import {useTheme} from "../theme-provider";
 import {Separator} from "../ui/separator";
 import {ApiService} from "../../utils/ApiService";
 import {useSelector} from "react-redux";
 import {toast} from "../ui/use-toast";
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogHeader,
-    AlertDialogTitle
-} from "../ui/alert-dialog";
 import {Skeleton} from "../ui/skeleton";
 import EmptyData from "../Comman/EmptyData";
 import {Dialog} from "@radix-ui/react-dialog";
-import {DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "../ui/dialog";
+import {DialogContent, DialogDescription, DialogHeader, DialogTitle} from "../ui/dialog";
+import {Sheet, SheetContent, SheetHeader, SheetOverlay} from "../ui/sheet";
+import {Label} from "../ui/label";
+import {Input} from "../ui/input";
+import {Switch} from "../ui/switch";
 
 const tableHeadingsArray = [
     {label:"Name"},
@@ -34,18 +28,37 @@ const tableHeadingsArray = [
 
 const perPageLimit = 10;
 
+const initialState = {
+    project_id: '',
+    customer_name: '',
+    customer_email_id: '',
+    customer_email_notification: false,
+    customer_first_seen: '',
+    customer_last_seen: '',
+    user_browser: '',
+    user_ip_address : '',
+}
+const initialStateError = {
+    customer_name: "",
+    customer_email_id: "",
+}
+
 const Customers = () => {
     const [isSheetOpen, setSheetOpen] = useState(false);
-    const {theme} =useTheme();
-    const apiService = new ApiService();
     const [customerList, setCustomerList] = useState([])
-    const [isLoading, setIsLoading] = useState(false)
-    const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isLoadingDelete,setIsLoadingDelete] = useState(false);
     const [pageNo, setPageNo] = useState(1);
     const [totalRecord, setTotalRecord] = useState(0);
     const [deleteId,setDeleteId]=useState(null);
-    const [deleteIndex,setDeleteIndex]=useState(null);
     const [openDelete,setOpenDelete]=useState(false);
+    const [isSave,setIsSave]=useState(false);
+
+    const [formError, setFormError] = useState(initialStateError);
+    const [customerDetails, setCustomerDetails] = useState(initialState);
+    const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
+    const {theme} =useTheme();
+    const apiService = new ApiService();
 
     useEffect(() => {
         if(projectDetailsReducer.id){
@@ -53,18 +66,51 @@ const Customers = () => {
         }
     }, [projectDetailsReducer.id,pageNo])
 
-    const openSheet = () => setSheetOpen(true);
-    const closeSheet = (createRecord) => {
-        if(createRecord?.id){
-            const clone = [...customerList];
-            clone.push(createRecord);
-            setCustomerList(clone);
+    const onChangeText = (event) => {
+        setCustomerDetails({...customerDetails, [event.target.name]: event.target.value});
+        setFormError(formError => ({...formError, [event.target.name]: ""}));
+    }
+
+    const onBlur = (event,) => {
+        const { name, value } = event.target;
+        setFormError({
+            ...formError,
+            [name]: formValidate(name, value)
+        });
+    }
+
+    const formValidate = (name, value) => {
+        switch (name) {
+            case "customer_name":
+                if (!value || value.trim() === "") {
+                    return "Customer name is required.";
+                } else {
+                    return "";
+                }
+            case "customer_email_id":
+                if (!value || value.trim() === "") {
+                    return "Customer e-mail is required.";
+                } else if (!value.match(/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/)) {
+                    return "Enter a valid email address.";
+                }
+                else {
+                    return "";
+                }
+            default: {
+                return "";
+            }
         }
+    };
+
+    const openSheet = () => setSheetOpen(true);
+
+    const closeSheet = () => {
         setSheetOpen(false);
+        setCustomerDetails(initialState);
+        setFormError(initialStateError);
     };
 
     const getAllCustomers = async () => {
-        setIsLoading(true)
         const payload = {
             project_id: projectDetailsReducer.id,
             page: pageNo,
@@ -78,7 +124,75 @@ const Customers = () => {
         } else {
             setIsLoading(false)
         }
-    }
+    };
+
+    const deleteCustomer =  (id) => {
+        setDeleteId(id);
+        setOpenDelete(true);
+    };
+
+    const handleDelete = async () =>{
+        setIsLoadingDelete(true);
+        const data = await apiService.deleteCustomers(deleteId);
+        const clone = [...customerList];
+        const indexToDelete = clone.findIndex((x)=> x.id == deleteId);
+        if(data.status === 200) {
+            clone.splice(indexToDelete,1);
+            setCustomerList(clone);
+            toast({
+                description: data.message
+            });
+            setIsLoadingDelete(false);
+        }
+        else{
+            toast({
+                description:data.message,
+                variant: "destructive",
+            });
+            setIsLoadingDelete(false);
+        };
+        setOpenDelete(false);
+        setDeleteId(null);
+    };
+
+    const addCustomer = async () => {
+        let validationErrors = {};
+        Object.keys(customerDetails).forEach(name => {
+            const error = formValidate(name, customerDetails[name]);
+            if (error && error.length > 0) {
+                validationErrors[name] = error;
+            }
+        });
+        if (Object.keys(validationErrors).length > 0) {
+            setFormError(validationErrors);
+            return;
+        }
+        const clone = [...customerList];
+        setIsSave(true);
+        const payload = {
+            ...customerDetails,
+            project_id: projectDetailsReducer.id,
+            customer_first_seen: new Date(),
+            customer_last_seen: new Date(),
+        }
+        const data = await apiService.createCustomers(payload)
+        if(data.status === 200) {
+            setIsSave(false);
+            setCustomerDetails(initialState);
+            toast({
+                description: data.message,
+            });
+            clone.push(data.data);
+            setCustomerList(clone);
+        } else {
+            setIsSave(false);
+            toast({
+                description:"Something went wrong",
+                variant: "destructive",
+            })
+        }
+        closeSheet();
+    };
 
     const totalPages = Math.ceil(totalRecord / perPageLimit);
 
@@ -88,195 +202,188 @@ const Customers = () => {
         }
     };
 
-    const deleteCustomer =  (id,index) => {
-        setDeleteId(id);
-        setDeleteIndex(index);
-        setOpenDelete(true);
-    }
-
-    const handleDelete = async () =>{
-        setIsLoading(true);
-        const data = await apiService.deleteCustomers(deleteId);
-        if(data.status === 200) {
-            const clone = [...customerList];
-            clone.splice(deleteIndex,1);
-            setCustomerList(clone);
-            toast({
-                description: "Customer deleted successfully"
-            });
-            setOpenDelete(false);
-            setIsLoading(false);
-        }
-        else{
-            toast({
-                description:"Something went wrong",
-                variant: "destructive",
-            });
-            setOpenDelete(false);
-            setIsLoading(false);
-        };
-        setDeleteId(null);
-        setDeleteIndex(null);
-    }
 
     return (
-        <div className={"pt-8 container xl:max-w-[1574px]  lg:max-w-[992px]  md:max-w-[768px] sm:max-w-[639px] px-4"}>
-            <NewCustomerSheet isOpen={isSheetOpen} onOpen={openSheet} callback={getAllCustomers} onClose={closeSheet}/>
-            {
-                openDelete &&
-                <Fragment>
-                    <Dialog open onOpenChange={()=> setOpenDelete(false)}>
-                        <DialogContent className="sm:max-w-[425px]">
-                            <DialogHeader className={"flex flex-row justify-between gap-2"}>
-                                <div className={"flex flex-col gap-2"}>
-                                    <DialogTitle className={"text-start"}>You really want delete this customer ?</DialogTitle>
-                                    <DialogDescription className={"text-start"}>This action can't be undone.</DialogDescription>
-                                </div>
-                                <X size={16} className={"m-0 cursor-pointer"} onClick={() => setOpenDelete(false)}/>
-                            </DialogHeader>
-                            <DialogFooter>
-                                <Button variant={"outline hover:none"}
-                                        className={"text-sm font-semibold border"}
-                                        onClick={() => setOpenDelete(false)}>Cancel</Button>
-                                <Button
-                                    variant={"hover:bg-destructive"}
-                                    className={`${theme === "dark" ? "text-card-foreground" : "text-card"} ${isLoading === true ? "py-2 px-6" : "py-2 px-6"} w-[76px] text-sm font-semibold bg-destructive`}
-                                    onClick={handleDelete}
-                                >
-                                    {isLoading ? <Loader2 size={16} className={"animate-spin"}/> : "Delete"}
-                                </Button>
-                            </DialogFooter>
-                        </DialogContent>
-                    </Dialog>
-                </Fragment>
-            }
+        <Fragment>
 
-            {/*<AlertDialog open={deleteId} onOpenChange={() => setDeleteId(null)}>*/}
-            {/*    <AlertDialogContent className={"w-[310px] md:w-full rounded-lg"}>*/}
-            {/*        <AlertDialogHeader>*/}
-            {/*            <AlertDialogTitle>You really want delete customer ?</AlertDialogTitle>*/}
-            {/*            <AlertDialogDescription>*/}
-            {/*                This action can't be undone.*/}
-            {/*            </AlertDialogDescription>*/}
-            {/*        </AlertDialogHeader>*/}
-            {/*        <div className={"flex justify-end gap-2"}>*/}
-            {/*            <AlertDialogCancel onClick={() => setDeleteId(null)}>Cancel</AlertDialogCancel>*/}
-            {/*            <AlertDialogAction onClick={handleDelete} className={"bg-red-600 hover:bg-red-600"}>Delete</AlertDialogAction>*/}
-            {/*        </div>*/}
-            {/*    </AlertDialogContent>*/}
-            {/*</AlertDialog>*/}
-            <div className={""}>
-                <div className={"flex flex-row gap-x-4 flex-wrap justify-between gap-y-2 items-center"}>
-                    <div>
-                        <h4 className={"font-medium text-lg sm:text-2xl leading-8"}>Customers</h4>
-                        <h5 className={"text-muted-foreground text-base leading-5"}>Last updates</h5>
+            {isSheetOpen && <Sheet open={isSheetOpen} onOpenChange={isSheetOpen ? closeSheet : openSheet}>
+                <SheetOverlay className={"inset-0"}/>
+                <SheetContent className={"sm:max-w-[662px] p-0"}>
+                    <SheetHeader className={"sm:px-8 sm:py-6 px-3 py-4 flex flex-row justify-between items-center"}>
+                        <h5 className={"text-sm md:text-xl font-medium leading-5"}>Add New Customer</h5>
+                        <Button onClick={closeSheet}  className={"h-5 w-5 p-0"} variant={"ghost"}><X  size={18} className={"h-5 w-5"}/></Button>
+                    </SheetHeader>
+                    <Separator className={"text-muted-foreground"}/>
+                    <div className={"sm:px-8 sm:py-6 px-3 py-4 "}>
+
+                        <div className="grid w-full gap-2">
+                            <Label htmlFor="name">Name</Label>
+                            <Input value={customerDetails.customer_name} name="customer_name" onChange={onChangeText} type="text" id="name" className={"h-9"} placeholder={"Enter the full name of customer..."}/>
+                            {formError.customer_name && <span className="text-sm text-red-500">{formError.customer_name}</span>}
+                        </div>
+
+                        <div className="grid w-full gap-2 mt-6">
+                            <Label htmlFor="email">E-mail</Label>
+                            <Input value={customerDetails.customer_email_id} name="customer_email_id" onChange={onChangeText} onBlur={onBlur} type="email" id="email" className={"h-9"} placeholder={"Enter the email of customer"}/>
+                            {formError.customer_email_id && <span className="text-sm text-red-500">{formError.customer_email_id}</span>}
+                        </div>
+
+                        <div className={"mt-6 flex"}>
+                            <Switch checked={customerDetails.customer_email_notification == 1} onCheckedChange={(checked) => onChangeText({target: {name: "customer_email_notification", value:checked}})} htmlFor={"switch"} />
+                            <Label id={"switch"} className={"ml-[9px] text-sm font-medium"}>Receive Notifications</Label>
+                        </div>
                     </div>
-                    <Button onClick={openSheet} className={"hover:bg-violet-600"}> <Plus className={"mr-4"} />New Customer</Button>
-                </div>
-                <div className={"pt-4 sm:pt-8"}>
-                            <Card className={""}>
-                                <CardContent className={"p-0 "}>
-                                    <div className={"rounded-md grid grid-cols-1 overflow-auto whitespace-nowrap"}>
-                                        <Table>
-                                            <TableHeader className={"py-8 px-5"}>
-                                                <TableRow className={""}>
-                                                    {
-                                                        (tableHeadingsArray || []).map((x,i)=>{
-                                                            return(
-                                                                <TableHead className={`text-base font-semibold py-5 ${theme === "dark"? "text-[]" : "bg-muted"} ${i == 0 ? "rounded-tl-lg" : i == 9 ? "rounded-tr-lg" : ""}`} key={x.label}>{x.label}</TableHead>
-                                                            )
-                                                        })
-                                                    }
-                                                </TableRow>
-                                            </TableHeader>
-                                            {
-                                                isLoading ? <TableBody>
-                                                        {
-                                                            [...Array(10)].map((_, index) => {
-                                                                return (
-                                                                    <TableRow key={index}>
-                                                                        {
-                                                                            [...Array(6)].map((_, i) => {
-                                                                                return (
-                                                                                    <TableCell key={i} className={"px-2"}>
-                                                                                        <Skeleton className={"rounded-md  w-full h-[24px]"}/>
-                                                                                    </TableCell>
-                                                                                )
-                                                                            })
-                                                                        }
-                                                                    </TableRow>
-                                                                )
-                                                            })
-                                                        }
-                                                    </TableBody> :
-                                                    <TableBody className={""}>
-                                                        {
-                                                            (customerList || []).map((x,index)=>{
-                                                                return(
-                                                                    <TableRow key={x.id} className={"font-medium"}>
-                                                                        <TableCell className={`py-3 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.customer_name ? x.customer_name : "-"}</TableCell>
-                                                                        <TableCell className={`py-3 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.customer_email_id ? x.customer_email_id : "-"}</TableCell>
-                                                                        <TableCell className={`py-3 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.customer_country ? x.customer_country : "-"}</TableCell>
-                                                                        <TableCell className={`py-3 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.customer_browser ? x.customer_browser : "-"}</TableCell>
-                                                                        <TableCell className={`py-3 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.os ? x.os : "-"}</TableCell>
-                                                                        <TableCell className={`py-3 ${theme === "dark" ? "" : "text-muted-foreground flex justify-center"}`}>
-                                                                            <Button onClick={() => deleteCustomer(x.id,index)} variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px]`}>
-                                                                                <Trash2 size={16}/>
-                                                                            </Button>
-                                                                        </TableCell>
-                                                                    </TableRow>
-                                                                )
-                                                            })
-                                                        }
+                    <Separator className={"mb-8 text-muted-foreground"}/>
+                    <div className={"px-3 sm:px-8"}>
+                        <Button onClick={addCustomer} className={` border w-[127px] ${isSave ? "justify-center items-center" : ""}`}>{isSave ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Add Customer"}</Button>
+                    </div>
+                </SheetContent>
+            </Sheet>}
 
-                                                    </TableBody>
-                                            }
+            <div className={"pt-8 container xl:max-w-[1574px]  lg:max-w-[992px]  md:max-w-[768px] sm:max-w-[639px] px-4"}>
+                {/*<NewCustomerSheet isOpen={isSheetOpen} onOpen={openSheet} callback={getAllCustomers} onClose={closeSheet}/>*/}
 
-                                    </Table>
-                                        {isLoading ? null : (isLoading === false && customerList?.length > 0 ? "" : <EmptyData/>)}
-
+                {
+                    openDelete &&
+                    <Fragment>
+                        <Dialog open onOpenChange={()=> setOpenDelete(false)}>
+                            <DialogContent className="w-[310px] md:w-full rounded-lg">
+                                <DialogHeader className={"flex flex-row justify-between gap-2"}>
+                                    <div className={"flex flex-col gap-2"}>
+                                        <DialogTitle className={"text-start"}>You really want delete this customer ?</DialogTitle>
+                                        <DialogDescription className={"text-start"}>This action can't be undone.</DialogDescription>
                                     </div>
-                                </CardContent>
-                                <Separator/>
-                                <CardFooter className={"p-0"}>
-                                    <div
-                                        className={`w-full p-5 ${theme === "dark" ? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end px-4 py-4 md:px-16 md:py-15px`}>
-                                        <div className={"w-full flex gap-8 items-center justify-between sm:justify-end"}>
-                                            <div>
-                                                <h5 className={"text-xs md:text-sm font-semibold"}>Page {pageNo} of {totalPages}</h5>
-                                            </div>
-                                            <div className={"flex flex-row gap-2 items-center"}>
-                                                <Button variant={"outline"}
-                                                        className={"h-[30px] w-[30px] p-1.5"}
-                                                        onClick={() => handlePaginationClick(1)} disabled={pageNo === 1}>
-                                                    <ChevronsLeft className={pageNo === 1 ? "stroke-muted-foreground" : "stroke-primary"}/>
-                                                </Button>
-                                                <Button variant={"outline"}
-                                                        className={"h-[30px] w-[30px] p-1.5"}
-                                                        onClick={() => handlePaginationClick(pageNo - 1)}
-                                                        disabled={pageNo === 1}>
-                                                    <ChevronLeft className={pageNo === 1 ? "stroke-muted-foreground" : "stroke-primary"}/>
-                                                </Button>
-                                                <Button variant={"outline"}
-                                                        className={" h-[30px] w-[30px] p-1.5"}
-                                                        onClick={() => handlePaginationClick(pageNo + 1)}
-                                                        disabled={pageNo === totalPages}>
-                                                    <ChevronRight className={pageNo === totalPages ? "stroke-muted-foreground" : "stroke-primary"}/>
-                                                </Button>
-                                                <Button variant={"outline"}
-                                                        className={"h-[30px] w-[30px] p-1.5"}
-                                                        onClick={() => handlePaginationClick(totalPages)}
-                                                        disabled={pageNo === totalPages}>
-                                                    <ChevronsRight className={pageNo === totalPages ? "stroke-muted-foreground" : "stroke-primary"}/>
-                                                </Button>
+                                    <X size={16} className={"m-0 cursor-pointer"} onClick={() => setOpenDelete(false)}/>
+                                </DialogHeader>
+                                <div className={"flex justify-end gap-2"}>
+                                    <Button variant={"outline hover:none"}
+                                            className={"text-sm font-semibold border"}
+                                            onClick={() => setOpenDelete(false)}>Cancel</Button>
+                                    <Button
+                                        variant={"hover:bg-destructive"}
+                                        className={`${theme === "dark" ? "text-card-foreground" : "text-card"} ${isLoadingDelete === true ? "py-2 px-6" : "py-2 px-6"} w-[76px] text-sm font-semibold bg-destructive`}
+                                        onClick={handleDelete}
+                                    >
+                                        {isLoadingDelete ? <Loader2 size={16} className={"animate-spin"}/> : "Delete"}
+                                    </Button>
+                                </div>
+                            </DialogContent>
+                        </Dialog>
+                    </Fragment>
+                }
+
+                <div className={""}>
+                    <div className={"flex flex-row gap-x-4 flex-wrap justify-between gap-y-2 items-center"}>
+                        <div>
+                            <h4 className={"font-medium text-lg sm:text-2xl leading-8"}>Customers</h4>
+                            <h5 className={"text-muted-foreground text-base leading-5"}>Last updates</h5>
+                        </div>
+                        <Button onClick={openSheet} className={"hover:bg-violet-600"}> <Plus className={"mr-4"} />New Customer</Button>
+                    </div>
+                    <div className={"pt-4 sm:pt-8"}>
+                                <Card className={""}>
+                                    <CardContent className={"p-0"}>
+                                        <div className={"rounded-md grid grid-cols-1 overflow-auto whitespace-nowrap"}>
+                                            <Table>
+                                                <TableHeader className={"py-8 px-5"}>
+                                                    <TableRow className={""}>
+                                                        {
+                                                            (tableHeadingsArray || []).map((x,i)=>{
+                                                                return(
+                                                                    <TableHead className={`font-semibold px-2 py-[10px] md:px-3 ${i == 5 ? "text-center" : ""}  ${theme === "dark"? "text-[]" : "bg-muted"} `} key={x.label}>{x.label}</TableHead>
+                                                                )
+                                                            })
+                                                        }
+                                                    </TableRow>
+                                                </TableHeader>
+                                                {
+                                                    isLoading ? <TableBody>
+                                                            {
+                                                                [...Array(10)].map((_, index) => {
+                                                                    return (
+                                                                        <TableRow key={index}>
+                                                                            {
+                                                                                [...Array(6)].map((_, i) => {
+                                                                                    return (
+                                                                                        <TableCell key={i} className={"px-2"}>
+                                                                                            <Skeleton className={"rounded-md  w-full h-[24px]"}/>
+                                                                                        </TableCell>
+                                                                                    )
+                                                                                })
+                                                                            }
+                                                                        </TableRow>
+                                                                    )
+                                                                })
+                                                            }
+                                                        </TableBody> :
+                                                        <TableBody className={""}>
+                                                            {
+                                                                (customerList || []).map((x,index)=>{
+                                                                    return(
+                                                                        <TableRow key={x.id} className={"font-medium"}>
+                                                                            <TableCell className={`px-2 py-[10px] md:px-3 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.customer_name ? x.customer_name : "-"}</TableCell>
+                                                                            <TableCell className={`px-2 py-[10px] md:px-3 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x?.customer_email_id}</TableCell>
+                                                                            <TableCell className={`px-2 py-[10px] md:px-3 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.customer_country ? x.customer_country : "-"}</TableCell>
+                                                                            <TableCell className={`px-2 py-[10px] md:px-3 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.customer_browser ? x.customer_browser : "-"}</TableCell>
+                                                                            <TableCell className={`px-2 py-[10px] md:px-3 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.os ? x.os : "-"}</TableCell>
+                                                                            <TableCell className={`px-2 py-[10px] md:px-3 ${theme === "dark" ? "" : "text-muted-foreground flex justify-center"}`}>
+                                                                                <Button onClick={() => deleteCustomer(x.id,index)} variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px]`}>
+                                                                                    <Trash2 size={16}/>
+                                                                                </Button>
+                                                                            </TableCell>
+                                                                        </TableRow>
+                                                                    )
+                                                                })
+                                                            }
+                                                        </TableBody>
+                                                }
+
+                                        </Table>
+                                            {isLoading ? null : (isLoading === false && customerList?.length > 0 ? "" : <EmptyData/>)}
+
+                                        </div>
+                                    </CardContent>
+                                    <Separator/>
+                                    <CardFooter className={"p-0"}>
+                                        <div
+                                            className={`w-full px-2 py-[10px] md:px-3 ${theme === "dark" ? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end`}>
+                                            <div className={"w-full flex gap-8 items-center justify-between sm:justify-end"}>
+                                                <div>
+                                                    <h5 className={"text-xs md:text-sm font-semibold"}>Page {pageNo} of {totalPages}</h5>
+                                                </div>
+                                                <div className={"flex flex-row gap-2 items-center"}>
+                                                    <Button variant={"outline"}
+                                                            className={"h-[30px] w-[30px] p-1.5"}
+                                                            onClick={() => handlePaginationClick(1)} disabled={pageNo === 1}>
+                                                        <ChevronsLeft className={pageNo === 1 ? "stroke-muted-foreground" : "stroke-primary"}/>
+                                                    </Button>
+                                                    <Button variant={"outline"}
+                                                            className={"h-[30px] w-[30px] p-1.5"}
+                                                            onClick={() => handlePaginationClick(pageNo - 1)}
+                                                            disabled={pageNo === 1}>
+                                                        <ChevronLeft className={pageNo === 1 ? "stroke-muted-foreground" : "stroke-primary"}/>
+                                                    </Button>
+                                                    <Button variant={"outline"}
+                                                            className={" h-[30px] w-[30px] p-1.5"}
+                                                            onClick={() => handlePaginationClick(pageNo + 1)}
+                                                            disabled={pageNo === totalPages}>
+                                                        <ChevronRight className={pageNo === totalPages ? "stroke-muted-foreground" : "stroke-primary"}/>
+                                                    </Button>
+                                                    <Button variant={"outline"}
+                                                            className={"h-[30px] w-[30px] p-1.5"}
+                                                            onClick={() => handlePaginationClick(totalPages)}
+                                                            disabled={pageNo === totalPages}>
+                                                        <ChevronsRight className={pageNo === totalPages ? "stroke-muted-foreground" : "stroke-primary"}/>
+                                                    </Button>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    </CardFooter>
-                            </Card>
+                                        </CardFooter>
+                                </Card>
+                    </div>
                 </div>
             </div>
-        </div>
+        </Fragment>
     );
 }
 
