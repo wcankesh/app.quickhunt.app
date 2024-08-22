@@ -10,12 +10,10 @@ import {useSelector,useDispatch} from "react-redux";
 import {ApiService} from "../../../utils/ApiService";
 import {toast} from "../../ui/use-toast";
 import {allStatusAndTypesAction} from "../../../redux/action/AllStatusAndTypesAction";
-import {Skeleton} from "../../ui/skeleton";
 import EmptyData from "../../Comman/EmptyData";
 import {Dialog} from "@radix-ui/react-dialog";
 import {DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "../../ui/dialog";
 import randomColor from 'randomcolor';
-
 
 const initialStatus = {
     title: '',
@@ -194,6 +192,8 @@ const Statuses = () => {
         setDeleteId(id);
         setDeleteIndex(index);
         setOpenDelete(true);
+        setStatusList(allStatusAndTypes.roadmap_status);
+        setIsEdit(null);
     };
 
     const onEdit = (index) => {
@@ -202,10 +202,11 @@ const Statuses = () => {
             clone.splice(isEdit, 1)
             setIsEdit(index)
             setStatusList(clone)
-        } else {
-            if(isEdit !== index){
-                setStatusList(allStatusAndTypes.roadmap_status)
-            }
+        }else if (isEdit !== index){
+            setStatusList(allStatusAndTypes?.roadmap_status);
+            setIsEdit(index);
+        }
+        else {
             setIsEdit(index)
         }
     }
@@ -314,9 +315,9 @@ const Statuses = () => {
             setIsDeleteLoading(false);
         }
     }
+
     return (
         <Fragment>
-
             {
                 openDelete &&
                 <Fragment>
@@ -345,7 +346,6 @@ const Statuses = () => {
                     </Dialog>
                 </Fragment>
             }
-
             <Card>
                 <CardHeader className="flex flex-row flex-wrap gap-y-2 justify-between items-center border-b p-4 sm:p-6">
                     <div>
@@ -407,7 +407,7 @@ const Statuses = () => {
                                                             <ColorInput name={"color_code"} value={x.color_code} onChange={(color) => onChangeColorColor(color, i)}/>
                                                         </div>
                                                     </TableCell>
-                                                    <TableCell className="flex justify-end gap-2 pr-4">
+                                                    <TableCell className={`flex justify-end gap-2 pr-4 ${labelError?.title ? "pt-[22px]" : ""} ${theme === "dark" ? "" : "text-muted-foreground"}`}>
                                                         <Fragment>
                                                             {
                                                                 x.id ? <Button
@@ -418,7 +418,7 @@ const Statuses = () => {
                                                                     {isSave ? <Loader2 className="mr-1 h-4 w-4 animate-spin justify-center"/> : <Check size={16}/>}
                                                                 </Button> : <Button
                                                                     variant=""
-                                                                    className="text-sm font-semibold h-[30px]"
+                                                                    className="text-sm font-semibold h-[30px] w-[126px]"
                                                                     onClick={() => handleAddNewStatus(x, i)}
                                                                 >
                                                                     {isSave ? <Loader2 className={"mr-2  h-4 w-4 animate-spin"}/> : "Add Status"}
@@ -445,7 +445,7 @@ const Statuses = () => {
                                                             <p>{x.color_code}</p>
                                                         </div>
                                                     </TableCell>
-                                                    <TableCell className="flex justify-end gap-2 pr-4">
+                                                    <TableCell className={`flex justify-end gap-2 pr-4 ${theme === "dark" ? "" : "text-muted-foreground"} `}>
                                                         <Fragment>
                                                             <Button
                                                                 variant="outline hover:bg-transparent"

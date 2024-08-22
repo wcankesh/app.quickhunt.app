@@ -34,16 +34,13 @@ const initialStateError = {
 
 const Project = () => {
     const {theme} = useTheme();
-    const [previewImage,setPreviewImage] = useState("");
     const [createProjectDetails, setCreateProjectDetails] = useState(initialState);
     const [formError, setFormError] = useState(initialStateError);
     const [isSave, setIsSave] = useState(false);
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const allProjectReducer = useSelector(state => state.allProjectReducer);
-    const [previewImageFav,setPreviewImageFav]=useState("");
     const [openDelete,setOpenDelete] = useState(false);
     const [isLoadingDelete,setIsLoadingDelete]= useState(false);
-    const [isDelete, setIsDelete] = useState(false);
     const dispatch = useDispatch();
     const apiService = new ApiService();
 
@@ -57,12 +54,10 @@ const Project = () => {
         const data = await apiService.getSingleProjects(projectDetailsReducer.id)
         if(data.status === 200) {
             setCreateProjectDetails({...data.data});
-            setPreviewImage(data.data.project_logo);
         } else {
 
         }
     }
-
 
     const formValidate = (name, value) => {
         switch (name) {
@@ -73,7 +68,7 @@ const Project = () => {
                     return "";
                 }
             case "project_website":
-                if (!value.match(/^(?:([A-Za-z]+):)?(\/{0,3})([0-9.\-A-Za-z]+)(?::(\d+))?(?:\/([^?#]*))?(?:\?([^#]*))?(?:#(.*))?$/)) {
+                if (value && !value.match(/^https:\/\/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-z]{2,63}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)$/)) {
                     return "Project website is invalid";
                 } else {
                     return "";
@@ -139,11 +134,9 @@ const Project = () => {
     }
 
     const handleFileChange =(file)=>{
-        setPreviewImage(URL.createObjectURL(file.target.files[0]));
         setCreateProjectDetails({...createProjectDetails, project_logo: file.target.files[0]})
     }
     const handleFileChangeFav =(file)=>{
-        setPreviewImageFav(URL.createObjectURL(file.target.files[0]));
         setCreateProjectDetails({...createProjectDetails, project_favicon: file.target.files[0]})
     }
 
@@ -190,14 +183,8 @@ const Project = () => {
         setOpenDelete(false);
     }
 
-    const removePreviewImage = () => {
-        setPreviewImage("");
-    }
-
-
     return (
         <Card>
-
             {
                 openDelete &&
                 <Fragment>
@@ -339,7 +326,6 @@ const Project = () => {
                                             />
                                             <label
                                                 htmlFor="pictureInput"
-                                                // className="border-dashed w-[80px] h-[80px] sm:w-[132px] sm:h-[128px] py-[52px] flex items-center justify-center bg-muted border border-muted-foreground rounded cursor-pointer"
                                                 className="flex w-[50px] bg-muted h-[50px] py-0 justify-center items-center flex-shrink-0 rounded cursor-pointer"
                                             >
                                                 <span className="text-center text-muted-foreground font-semibold text-[14px]">{Icon.editImgLogo}</span>
@@ -359,7 +345,7 @@ const Project = () => {
                 <div className={"flex flex-wrap sm:flex-nowrap gap-4 w-full"}>
                     <div className="basis-full sm:basis-1/2">
                         <Label htmlFor="project_name">Project Name</Label>
-                        <Input type="text" onChange={onChangeText} name={"project_name"} value={createProjectDetails.project_name} id="project_name" placeholder="testingapp" className={"mt-1 mb-1 bg-card"} />
+                        <Input type="text" onChange={onChangeText} name={"project_name"} value={createProjectDetails.project_name} id="project_name" placeholder="Project Name" className={"mt-1 mb-1 bg-card"} />
                         {
                             formError.project_name &&  <p className="text-red-500 text-xs mt-1" >{formError.project_name}</p>
                         }
@@ -376,10 +362,10 @@ const Project = () => {
             <CardFooter className={"pt-4 flex flex-wrap justify-end sm:justify-end gap-4 sm:p-5 p-4"}>
                 <Button
                     variant={"outline hover:bg-transparent"} onClick={deleteAlert}
-                    className={`text-sm font-semibold ${theme === "dark" ? "text-card-foreground" : "text-primary border-primary"} border ${isDelete === true ? "py-2 px-4" : "py-2 px-4 w-[130px]"}  text-sm font-semibold`}
-                >{isDelete ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Delete project"}</Button>
+                    className={`text-sm font-semibold ${theme === "dark" ? "text-card-foreground" : "text-primary border-primary"} border  text-sm font-semibold`}
+                >Delete project</Button>
                 <Button
-                    className={`${isSave === true ? "py-2 px-4" : "py-2 px-4"} w-[132px] text-sm font-semibold`}
+                    className={`w-[132px] text-sm font-semibold`}
                     onClick={() => updateProjects('')}>{isSave ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Update project"}</Button>
             </CardFooter>
         </Card>

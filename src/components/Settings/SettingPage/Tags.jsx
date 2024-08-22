@@ -14,13 +14,11 @@ import {Dialog} from "@radix-ui/react-dialog";
 import {DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "../../ui/dialog";
 import EmptyData from "../../Comman/EmptyData";
 
-
 const initialState ={
     title:""
 }
 
 const Tags = () => {
-    const [topicDetails,setTopicDetails]=useState(initialState);
     const [formError, setFormError] = useState(initialState);
     const [topicLists, setTopicLists] = useState([]);
     const [isLoading,setIsLoading]=useState(true);
@@ -51,7 +49,7 @@ const Tags = () => {
         switch (name) {
             case "title":
                 if (!value || value.trim() === "") {
-                    return "Title is required";
+                    return "Tag name is required";
                 }else {
                     return "";
                 }
@@ -61,10 +59,18 @@ const Tags = () => {
         }
     };
 
-    const addTopic = async (index) => {
+    const handleInputChange = (event,index) => {
+        const { name, value } = event.target;
+        const updatedTopic = [...topicLists];
+        updatedTopic[index] = { ...updatedTopic[index], [name]: value };
+        setTopicLists(updatedTopic);
+        setFormError(x => ({...x, [name]: ""}));
+    }
+
+    const addTag = async (newTag,index) => {
         let validationErrors = {};
-        Object.keys(topicDetails).forEach(name => {
-            const error = formValidate(name, topicDetails[name]);
+        Object.keys(newTag).forEach(name => {
+            const error = formValidate(name, newTag[name]);
             if (error && error.length > 0) {
                 validationErrors[name] = error;
             }
@@ -73,16 +79,16 @@ const Tags = () => {
             setFormError(validationErrors);
             return;
         }
-        setIsSave(true);
+
+        setIsSave(true)
         const payload = {
-            title: topicDetails.title,
-            project_id: projectDetailsReducer.id
+            project_id: `${projectDetailsReducer.id}`,
+            title: newTag.title,
         }
         const data = await apiService.createTopics(payload);
         const clone = [...topicLists];
 
         if(data.status === 200){
-
             clone.push(data.data);
             clone.splice(index,1);
             dispatch(allStatusAndTypesAction({...allStatusAndTypes, topics: clone}))
@@ -92,7 +98,6 @@ const Tags = () => {
             toast({
                 description:data.message
             });
-            setTopicDetails(initialState);
         } else {
             setIsSave(false);
             toast({
@@ -103,15 +108,12 @@ const Tags = () => {
         setIsEdit(null);
     };
 
-    const updateTopic = async (record,index) => {
+    const handleSaveTopic = async (index) => {
         const clone = [...topicLists];
         const topicToSave = clone[index];
 
         if (!topicToSave.title || topicToSave.title.trim() === "") {
-            setFormError({
-                ...formError,
-                title: "Label name is required."
-            });
+            setFormError({...formError, title: "Label name is required."});
             return;
         }
         setIsSave(true);
@@ -119,10 +121,10 @@ const Tags = () => {
             title: topicToSave.title,
             project_id: projectDetailsReducer.id
         }
-        const data = await apiService.updateTopics(payload, record.id);
+        const data = await apiService.updateTopics(payload, topicToSave.id);
         if(data.status === 200){
             const clone = [...topicLists];
-            const index = clone.findIndex((x) => x.id === record.id)
+            const index = clone.findIndex((x) => x.id === topicToSave.id)
             if(index !== -1){
                 clone[index] = data.data;
                 dispatch(allStatusAndTypesAction({...allStatusAndTypes, topics: clone}));
@@ -133,7 +135,6 @@ const Tags = () => {
                 description:data.message
             });
             setIsEdit(null);
-            setTopicDetails(initialState);
         } else {
             setIsSave(false);
             toast({
@@ -174,47 +175,45 @@ const Tags = () => {
        const clone = [...topicLists];
        clone.push(initialState);
        setTopicLists(clone);
-       setIsEdit(clone.length-1);
+       setIsEdit(clone.length - 1);
+       setFormError(initialState);
     }
 
-    const handleInputChange = (e,index) => {
-        const {name,value}= e.target;
-        if(index != undefined){
-            const clone =[...topicLists];
-            clone[index]= {...clone[index],[name]:value}
-            setTopicLists(clone);
-            setTopicDetails({...topicDetails,[name]:value});
-        }
-        else{
-            setTopicDetails({...topicDetails,[name]:value});
-        }
-        setFormError(formError => ({...formError, [e.target.name]: ""}));
-    }
+    const onBlur = (e) => {
+        const { name, value } = e.target;
+        setFormError({
+            ...formError,
+            [name]: formValidate(name, value)
+        });
+    };
 
-    const handleEditTopic = (index) => {
-        const clone = [...topicLists]
+    const onEdit = (index) => {
+        setFormError(initialState);
+        const clone =[...topicLists];
         if(isEdit !== null && !clone[isEdit]?.id){
             clone.splice(isEdit, 1)
             setIsEdit(index)
             setTopicLists(clone);
-        } else {
-            if(isEdit !== index){
-                setTopicLists(allStatusAndTypes.topics)
-            }
-            setIsEdit(index)
+        } else if (isEdit !== index){
+            setTopicLists(allStatusAndTypes?.topics);
+            setIsEdit(index);
         }
-
+        else {
+            setIsEdit(index);
+        }
     }
+
+    const handleDeleteStatus = (id) => {
+        setDeleteId(id);
+        setOpenDelete(true);
+        setTopicLists(allStatusAndTypes.topics);
+        setIsEdit(null)
+    };
 
     const onEditCancel = () => {
         setIsEdit(null)
-        setTopicLists(allStatusAndTypes.topics)
+        setTopicLists(allStatusAndTypes.topics);
     }
-
-    const handleDeleteTag = (id,index) => {
-        setDeleteId(id);
-        setOpenDelete(true);
-    };
 
     return (
         <Fragment>
@@ -254,7 +253,7 @@ const Tags = () => {
                         <CardDescription className={"text-sm text-muted-foreground p-0 mt-1 leading-5"}>Add Tags so that users can tag them when creating Ideas.</CardDescription>
                     </div>
                     <div className={"m-0"}>
-                        <Button onClick={handleNewTopics} disabled={isEdit != null} className={"text-sm font-semibold"}><Plus size={16} className={"mr-1 text-[#f9fafb]"} />New Tags</Button>
+                        <Button onClick={handleNewTopics} disabled={isEdit != null} className={"text-sm font-semibold"}><Plus size={16} className={"mr-1 text-[#f9fafb]"} />New Tag</Button>
                     </div>
                 </CardHeader>
                 <CardContent className={"p-0"}>
@@ -265,7 +264,7 @@ const Tags = () => {
                                     {
                                         ["Tag Name","Last Update","Action"].map((x,i)=>{
                                             return(
-                                                <TableHead className={`px-2 py-[10px] md:px-3 ${i === 0 ? "w-2/5" : i === 1 ? "text-center" : i === 2 ? "text-end" :""} ${theme === "dark" ? "" : "text-card-foreground"}`}>{x}</TableHead>
+                                                <TableHead key={x} className={`px-2 py-[10px] md:px-3 ${i === 0 ? "w-2/5" : i === 1 ? "text-center" : i === 2 ? "text-end" :""} ${theme === "dark" ? "" : "text-card-foreground"}`}>{x}</TableHead>
                                             )
                                         })
                                     }
@@ -275,71 +274,90 @@ const Tags = () => {
                             <TableBody>
                                 {
                                     topicLists.length > 0 ?
-                                    <Fragment>
-                                        {
-                                            (topicLists || []).map((x,index)=>{
-                                                return(
-
-                                                    <TableRow key={x.id}>
-                                                        {
-                                                            isEdit == index ?
-                                                                <Fragment>
-                                                                    <TableCell className={`px-2 py-[10px] md:px-3 font-medium text-xs ${theme === "dark" ? "" : "text-muted-foreground"}`}>
-                                                                        <Input value={x.title} placeholder="Enter Topic Name" onChange={(e) => handleInputChange(e, index)} name="title" type={"text"}/>
-                                                                        {formError?.title && <span className={"text-red-500 text-sm"}>{formError?.title}</span>}
-                                                                    </TableCell>
-                                                                    <TableCell/>
-                                                                    <TableCell className={"flex justify-end px-2 py-[10px] md:px-3"}>
-                                                                        <div className="pr-0">
-                                                                            {
-                                                                                x.id ?  <Button variant={"outline hover:bg-transparent"} onClick={()=>updateTopic(x,index)} className={`p-1 border w-[30px] h-[30px]`}>
-                                                                                    {isSave ? <Loader2 className="mr-1 h-4 w-4 animate-spin justify-center"/> :<Check size={16}/>}
-                                                                                </Button> :  <Button className={`${isSave === true ? "py-2 px-4" : "py-2 px-4"} w-[100px] h-[30px] text-sm font-semibold`} onClick={()=>addTopic(index)}>{isSave ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : "Add Tag"}</Button>
-                                                                            }
-
-                                                                        </div>
-                                                                        <div className="pl-2">
-                                                                            <Button
-                                                                                onClick={() =>  x.id ? onEditCancel() : handleEditTopic(null)}
-                                                                                variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px]`}>
-                                                                                <X  size={16}/>
-                                                                            </Button>
-                                                                        </div>
-                                                                    </TableCell>
-                                                                </Fragment>
-                                                                :
-                                                                <Fragment>
+                                        <Fragment>
+                                            {
+                                                (topicLists || []).map((x,i)=>{
+                                                    return(
+                                                        <TableRow key={i}>
+                                                            {
+                                                                isEdit == i ?
                                                                     <Fragment>
-                                                                        <TableCell className={`px-2 py-[10px] md:px-3 font-medium text-xs  ${theme === "dark" ? "" : "text-muted-foreground"}`}>
-                                                                            {x.title}
+                                                                        <TableCell className={"px-2 py-[10px] md:px-3"}>
+                                                                            <Input
+                                                                                placeholder={"Enter tag name"}
+                                                                                className={"bg-card h-9"}
+                                                                                type="title"
+                                                                                value={x.title}
+                                                                                name={"title"}
+                                                                                onBlur={onBlur}
+                                                                                onChange={(e) => handleInputChange(e, i)}
+                                                                            />
+                                                                            <div className="grid gap-2">
+                                                                                {formError.title && <span className="text-red-500 text-sm">{formError.title}</span>}
+                                                                            </div>
                                                                         </TableCell>
-                                                                        <TableCell className={`px-2 py-[10px] md:px-3 font-medium text-xs text-center ${theme === "dark" ? "" : "text-muted-foreground"}`}>{moment.utc(x.updated_at).local().startOf('seconds').fromNow()}</TableCell>
-                                                                        <TableCell className={"flex justify-end px-2 py-[10px] md:px-3"}>
+                                                                        <TableCell/>
+                                                                        <TableCell className={`flex justify-end gap-2 px-2 py-[10px] md:px-3 font-medium text-xs ${formError.title ? "pt-[22px]" : ""} ${theme === "dark" ? "" : "text-muted-foreground"}`}>
                                                                             <Fragment>
-                                                                                <div className="pr-0">
-                                                                                    <Button onClick={() => handleEditTopic(index)} variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px] `}>
-                                                                                        <Pencil size={16}/>
+                                                                                {
+                                                                                    x.id ? <Button
+                                                                                        variant="outline hover:bg-transparent"
+                                                                                        className={`p-1 border w-[30px] h-[30px] ${isSave ? "justify-center items-center" : ""}`}
+                                                                                        onClick={() => handleSaveTopic(i)}
+                                                                                    >
+                                                                                        {isSave ? <Loader2 className="mr-1 h-4 w-4 animate-spin justify-center"/> : <Check size={16}/>}
+                                                                                    </Button> : <Button
+                                                                                        variant=""
+                                                                                        className="text-sm font-semibold h-[30px] w-[89px]"
+                                                                                        onClick={() => addTag(x, i)}
+                                                                                    >
+                                                                                        {isSave ? <Loader2 className={"mr-2  h-4 w-4 animate-spin"}/> : "Add Tag"}
                                                                                     </Button>
-                                                                                </div>
-                                                                                <div className="pl-2">
-                                                                                    <Button onClick={() => handleDeleteTag(x.id)} variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px]`}>
-                                                                                        <Trash2 size={16}/>
-                                                                                    </Button>
-                                                                                </div>
+                                                                                }
+
+                                                                                <Button
+                                                                                    variant="outline hover:bg-transparent"
+                                                                                    className="p-1 border w-[30px] h-[30px]"
+                                                                                    onClick={() =>  x.id ? onEditCancel() : onEdit(null)}
+                                                                                >
+                                                                                    <X size={16}/>
+                                                                                </Button>
                                                                             </Fragment>
                                                                         </TableCell>
                                                                     </Fragment>
-                                                                </Fragment>
-                                                        }
-                                                    </TableRow>
-                                                )
-                                            })
-                                        }
-                                    </Fragment> : (topicLists.length == 0 && isLoading == false) ? <TableRow>
+                                                                    :
+                                                                    <Fragment>
+                                                                            <TableCell className={`px-2 py-[10px] md:px-3 font-medium text-xs  ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                                                                {x.title}
+                                                                            </TableCell>
+                                                                            <TableCell className={`px-2 py-[10px] md:px-3 font-medium text-xs text-center ${theme === "dark" ? "" : "text-muted-foreground"}`}>{moment.utc(x.updated_at).local().startOf('seconds').fromNow()}</TableCell>
+                                                                            <TableCell className={`flex justify-end px-2 py-[10px] md:px-3 ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                                                                <Fragment>
+                                                                                    <div className="pr-0">
+                                                                                        <Button onClick={() => onEdit(i)} variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px] `}>
+                                                                                            <Pencil size={16}/>
+                                                                                        </Button>
+                                                                                    </div>
+                                                                                    <div className="pl-2">
+                                                                                        <Button onClick={() => {handleDeleteStatus(x.id);}} variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px]`}>
+                                                                                            <Trash2 size={16}/>
+                                                                                        </Button>
+                                                                                    </div>
+                                                                                </Fragment>
+                                                                            </TableCell>
+                                                                    </Fragment>
+                                                            }
+                                                        </TableRow>
+                                                    )
+                                                })
+                                            }
+                                        </Fragment>
+                                        :
+                                        (topicLists.length == 0 && isLoading == false) ? <TableRow>
                                             <TableCell colSpan={6}>
                                                 <EmptyData />
                                             </TableCell>
-                                        </TableRow> : null
+                                        </TableRow> :null
                                 }
                             </TableBody>
                         </Table>

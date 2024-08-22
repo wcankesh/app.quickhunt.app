@@ -24,7 +24,7 @@ const Emoji = () => {
     const [editIndex, setEditIndex] = useState(null);
     const [isLoading,setIsLoading] = useState(true);
     const [isSave,setIsSave]=useState(false);
-    const [isEdit,setIsEdit]=useState(false)
+    const [isEdit,setIsEdit]=useState(false);
     const [isChangeEditEmoji,setIsChangeEditEmoji]=useState(false);
     const [validationError, setValidationError] = useState('');
     const [openDelete,setOpenDelete] = useState(false);
@@ -44,7 +44,7 @@ const Emoji = () => {
 
     const getAllEmoji = async () => {
         setEmojiList(allStatusAndTypes.emoji);
-        setIsLoading(false)
+        setIsLoading(false);
     }
 
     const handleEmojiSelect = (event) => {
@@ -55,9 +55,17 @@ const Emoji = () => {
         setValidationError('');
     };
 
+    const newEmoji = () => {
+        const clone = [...emojiList];
+        clone.push({});
+        setEmojiList(clone);
+        setEditIndex(clone.length - 1);
+        setValidationError("");
+    };
+
     const addEmoji = async (index) => {
         if (!selectedEmoji.imageUrl) {
-            setValidationError('Emoji is required');
+            setValidationError('Emoji is required.');
             return;
         }
         setIsSave(true);
@@ -86,12 +94,68 @@ const Emoji = () => {
             });
         }
         setSelectedEmoji({});
+        setIsChangeEditEmoji(false);
         setEditIndex(null);
-    }
+    };
 
-    const handleDeleteEmoji = (id) => {
-        setDeleteId(id);
-        setOpenDelete(true);
+    const handleSaveEmoji = async (index) => {
+        const cloneEmojiList = [...emojiList];
+        const emojiToSave = cloneEmojiList[index];
+
+        setIsSave(true);
+        const payload ={
+            project_id:projectDetailsReducer.id,
+            emoji:selectedEmoji.emoji,
+            emoji_url:selectedEmoji.imageUrl ? selectedEmoji.imageUrl : emojiToSave.emoji_url
+        }
+        const data = await apiService.updateEmoji(payload,emojiToSave.id);
+        if(data.status === 400) {
+            setIsSave(false);
+            const clone = [...emojiList];
+            clone[index] = {project_id:projectDetailsReducer.id, emoji:selectedEmoji.emoji, emoji_url:payload.emoji_url,id:emojiToSave.id};
+            setEmojiList(clone);
+            dispatch(allStatusAndTypesAction({...allStatusAndTypes, emoji: clone}))
+            setEditIndex(null);
+            setSelectedEmoji({});
+            toast({
+                description:data.message
+            });
+            setIsEdit(false);
+            setIsChangeEditEmoji(false);
+        }
+        else{
+            toast({
+                description:data.message,
+                variant: "destructive"
+            });
+            setIsEdit(false);
+            setIsChangeEditEmoji(false);
+        }
+    };
+
+    const onEdit = (record,index) => {
+        setSelectedEmoji(record);
+        setIsEdit(true);
+        const clone = [...emojiList]
+        if(editIndex !== null && !clone[editIndex]?.id){
+            clone.splice(editIndex, 1)
+            setEditIndex(index)
+            setEmojiList(clone)
+        }
+        else if (editIndex !== index){
+            setEmojiList(allStatusAndTypes?.emoji);
+            setEditIndex(index);
+        }else {
+            setEditIndex(index);
+        }
+        setIsChangeEditEmoji(false);
+    };
+
+    const onEditCancel = () => {
+        setEditIndex(null);
+        setIsChangeEditEmoji(false);
+        setEmojiList(allStatusAndTypes.emoji);
+        setSelectedEmoji({});
     };
 
     const handleDelete = async () => {
@@ -117,71 +181,17 @@ const Emoji = () => {
             setIsDeleteLoading(false);
             setOpenDelete(false);
         }
-    }
+    };
 
-    const handleEditEmoji = (record, index) => {
-        setSelectedEmoji(record);
-        const clone =[...emojiList];
-        const findIndex = clone.findIndex((x)=>!x.id);
-        if(findIndex != -1) {
-            clone.splice(findIndex,1);
-            setEmojiList(clone);
-        }
-        setEditIndex(index);
-        setIsEdit(true);
-    }
-
-    const handleSaveEmoji = async (record,index) => {
-        setIsSave(true);
-        const payload ={
-            project_id:projectDetailsReducer.id,
-            emoji:selectedEmoji.emoji,
-            emoji_url:selectedEmoji.imageUrl ? selectedEmoji.imageUrl : record.emoji_url
-        }
-        const data = await apiService.updateEmoji(payload,record.id);
-        if(data.status === 400) {
-            setIsSave(false);
-            const clone = [...emojiList];
-            clone[index] = {project_id:projectDetailsReducer.id, emoji:selectedEmoji.emoji, emoji_url:payload.emoji_url,id:record.id};
-            setEmojiList(clone);
-            dispatch(allStatusAndTypesAction({...allStatusAndTypes, emoji: clone}))
-            setEditIndex(null);
-            setSelectedEmoji({});
-            toast({
-                description:data.message
-            })
-            setIsEdit(false);
-            setIsChangeEditEmoji(false);
-        }
-        else{
-            toast({
-                description:data.message,
-                variant: "destructive"
-            });
-            setIsEdit(false);
-            setIsChangeEditEmoji(false);
-        }
-    }
-
-    const newEmoji = () => {
-        const clone = [...emojiList];
-        clone.push(selectedEmoji);
-        setEmojiList(clone);
-        setEditIndex(clone.length - 1);
-    }
-
-    const deleteAddEmoji = (index) => {
-        setValidationError("");
-        const clone = [...emojiList];
-        clone.splice(index,1);
-        setEmojiList(clone);
+    const handleDeleteEmoji = (id) => {
+        setDeleteId(id);
+        setOpenDelete(true);
+        setEmojiList(allStatusAndTypes.emoji);
         setEditIndex(null);
-        setSelectedEmoji({});
-    }
+    };
 
     return (
         <Fragment>
-
             {
                 openDelete &&
                 <Fragment>
@@ -210,7 +220,6 @@ const Emoji = () => {
                     </Dialog>
                 </Fragment>
             }
-
             <Card>
                 <CardHeader className={"p-4 sm:p-6 gap-1 border-b flex flex-row justify-between items-center flex-wrap gap-y-2"}>
                     <div>
@@ -225,117 +234,101 @@ const Emoji = () => {
                     <Table>
                         <TableHeader>
                             <TableRow>
-                                <TableHead className={`px-2 py-[10px] md:px-3 w-1/2 ${theme === "dark" ? "" : "text-card-foreground"}`}>Emoji</TableHead>
-                                <TableHead className={`px-2 py-[10px] md:px-3 text-end ${theme === "dark" ? "" : "text-card-foreground"}`}>Action</TableHead>
+                                {
+                                    ["Emoji","Action"].map((x,i)=>{
+                                        return(
+                                            <TableHead className={`px-2 py-[10px] md:px-3 ${i === 0 ? "w-1/2" : "text-end"} w-1/2 ${theme === "dark" ? "" : "text-card-foreground"}`} key={x}>{x}</TableHead>
+                                        )
+                                    })
+                                }
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {
                                  emojiList.length > 0 ? <>
                                     {
-                                        (emojiList || []).map((x, index) => {
+                                        (emojiList || []).map((x, i) => {
                                             return (
-
-                                                <TableRow key={x.id}>
+                                                <TableRow key={i}>
                                                     {
-                                                        editIndex === index && x.id ?
+                                                        editIndex == i ?
                                                             <Fragment>
-                                                                <TableCell className={"px-2 py-[10px] md:px-3"}>
-                                                                    <Popover>
-                                                                        <PopoverTrigger asChild>
-                                                                            <div className={"flex gap-2"}>
-                                                                                {selectedEmoji?.emoji_url ?
-                                                                                    <div
-                                                                                        className={"border border-input w-full p-1 rounded-md bg-background cursor-pointer"}>
-                                                                                        <img className={"cursor-pointer h-[25px] w-[25px]"} alt={"not-found"} src={selectedEmoji?.emoji_url}/>
-                                                                                    </div>
-                                                                                    : isChangeEditEmoji ? <div className={"border border-input w-full p-1 rounded-md bg-background cursor-pointer"}>
-                                                                                            <img className={"cursor-pointer h-[25px] w-[25px]"} alt={"not-found"} src={selectedEmoji?.imageUrl}/>
-                                                                                        </div>
-                                                                                        :
-                                                                                        <Input placeholder="Choose Emoji"/>}
-                                                                            </div>
-                                                                        </PopoverTrigger>
-                                                                        <PopoverContent className="w-full p-0 border-none w-[310px]]">
-                                                                            <EmojiPicker theme={theme === "dark" ? "dark" : "light"} height={350} autoFocusSearch={false} open={true} searchDisabled={true} onEmojiClick={handleEmojiSelect}/>
-                                                                        </PopoverContent>
-                                                                    </Popover>
-                                                                </TableCell>
-                                                                <TableCell className={"px-2 py-[10px] md:px-3 flex justify-end items-center"}>
+                                                                 <TableCell className={"px-2 py-[10px] md:px-3"}>
+                                                                     <Popover>
+                                                                         <PopoverTrigger asChild>
+                                                                             <div className={""}>
+                                                                                 {selectedEmoji.emoji_url ?
+                                                                                     <div
+                                                                                         className={"border border-input w-full p-1 rounded-md bg-background cursor-pointer"}>
+                                                                                         <img className={"cursor-pointer h-[25px] w-[25px]"} alt={"not-found"} src={selectedEmoji?.emoji_url}/>
+                                                                                     </div>
+                                                                                     : selectedEmoji?.imageUrl ? <div className={"border border-input w-full p-1 rounded-md bg-background cursor-pointer"}>
+                                                                                                                    <img className={"cursor-pointer h-[25px] w-[25px]"} alt={"not-found"} src={selectedEmoji?.imageUrl}/>
+                                                                                     </div>
+                                                                                     : isChangeEditEmoji ? <div className={"border border-input w-full p-1 rounded-md bg-background cursor-pointer"}>
+                                                                                                                <img className={"cursor-pointer h-[25px] w-[25px]"} alt={"not-found"} src={selectedEmoji?.imageUrl}/>
+                                                                                                            </div>
+                                                                                     :
+                                                                                     <Input placeholder="Choose Emoji"/>}
+                                                                                 {validationError && <span className={"text-red-500 text-sm"}>{validationError}</span>}
+                                                                             </div>
+                                                                         </PopoverTrigger>
+                                                                         <PopoverContent className="w-full p-0 border-none w-[310px]]">
+                                                                             <EmojiPicker theme={theme === "dark" ? "dark" : "light"} height={350} autoFocusSearch={false} open={true} searchDisabled={true} onEmojiClick={handleEmojiSelect}/>
+                                                                         </PopoverContent>
+                                                                     </Popover>
+                                                                 </TableCell>
+                                                                <TableCell className={`flex justify-end gap-2 pr-4 ${theme === "dark" ? "" : "text-muted-foreground"} ${validationError ? "pt-[22px]" : ""}`}>
                                                                     <Fragment>
-                                                                        <Button onClick={() => handleSaveEmoji(x,index)} variant={"outline hover:bg-transparent"} className={`p-1 mt-[6px] border w-[30px] h-[30px]`}>
-                                                                            {isSave ? <Loader2 className="mr-1 h-4 w-4 animate-spin justify-center"/> : <Check size={16}/>}
-                                                                        </Button>
-                                                                        <div className={"pl-2"}>
-                                                                            <Button onClick={() => {
-                                                                                setEditIndex(null);
-                                                                                setSelectedEmoji({});
-                                                                            }} variant={"outline hover:bg-transparent"} className={`p-1 mt-[6px] border w-[30px] h-[30px] `}>
-                                                                                <X size={16}/>
+                                                                        {
+                                                                            x.id ? <Button
+                                                                                variant="outline hover:bg-transparent"
+                                                                                className={`p-1 border w-[30px] h-[30px] ${isSave ? "justify-center items-center" : ""}`}
+                                                                               onClick={() => handleSaveEmoji(i)}
+                                                                            >
+                                                                                {isSave ? <Loader2 className="mr-1 h-4 w-4 animate-spin justify-center"/> : <Check size={16}/>}
+                                                                            </Button> : <Button
+                                                                                variant=""
+                                                                                className="text-sm font-semibold h-[30px] w-[99px]"
+                                                                                onClick={()=>addEmoji(i)}
+                                                                            >
+                                                                                {isSave ? <Loader2 className={"mr-2  h-4 w-4 animate-spin"}/> : "Add emoji"}
                                                                             </Button>
-                                                                        </div>
+                                                                        }
+
+                                                                        <Button
+                                                                            variant="outline hover:bg-transparent"
+                                                                            className="p-1 border w-[30px] h-[30px]"
+                                                                             onClick={() =>  x.id ? onEditCancel() : onEdit({})}
+                                                                        >
+                                                                            <X size={16}/>
+                                                                        </Button>
                                                                     </Fragment>
                                                                 </TableCell>
                                                             </Fragment>
-
-                                                            : <Fragment>
-                                                                {x.id ? <Fragment>
-                                                                            <TableCell className={"px-2 py-[10px] md:px-3"}>
-                                                                                <img className={"h-[30px] w-[30px] m-[5px]"}
-                                                                                     alt={"not-found"} src={x.emoji_url}/>
-                                                                            </TableCell>
-                                                                            <TableCell className={"px-2 py-[10px] md:px-3 flex justify-end items-center"}>
-                                                                                <Fragment>
-                                                                                    <Button
-                                                                                        onClick={() => handleEditEmoji(x, index)}
-                                                                                        variant={"outline hover:bg-transparent"}
-                                                                                        className={`p-1 mt-[6px] border w-[30px] h-[30px]`}>
-                                                                                        <Pencil size={16}/>
-                                                                                    </Button>
-                                                                                    <div className={"pl-2"}>
-                                                                                        <Button
-                                                                                            onClick={() => handleDeleteEmoji(x.id)}
-                                                                                            variant={"outline hover:bg-transparent"}
-                                                                                            className={"p-1 mt-[6px] border w-[30px] h-[30px]"}>
-                                                                                            <Trash2 size={16}/>
-                                                                                        </Button>
-                                                                                    </div>
-                                                                                </Fragment>
-                                                                            </TableCell>
-                                                                </Fragment>
-                                                                    :<Fragment>
-                                                                        <TableCell className={"px-2 py-[10px] md:px-3"}>
-                                                                            <Popover>
-                                                                                <PopoverTrigger asChild>
-                                                                                    <div className={"flex flex-col"}>
-                                                                                        {selectedEmoji?.imageUrl ? <div className={"border border-input w-full p-1 rounded-md bg-background cursor-pointer"}>
-                                                                                                <img className={"cursor-pointer h-[30px] w-[30px]"} alt={"not-found"} src={selectedEmoji?.imageUrl}/></div>
-                                                                                            :
-                                                                                            <Input placeholder="Choose Emoji"/>
-                                                                                        }
-                                                                                        {validationError && <span className={"text-red-500 text-sm"}>{validationError}</span>}
-                                                                                    </div>
-                                                                                </PopoverTrigger>
-                                                                                <PopoverContent className="w-full p-0 border-none relative">
-                                                                                    <div className={"absolute bottom-[55px] left-[-67px] sm:bottom-[50px] sm:left-[-170px]"}>
-                                                                                        <EmojiPicker height={350} width={280} autoFocusSearch={false}  open={true} searchDisabled={true} onEmojiClick={handleEmojiSelect}/>
-                                                                                    </div>
-                                                                                </PopoverContent>
-                                                                            </Popover>
-                                                                        </TableCell>
-                                                                        <TableCell className={"px-2 py-[15px] md:px-3 text-end flex flex-row justify-end gap-2"}>
-                                                                            <Button className={`${isSave === true ? "py-2 px-4" : "py-2 px-4"} w-[100px] h-[30px] text-sm font-semibold`} onClick={()=>addEmoji(index)}>
-                                                                                {isSave ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> :"Add Emoji"}
-                                                                            </Button>
-                                                                            <Button
-                                                                                variant="outline hover:bg-transparent"
-                                                                                className="p-1 border w-[30px] h-[30px]"
-                                                                                onClick={()=>deleteAddEmoji(index)}
-                                                                            >
-                                                                                <X size={16}/>
-                                                                            </Button>
-                                                                        </TableCell>
-                                                                    </Fragment>}
+                                                            :
+                                                            <Fragment>
+                                                                 <TableCell className={"px-2 py-[10px] md:px-3"}>
+                                                                     <img className={"h-[30px] w-[30px] m-[5px]"} alt={"not-found"} src={x.emoji_url}/>
+                                                                 </TableCell>
+                                                                <TableCell className={`flex justify-end gap-2 pr-4 ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                                                    <Fragment>
+                                                                        <Button
+                                                                            variant="outline hover:bg-transparent"
+                                                                            className="p-1 border w-[30px] h-[30px]"
+                                                                           onClick={() => onEdit(x,i)}
+                                                                        >
+                                                                            <Pencil size={16}/>
+                                                                        </Button>
+                                                                        <Button
+                                                                            variant="outline hover:bg-transparent"
+                                                                            className="p-1 border w-[30px] h-[30px]"
+                                                                            onClick={() => handleDeleteEmoji(x.id)}
+                                                                        >
+                                                                            <Trash2 size={16}/>
+                                                                        </Button>
+                                                                    </Fragment>
+                                                                </TableCell>
                                                             </Fragment>
                                                     }
                                                 </TableRow>
