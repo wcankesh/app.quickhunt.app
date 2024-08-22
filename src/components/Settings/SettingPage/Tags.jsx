@@ -191,34 +191,30 @@ const Tags = () => {
         setFormError(formError => ({...formError, [e.target.name]: ""}));
     }
 
-    const onBlur = (e) => {
-        const { name, value } = e.target;
-        setFormError({
-            ...formError,
-            [name]: formValidate(name, value)
-        });
-    };
-
     const handleEditTopic = (index) => {
-        setFormError(initialState);
-        const clone =[...topicLists];
+        const clone = [...topicLists]
         if(isEdit !== null && !clone[isEdit]?.id){
             clone.splice(isEdit, 1)
             setIsEdit(index)
             setTopicLists(clone);
         } else {
+            if(isEdit !== index){
+                setTopicLists(allStatusAndTypes.topics)
+            }
             setIsEdit(index)
         }
+
     }
 
-    const handleCancel = (index) => {
-        const clone = [...topicLists];
-        clone.splice(index,1);
-        setTopicLists(clone);
-        setIsEdit(null);
-        setTopicDetails(initialState);
-        setFormError(initialState);
+    const onEditCancel = () => {
+        setIsEdit(null)
+        setTopicLists(allStatusAndTypes.topics)
     }
+
+    const handleDeleteTag = (id,index) => {
+        setDeleteId(id);
+        setOpenDelete(true);
+    };
 
     return (
         <Fragment>
@@ -278,102 +274,72 @@ const Tags = () => {
 
                             <TableBody>
                                 {
-                                        topicLists.length > 0 ?
-                                        <>
-                                            {
-                                                (topicLists || []).map((x,index)=>{
-                                                    return(
+                                    topicLists.length > 0 ?
+                                    <Fragment>
+                                        {
+                                            (topicLists || []).map((x,index)=>{
+                                                return(
 
-                                                        <TableRow key={x.id}>
-                                                            {
-                                                                isEdit == index && x.id ?
+                                                    <TableRow key={x.id}>
+                                                        {
+                                                            isEdit == index ?
+                                                                <Fragment>
+                                                                    <TableCell className={`px-2 py-[10px] md:px-3 font-medium text-xs ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                                                        <Input value={x.title} placeholder="Enter Topic Name" onChange={(e) => handleInputChange(e, index)} name="title" type={"text"}/>
+                                                                        {formError?.title && <span className={"text-red-500 text-sm"}>{formError?.title}</span>}
+                                                                    </TableCell>
+                                                                    <TableCell/>
+                                                                    <TableCell className={"flex justify-end px-2 py-[10px] md:px-3"}>
+                                                                        <div className="pr-0">
+                                                                            {
+                                                                                x.id ?  <Button variant={"outline hover:bg-transparent"} onClick={()=>updateTopic(x,index)} className={`p-1 border w-[30px] h-[30px]`}>
+                                                                                    {isSave ? <Loader2 className="mr-1 h-4 w-4 animate-spin justify-center"/> :<Check size={16}/>}
+                                                                                </Button> :  <Button className={`${isSave === true ? "py-2 px-4" : "py-2 px-4"} w-[100px] h-[30px] text-sm font-semibold`} onClick={()=>addTopic(index)}>{isSave ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : "Add Tag"}</Button>
+                                                                            }
+
+                                                                        </div>
+                                                                        <div className="pl-2">
+                                                                            <Button
+                                                                                onClick={() =>  x.id ? onEditCancel() : handleEditTopic(null)}
+                                                                                variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px]`}>
+                                                                                <X  size={16}/>
+                                                                            </Button>
+                                                                        </div>
+                                                                    </TableCell>
+                                                                </Fragment>
+                                                                :
+                                                                <Fragment>
                                                                     <Fragment>
-                                                                        <TableCell className={`px-2 py-[10px] md:px-3 font-medium text-xs ${theme === "dark" ? "" : "text-muted-foreground"}`}>
-                                                                            <Input value={x.title} placeholder="Enter Topic Name" onChange={(e) => handleInputChange(e, index)} name="title" type={"text"}/>
-                                                                            {formError?.title && <span className={"text-red-500 text-sm"}>{formError?.title}</span>}
+                                                                        <TableCell className={`px-2 py-[10px] md:px-3 font-medium text-xs  ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                                                            {x.title}
                                                                         </TableCell>
-                                                                        <TableCell/>
+                                                                        <TableCell className={`px-2 py-[10px] md:px-3 font-medium text-xs text-center ${theme === "dark" ? "" : "text-muted-foreground"}`}>{moment.utc(x.updated_at).local().startOf('seconds').fromNow()}</TableCell>
                                                                         <TableCell className={"flex justify-end px-2 py-[10px] md:px-3"}>
+                                                                            <Fragment>
                                                                                 <div className="pr-0">
-                                                                                    <Button variant={"outline hover:bg-transparent"} onClick={()=>updateTopic(x,index)} className={`p-1 border w-[30px] h-[30px]`}>
-                                                                                        {isSave ? <Loader2 className="mr-1 h-4 w-4 animate-spin justify-center"/> :<Check size={16}/>}
+                                                                                    <Button onClick={() => handleEditTopic(index)} variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px] `}>
+                                                                                        <Pencil size={16}/>
                                                                                     </Button>
                                                                                 </div>
                                                                                 <div className="pl-2">
-                                                                                    <Button onClick={()=>{
-                                                                                     setIsEdit(null);
-                                                                                     setTopicLists(allStatusAndTypes.topics);
-                                                                                     setTopicDetails(initialState);
-                                                                                    }} variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px]`}>
-                                                                                        <X  size={16}/>
+                                                                                    <Button onClick={() => handleDeleteTag(x.id)} variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px]`}>
+                                                                                        <Trash2 size={16}/>
                                                                                     </Button>
                                                                                 </div>
+                                                                            </Fragment>
                                                                         </TableCell>
                                                                     </Fragment>
-                                                                    :
-                                                                    <Fragment>
-                                                                        {
-                                                                            x.id ? <Fragment>
-                                                                                        <TableCell className={`px-2 py-[10px] md:px-3 font-medium text-xs  ${theme === "dark" ? "" : "text-muted-foreground"}`}>
-                                                                                            {x.title}
-                                                                                        </TableCell>
-                                                                                        <TableCell className={`px-2 py-[10px] md:px-3 font-medium text-xs text-center ${theme === "dark" ? "" : "text-muted-foreground"}`}>{moment.utc(x.updated_at).local().startOf('seconds').fromNow()}</TableCell>
-                                                                                        <TableCell className={"flex justify-end px-2 py-[10px] md:px-3"}>
-                                                                                            <Fragment>
-                                                                                                <div className="pr-0">
-                                                                                                    <Button onClick={() => handleEditTopic(index)} variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px] `}>
-                                                                                                        <Pencil size={16}/>
-                                                                                                    </Button>
-                                                                                                </div>
-                                                                                                <div className="pl-2">
-                                                                                                    <Button onClick={() => {
-                                                                                                        setDeleteId(x.id);
-                                                                                                        setOpenDelete(true);
-                                                                                                    }} variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px]`}>
-                                                                                                        <Trash2 size={16}/>
-                                                                                                    </Button>
-                                                                                                </div>
-                                                                                            </Fragment>
-                                                                                        </TableCell>
-                                                                                </Fragment>
-                                                                                 :
-                                                                                    <Fragment>
-                                                                                            <TableCell className={"px-2 py-[10px] md:px-3"}>
-                                                                                                <Input
-                                                                                                    value={topicDetails.title}
-                                                                                                    type={"text"}
-                                                                                                    id={"title"}
-                                                                                                    onChange={(e)=>handleInputChange(e)}
-                                                                                                    name={"title"}
-                                                                                                    onBlur={onBlur}
-                                                                                                    placeholder={"Enter topic name"}
-                                                                                                />
-                                                                                                {formError?.title && <span className={"text-red-500 text-sm"}>{formError?.title}</span>}
-                                                                                            </TableCell>
-                                                                                            <TableCell className={"text-center px-2 py-[10px] md:px-3"}/>
-                                                                                            <TableCell className={"px-2 py-[15px] md:px-3 text-end flex flex-row justify-end gap-2"}>
-                                                                                                <Button className={`${isSave === true ? "py-2 px-4" : "py-2 px-4"} w-[100px] h-[30px] text-sm font-semibold`} onClick={()=>addTopic(index)}>{isSave ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : "Add Tag"}</Button>
-                                                                                                <Button
-                                                                                                    variant="outline hover:bg-transparent"
-                                                                                                    className="p-1 border w-[30px] h-[30px]"
-                                                                                                    onClick={()=>handleCancel(index)}
-                                                                                                >
-                                                                                                    <X size={16}/>
-                                                                                                </Button>
-                                                                                            </TableCell>
-                                                                                    </Fragment>
-                                                                        }
-                                                                    </Fragment>
-                                                            }
-                                                        </TableRow>
-                                                    )
-                                                })
-                                            }
-                                        </> : (topicLists.length == 0 && isLoading == false) ? <TableRow>
-                                                <TableCell colSpan={6}>
-                                                    <EmptyData />
-                                                </TableCell>
-                                            </TableRow> : null
+                                                                </Fragment>
+                                                        }
+                                                    </TableRow>
+                                                )
+                                            })
+                                        }
+                                    </Fragment> : (topicLists.length == 0 && isLoading == false) ? <TableRow>
+                                            <TableCell colSpan={6}>
+                                                <EmptyData />
+                                            </TableCell>
+                                        </TableRow> : null
                                 }
                             </TableBody>
                         </Table>

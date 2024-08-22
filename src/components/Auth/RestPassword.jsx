@@ -7,6 +7,8 @@ import {Eye, EyeOff, Loader2} from "lucide-react";
 import {ApiService} from "../../utils/ApiService";
 import {Icon} from "../../utils/Icon";
 import {useTheme} from "../theme-provider";
+import {useNavigate} from "react-router-dom";
+import {baseUrl} from "../../utils/constent";
 
 const RestPassword = () => {
     const {theme} = useTheme();
@@ -15,7 +17,7 @@ const RestPassword = () => {
     const [forgotPasswordDetails, setForgotPasswordDetails] = useState({password:"", confirm_password: ''});
     const [isLoading, setIsLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
-
+    let navigate = useNavigate();
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get('token');
 
@@ -78,7 +80,7 @@ const RestPassword = () => {
         const data  = await apiSerVice.resetPassword(payload)
         if(data.status === 200){
             setIsLoading(false)
-            history.push(`${baseUrl}/login`);
+            navigate(`${baseUrl}/login`);
         } else {
             setIsLoading(false)
         }

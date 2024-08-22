@@ -3,6 +3,7 @@ import SaidBarDesktop from "../Comman/SaidBarDesktop";
 import HeaderBar from "../Comman/HeaderBar";
 import {Outlet} from "react-router-dom";
 import {Card} from "../ui/card"
+import {ScrollArea, ScrollBar} from "../ui/scroll-area";
 
 const DefaultLayout = () => {
     return (

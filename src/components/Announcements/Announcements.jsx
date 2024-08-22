@@ -179,6 +179,7 @@ const Announcements = () => {
             setIsLoading(true);
             setPageNo(newPage);
             setIsLoading(false);
+            setIsFilter(false)
         }
     };
 

@@ -11,7 +11,6 @@ const PricingPlans = () => {
     const { theme } = useTheme();
     const dispatch = useDispatch();
     const userDetailsReducer = useSelector(state => state.userDetailsReducer);
-    console.log(userDetailsReducer)
     const apiService = new ApiService();
     const { toast } = useToast();
 
@@ -29,7 +28,7 @@ const PricingPlans = () => {
             planType: 0,
             productId: "",
             disabled: userDetailsReducer.plan === 0,
-            btnText: userDetailsReducer.plan >= 0 ? "Downgrade" : "Activated"
+            btnText:  0 < userDetailsReducer.plan ? "Downgrade" : "Activated"
         },
         {
             name: "Startup",

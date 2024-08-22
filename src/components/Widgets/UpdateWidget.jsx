@@ -85,7 +85,6 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
     }, [])
 
     const getWidgetsSetting = async () => {
-
         const data = await apiSerVice.getWidgets(id)
         if (data.status === 200) {
             setWidgetsSetting({...data.data});

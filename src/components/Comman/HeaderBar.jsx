@@ -187,10 +187,9 @@ const HeaderBar = () => {
         setTheme(theme === 'light' ? 'dark' : 'light');
     };
 
-    const isActive = (link) => {
-        return selectedUrl === link;
+    const isActive = (link, subLink ="") => {
+        return  window.location.pathname === subLink || window.location.pathname === link ;
     };
-
     const onChangeText = (event) => {
         const { name, value } = event.target;
         const removeCharacter = (input) => input.replace(/[^a-zA-Z0-9]/g, '');
@@ -336,7 +335,7 @@ const HeaderBar = () => {
                     title: 'Dashboard',
                     link: '/dashboard',
                     icon: Icon.homeIcon,
-                    selected: `${baseUrl}/dashboard`,
+                    selected: isActive(`${baseUrl}/dashboard`),
                 }
             ]
         },
@@ -347,31 +346,31 @@ const HeaderBar = () => {
                     title: 'Ideas',
                     link: '/ideas',
                     icon: Icon.ideasIcon,
-                    selected: `${baseUrl}/ideas`,
+                    selected: isActive(`${baseUrl}/ideas`),
                 },
                 {
                     title: 'Roadmap',
                     link: '/roadmap',
                     icon: Icon.roadmapIcon,
-                    selected: `${baseUrl}/roadmap`,
+                    selected: isActive(`${baseUrl}/roadmap`),
                 },
                 {
                     title: 'Announcements',
                     link: '/announcements',
                     icon: Icon.announcement,
-                    selected: `${baseUrl}/announcements`,
+                    selected: isActive(`${baseUrl}/announcements`),
                 },
                 {
                     title: 'Customers',
                     link: '/customers',
                     icon: Icon.userIcon,
-                    selected: `${baseUrl}/customers`,
+                    selected: isActive(`${baseUrl}/customers`),
                 },
                 {
                     title: 'Widget',
                     link: '/widget',
                     icon: Icon.widgetsIcon,
-                    selected: `${baseUrl}/widget`,
+                    selected: isActive(`${baseUrl}/widget`),
                 },
             ]
         },
@@ -379,45 +378,52 @@ const HeaderBar = () => {
 
     const footerMenuComponent = [
         {
+            title: 'Import / Export',
+            link: '/import-export',
+            icon: Icon.importExport,
+            selected: isActive(`${baseUrl}/import-export` , `${baseUrl}/import`),
+            isDisplay: true,
+        },
+        {
             title: `${userDetailsReducer.trial_days} days trial left`,
             link: '/pricing-plan',
             icon: Icon.trialPlanIcon,
-            selected: `${baseUrl}/pricing-plan`,
+            selected: isActive(`${baseUrl}/pricing-plan`),
             isDisplay: userDetailsReducer?.trial_days > 0 && userDetailsReducer.plan === 1,
         },
         {
             title: 'What’s New',
             link: '/notification',
             icon: Icon.notificationIcon,
-            selected: `${baseUrl}/notification`,
+            selected: isActive(`${baseUrl}/notification`),
             isDisplay: true,
         },
         {
             title: 'Invite Team',
-            link: '/invite-team',
+            link: '/settings/team',
             icon: Icon.userIcon,
-            selected: `${baseUrl}/invite-team`,
+            selected: isActive(`${baseUrl}/settings/team`),
             isDisplay: true,
         },
         {
             title: 'Help & Support',
             link: '/help-support',
             icon: Icon.helpSupportIcon,
-            selected: `${baseUrl}/help-support`,
+            selected: isActive(`${baseUrl}/help-support`),
             isDisplay: true,
         },
         {
             title: "Pricing & Plan",
             link: '/pricing-plan',
             icon: Icon.pricingIcon,
-            selected: `${baseUrl}/pricing-plan`,
+            selected: isActive(`${baseUrl}/pricing-plan`),
             isDisplay: true,
         },
         {
             title: 'Settings',
             link: '/settings/profile',
             icon: Icon.settingIcon,
-            selected: `${baseUrl}/profile`,
+            selected: isActive(`${baseUrl}/profile`),
             isDisplay: true,
         }
     ];
@@ -485,11 +491,11 @@ const HeaderBar = () => {
                                                                         <Button
                                                                             key={i}
                                                                             variant={"link hover:no-underline"}
-                                                                            className={`${isActive(z.selected) ? "flex justify-start gap-4 h-9 rounded-md bg-primary/15 transition-none" : 'flex items-center gap-4 h-9 justify-start transition-none'}`}
+                                                                            className={`${z.selected? "flex justify-start gap-4 h-9 rounded-md bg-primary/15 transition-none" : 'flex items-center gap-4 h-9 justify-start transition-none'}`}
                                                                             onClick={() => onRedirect(z.link)}
                                                                         >
-                                                                            <div className={`${isActive(z.selected) ? "active-menu" : "menu-icon"}`}>{z.icon}</div>
-                                                                            <div className={`${isActive(z.selected) ? "text-primary text-sm font-medium" : "text-sm font-medium"}`}>{z.title}</div>
+                                                                            <div className={`${z.selected ? "active-menu" : "menu-icon"}`}>{z.icon}</div>
+                                                                            <div className={`${z.selected ? "text-primary text-sm font-medium" : "text-sm font-medium"}`}>{z.title}</div>
                                                                         </Button>
                                                                     )
                                                                 })
@@ -505,11 +511,11 @@ const HeaderBar = () => {
                                                                                         <Button
                                                                                             key={i}
                                                                                             variant={"link hover:no-underline"}
-                                                                                            className={`${isActive(y.selected) ? "flex justify-start gap-4 h-9 rounded-md bg-primary/15 transition-none" : 'flex items-center gap-4 h-9 justify-start transition-none'}`}
+                                                                                            className={`${y.selected ? "flex justify-start gap-4 h-9 rounded-md bg-primary/15 transition-none" : 'flex items-center gap-4 h-9 justify-start transition-none'}`}
                                                                                             onClick={() => onRedirect(y.link)}
                                                                                         >
-                                                                                            <div className={`${isActive(y.selected) ? "active-menu" : "menu-icon"}`}>{y.icon}</div>
-                                                                                            <div className={`${isActive(y.selected) ? "text-primary text-sm font-medium" : "text-sm font-medium"}`}>{y.title}</div>
+                                                                                            <div className={`${y.selected ? "active-menu" : "menu-icon"}`}>{y.icon}</div>
+                                                                                            <div className={`${y.selected ? "text-primary text-sm font-medium" : "text-sm font-medium"}`}>{y.title}</div>
                                                                                         </Button>
                                                                                     )
                                                                                 })

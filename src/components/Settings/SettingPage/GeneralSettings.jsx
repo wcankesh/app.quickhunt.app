@@ -70,41 +70,37 @@ const GeneralSettings = () => {
     };
 
     const onUpdatePortal = async () => {
-        if (userDetailsReducer.plan === 0) {
-            onProModal(true)
+        setIsSave(true)
+        const payload = {
+            project_id: projectDetailsReducer.id,
+            announcement_title: generalSettingData.announcement_title,
+            btn_background_color: generalSettingData.btn_background_color,
+            btn_text_color: generalSettingData.btn_text_color,
+            header_bg_color: generalSettingData.header_bg_color,
+            header_text_color: generalSettingData.header_text_color,
+            header_btn_background_color: generalSettingData.header_btn_background_color,
+            header_btn_text_color: generalSettingData.header_btn_text_color,
+            idea_title: generalSettingData.idea_title,
+            is_announcement: generalSettingData.is_announcement,
+            is_branding: generalSettingData.is_branding,
+            is_comment: generalSettingData.is_comment,
+            is_idea: generalSettingData.is_idea,
+            is_reaction: generalSettingData.is_reaction,
+            is_roadmap: generalSettingData.is_roadmap,
+            roadmap_title: generalSettingData.roadmap_title,
+        }
+        const data = await apiSerVice.updatePortalSetting(generalSettingData.id, payload)
+        if (data.status === 200) {
+            setIsSave(false)
+            toast({
+                description: data.message
+            })
         } else {
-            setIsSave(true)
-            const payload = {
-                project_id: projectDetailsReducer.id,
-                announcement_title: generalSettingData.announcement_title,
-                btn_background_color: generalSettingData.btn_background_color,
-                btn_text_color: generalSettingData.btn_text_color,
-                header_bg_color: generalSettingData.header_bg_color,
-                header_text_color: generalSettingData.header_text_color,
-                header_btn_background_color: generalSettingData.header_btn_background_color,
-                header_btn_text_color: generalSettingData.header_btn_text_color,
-                idea_title: generalSettingData.idea_title,
-                is_announcement: generalSettingData.is_announcement,
-                is_branding: generalSettingData.is_branding,
-                is_comment: generalSettingData.is_comment,
-                is_idea: generalSettingData.is_idea,
-                is_reaction: generalSettingData.is_reaction,
-                is_roadmap: generalSettingData.is_roadmap,
-                roadmap_title: generalSettingData.roadmap_title,
-            }
-            const data = await apiSerVice.updatePortalSetting(generalSettingData.id, payload)
-            if (data.status === 200) {
-                setIsSave(false)
-                toast({
-                    description: data.message
-                })
-            } else {
-                setIsSave(false);
-                toast({
-                    description: data.message,
-                    variant: "destructive"
-                })
-            }
+            setIsSave(false);
+            toast({
+                description: data.message,
+                variant: "destructive"
+            })
         }
 
     }

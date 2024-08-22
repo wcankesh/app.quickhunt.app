@@ -12,6 +12,8 @@ import HelpSupport from "../components/HelpSupport/HelpSupport";
 import InAppMessage from "../components/InAppMessage/InAppMessage";
 import UpdateWidget from "../components/Widgets/UpdateWidget";
 import UpdateInAppMessage from "../components/InAppMessage/UpdateInAppMessage";
+import ImportExport from "../components/ImportExport/ImportExport";
+import ImportIdea from "../components/ImportExport/ImportIdea";
 
 export const routes = [
      {path: `${baseUrl}/dashboard`, component: <Dashboard/>},
@@ -27,4 +29,6 @@ export const routes = [
      {path: `${baseUrl}/settings/:type`, component: <Settings/>},
      {path: `${baseUrl}/in-app-message`, component: <InAppMessage/>},
      {path: `${baseUrl}/in-app-message/:id`, component: <UpdateInAppMessage/>},
+     {path: `${baseUrl}/import-export`, component: <ImportExport/>},
+     {path: `${baseUrl}/import`, component: <ImportIdea/>},
 ]

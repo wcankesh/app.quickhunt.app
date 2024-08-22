@@ -144,6 +144,7 @@ const Widgets = () => {
 <script src="https://quickhunt.app/widgetScript.js"></script>`;
     const embedLink = `https://${projectDetailsReducer.domain}/ideas?widget=${selectedId}`
     const iFrame = `<iframe src="${embedLink}" style="border: 0px; outline: 0px; width: 450px; height: 400px;"></iframe>`
+    const callback = `window.Quickhunt('${selectedId}')`
 
     return (
         <Fragment>
@@ -188,10 +189,11 @@ const Widgets = () => {
                                 <X size={16} className={`${theme === "dark" ? "text-card" : ""} m-0 cursor-pointer`} onClick={() => getCodeCopy("")}/>
                             </DialogHeader>
                             <Tabs defaultValue="script">
-                                <TabsList className="grid grid-cols-3 w-full bg-white">
+                                <TabsList className="grid grid-cols-4 w-full bg-white">
                                     <TabsTrigger value="script">Script</TabsTrigger>
                                     <TabsTrigger value="embedlink">Embed Link</TabsTrigger>
                                     <TabsTrigger value="iframe">iFrame</TabsTrigger>
+                                    <TabsTrigger value="callback">Callback function</TabsTrigger>
                                 </TabsList>
                                 <TabsContent value="script" className={"flex flex-col gap-2"}>
                                     <h4 className={`${theme === "dark" ? "text-muted-foreground" : "text-muted-foreground"} text-sm`}>
@@ -306,6 +308,41 @@ const Widgets = () => {
                                         for more information.
                                     </p>
 
+                                </TabsContent>
+                                <TabsContent value="callback"  className={"flex flex-col gap-2"}>
+                                    <h4 className={`${theme === "dark" ? "text-muted-foreground" : "text-muted-foreground"} text-sm`}>
+                                        Place the code below before the closing body tag on your site.
+                                    </h4>
+                                    <div>
+                                        <div className={"relative px-6 rounded-md bg-black mb-2"}>
+                                            <div className={"relative"}>
+                                                <pre id="text"  className={"py-4 whitespace-pre overflow-x-auto scrollbars-none text-[10px] text-text-invert text-white max-w-[230px] w-full md:max-w-[450px]"}>
+                                                      {callback}
+                                                  </pre>
+                                                <Button
+                                                    variant={"ghost hover:none"}
+                                                    className={`absolute top-0 right-0 px-0`}
+                                                    onClick={() => handleCopyCode(callback)}
+                                                >
+                                                    {isCopyLoading ? <Loader2 size={16} className={"animate-spin"} color={"white"}/> : <Copy size={16} color={"white"}/>}
+                                                </Button>
+
+                                            </div>
+                                        </div>
+
+                                        <p className={`${theme === "dark" ? "text-muted-foreground" : "text-muted-foreground"} text-xs`}>Read the {" "}
+                                            <Button variant={"ghost hover:none"} className={"p-0 h-auto text-xs text-primary font-semibold"}>
+                                                Setup Guide
+                                            </Button>
+                                            {" "}for more information or {" "}
+                                            <Button
+                                                variant={"ghost hover:none"}
+                                                className={"p-0 h-auto text-xs text-primary font-semibold"}
+                                            >
+                                                download the HTML example.
+                                            </Button>
+                                        </p>
+                                    </div>
                                 </TabsContent>
                             </Tabs>
                             <DialogFooter>

@@ -307,6 +307,10 @@ export class ApiService{
     async getAllIdea (payload){
         return await this.getData(`${baseUrlApi}/feature-idea?${qs.stringify(payload)}`)
     }
+
+    async ideaImport (payload){
+        return await this.postData(`${baseUrlApi}/idea/import`, payload, true)
+    }
     async getAllRoadmapStatus (id){
         return await this.getData(`${baseUrlApi}/roadmap-status?project_id=${id}`)
     }

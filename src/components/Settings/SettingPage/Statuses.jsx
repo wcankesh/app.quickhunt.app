@@ -203,6 +203,9 @@ const Statuses = () => {
             setIsEdit(index)
             setStatusList(clone)
         } else {
+            if(isEdit !== index){
+                setStatusList(allStatusAndTypes.roadmap_status)
+            }
             setIsEdit(index)
         }
     }
