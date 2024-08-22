@@ -43,7 +43,6 @@ const Emoji = () => {
     },[allStatusAndTypes.emoji])
 
     const getAllEmoji = async () => {
-        setIsLoading(true);
         setEmojiList(allStatusAndTypes.emoji);
         setIsLoading(false)
     }
@@ -122,9 +121,14 @@ const Emoji = () => {
 
     const handleEditEmoji = (record, index) => {
         setSelectedEmoji(record);
+        const clone =[...emojiList];
+        const findIndex = clone.findIndex((x)=>!x.id);
+        if(findIndex != -1) {
+            clone.splice(findIndex,1);
+            setEmojiList(clone);
+        }
         setEditIndex(index);
         setIsEdit(true);
-
     }
 
     const handleSaveEmoji = async (record,index) => {
@@ -167,6 +171,7 @@ const Emoji = () => {
     }
 
     const deleteAddEmoji = (index) => {
+        setValidationError("");
         const clone = [...emojiList];
         clone.splice(index,1);
         setEmojiList(clone);
@@ -184,7 +189,7 @@ const Emoji = () => {
                         <DialogContent className="max-w-[350px] w-full sm:max-w-[525px] p-3 md:p-6 rounded-lg">
                             <DialogHeader className={"flex flex-row justify-between gap-2"}>
                                 <div className={"flex flex-col gap-2"}>
-                                    <DialogTitle className={"text-start"}>You really want delete this Emoji?</DialogTitle>
+                                    <DialogTitle className={"text-start"}>You really want delete this emoji?</DialogTitle>
                                     <DialogDescription className={"text-start"}>This action can't be undone.</DialogDescription>
                                 </div>
                                 <X size={16} className={"m-0 cursor-pointer"} onClick={() => setOpenDelete(false)}/>
@@ -248,7 +253,7 @@ const Emoji = () => {
                                                                                             <img className={"cursor-pointer h-[25px] w-[25px]"} alt={"not-found"} src={selectedEmoji?.imageUrl}/>
                                                                                         </div>
                                                                                         :
-                                                                                        <Input placeholder="Choose Emoji 123"/>}
+                                                                                        <Input placeholder="Choose Emoji"/>}
                                                                             </div>
                                                                         </PopoverTrigger>
                                                                         <PopoverContent className="w-full p-0 border-none w-[310px]]">

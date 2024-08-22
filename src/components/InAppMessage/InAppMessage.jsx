@@ -316,7 +316,7 @@ const InAppMessage = () => {
                                         {
                                             ["Title","State","Sender","Content type","Seen","Created at","Live at",""].map((x,i)=>{
                                                 return(
-                                                    <TableHead  className={`text-base font-semibold py-5 ${i === 0 ? "md:pl-10 pl-4" : ""} ${theme === "dark"? "text-[]" : "bg-muted"} ${i == 0 ? "rounded-tl-lg" : i == 9 ? "rounded-tr-lg" : ""}`} key={i}>{x}</TableHead>
+                                                    <TableHead  className={`text-base font-semibold px-2 py-[10px] md:px-3 ${theme === "dark"? "text-[]" : "bg-muted"} ${i == 0 ? "rounded-tl-lg" : i == 9 ? "rounded-tr-lg" : ""}`} key={i}>{x}</TableHead>
                                                 )
                                             })
                                         }
@@ -348,8 +348,8 @@ const InAppMessage = () => {
                                                 (messageList || []).map((x,i)=>{
                                                     return(
                                                         <TableRow key={i}>
-                                                            <TableCell className={`md:pl-10 pl-4 font-medium ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.title}</TableCell>
-                                                            <TableCell>
+                                                            <TableCell className={`px-2 py-[10px] md:px-3 font-medium ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.title}</TableCell>
+                                                            <TableCell className={"px-2 py-[10px] md:px-3"}>
                                                                 <Select value={x.state}
                                                                         onValueChange={(value) => handleStatusChange(x, value)}>
                                                                     <SelectTrigger className="w-[135px] h-7">
@@ -378,21 +378,21 @@ const InAppMessage = () => {
                                                                     </SelectContent>
                                                                 </Select>
                                                             </TableCell>
-                                                            <TableCell className={`flex items-center mt-1`}>
+                                                            <TableCell className={`flex items-center mt-1 px-2 py-[10px] md:px-3`}>
                                                                 <img className={"h-5 w-5 rounded-full mr-2"} src={x?.avatar} alt={"not_found"}/>
                                                                 <p className={`font-medium ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.sender ? x.sender : "-"}</p>
                                                             </TableCell>
-                                                            <TableCell className={`font-medium ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                                            <TableCell className={`px-2 py-[10px] md:px-3 font-medium ${theme === "dark" ? "" : "text-muted-foreground"}`}>
                                                                 {
                                                                     x.content_type === 1 ? <div className={"flex items-center gap-1"}><ScrollText  size={16}/>Post</div> : x.content_type === 2 ? <div className={"flex items-center gap-1"}><ClipboardList  size={16}/>Survey</div> : x.content_type === 3 ? <div className={"flex items-center gap-1"}><BookCheck size={16}/>Checklist</div> : x.content_type === 4 ? <div className={"flex items-center gap-1"}><SquareMousePointer size={16}/>Banners</div> : ""
                                                                 }
                                                             </TableCell>
-                                                            <TableCell className={`font-medium ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.seen}</TableCell>
-                                                            <TableCell className={`font-medium ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                                            <TableCell className={`px-2 py-[10px] md:px-3 font-medium ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.seen}</TableCell>
+                                                            <TableCell className={`px-2 py-[10px] md:px-3 font-medium ${theme === "dark" ? "" : "text-muted-foreground"}`}>
                                                                 {x?.created_at ? moment.utc(x.created_at).local().startOf('seconds').fromNow() : "-"}
                                                             </TableCell>
-                                                            <TableCell className={`font-medium ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.live_at ? x.live_at : "-"}</TableCell>
-                                                            <TableCell className={`font-medium ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                                            <TableCell className={`px-2 py-[10px] md:px-3 font-medium ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.live_at ? x.live_at : "-"}</TableCell>
+                                                            <TableCell className={`px-2 py-[10px] md:px-3 font-medium ${theme === "dark" ? "" : "text-muted-foreground"}`}>
                                                                 <DropdownMenu>
                                                                     <DropdownMenuTrigger>
                                                                         <Ellipsis className={`font-medium`} size={18}/>
@@ -413,10 +413,10 @@ const InAppMessage = () => {
                        </div>
                            <Separator/>
                            <CardFooter className={"p-0"}>
-                               <div className={`w-full p-5 rounded-b-lg rounded-t-none flex justify-end px-8 py-4 md:px-16 md:py-15px ${theme === "dark"? "" : "bg-muted"}`}>
+                               <div className={`w-full px-2 py-[10px] md:px-3 rounded-b-lg rounded-t-none flex justify-end ${theme === "dark"? "" : "bg-muted"}`}>
                                    <div className={"w-full flex gap-8 items-center justify-between sm:justify-end"}>
                                        <h5 className={"text-sm font-semibold"}>Page {pageNo} of 10</h5>
-                                       <div className={"flex flex-row gap-2 items-center"}>
+                                       <div className={"flex flex-row gap-2 items-center "}>
                                            <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"} onClick={() => handlePaginationClick(1)} disabled={pageNo === 1}>
                                                <ChevronsLeft className={pageNo === 1 ? "stroke-muted-foreground" : "stroke-primary"}/>
                                            </Button>

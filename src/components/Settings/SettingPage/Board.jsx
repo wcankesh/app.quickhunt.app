@@ -127,9 +127,16 @@ const Board = () => {
         setDeleteId(id);
     }
 
-    const handleEditBoard = (index,record) => {
-        setIsEdit(index);
-        // setOriginalObj(record);
+    const handleEditBoard = (index) => {
+        setFormError(initialState);
+        const clone =[...boardList];
+        if(isEdit !== null && !clone[isEdit]?.id){
+            clone.splice(isEdit, 1)
+            setIsEdit(index)
+            setBoardList(clone);
+        } else {
+            setIsEdit(index)
+        }
     }
 
     const updateBoard = async (record,index)=>{
@@ -201,9 +208,6 @@ const Board = () => {
 
     const createNewBoard = () => {
         const clone = [...boardList];
-        clone.push(initialState);
-        setBoardList(clone);
-        setIsEdit(clone.length - 1);
 
         let length = boardList?.length;
         if(userDetailsReducer.plan === 0){
@@ -214,6 +218,9 @@ const Board = () => {
             }
         } else if(userDetailsReducer.plan === 1){
             onProModal(false)
+            clone.push(initialState);
+            setBoardList(clone);
+            setIsEdit(clone.length - 1);
         }
     }
 
@@ -223,8 +230,8 @@ const Board = () => {
        setBoardList(clone);
        setIsEdit(null);
        setBoardDetail(initialState);
+       setFormError(initialState);
     }
-
 
     return (
         <Fragment>
@@ -259,12 +266,12 @@ const Board = () => {
             }
 
             <Card>
-                <CardHeader className={"flex flex-row flex-wrap md:flex-nowrap justify-between gap-x-6 items-center p-4 sm:p-6 "}>
+                <CardHeader className={"flex flex-row flex-wrap md:flex-nowrap justify-between gap-x-6 items-center p-4 sm:p-6 gap-y-2"}>
                     <div>
                         <CardTitle className={"text-lg sm:text-2xl font-medium"}>Board</CardTitle>
                         <CardDescription className={"text-sm text-muted-foreground p-0"}>Use Boards to track Ideas on your Roadmap.</CardDescription>
                     </div>
-                    <div className={"mt-1 md:m-0"}>
+                    <div className={"m-0"}>
                         <Button
                             disabled={isEdit != null}
                             className="flex gap-1 items-center text-sm font-semibold m-0"
@@ -337,7 +344,7 @@ const Board = () => {
                                                                                 </TableCell>
                                                                                 <TableCell className={"px-2 py-[10px] md:px-3 flex justify-end"}>
                                                                                     <div className="pr-0">
-                                                                                        <Button onClick={() => handleEditBoard(i,x)} variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px] `}>
+                                                                                        <Button onClick={() => handleEditBoard(i)} variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px] `}>
                                                                                             <Pencil size={16}/>
                                                                                         </Button>
                                                                                     </div>
