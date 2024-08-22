@@ -2,7 +2,7 @@ import React, {useState, Fragment, useEffect} from 'react';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "../ui/table";
 import {Badge} from "../ui/badge";
 import {Button} from "../ui/button";
-import {BarChart, ChevronDown, ChevronUp, Circle, Ellipsis, Eye, Loader2, X,} from "lucide-react";
+import {BarChart, ChevronDown, ChevronUp, Circle, Ellipsis, Eye, Loader2, Pin, X,} from "lucide-react";
 import {useTheme} from "../theme-provider"
 import {CardContent} from "../ui/card";
 import {DropdownMenu, DropdownMenuTrigger} from "@radix-ui/react-dropdown-menu";
@@ -27,7 +27,7 @@ const status2 = [
     {name: "Draft", value: 3, fillColor: "#CF1322", strokeColor: "#CF1322",},
 ]
 
-const AnnouncementsTable = ({data, isLoading, setSelectedRecord, handleDelete, setAnalyticsObj,}) => {
+const AnnouncementsTable = ({data, isLoading, setSelectedRecord, handleDelete, setAnalyticsObj,isLoadingDelete}) => {
     const {theme} = useTheme();
     const [announcementData, setAnnouncementData] = useState(data);
     const [idToDelete, setIdToDelete] = useState(null);
@@ -36,7 +36,11 @@ const AnnouncementsTable = ({data, isLoading, setSelectedRecord, handleDelete, s
     const [sortedColumn, setSortedColumn] = useState('');
 
     useEffect(() => {
-        setAnnouncementData(data);
+        const updatedData = data.map(item => ({
+            ...item,
+            post_status: item.post_status ?? 1,
+        }));
+        setAnnouncementData(updatedData);
     }, [data]);
 
     const toggleSort = (column) => {
@@ -99,8 +103,8 @@ const AnnouncementsTable = ({data, isLoading, setSelectedRecord, handleDelete, s
         setOpenDelete(true);
     }
 
-    const deleteParticularRow = () => {
-        handleDelete(idToDelete);
+    const deleteParticularRow = async () => {
+       await handleDelete(idToDelete);
         setOpenDelete(false);
     }
 
@@ -128,10 +132,10 @@ const AnnouncementsTable = ({data, isLoading, setSelectedRecord, handleDelete, s
                                         onClick={() => setOpenDelete(false)}>Cancel</Button>
                                 <Button
                                     variant={"hover:bg-destructive"}
-                                    className={` ${theme === "dark" ? "text-card-foreground" : "text-card"} ${isLoading === true ? "py-2 px-6" : "py-2 px-6"} w-[76px] text-sm font-semibold bg-destructive`}
+                                    className={` ${theme === "dark" ? "text-card-foreground" : "text-card"} ${isLoadingDelete ? "py-2 px-6" : "py-2 px-6"} w-[76px] text-sm font-semibold bg-destructive`}
                                     onClick={deleteParticularRow}
                                 >
-                                    {isLoading ? <Loader2 size={16} className={"animate-spin"}/> : "Delete"}
+                                    {isLoadingDelete ? <Loader2 size={16} className={"animate-spin"}/> : "Delete"}
                                 </Button>
                             </DialogFooter>
                         </DialogContent>
@@ -184,10 +188,12 @@ const AnnouncementsTable = ({data, isLoading, setSelectedRecord, handleDelete, s
                                     return (
                                         <TableRow key={x?.id} className={""}>
                                             <TableCell
-                                                className={`inline-flex gap-2 md:gap-3 flex-wrap items-center px-2 py-[10px] md:px-3 font-medium h-12`}>
+                                                className={`inline-flex gap-2 md:gap-1 flex-wrap items-center px-2 py-[10px] md:px-3 font-medium`}>
+                                                {/*className={`inline-flex gap-2 md:gap-3 flex-wrap items-center px-2 py-[10px] md:px-3 font-medium h-12`}>*/}
                                                 <span
                                                     className={"cursor-pointer text-ellipsis overflow-hidden whitespace-nowrap"}
                                                     onClick={() => onEdit(x, index)}>{x?.post_title}</span>
+                                                {x.post_pin_to_top === 1 && <Pin size={14} fill={"bg-card-foreground"}/>}
                                                 {
                                                     x.labels && x.labels.length > 0 ?
                                                         <div className={"flex flex-wrap gap-1"}>
@@ -211,8 +217,8 @@ const AnnouncementsTable = ({data, isLoading, setSelectedRecord, handleDelete, s
                                             <TableCell
                                                 className={`font-medium px-2 py-[10px] md:px-3`}>{x?.post_modified_date ? moment.utc(x.post_modified_date).local().startOf('seconds').fromNow() : "-"}</TableCell>
                                             {/*<TableCell className={`font-medium px-2 py-[10px] md:px-3`}>{x?.post_published_at ? moment.utc(x.post_published_at).local().startOf('seconds').fromNow() : "-"}</TableCell>*/}
-                                            <TableCell
-                                                className={`font-medium px-2 py-[10px] md:px-3`}>{moment(x.post_published_at).format('D MMM, YYYY')}</TableCell>
+                                            {/*<TableCell className={`font-medium px-2 py-[10px] md:px-3`}>{moment(x.post_published_at).format('D MMM, YYYY')}</TableCell>*/}
+                                            <TableCell className={`font-medium px-2 py-[10px] md:px-3`}>{x.post_published_at ? moment(x.post_published_at).format('D MMM, YYYY') : moment().format('D MMM, YYYY')}</TableCell>
                                             <TableCell className={"px-2 py-[10px] md:px-3"}>
                                                 <Select value={x.post_status}
                                                         onValueChange={(value) => handleStatusChange(x, value)}>

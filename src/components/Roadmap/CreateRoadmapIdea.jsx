@@ -7,7 +7,6 @@ import {useSelector} from "react-redux";
 import {Check, Loader2, X} from "lucide-react";
 import {Sheet, SheetContent, SheetHeader, SheetOverlay} from "../ui/sheet";
 import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "../ui/select";
-import {Textarea} from "../ui/textarea";
 import {useToast} from "../ui/use-toast";
 import ReactQuillEditor from "../Comman/ReactQuillEditor";
 import {useTheme} from "../theme-provider";
@@ -28,20 +27,11 @@ const initialStateError = {
 
 }
 
-const CreateIdea = ({
-                        isOpen,
-                        onOpen,
-                        onClose,
-                        closeCreateIdea,
-                        selectedRoadmap,
-                        roadmapList,
-                        setRoadmapList,
-                    }) => {
+const CreateRoadmapIdea = ({isOpen, onOpen, onClose, closeCreateIdea, selectedRoadmap, roadmapList, setRoadmapList,}) => {
     const {theme} = useTheme()
     let apiSerVice = new ApiService();
     const { toast } = useToast()
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
-    const editor = useRef(null);
     const [ideaDetail, setIdeaDetail] = useState(initialState);
     const [topicLists, setTopicLists] = useState([]);
     const [description, setDescription] = useState(null);
@@ -110,9 +100,7 @@ const CreateIdea = ({
         formData.append('topic', ideaDetail.topic.join());
         formData.append('roadmap_id', selectedRoadmap && selectedRoadmap ? selectedRoadmap : "");
         const data = await apiSerVice.createIdea(formData)
-        debugger
         if(data.status === 200){
-            debugger
             let cloneRoadmap = [...roadmapList.columns];
             // cloneRoadmap.push(data.data);
             const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap);
@@ -277,4 +265,4 @@ const CreateIdea = ({
     );
 };
 
-export default CreateIdea;
+export default CreateRoadmapIdea;

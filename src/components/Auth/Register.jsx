@@ -160,7 +160,8 @@ const Register = () => {
                     <div className={"min-h-screen bg-background  flex items-center  overflow-hidden w-full"}>
                         <div className={"min-h-screen basis-full flex w-full  justify-center overflow-y-auto"}>
                             <div className="min-h-screen basis-1/2 bg-purple-400 w-full relative hidden xl:flex justify-center p-16 ">
-                                <div>
+                                <div className={"custom-width"}>
+                                    <div className={"h-full flex flex-col justify-center"}>
                                     <div className={"app-logo"}>{theme === "dark" ? Icon.whiteLogo : Icon.blackLogo}</div>
                                     <Carousel
                                         plugins={[plugin.current]}
@@ -170,8 +171,9 @@ const Register = () => {
                                     >
                                         <CarouselContent>
                                             {Array.from({length: 3}).map((_, index) => (
-                                                <CarouselItem key={index}>
-                                                    <img className={"w-[806px]"} src={widget_01} alt=''/>
+                                                <CarouselItem key={index} className={"max-w-[706px] w-full shrink-0 grow pl-4"}>
+                                                    {/*<img className={"w-[806px]"} src={widget_01} alt=''/>*/}
+                                                    <img className={"w-[706px]"} src={widget_01} alt=''/>
                                                 </CarouselItem>
                                             ))}
                                         </CarouselContent>
@@ -179,35 +181,26 @@ const Register = () => {
                                         {/*<CarouselNext/>*/}
                                     </Carousel>
                                     <div className={"description"}>
-                                        <p className={"text-white text-center text-[26px]"}>“This library has saved me
+                                        <p className={"text-white text-center text-[20px]"}>“This library has saved me
                                             countless hours of work and
                                             helped me deliver stunning designs to my clients faster than ever
                                             before.”</p>
                                     </div>
                                 </div>
+                                </div>
                             </div>
                             <div className=" min-h-screen md:basis-1/2 md:p-16 flex justify-center items-center">
                                 <div className={"lg:w-[641px] h-full"}>
-                                    <div className={"w-full pt-5"}>
-                                        <div className="text-center md:text-right text-xs md:text-sm">
-                                            <p className={"font-medium"}>
-                                                Already have an account?{" "}
-                                                <Button
-                                                    variant={"link"}
-                                                    className="p-0 h-auto hover:no-underline"
-                                                    onClick={() => onRedirect('login')}
-                                                >
-                                                    <span className={"font-bold text-primary"}>Login</span>
-                                                </Button>
-                                            </p>
-                                        </div>
-                                        <div className="mx-auto grid w-[320px] md:w-[392px] gap-8 lg:pt-[47px] pt-[50px] px-3">
-                                        <div className="gap-2 flex flex-col items-center">
-                                            {theme === "dark" ? Icon.whiteLogo : Icon.blackLogo}
-                                            <h1 className="text-2xl md:text-3xl font-medium">Let's Set Up Your Account</h1>
-                                            <h6 className="font-normal text-sm text-muted-foreground">
-                                                Enhance customer experience now.
-                                            </h6>
+                                    <div className={"w-full h-full pt-5"}>
+                                        {/*<div className="mx-auto grid w-[320px] md:w-[392px] gap-8 lg:pt-[47px] pt-[50px] px-3">*/}
+                                        <div className="mx-auto flex items-center w-[320px] md:w-[392px] px-3 h-full">
+                                            <div className={"w-full flex flex-col gap-8"}>
+                                        <div className="gap-2 flex flex-col items-start">
+                                            {/*{theme === "dark" ? Icon.whiteLogo : Icon.blackLogo}*/}
+                                            <h1 className="text-2xl md:text-3xl font-medium">Create Your Account</h1>
+                                            {/*<h6 className="font-normal text-sm text-muted-foreground">*/}
+                                            {/*    Enhance customer experience now.*/}
+                                            {/*</h6>*/}
                                         </div>
                                         <div className="grid gap-6">
                                             <div className="grid md:grid-flow-col gap-4">
@@ -215,7 +208,7 @@ const Register = () => {
                                                     <Label htmlFor="email" className={"font-medium"}>First Name</Label>
                                                     <Input
                                                         id="user_first_name"
-                                                        placeholder="First Name"
+                                                        placeholder="John"
                                                         value={companyDetails.user_first_name}
                                                         name={'user_first_name'}
                                                         onChange={onChange}
@@ -233,7 +226,7 @@ const Register = () => {
                                                         Name</Label>
                                                     <Input
                                                         id="user_last_name"
-                                                        placeholder="Last Name"
+                                                        placeholder="Doe"
                                                         value={companyDetails.user_last_name}
                                                         name={'user_last_name'}
                                                         onChange={onChange}
@@ -253,7 +246,7 @@ const Register = () => {
                                                     <Input
                                                         id="email"
                                                         type="email"
-                                                        placeholder="Email"
+                                                        placeholder="JohnDoe@gmail.com"
                                                         value={companyDetails.user_email_id}
                                                         name={'user_email_id'}
                                                         onChange={onChange}
@@ -334,22 +327,36 @@ const Register = () => {
                                                 </div>
                                                 <WithGoogle title={"Signup with Google"}/>
 
-                                                <p className='text-xs text-center'>
-                                                    By registering you agree to our{" "}
-                                                    <Button
-                                                        variant={"link"}
-                                                        className="p-0 h-auto hover:no-underline"
-                                                    >
-                                                        <span className={"font-medium text-primary"}>Terms of Service</span>
-                                                    </Button> and {""}
-                                                    <Button
-                                                        variant={"link"}
-                                                        className="p-0 h-auto hover:no-underline"
-                                                    >
-                                                        <span className={"font-medium text-primary"}>Privacy Policy</span>
-                                                    </Button>.
-                                                </p>
+                                                <div className="text-center text-xs md:text-sm">
+                                                    <p className={"font-normal text-sm text-muted-foreground"}>
+                                                        Already have an account?{" "}
+                                                        <Button
+                                                            variant={"link"}
+                                                            className="p-0 h-auto hover:no-underline"
+                                                            onClick={() => onRedirect('login')}
+                                                        >
+                                                            <span className={"font-bold text-primary"}>Login</span>
+                                                        </Button>
+                                                    </p>
+                                                </div>
+
+                                                {/*<p className='text-xs text-center'>*/}
+                                                {/*    By registering you agree to our{" "}*/}
+                                                {/*    <Button*/}
+                                                {/*        variant={"link"}*/}
+                                                {/*        className="p-0 h-auto hover:no-underline"*/}
+                                                {/*    >*/}
+                                                {/*        <span className={"font-medium text-primary"}>Terms of Service</span>*/}
+                                                {/*    </Button> and {""}*/}
+                                                {/*    <Button*/}
+                                                {/*        variant={"link"}*/}
+                                                {/*        className="p-0 h-auto hover:no-underline"*/}
+                                                {/*    >*/}
+                                                {/*        <span className={"font-medium text-primary"}>Privacy Policy</span>*/}
+                                                {/*    </Button>.*/}
+                                                {/*</p>*/}
                                             </div>
+                                        </div>
                                         </div>
                                         </div>
                                     </div>

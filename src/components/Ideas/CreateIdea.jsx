@@ -24,17 +24,9 @@ const initialStateError = {
     title: "",
     description: "",
     board: ""
-
 }
 
-const CreateIdea = ({
-                        isOpen,
-                        onOpen,
-                        onClose,
-                        closeCreateIdea,
-                        setIdeasList,
-                        ideasList,
-                    }) => {
+const CreateIdea = ({isOpen, onOpen, onClose, closeCreateIdea, setIdeasList, ideasList,getAllIdea}) => {
     const {theme} = useTheme()
     let apiSerVice = new ApiService();
     const { toast } = useToast()
@@ -71,6 +63,12 @@ const CreateIdea = ({
         }));
     }
 
+    const convertToSlug = (Text) => {
+        return Text.toLowerCase()
+            .replace(/ /g, "-")
+            .replace(/[^\w-]+/g, "");
+    }
+
     const onCreateIdea = async () => {
         let validationErrors = {};
         Object.keys(ideaDetail).forEach(name => {
@@ -87,24 +85,25 @@ const CreateIdea = ({
         setIsLoading(true)
         let formData = new FormData();
         formData.append('title', ideaDetail.title);
-        formData.append('slug_url', ideaDetail.title ? ideaDetail.title.replace(/ /g,"-").replace(/\?/g, "-") :"");
+        // formData.append('slug_url', ideaDetail.title ? ideaDetail.title.replace(/ /g,"-").replace(/\?/g, "-") :"");
+        formData.append('slug_url', convertToSlug(ideaDetail?.title || ''));
         formData.append('description', ideaDetail.description);
         formData.append('project_id', projectDetailsReducer.id);
         formData.append('board', ideaDetail.board);
         formData.append('topic', ideaDetail.topic.join());
         const data = await apiSerVice.createIdea(formData)
         if(data.status === 200){
-            debugger
             const clone = [...ideasList];
             const newArray = [data.data].concat(clone)
             setIdeasList(newArray);
             setIsLoading(false)
             setIdeaDetail(initialState)
+            await getAllIdea()
             closeCreateIdea()
             toast({description: data.message})
         } else {
             setIsLoading(false)
-            toast({description: data.message,variant: "destructive" })
+            toast({description: data.message, variant: "destructive" })
         }
     }
 

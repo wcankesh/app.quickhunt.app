@@ -1,16 +1,12 @@
 import React, {useState, useEffect} from 'react';
-import {Label} from "../ui/label";
-import {Input} from "../ui/input";
 import {Card, CardContent} from "../ui/card";
 import {Button} from "../ui/button";
-import {Eye, EyeOff, Loader2} from "lucide-react";
 import {useToast} from "../ui/use-toast";
 import {ApiService} from "../../utils/ApiService";
 import {Icon} from "../../utils/Icon";
 import {Avatar, AvatarFallback} from "../ui/avatar";
 import {baseUrl} from "../../utils/constent";
 import {useNavigate} from "react-router-dom";
-
 
 const initialState= {
     domain: '',
@@ -28,7 +24,6 @@ const Setup = () => {
     const token = urlParams.get('token');
     let navigate = useNavigate();
     const {toast} = useToast();
-
 
     useEffect(() => {
         getInvitationDetail()
@@ -93,7 +88,6 @@ const Setup = () => {
                         </CardContent>
                     </Card>
                 </div>
-
             </div>
         </div>
     );

@@ -1,15 +1,14 @@
 import React, {useState, Fragment, useEffect} from 'react';
 import {Check, Loader2, Pencil, X} from "lucide-react";
-import { Label } from "../ui/label";
-import { Input } from "../ui/input";
-import { Switch } from "../ui/switch";
-import { Checkbox } from "../ui/checkbox";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../ui/accordion";
-import { SelectTrigger, SelectContent, SelectItem, Select, SelectValue } from "../ui/select";
+import {Label} from "../ui/label";
+import {Input} from "../ui/input";
+import {Switch} from "../ui/switch";
+import {Checkbox} from "../ui/checkbox";
+import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from "../ui/accordion";
+import {SelectTrigger, SelectContent, SelectItem, Select, SelectValue} from "../ui/select";
 import {SheetContent, SheetHeader, Sheet, SheetOverlay} from "../ui/sheet";
-import { useNavigate, useParams} from "react-router-dom";
-import { baseUrl } from "../../utils/constent";
+import {useNavigate, useParams} from "react-router-dom";
+import {baseUrl} from "../../utils/constent";
 import ColorInput from "../Comman/ColorPicker";
 import {Button} from "../ui/button";
 import {ApiService} from "../../utils/ApiService";
@@ -55,7 +54,7 @@ const initialState = {
     changelog_reaction: 1
 }
 
-const UpdateWidget = ({ isOpen, onOpen, onClose,  }) => {
+const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
     const navigate = useNavigate();
     let apiSerVice = new ApiService();
     const {toast} = useToast()
@@ -74,10 +73,10 @@ const UpdateWidget = ({ isOpen, onOpen, onClose,  }) => {
     };
 
     useEffect(() => {
-       setTimeout(() => {
-           document.body.style.pointerEvents = 'auto';
-       }, 500)
-    },[]);
+        setTimeout(() => {
+            document.body.style.pointerEvents = 'auto';
+        }, 500)
+    }, []);
 
     useEffect(() => {
         if (id !== "new") {
@@ -131,7 +130,7 @@ const UpdateWidget = ({ isOpen, onOpen, onClose,  }) => {
         if (data.status === 200) {
             setIsLoading(false)
             toast({description: data.message})
-            if(id === "new"){
+            if (id === "new") {
                 navigate(`${baseUrl}/widget`)
             }
 
@@ -151,18 +150,19 @@ const UpdateWidget = ({ isOpen, onOpen, onClose,  }) => {
             window.removeEventListener("keydown", handleEsc);
         };
     }, []);
+
     const onUpdateWidgets = async () => {
         setIsLoading(true)
 
         const payload = {
             ...widgetsSetting
         }
-        const data = await apiSerVice.updateWidgets( payload, widgetsSetting.id)
+        const data = await apiSerVice.updateWidgets(payload, widgetsSetting.id)
 
         if (data.status === 200) {
             setIsLoading(false)
             toast({description: data.message})
-            if(id === "new"){
+            if (id === "new") {
                 navigate(`${baseUrl}/widget`)
             }
         } else {
@@ -175,7 +175,8 @@ const UpdateWidget = ({ isOpen, onOpen, onClose,  }) => {
             <div>
                 <Accordion type="single" defaultValue={"item-1"} collapsible className="w-full">
                     <AccordionItem value="item-1" className={"widget-accordion overflow-hidden"}>
-                        <AccordionTrigger className={`hover:no-underline text-[15px] font-medium border-b px-4 py-3`}>Widget Type</AccordionTrigger>
+                        <AccordionTrigger className={`hover:no-underline text-[15px] font-medium border-b px-4 py-3`}>Widget
+                            Type</AccordionTrigger>
                         <AccordionContent className={"px-4 py-3 space-y-4"}>
                             <div className={"flex flex-col gap-3"}>
                                 <Label className={"text-sm font-medium"}>Widget type</Label>
@@ -260,7 +261,8 @@ const UpdateWidget = ({ isOpen, onOpen, onClose,  }) => {
                         <Fragment>
                             <AccordionItem value="item-2" className={"widget-accordion"}>
                                 <AccordionTrigger
-                                    className={"hover:no-underline text-[15px] font-medium border-b px-4 py-3"}>Launcher Type</AccordionTrigger>
+                                    className={"hover:no-underline text-[15px] font-medium border-b px-4 py-3"}>Launcher
+                                    Type</AccordionTrigger>
                                 <AccordionContent className={"px-4 py-3"}>
                                     <div className={"flex flex-col gap-4"}>
                                         <div className={"space-y-2"}>
@@ -317,10 +319,14 @@ const UpdateWidget = ({ isOpen, onOpen, onClose,  }) => {
                                     className={"hover:no-underline text-[15px] font-medium border-b px-4 py-3"}>Sections</AccordionTrigger>
                                 <AccordionContent className={"px-4 py-3 space-y-2"}>
 
-                                    <ToggleGroup type="single" className={"justify-normal gap-2"} onValueChange={handleToggle}>
-                                        <ToggleGroupItem value="announcement"  className={`px-[9px] h-8 text-[12px] ${selectedToggle === 'announcement' ? 'bg-muted' : ''}`}>Announcement</ToggleGroupItem>
-                                        <ToggleGroupItem value="roadmap" className={`px-[9px] h-8 text-[12px] ${selectedToggle === 'roadmap' ? '' : ''}`}>Roadmap</ToggleGroupItem>
-                                        <ToggleGroupItem value="ideas" className={`px-[9px] h-8 text-[12px] ${selectedToggle === 'ideas' ? '' : ''}`}>Ideas</ToggleGroupItem>
+                                    <ToggleGroup type="single" className={"justify-normal gap-2"}
+                                                 onValueChange={handleToggle}>
+                                        <ToggleGroupItem value="announcement"
+                                                         className={`px-[9px] h-8 text-[12px] ${selectedToggle === 'announcement' ? 'bg-muted' : ''}`}>Announcement</ToggleGroupItem>
+                                        <ToggleGroupItem value="roadmap"
+                                                         className={`px-[9px] h-8 text-[12px] ${selectedToggle === 'roadmap' ? '' : ''}`}>Roadmap</ToggleGroupItem>
+                                        <ToggleGroupItem value="ideas"
+                                                         className={`px-[9px] h-8 text-[12px] ${selectedToggle === 'ideas' ? '' : ''}`}>Ideas</ToggleGroupItem>
                                     </ToggleGroup>
 
                                     {/* Content for Announcement */}
@@ -328,27 +334,31 @@ const UpdateWidget = ({ isOpen, onOpen, onClose,  }) => {
                                         <div className="space-y-4">
                                             <div className="space-y-2">
                                                 <Label className="text-sm font-medium">Title</Label>
-                                                <Input value={widgetsSetting.changelog_title} onChange={(e) => onChange("changelog_title", e.target.value)} />
+                                                <Input value={widgetsSetting.changelog_title}
+                                                       onChange={(e) => onChange("changelog_title", e.target.value)}/>
                                             </div>
                                             <div className="flex flex-col gap-2">
                                                 <Label className="text-sm font-medium">Display</Label>
-                                                <Select value={widgetsSetting.changelog_display} onValueChange={(value) => onChange("changelog_display", value)}>
+                                                <Select value={widgetsSetting.changelog_display}
+                                                        onValueChange={(value) => onChange("changelog_display", value)}>
                                                     <SelectTrigger>
-                                                        <SelectValue placeholder={1} />
+                                                        <SelectValue placeholder={1}/>
                                                     </SelectTrigger>
                                                     <SelectContent>
                                                         <SelectItem value={1}>In Widget</SelectItem>
                                                         <SelectItem value={2}>Link to Platform</SelectItem>
                                                     </SelectContent>
                                                 </Select>
-                                                <p className="text-xs font-medium text-muted-foreground">How should Announcement be displayed?</p>
+                                                <p className="text-xs font-medium text-muted-foreground">How should
+                                                    Announcement be displayed?</p>
                                             </div>
                                             {widgetsSetting.changelog_display === 2 && (
                                                 <div className="flex flex-col gap-2">
                                                     <Label className="text-sm font-medium">Ideas</Label>
-                                                    <Select value={widgetsSetting.changelog_open} onValueChange={(value) => onChange("changelog_open", value)}>
+                                                    <Select value={widgetsSetting.changelog_open}
+                                                            onValueChange={(value) => onChange("changelog_open", value)}>
                                                         <SelectTrigger>
-                                                            <SelectValue placeholder={1} />
+                                                            <SelectValue placeholder={1}/>
                                                         </SelectTrigger>
                                                         <SelectContent>
                                                             <SelectItem value={1}>Open in Widget</SelectItem>
@@ -356,21 +366,24 @@ const UpdateWidget = ({ isOpen, onOpen, onClose,  }) => {
                                                             <SelectItem value={3}>Do not open</SelectItem>
                                                         </SelectContent>
                                                     </Select>
-                                                    <p className="text-xs font-medium text-muted-foreground">How should Ideas open in the Announcement?</p>
+                                                    <p className="text-xs font-medium text-muted-foreground">How should
+                                                        Ideas open in the Announcement?</p>
                                                 </div>
                                             )}
                                             <div className="flex flex-col gap-2">
                                                 <Label className="text-sm font-medium">Reactions</Label>
-                                                <Select value={widgetsSetting.changelog_reaction} onValueChange={(value) => onChange("changelog_reaction", value)}>
+                                                <Select value={widgetsSetting.changelog_reaction}
+                                                        onValueChange={(value) => onChange("changelog_reaction", value)}>
                                                     <SelectTrigger>
-                                                        <SelectValue placeholder={1} />
+                                                        <SelectValue placeholder={1}/>
                                                     </SelectTrigger>
                                                     <SelectContent>
                                                         <SelectItem value={1}>Enable Reactions</SelectItem>
                                                         <SelectItem value={2}>Disable Reactions</SelectItem>
                                                     </SelectContent>
                                                 </Select>
-                                                <p className="text-xs font-medium text-muted-foreground">Choose whether or not reactions are shown</p>
+                                                <p className="text-xs font-medium text-muted-foreground">Choose whether
+                                                    or not reactions are shown</p>
                                             </div>
                                             <div className="announce-create-switch flex gap-4">
                                                 <Switch
@@ -383,7 +396,8 @@ const UpdateWidget = ({ isOpen, onOpen, onClose,  }) => {
                                                         }
                                                     }, event)}
                                                 />
-                                                <p className="text-sm text-muted-foreground font-medium">Show Your Announcement</p>
+                                                <p className="text-sm text-muted-foreground font-medium">Show Your
+                                                    Announcement</p>
                                             </div>
                                         </div>
                                     )}
@@ -393,27 +407,31 @@ const UpdateWidget = ({ isOpen, onOpen, onClose,  }) => {
                                         <div className="space-y-4">
                                             <div className="space-y-2">
                                                 <Label className="text-sm font-medium">Title</Label>
-                                                <Input value={widgetsSetting.roadmap_title} onChange={(e) => onChange("roadmap_title", e.target.value)} />
+                                                <Input value={widgetsSetting.roadmap_title}
+                                                       onChange={(e) => onChange("roadmap_title", e.target.value)}/>
                                             </div>
                                             <div className="flex flex-col gap-3">
                                                 <Label className="text-sm font-medium">Display</Label>
-                                                <Select value={widgetsSetting.roadmap_display} onValueChange={(value) => onChange("roadmap_display", value)}>
+                                                <Select value={widgetsSetting.roadmap_display}
+                                                        onValueChange={(value) => onChange("roadmap_display", value)}>
                                                     <SelectTrigger>
-                                                        <SelectValue placeholder={1} />
+                                                        <SelectValue placeholder={1}/>
                                                     </SelectTrigger>
                                                     <SelectContent>
                                                         <SelectItem value={1}>In Widget</SelectItem>
                                                         <SelectItem value={2}>Link to Platform</SelectItem>
                                                     </SelectContent>
                                                 </Select>
-                                                <p className="text-xs font-medium text-muted-foreground">How should the Roadmap be displayed?</p>
+                                                <p className="text-xs font-medium text-muted-foreground">How should the
+                                                    Roadmap be displayed?</p>
                                             </div>
                                             {widgetsSetting.roadmap_display === 2 && (
                                                 <div className="flex flex-col gap-2">
                                                     <Label className="text-sm font-medium">Ideas</Label>
-                                                    <Select value={widgetsSetting.roadmap_open} onValueChange={(value) => onChange("roadmap_open", value)}>
+                                                    <Select value={widgetsSetting.roadmap_open}
+                                                            onValueChange={(value) => onChange("roadmap_open", value)}>
                                                         <SelectTrigger>
-                                                            <SelectValue placeholder={1} />
+                                                            <SelectValue placeholder={1}/>
                                                         </SelectTrigger>
                                                         <SelectContent>
                                                             <SelectItem value={1}>Open in Widget</SelectItem>
@@ -421,7 +439,8 @@ const UpdateWidget = ({ isOpen, onOpen, onClose,  }) => {
                                                             <SelectItem value={3}>Do not open</SelectItem>
                                                         </SelectContent>
                                                     </Select>
-                                                    <p className="text-xs font-medium text-muted-foreground">How should the Ideas open in the Roadmap?</p>
+                                                    <p className="text-xs font-medium text-muted-foreground">How should
+                                                        the Ideas open in the Roadmap?</p>
                                                 </div>
                                             )}
                                             <div className="announce-create-switch flex gap-4">
@@ -435,7 +454,8 @@ const UpdateWidget = ({ isOpen, onOpen, onClose,  }) => {
                                                         }
                                                     }, event)}
                                                 />
-                                                <p className="text-sm text-muted-foreground font-medium">Show Your Roadmap</p>
+                                                <p className="text-sm text-muted-foreground font-medium">Show Your
+                                                    Roadmap</p>
                                             </div>
                                         </div>
                                     )}
@@ -445,27 +465,31 @@ const UpdateWidget = ({ isOpen, onOpen, onClose,  }) => {
                                         <div className="space-y-4">
                                             <div className="space-y-2">
                                                 <Label className="text-sm font-medium">Title</Label>
-                                                <Input value={widgetsSetting.idea_title} onChange={(e) => onChange("idea_title", e.target.value)} />
+                                                <Input value={widgetsSetting.idea_title}
+                                                       onChange={(e) => onChange("idea_title", e.target.value)}/>
                                             </div>
                                             <div className="flex flex-col gap-3">
                                                 <Label className="text-sm font-medium">Display</Label>
-                                                <Select value={widgetsSetting.idea_display} onValueChange={(value) => onChange("idea_display", value)}>
+                                                <Select value={widgetsSetting.idea_display}
+                                                        onValueChange={(value) => onChange("idea_display", value)}>
                                                     <SelectTrigger>
-                                                        <SelectValue placeholder={1} />
+                                                        <SelectValue placeholder={1}/>
                                                     </SelectTrigger>
                                                     <SelectContent>
                                                         <SelectItem value={1}>In Widget</SelectItem>
                                                         <SelectItem value={2}>Link to Platform</SelectItem>
                                                     </SelectContent>
                                                 </Select>
-                                                <p className="text-xs font-medium text-muted-foreground">How should Ideas be displayed?</p>
+                                                <p className="text-xs font-medium text-muted-foreground">How should
+                                                    Ideas be displayed?</p>
                                             </div>
                                             {widgetsSetting.idea_display === 2 && (
                                                 <div className="flex flex-col gap-2">
                                                     <Label className="text-sm font-medium">Ideas</Label>
-                                                    <Select value={widgetsSetting.idea_open} onValueChange={(value) => onChange("idea_open", value)}>
+                                                    <Select value={widgetsSetting.idea_open}
+                                                            onValueChange={(value) => onChange("idea_open", value)}>
                                                         <SelectTrigger>
-                                                            <SelectValue placeholder="Popover" />
+                                                            <SelectValue placeholder="Popover"/>
                                                         </SelectTrigger>
                                                         <SelectContent>
                                                             <SelectItem value={1}>Open in Widget</SelectItem>
@@ -473,12 +497,14 @@ const UpdateWidget = ({ isOpen, onOpen, onClose,  }) => {
                                                             <SelectItem value={3}>Do not open</SelectItem>
                                                         </SelectContent>
                                                     </Select>
-                                                    <p className="text-xs font-medium text-muted-foreground">How should the Ideas open?</p>
+                                                    <p className="text-xs font-medium text-muted-foreground">How should
+                                                        the Ideas open?</p>
                                                 </div>
                                             )}
                                             <div className="flex flex-col gap-3">
                                                 <Label className="text-sm font-medium">Button Label</Label>
-                                                <Input value={widgetsSetting.idea_button_label} name="idea_button_label" onChange={(e) => onChange("idea_button_label", e.target.value)} />
+                                                <Input value={widgetsSetting.idea_button_label} name="idea_button_label"
+                                                       onChange={(e) => onChange("idea_button_label", e.target.value)}/>
                                             </div>
                                             <div className="announce-create-switch flex gap-4">
                                                 <Switch
@@ -491,7 +517,8 @@ const UpdateWidget = ({ isOpen, onOpen, onClose,  }) => {
                                                         }
                                                     }, event)}
                                                 />
-                                                <p className="text-sm text-muted-foreground font-medium">Show Your Ideas</p>
+                                                <p className="text-sm text-muted-foreground font-medium">Show Your
+                                                    Ideas</p>
                                             </div>
                                         </div>
                                     )}
@@ -568,9 +595,13 @@ const UpdateWidget = ({ isOpen, onOpen, onClose,  }) => {
         );
     };
 
-    const handleEditWidgetName = () => {setEditWidgetName(!editWidgetName)};
+    const handleEditWidgetName = () => {
+        setEditWidgetName(!editWidgetName)
+    };
 
-    const handleBlur = () => {setEditWidgetName(false);};
+    const handleBlur = () => {
+        setEditWidgetName(false);
+    };
 
     const onToggle = () => {
         setToggle(!toggle)
@@ -602,12 +633,13 @@ const UpdateWidget = ({ isOpen, onOpen, onClose,  }) => {
     return (
         <Fragment>
             <Sheet open={true} onOpenChange={isOpen ? onClose : onOpen}>
-                    <SheetContent
-                        // className={"w-[282px] md:w-[350px] p-0 overflow-y-auto bg-card"}
-                        className={"md:w-[282px] w-full p-0 overflow-y-auto bg-card"}
-                        side={"left"}>
-                        <SheetHeader className=" px-4 py-3 md:p-4 text-left md:text-center flex-row items-center justify-between border-b">
-                            <div className={"flex gap-2 items-center"}>
+                <SheetContent
+                    // className={"w-[282px] md:w-[350px] p-0 overflow-y-auto bg-card"}
+                    className={"md:w-[282px] w-full p-0 overflow-y-auto bg-card"}
+                    side={"left"}>
+                    <SheetHeader
+                        className=" px-4 py-3 md:p-4 text-left md:text-center flex-row items-center justify-between border-b">
+                        <div className={"flex gap-2 items-center"}>
                             {editWidgetName ? (
                                 <Input
                                     value={widgetsSetting?.name}
@@ -616,32 +648,37 @@ const UpdateWidget = ({ isOpen, onOpen, onClose,  }) => {
                                     onBlur={handleBlur}
                                     autoFocus
                                 />
-                            ) : (<h2 className="text-xl text-left font-medium w-full max-w-[170px]">{widgetsSetting?.name}</h2>)}
-                                {editWidgetName ? <Check size={15} className={"cursor-pointer"} /> :<Pencil size={15} className={"cursor-pointer"} onClick={handleEditWidgetName}/>}
-                            </div>
-                            <X size={18} onClick={() => navigate(`${baseUrl}/widget`)} className="cursor-pointer m-0" />
-                        </SheetHeader>
-                        <div
-                            className={"flex h-full max-h-screen flex-col gap-2 lg:gap-8 widget-update-sheet-height overflow-y-auto"}>
-                            {renderSidebarItems()}
-                            <div className={"px-4"}>
-                                <Button className={"font-semibold w-[128px]"}
-                                        onClick={id === "new" ? createWidget : onUpdateWidgets}>
-                                    {
-                                        isLoading ?
-                                            <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : "Save Changes"
-                                    }</Button>
-                            </div>
+                            ) : (
+                                <h2 className="text-xl text-left font-medium w-full max-w-[170px]">{widgetsSetting?.name}</h2>)}
+                            {editWidgetName ? <Check size={15} className={"cursor-pointer"}/> :
+                                <Pencil size={15} className={"cursor-pointer"} onClick={handleEditWidgetName}/>}
                         </div>
-                    </SheetContent>
+                        <X size={18} onClick={() => navigate(`${baseUrl}/widget`)} className="cursor-pointer m-0"/>
+                    </SheetHeader>
+                    <div
+                        className={"flex h-full max-h-screen flex-col gap-2 lg:gap-8 widget-update-sheet-height overflow-y-auto"}>
+                        {renderSidebarItems()}
+                        <div className={"px-4"}>
+                            <Button className={"font-semibold w-[128px]"}
+                                    onClick={id === "new" ? createWidget : onUpdateWidgets}>
+                                {
+                                    isLoading ?
+                                        <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : "Save Changes"
+                                }</Button>
+                        </div>
+                    </div>
+                </SheetContent>
             </Sheet>
             {/*<div className={"container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-4 h-full relative xl:m-auto ml-[338px]"}>*/}
-            <div className={"md:container xl:max-w-[1005px] lg:max-w-[768px] md:max-w-[639px] md:block hidden pt-8 pb-5 px-4 h-full relative xl:m-auto md:ml-[338px]"}>
-                <div className={widgetsSetting.type === "popover" || widgetsSetting.type === "embed" ? "border h-full rounded-lg" : ""}>
+            <div
+                className={"md:container xl:max-w-[1005px] lg:max-w-[768px] md:max-w-[639px] md:block hidden pt-8 pb-5 px-4 h-full relative xl:m-auto md:ml-[338px]"}>
+                <div
+                    className={widgetsSetting.type === "popover" || widgetsSetting.type === "embed" ? "border h-full rounded-lg" : ""}>
                     {
-                        widgetsSetting.type !== "embed" && <div className='QH-floating-trigger' onClick={onToggle} style={{
+                        widgetsSetting.type !== "embed" &&
+                        <div className='QH-floating-trigger' onClick={onToggle} style={{
                             backgroundColor: widgetsSetting.launcher_icon_bg_color,
-                            left: widgetsSetting.launcher_position === 1 ?widgetsSetting.type === "popover" ? "40px" : 355 : "inherit",
+                            left: widgetsSetting.launcher_position === 1 ? widgetsSetting.type === "popover" ? "40px" : 355 : "inherit",
                             right: widgetsSetting.launcher_position === 2 ? "40px" : "inherit",
                             position: widgetsSetting.type === "popover" ? "absolute" : "fixed"
                         }}>
@@ -670,7 +707,7 @@ const UpdateWidget = ({ isOpen, onOpen, onClose,  }) => {
                             right: widgetsSetting.sidebar_position === 2 ? "0" : "inherit",
 
                         }}>
-                            <div className="QH-sidebar-content"  style={{
+                            <div className="QH-sidebar-content" style={{
                                 left: widgetsSetting.sidebar_position === 1 ? "350px" : "inherit",
                                 right: widgetsSetting.sidebar_position === 2 ? "0" : "inherit",
                                 width: `${widgetsSetting.sidebar_width}px`,

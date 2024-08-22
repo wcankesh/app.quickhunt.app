@@ -14,7 +14,7 @@ import {useSelector} from "react-redux";
 
 const perPageLimit = 10;
 
-const SidebarSheet = ({ isOpen, onOpen, onClose ,selectedViewAnalyticsRecord}) => {
+const AnalyticsView = ({ isOpen, onOpen, onClose ,selectedViewAnalyticsRecord}) => {
     const apiService = new ApiService();
     const [feedbackList, setFeedbackList] = useState([])
     const [reactionList, setReactionList] = useState([])
@@ -183,4 +183,4 @@ const SidebarSheet = ({ isOpen, onOpen, onClose ,selectedViewAnalyticsRecord}) =
     );
 };
 
-export default SidebarSheet;
+export default AnalyticsView;

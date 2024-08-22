@@ -1,24 +1,14 @@
 import React, {useState, useEffect, useRef,} from 'react';
 import {Button} from "../ui/button";
 import {Input} from "../ui/input";
-import AnnouncementsView from "./AnnouncementsView";
 import AnnouncementsTable from "./AnnouncementsTable";
-import {
-    ChevronLeft,
-    ChevronRight,
-    ChevronsLeft,
-    ChevronsRight,
-    Circle, Filter,
-    LayoutList,
-    Plus,
-    Text, X
-} from "lucide-react";
-import CreateAnnouncementsLogSheet from "./CreateAnnouncementsLogSheet";
+import {ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Circle, Filter, Plus, X} from "lucide-react";
+import CreateUpdateAnnouncements from "./CreateUpdateAnnouncements";
 import {useTheme} from "../theme-provider";
 import {useSelector} from "react-redux";
 import {ApiService} from "../../utils/ApiService";
 import {Card, CardFooter} from "../ui/card";
-import SidebarSheet from "./SidebarSheet";
+import AnalyticsView from "./AnalyticsView";
 import {toast} from "../ui/use-toast";
 import {Popover, PopoverTrigger} from "@radix-ui/react-popover";
 import {PopoverContent} from "../ui/popover";
@@ -31,6 +21,7 @@ const initialStateFilter = {
     s: "",
     q:""
 }
+
 const perPageLimit = 10;
 
 const status = [
@@ -53,7 +44,8 @@ const Announcements = () => {
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
     const [announcementList, setAnnouncementList] = useState([]);
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isLoadingDelete, setIsLoadingDelete] = useState(false);
     const [filter, setFilter] = useState(initialStateFilter);
     const [pageNo, setPageNo] = useState(1);
     const [totalRecord, setTotalRecord] = useState(0);
@@ -66,34 +58,28 @@ const Announcements = () => {
     const [isFilter, setIsFilter] = useState(false);
 
     useEffect(() => {
-            if(projectDetailsReducer.id){
-                if(filter.l || filter.s || filter.q || isFilter){
-                    searchAnnouncement({...filter, page: pageNo, project_id: projectDetailsReducer.id,})
-                } else {
-                    if(!isFilter){
-                        getAllPosts()
-                    }
-
+            if(filter.l || filter.s || filter.q || isFilter){
+                searchAnnouncement({...filter, page: pageNo, project_id: projectDetailsReducer.id,})
+            } else {
+                if(!isFilter && projectDetailsReducer.id){
+                    getAllPosts()
                 }
-
             }
     }, [projectDetailsReducer.id, allStatusAndTypes, pageNo]);
 
     const getAllPosts = async () => {
-        setIsLoading(true)
+        setIsLoading(true);
         const data = await apiService.getAllPosts({
             project_id: projectDetailsReducer.id,
             page: pageNo,
             limit: perPageLimit
         })
         if (data.status === 200) {
-            setIsLoading(false)
             setAnnouncementList(data.data)
             setTotalRecord(data.total)
             setIsFilter(true)
-        } else {
-            setIsLoading(false)
         }
+        setIsLoading(false)
     }
 
     const searchAnnouncement = async (payload) => {
@@ -116,6 +102,7 @@ const Announcements = () => {
     const onCloseAnalyticsSheet = () => {
         setAnalyticsObj({})
     }
+
     const closeSheet = (record,addRecord) => {
         if (record) {
             const updatedItems = announcementList.map((x) => x.id === record.id ? {...x, ...record} : x);
@@ -133,8 +120,10 @@ const Announcements = () => {
     };
 
     const handleDelete = async (id) => {
+        setIsLoadingDelete(true)
         const data = await apiService.deletePosts(id, pageNo)
         if (data.status === 200) {
+            setIsLoadingDelete(false)
             const clone = [...announcementList];
             const index = clone.findIndex((x) => x.id === id)
             if (index !== -1) {
@@ -145,6 +134,7 @@ const Announcements = () => {
                 description: data.message,
             })
         } else {
+            setIsLoadingDelete(false)
             toast({
                 description: data.message,
                 variant: "destructive"
@@ -184,9 +174,11 @@ const Announcements = () => {
 
     const totalPages = Math.ceil(totalRecord / perPageLimit);
 
-    const handlePaginationClick = (newPage) => {
+    const handlePaginationClick = async (newPage) => {
         if (newPage >= 1 && newPage <= totalPages) {
+            setIsLoading(true);
             setPageNo(newPage);
+            setIsLoading(false);
         }
     };
 
@@ -203,20 +195,25 @@ const Announcements = () => {
 
     const matchedObject = allStatusAndTypes.labels ? allStatusAndTypes.labels.find(x => x.id === filter.l) : null;
 
+    console.log(`Total Records: ${totalRecord}`);
+    console.log(`Per Page Limit: ${perPageLimit}`);
+    console.log(`Total Pages: ${totalPages}`);
 
     return (
         <div
-            className={"container xl:max-w-[1200px]  lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-3 md:px-4"}>
+            className={"container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-3 md:px-4"}>
             {selectedRecord.id &&
-            <CreateAnnouncementsLogSheet isOpen={selectedRecord.id}
-                                         selectedRecord={selectedRecord}
-                                         onOpen={openSheet}
-                                         onClose={closeSheet}
+            <CreateUpdateAnnouncements isOpen={selectedRecord.id}
+                                       selectedRecord={selectedRecord}
+                                       onOpen={openSheet}
+                                       onClose={closeSheet}
+                                       getAllPosts={getAllPosts}
+                                       announcementList={announcementList}
             />}
-            {analyticsObj.id && <SidebarSheet selectedViewAnalyticsRecord={analyticsObj}
-                                              analyticsObj={analyticsObj}
-                                              isOpen={analyticsObj.id}
-                                              onClose={onCloseAnalyticsSheet}/>}
+            {analyticsObj.id && <AnalyticsView selectedViewAnalyticsRecord={analyticsObj}
+                                               analyticsObj={analyticsObj}
+                                               isOpen={analyticsObj.id}
+                                               onClose={onCloseAnalyticsSheet}/>}
             <div className={"flex items-center justify-between flex-wrap gap-6"}>
                 <div className={"flex justify-between items-center w-full md:w-auto"}>
                     <h3 className={"text-2xl font-medium leading-8"}>Announcement</h3>
@@ -343,8 +340,10 @@ const Announcements = () => {
                     handleDelete={handleDelete}
                     data={announcementList}
                     setSelectedRecord={setSelectedRecord}
-                    isLoading={isLoading}/>
-                <CardFooter className={"p-0"}>
+                    isLoading={isLoading}
+                    isLoadingDelete={isLoadingDelete}
+                />
+                <CardFooter className={`p-0 ${theme === "dark" ? "border-t" : ""}`}>
                     <div
                         className={`w-full ${theme === "dark" ? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end p-2 md:px-3 md:py-[10px]`}>
                         <div className={"w-full flex gap-2 items-center justify-between sm:justify-end"}>
@@ -353,27 +352,28 @@ const Announcements = () => {
                             </div>
                             <div className={"flex flex-row gap-2 items-center"}>
                                 <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
-                                        onClick={() => handlePaginationClick(1)} disabled={pageNo === 1}>
+                                        onClick={() => handlePaginationClick(1)}
+                                        disabled={pageNo === 1 || isLoading}>
                                     <ChevronsLeft
-                                        className={pageNo === 1 ? "stroke-muted-foreground" : "stroke-primary"}/>
+                                        className={pageNo === 1 || isLoading ? "stroke-muted-foreground" : "stroke-primary"} />
                                 </Button>
                                 <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
                                         onClick={() => handlePaginationClick(pageNo - 1)}
-                                        disabled={pageNo === 1}>
+                                        disabled={pageNo === 1 || isLoading}>
                                     <ChevronLeft
-                                        className={pageNo === 1 ? "stroke-muted-foreground" : "stroke-primary"}/>
+                                        className={pageNo === 1 || isLoading ? "stroke-muted-foreground" : "stroke-primary"} />
                                 </Button>
                                 <Button variant={"outline"} className={" h-[30px] w-[30px] p-1.5"}
                                         onClick={() => handlePaginationClick(pageNo + 1)}
-                                        disabled={pageNo === totalPages}>
+                                        disabled={pageNo === totalPages || isLoading}>
                                     <ChevronRight
-                                        className={pageNo === totalPages ? "stroke-muted-foreground" : "stroke-primary"}/>
+                                        className={pageNo === totalPages || isLoading ? "stroke-muted-foreground" : "stroke-primary"} />
                                 </Button>
                                 <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
                                         onClick={() => handlePaginationClick(totalPages)}
-                                        disabled={pageNo === totalPages}>
+                                        disabled={pageNo === totalPages || isLoading}>
                                     <ChevronsRight
-                                        className={pageNo === totalPages ? "stroke-muted-foreground" : "stroke-primary"}/>
+                                        className={pageNo === totalPages || isLoading ? "stroke-muted-foreground" : "stroke-primary"} />
                                 </Button>
                             </div>
                         </div>

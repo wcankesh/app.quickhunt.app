@@ -3,15 +3,14 @@ import {Card, CardContent, CardHeader, CardTitle} from "../ui/card";
 import {Circle, Plus} from "lucide-react";
 import {Button} from "../ui/button";
 import {useTheme} from "../theme-provider";
-import RoadMapSidebarSheet from "./RoadMapSidebarSheet";
+import UpdateRoadMapIdea from "./UpdateRoadMapIdea";
 import {useSelector} from "react-redux";
 import {ApiService} from "../../utils/ApiService";
-import Board, {moveCard, allowAddColumn} from '@asseinfo/react-kanban'
+import Board, {moveCard} from '@asseinfo/react-kanban'
 import "@asseinfo/react-kanban/dist/styles.css";
-import CreateIdea from "./CreateIdea";
+import CreateRoadmapIdea from "./CreateRoadmapIdea";
 import {useToast} from "../ui/use-toast";
 import {CommSkel} from "../Comman/CommSkel";
-import EmptyData from "../Comman/EmptyData";
 
 const loading = {
     columns: Array.from({ length: 5 }, (_, index) => ({
@@ -31,14 +30,9 @@ const Roadmap = () => {
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const [isSheetOpen, setSheetOpen] = useState(false);
     const [isSheetOpenCreate, setSheetOpenCreate] = useState(false);
-    const [noStatus, setNoStatus] = useState([])
     const [roadmapList, setRoadmapList] = useState({columns: []})
     const [selectedIdea, setSelectedIdea] = useState({});
-    const [isUpdateIdea, setIsUpdateIdea] = useState(false);
-    const [isNoStatus, setIsNoStatus] = useState(false);
-    const [ideasList, setIdeasList] = useState([]);
     const [selectedRoadmap, setSelectedRoadmap] = useState({});
-    const [isCreateIdea, setIsCreateIdea] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
 
     const openSheet = () => setSheetOpen(true);
@@ -49,7 +43,6 @@ const Roadmap = () => {
 
     const openDetailsSheet = (record) => {
         const findRoadmap = roadmapList.columns.find((x) => x.id === record.roadmap_id)
-        setIsUpdateIdea(true);
         setSelectedIdea(record)
         setSelectedRoadmap(findRoadmap)
         openSheet();
@@ -76,7 +69,6 @@ const Roadmap = () => {
                 roadmapListClone.push({...x, cards: x.ideas})
             });
             setRoadmapList({columns: roadmapListClone})
-            setNoStatus(data.data.no_status)
             setIsLoading(false)
         } else {
             setIsLoading(false)
@@ -102,8 +94,6 @@ const Roadmap = () => {
     }
 
     const onCreateIdea = (mainRecord) => {
-        setIsCreateIdea(true);
-        setIdeasList(mainRecord.ideas || []);
         setSelectedRoadmap(mainRecord)
         openCreateIdea()
     }
@@ -112,7 +102,7 @@ const Roadmap = () => {
         <div
             // className={"roadmap-container height-inherit h-svh  overflow-y-auto xl:container-secondary xl:max-w-[1605px] lg:container lg:max-w-[992px] md:container md:max-w-[768px] sm:container max-w-[639px]"}>
             className={"roadmap-container height-inherit h-svh overflow-y-auto container-secondary xl:max-w-[1605px] lg:max-w-[1230px] md:max-w-[960px] max-w-[639px]"}>
-            <RoadMapSidebarSheet
+            <UpdateRoadMapIdea
                 isOpen={isSheetOpen}
                 onOpen={openSheet}
                 onClose={closeSheet}
@@ -123,7 +113,7 @@ const Roadmap = () => {
                 roadmapList={roadmapList}
                 setRoadmapList={setRoadmapList}
             />
-            <CreateIdea
+            <CreateRoadmapIdea
                 isOpen={isSheetOpenCreate}
                 onOpen={openCreateIdea}
                 onClose={closeCreateIdea}

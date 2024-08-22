@@ -7,15 +7,6 @@ import {useTheme} from "../../theme-provider";
 import {Input} from "../../ui/input";
 import {useDispatch,useSelector,} from "react-redux";
 import {ApiService} from "../../../utils/ApiService";
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogHeader,
-    AlertDialogTitle
-} from "../../ui/alert-dialog";
 import {projectDetailsAction} from "../../../redux/action/ProjectDetailsAction";
 import {allProjectAction} from "../../../redux/action/AllProjectAction";
 import {setProjectDetails} from "../../../utils/constent";
@@ -388,7 +379,7 @@ const Project = () => {
                     className={`text-sm font-semibold ${theme === "dark" ? "text-card-foreground" : "text-primary border-primary"} border ${isDelete === true ? "py-2 px-4" : "py-2 px-4 w-[130px]"}  text-sm font-semibold`}
                 >{isDelete ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Delete project"}</Button>
                 <Button
-                    className={`${isSave === true ? "py-2 px-4" : "py-2 px-4 w-[132px]"} text-sm font-semibold`}
+                    className={`${isSave === true ? "py-2 px-4" : "py-2 px-4"} w-[132px] text-sm font-semibold`}
                     onClick={() => updateProjects('')}>{isSave ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Update project"}</Button>
             </CardFooter>
         </Card>

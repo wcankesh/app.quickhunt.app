@@ -1,26 +1,5 @@
 import React, {Fragment} from "react";
 import {Skeleton} from "../ui/skeleton";
-import {TableBody, TableRow, TableCell} from "../ui/table";
-
-// export const CommSkel = ({count}) => {
-//     return <div className={"flex flex-col"}>
-//         {
-//             Array.from(Array(count)).map((_, r) => {
-//                 return (
-//                     <div key={r} className={"py-6 px-16 border-b flex gap-8"}>
-//                         <Skeleton className="h-12 w-12 rounded-full"/>
-//                         <div className="space-y-4 w-full">
-//                             <Skeleton className="h-4"/>
-//                             <Skeleton className="h-4"/>
-//                             <Skeleton className="h-4"/>
-//                             <Skeleton className="h-4"/>
-//                         </div>
-//                     </div>
-//                 )
-//             })
-//         }
-//     </div>
-// }
 
 export const CommSkel = {
     commonParagraphColumnFour: <div className={"grid grid-cols-4 gap-4"}>
@@ -28,7 +7,7 @@ export const CommSkel = {
             Array.from(Array(4)).map((_, r) => {
                 return (
                     <div className={"flex gap-2 py-2 px-4 border-b"} key={r}>
-                            <Skeleton className="h-[15px] w-[15px] rounded-full"/>
+                        <Skeleton className="h-[15px] w-[15px] rounded-full"/>
                         <div className="space-y-2 w-full">
                             <Skeleton className="h-4"/>
                             <Skeleton className="h-4"/>
@@ -45,7 +24,7 @@ export const CommSkel = {
             Array.from(Array(1)).map((_, r) => {
                 return (
                     <div className={"flex gap-2 py-2 px-4 border-b"} key={r}>
-                            <Skeleton className="h-[15px] w-[15px] rounded-full"/>
+                        <Skeleton className="h-[15px] w-[15px] rounded-full"/>
                         <div className="space-y-2 w-full">
                             <Skeleton className="h-4"/>
                         </div>
@@ -60,12 +39,12 @@ export const CommSkel = {
                 return (
                     // <div className={"flex gap-8 py-6 px-16 border-b "} key={r}>
                     <div className={"flex gap-[5px] md:gap-8 md:py-6 md:px-16 p-3 border-b "} key={r}>
-                            <Skeleton className="h-[30px] w-[30px] rounded-full"/>
+                        <Skeleton className="h-[30px] w-[30px] rounded-full"/>
                         <div className="flex flex-col w-full gap-6">
                             <div className="space-y-2 w-full">
-                            <Skeleton className="h-4"/>
-                            <Skeleton className="h-4"/>
-                            <Skeleton className="h-4"/>
+                                <Skeleton className="h-4"/>
+                                <Skeleton className="h-4"/>
+                                <Skeleton className="h-4"/>
                             </div>
                             <Skeleton className="h-4"/>
                         </div>
@@ -79,7 +58,7 @@ export const CommSkel = {
             Array.from(Array(1)).map((_, r) => {
                 return (
                     <Fragment key={r}>
-                        <div className="space-y-2 w-full">
+                        <div className="space-y-[14px] w-full">
                             <Skeleton className="h-4"/>
                             <Skeleton className="h-4"/>
                             <Skeleton className="h-4"/>
@@ -113,6 +92,8 @@ export const CommSkel = {
                         <div className="space-y-2 w-full">
                             <Skeleton className="h-4"/>
                             <Skeleton className="h-4"/>
+                            <Skeleton className="h-4"/>
+                            <Skeleton className="h-4"/>
                         </div>
                     </Fragment>
                 )
@@ -134,29 +115,4 @@ export const CommSkel = {
             })
         }
     </div>,
-    // commonParagraphTableCard: <div className={"flex gap-2 py-6"}>
-    //     <TableBody>
-    //         {
-    //             [...Array(1)].map((_, index) => {
-    //                 return (
-    //                     <TableRow key={index}>
-    //                         {
-    //                             [...Array(1)].map((_, i) => {
-    //                                 return (
-    //                                     <Fragment>
-    //                                     <TableCell><Skeleton className="h-4"/></TableCell>
-    //                                     <TableCell><Skeleton className="h-4"/></TableCell>
-    //                                     <TableCell><Skeleton className="h-4"/></TableCell>
-    //                                     <TableCell><Skeleton className="h-4"/></TableCell>
-    //                                     <TableCell><Skeleton className="h-4"/></TableCell>
-    //                                     </Fragment>
-    //                                 )
-    //                             })
-    //                         }
-    //                     </TableRow>
-    //                 )
-    //             })
-    //         }
-    //     </TableBody>
-    // </div>,
 }

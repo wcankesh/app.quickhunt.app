@@ -13,7 +13,7 @@ import {useNavigate} from "react-router-dom";
 import {baseUrl} from "../../utils/constent";
 import {ApiService} from "../../utils/ApiService";
 import {useToast} from "../ui/use-toast";
-import WidgetAnalyticsSideBarSheet from "./WidgetAnalyticsSideBarSheet";
+import WidgetAnalytics from "./WidgetAnalytics";
 import {Skeleton} from "../ui/skeleton";
 import EmptyData from "../Comman/EmptyData";
 import moment from "moment";
@@ -116,9 +116,12 @@ const Widgets = () => {
 
     const totalPages = Math.ceil(totalRecord / perPageLimit);
 
-    const handlePaginationClick = (newPage) => {
+    const handlePaginationClick = async (newPage) => {
         if (newPage >= 1 && newPage <= totalPages) {
+            setIsLoading(true);
             setPageNo(newPage);
+        } else {
+            setIsLoading(false);
         }
     };
 
@@ -203,7 +206,7 @@ const Widgets = () => {
 
                                                 <Button
                                                     variant={"ghost hover:none"}
-                                                    className={`absolute top-0 right-0 px-0`}
+                                                    className={`${isCopyLoading === true ? "absolute top-0 right-0 px-0" : "absolute top-0 right-0 px-0"}`}
                                                     onClick={() => handleCopyCode(codeString)}
                                                 >
                                                     {isCopyLoading ? <Loader2 size={16} className={"animate-spin"} color={"white"}/> : <Copy size={16} color={"white"}/>}
@@ -252,7 +255,7 @@ const Widgets = () => {
 
                                                 <Button
                                                     variant={"ghost hover:none"}
-                                                    className={`absolute top-0 right-0 px-0`}
+                                                    className={`${isCopyLoading === true ? "absolute top-0 right-0 px-0" : "absolute top-0 right-0 px-0"}`}
                                                     onClick={() => handleCopyCode(embedLink)}
                                                 >
                                                     {isCopyLoading ? <Loader2 size={16} className={"animate-spin"} color={"white"}/> : <Copy size={16} color={"white"}/>}
@@ -284,7 +287,7 @@ const Widgets = () => {
 
                                                 <Button
                                                     variant={"ghost hover:none"}
-                                                    className={`absolute top-0 right-0 px-0`}
+                                                    className={`${isCopyLoading === true ? "absolute top-0 right-0 px-0" : "absolute top-0 right-0 px-0"}`}
                                                     onClick={() => handleCopyCode(iFrame)}
                                                 >
                                                     {isCopyLoading ? <Loader2 size={16} className={"animate-spin"} color={"white"}/> : <Copy size={16} color={"white"}/>}
@@ -317,7 +320,7 @@ const Widgets = () => {
             <div
                 className={"container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-3 md:px-4"}>
 
-              <WidgetAnalyticsSideBarSheet
+              <WidgetAnalytics
                     isOpen={isSheetOpen}
                     onOpen={openSheet}
                     onClose={closeSheet}
@@ -413,7 +416,7 @@ const Widgets = () => {
                                 </TableBody>
                             </Table>
                         </CardContent>
-                        <CardFooter className={"p-0"}>
+                        <CardFooter className={`p-0 ${theme === "dark" ? "border-t" : ""}`}>
                             <div
                                 className={`w-full ${theme === "dark" ? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end p-2 md:px-3 md:py-[10px]`}>
                                 <div className={"w-full flex gap-2 items-center justify-between sm:justify-end"}>
@@ -422,27 +425,28 @@ const Widgets = () => {
                                     </div>
                                     <div className={"flex flex-row gap-2 items-center"}>
                                         <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
-                                                onClick={() => handlePaginationClick(1)} disabled={pageNo === 1}>
+                                                onClick={() => handlePaginationClick(1)}
+                                                disabled={pageNo === 1 || isLoading}>
                                             <ChevronsLeft
-                                                className={pageNo === 1 ? "stroke-muted-foreground" : "stroke-primary"}/>
+                                                className={pageNo === 1 || isLoading ? "stroke-muted-foreground" : "stroke-primary"} />
                                         </Button>
                                         <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
                                                 onClick={() => handlePaginationClick(pageNo - 1)}
-                                                disabled={pageNo === 1}>
+                                                disabled={pageNo === 1 || isLoading}>
                                             <ChevronLeft
-                                                className={pageNo === 1 ? "stroke-muted-foreground" : "stroke-primary"}/>
+                                                className={pageNo === 1 || isLoading ? "stroke-muted-foreground" : "stroke-primary"} />
                                         </Button>
                                         <Button variant={"outline"} className={" h-[30px] w-[30px] p-1.5"}
                                                 onClick={() => handlePaginationClick(pageNo + 1)}
-                                                disabled={pageNo === totalPages}>
+                                                disabled={pageNo === totalPages || isLoading}>
                                             <ChevronRight
-                                                className={pageNo === totalPages ? "stroke-muted-foreground" : "stroke-primary"}/>
+                                                className={pageNo === totalPages || isLoading ? "stroke-muted-foreground" : "stroke-primary"} />
                                         </Button>
                                         <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
                                                 onClick={() => handlePaginationClick(totalPages)}
-                                                disabled={pageNo === totalPages}>
+                                                disabled={pageNo === totalPages || isLoading}>
                                             <ChevronsRight
-                                                className={pageNo === totalPages ? "stroke-muted-foreground" : "stroke-primary"}/>
+                                                className={pageNo === totalPages || isLoading ? "stroke-muted-foreground" : "stroke-primary"} />
                                         </Button>
                                     </div>
                                 </div>

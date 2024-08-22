@@ -77,7 +77,8 @@ const Forgot = () => {
         if(data.status === 200){
             setForgotPasswordDetails({email: ""})
             toast({
-                description: "Your password reset request has been received successfully, please check your email for the reset link",
+                description: data.message,
+                // description: "Your password reset request has been received successfully, please check your email for the reset link",
             })
             setIsLoading(false)
         } else {

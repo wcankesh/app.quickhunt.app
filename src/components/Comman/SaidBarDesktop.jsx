@@ -123,7 +123,7 @@ const SaidBarDesktop = () => {
         <div className={`main-sidebar pointer-events-none fixed start-0 top-0 z-[60] flex h-full xl:z-10 hidden md:block ${location.pathname.includes("widget/") ? "overflow-hidden" : "overflow-auto"}`}>
             <div className="pointer-events-auto relative z-30 flex h-full w-[282px] flex-col ltr:-translate-x-full rtl:translate-x-full ltr:xl:translate-x-0 rtl:xl:translate-x-0">
                 <div className={"flex gap-3 items-center px-4"}>
-                    <div className="flex h-14 items-center lg:h-[60px] ">
+                    <div className="flex h-14 items-center lg:h-[60px]">
                         <div className={"app-logo cursor-pointer"}  onClick={() => onRedirect("/dashboard")}>
                             {theme === "dark" ? Icon.whiteLogo : Icon.blackLogo}
                         </div>

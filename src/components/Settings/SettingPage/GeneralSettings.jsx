@@ -40,14 +40,14 @@ const GeneralSettings = () => {
     const [isSave, setIsSave] = useState(false);
 
     useEffect(() => {
-        if(projectDetailsReducer.id){
+        if (projectDetailsReducer.id) {
             getPortalSetting()
         }
     }, [projectDetailsReducer.id])
 
     const getPortalSetting = async () => {
         const data = await apiSerVice.getPortalSetting(projectDetailsReducer.id)
-        if(data.status === 200){
+        if (data.status === 200) {
             setGeneralSettingData({...data.data})
         } else {
 
@@ -55,7 +55,7 @@ const GeneralSettings = () => {
     }
 
     const onChangeSwitch = (event, e) => {
-        if (userDetailsReducer.plan !== 0){
+        if (userDetailsReducer.plan !== 0) {
             setGeneralSettingData({...generalSettingData, [event.event1.name]: event.event1.value})
         }
         setGeneralSettingData({...generalSettingData, [event.event1.name]: event.event1.value})
@@ -70,7 +70,7 @@ const GeneralSettings = () => {
     };
 
     const onUpdatePortal = async () => {
-        if(userDetailsReducer.plan === 0){
+        if (userDetailsReducer.plan === 0) {
             onProModal(true)
         } else {
             setIsSave(true)
@@ -93,7 +93,7 @@ const GeneralSettings = () => {
                 roadmap_title: generalSettingData.roadmap_title,
             }
             const data = await apiSerVice.updatePortalSetting(generalSettingData.id, payload)
-            if(data.status === 200){
+            if (data.status === 200) {
                 setIsSave(false)
                 toast({
                     description: data.message
@@ -111,12 +111,12 @@ const GeneralSettings = () => {
 
     return (
         <Card>
-                <CardHeader className={"gap-1 border-b p-4 sm:p-6"}>
-                    <h3 className={"font-medium text-lg sm:text-2xl"}>General Settings</h3>
-                </CardHeader>
-                <CardContent className={"p-0"}>
-                    <div className={"space-y-3 p-4 px-6 border-b"}>
-                        <div className={"flex justify-between"}>
+            <CardHeader className={"gap-1 border-b p-4 sm:p-6"}>
+                <h3 className={"font-medium text-lg sm:text-2xl"}>General Settings</h3>
+            </CardHeader>
+            <CardContent className={"p-0"}>
+                <div className={"space-y-3 p-4 px-6 border-b"}>
+                    <div className={"flex justify-between"}>
                         <h3 className={"font-medium"}>Announcement</h3>
                         <div className="announce-create-switch flex gap-4">
                             <Switch
@@ -130,117 +130,120 @@ const GeneralSettings = () => {
                                 }, event)}
                             />
                         </div>
-                        </div>
-                        {
-                            generalSettingData.is_announcement === 1 &&
-                                <Fragment>
-                                    <div className={"space-y-3"}>
-                                        <div className="space-y-1 w-1/2">
-                                            <Label className="text-sm font-normal">Title</Label>
-                                            <Input value={generalSettingData.announcement_title}  onChange={(e) => onChange('announcement_title', e.target.value )} />
-                                        </div>
-                                        <div className={"flex flex-col flex-wrap w-full md:basis-1/2 gap-2"}>
-                                            <div className="flex items-center gap-4">
-                                                <Checkbox
-                                                    id="reaction"
-                                                    checked={generalSettingData.is_reaction === 1}
-                                                    onCheckedChange={(checked, event) => onChangeSwitch({
-                                                        event1: {
-                                                            name: "is_reaction",
-                                                            value: checked ? 1 : 0
-                                                        }
-                                                    }, event)}
-                                                />
-                                                <label
-                                                    htmlFor="reaction"
-                                                    className="text-sm text-muted-foreground font-medium"
-                                                >
-                                                    Reactions
-                                                </label>
-                                            </div>
-                                            <div className="flex items-center gap-4">
-                                                <Checkbox
-                                                    id="reaction"
-                                                    checked={generalSettingData.is_comment === 1}
-                                                    onCheckedChange={(checked, event) => onChangeSwitch({
-                                                        event1: {
-                                                            name: "is_comment",
-                                                            value: checked ? 1 : 0
-                                                        }
-                                                    }, event)}
-                                                />
-                                                <label
-                                                    htmlFor="reaction"
-                                                    className="text-sm text-muted-foreground font-medium"
-                                                >
-                                                    Show Comment
-                                                </label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </Fragment>
-                        }
                     </div>
-                    <div className={"space-y-3 p-4 px-6 border-b"}>
-                        <div className={"flex justify-between"}>
-                            <h3 className={"font-medium"}>Roadmap</h3>
-                            <div className="announce-create-switch flex gap-4">
-                                <Switch
-                                    className="w-[38px] h-[20px]"
-                                    checked={generalSettingData.is_roadmap === 1}
-                                    onCheckedChange={(checked, event) => onChangeSwitch({
-                                        event1: {
-                                            name: "is_roadmap",
-                                            value: checked ? 1 : 0
-                                        }
-                                    }, event)}
-                                />
+                    {
+                        generalSettingData.is_announcement === 1 &&
+                        <Fragment>
+                            <div className={"space-y-3"}>
+                                <div className="space-y-1 w-1/2">
+                                    <Label className="text-sm font-normal">Title</Label>
+                                    <Input value={generalSettingData.announcement_title}
+                                           onChange={(e) => onChange('announcement_title', e.target.value)}/>
+                                </div>
+                                <div className={"flex flex-col flex-wrap w-full md:basis-1/2 gap-2"}>
+                                    <div className="flex items-center gap-4">
+                                        <Checkbox
+                                            id="reaction"
+                                            checked={generalSettingData.is_reaction === 1}
+                                            onCheckedChange={(checked, event) => onChangeSwitch({
+                                                event1: {
+                                                    name: "is_reaction",
+                                                    value: checked ? 1 : 0
+                                                }
+                                            }, event)}
+                                        />
+                                        <label
+                                            htmlFor="reaction"
+                                            className="text-sm text-muted-foreground font-medium"
+                                        >
+                                            Reactions
+                                        </label>
+                                    </div>
+                                    <div className="flex items-center gap-4">
+                                        <Checkbox
+                                            id="reaction"
+                                            checked={generalSettingData.is_comment === 1}
+                                            onCheckedChange={(checked, event) => onChangeSwitch({
+                                                event1: {
+                                                    name: "is_comment",
+                                                    value: checked ? 1 : 0
+                                                }
+                                            }, event)}
+                                        />
+                                        <label
+                                            htmlFor="reaction"
+                                            className="text-sm text-muted-foreground font-medium"
+                                        >
+                                            Show Comment
+                                        </label>
+                                    </div>
+                                </div>
                             </div>
+                        </Fragment>
+                    }
+                </div>
+                <div className={"space-y-3 p-4 px-6 border-b"}>
+                    <div className={"flex justify-between"}>
+                        <h3 className={"font-medium"}>Roadmap</h3>
+                        <div className="announce-create-switch flex gap-4">
+                            <Switch
+                                className="w-[38px] h-[20px]"
+                                checked={generalSettingData.is_roadmap === 1}
+                                onCheckedChange={(checked, event) => onChangeSwitch({
+                                    event1: {
+                                        name: "is_roadmap",
+                                        value: checked ? 1 : 0
+                                    }
+                                }, event)}
+                            />
                         </div>
-                        {
-                            generalSettingData.is_roadmap === 1 &&
-                                <Fragment>
-                                    <div className={"flex items-center gap-3 flex-wrap md:flex-nowrap"}>
-                                        <div className="space-y-1 w-full md:basis-1/2">
-                                            <Label className="text-sm font-normal">Title</Label>
-                                            <Input value={generalSettingData.roadmap_title} onChange={(e) => onChange('roadmap_title', e.target.value )} />
-                                        </div>
-                                    </div>
-                                </Fragment>
-                        }
-
                     </div>
-                    <div className={"space-y-3 p-4 px-6 border-b"}>
-                        <div className={"flex justify-between"}>
-                            <h3 className={"font-medium"}>Ideas</h3>
-                            <div className="announce-create-switch flex gap-4">
-                                <Switch
-                                    className="w-[38px] h-[20px]"
-                                    checked={generalSettingData.is_idea === 1}
-                                    onCheckedChange={(checked, event) => onChangeSwitch({
-                                        event1: {
-                                            name: "is_idea",
-                                            value: checked ? 1 : 0
-                                        }
-                                    }, event)}
-                                />
-                            </div>
-                        </div>
-                        {
-                            generalSettingData.is_idea === 1 &&
-                                <Fragment>
-                                    <div className={"flex items-center gap-3 flex-wrap md:flex-nowrap"}>
-                                        <div className="space-y-1 w-full md:basis-1/2">
-                                            <Label className="text-sm font-normal">Title</Label>
-                                            <Input value={generalSettingData.idea_title} onChange={(e) => onChange('idea_title', e.target.value )} />
-                                        </div>
-                                    </div>
-                                </Fragment>
-                        }
-                    </div>
-                    <div className={"space-y-3 p-4 px-6 border-b"}>
-                        <h3 className={"font-medium"}>Header Color</h3>
+                    {
+                        generalSettingData.is_roadmap === 1 &&
+                        <Fragment>
                             <div className={"flex items-center gap-3 flex-wrap md:flex-nowrap"}>
+                                <div className="space-y-1 w-full md:basis-1/2">
+                                    <Label className="text-sm font-normal">Title</Label>
+                                    <Input value={generalSettingData.roadmap_title}
+                                           onChange={(e) => onChange('roadmap_title', e.target.value)}/>
+                                </div>
+                            </div>
+                        </Fragment>
+                    }
+
+                </div>
+                <div className={"space-y-3 p-4 px-6 border-b"}>
+                    <div className={"flex justify-between"}>
+                        <h3 className={"font-medium"}>Ideas</h3>
+                        <div className="announce-create-switch flex gap-4">
+                            <Switch
+                                className="w-[38px] h-[20px]"
+                                checked={generalSettingData.is_idea === 1}
+                                onCheckedChange={(checked, event) => onChangeSwitch({
+                                    event1: {
+                                        name: "is_idea",
+                                        value: checked ? 1 : 0
+                                    }
+                                }, event)}
+                            />
+                        </div>
+                    </div>
+                    {
+                        generalSettingData.is_idea === 1 &&
+                        <Fragment>
+                            <div className={"flex items-center gap-3 flex-wrap md:flex-nowrap"}>
+                                <div className="space-y-1 w-full md:basis-1/2">
+                                    <Label className="text-sm font-normal">Title</Label>
+                                    <Input value={generalSettingData.idea_title}
+                                           onChange={(e) => onChange('idea_title', e.target.value)}/>
+                                </div>
+                            </div>
+                        </Fragment>
+                    }
+                </div>
+                <div className={"space-y-3 p-4 px-6 border-b"}>
+                    <h3 className={"font-medium"}>Header Color</h3>
+                    <div className={"flex items-center gap-3 flex-wrap md:flex-nowrap"}>
                         <div className={"widget-color-picker space-y-2 w-full md:basis-1/2"}>
                             <Label className={"text-sm font-normal"}>Background Color</Label>
                             <ColorInput name="header_bg_color"
@@ -255,8 +258,8 @@ const GeneralSettings = () => {
                                         onChange={(color) => onChange("header_text_color", color?.header_text_color)}
                             />
                         </div>
-                        </div>
-                        <div className={"flex items-center gap-3 flex-wrap md:flex-nowrap"}>
+                    </div>
+                    <div className={"flex items-center gap-3 flex-wrap md:flex-nowrap"}>
                         <div className={"widget-color-picker space-y-2 w-full md:basis-1/2"}>
                             <Label className={"text-sm font-normal"}>Button Background Color</Label>
                             <ColorInput
@@ -273,53 +276,54 @@ const GeneralSettings = () => {
                                 onChange={(color) => onChange("header_btn_text_color", color?.header_btn_text_color)}
                             />
                         </div>
-                        </div>
                     </div>
-                    <div className={"space-y-3 p-4 px-6 border-b"}>
-                        <h3 className={"font-medium"}>Global Color</h3>
-                        <div className={"flex items-center gap-3 flex-wrap md:flex-nowrap"}>
-                            <div className={"widget-color-picker space-y-2 w-full md:basis-1/2"}>
-                                <Label className={"text-sm font-normal"}>Button Background Color</Label>
-                                <ColorInput
-                                    name="btn_background_color"
-                                    value={generalSettingData.btn_background_color}
-                                    onChange={(color) => onChange("btn_background_color", color?.btn_background_color)}
-                                />
-                            </div>
-                            <div className={"widget-color-picker space-y-2 w-full md:basis-1/2"}>
-                                <Label className={"text-sm font-normal"}>Button Text Color</Label>
-                                <ColorInput
-                                    name="btn_text_color"
-                                    value={generalSettingData.btn_text_color}
-                                    onChange={(color) => onChange("btn_text_color", color?.btn_text_color)}
-                                />
-                            </div>
-                        </div>
-                    </div>
-                    <div className={"space-y-3 p-4 px-6 border-b"}>
-                        <h3 className={"font-medium"}>Branding</h3>
-                        <div className="announce-create-switch flex gap-4">
-                            <Switch
-                                className="w-[38px] h-[20px]"
-                                checked={generalSettingData.is_branding === 1}
-                                disabled={userDetailsReducer.plan === 0}
-                                onCheckedChange={(checked, event) => onChangeSwitch({
-                                    event1: {
-                                        name: "is_branding",
-                                        value: checked ? 1 : 0
-                                    }
-                                }, event)}
+                </div>
+                <div className={"space-y-3 p-4 px-6 border-b"}>
+                    <h3 className={"font-medium"}>Global Color</h3>
+                    <div className={"flex items-center gap-3 flex-wrap md:flex-nowrap"}>
+                        <div className={"widget-color-picker space-y-2 w-full md:basis-1/2"}>
+                            <Label className={"text-sm font-normal"}>Button Background Color</Label>
+                            <ColorInput
+                                name="btn_background_color"
+                                value={generalSettingData.btn_background_color}
+                                onChange={(color) => onChange("btn_background_color", color?.btn_background_color)}
                             />
-                            <p className="text-sm text-muted-foreground font-medium">Show Branding</p>
+                        </div>
+                        <div className={"widget-color-picker space-y-2 w-full md:basis-1/2"}>
+                            <Label className={"text-sm font-normal"}>Button Text Color</Label>
+                            <ColorInput
+                                name="btn_text_color"
+                                value={generalSettingData.btn_text_color}
+                                onChange={(color) => onChange("btn_text_color", color?.btn_text_color)}
+                            />
                         </div>
                     </div>
-                </CardContent>
-                <CardFooter className={"p-4 sm:p-6 justify-end"}>
-                    <Button
-                        className={`${isSave === true ? "py-2 px-6" : "py-2 px-6 "} w-[213px] text-sm font-semibold`}
-                        onClick={onUpdatePortal}>{isSave ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Update General Settings"} </Button>
-                </CardFooter>
-            </Card>
+                </div>
+                <div className={"space-y-3 p-4 px-6 border-b"}>
+                    <h3 className={"font-medium"}>Branding</h3>
+                    <div className="announce-create-switch flex gap-4">
+                        <Switch
+                            className="w-[38px] h-[20px]"
+                            checked={generalSettingData.is_branding === 1}
+                            disabled={userDetailsReducer.plan === 0}
+                            onCheckedChange={(checked, event) => onChangeSwitch({
+                                event1: {
+                                    name: "is_branding",
+                                    value: checked ? 1 : 0
+                                }
+                            }, event)}
+                        />
+                        <p className="text-sm text-muted-foreground font-medium">Show Branding</p>
+                    </div>
+                </div>
+            </CardContent>
+            <CardFooter className={"p-4 sm:p-6 justify-end"}>
+                <Button
+                    className={`${isSave === true ? "py-2 px-6" : "py-2 px-6 "} w-[213px] text-sm font-semibold`}
+                    onClick={onUpdatePortal}>{isSave ?
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : "Update General Settings"} </Button>
+            </CardFooter>
+        </Card>
     );
 };
 

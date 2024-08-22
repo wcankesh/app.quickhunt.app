@@ -38,6 +38,11 @@ export function Dashboard() {
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
     const [isLoading, setIsLoading] = useState(false);
+    const [dataAvailable, setDataAvailable] = useState(true);
+    const [visibleFeedback, setVisibleFeedback] = useState(3);
+    const [visibleReactions, setVisibleReactions] = useState(3);
+    const [expandedFeedback, setExpandedFeedback] = useState(false);
+    const [expandedReactions, setExpandedReactions] = useState(false);
     const [state, setState] = useState({from: new Date(new Date().setDate(new Date().getDate() - 29)), to: new Date(),});
     const [chartList, setChartList] = useState({
         reactionAnalytic: [],
@@ -73,8 +78,6 @@ export function Dashboard() {
             }
         ]
     });
-
-    const [dataAvailable, setDataAvailable] = useState(true);
 
     useEffect(() => {
         if(projectDetailsReducer.id){
@@ -121,7 +124,6 @@ export function Dashboard() {
         }
     }
 
-
     const onChangeDate = (selected) => {
        // debugger
         if (selected && selected.from && selected.to) {
@@ -132,7 +134,10 @@ export function Dashboard() {
         }
         //setState({...state, ...selected})
     }
-    console.log(state)
+
+    const isDateOutsideRange = (date, from, to) => {
+        return date < from || date > to;
+    };
 
     const programAnalytics = [
         {
@@ -160,6 +165,24 @@ export function Dashboard() {
             count : chartList.reactionCount || 0,
         },
     ]
+
+    const handleLoadMoreLess = (type, action) => {
+        if (type === 'feedback') {
+            setVisibleFeedback((prev) => {
+                const newCount = action === 'more' ? prev + 3 : (prev > 3 ? prev - 3 : prev);
+                if (action === 'more') setExpandedFeedback(true);
+                else setExpandedFeedback(false);
+                return newCount;
+            });
+        } else if (type === 'reactions') {
+            setVisibleReactions((prev) => {
+                const newCount = action === 'more' ? prev + 3 : (prev > 3 ? prev - 3 : prev);
+                if (action === 'more') setExpandedReactions(true);
+                else setExpandedReactions(false);
+                return newCount;
+            });
+        }
+    };
 
     return (
         <Fragment>
@@ -198,6 +221,9 @@ export function Dashboard() {
                                         showOutsideDays={false}
                                         // onSelect={(selected, triggerDate, modifiers, e) => onChangeDate(selected, triggerDate, modifiers, e)}
                                         onSelect={onChangeDate}
+                                      // modifiers={{
+                                      //     disabled: (date) => isDateOutsideRange(date, state.from, state.to)
+                                      // }}
                                     />
                                 </PopoverContent>
                             </Popover>
@@ -215,7 +241,7 @@ export function Dashboard() {
                                                                 <CardTitle className={"text-sm font-medium"}>
                                                                     {x.title}
                                                                 </CardTitle>
-                                                                <CardContent className={"p-0 flex flex-col gap-2"}>
+                                                                <CardContent className={"p-0 flex flex-col gap-2 m-0"}>
                                                                     <h3 className={"text-primary text-2xl font-bold"}>
                                                                         {x.count}
                                                                     </h3>
@@ -238,10 +264,10 @@ export function Dashboard() {
                                     </CardHeader>
                                     {
                                         (chartList.feedbacks && chartList.feedbacks.length > 0) ? (
-                                            (chartList.feedbacks || []).map((x, i) => (
+                                            (chartList.feedbacks.slice(0, visibleFeedback) || []).map((x, i) => (
                                                 <Fragment>
                                                     {
-                                                        isLoading ? CommSkel.commonParagraphTwo :
+                                                        isLoading ? <CardContent className={"p-0"} key={i}>{CommSkel.commonParagraphTwo}</CardContent> :
                                                             <CardContent className={"p-2 pl-6 pr-4 flex flex-col gap-2"} key={i}>
                                                                 <div className="flex gap-2 items-center">
                                                                     <h4 className="text-sm font-semibold">{x.customer_name}</h4>
@@ -257,7 +283,12 @@ export function Dashboard() {
                                         )
                                     }
                                     <CardFooter className={"p-0 pt-4 justify-end"}>
-                                        <Button className={"text-primary p-0 h-[20px] text-sm font-semibold"} variant={"ghost hover:none"}>View More Feedbacks</Button>
+                                        {!expandedFeedback && chartList.feedbacks.length > visibleFeedback && (
+                                            <Button className={"text-primary p-0 h-[20px] text-sm font-semibold"} onClick={() => handleLoadMoreLess('feedback', 'more')} variant={"ghost hover:none"}>View More Feedbacks</Button>
+                                        )}
+                                        {expandedFeedback && (
+                                            <Button className={"text-primary p-0 h-[20px] text-sm font-semibold"} onClick={() => handleLoadMoreLess('feedback', 'less')} variant={"ghost hover:none"}>View Less Feedbacks</Button>
+                                        )}
                                     </CardFooter>
                                 </Card>
                                 <Card className={"lg:basis-1/3 basis-full min-w-[270px] p-4 md:pr-8 divide-y shadow border"}>
@@ -266,34 +297,38 @@ export function Dashboard() {
                                     </CardHeader>
                                     {
                                         (chartList.reactions && chartList.reactions.length > 0) ? (
-                                                (chartList.reactions || []).map((x, i) => {
-                                                    const emoji = allStatusAndTypes.emoji.find((e) => e.id === x.reaction_id) || {emoji_url: ""}
-                                                    return(
-                                                        <Fragment>
-                                                            {
-                                                                isLoading ? CommSkel.commonParagraphTwoAvatar :
-                                                                    <CardContent className={"py-2.5 px-0"} key={i}>
-                                                                        <div className={"flex gap-4"}>
-                                                                            <Avatar className={"w-[35px] h-[35px]"}>
-                                                                                <AvatarImage src={emoji.emoji_url}/>
-                                                                            </Avatar>
-                                                                            <div className={"flex flex-col gap-1"}>
-                                                                                <div className="flex gap-1 items-center">
-                                                                                    <h4 className="text-sm font-semibold">{x.customer_name}</h4>
-                                                                                    <p className="text-xs font-medium text-muted-foreground">Reacted To</p>
-                                                                                </div>
-                                                                                <p className="text-xs font-medium text-foreground">"{x.post_title}"</p>
-                                                                            </div>
+                                            (chartList.reactions.slice(0, visibleReactions) || []).map((x, i) => {
+                                                const emoji = allStatusAndTypes.emoji.find((e) => e.id === x.reaction_id) || { emoji_url: "" };
+                                                return (
+                                                    <Fragment key={i}>
+                                                        {isLoading ? <CardContent className={"p-0"} key={i}>{CommSkel.commonParagraphTwoAvatar}</CardContent> :
+                                                            <CardContent className={"py-2.5 px-0"}>
+                                                                <div className={"flex gap-4"}>
+                                                                    <Avatar className={"w-[35px] h-[35px]"}>
+                                                                        <AvatarImage src={emoji.emoji_url} />
+                                                                    </Avatar>
+                                                                    <div className={"flex flex-col gap-1"}>
+                                                                        <div className="flex gap-1 items-center">
+                                                                            <h4 className="text-sm font-semibold">{x.customer_name}</h4>
+                                                                            <p className="text-xs font-medium text-muted-foreground">Reacted To</p>
                                                                         </div>
-                                                                    </CardContent>
-                                                            }
-                                                        </Fragment>
-                                                    )
-                                                })
-                                            ) : <EmptyData />
+                                                                        <p className="text-xs font-medium text-foreground">"{x.post_title}"</p>
+                                                                    </div>
+                                                                </div>
+                                                            </CardContent>
+                                                        }
+                                                    </Fragment>
+                                                );
+                                            })
+                                        ) : <EmptyData />
                                     }
                                     <CardFooter className={"p-0 pt-4 justify-end"}>
-                                        <Button className={"text-primary text-sm p-0 h-[20px] font-semibold"} variant={"ghost hover:none"}>View More Reactions</Button>
+                                        {!expandedReactions && chartList.reactions.length > visibleReactions && (
+                                            <Button className={"text-primary text-sm p-0 h-[20px] font-semibold"} onClick={() => handleLoadMoreLess('reactions', 'more')} variant={"ghost hover:none"}>View More Reactions</Button>
+                                        )}
+                                        {expandedReactions && (
+                                            <Button className={"text-primary text-sm p-0 h-[20px] font-semibold"} onClick={() => handleLoadMoreLess('reactions', 'less')} variant={"ghost hover:none"}>View Less Reactions</Button>
+                                        )}
                                     </CardFooter>
                                 </Card>
                             </div>

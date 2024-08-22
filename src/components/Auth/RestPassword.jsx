@@ -1,10 +1,9 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import {Label} from "../ui/label";
 import {Input} from "../ui/input";
 import {Card, CardContent} from "../ui/card";
 import {Button} from "../ui/button";
 import {Eye, EyeOff, Loader2} from "lucide-react";
-import {useToast} from "../ui/use-toast";
 import {ApiService} from "../../utils/ApiService";
 import {Icon} from "../../utils/Icon";
 import {useTheme} from "../theme-provider";
@@ -19,9 +18,6 @@ const RestPassword = () => {
 
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get('token');
-    const { toast } = useToast()
-
-
 
     const onChange = (event) => {
         setForgotPasswordDetails({...forgotPasswordDetails,[event.target.name]: event.target.value})
@@ -89,6 +85,7 @@ const RestPassword = () => {
     }
 
     const togglePasswordVisibility = () => {setShowPassword(!showPassword);};
+
     return (
         <div className={"w-full flex flex-col items-center justify-center p-4 md:px-4 md:py-0"}>
             <div className={"max-w-2xl m-auto"}>

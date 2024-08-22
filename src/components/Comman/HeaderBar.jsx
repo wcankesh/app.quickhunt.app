@@ -78,6 +78,7 @@ const HeaderBar = () => {
     const [scrollingDown, setScrollingDown] = useState(false);
     const [isOpenDeleteAlert,setIsOpenDeleteAlert]=useState(false);
     const [isDeleteLoading, setDeleteIsLoading] = useState(false);
+    const [isCreateLoading, setIsCreateLoading] = useState(false);
 
     const dispatch = useDispatch();
     const {toast} = useToast()
@@ -229,6 +230,7 @@ const HeaderBar = () => {
     };
 
     const onCreateProject = async () => {
+        setIsCreateLoading(true);
         let validationErrors = {};
         Object.keys(createProjectDetails).forEach(name => {
             const error = formValidate(name, createProjectDetails[name]);
@@ -264,13 +266,16 @@ const HeaderBar = () => {
             setProjectList(clone)
             setProjectDetails(obj);
             dispatch(projectDetailsAction(obj))
+            setIsCreateLoading(false);
             toast({description: data.message})
             // setSheetOpen(false)
             setCreateProjectDetails(initialStateProject)
             navigate(`${baseUrl}/dashboard`);
         } else {
+            setIsCreateLoading(false);
             toast({variant: "destructive" ,description: data.message})
         }
+        closeSheet()
     }
 
     const onChangeProject = (value) => {
@@ -678,7 +683,7 @@ const HeaderBar = () => {
                                             value={createProjectDetails.project_name}
                                             name="project_name"
                                             onChange={onChangeText}
-                                            // onBlur={onBlur}
+                                            onBlur={onBlur}
                                         />
                                         {
                                             formError.project_name &&
@@ -709,10 +714,11 @@ const HeaderBar = () => {
                                     </div>
                                 <div className={"gap-4 flex sm:justify-start"}>
                                         <Button
-                                            className={"text-sm font-semibold hover:bg-primary"}
+                                            // className={"text-sm font-semibold hover:bg-primary"}
+                                            className={` bg-primary ${theme === "dark" ? "text-card-foreground" : "text-card"} w-[129px] font-semibold`}
                                             onClick={onCreateProject} type="submit"
                                         >
-                                            Create Project
+                                            {isCreateLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : "Create Project"}
                                         </Button>
                                         <Button
                                             className={`${theme === "dark" ? "" : "text-primary"} text-sm font-semibold hover:bg-card border border-primary bg-card`}

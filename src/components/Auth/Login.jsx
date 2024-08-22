@@ -130,13 +130,15 @@ const Login = () => {
                 <div className={"min-h-screen bg-background flex items-center overflow-hidden w-full"}>
                     <div className={"min-h-screen basis-full flex w-full justify-center overflow-y-auto"}>
                         <div className="min-h-screen basis-1/2 bg-purple-400 w-full relative hidden xl:flex justify-center p-16 ">
-                            <div>
+                            <div className={"custom-width"}>
+                            <div className={"h-full flex flex-col justify-center"}>
                                 <div className={"app-logo"}>{theme === "dark" ? Icon.whiteLogo : Icon.blackLogo}</div>
                                 <Carousel plugins={[plugin.current]} className={"w-full mt-[25px] mb-[25px]"} onMouseEnter={plugin.current.stop} onMouseLeave={plugin.current.reset}>
                                     <CarouselContent>
                                         {Array.from({length: 3}).map((_, index) => (
-                                            <CarouselItem key={index}>
-                                                <img className={"w-[806px]"} src={widget_01} alt=''/>
+                                            <CarouselItem key={index} className={"max-w-[706px] w-full shrink-0 grow pl-4"}>
+                                                {/*<img className={"w-[806px]"} src={widget_01} alt=''/>*/}
+                                                <img className={"w-[706px]"} src={widget_01} alt=''/>
                                             </CarouselItem>
                                         ))}
                                     </CarouselContent>
@@ -144,36 +146,26 @@ const Login = () => {
                                     {/*<CarouselNext/>*/}
                                 </Carousel>
                                 <div className={"description"}>
-                                    <p className={"text-white text-center text-[26px]"}>“This library has saved me
+                                    <p className={"text-white text-center text-[20px]"}>“This library has saved me
                                         countless hours of work and
                                         helped me deliver stunning designs to my clients faster than ever
                                         before.”</p>
                                 </div>
                             </div>
+                            </div>
                         </div>
                         <div className=" min-h-screen md:basis-1/2 md:p-16 flex justify-center items-center">
                             <div className={"lg:w-[641px] h-full"}>
-                                <div className={"w-full pt-5"}>
-                                    <div className="text-center md:text-right text-xs md:text-sm">
-                                        <p className={"font-medium"}>
-                                            Don't have an account?{" "}
-                                            <Button
-                                                variant={"link"}
-                                                className="p-0 h-auto hover:no-underline"
-                                                onClick={() => onRedirect('register')}
-                                            >
-                                                <span
-                                                    className={"font-bold text-primary"}>Create an account</span>
-                                            </Button>
-                                        </p>
-                                    </div>
-                                    <div className="mx-auto grid w-[320px] md:w-[384px] gap-8 lg:pt-[47px] pt-[50px] px-3">
-                                        <div className="gap-2 flex flex-col items-center">
-                                            {theme === "dark" ? Icon.whiteLogo : Icon.blackLogo}
-                                            <h1 className="text-2xl md:text-3xl font-medium ">Login to Your Account</h1>
-                                            <h6 className="text-center font-normal text-sm text-muted-foreground">
-                                                Enter your email below to create your account
-                                            </h6>
+                                <div className={"w-full h-full pt-5"}>
+                                    {/*<div className="mx-auto grid w-[320px] md:w-[384px] gap-8 lg:pt-[47px] pt-[50px] px-3">*/}
+                                    <div className="mx-auto flex items-center w-[320px] md:w-[384px] px-3 h-full">
+                                        <div className={"w-full flex flex-col gap-8"}>
+                                        <div className="gap-2 flex flex-col items-start">
+                                            {/*{theme === "dark" ? Icon.whiteLogo : Icon.blackLogo}*/}
+                                            <h1 className="text-2xl md:text-3xl font-medium ">Login</h1>
+                                            {/*<h6 className="text-center font-normal text-sm text-muted-foreground">*/}
+                                            {/*    Enter your email below to create your account*/}
+                                            {/*</h6>*/}
                                         </div>
                                         <div className="grid gap-6">
                                             <div className="grid gap-2">
@@ -191,7 +183,8 @@ const Login = () => {
                                                     formError.user_email_id ? (
                                                         <span className="text-destructive text-sm">{formError.user_email_id}</span>
                                                     ) : (
-                                                        <span className="text-muted-foreground text-sm">Enter your email address</span>
+                                                        ""
+                                                        // <span className="text-muted-foreground text-sm">Enter your email address</span>
                                                     )
                                                 }
                                             </div>
@@ -217,10 +210,11 @@ const Login = () => {
                                                 <div className={"flex justify-between"}>
                                                     {formError.user_password && <span className="text-destructive text-sm">{formError.user_password}</span>}
                                                     <Button variant={"link"}
-                                                            className="ml-auto inline-block text-sm p-0 h-auto hover:no-underline"
+                                                            // className="ml-auto inline-block text-sm p-0 h-auto hover:no-underline"
+                                                            className="inline-block text-sm p-0 h-auto hover:no-underline"
                                                             onClick={() => navigate(`${baseUrl}/forgot-password`)}
                                                     >
-                                                        <span className={"font-normal text-muted-foreground"}>Forgot your password?</span>
+                                                        <span className={"font-normal text-primary"}>Forgot your password?</span>
                                                     </Button>
                                                 </div>
                                             </div>
@@ -241,6 +235,20 @@ const Login = () => {
                                             </div>
                                             <WithGoogle title={"Login With Google"}/>
                                         </div>
+                                        <div className="text-center text-xs md:text-sm">
+                                            <p className={"font-normal text-sm text-muted-foreground"}>
+                                                Don't have an account?{" "}
+                                                <Button
+                                                    variant={"link"}
+                                                    className="p-0 h-auto hover:no-underline"
+                                                    onClick={() => onRedirect('register')}
+                                                >
+                                                <span
+                                                    className={"font-bold text-primary"}>Create an account</span>
+                                                </Button>
+                                            </p>
+                                        </div>
+                                    </div>
                                     </div>
                                 </div>
                             </div>

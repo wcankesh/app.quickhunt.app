@@ -88,7 +88,6 @@ const Domain = () => {
 
     }
 
-
     return (
         <Card>
             <CardHeader className={"p-4 sm:p-6  gap-1 border-b"}>

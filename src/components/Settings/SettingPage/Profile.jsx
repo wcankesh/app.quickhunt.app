@@ -54,13 +54,10 @@ const Profile = () => {
     const [isLoadingPass, setIsLoadingPass] = useState(false);
     const dispatch = useDispatch();
     const apiSerVice = new ApiService();
-    const [previewImage,setPreviewImage] = useState("");
-    // const [userImage,setUserImage] = useState("");
     const {theme} = useTheme();
 
     useEffect(() => {
         setUserDetails({...userDetailsReducer});
-        setPreviewImage(userDetailsReducer.user_photo)
     },[userDetailsReducer]);
 
     const onChange = (event) => {
@@ -149,7 +146,6 @@ const Profile = () => {
 
     const handleFileChange = (file) => {
         setUserDetails({...userDetails, user_photo : file.target.files[0]});
-        setPreviewImage(URL.createObjectURL(file.target.files[0]));
     };
 
     const onDeleteImg = async (name, value) => {
@@ -226,19 +222,15 @@ const Profile = () => {
         if(data.status === 200){
             setIsLoadingPass(false)
             toast({
-                description: data.success,
+                description: data.message,
             })
         }else {
             setIsLoadingPass(false);
             toast({
-                description: "Something went wrong!!!",
+                description: data.message,
                 variant:"destructive"
             });
         }
-    }
-
-    const removePreviewImage = () => {
-        setPreviewImage("");
     }
 
     return (
@@ -257,7 +249,6 @@ const Profile = () => {
                                         {userDetails && userDetails.user_photo && userDetails.user_photo.name ?
                                             <div className={"w-[80px] h-[80px] sm:w-[132px] sm:h-[128px] relative border"}>
                                                 <img
-                                                    // className={"upload-img"}
                                                     className="h-full w-full rounded-md object-cover"
                                                     src={userDetails && userDetails.user_photo && userDetails.user_photo.name ? URL.createObjectURL(userDetails.user_photo) : userDetails.user_photo}
                                                     alt=""
@@ -270,7 +261,6 @@ const Profile = () => {
                                             </div> : userDetails.user_photo ?
                                                 <div className={"w-[80px] h-[80px] sm:w-[132px] sm:h-[128px] relative border"}>
                                                     <img
-                                                        // className={"upload-img"}
                                                         className="h-full w-full rounded-md object-cover"
                                                         src={userDetails.user_photo}
                                                         alt=""/>
@@ -283,7 +273,6 @@ const Profile = () => {
                                                 : ''}
                                     </div> :
                                     <div>
-
                                         <input
                                             id="pictureInput"
                                             type="file"
@@ -293,7 +282,6 @@ const Profile = () => {
                                         />
                                         <label
                                             htmlFor="pictureInput"
-                                            // className="border-dashed w-[80px] h-[80px] sm:w-[132px] sm:h-[128px] py-[52px] flex items-center justify-center bg-muted border border-muted-foreground rounded cursor-pointer"
                                             className="flex w-[80px] h-[80px] sm:w-[132px] sm:h-[128px] py-0 justify-center items-center flex-shrink-0 border-dashed border-[1px] border-gray-300 rounded cursor-pointer"
                                         >
                                             <h4 className="text-xs font-semibold">Upload</h4>
@@ -382,7 +370,7 @@ const Profile = () => {
                 </CardContent>
                 <CardFooter className={"flex items-center p-4 sm:p-6 justify-end"}>
                     <Button onClick={onUpdateUser}
-                            className={`${isLoading === true ? "py-2 px-4" : "py-2 px-4 w-[128px]"} text-sm font-semibold`}
+                            className={`${isLoading === true ? "py-2 px-4" : "py-2 px-4"} w-[128px] text-sm font-semibold`}
                     >
                         {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Save Changes"}</Button>
                 </CardFooter>
@@ -468,7 +456,7 @@ const Profile = () => {
                     </div>
                 </CardContent>
                 <CardFooter className={"justify-end sm:pt-0 pt-0 px-4 pt-0 pb-4 sm:px-6"}>
-                    <Button className={`${isLoadingPass === true ? "py-2 px-4" : "py-2 px-4 w-[150px]"} text-sm font-semibold`}
+                    <Button className={`${isLoadingPass === true ? "py-2 px-4" : "py-2 px-4"} w-[150px] text-sm font-semibold`}
                             onClick={changePassword}>{isLoadingPass ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Update Password"}</Button>
                 </CardFooter>
             </Card>

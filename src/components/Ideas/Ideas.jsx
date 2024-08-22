@@ -5,7 +5,7 @@ import {Card, CardContent, CardFooter} from "../ui/card";
 import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "../ui/select";
 import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList} from "../ui/command";
 import {Checkbox} from "../ui/checkbox";
-import SidebarSheet from "../Ideas/SidebarSheet";
+import UpdateIdea from "./UpdateIdea";
 import {useTheme} from "../theme-provider";
 import {ApiService} from "../../utils/ApiService";
 import {useNavigate} from "react-router";
@@ -50,7 +50,7 @@ const Ideas = () => {
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
     const [ideasList, setIdeasList] = useState([]);
     const [isDeleteLoading, setDeleteIsLoading] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
     const [isLoadingSearch, setIsLoadingSearch] = useState(false);
     const [selectedIdea, setSelectedIdea] = useState({}); // update idea
     const [oldSelectedIdea, setOldSelectedIdea] = useState({});
@@ -77,14 +77,15 @@ const Ideas = () => {
             let payload = {...filter, project_id: projectDetailsReducer.id, page: pageNo, limit: perPageLimit}
             ideaSearch(payload)
         } else {
-            getAllIdea()
+            if(projectDetailsReducer.id){
+                getAllIdea()
+            }
         }
         setTopicLists(allStatusAndTypes.topics)
         setRoadmapStatus(allStatusAndTypes.roadmap_status)
     }, [projectDetailsReducer.id, pageNo, allStatusAndTypes])
 
     const getAllIdea = async () => {
-        setIsLoading(true)
         const data = await apiSerVice.getAllIdea({
             project_id: projectDetailsReducer.id,
             page: pageNo,
@@ -99,7 +100,7 @@ const Ideas = () => {
             }
             setIsLoading(false)
         } else {
-            // setIsLoading(false)
+            setIsLoading(false)
         }
     }
 
@@ -226,9 +227,12 @@ const Ideas = () => {
 
     const totalPages = Math.ceil(totalRecord / perPageLimit);
 
-    const handlePaginationClick = (newPage) => {
+    const handlePaginationClick = async (newPage) => {
         if (newPage >= 1 && newPage <= totalPages) {
+            setIsLoading(true);
             setPageNo(newPage);
+        } else {
+            setIsLoading(false);
         }
     };
 
@@ -304,7 +308,7 @@ const Ideas = () => {
                 </Fragment>
             }
             <div className={"container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-3 md:px-4"}>
-                <SidebarSheet
+                <UpdateIdea
                     isOpen={isSheetOpen}
                     onOpen={openSheet}
                     onClose={closeSheet}
@@ -322,6 +326,7 @@ const Ideas = () => {
                     closeCreateIdea={closeCreateIdea}
                     setIdeasList={setIdeasList}
                     ideasList={ideasList}
+                    getAllIdea={getAllIdea}
                 />
 
                     <div className="flex items-center gap-4 mb-6 justify-between">
@@ -674,41 +679,42 @@ const Ideas = () => {
                                     </CardContent> : <EmptyData/>
                             }
 
-                        <CardFooter className={"p-0"}>
-                            <div
-                                className={`w-full ${theme === "dark" ? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end p-2 md:p-4`}>
-                                <div className={"w-full flex gap-2 items-center justify-between sm:justify-end"}>
-                                    <div>
-                                        <h5 className={"text-sm font-semibold"}>Page {pageNo} of {totalPages}</h5>
-                                    </div>
-                                    <div className={"flex flex-row gap-2 items-center"}>
-                                        <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
-                                                onClick={() => handlePaginationClick(1)} disabled={pageNo === 1}>
-                                            <ChevronsLeft
-                                                className={pageNo === 1 ? "stroke-muted-foreground" : "stroke-primary"}/>
-                                        </Button>
-                                        <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
-                                                onClick={() => handlePaginationClick(pageNo - 1)}
-                                                disabled={pageNo === 1}>
-                                            <ChevronLeft
-                                                className={pageNo === 1 ? "stroke-muted-foreground" : "stroke-primary"}/>
-                                        </Button>
-                                        <Button variant={"outline"} className={" h-[30px] w-[30px] p-1.5"}
-                                                onClick={() => handlePaginationClick(pageNo + 1)}
-                                                disabled={pageNo === totalPages}>
-                                            <ChevronRight
-                                                className={pageNo === totalPages ? "stroke-muted-foreground" : "stroke-primary"}/>
-                                        </Button>
-                                        <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
-                                                onClick={() => handlePaginationClick(totalPages)}
-                                                disabled={pageNo === totalPages}>
-                                            <ChevronsRight
-                                                className={pageNo === totalPages ? "stroke-muted-foreground" : "stroke-primary"}/>
-                                        </Button>
+                            <CardFooter className={`p-0`}>
+                                <div
+                                    className={`w-full ${theme === "dark" ? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end p-2 md:px-3 md:py-[10px]`}>
+                                    <div className={"w-full flex gap-2 items-center justify-between sm:justify-end"}>
+                                        <div>
+                                            <h5 className={"text-sm font-semibold"}>Page {pageNo} of {totalPages}</h5>
+                                        </div>
+                                        <div className={"flex flex-row gap-2 items-center"}>
+                                            <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
+                                                    onClick={() => handlePaginationClick(1)}
+                                                    disabled={pageNo === 1 || isLoading}>
+                                                <ChevronsLeft
+                                                    className={pageNo === 1 || isLoading ? "stroke-muted-foreground" : "stroke-primary"} />
+                                            </Button>
+                                            <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
+                                                    onClick={() => handlePaginationClick(pageNo - 1)}
+                                                    disabled={pageNo === 1 || isLoading}>
+                                                <ChevronLeft
+                                                    className={pageNo === 1 || isLoading ? "stroke-muted-foreground" : "stroke-primary"} />
+                                            </Button>
+                                            <Button variant={"outline"} className={" h-[30px] w-[30px] p-1.5"}
+                                                    onClick={() => handlePaginationClick(pageNo + 1)}
+                                                    disabled={pageNo === totalPages || isLoading}>
+                                                <ChevronRight
+                                                    className={pageNo === totalPages || isLoading ? "stroke-muted-foreground" : "stroke-primary"} />
+                                            </Button>
+                                            <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
+                                                    onClick={() => handlePaginationClick(totalPages)}
+                                                    disabled={pageNo === totalPages || isLoading}>
+                                                <ChevronsRight
+                                                    className={pageNo === totalPages || isLoading ? "stroke-muted-foreground" : "stroke-primary"} />
+                                            </Button>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </CardFooter>
+                            </CardFooter>
                     </Card>
                 </div>
             </div>

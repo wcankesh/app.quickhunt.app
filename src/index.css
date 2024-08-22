@@ -511,6 +511,7 @@ span.LinesEllipsis-ellipsis {color: hsl(var(--primary)) !important;font-weight: 
   color: var(--quill-icon)
 }
 
+/*React quill editor*/
 /*.ql-editor p {display: flex; gap: 8px}*/
 /*.description-container div p span {color: var(--muted-foreground) !important;}*/
 /*.description-container .LinesEllipsis .LinesEllipsis--clamped div p span .LinesEllipsis-ellipsis {color: var(--primary) !important;}*/
@@ -518,6 +519,7 @@ em {color: var(--muted-foreground) !important;}
 .description-container div div div p span {color: var(--muted-foreground) !important;}
 .description-container div div div p span span span {color: var(--primary) !important;}
 .ql-snow .ql-editor p span {color: var(--card) !important}
+.description-container div p img{width: 50px; height: 50px}
 
 input:-webkit-autofill {
   background-color: transparent !important; /* Change background */
@@ -531,3 +533,6 @@ input:-webkit-autofill::first-line {
 /*Calender css*/
 td.h-9.w-9.text-center.text-sm.p-0.relative.\[\&\:has\(\[aria-selected\]\.range_end\)\]\:rounded-r-md.\[\&\:has\(\[aria-selected\]\.day-outside\)\]\:bg-accent\/50.\[\&\:has\(\[aria-selected\]\)\]\:bg-accent.first\:\[\&\:has\(\[aria-selected\]\.range_start\)\]\:rounded-l-md.last\:\[\&\:has\(\[aria-selected\]\)\]\:rounded-r-md.focus-within\:relative.focus-within\:z-20.rdp-range_middle.rdp-selected {color: black}
 .calendar-das .rdp-button_previous svg, .calendar-das .rdp-button_next svg{fill: white}
+
+/* Carousal */
+.custom-width {max-width: 706px; width: 100%; margin: 0 auto}
