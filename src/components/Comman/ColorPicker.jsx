@@ -43,7 +43,7 @@ const ColorInput = ({ value, name, onChange, style }) => {
                 <div className="flex gap-1 items-center">
                     <div style={{background: inputValue}} className="color_picker_color"/>
                     <Input
-                        className="text-sm border-none p-0 h-auto"
+                        className="text-sm border-none p-0 h-auto focus-visible:none focus-visible:ring-offset-0 focus-visible:box"
                         id={name}
                         value={inputValue}
                         onChange={handleInputChange}

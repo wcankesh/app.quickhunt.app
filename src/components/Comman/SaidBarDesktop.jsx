@@ -58,6 +58,12 @@ const SaidBarDesktop = () => {
                     selected: isActive(`${baseUrl}/customers`),
                 },
                 {
+                    title: 'In App Message',
+                    link: '/in-app-message',
+                    icon: Icon.inAppMessage,
+                    selected: isActive(`${baseUrl}/in-app-message`),
+                },
+                {
                     title: 'Widget',
                     link: '/widget',
                     icon: Icon.widgetsIcon,
@@ -79,7 +85,7 @@ const SaidBarDesktop = () => {
             title: `${userDetailsReducer.trial_days} days trial left`,
             link: '/pricing-plan',
             icon: Icon.trialPlanIcon,
-            selected: isActive(`${baseUrl}/pricing-plan`),
+            selected: false,
             isDisplay: userDetailsReducer?.trial_days > 0 && userDetailsReducer.plan === 1,
         },
         {
@@ -114,7 +120,7 @@ const SaidBarDesktop = () => {
             title: 'Settings',
             link: '/settings/profile',
             icon: Icon.settingIcon,
-            selected: isActive(`${baseUrl}/profile`),
+            selected: window.location.pathname === `${baseUrl}/settings/team` ? false :isActive(`${baseUrl}/settings/profile`, `${baseUrl}/settings/${type}`),
             isDisplay: true,
         }
     ];

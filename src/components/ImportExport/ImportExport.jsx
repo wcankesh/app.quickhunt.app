@@ -3,6 +3,7 @@ import {CardHeader, CardTitle, Card, CardContent} from "../ui/card";
 import {Button} from "../ui/button";
 import {useNavigate} from "react-router-dom";
 import {baseUrl} from "../../utils/constent";
+import {useSelector} from "react-redux";
 
 
 const ImportExport = () => {
@@ -10,6 +11,7 @@ const ImportExport = () => {
     const onRedirect = () => {
         navigate(`${baseUrl}/import`);
     };
+    const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     return (
         <div
             className={"container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-3 md:px-4"}>
@@ -33,7 +35,7 @@ const ImportExport = () => {
                         </CardHeader>
                         <CardContent className={"flex flex-col gap-3 p-4 pt-1"}>
                             <p className={"text-muted-foreground text-sm"}>You can export all your data in CSV format. (This can take up to 30 sec.)</p>
-                            <div><Button className={"font-semibold"} >Export Data</Button></div>
+                            <div><Button className={"font-semibold"} onClick={() => window.open(`https://code.quickhunt.app/public/api/idea/export?project_id=${projectDetailsReducer.id}`, "_blank")}>Export Data</Button></div>
                         </CardContent>
                     </Card>
                 </div>

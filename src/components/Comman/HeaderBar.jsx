@@ -369,6 +369,12 @@ const HeaderBar = () => {
                     selected: isActive(`${baseUrl}/customers`),
                 },
                 {
+                    title: 'In App Message',
+                    link: '/in-app-message',
+                    icon: Icon.inAppMessage,
+                    selected: isActive(`${baseUrl}/in-app-message`),
+                },
+                {
                     title: 'Widget',
                     link: '/widget',
                     icon: Icon.widgetsIcon,

@@ -15,6 +15,7 @@ import {ApiService} from "../../utils/ApiService";
 import {useToast} from "../ui/use-toast";
 import {useSelector} from "react-redux";
 import {ToggleGroup, ToggleGroupItem} from "../ui/toggle-group";
+import qs from 'qs';
 
 const initialState = {
     project_id: "",
@@ -699,7 +700,7 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
                             width: `${widgetsSetting.popover_width}px`, height: `${widgetsSetting.popover_height}px`
                         }}>
                             <iframe className='QH-frame'
-                                    src={`https://${projectDetailsReducer.domain}/ideas?widget=${id}`}/>
+                                    src={`https://${projectDetailsReducer.domain}/ideas?${qs.stringify({...widgetsSetting, widget: id})}`}/>
                         </div>
                     }
 
