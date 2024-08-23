@@ -1016,10 +1016,10 @@ const UpdateIdea = ({
                                                     </div>
                                                 </div>
                                                 {
-                                                    selectedIdea && selectedIdea.images && selectedIdea.images.length > 0 ?
+                                                    selectedIdea && selectedIdea?.images && selectedIdea?.images.length > 0 ?
                                                         <div className={"flex gap-2 flex-wrap"}>
                                                             {
-                                                                (selectedIdea.images || []).map((x, i) => {
+                                                                (selectedIdea?.images || []).map((x, i) => {
                                                                         return (
                                                                             <Fragment>
                                                                                 {
@@ -1459,9 +1459,11 @@ const UpdateIdea = ({
                                                                                                             return (
                                                                                                                 <div
                                                                                                                     key={ind}
-                                                                                                                    className={"w-[50px] h-[50px] md:w-[100px] md:h-[100px] border p-[3px]"}>
+                                                                                                                    className={"w-[50px] h-[50px] md:w-[100px] md:h-[100px] border p-[3px]"}
+                                                                                                                    onClick={() => handleImageClick(img)}
+                                                                                                                >
                                                                                                                     <img
-                                                                                                                        className={"upload-img"}
+                                                                                                                        className={"upload-img cursor-pointer"}
                                                                                                                         src={img}
                                                                                                                         alt={img}/>
                                                                                                                 </div>
@@ -1648,9 +1650,11 @@ const UpdateIdea = ({
                                                                                                                                                         (y.images || []).map((z, i) => {
                                                                                                                                                             return (
                                                                                                                                                                 <div
-                                                                                                                                                                    className={"w-[50px] h-[50px] md:w-[100px] md:h-[100px] border p-[3px]"}>
+                                                                                                                                                                    className={"w-[50px] h-[50px] md:w-[100px] md:h-[100px] border p-[3px]"}
+                                                                                                                                                                    onClick={() => handleImageClick(z)}
+                                                                                                                                                                >
                                                                                                                                                                     <img
-                                                                                                                                                                        className={"upload-img"}
+                                                                                                                                                                        className={"upload-img cursor-pointer"}
                                                                                                                                                                         src={z}
                                                                                                                                                                         alt={z}/>
                                                                                                                                                                 </div>

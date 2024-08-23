@@ -171,7 +171,7 @@ const ImportIdea = () => {
         }
 
         return (
-            <div className={"pt-8 container xl:max-w-[1574px]  lg:max-w-[992px]  md:max-w-[768px] sm:max-w-[639px] px-4"}>
+            <div className={"container xl:max-w-[1574px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-3 md:px-4"}>
                 <div className={"flex flex-row gap-x-4 flex-wrap justify-between gap-y-2 items-center"}>
                     <h4 className={"font-medium text-lg sm:text-2xl leading-8"}>Import Data</h4>
                     {

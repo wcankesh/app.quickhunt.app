@@ -29,12 +29,12 @@ const initialState = {
     is_roadmap: true,
     is_announcement: true,
     is_navigate: true,
-    header_bg_color: "#FD6B65",
-    header_text_color: "#ffffff",
-    header_btn_background_color: "#FD6B65",
+    header_bg_color: "#ffffff",
+    header_text_color: "#000000",
+    header_btn_background_color: "#7c3aed",
     header_btn_text_color: "#FFFFFF",
-    btn_background_color: "#FFFFFF",
-    btn_text_color: "#194cdb",
+    btn_background_color: "#7c3aed",
+    btn_text_color: "#FFFFFF",
     popover_offset: "20",
     modal_width: "640",
     modal_height: "500",
@@ -528,52 +528,56 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
                     <AccordionItem value="item-4" className={"widget-accordion"}>
                         <AccordionTrigger
                             className={"hover:no-underline text-[15px] font-medium border-b px-4 py-3"}>Advanced</AccordionTrigger>
-                        <AccordionContent className={"px-4 py-3 space-y-4"}>
-                            <div className={"widget-color-picker space-y-2"}>
-                                <Label className={"text-sm font-medium"}>Header Background Color</Label>
-                                <ColorInput name="header_bg_color"
-                                            onChange={(color) => onChange("header_bg_color", color?.header_bg_color)}
-                                            value={widgetsSetting.header_bg_color}
-                                />
+                        <AccordionContent className={"p-0"}>
+                            <div className={"px-4 py-3 space-y-4 border-b"}>
+                                <div className={"widget-color-picker space-y-2"}>
+                                    <Label className={"text-sm font-medium"}>Header Background Color</Label>
+                                    <ColorInput name="header_bg_color"
+                                                onChange={(color) => onChange("header_bg_color", color?.header_bg_color)}
+                                                value={widgetsSetting.header_bg_color}
+                                    />
+                                </div>
+                                <div className={"widget-color-picker space-y-2"}>
+                                    <Label className={"text-sm font-medium"}>Header Text Color</Label>
+                                    <ColorInput type="color" name="header_text_color"
+                                                onChange={(color) => onChange("header_text_color", color?.header_text_color)}
+                                                value={widgetsSetting.header_text_color}
+                                    />
+                                </div>
+                                <div className={"widget-color-picker space-y-2"}>
+                                    <Label className={"text-sm font-medium"}>Header Button Background Color</Label>
+                                    <ColorInput name="header_btn_background_color"
+                                                onChange={(color) => onChange("header_btn_background_color", color?.header_btn_background_color)}
+                                                value={widgetsSetting.header_btn_background_color}
+                                    />
+                                </div>
+                                <div className={"widget-color-picker space-y-2"}>
+                                    <Label className={"text-sm font-medium"}>Header Button Text Color</Label>
+                                    <ColorInput type="color" name="header_btn_text_color"
+                                                onChange={(color) => onChange("header_btn_text_color", color?.header_btn_text_color)}
+                                                value={widgetsSetting.header_btn_text_color}
+                                    />
+                                </div>
                             </div>
-                            <div className={"widget-color-picker space-y-2"}>
-                                <Label className={"text-sm font-medium"}>Header Text Color</Label>
-                                <ColorInput type="color" name="header_text_color"
-                                            onChange={(color) => onChange("header_text_color", color?.header_text_color)}
-                                            value={widgetsSetting.header_text_color}
-                                />
-                            </div>
-                            <div className={"widget-color-picker space-y-2"}>
-                                <Label className={"text-sm font-medium"}>Button Background Color</Label>
-                                <ColorInput name="btn_background_color"
-                                            onChange={(color) => onChange("btn_background_color", color?.btn_background_color)}
-                                            value={widgetsSetting.btn_background_color}
-                                />
-                            </div>
-                            <div className={"widget-color-picker space-y-2"}>
-                                <Label className={"text-sm font-medium"}>Button Text Color</Label>
-                                <ColorInput type="color" name="btn_text_color"
-                                            onChange={(color) => onChange("btn_text_color", color?.btn_text_color)}
-                                            value={widgetsSetting.btn_text_color}
-                                />
-                            </div>
-                            <div className={"widget-color-picker space-y-2"}>
-                                <Label className={"text-sm font-medium"}>Header Button Background Color</Label>
-                                <ColorInput name="header_btn_background_color"
-                                            onChange={(color) => onChange("header_btn_background_color", color?.header_btn_background_color)}
-                                            value={widgetsSetting.header_btn_background_color}
-                                />
-                            </div>
-                            <div className={"widget-color-picker space-y-2"}>
-                                <Label className={"text-sm font-medium"}>Header Button Text Color</Label>
-                                <ColorInput type="color" name="header_btn_text_color"
-                                            onChange={(color) => onChange("header_btn_text_color", color?.header_btn_text_color)}
-                                            value={widgetsSetting.header_btn_text_color}
-                                />
+                            <div className={"px-4 py-3 space-y-4"}>
+                                <div className={"widget-color-picker space-y-2"}>
+                                    <Label className={"text-sm font-medium"}>Button Background Color</Label>
+                                    <ColorInput name="btn_background_color"
+                                                onChange={(color) => onChange("btn_background_color", color?.btn_background_color)}
+                                                value={widgetsSetting.btn_background_color}
+                                    />
+                                </div>
+                                <div className={"widget-color-picker space-y-2"}>
+                                    <Label className={"text-sm font-medium"}>Button Text Color</Label>
+                                    <ColorInput type="color" name="btn_text_color"
+                                                onChange={(color) => onChange("btn_text_color", color?.btn_text_color)}
+                                                value={widgetsSetting.btn_text_color}
+                                    />
+                                </div>
                             </div>
                             {
                                 widgetsSetting.type !== "embed" &&
-                                <div className="flex flex-col gap-2">
+                                <div className="flex flex-col gap-2 px-4 py-3 border-t">
                                     <Label className={"text-sm font-medium"}>Navigation Menu</Label>
                                     <div className={"flex items-center gap-4 m-0"}>
                                         <Checkbox id="terms" checked={widgetsSetting.is_navigate === 1}

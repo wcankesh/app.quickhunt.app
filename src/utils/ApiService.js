@@ -314,8 +314,8 @@ export class ApiService{
     async getAllRoadmapStatus (id){
         return await this.getData(`${baseUrlApi}/roadmap-status?project_id=${id}`)
     }
-    async getWidgetsSetting (id){
-        return await this.getData(`${baseUrlApi}/widget?project_id=${id}`)
+    async getWidgetsSetting (payload){
+        return await this.getData(`${baseUrlApi}/widget?${qs.stringify(payload)}`)
     }
     async getRoadmapIdea (payload){
         return await this.postData(`${baseUrlApi}/roadmap-idea`, payload)

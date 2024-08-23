@@ -175,7 +175,7 @@ const AnnouncementsTable = ({data, isLoading, setSelectedRecord, handleDelete, s
                                                 [...Array(7)].map((_, i) => {
                                                     return (
                                                         <TableCell className={"max-w-[373px] px-2 py-[10px] md:px-3"}>
-                                                            <Skeleton className={"rounded-md  w-full h-8"}/>
+                                                            <Skeleton className={"rounded-md  w-full h-7"}/>
                                                         </TableCell>
                                                     )
                                                 })

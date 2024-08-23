@@ -239,6 +239,7 @@ const HeaderBar = () => {
         });
         if (Object.keys(validationErrors).length > 0) {
             setFormError(validationErrors);
+            setIsCreateLoading(false);
             return;
         }
 
@@ -265,16 +266,17 @@ const HeaderBar = () => {
             setProjectList(clone)
             setProjectDetails(obj);
             dispatch(projectDetailsAction(obj))
-            setIsCreateLoading(false);
             toast({description: data.message})
-            // setSheetOpen(false)
             setCreateProjectDetails(initialStateProject)
+            setIsCreateLoading(false);
             navigate(`${baseUrl}/dashboard`);
+            closeSheet();
+            // setSheetOpen(false)
         } else {
             setIsCreateLoading(false);
             toast({variant: "destructive" ,description: data.message})
         }
-        closeSheet()
+        // closeSheet()
     }
 
     const onChangeProject = (value) => {
@@ -689,7 +691,7 @@ const HeaderBar = () => {
                                             value={createProjectDetails.project_name}
                                             name="project_name"
                                             onChange={onChangeText}
-                                            onBlur={onBlur}
+                                            // onBlur={onBlur}
                                         />
                                         {
                                             formError.project_name &&

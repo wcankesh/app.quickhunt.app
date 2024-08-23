@@ -52,14 +52,19 @@ const Widgets = () => {
     }
 
     useEffect(() => {
-        if(projectDetailsReducer?.id !== ""){
-            getWidgetsSetting()
+        if (projectDetailsReducer?.id !== "") {
+            getWidgetsSetting(pageNo, perPageLimit);
         }
-    },[projectDetailsReducer.id])
+    }, [projectDetailsReducer.id, pageNo, perPageLimit]);
 
     const getWidgetsSetting = async () => {
         setIsLoading(true)
-        const data = await apiSerVice.getWidgetsSetting(projectDetailsReducer.id)
+        const payload = {
+            project_id : projectDetailsReducer.id,
+            page: pageNo,
+            limit: perPageLimit
+        }
+        const data = await apiSerVice.getWidgetsSetting(payload)
         if(data.status === 200){
             setWidgetsSetting(data.data);
             setTotalRecord(data.total);
@@ -118,10 +123,8 @@ const Widgets = () => {
 
     const handlePaginationClick = async (newPage) => {
         if (newPage >= 1 && newPage <= totalPages) {
-            setIsLoading(true);
             setPageNo(newPage);
-        } else {
-            setIsLoading(false);
+            // await getWidgetsSetting(newPage, perPageLimit);
         }
     };
 
@@ -404,7 +407,7 @@ const Widgets = () => {
                                                             [...Array(6)].map((_, i) => {
                                                                 return (
                                                                     <TableCell className={"max-w-[373px] px-2 py-[10px] md:px-3"}>
-                                                                        <Skeleton className={"rounded-md  w-full h-8"}/>
+                                                                        <Skeleton className={"rounded-md  w-full h-7"}/>
                                                                     </TableCell>
                                                                 )
                                                             })
@@ -454,8 +457,7 @@ const Widgets = () => {
                             </Table>
                         </CardContent>
                         <CardFooter className={`p-0 ${theme === "dark" ? "border-t" : ""}`}>
-                            <div
-                                className={`w-full ${theme === "dark" ? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end p-2 md:px-3 md:py-[10px]`}>
+                            <div className={`w-full ${theme === "dark" ? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end p-2 md:px-3 md:py-[10px]`}>
                                 <div className={"w-full flex gap-2 items-center justify-between sm:justify-end"}>
                                     <div>
                                         <h5 className={"text-sm font-semibold"}>Page {pageNo} of {totalPages}</h5>

@@ -4,7 +4,6 @@ import {ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Loader2, Plus, T
 import {Card, CardContent, CardFooter} from "../ui/card";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "../ui/table";
 import {useTheme} from "../theme-provider";
-import {Separator} from "../ui/separator";
 import {ApiService} from "../../utils/ApiService";
 import {useSelector} from "react-redux";
 import {toast} from "../ui/use-toast";
@@ -111,6 +110,7 @@ const Customers = () => {
     };
 
     const getAllCustomers = async () => {
+        setIsLoading(true);
         const payload = {
             project_id: projectDetailsReducer.id,
             page: pageNo,
@@ -120,10 +120,9 @@ const Customers = () => {
         if (data.status === 200) {
             setCustomerList(data.data);
             setTotalRecord(data?.total);
-            setIsLoading(false);
-        } else {
-            setIsLoading(false)
+            // setIsLoading(false);
         }
+        setIsLoading(false)
     };
 
     const deleteCustomer =  (id) => {
@@ -198,7 +197,9 @@ const Customers = () => {
 
     const handlePaginationClick = (newPage) => {
         if (newPage >= 1 && newPage <= totalPages) {
+            setIsLoading(true);
             setPageNo(newPage);
+            setIsLoading(false);
         }
     };
 
@@ -209,13 +210,11 @@ const Customers = () => {
             {isSheetOpen && <Sheet open={isSheetOpen} onOpenChange={isSheetOpen ? closeSheet : openSheet}>
                 <SheetOverlay className={"inset-0"}/>
                 <SheetContent className={"sm:max-w-[662px] p-0"}>
-                    <SheetHeader className={"sm:px-8 sm:py-6 px-3 py-4 flex flex-row justify-between items-center"}>
-                        <h5 className={"text-sm md:text-xl font-medium leading-5"}>Add New Customer</h5>
-                        <Button onClick={closeSheet}  className={"h-5 w-5 p-0"} variant={"ghost"}><X  size={18} className={"h-5 w-5"}/></Button>
+                    <SheetHeader className={"px-3 py-4 lg:px-8 lg:py-[20px] flex flex-row justify-between items-center border-b"}>
+                        <h5 className={"text-sm md:text-xl font-medium"}>Add New Customer</h5>
+                        <X onClick={closeSheet} size={18} className={"cursor-pointer m-0"}/>
                     </SheetHeader>
-                    <Separator className={"text-muted-foreground"}/>
-                    <div className={"sm:px-8 sm:py-6 px-3 py-4 "}>
-
+                    <div className={"sm:px-8 sm:py-6 px-3 py-4 border-b"}>
                         <div className="grid w-full gap-2">
                             <Label htmlFor="name">Name</Label>
                             <Input value={customerDetails.customer_name} name="customer_name" onChange={onChangeText} type="text" id="name" className={"h-9"} placeholder={"Enter the full name of customer..."}/>
@@ -228,19 +227,18 @@ const Customers = () => {
                             {formError.customer_email_id && <span className="text-sm text-red-500">{formError.customer_email_id}</span>}
                         </div>
 
-                        <div className={"mt-6 flex"}>
+                        <div className={"mt-6 flex items-center"}>
                             <Switch checked={customerDetails.customer_email_notification == 1} onCheckedChange={(checked) => onChangeText({target: {name: "customer_email_notification", value:checked}})} htmlFor={"switch"} />
                             <Label id={"switch"} className={"ml-[9px] text-sm font-medium"}>Receive Notifications</Label>
                         </div>
                     </div>
-                    <Separator className={"mb-8 text-muted-foreground"}/>
-                    <div className={"px-3 sm:px-8"}>
-                        <Button onClick={addCustomer} className={` border w-[127px] ${isSave ? "justify-center items-center" : ""}`}>{isSave ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Add Customer"}</Button>
+                    <div className={"px-3 py-4 sm:p-8"}>
+                        <Button onClick={addCustomer} className={` border w-[127px] font-semibold ${isSave ? "justify-center items-center" : ""}`}>{isSave ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Add Customer"}</Button>
                     </div>
                 </SheetContent>
             </Sheet>}
 
-            <div className={"pt-8 container xl:max-w-[1574px]  lg:max-w-[992px]  md:max-w-[768px] sm:max-w-[639px] px-4"}>
+            <div className={"container xl:max-w-[1574px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-3 md:px-4"}>
                 {/*<NewCustomerSheet isOpen={isSheetOpen} onOpen={openSheet} callback={getAllCustomers} onClose={closeSheet}/>*/}
 
                 {
@@ -275,10 +273,10 @@ const Customers = () => {
                 <div className={""}>
                     <div className={"flex flex-row gap-x-4 flex-wrap justify-between gap-y-2 items-center"}>
                         <div>
-                            <h4 className={"font-medium text-lg sm:text-2xl leading-8"}>Customers</h4>
-                            <h5 className={"text-muted-foreground text-base leading-5"}>Last updates</h5>
+                            <h4 className={"font-medium text-lg sm:text-2xl"}>Customers</h4>
+                            <h5 className={"text-muted-foreground text-base"}>Last updates</h5>
                         </div>
-                        <Button onClick={openSheet} className={"hover:bg-violet-600"}> <Plus className={"mr-4"} />New Customer</Button>
+                        <Button size="sm" onClick={openSheet} className={"gap-2 font-semibold hover:bg-primary"}> <Plus size={20} strokeWidth={3} />New Customer</Button>
                     </div>
                     <div className={"pt-4 sm:pt-8"}>
                                 <Card className={""}>
@@ -305,8 +303,8 @@ const Customers = () => {
                                                                             {
                                                                                 [...Array(6)].map((_, i) => {
                                                                                     return (
-                                                                                        <TableCell key={i} className={"px-2"}>
-                                                                                            <Skeleton className={"rounded-md  w-full h-[24px]"}/>
+                                                                                        <TableCell key={i} className={"px-2 py-[10px] md:px-3"}>
+                                                                                            <Skeleton className={"rounded-md  w-full h-7"}/>
                                                                                         </TableCell>
                                                                                     )
                                                                                 })
@@ -343,42 +341,42 @@ const Customers = () => {
 
                                         </div>
                                     </CardContent>
-                                    <Separator/>
-                                    <CardFooter className={"p-0"}>
+                                    <CardFooter className={`p-0 ${theme === "dark" ? "border-t" : ""}`}>
                                         <div
-                                            className={`w-full px-2 py-[10px] md:px-3 ${theme === "dark" ? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end`}>
-                                            <div className={"w-full flex gap-8 items-center justify-between sm:justify-end"}>
+                                            className={`w-full ${theme === "dark" ? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end p-2 md:px-3 md:py-[10px]`}>
+                                            <div className={"w-full flex gap-2 items-center justify-between sm:justify-end"}>
                                                 <div>
-                                                    <h5 className={"text-xs md:text-sm font-semibold"}>Page {pageNo} of {totalPages}</h5>
+                                                    <h5 className={"text-sm font-semibold"}>Page {pageNo} of {totalPages}</h5>
                                                 </div>
                                                 <div className={"flex flex-row gap-2 items-center"}>
-                                                    <Button variant={"outline"}
-                                                            className={"h-[30px] w-[30px] p-1.5"}
-                                                            onClick={() => handlePaginationClick(1)} disabled={pageNo === 1}>
-                                                        <ChevronsLeft className={pageNo === 1 ? "stroke-muted-foreground" : "stroke-primary"}/>
+                                                    <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
+                                                            onClick={() => handlePaginationClick(1)}
+                                                            disabled={pageNo === 1 || isLoading}>
+                                                        <ChevronsLeft
+                                                            className={pageNo === 1 || isLoading ? "stroke-muted-foreground" : "stroke-primary"} />
                                                     </Button>
-                                                    <Button variant={"outline"}
-                                                            className={"h-[30px] w-[30px] p-1.5"}
+                                                    <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
                                                             onClick={() => handlePaginationClick(pageNo - 1)}
-                                                            disabled={pageNo === 1}>
-                                                        <ChevronLeft className={pageNo === 1 ? "stroke-muted-foreground" : "stroke-primary"}/>
+                                                            disabled={pageNo === 1 || isLoading}>
+                                                        <ChevronLeft
+                                                            className={pageNo === 1 || isLoading ? "stroke-muted-foreground" : "stroke-primary"} />
                                                     </Button>
-                                                    <Button variant={"outline"}
-                                                            className={" h-[30px] w-[30px] p-1.5"}
+                                                    <Button variant={"outline"} className={" h-[30px] w-[30px] p-1.5"}
                                                             onClick={() => handlePaginationClick(pageNo + 1)}
-                                                            disabled={pageNo === totalPages}>
-                                                        <ChevronRight className={pageNo === totalPages ? "stroke-muted-foreground" : "stroke-primary"}/>
+                                                            disabled={pageNo === totalPages || isLoading}>
+                                                        <ChevronRight
+                                                            className={pageNo === totalPages || isLoading ? "stroke-muted-foreground" : "stroke-primary"} />
                                                     </Button>
-                                                    <Button variant={"outline"}
-                                                            className={"h-[30px] w-[30px] p-1.5"}
+                                                    <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
                                                             onClick={() => handlePaginationClick(totalPages)}
-                                                            disabled={pageNo === totalPages}>
-                                                        <ChevronsRight className={pageNo === totalPages ? "stroke-muted-foreground" : "stroke-primary"}/>
+                                                            disabled={pageNo === totalPages || isLoading}>
+                                                        <ChevronsRight
+                                                            className={pageNo === totalPages || isLoading ? "stroke-muted-foreground" : "stroke-primary"} />
                                                     </Button>
                                                 </div>
                                             </div>
                                         </div>
-                                        </CardFooter>
+                                    </CardFooter>
                                 </Card>
                     </div>
                 </div>

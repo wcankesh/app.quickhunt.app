@@ -14,11 +14,11 @@ import {Checkbox} from "../../ui/checkbox";
 
 const initialState = {
     announcement_title: "",
-    btn_background_color: "",
-    btn_text_color: "",
+    btn_background_color: "#7c3aed",
+    btn_text_color: "#ffffff",
     header_bg_color: "#FFFFFF",
     header_text_color: "#030712",
-    header_btn_background_color: "#FD6B65",
+    header_btn_background_color: "#7c3aed",
     header_btn_text_color: "#FFFFFF",
     idea_title: "",
     is_announcement: 1,
@@ -131,7 +131,7 @@ const GeneralSettings = () => {
                         generalSettingData.is_announcement === 1 &&
                         <Fragment>
                             <div className={"space-y-3"}>
-                                <div className="space-y-1 w-1/2">
+                                <div className="space-y-1 w-full md:w-1/2">
                                     <Label className="text-sm font-normal">Title</Label>
                                     <Input value={generalSettingData.announcement_title}
                                            onChange={(e) => onChange('announcement_title', e.target.value)}/>
@@ -139,7 +139,7 @@ const GeneralSettings = () => {
                                 <div className={"flex flex-col flex-wrap w-full md:basis-1/2 gap-2"}>
                                     <div className="flex items-center gap-4">
                                         <Checkbox
-                                            id="reaction"
+                                            id="is_reaction"
                                             checked={generalSettingData.is_reaction === 1}
                                             onCheckedChange={(checked, event) => onChangeSwitch({
                                                 event1: {
@@ -149,7 +149,7 @@ const GeneralSettings = () => {
                                             }, event)}
                                         />
                                         <label
-                                            htmlFor="reaction"
+                                            htmlFor="is_reaction"
                                             className="text-sm text-muted-foreground font-medium"
                                         >
                                             Reactions
@@ -157,7 +157,7 @@ const GeneralSettings = () => {
                                     </div>
                                     <div className="flex items-center gap-4">
                                         <Checkbox
-                                            id="reaction"
+                                            id="is_comment"
                                             checked={generalSettingData.is_comment === 1}
                                             onCheckedChange={(checked, event) => onChangeSwitch({
                                                 event1: {
@@ -167,7 +167,7 @@ const GeneralSettings = () => {
                                             }, event)}
                                         />
                                         <label
-                                            htmlFor="reaction"
+                                            htmlFor="is_comment"
                                             className="text-sm text-muted-foreground font-medium"
                                         >
                                             Show Comment

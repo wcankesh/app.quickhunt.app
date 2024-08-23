@@ -466,7 +466,7 @@ const Ideas = () => {
                                     </Command>
                                 </PopoverContent>
                             </Popover>
-                            <Button size="sm" className={"gap-2 font-semibold"} onClick={openCreateIdea}><Plus/>Create Idea</Button>
+                            <Button size="sm" className={"gap-2 font-semibold hover:bg-primary"} onClick={openCreateIdea}><Plus size={20} strokeWidth={3}/>Create Idea</Button>
                         </div>
                     </div>
                     {

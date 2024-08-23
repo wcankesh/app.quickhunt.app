@@ -24,7 +24,7 @@ const ImportExport = () => {
                         </CardHeader>
                         <CardContent className={"flex flex-col gap-3 p-4 pt-1"}>
                             <p className={"text-muted-foreground text-sm"}>We've made it easy to import your data from other tools and spreadsheets.</p>
-                            <div><Button onClick={onRedirect}>Import Data</Button></div>
+                            <div><Button className={"font-semibold"} onClick={onRedirect}>Import Data</Button></div>
                         </CardContent>
                     </Card>
                     <Card>
@@ -33,7 +33,7 @@ const ImportExport = () => {
                         </CardHeader>
                         <CardContent className={"flex flex-col gap-3 p-4 pt-1"}>
                             <p className={"text-muted-foreground text-sm"}>You can export all your data in CSV format. (This can take up to 30 sec.)</p>
-                            <div><Button>Export Data</Button></div>
+                            <div><Button className={"font-semibold"} >Export Data</Button></div>
                         </CardContent>
                     </Card>
                 </div>
