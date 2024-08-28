@@ -22,7 +22,6 @@ const initialNewLabel = {
 
 const Labels = () => {
     const {theme} = useTheme();
-    const [newLabel, setNewLabel] = useState({...initialNewLabel });
     const [labelError, setLabelError] = useState(initialNewLabel);
     const [isEdit,setIsEdit]= useState(null);
     const [isLoading,setIsLoading]=useState(true);
@@ -113,7 +112,6 @@ const Labels = () => {
                 variant: "destructive"
             })
         }
-        setNewLabel({ ...initialNewLabel });
         setIsEdit(null);
     };
 
@@ -285,11 +283,11 @@ const Labels = () => {
                     className="flex gap-1 items-center text-sm font-semibold m-0"
                     onClick={handleShowInput}
                 >
-                    <div><Plus size={20} /></div>New Label
+                    <div><Plus size={20} strokeWidth={3} /></div>New Label
                 </Button>
             </CardHeader>
             <CardContent className="p-0">
-                <div className={"grid grid-cols-1 overflow-visible whitespace-nowrap"}>
+                <div className={"grid grid-cols-1 overflow-auto sm:overflow-visible whitespace-nowrap"}>
                     <Table>
                     <TableHeader className="p-0">
                         <TableRow>
@@ -329,7 +327,7 @@ const Labels = () => {
 
                                                                 <TableCell className={"px-[8.5px] py-[11px]"}>
                                                                     <div className={"flex justify-center items-center"}>
-                                                                        <ColorInput style={{width:"102px"}} name={"clr"} value={x.label_color_code} onChange={(color) => onChangeColorColor(color, i)}/>
+                                                                        <ColorInput name={"clr"} value={x.label_color_code} onChange={(color) => onChangeColorColor(color, i)}/>
                                                                     </div>
                                                                 </TableCell>
 
@@ -344,7 +342,7 @@ const Labels = () => {
                                                                                 {isSave ? <Loader2 className="mr-1 h-4 w-4 animate-spin justify-center"/> : <Check size={16}/>}
                                                                             </Button> : <Button
                                                                                 variant=""
-                                                                                className="text-sm font-semibold h-[30px] w-[126px]"
+                                                                                className={`text-sm font-semibold h-[30px] ${isSave ? "w-[100px]" : ""} `}
                                                                                 onClick={() => handleAddNewLabel(x, i)}
                                                                             >
                                                                                 {isSave ? <Loader2 className={"mr-2  h-4 w-4 animate-spin"}/> : "Add Label"}

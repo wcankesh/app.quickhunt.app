@@ -64,7 +64,8 @@ const Statuses = () => {
         const clone = [...statusList];
         clone.push({title: '', color_code: randomColor(),});
         setIsEdit(clone.length - 1);
-        setStatusList(clone)
+        setStatusList(clone);
+        setLabelError(initialStatus);
     };
 
     const handleInputChange = (event, index) => {
@@ -359,11 +360,11 @@ const Statuses = () => {
                         className="flex gap-1 items-center text-sm font-semibold m-0"
                         onClick={handleShowInput}
                     >
-                        <div><Plus size={20} /></div>New Status
+                        <div><Plus strokeWidth={3} size={20} /></div>New Status
                     </Button>
                 </CardHeader>
                 <CardContent className="p-0">
-                    <div className={"grid grid-cols-1 overflow-visible whitespace-nowrap"}>
+                    <div className={"grid grid-cols-1 overflow-auto sm:overflow-visible whitespace-nowrap"}>
                         <Table>
                         <TableHeader className={"p-0"}>
                             <TableRow>
@@ -393,6 +394,7 @@ const Statuses = () => {
                                                             name={"title"}
                                                             onBlur={onBlur}
                                                             onChange={(e) => handleInputChange(e, i)}
+                                                            placeholder={"Enter status name"}
                                                         />
                                                         <div className="grid gap-2">
                                                             {
@@ -407,32 +409,34 @@ const Statuses = () => {
                                                             <ColorInput name={"color_code"} value={x.color_code} onChange={(color) => onChangeColorColor(color, i)}/>
                                                         </div>
                                                     </TableCell>
-                                                    <TableCell className={`flex justify-end gap-2 pr-4 ${labelError?.title ? "pt-[22px]" : ""} ${theme === "dark" ? "" : "text-muted-foreground"}`}>
-                                                        <Fragment>
-                                                            {
-                                                                x.id ? <Button
-                                                                    variant="outline hover:bg-transparent"
-                                                                    className={`p-1 border w-[30px] h-[30px] ${isSave ? "justify-center items-center" : ""}`}
-                                                                    onClick={() => handleSaveStatus(i)}
-                                                                >
-                                                                    {isSave ? <Loader2 className="mr-1 h-4 w-4 animate-spin justify-center"/> : <Check size={16}/>}
-                                                                </Button> : <Button
-                                                                    variant=""
-                                                                    className="text-sm font-semibold h-[30px] w-[126px]"
-                                                                    onClick={() => handleAddNewStatus(x, i)}
-                                                                >
-                                                                    {isSave ? <Loader2 className={"mr-2  h-4 w-4 animate-spin"}/> : "Add Status"}
-                                                                </Button>
-                                                            }
+                                                    <TableCell className={`pr-4 ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                                        <div className={"flex justify-end items-center gap-2"}>
+                                                            <Fragment>
+                                                                {
+                                                                    x.id ? <Button
+                                                                        variant="outline hover:bg-transparent"
+                                                                        className={`p-1 border w-[30px] h-[30px] ${isSave ? "justify-center items-center" : ""}`}
+                                                                        onClick={() => handleSaveStatus(i)}
+                                                                    >
+                                                                        {isSave ? <Loader2 className="mr-1 h-4 w-4 animate-spin justify-center"/> : <Check size={16}/>}
+                                                                    </Button> : <Button
+                                                                        variant=""
+                                                                        className="text-sm font-semibold h-[30px] w-[126px]"
+                                                                        onClick={() => handleAddNewStatus(x, i)}
+                                                                    >
+                                                                        {isSave ? <Loader2 className={"mr-2  h-4 w-4 animate-spin"}/> : "Add Status"}
+                                                                    </Button>
+                                                                }
 
-                                                            <Button
-                                                                variant="outline hover:bg-transparent"
-                                                                className="p-1 border w-[30px] h-[30px]"
-                                                                onClick={() =>  x.id ? onEditCancel() : onEdit(null)}
-                                                            >
-                                                                <X size={16}/>
-                                                            </Button>
-                                                        </Fragment>
+                                                                <Button
+                                                                    variant="outline hover:bg-transparent"
+                                                                    className="p-1 border w-[30px] h-[30px]"
+                                                                    onClick={() =>  x.id ? onEditCancel() : onEdit(null)}
+                                                                >
+                                                                    <X size={16}/>
+                                                                </Button>
+                                                            </Fragment>
+                                                        </div>
                                                     </TableCell>
                                                 </Fragment>
                                                 :

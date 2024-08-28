@@ -271,7 +271,7 @@ const Board = () => {
                             className="flex gap-1 items-center text-sm font-semibold m-0"
                             onClick={createNewBoard}
                         >
-                            <div><Plus size={20} /></div>New Board
+                            <div><Plus size={20} strokeWidth={3} /></div>New Board
                         </Button>
                     </div>
                 </CardHeader>
@@ -320,32 +320,34 @@ const Board = () => {
                                                                         </div>
                                                                     </TableCell>
                                                                     <TableCell/>
-                                                                    <TableCell className={`flex justify-end gap-2 px-2 py-[10px] md:px-3 ${formError.title ? "pt-[22px]" : ""} font-medium text-xs ${theme === "dark" ? "" : "text-muted-foreground"}`}>
-                                                                        <Fragment>
-                                                                            {
-                                                                                x.id ? <Button
-                                                                                    variant="outline hover:bg-transparent"
-                                                                                    className={`p-1 border w-[30px] h-[30px] ${isSave ? "justify-center items-center" : ""}`}
-                                                                                    onClick={() => updateBoard(i)}
-                                                                                >
-                                                                                    {isSave ? <Loader2 className="mr-1 h-4 w-4 animate-spin justify-center"/> : <Check size={16}/>}
-                                                                                </Button> : <Button
-                                                                                    variant=""
-                                                                                    className="text-sm font-semibold h-[30px] w-[126px]"
-                                                                                    onClick={() => addBoard(x, i)}
-                                                                                >
-                                                                                    {isSave ? <Loader2 className={"mr-2  h-4 w-4 animate-spin"}/> : "Add Board"}
-                                                                                </Button>
-                                                                            }
+                                                                    <TableCell className={`px-2 py-[10px] md:px-3 font-medium text-xs ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                                                        <div className={"flex justify-end gap-2 items-center"}>
+                                                                            <Fragment>
+                                                                                {
+                                                                                    x.id ? <Button
+                                                                                        variant="outline hover:bg-transparent"
+                                                                                        className={`p-1 border w-[30px] h-[30px] ${isSave ? "justify-center items-center" : ""}`}
+                                                                                        onClick={() => updateBoard(i)}
+                                                                                    >
+                                                                                        {isSave ? <Loader2 className="mr-1 h-4 w-4 animate-spin justify-center"/> : <Check size={16}/>}
+                                                                                    </Button> : <Button
+                                                                                        variant=""
+                                                                                        className="text-sm font-semibold h-[30px] w-[126px]"
+                                                                                        onClick={() => addBoard(x, i)}
+                                                                                    >
+                                                                                        {isSave ? <Loader2 className={"mr-2  h-4 w-4 animate-spin"}/> : "Add Board"}
+                                                                                    </Button>
+                                                                                }
 
-                                                                            <Button
-                                                                                variant="outline hover:bg-transparent"
-                                                                                className="p-1 border w-[30px] h-[30px]"
-                                                                                onClick={() =>  x.id ? onEditCancel() : onEdit(null)}
-                                                                            >
-                                                                                <X size={16}/>
-                                                                            </Button>
-                                                                        </Fragment>
+                                                                                <Button
+                                                                                    variant="outline hover:bg-transparent"
+                                                                                    className="p-1 border w-[30px] h-[30px]"
+                                                                                    onClick={() =>  x.id ? onEditCancel() : onEdit(null)}
+                                                                                >
+                                                                                    <X size={16}/>
+                                                                                </Button>
+                                                                            </Fragment>
+                                                                        </div>
                                                                     </TableCell>
                                                                 </Fragment>
                                                                  :
@@ -388,7 +390,7 @@ const Board = () => {
                 </CardContent>
             </Card>
         </Fragment>
-    )
+    );
 };
 
 export default Board;

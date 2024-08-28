@@ -227,7 +227,7 @@ const Emoji = () => {
                         <CardDescription className={"text-sm text-muted-foreground p-0 mt-1 leading-5"}>Use Emoji to organise your Changelog</CardDescription>
                     </div>
                     <div className={"m-0"}>
-                        <Button onClick={newEmoji} disabled={editIndex != null} className={"text-sm font-semibold"}><Plus size={16} className={"mr-1 text-[#f9fafb]"} /> New Emoji</Button>
+                        <Button onClick={newEmoji} disabled={editIndex != null} className={"flex gap-1 items-center text-sm font-semibold m-0"}><Plus strokeWidth={3} size={20}/> New Emoji</Button>
                     </div>
                 </CardHeader>
                 <CardContent className={"p-0"}>
@@ -278,32 +278,34 @@ const Emoji = () => {
                                                                          </PopoverContent>
                                                                      </Popover>
                                                                  </TableCell>
-                                                                <TableCell className={`flex justify-end gap-2 pr-4 ${theme === "dark" ? "" : "text-muted-foreground"} ${validationError ? "pt-[22px]" : ""}`}>
-                                                                    <Fragment>
-                                                                        {
-                                                                            x.id ? <Button
-                                                                                variant="outline hover:bg-transparent"
-                                                                                className={`p-1 border w-[30px] h-[30px] ${isSave ? "justify-center items-center" : ""}`}
-                                                                               onClick={() => handleSaveEmoji(i)}
-                                                                            >
-                                                                                {isSave ? <Loader2 className="mr-1 h-4 w-4 animate-spin justify-center"/> : <Check size={16}/>}
-                                                                            </Button> : <Button
-                                                                                variant=""
-                                                                                className="text-sm font-semibold h-[30px] w-[99px]"
-                                                                                onClick={()=>addEmoji(i)}
-                                                                            >
-                                                                                {isSave ? <Loader2 className={"mr-2  h-4 w-4 animate-spin"}/> : "Add emoji"}
-                                                                            </Button>
-                                                                        }
+                                                                <TableCell className={`pr-4 ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                                                    <div className={"flex justify-end items-center gap-2"}>
+                                                                        <Fragment>
+                                                                            {
+                                                                                x.id ? <Button
+                                                                                    variant="outline hover:bg-transparent"
+                                                                                    className={`p-1 border w-[30px] h-[30px] ${isSave ? "justify-center items-center" : ""}`}
+                                                                                   onClick={() => handleSaveEmoji(i)}
+                                                                                >
+                                                                                    {isSave ? <Loader2 className="mr-1 h-4 w-4 animate-spin justify-center"/> : <Check size={16}/>}
+                                                                                </Button> : <Button
+                                                                                    variant=""
+                                                                                    className="text-sm font-semibold h-[30px] w-[99px]"
+                                                                                    onClick={()=>addEmoji(i)}
+                                                                                >
+                                                                                    {isSave ? <Loader2 className={"mr-2  h-4 w-4 animate-spin"}/> : "Add emoji"}
+                                                                                </Button>
+                                                                            }
 
-                                                                        <Button
-                                                                            variant="outline hover:bg-transparent"
-                                                                            className="p-1 border w-[30px] h-[30px]"
-                                                                             onClick={() =>  x.id ? onEditCancel() : onEdit({})}
-                                                                        >
-                                                                            <X size={16}/>
-                                                                        </Button>
-                                                                    </Fragment>
+                                                                            <Button
+                                                                                variant="outline hover:bg-transparent"
+                                                                                className="p-1 border w-[30px] h-[30px]"
+                                                                                 onClick={() =>  x.id ? onEditCancel() : onEdit({})}
+                                                                            >
+                                                                                <X size={16}/>
+                                                                            </Button>
+                                                                        </Fragment>
+                                                                    </div>
                                                                 </TableCell>
                                                             </Fragment>
                                                             :
@@ -347,6 +349,6 @@ const Emoji = () => {
             </Card>
         </Fragment>
     )
-};
+}
 
 export default Emoji;

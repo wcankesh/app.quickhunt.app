@@ -257,10 +257,13 @@ const Categories = () => {
                         <CardDescription className={"text-sm text-muted-foreground p-0 mt-1 leading-5"}>Use Categories to organise your Changelog</CardDescription>
                     </div>
                     <div className={"m-0"}>
-                        <Button disabled={isEdit != null} onClick={addNewTopic} className={"text-sm font-semibold"}><Plus size={16} className={"mr-1 text-[#f9fafb]"} /> New Categories</Button>
+                        <Button disabled={isEdit != null} onClick={addNewTopic} className={"flex gap-1 items-center text-sm font-semibold m-0"}>
+                            <Plus size={20} strokeWidth={3}/>
+                            New Categories</Button>
                     </div>
                 </CardHeader>
                 <CardContent className={"p-0"}>
+                    <div className={"grid grid-cols-1 overflow-auto whitespace-nowrap"}>
                                     <Table>
                                         <TableHeader className={""}>
                                             <TableRow>
@@ -299,32 +302,34 @@ const Categories = () => {
                                                                                             </div>
                                                                                         </TableCell>
                                                                                         <TableCell/>
-                                                                                        <TableCell className={`flex justify-end gap-2 px-2 py-[10px] md:px-3 font-medium text-xs ${formError.name ? "pt-[22px]" : ""} ${theme === "dark" ? "" : "text-muted-foreground"}`}>
-                                                                                            <Fragment>
-                                                                                                {
-                                                                                                    x.id ? <Button
-                                                                                                        variant="outline hover:bg-transparent"
-                                                                                                        className={`p-1 border w-[30px] h-[30px] ${isSave ? "justify-center items-center" : ""}`}
-                                                                                                        onClick={() => handleSaveCategory(i)}
-                                                                                                    >
-                                                                                                        {isSave ? <Loader2 className="mr-1 h-4 w-4 animate-spin justify-center"/> : <Check size={16}/>}
-                                                                                                    </Button> : <Button
-                                                                                                        variant=""
-                                                                                                        className="text-sm font-semibold h-[30px] w-[126px]"
-                                                                                                        onClick={() => addCategory(x, i)}
-                                                                                                    >
-                                                                                                        {isSave ? <Loader2 className={"mr-2  h-4 w-4 animate-spin"}/> : "Add Category"}
-                                                                                                    </Button>
-                                                                                                }
+                                                                                        <TableCell className={`px-2 py-[10px] pt-[13px] md:px-3 font-medium text-xs ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                                                                            <div className={"flex justify-end items-center gap-2"}>
+                                                                                                <Fragment>
+                                                                                                    {
+                                                                                                        x.id ? <Button
+                                                                                                            variant="outline hover:bg-transparent"
+                                                                                                            className={`p-1 border w-[30px] h-[30px] ${isSave ? "justify-center items-center" : ""}`}
+                                                                                                            onClick={() => handleSaveCategory(i)}
+                                                                                                        >
+                                                                                                            {isSave ? <Loader2 className="mr-1 h-4 w-4 animate-spin justify-center"/> : <Check size={16}/>}
+                                                                                                        </Button> : <Button
+                                                                                                            variant=""
+                                                                                                            className="text-sm font-semibold h-[30px] w-[126px]"
+                                                                                                            onClick={() => addCategory(x, i)}
+                                                                                                        >
+                                                                                                            {isSave ? <Loader2 className={"mr-2  h-4 w-4 animate-spin"}/> : "Add Category"}
+                                                                                                        </Button>
+                                                                                                    }
 
-                                                                                                <Button
-                                                                                                    variant="outline hover:bg-transparent"
-                                                                                                    className="p-1 border w-[30px] h-[30px]"
-                                                                                                    onClick={() =>  x.id ? onEditCancel() : onEdit(null)}
-                                                                                                >
-                                                                                                    <X size={16}/>
-                                                                                                </Button>
-                                                                                            </Fragment>
+                                                                                                    <Button
+                                                                                                        variant="outline hover:bg-transparent"
+                                                                                                        className="p-1 border w-[30px] h-[30px]"
+                                                                                                        onClick={() =>  x.id ? onEditCancel() : onEdit(null)}
+                                                                                                    >
+                                                                                                        <X size={16}/>
+                                                                                                    </Button>
+                                                                                                </Fragment>
+                                                                                            </div>
                                                                                         </TableCell>
                                                                                     </Fragment>
                                                                                     :
@@ -333,11 +338,13 @@ const Categories = () => {
                                                                                             {x.name}
                                                                                         </TableCell>
                                                                                         <TableCell className={`px-2 py-[10px] md:px-3 font-medium text-xs leading-normal text-center ${theme === "dark" ? "" : "text-muted-foreground"}`}>{moment.utc(x.updated_at).local().startOf('seconds').fromNow()}</TableCell>
-                                                                                        <TableCell className={`px-2 py-[10px] md:px-3 flex justify-end ${theme === "dark" ? "" : "text-muted-foreground"}} `}>
-                                                                                            <div className="pr-0">
-                                                                                                <Button onClick={() => onEdit(i)} variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px] text-muted-foreground`}><Pencil size={16}/></Button>
+                                                                                        <TableCell className={`px-2 py-[10px] md:px-3  ${theme === "dark" ? "" : "text-muted-foreground"}} `}>
+                                                                                            <div className={"flex justify-end items-center"}>
+                                                                                                <div className="pr-0">
+                                                                                                    <Button onClick={() => onEdit(i)} variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px] text-muted-foreground`}><Pencil size={16}/></Button>
+                                                                                                </div>
+                                                                                                <div className="pl-2"><Button onClick={()=>deleteCategory(x.id)} variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px] text-muted-foreground`}><Trash2 size={16} /></Button></div>
                                                                                             </div>
-                                                                                            <div className="pl-2"><Button onClick={()=>deleteCategory(x.id)} variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px] text-muted-foreground`}><Trash2 size={16} /></Button></div>
                                                                                         </TableCell>
                                                                                     </Fragment>
                                                                             }
@@ -355,11 +362,11 @@ const Categories = () => {
                                                 }
                                             </TableBody>
                                     </Table>
-
+                    </div>
                 </CardContent>
             </Card>
         </Fragment>
-    )
-}
+    );
+};
 
 export default Categories;

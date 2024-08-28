@@ -426,4 +426,14 @@ export class ApiService{
     async updateBoard (payload, id){
         return await this.putData(`${baseUrlApi}/board/${id}`, payload)
     }
+    async getInAppMessage (id){
+        return await this.getData(`${baseUrlApi}/app-message?project_id=${id}`)
+    }
+    async createInAppMessage (payload){
+        return await this.postData(`${baseUrlApi}/app-message`,payload)
+    }
+    async deleteInAppMessage (id){
+        return await this.deleteData(`${baseUrlApi}/app-message/${id}`)
+    }
+
 }

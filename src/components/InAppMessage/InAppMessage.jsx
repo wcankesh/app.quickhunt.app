@@ -4,7 +4,7 @@ import {
     BookCheck, Calendar, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight,
     Circle,
     ClipboardList,
-    Ellipsis, Filter,
+    Ellipsis, Filter, Loader2,
     Plus,
     ScrollText,
     SquareMousePointer, User, Users, X
@@ -16,60 +16,23 @@ import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "../
 import {Card, CardFooter} from "../ui/card";
 import {useTheme} from "../theme-provider";
 import {Skeleton} from "../ui/skeleton";
-import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "../ui/select";
-import moment from "moment";
 import {Separator} from "../ui/separator";
 import {Checkbox} from "../ui/checkbox";
 import {Badge} from "../ui/badge";
 import {useNavigate} from "react-router-dom";
-import {baseUrl} from "../../utils/constent";
-import {DropdownMenu, DropdownMenuTrigger} from "@radix-ui/react-dropdown-menu";
-import {DropdownMenuContent, DropdownMenuItem} from "../ui/dropdown-menu";
+import { baseUrl} from "../../utils/constent";
 import {Dialog} from "@radix-ui/react-dialog";
 import {DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "../ui/dialog";
-
-const dummyTable = {
-    data: [{
-        title: "Untitled",
-        state: 1,
-        sender: "Testingapp",
-        content_type: 1,
-        seen: 0,
-        created_at: "2024-06-21T04:35:37.000000Z",
-        live_at: "",
-        avatar:"https://avatars.githubusercontent.com/u/124599?v=4&size=40",
-    },
-        {
-            title: "Untitled",
-            state: 2,
-            sender: "Testingapp",
-            content_type: 2,
-            seen: 0,
-            created_at: "2024-06-21T04:35:37.000000Z",
-            live_at: "",
-            avatar:"https://avatars.githubusercontent.com/u/124599?v=4&size=40",
-        },
-        {
-            title: "Untitled",
-            state: 3,
-            sender: "Testingapp",
-            content_type: 3,
-            seen: 0,
-            created_at: "2024-06-21T04:35:37.000000Z",
-            live_at: "",
-            avatar:"https://avatars.githubusercontent.com/u/124599?v=4&size=40",
-        },
-        {
-            title: "Untitled",
-            state: 4,
-            sender: "Testingapp",
-            content_type: 4,
-            seen: 0,
-            created_at: "2024-06-21T04:35:37.000000Z",
-            live_at: "",
-            avatar:"https://avatars.githubusercontent.com/u/124599?v=4&size=40",
-        }]
-};
+import {ApiService} from "../../utils/ApiService";
+import {useSelector} from "react-redux";
+import EmptyData from "../Comman/EmptyData";
+import {Select, SelectGroup, SelectValue} from "@radix-ui/react-select";
+import {SelectContent, SelectItem, SelectTrigger} from "../ui/select";
+import {Avatar, AvatarFallback, AvatarImage} from "../ui/avatar";
+import moment from "moment";
+import {DropdownMenu, DropdownMenuTrigger} from "@radix-ui/react-dropdown-menu";
+import {DropdownMenuContent, DropdownMenuItem} from "../ui/dropdown-menu";
+import {toast} from "../ui/use-toast";
 
 const perPageLimit = 10;
 
@@ -143,11 +106,37 @@ const InAppMessage = () => {
     const [totalRecord, setTotalRecord] = useState(0);
     const [open,setOpen]=useState(false);
     const [openFilter,setOpenFilter]=useState(false);
-    const [isSheetOpen, setSheetOpen] = useState(false);
     const [openFilterType, setOpenFilterType] = useState('');
     const [formData,setFormData]=useState(initialState);
-    const [openDelete, setOpenDelete] = useState(false);
+    const [deleteId,setDeleteId] = useState(null);
+    const [isLoadingDelete,setIsLoadingDelete] = useState(false);
     const navigate = useNavigate();
+    const apiService = new ApiService();
+    const projectDetail = useSelector(state => state.projectDetailsReducer);
+    const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
+    console.log(projectDetail);
+    console.log(allStatusAndTypes,"allStatusAndTypes")
+
+
+    useEffect(()=>{
+        if(projectDetail?.id){
+            getInAppMessageList();
+        }
+    },[projectDetail?.id])
+
+    const getInAppMessageList = async () => {
+        setIsLoading(true);
+        const data = await  apiService.getInAppMessage(69);
+        if(data.status === 200) {
+            setIsLoading(false);
+            setMessageList(data.data);
+            setIsLoading(false);
+        }
+        else{
+            setIsLoading(false);
+        }
+
+    }
 
     const filterPosts = (event) => {
         setFormData({...formData,[event.name]:event.value})
@@ -161,10 +150,6 @@ const InAppMessage = () => {
         }
     };
 
-    useEffect(()=>{
-        setMessageList(dummyTable.data);
-    },[]);
-
     const handleStatusChange = () =>{
 
     }
@@ -173,45 +158,72 @@ const InAppMessage = () => {
         setFormData({...formData,[name]:""});
     }
 
+    const handleCreateNew = (id) => {
+        if(id == "new"){
+            navigate(`${baseUrl}/in-app-message/${id}`);
+        }
+        else{
+            navigate(`${baseUrl}/in-app-message/${id}`);
+        }
+    }
+
+    const onDelete = async () => {
+        setIsLoadingDelete(true);
+        const clone = [...messageList];
+        const deleteIndex = clone.findIndex((x)=> x.id === deleteId);
+        const data = await apiService.deleteInAppMessage(deleteId);
+        if (data.status === 200) {
+            setDeleteId(null);
+            clone.splice(deleteIndex,1);
+            setMessageList(clone);
+            setIsLoadingDelete(false);
+            toast({
+                description:data.message
+            })
+        } else {
+            setIsLoadingDelete(false);
+            toast({
+                description:data.message
+            })
+        }
+    }
+
     return (
         <Fragment>
             {
-                openDelete &&
+                deleteId &&
                 <Fragment>
-                    <Dialog open onOpenChange={""}>
+                    <Dialog open onOpenChange={()=> setDeleteId(null)}>
                         <DialogContent className="max-w-[350px] w-full sm:max-w-[525px] p-3 md:p-6 rounded-lg">
                             <DialogHeader className={"flex flex-row justify-between gap-2"}>
                                 <div className={"flex flex-col gap-2"}>
-                                    <DialogTitle>You really want delete this announcement?</DialogTitle>
-                                    <DialogDescription>This action can't be undone.</DialogDescription>
+                                    <DialogTitle className={"text-start"}>You really want delete this label?</DialogTitle>
+                                    <DialogDescription className={"text-start"}>This action can't be undone.</DialogDescription>
                                 </div>
-                                <X size={16} className={"m-0 cursor-pointer"}/>
+                                <X size={16} className={"m-0 cursor-pointer"} onClick={() => setDeleteId(null)}/>
                             </DialogHeader>
                             <DialogFooter className={"flex-row justify-end space-x-2"}>
                                 <Button variant={"outline hover:none"}
                                         className={"text-sm font-semibold border"}
-                                        onClick={() => setOpenDelete(false)}>Cancel
-                                    </Button>
+                                        onClick={() => setDeleteId(null)}>Cancel</Button>
                                 <Button
                                     variant={"hover:bg-destructive"}
-                                    className={` ${theme === "dark" ? "text-card-foreground" : "text-card"} ${isLoading === true ? "py-2 px-6" : "py-2 px-6"} w-[76px] text-sm font-semibold bg-destructive`}
-                                    // onClick={deleteParticularRow}
+                                    className={` ${theme === "dark" ? "text-card-foreground" : "text-card"} ${isLoadingDelete === true ? "py-2 px-6" : "py-2 px-6"} w-[76px] text-sm font-semibold bg-destructive`}
+                                    onClick={onDelete}
                                 >
-                                    {isLoading ? <Loader2 size={16} className={"animate-spin"}/> : "Delete"}
+                                    {isLoadingDelete ? <Loader2 size={16} className={"animate-spin"}/> : "Delete"}
                                 </Button>
                             </DialogFooter>
                         </DialogContent>
                     </Dialog>
                 </Fragment>
             }
+
             <div className={"pt-8 container xl:max-w-[1574px]  lg:max-w-[992px]  md:max-w-[768px] sm:max-w-[639px] px-4"}>
                <div className={""}>
                     <div className={"flex justify-between items-center"}>
                         <h4 className={"font-medium text-lg sm:text-2xl leading-8"}>In App Messages</h4>
-                        <Button onClick={()=> {
-                            setSheetOpen(true);
-                            navigate(`${baseUrl}/in-app-message/new`);
-                        }} className={"hover:bg-violet-600"}> <Plus className={"mr-4"} />New Content</Button>
+                        <Button onClick={()=>handleCreateNew("new")} className={"hover:bg-violet-600"}> <Plus className={"mr-4"} />New Content</Button>
                     </div>
                    <div className={"flex justify-between pt-7"}>
                         <div className={"flex gap-4"}>
@@ -322,33 +334,35 @@ const InAppMessage = () => {
                                         }
                                     </TableRow>
                                 </TableHeader>
+                                <TableBody>
                                     {
-                                        isLoading ? <TableBody>
-                                                {
-                                                    [...Array(10)].map((_, index) => {
-                                                        return (
-                                                            <TableRow key={index}>
-                                                                {
-                                                                    [...Array(8)].map((_, i) => {
-                                                                        return (
-                                                                            <TableCell key={i} className={"px-2"}>
-                                                                                <Skeleton className={"rounded-md  w-full h-[24px]"}/>
-                                                                            </TableCell>
-                                                                        )
-                                                                    })
-                                                                }
-                                                            </TableRow>
-                                                        )
-                                                    })
-                                                }
-                                            </TableBody>
+                                        isLoading ? (
+                                            [...Array(10)].map((x,index)=>{
+                                                return(
+                                                    <TableRow key={index}>
+                                                        {
+                                                            [...Array(7)].map((_, i) => {
+                                                                return (
+                                                                    <TableCell key={i} className={"max-w-[373px] px-2 py-[10px] md:px-3"}>
+                                                                        <Skeleton className={"rounded-md  w-full h-7"}/>
+                                                                    </TableCell>
+                                                                )
+                                                            })
+                                                        }
+                                                    </TableRow>
+                                                )
+                                            })
+                                        )
                                         :
-                                        <TableBody>
+                                        messageList.length >  0 ?
+                                        <Fragment>
                                             {
-                                                (messageList || []).map((x,i)=>{
+                                                messageList.map((x,i)=>{
+                                                    const sender = allStatusAndTypes?.members.find((y)=> y.id == x.from);
+                                                    console.log(sender,"sender")
                                                     return(
-                                                        <TableRow key={i}>
-                                                            <TableCell className={`px-2 py-[10px] md:px-3 font-medium ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.title}</TableCell>
+                                                        <TableRow key={x.id}>
+                                                            <TableCell className={"px-2 py-[10px] md:px-3 font-medium"}>{x.title}</TableCell>
                                                             <TableCell className={"px-2 py-[10px] md:px-3"}>
                                                                 <Select value={x.state}
                                                                         onValueChange={(value) => handleStatusChange(x, value)}>
@@ -378,28 +392,38 @@ const InAppMessage = () => {
                                                                     </SelectContent>
                                                                 </Select>
                                                             </TableCell>
-                                                            <TableCell className={`flex items-center mt-1 px-2 py-[10px] md:px-3`}>
-                                                                <img className={"h-5 w-5 rounded-full mr-2"} src={x?.avatar} alt={"not_found"}/>
-                                                                <p className={`font-medium ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.sender ? x.sender : "-"}</p>
+                                                            <TableCell className={`flex items-center mt-1 px-2 py-[10px] md:px-3 flex gap-2`}>
+                                                                <Avatar className={"w-[20px] h-[20px] "}>
+                                                                    {
+                                                                        sender?.user_photo ? <AvatarImage src={sender?.user_photo} alt="@shadcn"/>
+                                                                            :
+                                                                        <AvatarFallback>{sender && sender.user_first_name && sender.user_first_name.substring(0, 1)}</AvatarFallback>
+                                                                    }
+                                                                </Avatar>
+                                                                <p className={"font-medium"}>{sender && sender?.user_first_name}</p>
                                                             </TableCell>
-                                                            <TableCell className={`px-2 py-[10px] md:px-3 font-medium ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                                            <TableCell className={`px-2 py-[10px] md:px-3 font-medium`}>
                                                                 {
-                                                                    x.content_type === 1 ? <div className={"flex items-center gap-1"}><ScrollText  size={16}/>Post</div> : x.content_type === 2 ? <div className={"flex items-center gap-1"}><ClipboardList  size={16}/>Survey</div> : x.content_type === 3 ? <div className={"flex items-center gap-1"}><BookCheck size={16}/>Checklist</div> : x.content_type === 4 ? <div className={"flex items-center gap-1"}><SquareMousePointer size={16}/>Banners</div> : ""
+                                                                    x.type === 1 ? <div className={"flex items-center gap-1"}><ScrollText  size={16}/>Post</div> : x.type === 2 ? <div className={"flex items-center gap-1"}><ClipboardList  size={16}/>Survey</div> : x.type === 3 ? <div className={"flex items-center gap-1"}><BookCheck size={16}/>Checklist</div> : x.type === 4 ? <div className={"flex items-center gap-1"}><SquareMousePointer size={16}/>Banners</div> : ""
                                                                 }
                                                             </TableCell>
-                                                            <TableCell className={`px-2 py-[10px] md:px-3 font-medium ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.seen}</TableCell>
-                                                            <TableCell className={`px-2 py-[10px] md:px-3 font-medium ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                                            <TableCell className={"px-2 py-[10px] md:px-3"}>
+                                                                {x.seen ? x.seen : "-"}
+                                                            </TableCell>
+                                                            <TableCell className={`px-2 py-[10px] md:px-3 font-medium`}>
                                                                 {x?.created_at ? moment.utc(x.created_at).local().startOf('seconds').fromNow() : "-"}
                                                             </TableCell>
-                                                            <TableCell className={`px-2 py-[10px] md:px-3 font-medium ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.live_at ? x.live_at : "-"}</TableCell>
-                                                            <TableCell className={`px-2 py-[10px] md:px-3 font-medium ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                                            <TableCell className={"px-2 py-[10px] md:px-3"}>
+                                                                {x?.live_at ? x?.live_at : "-"}
+                                                            </TableCell>
+                                                            <TableCell className={`px-2 py-[10px] md:px-3 font-medium flex justify-center`}>
                                                                 <DropdownMenu>
                                                                     <DropdownMenuTrigger>
                                                                         <Ellipsis className={`font-medium`} size={18}/>
                                                                     </DropdownMenuTrigger>
                                                                     <DropdownMenuContent align={"end"}>
-                                                                        <DropdownMenuItem>Edit</DropdownMenuItem>
-                                                                        <DropdownMenuItem>Delete</DropdownMenuItem>
+                                                                        <DropdownMenuItem onClick={()=>handleCreateNew(x.id)}>Edit</DropdownMenuItem>
+                                                                        <DropdownMenuItem onClick={()=>setDeleteId(x.id)}>Delete</DropdownMenuItem>
                                                                     </DropdownMenuContent>
                                                                 </DropdownMenu>
                                                             </TableCell>
@@ -407,8 +431,105 @@ const InAppMessage = () => {
                                                     )
                                                 })
                                             }
-                                        </TableBody>
+                                        </Fragment>
+                                        :
+                                        <TableRow>
+                                            <TableCell colSpan={7}>
+                                                <EmptyData/>
+                                            </TableCell>
+                                        </TableRow>
                                     }
+                                </TableBody>
+
+
+
+                               {/*{*/}
+                                    {/*    isLoading ? <TableBody>*/}
+                                    {/*            {*/}
+                                    {/*                [...Array(10)].map((_, index) => {*/}
+                                    {/*                    return (*/}
+                                    {/*                        <TableRow key={index}>*/}
+                                    {/*                            {*/}
+                                    {/*                                [...Array(8)].map((_, i) => {*/}
+                                    {/*                                    return (*/}
+                                    {/*                                        <TableCell key={i} className={"px-2"}>*/}
+                                    {/*                                            <Skeleton className={"rounded-md  w-full h-[24px]"}/>*/}
+                                    {/*                                        </TableCell>*/}
+                                    {/*                                    )*/}
+                                    {/*                                })*/}
+                                    {/*                            }*/}
+                                    {/*                        </TableRow>*/}
+                                    {/*                    )*/}
+                                    {/*                })*/}
+                                    {/*            }*/}
+                                    {/*        </TableBody>*/}
+                                    {/*    :*/}
+                                    {/*    <TableBody>*/}
+                                    {/*        {*/}
+                                    {/*            (messageList || []).map((x,i)=>{*/}
+                                    {/*                return(*/}
+                                    {/*                    <TableRow key={i}>*/}
+                                    {/*                        <TableCell className={`px-2 py-[10px] md:px-3 font-medium ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.title}</TableCell>*/}
+                                    {/*                        <TableCell className={"px-2 py-[10px] md:px-3"}>*/}
+                                    {/*                            <Select value={x.state}*/}
+                                    {/*                                    onValueChange={(value) => handleStatusChange(x, value)}>*/}
+                                    {/*                                <SelectTrigger className="w-[135px] h-7">*/}
+                                    {/*                                    <SelectValue placeholder="Publish"/>*/}
+                                    {/*                                </SelectTrigger>*/}
+                                    {/*                                <SelectContent>*/}
+                                    {/*                                    <SelectGroup>*/}
+                                    {/*                                        {*/}
+                                    {/*                                            (   status || []).map((x, i) => {*/}
+                                    {/*                                                return (*/}
+                                    {/*                                                    <Fragment key={i}>*/}
+                                    {/*                                                        <SelectItem value={x.value}>*/}
+                                    {/*                                                            <div*/}
+                                    {/*                                                                className={"flex items-center gap-2"}>*/}
+                                    {/*                                                                {x.fillColor && <Circle fill={x.fillColor}*/}
+                                    {/*                                                                         stroke={x.strokeColor}*/}
+                                    {/*                                                                         className={`${theme === "dark" ? "" : "text-muted-foreground"} w-2 h-2`}/>}*/}
+                                    {/*                                                                {x.name}*/}
+                                    {/*                                                            </div>*/}
+                                    {/*                                                        </SelectItem>*/}
+                                    {/*                                                    </Fragment>*/}
+                                    {/*                                                )*/}
+                                    {/*                                            })*/}
+                                    {/*                                        }*/}
+                                    {/*                                    </SelectGroup>*/}
+                                    {/*                                </SelectContent>*/}
+                                    {/*                            </Select>*/}
+                                    {/*                        </TableCell>*/}
+                                    {/*                        <TableCell className={`flex items-center mt-1 px-2 py-[10px] md:px-3`}>*/}
+                                    {/*                            <img className={"h-5 w-5 rounded-full mr-2"} src={x?.avatar} alt={"not_found"}/>*/}
+                                    {/*                            <p className={`font-medium ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.sender ? x.sender : "-"}</p>*/}
+                                    {/*                        </TableCell>*/}
+                                    {/*                        <TableCell className={`px-2 py-[10px] md:px-3 font-medium ${theme === "dark" ? "" : "text-muted-foreground"}`}>*/}
+                                    {/*                            {*/}
+                                    {/*                                x.content_type === 1 ? <div className={"flex items-center gap-1"}><ScrollText  size={16}/>Post</div> : x.content_type === 2 ? <div className={"flex items-center gap-1"}><ClipboardList  size={16}/>Survey</div> : x.content_type === 3 ? <div className={"flex items-center gap-1"}><BookCheck size={16}/>Checklist</div> : x.content_type === 4 ? <div className={"flex items-center gap-1"}><SquareMousePointer size={16}/>Banners</div> : ""*/}
+                                    {/*                            }*/}
+                                    {/*                        </TableCell>*/}
+                                    {/*                        <TableCell className={`px-2 py-[10px] md:px-3 font-medium ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.seen}</TableCell>*/}
+                                    {/*                        <TableCell className={`px-2 py-[10px] md:px-3 font-medium ${theme === "dark" ? "" : "text-muted-foreground"}`}>*/}
+                                    {/*                            {x?.created_at ? moment.utc(x.created_at).local().startOf('seconds').fromNow() : "-"}*/}
+                                    {/*                        </TableCell>*/}
+                                    {/*                        <TableCell className={`px-2 py-[10px] md:px-3 font-medium ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.live_at ? x.live_at : "-"}</TableCell>*/}
+                                    {/*                        <TableCell className={`px-2 py-[10px] md:px-3 font-medium ${theme === "dark" ? "" : "text-muted-foreground"}`}>*/}
+                                    {/*                            <DropdownMenu>*/}
+                                    {/*                                <DropdownMenuTrigger>*/}
+                                    {/*                                    <Ellipsis className={`font-medium`} size={18}/>*/}
+                                    {/*                                </DropdownMenuTrigger>*/}
+                                    {/*                                <DropdownMenuContent align={"end"}>*/}
+                                    {/*                                    <DropdownMenuItem onClick={()=>handleCreateNew(x.id)}>Edit</DropdownMenuItem>*/}
+                                    {/*                                    <DropdownMenuItem>Delete</DropdownMenuItem>*/}
+                                    {/*                                </DropdownMenuContent>*/}
+                                    {/*                            </DropdownMenu>*/}
+                                    {/*                        </TableCell>*/}
+                                    {/*                    </TableRow>*/}
+                                    {/*                )*/}
+                                    {/*            })*/}
+                                    {/*        }*/}
+                                    {/*    </TableBody>*/}
+                                    {/*}*/}
                            </Table>
                        </div>
                            <Separator/>

@@ -253,7 +253,7 @@ const Tags = () => {
                         <CardDescription className={"text-sm text-muted-foreground p-0 mt-1 leading-5"}>Add Tags so that users can tag them when creating Ideas.</CardDescription>
                     </div>
                     <div className={"m-0"}>
-                        <Button onClick={handleNewTopics} disabled={isEdit != null} className={"text-sm font-semibold"}><Plus size={16} className={"mr-1 text-[#f9fafb]"} />New Tag</Button>
+                        <Button onClick={handleNewTopics} disabled={isEdit != null} className={"flex gap-1 items-center text-sm font-semibold m-0"}><Plus size={20} strokeWidth={3}/>New Tag</Button>
                     </div>
                 </CardHeader>
                 <CardContent className={"p-0"}>
@@ -297,32 +297,34 @@ const Tags = () => {
                                                                             </div>
                                                                         </TableCell>
                                                                         <TableCell/>
-                                                                        <TableCell className={`flex justify-end gap-2 px-2 py-[10px] md:px-3 font-medium text-xs ${formError.title ? "pt-[22px]" : ""} ${theme === "dark" ? "" : "text-muted-foreground"}`}>
-                                                                            <Fragment>
-                                                                                {
-                                                                                    x.id ? <Button
-                                                                                        variant="outline hover:bg-transparent"
-                                                                                        className={`p-1 border w-[30px] h-[30px] ${isSave ? "justify-center items-center" : ""}`}
-                                                                                        onClick={() => handleSaveTopic(i)}
-                                                                                    >
-                                                                                        {isSave ? <Loader2 className="mr-1 h-4 w-4 animate-spin justify-center"/> : <Check size={16}/>}
-                                                                                    </Button> : <Button
-                                                                                        variant=""
-                                                                                        className="text-sm font-semibold h-[30px] w-[89px]"
-                                                                                        onClick={() => addTag(x, i)}
-                                                                                    >
-                                                                                        {isSave ? <Loader2 className={"mr-2  h-4 w-4 animate-spin"}/> : "Add Tag"}
-                                                                                    </Button>
-                                                                                }
+                                                                        <TableCell className={`px-2 py-[10px] md:px-3 font-medium text-xs ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                                                            <div className={"flex justify-end gap-2 items-center"}>
+                                                                                <Fragment>
+                                                                                    {
+                                                                                        x.id ? <Button
+                                                                                            variant="outline hover:bg-transparent"
+                                                                                            className={`p-1 border w-[30px] h-[30px] ${isSave ? "justify-center items-center" : ""}`}
+                                                                                            onClick={() => handleSaveTopic(i)}
+                                                                                        >
+                                                                                            {isSave ? <Loader2 className="mr-1 h-4 w-4 animate-spin justify-center"/> : <Check size={16}/>}
+                                                                                        </Button> : <Button
+                                                                                            variant=""
+                                                                                            className="text-sm font-semibold h-[30px] w-[89px]"
+                                                                                            onClick={() => addTag(x, i)}
+                                                                                        >
+                                                                                            {isSave ? <Loader2 className={"mr-2  h-4 w-4 animate-spin"}/> : "Add Tag"}
+                                                                                        </Button>
+                                                                                    }
 
-                                                                                <Button
-                                                                                    variant="outline hover:bg-transparent"
-                                                                                    className="p-1 border w-[30px] h-[30px]"
-                                                                                    onClick={() =>  x.id ? onEditCancel() : onEdit(null)}
-                                                                                >
-                                                                                    <X size={16}/>
-                                                                                </Button>
-                                                                            </Fragment>
+                                                                                    <Button
+                                                                                        variant="outline hover:bg-transparent"
+                                                                                        className="p-1 border w-[30px] h-[30px]"
+                                                                                        onClick={() =>  x.id ? onEditCancel() : onEdit(null)}
+                                                                                    >
+                                                                                        <X size={16}/>
+                                                                                    </Button>
+                                                                                </Fragment>
+                                                                            </div>
                                                                         </TableCell>
                                                                     </Fragment>
                                                                     :
@@ -366,7 +368,7 @@ const Tags = () => {
                 </CardContent>
             </Card>
         </Fragment>
-    );
-};
+    )
+}
 
 export default Tags;
