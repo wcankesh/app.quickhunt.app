@@ -1,7 +1,17 @@
 import React, {Fragment, useEffect, useState} from 'react';
 import {Button} from "../ui/button";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow,} from "../ui/table";
-import {BarChart, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Copy, Ellipsis, Loader2, X} from "lucide-react";
+import {
+    BarChart,
+    ChevronLeft,
+    ChevronRight,
+    ChevronsLeft,
+    ChevronsRight,
+    Copy,
+    Ellipsis,
+    Loader2,
+    X
+} from "lucide-react";
 import {useTheme} from "../theme-provider";
 import {useSelector} from "react-redux";
 import {Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "../ui/dialog";
@@ -60,12 +70,12 @@ const Widgets = () => {
     const getWidgetsSetting = async () => {
         setIsLoading(true)
         const payload = {
-            project_id : projectDetailsReducer.id,
+            project_id: projectDetailsReducer.id,
             page: pageNo,
             limit: perPageLimit
         }
         const data = await apiSerVice.getWidgetsSetting(payload)
-        if(data.status === 200){
+        if (data.status === 200) {
             setWidgetsSetting(data.data);
             setTotalRecord(data.total);
             setIsLoading(false);
@@ -76,14 +86,14 @@ const Widgets = () => {
 
     const handleCreateNew = (id) => {
         let length = widgetsSetting?.length;
-        if(userDetailsReducer.plan === 0 && id === "new"){
-            if(length < 1){
+        if (userDetailsReducer.plan === 0 && id === "new") {
+            if (length < 1) {
                 navigate(`${baseUrl}/widget/${id}`);
                 onProModal(false)
-            }  else{
+            } else {
                 onProModal(true)
             }
-        } else{
+        } else {
             navigate(`${baseUrl}/widget/${id}`);
             onProModal(false)
         }
@@ -103,8 +113,8 @@ const Widgets = () => {
                 setDeleteIsLoading(false);
                 toast({description: data.message});
             } else {
-                    toast({variant: "destructive", description: data.message});
-                }
+                toast({variant: "destructive", description: data.message});
+            }
         }
     };
 
@@ -159,7 +169,8 @@ const Widgets = () => {
                             <DialogHeader className={"flex flex-row justify-between gap-2"}>
                                 <div className={"flex flex-col gap-2"}>
                                     <DialogTitle className={"text-left"}>Delete widget?</DialogTitle>
-                                    <DialogDescription className={"text-left"}>Are you sure? This cannot be undone.</DialogDescription>
+                                    <DialogDescription className={"text-left"}>Are you sure? This cannot be
+                                        undone.</DialogDescription>
                                 </div>
                                 <X size={16} className={"m-0 cursor-pointer"} onClick={() => setOpenDelete(false)}/>
                             </DialogHeader>
@@ -186,26 +197,30 @@ const Widgets = () => {
                         <DialogContent className="max-w-[350px] w-full sm:max-w-[580px] bg-white rounded-lg p-3 md:p-6">
                             <DialogHeader className={"flex flex-row justify-between gap-2"}>
                                 <div className={"flex flex-col gap-2"}>
-                                    <DialogTitle className={`text-left ${theme === "dark" ? "text-card" : ""}`}>Embed Widget</DialogTitle>
-                                    <DialogDescription className={"text-left"}>Choose how you would like to embed your widget.</DialogDescription>
+                                    <DialogTitle className={`text-left ${theme === "dark" ? "text-card" : ""}`}>Embed
+                                        Widget</DialogTitle>
+                                    <DialogDescription className={"text-left"}>Choose how you would like to embed your
+                                        widget.</DialogDescription>
                                 </div>
-                                <X size={16} className={`${theme === "dark" ? "text-card" : ""} m-0 cursor-pointer`} onClick={() => getCodeCopy("")}/>
+                                <X size={16} className={`${theme === "dark" ? "text-card" : ""} m-0 cursor-pointer`}
+                                   onClick={() => getCodeCopy("")}/>
                             </DialogHeader>
-                            <Tabs defaultValue="script">
-                                <TabsList className="grid grid-cols-4 w-full bg-white">
+                            <Tabs defaultValue="script" className={""}>
+                                <TabsList className="grid grid-cols-4 w-full bg-white mb-2 h-auto sm:h-10">
                                     <TabsTrigger value="script">Script</TabsTrigger>
-                                    <TabsTrigger value="embedlink">Embed Link</TabsTrigger>
+                                    <TabsTrigger className={"whitespace-normal sm:whitespace-nowrap"} value="embedlink">Embed Link</TabsTrigger>
                                     <TabsTrigger value="iframe">iFrame</TabsTrigger>
-                                    <TabsTrigger value="callback">Callback function</TabsTrigger>
+                                    <TabsTrigger className={"whitespace-normal sm:whitespace-nowrap"} value="callback">Callback function</TabsTrigger>
                                 </TabsList>
-                                <TabsContent value="script" className={"flex flex-col gap-2"}>
+                                <TabsContent value="script" className={"flex flex-col gap-2 m-0"}>
                                     <h4 className={`${theme === "dark" ? "text-muted-foreground" : "text-muted-foreground"} text-sm`}>
                                         Place the code below before the closing body tag on your site.
                                     </h4>
                                     <div>
                                         <div className={"relative px-6 rounded-md bg-black mb-2"}>
                                             <div className={"relative"}>
-                                                <pre id="text"  className={"py-4 whitespace-pre overflow-x-auto scrollbars-none text-[10px] text-text-invert text-white max-w-[230px] w-full md:max-w-[450px]"}>
+                                                <pre id="text"
+                                                     className={"py-4 whitespace-pre overflow-x-auto scrollbars-none text-[10px] text-text-invert text-white max-w-[230px] w-full md:max-w-[450px]"}>
                                                       {codeString}
                                                   </pre>
 
@@ -214,14 +229,18 @@ const Widgets = () => {
                                                     className={`${isCopyLoading === true ? "absolute top-0 right-0 px-0" : "absolute top-0 right-0 px-0"}`}
                                                     onClick={() => handleCopyCode(codeString)}
                                                 >
-                                                    {isCopyLoading ? <Loader2 size={16} className={"animate-spin"} color={"white"}/> : <Copy size={16} color={"white"}/>}
+                                                    {isCopyLoading ? <Loader2 size={16} className={"animate-spin"}
+                                                                              color={"white"}/> :
+                                                        <Copy size={16} color={"white"}/>}
                                                 </Button>
 
                                             </div>
                                         </div>
 
-                                        <p className={`${theme === "dark" ? "text-muted-foreground" : "text-muted-foreground"} text-xs`}>Read the {" "}
-                                            <Button variant={"ghost hover:none"} className={"p-0 h-auto text-xs text-primary font-semibold"}>
+                                        <p className={`${theme === "dark" ? "text-muted-foreground" : "text-muted-foreground"} text-xs`}>Read
+                                            the {" "}
+                                            <Button variant={"ghost hover:none"}
+                                                    className={"p-0 h-auto text-xs text-primary font-semibold"}>
                                                 Setup Guide
                                             </Button>
                                             {" "}for more information or {" "}
@@ -234,9 +253,10 @@ const Widgets = () => {
                                         </p>
                                     </div>
                                 </TabsContent>
-                                <TabsContent value="embedlink" className={"space-y-2"}>
+                                <TabsContent value="embedlink" className={"space-y-2 m-0"}>
                                     <div className={"space-y-2"}>
-                                        <div className={`${theme === "dark" ? "text-muted-foreground" : "text-muted-foreground"} text-sm`}>
+                                        <div
+                                            className={`${theme === "dark" ? "text-muted-foreground" : "text-muted-foreground"} text-sm`}>
                                             Follow these simple steps to embed the widget on any {" "}
                                             <Button
                                                 variant={"ghost hover:none"}
@@ -246,15 +266,19 @@ const Widgets = () => {
                                             </Button>
                                         </div>
                                         <div>
-                                            <p className={`text-xs ${theme === "dark" ? "text-muted-foreground" : "text-muted-foreground"} pb-1`}>1. Copy the link below</p>
-                                            <p className={`text-xs ${theme === "dark" ? "text-muted-foreground" : "text-muted-foreground"} pb-1`}>2. Paste the link on any site where you want the widget to show.</p>
-                                            <p className={`text-xs ${theme === "dark" ? "text-muted-foreground" : "text-muted-foreground"} pb-1`}>3. That's it!</p>
+                                            <p className={`text-xs ${theme === "dark" ? "text-muted-foreground" : "text-muted-foreground"} pb-1`}>1.
+                                                Copy the link below</p>
+                                            <p className={`text-xs ${theme === "dark" ? "text-muted-foreground" : "text-muted-foreground"} pb-1`}>2.
+                                                Paste the link on any site where you want the widget to show.</p>
+                                            <p className={`text-xs ${theme === "dark" ? "text-muted-foreground" : "text-muted-foreground"} pb-1`}>3.
+                                                That's it!</p>
                                         </div>
                                     </div>
                                     <div>
                                         <div className={"relative px-6 rounded-md bg-black mb-2"}>
                                             <div className={"relative"}>
-                                                <pre id="text" className={"py-4 whitespace-pre overflow-x-auto scrollbars-none text-[10px] text-text-invert text-white max-w-[230px] w-full md:max-w-[450px]"}>
+                                                <pre id="text"
+                                                     className={"py-4 whitespace-pre overflow-x-auto scrollbars-none text-[10px] text-text-invert text-white max-w-[230px] w-full md:max-w-[450px]"}>
                                                     {embedLink}
                                                   </pre>
 
@@ -263,12 +287,15 @@ const Widgets = () => {
                                                     className={`${isCopyLoading === true ? "absolute top-0 right-0 px-0" : "absolute top-0 right-0 px-0"}`}
                                                     onClick={() => handleCopyCode(embedLink)}
                                                 >
-                                                    {isCopyLoading ? <Loader2 size={16} className={"animate-spin"} color={"white"}/> : <Copy size={16} color={"white"}/>}
+                                                    {isCopyLoading ? <Loader2 size={16} className={"animate-spin"}
+                                                                              color={"white"}/> :
+                                                        <Copy size={16} color={"white"}/>}
                                                 </Button>
 
                                             </div>
                                         </div>
-                                        <p className={`text-xs ${theme === "dark" ? "text-muted-foreground" : "text-muted-foreground"}`}>Read the {" "}
+                                        <p className={`text-xs ${theme === "dark" ? "text-muted-foreground" : "text-muted-foreground"}`}>Read
+                                            the {" "}
                                             <Button
                                                 variant={"ghost hover:none"}
                                                 className={"p-0 h-auto text-xs text-primary font-semibold"}
@@ -279,14 +306,16 @@ const Widgets = () => {
                                         </p>
                                     </div>
                                 </TabsContent>
-                                <TabsContent value="iframe"  className={"flex flex-col gap-2"}>
-                                    <div className={`${theme === "dark" ? "text-muted-foreground" : "text-muted-foreground"} text-sm`}>
+                                <TabsContent value="iframe" className={"flex flex-col gap-2 m-0"}>
+                                    <div
+                                        className={`${theme === "dark" ? "text-muted-foreground" : "text-muted-foreground"} text-sm`}>
                                         Place the code below before the closing body tag on your site.
                                     </div>
                                     <div>
                                         <div className={"relative px-6 rounded-md bg-black"}>
                                             <div className={"relative"}>
-                                                <pre id="text"  className={"py-4 whitespace-pre overflow-x-auto scrollbars-none text-[10px] text-text-invert text-white max-w-[230px] w-full md:max-w-[450px]"}>
+                                                <pre id="text"
+                                                     className={"py-4 whitespace-pre overflow-x-auto scrollbars-none text-[10px] text-text-invert text-white max-w-[230px] w-full md:max-w-[450px]"}>
                                                       {iFrame}
                                                   </pre>
 
@@ -295,13 +324,16 @@ const Widgets = () => {
                                                     className={`${isCopyLoading === true ? "absolute top-0 right-0 px-0" : "absolute top-0 right-0 px-0"}`}
                                                     onClick={() => handleCopyCode(iFrame)}
                                                 >
-                                                    {isCopyLoading ? <Loader2 size={16} className={"animate-spin"} color={"white"}/> : <Copy size={16} color={"white"}/>}
+                                                    {isCopyLoading ? <Loader2 size={16} className={"animate-spin"}
+                                                                              color={"white"}/> :
+                                                        <Copy size={16} color={"white"}/>}
                                                 </Button>
 
                                             </div>
                                         </div>
                                     </div>
-                                    <p className={`text-xs ${theme === "dark" ? "text-muted-foreground" : "text-muted-foreground"}`}>Read the {" "}
+                                    <p className={`text-xs ${theme === "dark" ? "text-muted-foreground" : "text-muted-foreground"}`}>Read
+                                        the {" "}
                                         <Button
                                             variant={"ghost hover:none"}
                                             className={"p-0 h-auto text-xs text-primary font-semibold"}
@@ -310,16 +342,16 @@ const Widgets = () => {
                                         </Button>
                                         for more information.
                                     </p>
-
                                 </TabsContent>
-                                <TabsContent value="callback"  className={"flex flex-col gap-2"}>
+                                <TabsContent value="callback" className={"flex flex-col gap-2 m-0"}>
                                     <h4 className={`${theme === "dark" ? "text-muted-foreground" : "text-muted-foreground"} text-sm`}>
                                         Place the code below before the closing body tag on your site.
                                     </h4>
                                     <div>
                                         <div className={"relative px-6 rounded-md bg-black mb-2"}>
                                             <div className={"relative"}>
-                                                <pre id="text"  className={"py-4 whitespace-pre overflow-x-auto scrollbars-none text-[10px] text-text-invert text-white max-w-[230px] w-full md:max-w-[450px]"}>
+                                                <pre id="text"
+                                                     className={"py-4 whitespace-pre overflow-x-auto scrollbars-none text-[10px] text-text-invert text-white max-w-[230px] w-full md:max-w-[450px]"}>
                                                       {callback}
                                                   </pre>
                                                 <Button
@@ -327,14 +359,18 @@ const Widgets = () => {
                                                     className={`absolute top-0 right-0 px-0`}
                                                     onClick={() => handleCopyCode(callback)}
                                                 >
-                                                    {isCopyLoading ? <Loader2 size={16} className={"animate-spin"} color={"white"}/> : <Copy size={16} color={"white"}/>}
+                                                    {isCopyLoading ? <Loader2 size={16} className={"animate-spin"}
+                                                                              color={"white"}/> :
+                                                        <Copy size={16} color={"white"}/>}
                                                 </Button>
 
                                             </div>
                                         </div>
 
-                                        <p className={`${theme === "dark" ? "text-muted-foreground" : "text-muted-foreground"} text-xs`}>Read the {" "}
-                                            <Button variant={"ghost hover:none"} className={"p-0 h-auto text-xs text-primary font-semibold"}>
+                                        <p className={`${theme === "dark" ? "text-muted-foreground" : "text-muted-foreground"} text-xs`}>Read
+                                            the {" "}
+                                            <Button variant={"ghost hover:none"}
+                                                    className={"p-0 h-auto text-xs text-primary font-semibold"}>
                                                 Setup Guide
                                             </Button>
                                             {" "}for more information or {" "}
@@ -360,7 +396,7 @@ const Widgets = () => {
             <div
                 className={"container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-3 md:px-4"}>
 
-              <WidgetAnalytics
+                <WidgetAnalytics
                     isOpen={isSheetOpen}
                     onOpen={openSheet}
                     onClose={closeSheet}
@@ -391,7 +427,8 @@ const Widgets = () => {
                                         {
                                             ["Name", "Sections", "Last Updated", "", "Analytics", "Actions"].map((x, i) => {
                                                 return (
-                                                    <TableHead className={"px-2 py-[10px] md:px-3 font-semibold"}>{x}</TableHead>
+                                                    <TableHead
+                                                        className={"px-2 py-[10px] md:px-3 font-semibold"}>{x}</TableHead>
                                                 )
                                             })
                                         }
@@ -406,7 +443,8 @@ const Widgets = () => {
                                                         {
                                                             [...Array(6)].map((_, i) => {
                                                                 return (
-                                                                    <TableCell className={"max-w-[373px] px-2 py-[10px] md:px-3"}>
+                                                                    <TableCell
+                                                                        className={"max-w-[373px] px-2 py-[10px] md:px-3"}>
                                                                         <Skeleton className={"rounded-md  w-full h-7"}/>
                                                                     </TableCell>
                                                                 )
@@ -418,9 +456,13 @@ const Widgets = () => {
                                         ) : widgetsSetting.length > 0 ? <>
                                             {widgetsSetting.map((x, i) => (
                                                 <TableRow key={i}>
-                                                    <TableCell className={"font-medium p-2 px-2 py-[10px] md:px-3 cursor-pointer"} onClick={() => handleCreateNew(x.id)}>{x.name}</TableCell>
-                                                    <TableCell className={"font-medium p-2 px-2 py-[10px] md:px-3"}>{x.type}</TableCell>
-                                                    <TableCell className={"font-medium p-2 px-2 py-[10px] md:px-3"}>{moment(x.created_at).format('D MMM, YYYY')}</TableCell>
+                                                    <TableCell
+                                                        className={"font-medium p-2 px-2 py-[10px] md:px-3 cursor-pointer"}
+                                                        onClick={() => handleCreateNew(x.id)}>{x.name}</TableCell>
+                                                    <TableCell
+                                                        className={"font-medium p-2 px-2 py-[10px] md:px-3"}>{x.type}</TableCell>
+                                                    <TableCell
+                                                        className={"font-medium p-2 px-2 py-[10px] md:px-3"}>{moment(x.created_at).format('D MMM, YYYY')}</TableCell>
                                                     <TableCell className={" p-2 px-2 py-[10px] md:px-3"}>
                                                         <Button
                                                             className={"py-[6px] px-3 h-auto text-xs font-semibold hover:bg-primary"}
@@ -439,7 +481,8 @@ const Widgets = () => {
                                                             </DropdownMenuTrigger>
                                                             <DropdownMenuContent align={"end"}>
                                                                 <DropdownMenuItem
-                                                                    className={"cursor-pointer"} onClick={() => handleCreateNew(x.id)}>Edit</DropdownMenuItem>
+                                                                    className={"cursor-pointer"}
+                                                                    onClick={() => handleCreateNew(x.id)}>Edit</DropdownMenuItem>
                                                                 <DropdownMenuItem className={"cursor-pointer"}
                                                                                   onClick={() => openDeleteWidget(x.id)}>Delete</DropdownMenuItem>
                                                             </DropdownMenuContent>
@@ -447,9 +490,9 @@ const Widgets = () => {
                                                     </TableCell>
                                                 </TableRow>
                                             ))}
-                                        </>: <TableRow>
+                                        </> : <TableRow>
                                             <TableCell colSpan={6}>
-                                                <EmptyData />
+                                                <EmptyData/>
                                             </TableCell>
                                         </TableRow>
                                     }
@@ -457,7 +500,8 @@ const Widgets = () => {
                             </Table>
                         </CardContent>
                         <CardFooter className={`p-0 ${theme === "dark" ? "border-t" : ""}`}>
-                            <div className={`w-full ${theme === "dark" ? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end p-2 md:px-3 md:py-[10px]`}>
+                            <div
+                                className={`w-full ${theme === "dark" ? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end p-2 md:px-3 md:py-[10px]`}>
                                 <div className={"w-full flex gap-2 items-center justify-between sm:justify-end"}>
                                     <div>
                                         <h5 className={"text-sm font-semibold"}>Page {pageNo} of {totalPages}</h5>
@@ -467,25 +511,25 @@ const Widgets = () => {
                                                 onClick={() => handlePaginationClick(1)}
                                                 disabled={pageNo === 1 || isLoading}>
                                             <ChevronsLeft
-                                                className={pageNo === 1 || isLoading ? "stroke-muted-foreground" : "stroke-primary"} />
+                                                className={pageNo === 1 || isLoading ? "stroke-muted-foreground" : "stroke-primary"}/>
                                         </Button>
                                         <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
                                                 onClick={() => handlePaginationClick(pageNo - 1)}
                                                 disabled={pageNo === 1 || isLoading}>
                                             <ChevronLeft
-                                                className={pageNo === 1 || isLoading ? "stroke-muted-foreground" : "stroke-primary"} />
+                                                className={pageNo === 1 || isLoading ? "stroke-muted-foreground" : "stroke-primary"}/>
                                         </Button>
                                         <Button variant={"outline"} className={" h-[30px] w-[30px] p-1.5"}
                                                 onClick={() => handlePaginationClick(pageNo + 1)}
                                                 disabled={pageNo === totalPages || isLoading}>
                                             <ChevronRight
-                                                className={pageNo === totalPages || isLoading ? "stroke-muted-foreground" : "stroke-primary"} />
+                                                className={pageNo === totalPages || isLoading ? "stroke-muted-foreground" : "stroke-primary"}/>
                                         </Button>
                                         <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
                                                 onClick={() => handlePaginationClick(totalPages)}
                                                 disabled={pageNo === totalPages || isLoading}>
                                             <ChevronsRight
-                                                className={pageNo === totalPages || isLoading ? "stroke-muted-foreground" : "stroke-primary"} />
+                                                className={pageNo === totalPages || isLoading ? "stroke-muted-foreground" : "stroke-primary"}/>
                                         </Button>
                                     </div>
                                 </div>

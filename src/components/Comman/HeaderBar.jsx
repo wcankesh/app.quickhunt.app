@@ -6,7 +6,7 @@ import {Input} from "../ui/input";
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger} from "../ui/dropdown-menu";
 import {useTheme} from "../theme-provider";
 import {baseUrl, getProjectDetails, logout, removeProjectDetails, setProjectDetails} from "../../utils/constent";
-import {useNavigate} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import {Icon} from "../../utils/Icon";
 import {Avatar, AvatarFallback, AvatarImage} from "../ui/avatar";
 import {ApiService} from "../../utils/ApiService";
@@ -54,12 +54,11 @@ const initialStateErrorProject = {
     project_name: '',
 }
 
-
-
 const HeaderBar = () => {
     const {setTheme, theme, onProModal} = useTheme()
     let navigate = useNavigate();
     let location = useLocation();
+    const {type} = useParams();
     let apiSerVice = new ApiService();
     let url = location.pathname;
     const newUrl = url.replace(/[0-9]/g, '');
@@ -396,7 +395,7 @@ const HeaderBar = () => {
             title: `${userDetailsReducer.trial_days} days trial left`,
             link: '/pricing-plan',
             icon: Icon.trialPlanIcon,
-            selected: isActive(`${baseUrl}/pricing-plan`),
+            selected: false,
             isDisplay: userDetailsReducer?.trial_days > 0 && userDetailsReducer.plan === 1,
         },
         {
@@ -431,7 +430,7 @@ const HeaderBar = () => {
             title: 'Settings',
             link: '/settings/profile',
             icon: Icon.settingIcon,
-            selected: isActive(`${baseUrl}/profile`),
+            selected: window.location.pathname === `${baseUrl}/settings/team` ? false :isActive(`${baseUrl}/settings/profile`, `${baseUrl}/settings/${type}`),
             isDisplay: true,
         }
     ];
@@ -480,7 +479,7 @@ const HeaderBar = () => {
                                     </Button>
                                 </SheetTrigger>
                                 <SheetOverlay className={"inset-0"} />
-                                <SheetContent side="left" className="flex flex-col w-[280px] md:w-[340px] p-0">
+                                <SheetContent side="left" className="flex flex-col w-[280px] md:w-[340px] p-0 pb-5">
                                     <SheetHeader className={"flex flex-row justify-between items-center p-3 pb-0 md:p-6 md:pb-0"}>
                                         <div className={"app-logo cursor-pointer"}  onClick={() => onRedirect("/dashboard")}>
                                             {theme === "dark" ? Icon.whiteLogo : Icon.blackLogo}
@@ -499,7 +498,7 @@ const HeaderBar = () => {
                                                                         <Button
                                                                             key={i}
                                                                             variant={"link hover:no-underline"}
-                                                                            className={`${z.selected? "flex justify-start gap-4 h-9 rounded-md bg-primary/15 transition-none" : 'flex items-center gap-4 h-9 justify-start transition-none'}`}
+                                                                            className={`${z.selected ? "flex justify-start gap-4 h-9 rounded-md bg-primary/15 transition-none" : 'flex items-center gap-4 h-9 justify-start transition-none'}`}
                                                                             onClick={() => onRedirect(z.link)}
                                                                         >
                                                                             <div className={`${z.selected ? "active-menu" : "menu-icon"}`}>{z.icon}</div>
@@ -542,15 +541,15 @@ const HeaderBar = () => {
                                                     (footerMenuComponent || []).map((x, i) => {
                                                         return (
                                                             x.isDisplay ?
-                                                            <Button
-                                                                key={i}
-                                                                variant={"link hover:no-underline"}
-                                                                className={`${isActive(x.selected)  ? "flex justify-start gap-4 h-9 rounded-md bg-primary/15 transition-none" : 'flex items-center gap-4 h-9 justify-start transition-none'}`}
-                                                                onClick={() => onRedirect(x.link)}
-                                                            >
-                                                                <div className={`${isActive(x.selected) ? "active-menu" : "menu-icon"}`}>{x.icon}</div>
-                                                                <div className={`${isActive(x.selected) ? "text-primary text-sm font-medium" : "text-sm font-medium"}`}>{x.title}</div>
-                                                            </Button> : ''
+                                                                <Button
+                                                                    key={i}
+                                                                    variant={"link hover:no-underline"}
+                                                                    className={`${x.selected  ? "flex justify-start gap-4 h-9 rounded-md bg-primary/15 transition-none" : 'flex items-center gap-4 h-9 justify-start transition-none'}`}
+                                                                    onClick={() => onRedirect(x.link)}
+                                                                >
+                                                                    <div className={`${x.selected ? "active-menu" : "menu-icon"}`}>{x.icon}</div>
+                                                                    <div className={`${x.selected ? "text-primary text-sm font-medium" : "text-sm font-medium"}`}>{x.title}</div>
+                                                                </Button> : ''
                                                         )
                                                     })
                                                 }
@@ -577,7 +576,7 @@ const HeaderBar = () => {
                                             variant="outline"
                                             role="combobox"
                                             aria-expanded={open}
-                                            className="min-w-[150px] md:w-[200px] h-[36px] justify-between bg-card"
+                                            className="min-w-[150px] md:w-[222px] h-[36px] justify-between bg-card"
                                         >
                                             {projectDetailsReducer.id ? projectDetailsReducer.project_name : "Select project"}
                                             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50"/>
@@ -648,26 +647,26 @@ const HeaderBar = () => {
                                     <DropdownMenuLabel className={"text-sm font-semibold"}>My Account</DropdownMenuLabel>
                                     <DropdownMenuSeparator/>
                                     <DropdownMenuItem
-                                        className={"text-sm font-medium flex gap-2"}
+                                        className={"text-sm font-medium flex gap-2 cursor-pointer"}
                                         onClick={() => navigate(`${baseUrl}/settings/profile`)}
                                     >
                                         <span className={`${theme === "dark" ? "profile-menu-icon" : ""}`}>{Icon.accountUserIcon}</span>
                                         Profile
                                     </DropdownMenuItem>
                                     <DropdownMenuItem
-                                        className={"text-sm font-medium flex gap-2"}
+                                        className={"text-sm font-medium flex gap-2 cursor-pointer"}
                                         onClick={() => navigate(`${baseUrl}/pricing-plan`)}
                                     >
                                         <span className={`${theme === "dark" ? "profile-menu-icon" : ""}`}>{Icon.bilingIcon}</span>
                                         Billing
                                     </DropdownMenuItem>
                                     <DropdownMenuSeparator/>
-                                    <DropdownMenuItem className={"text-sm font-medium flex gap-2"} onClick={openSheet}>
+                                    <DropdownMenuItem className={"text-sm font-medium flex gap-2 cursor-pointer"} onClick={openSheet}>
                                         <span className={`${theme === "dark" ? "profile-menu-icon" : ""}`}>{Icon.projectsIcon}</span>
                                         Projects
                                     </DropdownMenuItem>
                                     <DropdownMenuSeparator/>
-                                    <DropdownMenuItem onClick={onLogout} className={"text-sm font-medium flex gap-2"}>
+                                    <DropdownMenuItem onClick={onLogout} className={"text-sm font-medium flex gap-2 cursor-pointer"}>
                                         <span className={`${theme === "dark" ? "profile-menu-icon" : ""}`}>{Icon.logoutIcon}</span>
                                         Logout
                                     </DropdownMenuItem>

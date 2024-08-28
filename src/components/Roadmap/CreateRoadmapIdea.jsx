@@ -165,7 +165,7 @@ const CreateRoadmapIdea = ({isOpen, onOpen, onClose, closeCreateIdea, selectedRo
                         </div>
                     </SheetHeader>
                     <div className={"w-full overflow-y-auto create-sheet-height"}>
-                            <div className={""}>
+                            <div className={"pb-[60px] sm:p-0"}>
                                 <div className={"px-4 py-3 lg:py-6 lg:px-8 flex flex-col gap-6 border-b"}>
                                     <div className="space-y-2">
                                         <Label htmlFor="text">Title</Label>

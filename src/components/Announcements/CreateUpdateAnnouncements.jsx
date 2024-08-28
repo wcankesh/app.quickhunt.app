@@ -84,10 +84,33 @@ const CreateUpdateAnnouncements = ({isOpen, onOpen, onClose, selectedRecord, get
         // setPreviewImage(selectedRecord.feature_image);
     }
 
+    // const handleFileChange = (file) => {
+    //     setChangeLogDetails({...changeLogDetails, image: file.target.files[0]});
+    //     // setPreviewImage(URL.createObjectURL(file.target.files[0]));
+    // };
+
     const handleFileChange = (file) => {
-        setChangeLogDetails({...changeLogDetails, image: file.target.files[0]});
-        // setPreviewImage(URL.createObjectURL(file.target.files[0]));
+        const selectedFile = file.target.files[0];
+        if (selectedFile) {
+            if (selectedFile.size > 5 * 1024 * 1024) { // 5 MB
+                setFormError(prevErrors => ({
+                    ...prevErrors,
+                    image: 'Image size must be less than 5 MB.'
+                }));
+            } else {
+                setFormError(prevErrors => ({
+                    ...prevErrors,
+                    image: ''
+                }));
+                setChangeLogDetails({
+                    ...changeLogDetails,
+                    image: selectedFile
+                });
+                // setPreviewImage(URL.createObjectURL(selectedFile));
+            }
+        }
     };
+
 
     const onDeleteImg = async (name, value) => {
         if (changeLogDetails && changeLogDetails?.image && changeLogDetails.image?.name) {
@@ -115,6 +138,12 @@ const CreateUpdateAnnouncements = ({isOpen, onOpen, onClose, selectedRecord, get
             case "post_description":
                 if (!value || value.trim() === "") {
                     return "Description is required.";
+                } else {
+                    return "";
+                }
+            case "image":
+                if (value && value.size > 5 * 1024 * 1024) { // 5 MB
+                    return "Image size must be less than 5 MB.";
                 } else {
                     return "";
                 }
@@ -196,6 +225,10 @@ const CreateUpdateAnnouncements = ({isOpen, onOpen, onClose, selectedRecord, get
                 validationErrors[name] = error;
             }
         });
+        const imageError = formValidate('image', changeLogDetails.image);
+        if (imageError) {
+            validationErrors['image'] = imageError;
+        }
         if (Object.keys(validationErrors).length > 0) {
             setFormError(validationErrors);
             return;
@@ -557,20 +590,19 @@ const CreateUpdateAnnouncements = ({isOpen, onOpen, onClose, selectedRecord, get
                                                         className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
                                                         onClick={() => onDeleteImg('delete_image', changeLogDetails && changeLogDetails?.image && changeLogDetails.image?.name ? "" : changeLogDetails.image.replace("https://code.quickhunt.app/public/storage/post/", ""))}
                                                     />
-                                                </div> : changeLogDetails.image ?
-                                                    <div className={"w-[282px] h-[128px] relative border p-[5px]"}>
-                                                        <img className={"upload-img"} src={changeLogDetails.image}
-                                                             alt=""/>
-                                                        <CircleX
-                                                            size={20}
-                                                            className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
-                                                            onClick={() => onDeleteImg('delete_image', changeLogDetails && changeLogDetails?.image && changeLogDetails.image?.name ? "" : changeLogDetails.image.replace("https://code.quickhunt.app/public/storage/post/", ""))}
-                                                        />
-                                                    </div>
-                                                    : ''}
+                                                </div> :
+                                                <div className={"w-[282px] h-[128px] relative border p-[5px]"}>
+                                                    <img className={"upload-img"} src={changeLogDetails.image}
+                                                         alt=""/>
+                                                    <CircleX
+                                                        size={20}
+                                                        className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
+                                                        onClick={() => onDeleteImg('delete_image', changeLogDetails && changeLogDetails?.image && changeLogDetails.image?.name ? "" : changeLogDetails.image.replace("https://code.quickhunt.app/public/storage/post/", ""))}
+                                                    />
+                                                </div>
+                                            }
                                         </div> :
                                         <div>
-
                                             <input
                                                 id="pictureInput"
                                                 type="file"
@@ -587,6 +619,7 @@ const CreateUpdateAnnouncements = ({isOpen, onOpen, onClose, selectedRecord, get
                                         </div>
                                 }
                             </div>
+                            {formError.image && <div className={"text-xs text-red-500"}>{formError.image}</div>}
                         </div>
                         <div className={"flex flex-col gap-[18px] w-full"}>
                             <div className={"announce-create-switch flex gap-6"}>
@@ -632,7 +665,7 @@ const CreateUpdateAnnouncements = ({isOpen, onOpen, onClose, selectedRecord, get
 
                         </div>
                     </div>
-                    <div className={"p-3 lg:p-8 flex flex-row gap-4"}>
+                    <div className={"p-3 pb-[60px] lg:p-8 sm:pb-0 flex flex-row gap-4"}>
                         <Button
                             variant={"outline "}
                             disabled={isSave}

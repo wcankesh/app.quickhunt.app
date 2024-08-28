@@ -20,6 +20,7 @@ import {
 } from "../ui/chart"
 import {Avatar, AvatarImage} from "../ui/avatar";
 import {useTheme} from "../theme-provider";
+import ReadMoreText from "../Comman/ReadMoreText";
 
 const chartConfig = {
     totalView: {
@@ -256,7 +257,12 @@ export function Dashboard() {
                                                                     <h4 className="text-sm font-semibold">{x.customer_name}</h4>
                                                                     <p className="text-xs font-medium text-muted-foreground">{x.customer_email_id}</p>
                                                                 </div>
-                                                                <p className="text-xs font-medium text-foreground">“{x.feedback}”</p>
+                                                                {/*<p className="text-xs font-medium text-foreground">“{x.feedback}”</p>*/}
+                                                                <p className={"text-xs font-medium text-foreground"}>
+                                                                    <ReadMoreText
+                                                                        className={"text-xs"}
+                                                                        html={`${x.feedback}`}/>
+                                                                </p>
                                                             </CardContent>
                                                     }
                                                 </Fragment>

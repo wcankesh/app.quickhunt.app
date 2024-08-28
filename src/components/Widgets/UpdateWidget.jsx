@@ -175,11 +175,11 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
             <div>
                 <Accordion type="single" defaultValue={"item-1"} collapsible className="w-full">
                     <AccordionItem value="item-1" className={"widget-accordion overflow-hidden"}>
-                        <AccordionTrigger className={`hover:no-underline text-[15px] font-medium border-b px-4 py-3`}>Widget
+                        <AccordionTrigger className={`hover:no-underline font-medium border-b px-4 py-3`}>Widget
                             Type</AccordionTrigger>
                         <AccordionContent className={"px-4 py-3 space-y-4"}>
                             <div className={"flex flex-col gap-3"}>
-                                <Label className={"text-sm font-medium"}>Widget type</Label>
+                                <Label className={"text-sm font-normal"}>Widget type</Label>
                                 <Select onValueChange={(val) => handleShowInput(val)} value={widgetsSetting?.type}>
                                     <SelectTrigger className="">
                                         <SelectValue placeholder="embed"/>
@@ -196,7 +196,7 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
                                 widgetsSetting?.type !== "embed" &&
                                 <div className={"space-y-4"}>
                                     <div className={"space-y-2"}>
-                                        <Label>Width</Label>
+                                        <Label className={"font-normal"}>Width</Label>
                                         {
                                             widgetsSetting?.type === "popover" &&
                                             <Input type={"number"} value={widgetsSetting.popover_width}
@@ -221,7 +221,7 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
                             {
                                 widgetsSetting?.type === "popover" &&
                                 <div className={"space-y-2"}>
-                                    <Label>Height</Label>
+                                    <Label className={"font-normal"}>Height</Label>
                                     <Input type={"number"} value={widgetsSetting.popover_height}
                                            onChange={(e) => onChange('popover_height', e.target.value)}
                                            className={"w-full"}/>
@@ -230,7 +230,7 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
                             {
                                 widgetsSetting?.type === "modal" &&
                                 <div className={"space-y-2"}>
-                                    <Label>Height</Label>
+                                    <Label className={"font-normal"}>Height</Label>
                                     <Input type={"number"} value={widgetsSetting.modal_height}
                                            onChange={(e) => onChange("modal_height", e.target.value)}
                                            className={"w-full"}/>
@@ -239,7 +239,7 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
                             {
                                 widgetsSetting?.type === "sidebar" &&
                                 <div className={"space-y-2"}>
-                                    <Label>Position</Label>
+                                    <Label className={"font-normal"}>Position</Label>
                                     <Select
                                         onValueChange={(value) => onChange("sidebar_position", value)}
                                         value={widgetsSetting.sidebar_position}
@@ -260,13 +260,12 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
                         widgetsSetting.type !== "embed" &&
                         <Fragment>
                             <AccordionItem value="item-2" className={"widget-accordion"}>
-                                <AccordionTrigger
-                                    className={"hover:no-underline text-[15px] font-medium border-b px-4 py-3"}>Launcher
+                                <AccordionTrigger className={"hover:no-underline font-medium border-b px-4 py-3"}>Launcher
                                     Type</AccordionTrigger>
                                 <AccordionContent className={"px-4 py-3"}>
                                     <div className={"flex flex-col gap-4"}>
                                         <div className={"space-y-2"}>
-                                            <Label className={"text-sm font-medium"}>Icon</Label>
+                                            <Label className={"font-normal"}>Icon</Label>
                                             <Select
                                                 onValueChange={(value) => onChange("launcher_icon", value)}
                                                 value={widgetsSetting.launcher_icon}
@@ -283,7 +282,7 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
                                             </Select>
                                         </div>
                                         <div className={"space-y-2"}>
-                                            <Label className={"text-sm font-medium"}>Position</Label>
+                                            <Label className={"font-normal"}>Position</Label>
                                             <Select
                                                 value={widgetsSetting.launcher_position}
                                                 onValueChange={(value) => onChange("launcher_position", value)}
@@ -298,14 +297,14 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
                                             </Select>
                                         </div>
                                         <div className={"widget-color-picker space-y-2"}>
-                                            <Label className={"text-sm font-medium"}>Background Color</Label>
+                                            <Label className={"font-normal"}>Background Color</Label>
                                             <ColorInput name="launcher_icon_bg_color"
                                                         value={widgetsSetting.launcher_icon_bg_color}
                                                         onChange={(color) => onChange("launcher_icon_bg_color", color?.launcher_icon_bg_color)}
                                             />
                                         </div>
                                         <div className={"widget-color-picker space-y-2"}>
-                                            <Label className={"text-sm font-medium"}>Icon Color</Label>
+                                            <Label className={"font-normal"}>Icon Color</Label>
                                             <ColorInput name="launcher_icon_color"
                                                         value={widgetsSetting.launcher_icon_color}
                                                         onChange={(color) => onChange("launcher_icon_color", color?.launcher_icon_color)}
@@ -316,7 +315,7 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
                             </AccordionItem>
                             <AccordionItem value="item-3" className={"widget-accordion"}>
                                 <AccordionTrigger
-                                    className={"hover:no-underline text-[15px] font-medium border-b px-4 py-3"}>Sections</AccordionTrigger>
+                                    className={"hover:no-underline font-medium border-b px-4 py-3"}>Sections</AccordionTrigger>
                                 <AccordionContent className={"px-4 py-3 space-y-2"}>
 
                                     <ToggleGroup type="single" className={"justify-normal gap-2"}
@@ -333,12 +332,12 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
                                     {selectedToggle === 'announcement' && (
                                         <div className="space-y-4">
                                             <div className="space-y-2">
-                                                <Label className="text-sm font-medium">Title</Label>
+                                                <Label className={"font-normal"}>Title</Label>
                                                 <Input value={widgetsSetting.changelog_title}
                                                        onChange={(e) => onChange("changelog_title", e.target.value)}/>
                                             </div>
                                             <div className="flex flex-col gap-2">
-                                                <Label className="text-sm font-medium">Display</Label>
+                                                <Label className={"font-normal"}>Display</Label>
                                                 <Select value={widgetsSetting.changelog_display}
                                                         onValueChange={(value) => onChange("changelog_display", value)}>
                                                     <SelectTrigger>
@@ -354,7 +353,7 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
                                             </div>
                                             {widgetsSetting.changelog_display === 2 && (
                                                 <div className="flex flex-col gap-2">
-                                                    <Label className="text-sm font-medium">Ideas</Label>
+                                                    <Label className={"font-normal"}>Ideas</Label>
                                                     <Select value={widgetsSetting.changelog_open}
                                                             onValueChange={(value) => onChange("changelog_open", value)}>
                                                         <SelectTrigger>
@@ -371,7 +370,7 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
                                                 </div>
                                             )}
                                             <div className="flex flex-col gap-2">
-                                                <Label className="text-sm font-medium">Reactions</Label>
+                                                <Label className={"font-normal"}>Reactions</Label>
                                                 <Select value={widgetsSetting.changelog_reaction}
                                                         onValueChange={(value) => onChange("changelog_reaction", value)}>
                                                     <SelectTrigger>
@@ -406,12 +405,12 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
                                     {selectedToggle === 'roadmap' && (
                                         <div className="space-y-4">
                                             <div className="space-y-2">
-                                                <Label className="text-sm font-medium">Title</Label>
+                                                <Label className={"font-normal"}>Title</Label>
                                                 <Input value={widgetsSetting.roadmap_title}
                                                        onChange={(e) => onChange("roadmap_title", e.target.value)}/>
                                             </div>
                                             <div className="flex flex-col gap-3">
-                                                <Label className="text-sm font-medium">Display</Label>
+                                                <Label className={"font-normal"}>Display</Label>
                                                 <Select value={widgetsSetting.roadmap_display}
                                                         onValueChange={(value) => onChange("roadmap_display", value)}>
                                                     <SelectTrigger>
@@ -427,7 +426,7 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
                                             </div>
                                             {widgetsSetting.roadmap_display === 2 && (
                                                 <div className="flex flex-col gap-2">
-                                                    <Label className="text-sm font-medium">Ideas</Label>
+                                                    <Label className={"font-normal"}>Ideas</Label>
                                                     <Select value={widgetsSetting.roadmap_open}
                                                             onValueChange={(value) => onChange("roadmap_open", value)}>
                                                         <SelectTrigger>
@@ -464,12 +463,12 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
                                     {selectedToggle === 'ideas' && (
                                         <div className="space-y-4">
                                             <div className="space-y-2">
-                                                <Label className="text-sm font-medium">Title</Label>
+                                                <Label className={"font-normal"}>Title</Label>
                                                 <Input value={widgetsSetting.idea_title}
                                                        onChange={(e) => onChange("idea_title", e.target.value)}/>
                                             </div>
                                             <div className="flex flex-col gap-3">
-                                                <Label className="text-sm font-medium">Display</Label>
+                                                <Label className={"font-normal"}>Display</Label>
                                                 <Select value={widgetsSetting.idea_display}
                                                         onValueChange={(value) => onChange("idea_display", value)}>
                                                     <SelectTrigger>
@@ -485,7 +484,7 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
                                             </div>
                                             {widgetsSetting.idea_display === 2 && (
                                                 <div className="flex flex-col gap-2">
-                                                    <Label className="text-sm font-medium">Ideas</Label>
+                                                    <Label className={"font-normal"}>Ideas</Label>
                                                     <Select value={widgetsSetting.idea_open}
                                                             onValueChange={(value) => onChange("idea_open", value)}>
                                                         <SelectTrigger>
@@ -502,7 +501,7 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
                                                 </div>
                                             )}
                                             <div className="flex flex-col gap-3">
-                                                <Label className="text-sm font-medium">Button Label</Label>
+                                                <Label className={"font-normal"}>Button Label</Label>
                                                 <Input value={widgetsSetting.idea_button_label} name="idea_button_label"
                                                        onChange={(e) => onChange("idea_button_label", e.target.value)}/>
                                             </div>
@@ -528,32 +527,32 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
                     }
                     <AccordionItem value="item-4" className={"widget-accordion"}>
                         <AccordionTrigger
-                            className={"hover:no-underline text-[15px] font-medium border-b px-4 py-3"}>Advanced</AccordionTrigger>
+                            className={"hover:no-underline font-medium border-b px-4 py-3"}>Advanced</AccordionTrigger>
                         <AccordionContent className={"p-0"}>
                             <div className={"px-4 py-3 space-y-4 border-b"}>
                                 <div className={"widget-color-picker space-y-2"}>
-                                    <Label className={"text-sm font-medium"}>Header Background Color</Label>
+                                    <Label className={"font-normal"}>Header Background Color</Label>
                                     <ColorInput name="header_bg_color"
                                                 onChange={(color) => onChange("header_bg_color", color?.header_bg_color)}
                                                 value={widgetsSetting.header_bg_color}
                                     />
                                 </div>
                                 <div className={"widget-color-picker space-y-2"}>
-                                    <Label className={"text-sm font-medium"}>Header Text Color</Label>
+                                    <Label className={"font-normal"}>Header Text Color</Label>
                                     <ColorInput type="color" name="header_text_color"
                                                 onChange={(color) => onChange("header_text_color", color?.header_text_color)}
                                                 value={widgetsSetting.header_text_color}
                                     />
                                 </div>
                                 <div className={"widget-color-picker space-y-2"}>
-                                    <Label className={"text-sm font-medium"}>Header Button Background Color</Label>
+                                    <Label className={"font-normal"}>Header Button Background Color</Label>
                                     <ColorInput name="header_btn_background_color"
                                                 onChange={(color) => onChange("header_btn_background_color", color?.header_btn_background_color)}
                                                 value={widgetsSetting.header_btn_background_color}
                                     />
                                 </div>
                                 <div className={"widget-color-picker space-y-2"}>
-                                    <Label className={"text-sm font-medium"}>Header Button Text Color</Label>
+                                    <Label className={"font-normal"}>Header Button Text Color</Label>
                                     <ColorInput type="color" name="header_btn_text_color"
                                                 onChange={(color) => onChange("header_btn_text_color", color?.header_btn_text_color)}
                                                 value={widgetsSetting.header_btn_text_color}
@@ -562,14 +561,14 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
                             </div>
                             <div className={"px-4 py-3 space-y-4"}>
                                 <div className={"widget-color-picker space-y-2"}>
-                                    <Label className={"text-sm font-medium"}>Button Background Color</Label>
+                                    <Label className={"font-normal"}>Button Background Color</Label>
                                     <ColorInput name="btn_background_color"
                                                 onChange={(color) => onChange("btn_background_color", color?.btn_background_color)}
                                                 value={widgetsSetting.btn_background_color}
                                     />
                                 </div>
                                 <div className={"widget-color-picker space-y-2"}>
-                                    <Label className={"text-sm font-medium"}>Button Text Color</Label>
+                                    <Label className={"font-normal"}>Button Text Color</Label>
                                     <ColorInput type="color" name="btn_text_color"
                                                 onChange={(color) => onChange("btn_text_color", color?.btn_text_color)}
                                                 value={widgetsSetting.btn_text_color}
@@ -578,14 +577,14 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
                             </div>
                             {
                                 widgetsSetting.type !== "embed" &&
-                                <div className="flex flex-col gap-2 px-4 py-3 border-t">
-                                    <Label className={"text-sm font-medium"}>Navigation Menu</Label>
+                                <div className="flex flex-col gap-3 px-4 py-3 border-t">
+                                    <Label className={"font-medium"}>Navigation Menu</Label>
                                     <div className={"flex items-center gap-4 m-0"}>
                                         <Checkbox id="terms" checked={widgetsSetting.is_navigate === 1}
                                                   onCheckedChange={(value) => onChange("is_navigate", value ? 1 : 0)}/>
                                         <label
                                             htmlFor="terms"
-                                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                            className="text-sm font-normal leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                                         >
                                             Open links in new window
                                         </label>

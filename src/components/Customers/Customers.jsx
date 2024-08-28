@@ -303,8 +303,8 @@ const Customers = () => {
                                                                             {
                                                                                 [...Array(6)].map((_, i) => {
                                                                                     return (
-                                                                                        <TableCell key={i} className={"px-2 py-[10px] md:px-3"}>
-                                                                                            <Skeleton className={"rounded-md  w-full h-7"}/>
+                                                                                        <TableCell key={i} className={"px-2 py-[9px] md:px-3"}>
+                                                                                            <Skeleton className={"rounded-md  w-full h-8"}/>
                                                                                         </TableCell>
                                                                                     )
                                                                                 })

@@ -1,9 +1,5 @@
 import React, {useState, useEffect, Fragment} from 'react';
-import {
-    Sheet,
-    SheetContent,
-    SheetHeader, SheetOverlay,
-} from "../ui/sheet";
+import {Sheet, SheetContent, SheetHeader, SheetOverlay,} from "../ui/sheet";
 import {Separator} from "../ui/separator";
 import {Icon} from "../../utils/Icon";
 import {Button} from "../ui/button";
@@ -11,6 +7,7 @@ import {ChevronLeft, ChevronRight, X} from "lucide-react";
 import {ApiService} from "../../utils/ApiService";
 import {Skeleton} from "../ui/skeleton";
 import {useSelector} from "react-redux";
+import ReadMoreText from "../Comman/ReadMoreText";
 
 const perPageLimit = 10;
 
@@ -153,28 +150,30 @@ const AnalyticsView = ({isOpen, onOpen, onClose, selectedViewAnalyticsRecord}) =
                                             <p className={"text-muted-foreground text-xs font-medium"}>No feedback
                                                 received for this announcement yet</p> :
                                             <div>
-                                                    {
-                                                        (feedbackList || []).map((x) => {
-                                                            return (
-                                                                <div key={x.id} className={"flex flex-col py-4 first:pt-0 border-b"}>
-                                                                    <div className={"flex flex-row gap-4 ml-4 mr-[10px]"}>
-                                                                        <div className={"flex flex-col gap-1"}>
-                                                                            <div className={"flex flex-row gap-4 items-center"}>
-                                                                                <h5 className={"text-sm font-semibold leading-5 capitalize"}>{x?.customer_name}</h5>
-                                                                                <p className={"text-muted-foreground text-[10px] leading-5 font-medium"}>{x?.customer_email_id}</p>
-                                                                            </div>
-                                                                            <p className={"text-muted-foreground text-xs font-medium"}>{x.feedback}</p>
+                                                {
+                                                    (feedbackList || []).map((x) => {
+                                                        return (
+                                                            <div key={x.id} className={"flex flex-col py-4 first:pt-0 border-b"}>
+                                                                <div className={"flex flex-row gap-4 ml-4 mr-[10px]"}>
+                                                                    <div className={"flex flex-col gap-1"}>
+                                                                        <div className={"flex flex-row gap-4 items-center"}>
+                                                                            <h5 className={"text-sm font-semibold leading-5 capitalize"}>{x?.customer_name}</h5>
+                                                                            <p className={"text-muted-foreground text-[10px] leading-5 font-medium"}>{x?.customer_email_id}</p>
                                                                         </div>
+                                                                        <p className={"text-muted-foreground text-xs font-medium"}>
+                                                                            <ReadMoreText className={"text-xs"} html={x.feedback}/>
+                                                                        </p>
                                                                     </div>
                                                                 </div>
-                                                            )
-                                                        })
-                                                    }
+                                                            </div>
+                                                        )
+                                                    })
+                                                }
                                             </div>
                                     }
                                 </Fragment>
                         }
-                        <div className={"flex flex-row justify-end items-center gap-3"}>
+                        <div className={"flex flex-row justify-end items-center gap-3 "}>
                             <Button
                                 disabled={pageNo === 1 || isLoading}
                                 variant={"outline"}
