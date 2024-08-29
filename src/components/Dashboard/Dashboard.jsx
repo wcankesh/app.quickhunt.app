@@ -1,26 +1,16 @@
 import React, {Fragment, useEffect, useState} from "react"
-import {Card, CardContent, CardHeader, CardTitle, CardFooter} from "../ui/card"
-import {Button} from "../ui/button";
-import {Icon} from "../../utils/Icon";
-import {Calendar} from "../ui/calendar";
-import {PopoverTrigger, Popover, PopoverContent} from "../ui/popover";
-import { CalendarIcon} from "lucide-react";
+import {Card, CardContent, CardHeader, CardTitle} from "../ui/card"
 import moment from "moment";
-import { addDays, format } from "date-fns"
-import { cn } from "../../lib/utils";
 import {ApiService} from "../../utils/ApiService";
 import {useSelector} from "react-redux";
 import EmptyData from "../Comman/EmptyData";
 import {CommSkel} from "../Comman/CommSkel";
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts"
-import {
-    ChartContainer,
-    ChartTooltip,
-    ChartTooltipContent,
-} from "../ui/chart"
+import {Bar, BarChart, CartesianGrid, XAxis, YAxis} from "recharts"
+import {ChartContainer, ChartTooltip, ChartTooltipContent,} from "../ui/chart"
 import {Avatar, AvatarImage} from "../ui/avatar";
 import {useTheme} from "../theme-provider";
 import ReadMoreText from "../Comman/ReadMoreText";
+import {DateRangePicker} from "../ui/date-range-picker";
 
 const chartConfig = {
     totalView: {
@@ -40,10 +30,6 @@ export function Dashboard() {
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
     const [isLoading, setIsLoading] = useState(false);
     const [dataAvailable, setDataAvailable] = useState(true);
-    const [visibleFeedback, setVisibleFeedback] = useState(3);
-    const [visibleReactions, setVisibleReactions] = useState(3);
-    const [expandedFeedback, setExpandedFeedback] = useState(false);
-    const [expandedReactions, setExpandedReactions] = useState(false);
     const [state, setState] = useState({from: new Date(new Date().setDate(new Date().getDate() - 29)), to: new Date(),});
     const [chartList, setChartList] = useState({
         reactionAnalytic: [],
@@ -96,16 +82,6 @@ export function Dashboard() {
         }
         const data = await apiSerVice.dashboardData(payload)
         if(data.status === 200){
-            // const feedbackAnalytics = [];
-            // data.data.feedbackAnalytics.map((j, i) => {
-            //     let obj = {
-            //         x: new Date(j.x),
-            //         y: parseInt(j.y)
-            //     }
-            //
-            //     feedbackAnalytics.push(obj)
-            // })
-
             const feedbackAnalytics = data.data.feedbackAnalytics.map((j) => ({
                 x: new Date(j.x),
                 y: parseInt(j.y),
@@ -113,12 +89,6 @@ export function Dashboard() {
 
             setChartList({...data.data,totalViewViewList: data.data.viewsAnalytic, feedbackAnalytics:feedbackAnalytics})
             setIsLoading(false)
-            // if (data.data.viewsAnalytic.length === 0) {
-            //     setDataAvailable(false);
-            // } else {
-            //     setDataAvailable(true);
-            // }
-
             setDataAvailable(data.data.viewsAnalytic.length > 0);
         } else {
 
@@ -126,19 +96,13 @@ export function Dashboard() {
     }
 
     const onChangeDate = (selected) => {
-       // debugger
         if (selected && selected.from && selected.to) {
             setState({
                 from: selected.from,
                 to: selected.to,
             });
         }
-        //setState({...state, ...selected})
     }
-
-    const isDateOutsideRange = (date, from, to) => {
-        return date < from || date > to;
-    };
 
     const programAnalytics = [
         {
@@ -177,39 +141,14 @@ export function Dashboard() {
                 <div className="container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pb-5 px-3 md:px-4">
                         <div className={"flex items-center flex-wrap pb-6 pt-9 gap-2 md:justify-between md:flex-nowrap"}>
                             <h3 className="text-base font-bold">Here's what has happened to your program</h3>
-                            <Popover>
-                                <PopoverTrigger asChild>
-                                    <Button
-                                        id="date"
-                                        variant={"outline"}
-                                        className={cn(
-                                            "w-[300px] justify-start text-left font-normal",
-
-                                        )}
-                                    >
-                                        <CalendarIcon className="mr-2 h-4 w-4" />
-                                        <>
-                                            {moment(state.from).format("LL")} -{" "}
-                                            {moment(state.to).format("LL")}
-                                        </>
-                                    </Button>
-                                </PopoverTrigger>
-                                <PopoverContent className={"md:w-auto p-0"} align="end">
-                                    <Calendar className={`${theme === 'dark' ? 'calendar-das' : ''}`}
-                                        mode="range"
-                                        selected={{from: state.from, to:state.to}}
-                                        numberOfMonths={2}
-                                        startMonth={new Date(2024, 0)}
-                                        endMonth={new Date(2050, 12)}
-                                        showOutsideDays={false}
-                                        // onSelect={(selected, triggerDate, modifiers, e) => onChangeDate(selected, triggerDate, modifiers, e)}
-                                        onSelect={onChangeDate}
-                                      // modifiers={{
-                                      //     disabled: (date) => isDateOutsideRange(date, state.from, state.to)
-                                      // }}
-                                    />
-                                </PopoverContent>
-                            </Popover>
+                            <DateRangePicker
+                                onUpdate={(values) => onChangeDate(values)}
+                                initialDateFrom={state.from}
+                                initialDateTo={state.to}
+                                align="start"
+                                locale="en-GB"
+                                showCompare={false}
+                            />
                         </div>
                         <div className={"flex flex-col gap-8"}>
                             <div className={"grid lg:grid-cols-4 lg:gap-8 md:grid-cols-2 md:gap-4 gap-3"}>
@@ -272,9 +211,6 @@ export function Dashboard() {
                                         )
                                     }
                                     </div>
-                                    {/*<CardFooter className={"p-0 pt-4 justify-end border-none"}>*/}
-                                    {/*    <Button className={"text-primary p-0 h-[20px] text-sm font-semibold"} variant={"ghost hover:none"}>View More Feedbacks</Button>*/}
-                                    {/*</CardFooter>*/}
                                 </Card>
                                 <Card className={"lg:basis-1/3 basis-full min-w-[270px] p-4 md:pr-8 divide-y shadow border"}>
                                     <CardHeader className={"p-0 pb-4"}>
@@ -309,9 +245,6 @@ export function Dashboard() {
                                         ) : <EmptyData />
                                     }
                                     </div>
-                                    {/*<CardFooter className={"p-0 pt-4 justify-end border-none"}>*/}
-                                    {/*    <Button className={"text-primary text-sm p-0 h-[20px] font-semibold"} variant={"ghost hover:none"}>View More Reactions</Button>*/}
-                                    {/*</CardFooter>*/}
                                 </Card>
                             </div>
                             <div>

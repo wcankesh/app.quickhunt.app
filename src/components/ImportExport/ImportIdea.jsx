@@ -3,13 +3,15 @@ import Papa from "papaparse";
 import {Button} from "../ui/button";
 import {ScrollArea, ScrollBar} from "../ui/scroll-area";
 import {Card, CardDescription, CardHeader, CardContent} from "../ui/Card";
-import {Circle, FileUp, Loader2} from "lucide-react";
+import {ChevronsUpDown, Circle, FileUp, Loader2} from "lucide-react";
 import {Popover, PopoverContent, PopoverTrigger} from "../ui/popover";
 import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList} from "../ui/command";
 import {useToast} from "../ui/use-toast";
 import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "../ui/select";
 import {useSelector} from "react-redux";
 import {ApiService} from "../../utils/ApiService";
+import {baseUrl} from "../../utils/constent";
+import {useNavigate} from "react-router-dom";
 
 const initialColumnList = [
     {columnName: "Title (Required)", id: "title"},
@@ -27,6 +29,7 @@ const initialColumnList = [
 const ImportIdea = () => {
         const {toast} = useToast()
         let apiSerVice = new ApiService();
+        let navigate = useNavigate();
         const [tableData, setTableData] = useState([]);
         const [headers, setHeaders] = useState([]);
         const [selectedColumn, setSelectedColumn] = useState([]);
@@ -36,6 +39,7 @@ const ImportIdea = () => {
         const [selectedCSVFile, setSelectedCSVFile] = useState(null);
         const [step, setStep] = useState(1);
         const [isLoading, setIsLoading] = useState(false);
+        const [isDirectImport, setIsDirectImport] = useState(true);
         const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
         const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
 
@@ -64,11 +68,20 @@ const ImportIdea = () => {
             if (findIndex === -1) {
                 const obj = {...column, csvColumn, index};
                 clone.push(obj);
+                if(column.id === "board" || column.id === "roadmap_id" ){
+                    setIsDirectImport(false)
+                }
             } else {
                 if (column.id === "") {
                     clone.splice(findIndex, 1);
+                    if(clone.filter((x) => x.id === "board" || x.id === "roadmap_id").length === 0){
+                        setIsDirectImport(true)
+                    }
                 } else {
                     clone[findIndex] = {...column, csvColumn, index};
+                    if(column.id === "board" || column.id === "roadmap_id" ){
+                        setIsDirectImport(false)
+                    }
                 }
             }
             setSelectedColumn(clone);
@@ -80,19 +93,18 @@ const ImportIdea = () => {
             const findTitle = selectedColumn.find((x) => x.id === "title") || {csvColumn: "", id: ""};
             const findBoard = selectedColumn.find((x) => x.id === "board") || {csvColumn: "", id: ""};
             const findRoadmap = selectedColumn.find((x) => x.id === "roadmap_id") || {csvColumn: "", id: ""};
-
             if (!findTitle.id) {
                 toast({description: "You need to select a title column", variant: "destructive"})
                 return
             }
 
-            if (!findBoard.id) {
-                toast({description: "You need to select a board column", variant: "destructive"})
-                return
-            }
+            // if (!findBoard.id) {
+            //     toast({description: "You need to select a board column", variant: "destructive"})
+            //     return
+            // }
 
             if (findBoard.id) {
-                const board = Array.from(new Set(tableData.map(item => item.board))).map(status => ({
+                const board = Array.from(new Set(tableData.map(item => item[findBoard.csvColumn]))).map(status => ({
                     csv_board: status,
                     board_id: null
                 }));
@@ -100,7 +112,7 @@ const ImportIdea = () => {
             }
 
             if (findRoadmap.id) {
-                const roadmap = Array.from(new Set(tableData.map(item => item.status))).map(status => ({
+                const roadmap = Array.from(new Set(tableData.map(item => item[findBoard.csvColumn]))).map(status => ({
                     csv_roadmap: status,
                     roadmap_id: null
                 }));
@@ -123,6 +135,13 @@ const ImportIdea = () => {
         };
 
         const importData = async () => {
+            if(isDirectImport){
+                const findTitle = selectedColumn.find((x) => x.id === "title") || {csvColumn: "", id: ""};
+                if (!findTitle.id) {
+                    toast({description: "You need to select a title column", variant: "destructive"})
+                    return
+                }
+            }
             let isRoadmapNotMap = false;
             csvRoadmap.some((x) => {
                 if (x.roadmap_id == null || x.roadmap_id == "") {
@@ -164,6 +183,7 @@ const ImportIdea = () => {
             if (data.status === 200) {
                 setIsLoading(false)
                 toast({description: data.message})
+                navigate(`${baseUrl}/ideas`);
             } else {
                 setIsLoading(false)
                 toast({description: data.message, variant: "destructive"})
@@ -175,13 +195,12 @@ const ImportIdea = () => {
                 <div className={"flex flex-row gap-x-4 flex-wrap justify-between gap-y-2 items-center"}>
                     <h4 className={"font-medium text-lg sm:text-2xl leading-8"}>Import Data</h4>
                     {
-                        step >= 2 && <div className={"flex items-center gap-2"}>
+                        step >=  2 && <div className={"flex items-center gap-2"}>
                             <Button variant={"outline"} className={'flex items-center h-9 justify-start'}
                                     onClick={() => setStep(step - 1)}>
                                 Go Back
                             </Button>
-                            {step === 2 ? <Button disabled={selectedColumn.length <= 0}
-                                                  className={'flex items-center h-9 justify-start'} onClick={onNext}>
+                            {step === 2 && !isDirectImport ? <Button disabled={selectedColumn.length <= 0} className={'flex items-center h-9 justify-start'} onClick={onNext}>
                                 Next
                             </Button> : <Button className={'flex items-center h-9 justify-start'} onClick={importData}>
                                 {
@@ -191,6 +210,7 @@ const ImportIdea = () => {
 
                         </div>
                     }
+
                 </div>
 
                 <div className={"pt-4 sm:pt-8"}>
@@ -260,11 +280,13 @@ const ImportIdea = () => {
                                                         <PopoverTrigger asChild>
                                                             <Button
                                                                 variant={"outline"}
-                                                                className={'w-full flex items-center h-9 justify-start'}
+                                                                className={'w-full flex items-center h-9 justify-between'}
                                                                 role="combobox"
                                                             >
                                                                 {findColumn.columnName}
+                                                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50"/>
                                                             </Button>
+
                                                         </PopoverTrigger>
                                                         <PopoverContent className="w-[200px] p-0">
                                                             <Command>

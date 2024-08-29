@@ -49,7 +49,7 @@ const initialState = {
     roadmap_title: "Roadmap",
     roadmap_display: 1,
     roadmap_open: 1,
-    changelog_title: "Latest changes",
+    changelog_title: "Announcement",
     changelog_display: 1,
     changelog_open: 1,
     changelog_reaction: 1
@@ -633,6 +633,9 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
         </svg>
     }
 
+
+
+
     return (
         <Fragment>
             <Sheet open={true} onOpenChange={isOpen ? onClose : onOpen}>
@@ -699,7 +702,8 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
                             width: `${widgetsSetting.popover_width}px`, height: `${widgetsSetting.popover_height}px`
                         }}>
                             <iframe className='QH-frame'
-                                    src={`https://${projectDetailsReducer.domain}/ideas?${qs.stringify({...widgetsSetting, widget: id})}`}/>
+                                    allow="http://localhost:5173"
+                                    src={`https://${projectDetailsReducer.domain}/ideas?${qs.stringify({...widgetsSetting, widget: id, isPreview: true})}`}/>
                         </div>
                     }
 
@@ -716,7 +720,7 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
                                 width: `${widgetsSetting.sidebar_width}px`,
                             }}>
                                 <iframe className='QH-frame'
-                                        src={`https://${projectDetailsReducer.domain}/ideas?widget=${id}`}/>
+                                        src={`https://${projectDetailsReducer.domain}/ideas?${qs.stringify({...widgetsSetting, widget: id, isPreview: true})}`}/>
                             </div>
                             <div className="QH-sidebar-shadow" onClick={onToggle}>&nbsp;</div>
 
@@ -732,7 +736,7 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
                                      height: `${widgetsSetting.modal_height}px`,
                                  }}>
                                 <iframe className='QH-frame'
-                                        src={`https://${projectDetailsReducer.domain}/ideas?widget=${id}`}/>
+                                        src={`https://${projectDetailsReducer.domain}/ideas?${qs.stringify({...widgetsSetting, widget: id, isPreview: true})}`}/>
                             </div>
                         </div>
                     }
@@ -742,7 +746,7 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
                         <div className={"QH-widget-embed"}>
                             <div className={"QH-embed"}>
                                 <iframe className='QH-frame rounded-lg'
-                                        src={`https://${projectDetailsReducer.domain}/ideas?widget=${id}`}/>
+                                        src={`https://${projectDetailsReducer.domain}/ideas?${qs.stringify({...widgetsSetting, widget: id, isPreview: true})}`}/>
                             </div>
                         </div>
 

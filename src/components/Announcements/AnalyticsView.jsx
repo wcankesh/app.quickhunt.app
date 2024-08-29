@@ -169,29 +169,31 @@ const AnalyticsView = ({isOpen, onOpen, onClose, selectedViewAnalyticsRecord}) =
                                                         )
                                                     })
                                                 }
+                                                <div className={"flex flex-row justify-end items-center gap-3 "}>
+                                                    <Button
+                                                        disabled={pageNo === 1 || isLoading}
+                                                        variant={"outline"}
+                                                        className={"h-[30px] w-[30px] p-1.5"}
+                                                        onClick={() => handlePaginationClick(pageNo - 1)}
+                                                    >
+                                                        <ChevronLeft className={pageNo === 1 || isLoading ? "stroke-muted-foreground" : "stroke-primary"} />
+                                                    </Button>
+                                                    <h5 className={"text-[14px] font-bold"}>{pageNo}</h5>
+                                                    <Button
+                                                        disabled={pageNo === totalPages || isLoading}
+                                                        variant={"outline"}
+                                                        className={"h-[30px] w-[30px] p-1.5"}
+                                                        onClick={() => handlePaginationClick(pageNo + 1)}
+                                                    >
+                                                        <ChevronRight className={pageNo === totalPages || isLoading ? "stroke-muted-foreground" : "stroke-primary"} />
+                                                    </Button>
+                                                </div>
                                             </div>
                                     }
                                 </Fragment>
                         }
-                        <div className={"flex flex-row justify-end items-center gap-3 "}>
-                            <Button
-                                disabled={pageNo === 1 || isLoading}
-                                variant={"outline"}
-                                className={"h-[30px] w-[30px] p-1.5"}
-                                onClick={() => handlePaginationClick(pageNo - 1)}
-                            >
-                                <ChevronLeft className={pageNo === 1 || isLoading ? "stroke-muted-foreground" : "stroke-primary"} />
-                            </Button>
-                            <h5 className={"text-[14px] font-bold"}>{pageNo}</h5>
-                            <Button
-                                disabled={pageNo === totalPages || isLoading}
-                                variant={"outline"}
-                                className={"h-[30px] w-[30px] p-1.5"}
-                                onClick={() => handlePaginationClick(pageNo + 1)}
-                            >
-                                <ChevronRight className={pageNo === totalPages || isLoading ? "stroke-muted-foreground" : "stroke-primary"} />
-                            </Button>
-                        </div>
+
+
                     </div>
                 </div>
             </SheetContent>

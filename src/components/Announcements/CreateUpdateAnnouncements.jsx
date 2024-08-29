@@ -559,12 +559,12 @@ const CreateUpdateAnnouncements = ({isOpen, onOpen, onClose, selectedRecord, get
                                         <Calendar
                                             mode="single"
                                             captionLayout="dropdown"
+                                            showOutsideDays={false}
                                             selected={changeLogDetails.post_published_at ? new Date(changeLogDetails.post_published_at) : new Date()}
                                             onSelect={(date) => onDateChange("post_published_at", date)}
                                             startMonth={new Date(2024, 0)}
                                             endMonth={new Date(2050, 12)}
-
-
+                                            hideNavigation
                                         />
                                     </PopoverContent>
                                 </Popover>
@@ -651,12 +651,13 @@ const CreateUpdateAnnouncements = ({isOpen, onOpen, onClose, selectedRecord, get
                                             <PopoverContent className="w-auto p-0" align="start">
                                                 <Calendar
                                                     mode="single"
+                                                    showOutsideDays={false}
                                                     captionLayout="dropdown"
                                                     selected={changeLogDetails.post_expired_at}
                                                     onSelect={(date) => onDateChange("post_expired_at", date)}
                                                     startMonth={new Date(2024, 0)}
                                                     endMonth={new Date(2050, 12)}
-
+                                                    hideNavigation
                                                 />
                                             </PopoverContent>
                                         </Popover>

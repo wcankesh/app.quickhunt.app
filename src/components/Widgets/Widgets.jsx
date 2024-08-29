@@ -504,7 +504,7 @@ const Widgets = () => {
                                 className={`w-full ${theme === "dark" ? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end p-2 md:px-3 md:py-[10px]`}>
                                 <div className={"w-full flex gap-2 items-center justify-between sm:justify-end"}>
                                     <div>
-                                        <h5 className={"text-sm font-semibold"}>Page {pageNo} of {totalPages}</h5>
+                                        <h5 className={"text-sm font-semibold"}>Page {widgetsSetting.length <= 0 ? 0 :pageNo} of {totalPages}</h5>
                                     </div>
                                     <div className={"flex flex-row gap-2 items-center"}>
                                         <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
@@ -521,15 +521,15 @@ const Widgets = () => {
                                         </Button>
                                         <Button variant={"outline"} className={" h-[30px] w-[30px] p-1.5"}
                                                 onClick={() => handlePaginationClick(pageNo + 1)}
-                                                disabled={pageNo === totalPages || isLoading}>
+                                                disabled={pageNo === totalPages || isLoading || widgetsSetting.length <= 0}>
                                             <ChevronRight
-                                                className={pageNo === totalPages || isLoading ? "stroke-muted-foreground" : "stroke-primary"}/>
+                                                className={pageNo === totalPages || isLoading || widgetsSetting.length <= 0 ? "stroke-muted-foreground" : "stroke-primary"}/>
                                         </Button>
                                         <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
                                                 onClick={() => handlePaginationClick(totalPages)}
-                                                disabled={pageNo === totalPages || isLoading}>
+                                                disabled={pageNo === totalPages || isLoading || widgetsSetting.length <= 0}>
                                             <ChevronsRight
-                                                className={pageNo === totalPages || isLoading ? "stroke-muted-foreground" : "stroke-primary"}/>
+                                                className={pageNo === totalPages || isLoading || widgetsSetting.length <= 0 ? "stroke-muted-foreground" : "stroke-primary"}/>
                                         </Button>
                                     </div>
                                 </div>
