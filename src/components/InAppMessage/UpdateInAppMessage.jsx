@@ -80,7 +80,7 @@ const initialState = {
     position: "top", //top/bottom
     alignment: "left", //left/right
     is_close_button: "", //true/false
-    reply_type: 1, //1=Text,2=Reaction
+    reply_type: "", //1=Text,2=Reaction
     question_type: 1, //1=Net Promoter Score,2=Numeric Scale,3=Star rating scale,4=Emoji rating scale,5=Drop Down / List,6=Questions
     start_number: 1,
     end_number: 10,
@@ -171,7 +171,6 @@ const UpdateInAppMessage = ({ isOpen, onOpen, onClose,}) => {
 
     const [messageType,setMessageType]=useState(1);
     const [date, setDate] = useState([new Date(),addDays(new Date(), 4)]);
-    const [memberList, setMemberList] = useState([])
     // const [addOption, setAddOption] = useState([])
     const [inAppMsgSetting, setInAppMsgSetting] = useState(initialState);
     const [editMessageName, setEditMessageName] = useState(false);
@@ -217,26 +216,22 @@ const UpdateInAppMessage = ({ isOpen, onOpen, onClose,}) => {
     //     }
     // }, [projectDetailsReducer.id, allStatusAndTypes])
 
-    // useEffect(() => {
-    //     if (id !== "new") {
-    //         getSingleInAppMessages()
-    //     }
-    //     setMemberList(allStatusAndTypes.members);
-    // }, [])
+    useEffect(() => {
+        if (id === "new" && projectDetailsReducer.id) {
+            if (allStatusAndTypes.members.length > 0) {
+                setInAppMsgSetting(prevState => ({
+                    ...prevState,
+                    from: allStatusAndTypes.members[0].id
+                }));
+            }
+        }
+    }, [allStatusAndTypes.members])
 
     useEffect(() => {
-        if (id !== "new") {
+        if (id !== "new" && projectDetailsReducer.id) {
             getSingleInAppMessages();
         }
-        setMemberList(allStatusAndTypes.members);
-
-        if (allStatusAndTypes.members.length > 0) {
-            setInAppMsgSetting(prevState => ({
-                ...prevState,
-                from: allStatusAndTypes.members[0].id
-            }));
-        }
-    }, [allStatusAndTypes]);
+    }, [projectDetailsReducer.id]);
 
     const getSingleInAppMessages = async () => {
         const data = await apiSerVice.getSingleInAppMessage(id)
@@ -408,11 +403,6 @@ const UpdateInAppMessage = ({ isOpen, onOpen, onClose,}) => {
         }
     }
 
-    const getSelectedUserName = () => {
-        const selectedUser = memberList.find(x => x.id == inAppMsgSetting.from);
-        return selectedUser?.user_first_name && selectedUser?.user_last_name ? `${selectedUser?.user_first_name} ${selectedUser?.user_last_name}` : 'Select a user';
-    };
-
     const renderSideBarItem = () => {
         return(
             <div>
@@ -467,17 +457,17 @@ const UpdateInAppMessage = ({ isOpen, onOpen, onClose,}) => {
                                         <div className={"space-y-1"}>
                                             <Label className={"font-normal"}>From</Label>
                                             <Select
-                                                value={inAppMsgSetting.from || ''}
+                                                value={Number(inAppMsgSetting.from)}
                                                 name={"from"}
                                                 onValueChange={(value) => handleStatusChange(value, "from")}
                                             >
                                                 <SelectTrigger className="w-full h-9">
-                                                    <SelectValue placeholder={getSelectedUserName()}/>
+                                                    <SelectValue />
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                     <SelectGroup>
-                                                            {memberList.map((x) => (
-                                                            <SelectItem key={x.id} value={x.id}>
+                                                            {allStatusAndTypes.members.map((x) => (
+                                                            <SelectItem key={Number(x.id)} value={Number(x.id)}>
                                                                 {x.user_first_name} {x.user_last_name}
                                                             </SelectItem>
                                                         ))}

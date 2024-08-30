@@ -4,7 +4,6 @@ import { Input } from "../ui/input";
 
 const ColorInput = ({ value, name, onChange, style }) => {
     const [clickedOutside, setClickedOutside] = useState(false);
-    const [inputValue, setInputValue] = useState(value || "#000000");
     const myRef = useRef();
 
     const handleClickOutside = (e) => {
@@ -20,16 +19,10 @@ const ColorInput = ({ value, name, onChange, style }) => {
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
-    const handleInputChange = (e) => {
-        const newValue = e.target.value;
-        setInputValue(newValue);
-        onChange({ [name]: newValue });
-    };
 
     const handleColorChange = (color) => {
         const newColor = color.hex;
-        setInputValue(newColor);
-        onChange({ [name]: newColor });
+        onChange(name, newColor);
     };
 
     return (
@@ -41,19 +34,19 @@ const ColorInput = ({ value, name, onChange, style }) => {
                 ref={myRef}
             >
                 <div className="flex gap-1 items-center">
-                    <div style={{background: inputValue}} className="color_picker_color"/>
+                    <div style={{background: value}} className="color_picker_color"/>
                     <Input
                         className={"text-sm border-none p-0 h-auto focus-visible:ring-offset-0 focus-visible:ring-0"}
                         id={name}
-                        value={inputValue}
-                        onChange={handleInputChange}
+                        value={value}
+                        onChange={(e) => handleColorChange({hex: e.target.value})}
                     />
                     {/*<span className="text-sm" id={name}>{inputValue}</span>*/}
                 </div>
                 {
                     clickedOutside &&
                     <SketchPicker
-                        color={inputValue}
+                        color={value}
                         onChange={handleColorChange}
                     />
                 }

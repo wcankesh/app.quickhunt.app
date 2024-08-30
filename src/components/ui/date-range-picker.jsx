@@ -229,6 +229,7 @@ export const DateRangePicker = ({
                 }
                 : undefined
         )
+        setIsOpen(false)
     }
 
     useEffect(() => {
@@ -333,6 +334,7 @@ export const DateRangePicker = ({
                             <Button
                                 size={"sm"}
                                 onClick={() => {
+
                                     resetValues()
                                 }}
                                 variant="ghost"

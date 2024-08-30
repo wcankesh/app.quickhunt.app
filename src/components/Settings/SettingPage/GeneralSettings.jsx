@@ -3,7 +3,6 @@ import {Card, CardContent, CardFooter, CardHeader} from "../../ui/card";
 import {Label} from "../../ui/label";
 import {Input} from "../../ui/input";
 import {Switch} from "../../ui/switch";
-import {useTheme} from "../../theme-provider";
 import {ApiService} from "../../../utils/ApiService";
 import {useToast} from "../../ui/use-toast";
 import {useSelector} from "react-redux";
@@ -31,35 +30,32 @@ const initialState = {
 }
 
 const GeneralSettings = () => {
-    const {onProModal} = useTheme()
     let apiSerVice = new ApiService();
     const {toast} = useToast();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const userDetailsReducer = useSelector(state => state.userDetailsReducer);
-    const [generalSettingData, setGeneralSettingData] = useState(initialState);
+
+    let [generalSettingData, setGeneralSettingData] = useState(initialState);
     const [isSave, setIsSave] = useState(false);
 
     useEffect(() => {
+        const getPortalSetting = async () => {
+            const data = await apiSerVice.getPortalSetting(projectDetailsReducer.id)
+            console.log(data.status)
+            if (data.status === 200) {
+                setGeneralSettingData(data.data);
+                console.log("generalSettingData.header_btn_background_color", data.data.header_btn_background_color)
+            } else {
+
+            }
+        }
         if (projectDetailsReducer.id) {
             getPortalSetting()
         }
     }, [projectDetailsReducer.id])
 
-    const getPortalSetting = async () => {
-        const data = await apiSerVice.getPortalSetting(projectDetailsReducer.id)
-        if (data.status === 200) {
-            setGeneralSettingData({...data.data})
-        } else {
-
-        }
-    }
-
-    const onChangeSwitch = (event, e) => {
-        if (userDetailsReducer.plan !== 0) {
-            setGeneralSettingData({...generalSettingData, [event.event1.name]: event.event1.value})
-        }
-        setGeneralSettingData({...generalSettingData, [event.event1.name]: event.event1.value})
-        e.stopPropagation();
+    const onChangeSwitch = (name, value) => {
+        setGeneralSettingData({...generalSettingData, [name]: value})
     }
 
     const onChange = (name, value) => {
@@ -72,22 +68,9 @@ const GeneralSettings = () => {
     const onUpdatePortal = async () => {
         setIsSave(true)
         const payload = {
+            ...generalSettingData,
             project_id: projectDetailsReducer.id,
-            announcement_title: generalSettingData.announcement_title,
-            btn_background_color: generalSettingData.btn_background_color,
-            btn_text_color: generalSettingData.btn_text_color,
-            header_bg_color: generalSettingData.header_bg_color,
-            header_text_color: generalSettingData.header_text_color,
-            header_btn_background_color: generalSettingData.header_btn_background_color,
-            header_btn_text_color: generalSettingData.header_btn_text_color,
-            idea_title: generalSettingData.idea_title,
-            is_announcement: generalSettingData.is_announcement,
-            is_branding: generalSettingData.is_branding,
-            is_comment: generalSettingData.is_comment,
-            is_idea: generalSettingData.is_idea,
-            is_reaction: generalSettingData.is_reaction,
-            is_roadmap: generalSettingData.is_roadmap,
-            roadmap_title: generalSettingData.roadmap_title,
+
         }
         const data = await apiSerVice.updatePortalSetting(generalSettingData.id, payload)
         if (data.status === 200) {
@@ -118,12 +101,7 @@ const GeneralSettings = () => {
                             <Switch
                                 className="w-[38px] h-[20px]"
                                 checked={generalSettingData.is_announcement === 1}
-                                onCheckedChange={(checked, event) => onChangeSwitch({
-                                    event1: {
-                                        name: "is_announcement",
-                                        value: checked ? 1 : 0
-                                    }
-                                }, event)}
+                                onCheckedChange={(checked) => onChangeSwitch("is_announcement", checked ? 1 : 0)}
                             />
                         </div>
                     </div>
@@ -185,12 +163,8 @@ const GeneralSettings = () => {
                             <Switch
                                 className="w-[38px] h-[20px]"
                                 checked={generalSettingData.is_roadmap === 1}
-                                onCheckedChange={(checked, event) => onChangeSwitch({
-                                    event1: {
-                                        name: "is_roadmap",
-                                        value: checked ? 1 : 0
-                                    }
-                                }, event)}
+                                onCheckedChange={(checked) => onChangeSwitch("is_roadmap", checked ? 1 : 0)}
+
                             />
                         </div>
                     </div>
@@ -215,12 +189,8 @@ const GeneralSettings = () => {
                             <Switch
                                 className="w-[38px] h-[20px]"
                                 checked={generalSettingData.is_idea === 1}
-                                onCheckedChange={(checked, event) => onChangeSwitch({
-                                    event1: {
-                                        name: "is_idea",
-                                        value: checked ? 1 : 0
-                                    }
-                                }, event)}
+                                onCheckedChange={(checked) => onChangeSwitch("is_idea", checked ? 1 : 0)}
+
                             />
                         </div>
                     </div>
@@ -244,14 +214,14 @@ const GeneralSettings = () => {
                             <Label className={"text-sm font-normal"}>Background Color</Label>
                             <ColorInput name="header_bg_color"
                                         value={generalSettingData.header_bg_color}
-                                        onChange={(color) => onChange("header_bg_color", color?.header_bg_color)}
+                                        onChange={onChange}
                             />
                         </div>
                         <div className={"widget-color-picker space-y-2 w-full md:basis-1/2"}>
                             <Label className={"text-sm font-normal"}>Text Color</Label>
                             <ColorInput name="header_text_color"
                                         value={generalSettingData.header_text_color}
-                                        onChange={(color) => onChange("header_text_color", color?.header_text_color)}
+                                        onChange={onChange}
                             />
                         </div>
                     </div>
@@ -261,7 +231,7 @@ const GeneralSettings = () => {
                             <ColorInput
                                 name="header_btn_background_color"
                                 value={generalSettingData.header_btn_background_color}
-                                onChange={(color) => onChange("header_btn_background_color", color?.header_btn_background_color)}
+                                onChange={onChange}
                             />
                         </div>
                         <div className={"widget-color-picker space-y-2 w-full md:basis-1/2"}>
@@ -269,7 +239,7 @@ const GeneralSettings = () => {
                             <ColorInput
                                 name="header_btn_text_color"
                                 value={generalSettingData.header_btn_text_color}
-                                onChange={(color) => onChange("header_btn_text_color", color?.header_btn_text_color)}
+                                onChange={onChange}
                             />
                         </div>
                     </div>
@@ -282,7 +252,7 @@ const GeneralSettings = () => {
                             <ColorInput
                                 name="btn_background_color"
                                 value={generalSettingData.btn_background_color}
-                                onChange={(color) => onChange("btn_background_color", color?.btn_background_color)}
+                                onChange={onChange}
                             />
                         </div>
                         <div className={"widget-color-picker space-y-2 w-full md:basis-1/2"}>
@@ -290,7 +260,7 @@ const GeneralSettings = () => {
                             <ColorInput
                                 name="btn_text_color"
                                 value={generalSettingData.btn_text_color}
-                                onChange={(color) => onChange("btn_text_color", color?.btn_text_color)}
+                                onChange={onChange}
                             />
                         </div>
                     </div>
@@ -302,12 +272,8 @@ const GeneralSettings = () => {
                             className="w-[38px] h-[20px]"
                             checked={generalSettingData.is_branding === 1}
                             disabled={userDetailsReducer.plan === 0}
-                            onCheckedChange={(checked, event) => onChangeSwitch({
-                                event1: {
-                                    name: "is_branding",
-                                    value: checked ? 1 : 0
-                                }
-                            }, event)}
+                            onCheckedChange={(checked) => onChangeSwitch("is_branding", checked ? 1 : 0)}
+
                         />
                         <p className="text-sm text-muted-foreground font-medium">Show Branding</p>
                     </div>

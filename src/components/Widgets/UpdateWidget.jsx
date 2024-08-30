@@ -24,7 +24,7 @@ const initialState = {
     popover_height: "620",
     launcher_icon: "bolt",
     launcher_position: 2,
-    launcher_icon_bg_color: "#FD6B65",
+    launcher_icon_bg_color: "#7c3aed",
     launcher_icon_color: "#ffffff",
     is_idea: true,
     is_roadmap: true,
@@ -300,14 +300,14 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
                                             <Label className={"font-normal"}>Background Color</Label>
                                             <ColorInput name="launcher_icon_bg_color"
                                                         value={widgetsSetting.launcher_icon_bg_color}
-                                                        onChange={(color) => onChange("launcher_icon_bg_color", color?.launcher_icon_bg_color)}
+                                                        onChange={onChange}
                                             />
                                         </div>
                                         <div className={"widget-color-picker space-y-2"}>
                                             <Label className={"font-normal"}>Icon Color</Label>
                                             <ColorInput name="launcher_icon_color"
                                                         value={widgetsSetting.launcher_icon_color}
-                                                        onChange={(color) => onChange("launcher_icon_color", color?.launcher_icon_color)}
+                                                        onChange={onChange}
                                             />
                                         </div>
                                     </div>
@@ -533,28 +533,28 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
                                 <div className={"widget-color-picker space-y-2"}>
                                     <Label className={"font-normal"}>Header Background Color</Label>
                                     <ColorInput name="header_bg_color"
-                                                onChange={(color) => onChange("header_bg_color", color?.header_bg_color)}
+                                                onChange={onChange}
                                                 value={widgetsSetting.header_bg_color}
                                     />
                                 </div>
                                 <div className={"widget-color-picker space-y-2"}>
                                     <Label className={"font-normal"}>Header Text Color</Label>
                                     <ColorInput type="color" name="header_text_color"
-                                                onChange={(color) => onChange("header_text_color", color?.header_text_color)}
+                                                onChange={onChange}
                                                 value={widgetsSetting.header_text_color}
                                     />
                                 </div>
                                 <div className={"widget-color-picker space-y-2"}>
                                     <Label className={"font-normal"}>Header Button Background Color</Label>
                                     <ColorInput name="header_btn_background_color"
-                                                onChange={(color) => onChange("header_btn_background_color", color?.header_btn_background_color)}
+                                                onChange={onChange}
                                                 value={widgetsSetting.header_btn_background_color}
                                     />
                                 </div>
                                 <div className={"widget-color-picker space-y-2"}>
                                     <Label className={"font-normal"}>Header Button Text Color</Label>
                                     <ColorInput type="color" name="header_btn_text_color"
-                                                onChange={(color) => onChange("header_btn_text_color", color?.header_btn_text_color)}
+                                                onChange={onChange}
                                                 value={widgetsSetting.header_btn_text_color}
                                     />
                                 </div>
@@ -563,14 +563,14 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
                                 <div className={"widget-color-picker space-y-2"}>
                                     <Label className={"font-normal"}>Button Background Color</Label>
                                     <ColorInput name="btn_background_color"
-                                                onChange={(color) => onChange("btn_background_color", color?.btn_background_color)}
+                                                onChange={onChange}
                                                 value={widgetsSetting.btn_background_color}
                                     />
                                 </div>
                                 <div className={"widget-color-picker space-y-2"}>
                                     <Label className={"font-normal"}>Button Text Color</Label>
                                     <ColorInput type="color" name="btn_text_color"
-                                                onChange={(color) => onChange("btn_text_color", color?.btn_text_color)}
+                                                onChange={onChange}
                                                 value={widgetsSetting.btn_text_color}
                                     />
                                 </div>
