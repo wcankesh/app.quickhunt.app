@@ -20,7 +20,7 @@ import {Separator} from "../ui/separator";
 import {Checkbox} from "../ui/checkbox";
 import {Badge} from "../ui/badge";
 import {useNavigate} from "react-router-dom";
-import { baseUrl} from "../../utils/constent";
+import {baseUrl, urlParams} from "../../utils/constent";
 import {Dialog} from "@radix-ui/react-dialog";
 import {DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "../ui/dialog";
 import {ApiService} from "../../utils/ApiService";
@@ -92,10 +92,35 @@ const filterType = [
     }
 ]
 
+// const initialState = {
+//     content_type:"",
+//     add_filter:"",
+//     search:""
+// }
+
 const initialState = {
-    content_type:"",
-    add_filter:"",
-    search:""
+    project_id: "2",
+    title: "Shipped",
+    type: 1, //1=post,2=banner,3=survey,4=checklist
+    from: "",
+    reply_to: "",
+    bg_color: "",
+    text_color: "",
+    icon_color: "",
+    btn_color: "",
+    delay: "", //time in seconds
+    start_at: "",
+    end_at: "",
+    position: "", //top/bottom
+    alignment: "", //left/right
+    is_close_button: "", //true/false
+    question_type: "", //1=Net Promoter Score,2=Numeric Scale,3=Star rating scale,4=Emoji rating scale,5=Drop Down / List,6=Questions
+    start_number: "",
+    end_number: "",
+    start_label: "",
+    end_label: "",
+    placeholder_text: "",
+    options: [],
 }
 
 const InAppMessage = () => {
@@ -112,30 +137,34 @@ const InAppMessage = () => {
     const [isLoadingDelete,setIsLoadingDelete] = useState(false);
     const navigate = useNavigate();
     const apiService = new ApiService();
-    const projectDetail = useSelector(state => state.projectDetailsReducer);
+    const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
-    console.log(projectDetail);
-    console.log(allStatusAndTypes,"allStatusAndTypes")
-
 
     useEffect(()=>{
-        if(projectDetail?.id){
-            getInAppMessageList();
+        if(projectDetailsReducer.id){
+            getAllInAppMessageList(pageNo, perPageLimit);
         }
-    },[projectDetail?.id])
+    },[projectDetailsReducer.id, pageNo, allStatusAndTypes, perPageLimit])
 
-    const getInAppMessageList = async () => {
+    const getAllInAppMessageList = async () => {
         setIsLoading(true);
-        const data = await  apiService.getInAppMessage(69);
+        const data = await  apiService.getAllInAppMessage({
+            project_id: projectDetailsReducer.id,
+            page: pageNo,
+            limit: perPageLimit
+        });
         if(data.status === 200) {
-            setIsLoading(false);
             setMessageList(data.data);
-            setIsLoading(false);
+            setTotalRecord(data.total);
+            // const id = urlParams.get('id') || "";
+            // if (id) {
+            //     getSingleInAppMessage()
+            // }
+            setIsLoading(false)
         }
         else{
             setIsLoading(false);
         }
-
     }
 
     const filterPosts = (event) => {
@@ -143,10 +172,13 @@ const InAppMessage = () => {
     }
 
     const totalPages = Math.ceil(totalRecord / perPageLimit);
+    console.log(totalRecord)
 
-    const handlePaginationClick = (newPage) => {
+    const handlePaginationClick = async (newPage) => {
         if (newPage >= 1 && newPage <= totalPages) {
+            setIsLoading(true);
             setPageNo(newPage);
+            setIsLoading(false);
         }
     };
 
@@ -220,12 +252,12 @@ const InAppMessage = () => {
             }
 
             <div className={"pt-8 container xl:max-w-[1574px]  lg:max-w-[992px]  md:max-w-[768px] sm:max-w-[639px] px-4"}>
-               <div className={""}>
+                <div className={""}>
                     <div className={"flex justify-between items-center"}>
                         <h4 className={"font-medium text-lg sm:text-2xl leading-8"}>In App Messages</h4>
                         <Button onClick={()=>handleCreateNew("new")} className={"hover:bg-violet-600"}> <Plus className={"mr-4"} />New Content</Button>
                     </div>
-                   <div className={"flex justify-between pt-7"}>
+                    <div className={"flex justify-between pt-7"}>
                         <div className={"flex gap-4"}>
                             <Input
                                 type="search"
@@ -300,35 +332,35 @@ const InAppMessage = () => {
                                 </PopoverContent>
                             </Popover>
                         </div>
-                   </div>
-                   {
-                       (formData.add_filter || formData.content_type) && <div className={"flex flex-wrap gap-2 mt-6"}>
-                                                                               {
-                                                                                   formData.add_filter &&
-                                                                                   <Badge variant="outline" className="rounded p-0">
-                                                                                        <span className="px-3 py-1.5 border-r">{formData.add_filter == 1 ? "People" : formData.add_filter === 2 ? "State" : formData.add_filter === 3 ? "Sender" : formData.add_filter === 4 ? "Date" : ""}</span>
-                                                                                        <span className="w-7 h-7 flex items-center justify-center cursor-pointer" onClick={() => removeBadge("add_filter")}><X className='w-4 h-4'/></span>
-                                                                                   </Badge>
-                                                                               }
+                    </div>
+                    {
+                        (formData.add_filter || formData.content_type) && <div className={"flex flex-wrap gap-2 mt-6"}>
+                            {
+                                formData.add_filter &&
+                                <Badge variant="outline" className="rounded p-0">
+                                    <span className="px-3 py-1.5 border-r">{formData.add_filter == 1 ? "People" : formData.add_filter === 2 ? "State" : formData.add_filter === 3 ? "Sender" : formData.add_filter === 4 ? "Date" : ""}</span>
+                                    <span className="w-7 h-7 flex items-center justify-center cursor-pointer" onClick={() => removeBadge("add_filter")}><X className='w-4 h-4'/></span>
+                                </Badge>
+                            }
 
-                                                                               {
-                                                                                   formData.content_type &&
-                                                                                   <Badge variant="outline" className="rounded p-0">
-                                                                                       <span className="px-3 py-1.5 border-r">{formData.content_type === 1 ? "Post" : formData.content_type === 2 ? "Survey": formData.content_type === 3 ? "Checklist" : formData.content_type === 4 ? "Banners" : ""}</span>
-                                                                                       <span className="w-7 h-7 flex items-center justify-center cursor-pointer" onClick={() => removeBadge("content_type")}><X className='w-4 h-4'/></span>
-                                                                                   </Badge>
-                                                                               }
-                                                                         </div>
-                   }
-                   <Card className={"mt-8"}>
-                       <div className={"grid grid-cols-1 overflow-auto whitespace-nowrap"}>
-                           <Table className={""}>
-                                <TableHeader>
-                                    <TableRow className={""}>
+                            {
+                                formData.content_type &&
+                                <Badge variant="outline" className="rounded p-0">
+                                    <span className="px-3 py-1.5 border-r">{formData.content_type === 1 ? "Post" : formData.content_type === 2 ? "Survey": formData.content_type === 3 ? "Checklist" : formData.content_type === 4 ? "Banners" : ""}</span>
+                                    <span className="w-7 h-7 flex items-center justify-center cursor-pointer" onClick={() => removeBadge("content_type")}><X className='w-4 h-4'/></span>
+                                </Badge>
+                            }
+                        </div>
+                    }
+                    <Card className={"mt-8"}>
+                        <div className={"grid grid-cols-1 overflow-auto whitespace-nowrap"}>
+                            <Table>
+                                <TableHeader className={`${theme === "dark" ? "" : "bg-muted"}`}>
+                                    <TableRow>
                                         {
-                                            ["Title","State","Sender","Content type","Seen","Created at","Live at",""].map((x,i)=>{
+                                            ["Title","State","Sender","Content type","Seen","Created at","Live at", "Action"].map((x,i)=>{
                                                 return(
-                                                    <TableHead  className={`text-base font-semibold px-2 py-[10px] md:px-3 ${theme === "dark"? "text-[]" : "bg-muted"} ${i == 0 ? "rounded-tl-lg" : i == 9 ? "rounded-tr-lg" : ""}`} key={i}>{x}</TableHead>
+                                                    <TableHead  className={`font-semibold px-2 py-[10px] md:px-3 ${theme === "dark"? "text-[]" : "bg-muted"} ${i == 0 ? "rounded-tl-lg" : i == 9 ? "rounded-tr-lg" : ""}`} key={i}>{x}</TableHead>
                                                 )
                                             })
                                         }
@@ -337,226 +369,240 @@ const InAppMessage = () => {
                                 <TableBody>
                                     {
                                         isLoading ? (
-                                            [...Array(10)].map((x,index)=>{
-                                                return(
-                                                    <TableRow key={index}>
-                                                        {
-                                                            [...Array(7)].map((_, i) => {
-                                                                return (
-                                                                    <TableCell key={i} className={"max-w-[373px] px-2 py-[10px] md:px-3"}>
-                                                                        <Skeleton className={"rounded-md  w-full h-7"}/>
-                                                                    </TableCell>
-                                                                )
-                                                            })
-                                                        }
-                                                    </TableRow>
-                                                )
-                                            })
-                                        )
-                                        :
-                                        messageList.length >  0 ?
-                                        <Fragment>
-                                            {
-                                                messageList.map((x,i)=>{
-                                                    const sender = allStatusAndTypes?.members.find((y)=> y.id == x.from);
-                                                    console.log(sender,"sender")
+                                                [...Array(10)].map((x,index)=>{
                                                     return(
-                                                        <TableRow key={x.id}>
-                                                            <TableCell className={"px-2 py-[10px] md:px-3 font-medium"}>{x.title}</TableCell>
-                                                            <TableCell className={"px-2 py-[10px] md:px-3"}>
-                                                                <Select value={x.state}
-                                                                        onValueChange={(value) => handleStatusChange(x, value)}>
-                                                                    <SelectTrigger className="w-[135px] h-7">
-                                                                        <SelectValue placeholder="Publish"/>
-                                                                    </SelectTrigger>
-                                                                    <SelectContent>
-                                                                        <SelectGroup>
-                                                                            {
-                                                                                (   status || []).map((x, i) => {
-                                                                                    return (
-                                                                                        <Fragment key={i}>
-                                                                                            <SelectItem value={x.value}>
-                                                                                                <div
-                                                                                                    className={"flex items-center gap-2"}>
-                                                                                                    {x.fillColor && <Circle fill={x.fillColor}
-                                                                                                             stroke={x.strokeColor}
-                                                                                                             className={`${theme === "dark" ? "" : "text-muted-foreground"} w-2 h-2`}/>}
-                                                                                                    {x.name}
-                                                                                                </div>
-                                                                                            </SelectItem>
-                                                                                        </Fragment>
-                                                                                    )
-                                                                                })
-                                                                            }
-                                                                        </SelectGroup>
-                                                                    </SelectContent>
-                                                                </Select>
-                                                            </TableCell>
-                                                            <TableCell className={`flex items-center mt-1 px-2 py-[10px] md:px-3 flex gap-2`}>
-                                                                <Avatar className={"w-[20px] h-[20px] "}>
-                                                                    {
-                                                                        sender?.user_photo ? <AvatarImage src={sender?.user_photo} alt="@shadcn"/>
-                                                                            :
-                                                                        <AvatarFallback>{sender && sender.user_first_name && sender.user_first_name.substring(0, 1)}</AvatarFallback>
-                                                                    }
-                                                                </Avatar>
-                                                                <p className={"font-medium"}>{sender && sender?.user_first_name}</p>
-                                                            </TableCell>
-                                                            <TableCell className={`px-2 py-[10px] md:px-3 font-medium`}>
-                                                                {
-                                                                    x.type === 1 ? <div className={"flex items-center gap-1"}><ScrollText  size={16}/>Post</div> : x.type === 2 ? <div className={"flex items-center gap-1"}><ClipboardList  size={16}/>Survey</div> : x.type === 3 ? <div className={"flex items-center gap-1"}><BookCheck size={16}/>Checklist</div> : x.type === 4 ? <div className={"flex items-center gap-1"}><SquareMousePointer size={16}/>Banners</div> : ""
-                                                                }
-                                                            </TableCell>
-                                                            <TableCell className={"px-2 py-[10px] md:px-3"}>
-                                                                {x.seen ? x.seen : "-"}
-                                                            </TableCell>
-                                                            <TableCell className={`px-2 py-[10px] md:px-3 font-medium`}>
-                                                                {x?.created_at ? moment.utc(x.created_at).local().startOf('seconds').fromNow() : "-"}
-                                                            </TableCell>
-                                                            <TableCell className={"px-2 py-[10px] md:px-3"}>
-                                                                {x?.live_at ? x?.live_at : "-"}
-                                                            </TableCell>
-                                                            <TableCell className={`px-2 py-[10px] md:px-3 font-medium flex justify-center`}>
-                                                                <DropdownMenu>
-                                                                    <DropdownMenuTrigger>
-                                                                        <Ellipsis className={`font-medium`} size={18}/>
-                                                                    </DropdownMenuTrigger>
-                                                                    <DropdownMenuContent align={"end"}>
-                                                                        <DropdownMenuItem onClick={()=>handleCreateNew(x.id)}>Edit</DropdownMenuItem>
-                                                                        <DropdownMenuItem onClick={()=>setDeleteId(x.id)}>Delete</DropdownMenuItem>
-                                                                    </DropdownMenuContent>
-                                                                </DropdownMenu>
-                                                            </TableCell>
+                                                        <TableRow key={index}>
+                                                            {
+                                                                [...Array(7)].map((_, i) => {
+                                                                    return (
+                                                                        <TableCell key={i} className={"max-w-[373px] px-2 py-[10px] md:px-3"}>
+                                                                            <Skeleton className={"rounded-md  w-full h-7"}/>
+                                                                        </TableCell>
+                                                                    )
+                                                                })
+                                                            }
                                                         </TableRow>
                                                     )
                                                 })
-                                            }
-                                        </Fragment>
-                                        :
-                                        <TableRow>
-                                            <TableCell colSpan={7}>
-                                                <EmptyData/>
-                                            </TableCell>
-                                        </TableRow>
+                                            )
+                                            :
+                                            messageList.length >  0 ?
+                                                <Fragment>
+                                                    {
+                                                        messageList.map((x,i)=>{
+                                                            const sender = allStatusAndTypes?.members.find((y)=> y.id == x.from);
+                                                            return(
+                                                                <TableRow key={x.id}>
+                                                                    <TableCell className={"px-2 py-[10px] md:px-3 font-medium cursor-pointer"} onClick={()=>handleCreateNew(x.id)}>{x.title}</TableCell>
+                                                                    <TableCell className={"px-2 py-[10px] md:px-3"}>
+                                                                        <Select value={x.state}
+                                                                                onValueChange={(value) => handleStatusChange(x, value)}>
+                                                                            <SelectTrigger className="w-[135px] h-7">
+                                                                                <SelectValue placeholder="Publish"/>
+                                                                            </SelectTrigger>
+                                                                            <SelectContent>
+                                                                                <SelectGroup>
+                                                                                    {
+                                                                                        (   status || []).map((x, i) => {
+                                                                                            return (
+                                                                                                <Fragment key={i}>
+                                                                                                    <SelectItem value={x.value}>
+                                                                                                        <div
+                                                                                                            className={"flex items-center gap-2"}>
+                                                                                                            {x.fillColor && <Circle fill={x.fillColor}
+                                                                                                                                    stroke={x.strokeColor}
+                                                                                                                                    className={`${theme === "dark" ? "" : "text-muted-foreground"} w-2 h-2`}/>}
+                                                                                                            {x.name}
+                                                                                                        </div>
+                                                                                                    </SelectItem>
+                                                                                                </Fragment>
+                                                                                            )
+                                                                                        })
+                                                                                    }
+                                                                                </SelectGroup>
+                                                                            </SelectContent>
+                                                                        </Select>
+                                                                    </TableCell>
+                                                                    <TableCell className={`flex items-center mt-1 px-2 py-[10px] md:px-3 flex gap-2`}>
+                                                                        <Avatar className={"w-[20px] h-[20px] "}>
+                                                                            {
+                                                                                sender?.user_photo ? <AvatarImage src={sender?.user_photo} alt="@shadcn"/>
+                                                                                    :
+                                                                                    <AvatarFallback>{sender && sender.user_first_name && sender.user_first_name.substring(0, 1)}</AvatarFallback>
+                                                                            }
+                                                                        </Avatar>
+                                                                        <p className={"font-medium"}>{sender && sender?.user_first_name}</p>
+                                                                    </TableCell>
+                                                                    <TableCell className={`px-2 py-[10px] md:px-3 font-medium`}>
+                                                                        {
+                                                                            x.type === 1 ? <div className={"flex items-center gap-1"}><ScrollText  size={16}/>Post</div> : x.type === 2 ? <div className={"flex items-center gap-1"}><ClipboardList  size={16}/>Survey</div> : x.type === 3 ? <div className={"flex items-center gap-1"}><BookCheck size={16}/>Checklist</div> : x.type === 4 ? <div className={"flex items-center gap-1"}><SquareMousePointer size={16}/>Banners</div> : ""
+                                                                        }
+                                                                    </TableCell>
+                                                                    <TableCell className={"px-2 py-[10px] md:px-3"}>
+                                                                        {x.seen ? x.seen : "-"}
+                                                                    </TableCell>
+                                                                    <TableCell className={`px-2 py-[10px] md:px-3 font-medium`}>
+                                                                        {x?.created_at ? moment.utc(x.created_at).local().startOf('seconds').fromNow() : "-"}
+                                                                    </TableCell>
+                                                                    <TableCell className={"px-2 py-[10px] md:px-3"}>
+                                                                        {x?.live_at ? x?.live_at : "-"}
+                                                                    </TableCell>
+                                                                    <TableCell className={`px-2 py-[10px] md:px-3`}>
+                                                                        <DropdownMenu>
+                                                                            <DropdownMenuTrigger>
+                                                                                <Ellipsis className={`font-medium`} size={18}/>
+                                                                            </DropdownMenuTrigger>
+                                                                            <DropdownMenuContent align={"end"}>
+                                                                                <DropdownMenuItem onClick={()=>handleCreateNew(x.id)}>Edit</DropdownMenuItem>
+                                                                                <DropdownMenuItem onClick={()=>setDeleteId(x.id)}>Delete</DropdownMenuItem>
+                                                                            </DropdownMenuContent>
+                                                                        </DropdownMenu>
+                                                                    </TableCell>
+                                                                </TableRow>
+                                                            )
+                                                        })
+                                                    }
+                                                </Fragment>
+                                                :
+                                                <TableRow>
+                                                    <TableCell colSpan={7}>
+                                                        <EmptyData/>
+                                                    </TableCell>
+                                                </TableRow>
                                     }
                                 </TableBody>
 
 
 
-                               {/*{*/}
-                                    {/*    isLoading ? <TableBody>*/}
-                                    {/*            {*/}
-                                    {/*                [...Array(10)].map((_, index) => {*/}
-                                    {/*                    return (*/}
-                                    {/*                        <TableRow key={index}>*/}
-                                    {/*                            {*/}
-                                    {/*                                [...Array(8)].map((_, i) => {*/}
-                                    {/*                                    return (*/}
-                                    {/*                                        <TableCell key={i} className={"px-2"}>*/}
-                                    {/*                                            <Skeleton className={"rounded-md  w-full h-[24px]"}/>*/}
-                                    {/*                                        </TableCell>*/}
-                                    {/*                                    )*/}
-                                    {/*                                })*/}
-                                    {/*                            }*/}
-                                    {/*                        </TableRow>*/}
-                                    {/*                    )*/}
-                                    {/*                })*/}
-                                    {/*            }*/}
-                                    {/*        </TableBody>*/}
-                                    {/*    :*/}
-                                    {/*    <TableBody>*/}
-                                    {/*        {*/}
-                                    {/*            (messageList || []).map((x,i)=>{*/}
-                                    {/*                return(*/}
-                                    {/*                    <TableRow key={i}>*/}
-                                    {/*                        <TableCell className={`px-2 py-[10px] md:px-3 font-medium ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.title}</TableCell>*/}
-                                    {/*                        <TableCell className={"px-2 py-[10px] md:px-3"}>*/}
-                                    {/*                            <Select value={x.state}*/}
-                                    {/*                                    onValueChange={(value) => handleStatusChange(x, value)}>*/}
-                                    {/*                                <SelectTrigger className="w-[135px] h-7">*/}
-                                    {/*                                    <SelectValue placeholder="Publish"/>*/}
-                                    {/*                                </SelectTrigger>*/}
-                                    {/*                                <SelectContent>*/}
-                                    {/*                                    <SelectGroup>*/}
-                                    {/*                                        {*/}
-                                    {/*                                            (   status || []).map((x, i) => {*/}
-                                    {/*                                                return (*/}
-                                    {/*                                                    <Fragment key={i}>*/}
-                                    {/*                                                        <SelectItem value={x.value}>*/}
-                                    {/*                                                            <div*/}
-                                    {/*                                                                className={"flex items-center gap-2"}>*/}
-                                    {/*                                                                {x.fillColor && <Circle fill={x.fillColor}*/}
-                                    {/*                                                                         stroke={x.strokeColor}*/}
-                                    {/*                                                                         className={`${theme === "dark" ? "" : "text-muted-foreground"} w-2 h-2`}/>}*/}
-                                    {/*                                                                {x.name}*/}
-                                    {/*                                                            </div>*/}
-                                    {/*                                                        </SelectItem>*/}
-                                    {/*                                                    </Fragment>*/}
-                                    {/*                                                )*/}
-                                    {/*                                            })*/}
-                                    {/*                                        }*/}
-                                    {/*                                    </SelectGroup>*/}
-                                    {/*                                </SelectContent>*/}
-                                    {/*                            </Select>*/}
-                                    {/*                        </TableCell>*/}
-                                    {/*                        <TableCell className={`flex items-center mt-1 px-2 py-[10px] md:px-3`}>*/}
-                                    {/*                            <img className={"h-5 w-5 rounded-full mr-2"} src={x?.avatar} alt={"not_found"}/>*/}
-                                    {/*                            <p className={`font-medium ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.sender ? x.sender : "-"}</p>*/}
-                                    {/*                        </TableCell>*/}
-                                    {/*                        <TableCell className={`px-2 py-[10px] md:px-3 font-medium ${theme === "dark" ? "" : "text-muted-foreground"}`}>*/}
-                                    {/*                            {*/}
-                                    {/*                                x.content_type === 1 ? <div className={"flex items-center gap-1"}><ScrollText  size={16}/>Post</div> : x.content_type === 2 ? <div className={"flex items-center gap-1"}><ClipboardList  size={16}/>Survey</div> : x.content_type === 3 ? <div className={"flex items-center gap-1"}><BookCheck size={16}/>Checklist</div> : x.content_type === 4 ? <div className={"flex items-center gap-1"}><SquareMousePointer size={16}/>Banners</div> : ""*/}
-                                    {/*                            }*/}
-                                    {/*                        </TableCell>*/}
-                                    {/*                        <TableCell className={`px-2 py-[10px] md:px-3 font-medium ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.seen}</TableCell>*/}
-                                    {/*                        <TableCell className={`px-2 py-[10px] md:px-3 font-medium ${theme === "dark" ? "" : "text-muted-foreground"}`}>*/}
-                                    {/*                            {x?.created_at ? moment.utc(x.created_at).local().startOf('seconds').fromNow() : "-"}*/}
-                                    {/*                        </TableCell>*/}
-                                    {/*                        <TableCell className={`px-2 py-[10px] md:px-3 font-medium ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.live_at ? x.live_at : "-"}</TableCell>*/}
-                                    {/*                        <TableCell className={`px-2 py-[10px] md:px-3 font-medium ${theme === "dark" ? "" : "text-muted-foreground"}`}>*/}
-                                    {/*                            <DropdownMenu>*/}
-                                    {/*                                <DropdownMenuTrigger>*/}
-                                    {/*                                    <Ellipsis className={`font-medium`} size={18}/>*/}
-                                    {/*                                </DropdownMenuTrigger>*/}
-                                    {/*                                <DropdownMenuContent align={"end"}>*/}
-                                    {/*                                    <DropdownMenuItem onClick={()=>handleCreateNew(x.id)}>Edit</DropdownMenuItem>*/}
-                                    {/*                                    <DropdownMenuItem>Delete</DropdownMenuItem>*/}
-                                    {/*                                </DropdownMenuContent>*/}
-                                    {/*                            </DropdownMenu>*/}
-                                    {/*                        </TableCell>*/}
-                                    {/*                    </TableRow>*/}
-                                    {/*                )*/}
-                                    {/*            })*/}
-                                    {/*        }*/}
-                                    {/*    </TableBody>*/}
-                                    {/*}*/}
-                           </Table>
-                       </div>
-                           <Separator/>
-                           <CardFooter className={"p-0"}>
-                               <div className={`w-full px-2 py-[10px] md:px-3 rounded-b-lg rounded-t-none flex justify-end ${theme === "dark"? "" : "bg-muted"}`}>
-                                   <div className={"w-full flex gap-8 items-center justify-between sm:justify-end"}>
-                                       <h5 className={"text-sm font-semibold"}>Page {pageNo} of 10</h5>
-                                       <div className={"flex flex-row gap-2 items-center "}>
-                                           <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"} onClick={() => handlePaginationClick(1)} disabled={pageNo === 1}>
-                                               <ChevronsLeft className={pageNo === 1 ? "stroke-muted-foreground" : "stroke-primary"}/>
-                                           </Button>
-                                           <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"} onClick={() => handlePaginationClick(pageNo - 1)} disabled={pageNo === 1}>
-                                               <ChevronLeft className={pageNo === 1 ? "stroke-muted-foreground" : "stroke-primary"}/>
-                                           </Button>
-                                           <Button variant={"outline"} className={" h-[30px] w-[30px] p-1.5"} onClick={() => handlePaginationClick(pageNo + 1)} disabled={pageNo === totalPages}>
-                                               <ChevronRight className={pageNo === totalPages ? "stroke-muted-foreground" : "stroke-primary"}/>
-                                           </Button>
-                                           <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"} onClick={() => handlePaginationClick(totalPages)} disabled={pageNo === totalPages}>
-                                               <ChevronsRight className={pageNo === totalPages ? "stroke-muted-foreground" : "stroke-primary"}/>
-                                           </Button>
-                                       </div>
-                                   </div>
-                               </div>
-                           </CardFooter>
+                                {/*{*/}
+                                {/*    isLoading ? <TableBody>*/}
+                                {/*            {*/}
+                                {/*                [...Array(10)].map((_, index) => {*/}
+                                {/*                    return (*/}
+                                {/*                        <TableRow key={index}>*/}
+                                {/*                            {*/}
+                                {/*                                [...Array(8)].map((_, i) => {*/}
+                                {/*                                    return (*/}
+                                {/*                                        <TableCell key={i} className={"px-2"}>*/}
+                                {/*                                            <Skeleton className={"rounded-md  w-full h-[24px]"}/>*/}
+                                {/*                                        </TableCell>*/}
+                                {/*                                    )*/}
+                                {/*                                })*/}
+                                {/*                            }*/}
+                                {/*                        </TableRow>*/}
+                                {/*                    )*/}
+                                {/*                })*/}
+                                {/*            }*/}
+                                {/*        </TableBody>*/}
+                                {/*    :*/}
+                                {/*    <TableBody>*/}
+                                {/*        {*/}
+                                {/*            (messageList || []).map((x,i)=>{*/}
+                                {/*                return(*/}
+                                {/*                    <TableRow key={i}>*/}
+                                {/*                        <TableCell className={`px-2 py-[10px] md:px-3 font-medium ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.title}</TableCell>*/}
+                                {/*                        <TableCell className={"px-2 py-[10px] md:px-3"}>*/}
+                                {/*                            <Select value={x.state}*/}
+                                {/*                                    onValueChange={(value) => handleStatusChange(x, value)}>*/}
+                                {/*                                <SelectTrigger className="w-[135px] h-7">*/}
+                                {/*                                    <SelectValue placeholder="Publish"/>*/}
+                                {/*                                </SelectTrigger>*/}
+                                {/*                                <SelectContent>*/}
+                                {/*                                    <SelectGroup>*/}
+                                {/*                                        {*/}
+                                {/*                                            (   status || []).map((x, i) => {*/}
+                                {/*                                                return (*/}
+                                {/*                                                    <Fragment key={i}>*/}
+                                {/*                                                        <SelectItem value={x.value}>*/}
+                                {/*                                                            <div*/}
+                                {/*                                                                className={"flex items-center gap-2"}>*/}
+                                {/*                                                                {x.fillColor && <Circle fill={x.fillColor}*/}
+                                {/*                                                                         stroke={x.strokeColor}*/}
+                                {/*                                                                         className={`${theme === "dark" ? "" : "text-muted-foreground"} w-2 h-2`}/>}*/}
+                                {/*                                                                {x.name}*/}
+                                {/*                                                            </div>*/}
+                                {/*                                                        </SelectItem>*/}
+                                {/*                                                    </Fragment>*/}
+                                {/*                                                )*/}
+                                {/*                                            })*/}
+                                {/*                                        }*/}
+                                {/*                                    </SelectGroup>*/}
+                                {/*                                </SelectContent>*/}
+                                {/*                            </Select>*/}
+                                {/*                        </TableCell>*/}
+                                {/*                        <TableCell className={`flex items-center mt-1 px-2 py-[10px] md:px-3`}>*/}
+                                {/*                            <img className={"h-5 w-5 rounded-full mr-2"} src={x?.avatar} alt={"not_found"}/>*/}
+                                {/*                            <p className={`font-medium ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.sender ? x.sender : "-"}</p>*/}
+                                {/*                        </TableCell>*/}
+                                {/*                        <TableCell className={`px-2 py-[10px] md:px-3 font-medium ${theme === "dark" ? "" : "text-muted-foreground"}`}>*/}
+                                {/*                            {*/}
+                                {/*                                x.content_type === 1 ? <div className={"flex items-center gap-1"}><ScrollText  size={16}/>Post</div> : x.content_type === 2 ? <div className={"flex items-center gap-1"}><ClipboardList  size={16}/>Survey</div> : x.content_type === 3 ? <div className={"flex items-center gap-1"}><BookCheck size={16}/>Checklist</div> : x.content_type === 4 ? <div className={"flex items-center gap-1"}><SquareMousePointer size={16}/>Banners</div> : ""*/}
+                                {/*                            }*/}
+                                {/*                        </TableCell>*/}
+                                {/*                        <TableCell className={`px-2 py-[10px] md:px-3 font-medium ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.seen}</TableCell>*/}
+                                {/*                        <TableCell className={`px-2 py-[10px] md:px-3 font-medium ${theme === "dark" ? "" : "text-muted-foreground"}`}>*/}
+                                {/*                            {x?.created_at ? moment.utc(x.created_at).local().startOf('seconds').fromNow() : "-"}*/}
+                                {/*                        </TableCell>*/}
+                                {/*                        <TableCell className={`px-2 py-[10px] md:px-3 font-medium ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.live_at ? x.live_at : "-"}</TableCell>*/}
+                                {/*                        <TableCell className={`px-2 py-[10px] md:px-3 font-medium ${theme === "dark" ? "" : "text-muted-foreground"}`}>*/}
+                                {/*                            <DropdownMenu>*/}
+                                {/*                                <DropdownMenuTrigger>*/}
+                                {/*                                    <Ellipsis className={`font-medium`} size={18}/>*/}
+                                {/*                                </DropdownMenuTrigger>*/}
+                                {/*                                <DropdownMenuContent align={"end"}>*/}
+                                {/*                                    <DropdownMenuItem onClick={()=>handleCreateNew(x.id)}>Edit</DropdownMenuItem>*/}
+                                {/*                                    <DropdownMenuItem>Delete</DropdownMenuItem>*/}
+                                {/*                                </DropdownMenuContent>*/}
+                                {/*                            </DropdownMenu>*/}
+                                {/*                        </TableCell>*/}
+                                {/*                    </TableRow>*/}
+                                {/*                )*/}
+                                {/*            })*/}
+                                {/*        }*/}
+                                {/*    </TableBody>*/}
+                                {/*}*/}
+                            </Table>
+                        </div>
+                        <Separator/>
+                        <CardFooter className={`p-0 ${theme === "dark" ? "border-t" : ""}`}>
+                            <div
+                                className={`w-full ${theme === "dark" ? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end p-2 md:px-3 md:py-[10px]`}>
+                                <div className={"w-full flex gap-2 items-center justify-between sm:justify-end"}>
+                                    <div>
+                                        <h5 className={"text-sm font-semibold"}>Page {pageNo} of {totalPages}</h5>
+                                    </div>
+                                    <div className={"flex flex-row gap-2 items-center"}>
+                                        <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
+                                                onClick={() => handlePaginationClick(1)}
+                                                disabled={pageNo === 1 || isLoading}>
+                                            <ChevronsLeft
+                                                className={pageNo === 1 || isLoading ? "stroke-muted-foreground" : "stroke-primary"} />
+                                        </Button>
+                                        <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
+                                                onClick={() => handlePaginationClick(pageNo - 1)}
+                                                disabled={pageNo === 1 || isLoading}>
+                                            <ChevronLeft
+                                                className={pageNo === 1 || isLoading ? "stroke-muted-foreground" : "stroke-primary"} />
+                                        </Button>
+                                        <Button variant={"outline"} className={" h-[30px] w-[30px] p-1.5"}
+                                                onClick={() => handlePaginationClick(pageNo + 1)}
+                                                disabled={pageNo === totalPages || isLoading}>
+                                            <ChevronRight
+                                                className={pageNo === totalPages || isLoading ? "stroke-muted-foreground" : "stroke-primary"} />
+                                        </Button>
+                                        <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
+                                                onClick={() => handlePaginationClick(totalPages)}
+                                                disabled={pageNo === totalPages || isLoading}>
+                                            <ChevronsRight
+                                                className={pageNo === totalPages || isLoading ? "stroke-muted-foreground" : "stroke-primary"} />
+                                        </Button>
+                                    </div>
+                                </div>
+                            </div>
+                        </CardFooter>
 
-                   </Card>
-               </div>
+                    </Card>
+                </div>
             </div>
         </Fragment>
     )

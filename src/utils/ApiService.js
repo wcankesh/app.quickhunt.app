@@ -426,14 +426,24 @@ export class ApiService{
     async updateBoard (payload, id){
         return await this.putData(`${baseUrlApi}/board/${id}`, payload)
     }
-    async getInAppMessage (id){
-        return await this.getData(`${baseUrlApi}/app-message?project_id=${id}`)
+    // async getAllInAppMessage (id){
+    //     return await this.getData(`${baseUrlApi}/app-message?project_id=${id}`)
+    // }
+
+    async getAllInAppMessage (payload){
+        return await this.getData(`${baseUrlApi}/app-message?${qs.stringify(payload)}`)
     }
     async createInAppMessage (payload){
-        return await this.postData(`${baseUrlApi}/app-message`,payload)
+        return await this.postData(`${baseUrlApi}/app-message`, payload)
     }
     async deleteInAppMessage (id){
         return await this.deleteData(`${baseUrlApi}/app-message/${id}`)
+    }
+    async getSingleInAppMessage (id){
+        return await this.getData(`${baseUrlApi}/app-message/${id}`)
+    }
+    async updateInAppMessage (payload, id){
+        return await this.postData(`${baseUrlApi}/app-message/${id}?_method=PUT`, payload)
     }
 
 }

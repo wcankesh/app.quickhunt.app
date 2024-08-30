@@ -6,6 +6,9 @@ import {useNavigate} from "react-router-dom"
 import {Carousel, CarouselContent, CarouselItem} from "../ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
 import widget_01 from "../../img/widget.png";
+import carousel_1 from "../../img/carousel1.png";
+import carousel_2 from "../../img/carousel2.png";
+import carousel_3 from "../../img/carousel3.png";
 import {Icon} from "../../utils/Icon";
 import {ApiService} from "../../utils/ApiService";
 import {baseUrl} from "../../utils/constent";
@@ -124,6 +127,8 @@ const Login = () => {
 
     const togglePasswordVisibility = () => {setShowPassword(!showPassword);};
 
+    const imageSources = [carousel_1, carousel_2, carousel_3];
+
     return (
         <div className="h-full">
             <div className="ltr">
@@ -135,10 +140,15 @@ const Login = () => {
                                 <div className={"app-logo"}>{theme === "dark" ? Icon.whiteLogo : Icon.blackLogo}</div>
                                 <Carousel plugins={[plugin.current]} className={"w-full mt-[25px] mb-[25px]"} onMouseEnter={plugin.current.stop} onMouseLeave={plugin.current.reset}>
                                     <CarouselContent>
-                                        {Array.from({length: 3}).map((_, index) => (
+                                        {/*{Array.from({length: 3}).map((_, index) => (*/}
+                                        {/*    <CarouselItem key={index} className={"max-w-[706px] w-full shrink-0 grow pl-4"}>*/}
+                                        {/*        /!*<img className={"w-[806px]"} src={widget_01} alt=''/>*!/*/}
+                                        {/*        <img className={"w-[706px]"} src={widget_01} alt=''/>*/}
+                                        {/*    </CarouselItem>*/}
+                                        {/*))}*/}
+                                        {imageSources.map((src, index) => (
                                             <CarouselItem key={index} className={"max-w-[706px] w-full shrink-0 grow pl-4"}>
-                                                {/*<img className={"w-[806px]"} src={widget_01} alt=''/>*/}
-                                                <img className={"w-[706px]"} src={widget_01} alt=''/>
+                                                <img className={"w-[706px]"} src={src} alt={`Carousel image ${index + 1}`} />
                                             </CarouselItem>
                                         ))}
                                     </CarouselContent>
@@ -212,7 +222,8 @@ const Login = () => {
                                                     <Button variant={"link"}
                                                             // className="ml-auto inline-block text-sm p-0 h-auto hover:no-underline"
                                                             className="inline-block text-sm p-0 h-auto hover:no-underline"
-                                                            onClick={() => navigate(`${baseUrl}/forgot-password`)}
+                                                            // onClick={() => navigate(`${baseUrl}/forgot-password`)}
+                                                            onClick={() => onRedirect('forgot-password')}
                                                     >
                                                         <span className={"font-normal text-primary"}>Forgot your password?</span>
                                                     </Button>
