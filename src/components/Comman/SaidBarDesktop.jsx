@@ -136,7 +136,7 @@ const SaidBarDesktop = () => {
                     </div>
                 </div>
                 <div className={"sidebar-dek-menu flex flex-col gap-3 overflow-y-auto"}>
-                    <nav className="grid items-start px-4 gap-3">
+                    <nav className="grid items-start px-4 gap-3 pt-[10px]">
                         {
                             (menuComponent || []).map((x, i) => {
                                 return (

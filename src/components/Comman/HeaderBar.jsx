@@ -1,7 +1,7 @@
 import React, {Fragment, useEffect, useState} from 'react';
 import {Sheet, SheetContent, SheetHeader, SheetOverlay, SheetTitle, SheetTrigger} from "../ui/sheet";
 import {Button} from "../ui/button";
-import {ChevronsUpDown, Eye, Loader2, Menu, Moon, Plus, Sun, Trash2, X} from "lucide-react";
+import {Bell, ChevronsUpDown, Eye, Loader2, Menu, Moon, Plus, Sun, Trash2, X} from "lucide-react";
 import {Input} from "../ui/input";
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger} from "../ui/dropdown-menu";
 import {useTheme} from "../theme-provider";
@@ -617,8 +617,11 @@ const HeaderBar = () => {
                             </div>
                         </div>
                         <div className={"flex gap-2 md:gap-4 items-center"}>
-                            <Button variant="ghost hover:none" size="icon" className="h-8 w-8" onClick={viewLink}>
+                            <Button variant="ghost hover:none" size="icon" className={"h-8 w-8"} onClick={viewLink}>
                                 <Eye size={20} />
+                            </Button>
+                            <Button variant="ghost hover:none" size="icon" className={"h-8 w-8"}>
+                                <Bell size={20} />
                             </Button>
                             <Button variant="ghost hover:none" size="icon" className="h-8 w-8" onClick={toggleTheme}>
                                 {theme === 'light' ? <Moon size={20} className="fill-black stroke-black"/> :

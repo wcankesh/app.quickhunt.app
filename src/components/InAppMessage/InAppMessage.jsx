@@ -123,6 +123,13 @@ const initialState = {
     options: [],
 }
 
+const typeNames = {
+    1: "Post",
+    2: "Banner",
+    3: "Survey",
+    4: "Checklist"
+};
+
 const InAppMessage = () => {
     const {theme} = useTheme();
     const [isLoading,setIsLoading]=useState(false);
@@ -190,12 +197,12 @@ const InAppMessage = () => {
         setFormData({...formData,[name]:""});
     }
 
-    const handleCreateNew = (id) => {
+    const handleCreateNew = (id, type) => {
         if(id == "new"){
             navigate(`${baseUrl}/in-app-message/${id}`);
         }
         else{
-            navigate(`${baseUrl}/in-app-message/${id}`);
+            navigate(`${baseUrl}/in-app-message/${type}/${id}`);
         }
     }
 
@@ -393,7 +400,7 @@ const InAppMessage = () => {
                                                             const sender = allStatusAndTypes?.members.find((y)=> y.id == x.from);
                                                             return(
                                                                 <TableRow key={x.id}>
-                                                                    <TableCell className={"px-2 py-[10px] md:px-3 font-medium cursor-pointer"} onClick={()=>handleCreateNew(x.id)}>{x.title}</TableCell>
+                                                                    <TableCell className={"px-2 py-[10px] md:px-3 font-medium cursor-pointer"} onClick={()=>handleCreateNew(x.id, x.type)}>{x.title}</TableCell>
                                                                     <TableCell className={"px-2 py-[10px] md:px-3"}>
                                                                         <Select value={x.state}
                                                                                 onValueChange={(value) => handleStatusChange(x, value)}>
@@ -434,9 +441,7 @@ const InAppMessage = () => {
                                                                         <p className={"font-medium"}>{sender && sender?.user_first_name}</p>
                                                                     </TableCell>
                                                                     <TableCell className={`px-2 py-[10px] md:px-3 font-medium`}>
-                                                                        {
-                                                                            x.type === 1 ? <div className={"flex items-center gap-1"}><ScrollText  size={16}/>Post</div> : x.type === 2 ? <div className={"flex items-center gap-1"}><ClipboardList  size={16}/>Survey</div> : x.type === 3 ? <div className={"flex items-center gap-1"}><BookCheck size={16}/>Checklist</div> : x.type === 4 ? <div className={"flex items-center gap-1"}><SquareMousePointer size={16}/>Banners</div> : ""
-                                                                        }
+                                                                        <div className={"flex items-center gap-1"}><ScrollText  size={16}/>{typeNames[x.type] || "-"}</div>
                                                                     </TableCell>
                                                                     <TableCell className={"px-2 py-[10px] md:px-3"}>
                                                                         {x.seen ? x.seen : "-"}
