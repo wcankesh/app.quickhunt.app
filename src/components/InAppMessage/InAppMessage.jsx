@@ -198,10 +198,9 @@ const InAppMessage = () => {
     }
 
     const handleCreateNew = (id, type) => {
-        if(id == "new"){
+        if(id == "type"){
             navigate(`${baseUrl}/in-app-message/${id}`);
-        }
-        else{
+        } else{
             navigate(`${baseUrl}/in-app-message/${type}/${id}`);
         }
     }
@@ -262,7 +261,7 @@ const InAppMessage = () => {
                 <div className={""}>
                     <div className={"flex justify-between items-center"}>
                         <h4 className={"font-medium text-lg sm:text-2xl leading-8"}>In App Messages</h4>
-                        <Button onClick={()=>handleCreateNew("new")} className={"hover:bg-violet-600"}> <Plus className={"mr-4"} />New Content</Button>
+                        <Button onClick={()=>handleCreateNew("type")} className={"hover:bg-violet-600"}> <Plus className={"mr-4"} />New Content</Button>
                     </div>
                     <div className={"flex justify-between pt-7"}>
                         <div className={"flex gap-4"}>

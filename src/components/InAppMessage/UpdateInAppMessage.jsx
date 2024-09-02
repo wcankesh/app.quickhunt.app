@@ -142,7 +142,7 @@ const UpdateInAppMessage = ({ isOpen, onOpen, onClose,}) => {
     const renderContent = (type) => {
         switch (type) {
             case 1:
-                return <Post />;
+                return <Post/>;
             case 2:
                 return <Banners />;
             case 3:
@@ -857,7 +857,7 @@ const UpdateInAppMessage = ({ isOpen, onOpen, onClose,}) => {
             <div className={"flex"}>
                 <div className={"p-6 w-1/2"}>
                     <div className={"space-x-4"}>
-                        <Button variant={"outline"} size={"icon"} onClick={() => navigate(`${baseUrl}/in-app-message/${id}`)}>
+                        <Button variant={"outline"} size={"icon"} onClick={() => navigate(`${baseUrl}/in-app-message/type`)}>
                             <ArrowLeft className="h-4 w-4" />
                         </Button>
                         <span className={"font-medium text-lg"}>Back</span>
