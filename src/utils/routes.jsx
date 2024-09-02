@@ -15,6 +15,7 @@ import UpdateInAppMessage from "../components/InAppMessage/UpdateInAppMessage";
 import ImportExport from "../components/ImportExport/ImportExport";
 import ImportIdea from "../components/ImportExport/ImportIdea";
 import MessageTypes from "../components/InAppMessage/MessageTypes";
+import WidgetsTypes from "../components/Widgets/WidgetsTypes";
 
 export const routes = [
      {path: `${baseUrl}/dashboard`, component: <Dashboard/>},
@@ -23,7 +24,8 @@ export const routes = [
      {path: `${baseUrl}/roadmap`, component: <Roadmap/>},
      {path: `${baseUrl}/customers`, component: <Customers/>},
      {path: `${baseUrl}/widget`, component: <Widgets/>},
-     {path: `${baseUrl}/widget/:id`, component: <UpdateWidget/>},
+     {path: `${baseUrl}/widget/type`, component: <WidgetsTypes/>},
+     {path: `${baseUrl}/widget/:type/:id`, component: <UpdateWidget/>},
      {path: `${baseUrl}/notification`, component: <Notification/>},
      {path: `${baseUrl}/help-support`, component: <HelpSupport/>},
      {path: `${baseUrl}/pricing-plan`, component: <PricingPlans/>},

@@ -84,9 +84,9 @@ const Widgets = () => {
         }
     }
 
-    const handleCreateNew = (id) => {
+    const handleCreateNew = (id, type) => {
         let length = widgetsSetting?.length;
-        if (userDetailsReducer.plan === 0 && id === "new") {
+        if (userDetailsReducer.plan === 0 && id === "type") {
             if (length < 1) {
                 navigate(`${baseUrl}/widget/${id}`);
                 onProModal(false)
@@ -94,7 +94,12 @@ const Widgets = () => {
                 onProModal(true)
             }
         } else {
-            navigate(`${baseUrl}/widget/${id}`);
+            if(id === "type"){
+                navigate(`${baseUrl}/widget/${id}`);
+            } else {
+                navigate(`${baseUrl}/widget/${type}/${id}`);
+            }
+
             onProModal(false)
         }
 
@@ -409,7 +414,7 @@ const Widgets = () => {
                             <h1 className={"text-2xl font-medium"}>Widgets</h1>
                             <Button
                                 className={"text-sm font-semibold hover:bg-primary px-3 h-auto"}
-                                onClick={() => handleCreateNew("new")}
+                                onClick={() => handleCreateNew("type")}
                             >
                                 Create New
                             </Button>
@@ -458,7 +463,7 @@ const Widgets = () => {
                                                 <TableRow key={i}>
                                                     <TableCell
                                                         className={"font-medium p-2 px-2 py-[10px] md:px-3 cursor-pointer"}
-                                                        onClick={() => handleCreateNew(x.id)}>{x.name}</TableCell>
+                                                        onClick={() => handleCreateNew(x.id, x.type)}>{x.name}</TableCell>
                                                     <TableCell
                                                         className={"font-medium p-2 px-2 py-[10px] md:px-3"}>{x.type}</TableCell>
                                                     <TableCell
@@ -482,7 +487,7 @@ const Widgets = () => {
                                                             <DropdownMenuContent align={"end"}>
                                                                 <DropdownMenuItem
                                                                     className={"cursor-pointer"}
-                                                                    onClick={() => handleCreateNew(x.id)}>Edit</DropdownMenuItem>
+                                                                    onClick={() => handleCreateNew(x.id, x.type)}>Edit</DropdownMenuItem>
                                                                 <DropdownMenuItem className={"cursor-pointer"}
                                                                                   onClick={() => openDeleteWidget(x.id)}>Delete</DropdownMenuItem>
                                                             </DropdownMenuContent>
