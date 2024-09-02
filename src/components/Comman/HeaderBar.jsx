@@ -62,7 +62,6 @@ const HeaderBar = () => {
     let apiSerVice = new ApiService();
     let url = location.pathname;
     const newUrl = url.replace(/[0-9]/g, '');
-
     const userDetailsReducer = useSelector(state => state.userDetailsReducer);
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const allProjectReducer = useSelector(state => state.allProjectReducer);
@@ -191,26 +190,24 @@ const HeaderBar = () => {
     };
     const onChangeText = (event) => {
         const { name, value } = event.target;
-        const removeCharacter = (input) => input.replace(/[^a-zA-Z0-9]/g, '');
-        const newValue = name === 'domain' ? removeCharacter(value) : value;
-
-        setCreateProjectDetails({
-            ...createProjectDetails,
-            [name]: newValue
-        });
-
+        if(name === "project_name" || name === 'domain'){
+            const cleanDomain = (name) => name.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+            const sanitizedProjectName = cleanDomain(value);
+            setCreateProjectDetails({
+                ...createProjectDetails,
+                [name]: value,
+                domain: sanitizedProjectName
+            });
+        } else {
+            setCreateProjectDetails({
+                ...createProjectDetails,
+                [name]: value,
+            });
+        }
         setFormError(formError => ({
             ...formError,
             [name]: ""
         }));
-    };
-
-    const onBlur = (event) => {
-        const {name, value} = event.target;
-        setFormError({
-            ...formError,
-            [name]: formValidate(name, value)
-        });
     };
 
     const formValidate = (name, value) => {
@@ -719,14 +716,17 @@ const HeaderBar = () => {
                                     </div>
                                     <div className="space-y-1">
                                         <Label htmlFor="domain" className="text-right">Project domain</Label>
-                                        <Input
-                                            id="domain"
-                                            placeholder="https://projectname.quickhunt.io"
-                                            className={`${theme === "dark" ? "placeholder:text-muted-foreground/75 pr-[115px]" : "placeholder:text-muted-foreground/75 pr-[115px]"}`}
-                                            value={createProjectDetails.domain}
-                                            name="domain"
-                                            onChange={onChangeText}
-                                        />
+                                        <div className={"relative"}>
+                                            <Input
+                                                id="domain"
+                                                placeholder="projectname"
+                                                className={`${theme === "dark" ? "placeholder:text-muted-foreground/75 pr-[115px]" : "placeholder:text-muted-foreground/75 pr-[115px]"}`}
+                                                value={createProjectDetails.domain}
+                                                name="domain"
+                                                onChange={onChangeText}
+                                            />
+                                            <span className={"absolute top-2 right-2"}>quickhunt.app</span>
+                                        </div>
                                     </div>
                                 <div className={"gap-4 flex sm:justify-start"}>
                                         <Button

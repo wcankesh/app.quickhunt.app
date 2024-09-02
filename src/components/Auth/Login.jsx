@@ -108,7 +108,11 @@ const Login = () => {
                 navigate(`${baseUrl}/setup?token=${token}`);
             } else {
                 urlParams.delete('token')
-                navigate(`${baseUrl}/dashboard`);
+                if(data.project_count === 0){
+                    navigate(`${baseUrl}/project`);
+                } else {
+                    navigate(`${baseUrl}/dashboard`);
+                }
             }
             setIsLoading(false)
         } else {

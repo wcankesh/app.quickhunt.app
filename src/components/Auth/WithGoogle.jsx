@@ -36,8 +36,6 @@ const WithGoogle = ({title}) => {
     };
 
     const updateUser = async (currentUser) => {
-        // const name = currentUser.getBasicProfile().getName();
-
         const getEmail = currentUser.getBasicProfile().getEmail();
         let firstName = currentUser.getBasicProfile().getGivenName() ;
         let lastName = currentUser.getBasicProfile().getFamilyName() ;
@@ -63,7 +61,11 @@ const WithGoogle = ({title}) => {
                 navigate(`${baseUrl}/setup?token=${token}`);
             } else {
                 urlParams.delete('token')
-                navigate(`${baseUrl}/dashboard`);
+                if(data.project_count === 0){
+                    navigate(`${baseUrl}/project`);
+                } else {
+                    navigate(`${baseUrl}/dashboard`);
+                }
             }
             setIsLoading(false)
         } else {

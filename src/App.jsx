@@ -12,6 +12,7 @@ import Forgot from "./components/Auth/Forgot";
 import RestPassword from "./components/Auth/RestPassword";
 import 'quill/dist/quill.snow.css'
 import Setup from "./components/Auth/Setup";
+import Project from "./components/Auth/Project";
 
 function App() {
 
@@ -30,13 +31,14 @@ function App() {
                                 return <Route key={i} path={x.path} element={x.component}/>
                             })
                         }
-
                         <Route path={`${baseUrl}/`} element={<Navigate to={`${baseUrl}/dashboard`} replace/>}/>
                     </Route>
+                    <Route path={`${baseUrl}/project`} element={<Project/>}/>
                     <Route path={`${baseUrl}/setup`} element={<Setup/>}/>
                 </Route>
                 <Route element={<ThemeProvider defaultTheme="system" storageKey="vite-ui-theme"><PublicRoutes/></ThemeProvider>}>
                     <Route path={`${baseUrl}/register`} element={<Register/>}/>
+
                     <Route path={`${baseUrl}/login`} element={<Login/>}/>
                     <Route path={`${baseUrl}/forgot-password`} element={<Forgot/>}/>
                     <Route path={`${baseUrl}/reset-verify`} element={<RestPassword/>}/>

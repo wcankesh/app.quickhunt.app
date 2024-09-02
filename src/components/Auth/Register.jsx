@@ -125,6 +125,7 @@ const Register = () => {
             ...companyDetails
         }
         const data = await apiSerVice.adminSignup(payload)
+        console.log(data)
         if (data.status === 200) {
             toast({description: data.message})
             const urlParams = new URLSearchParams(window.location.search);
@@ -133,6 +134,7 @@ const Register = () => {
                 navigate(`${baseUrl}/login?token=${token}`);
             } else {
                 navigate(`${baseUrl}/login`);
+                localStorage.setItem("token", data.access_token);
             }
             setIsLoading(false)
         } else {
