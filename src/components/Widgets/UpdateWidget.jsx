@@ -4,10 +4,16 @@ import {Label} from "../ui/label";
 import {Input} from "../ui/input";
 import {Switch} from "../ui/switch";
 import {Checkbox} from "../ui/checkbox";
-import {Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator} from "../ui/breadcrumb";
+import {
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList,
+    BreadcrumbPage,
+    BreadcrumbSeparator
+} from "../ui/breadcrumb";
 import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from "../ui/accordion";
 import {SelectTrigger, SelectContent, SelectItem, Select, SelectValue} from "../ui/select";
-import {SheetContent, SheetHeader, Sheet, SheetOverlay} from "../ui/sheet";
 import {useNavigate, useParams} from "react-router-dom";
 import {baseUrl} from "../../utils/constent";
 import ColorInput from "../Comman/ColorPicker";
@@ -60,8 +66,8 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
     const navigate = useNavigate();
     let apiSerVice = new ApiService();
     const {toast} = useToast()
-    const {id} = useParams()
-
+    const {id, type} = useParams()
+    console.log("type", type)
     const [widgetsSetting, setWidgetsSetting] = useState(initialState);
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const [isLoading, setIsLoading] = useState(false);
@@ -81,20 +87,12 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
         }, 500)
     }, []);
 
-    // useEffect(() => {
-    //     if (id !== "new") {
-    //         getWidgetsSetting()
-    //     }
-    // }, [])
-
     useEffect(() => {
-        if (id === "new") {
-            setCreateUpdate('create');
-        } else {
-            setCreateUpdate('update');
-            getWidgetsSetting();
+        if (id !== "new") {
+            getWidgetsSetting()
         }
-    }, [id]);
+    }, [])
+
 
     const getWidgetsSetting = async () => {
         const data = await apiSerVice.getWidgets(id)
@@ -130,43 +128,26 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
         setWidgetsSetting({...widgetsSetting, type: value});
     };
 
-    // const createWidget = async () => {
-    //     setIsLoading(true)
-    //     const payload = {
-    //         ...widgetsSetting,
-    //         project_id: projectDetailsReducer.id,
-    //         name: widgetsSetting?.name
-    //     }
-    //     const data = await apiSerVice.createWidgets(payload)
-    //     if (data.status === 200) {
-    //         setIsLoading(false)
-    //         toast({description: data.message})
-    //         if (id === "new") {
-    //             navigate(`${baseUrl}/widget`)
-    //         }
-    //
-    //     } else {
-    //         setIsLoading(false)
-    //     }
-    // }
-
-    const handleCreateOrUpdate = async () => {
-        setIsLoading(true);
-        const payload = { ...widgetsSetting, project_id: projectDetailsReducer.id, name: widgetsSetting?.name };
-        let data;
-        if (createUpdate === 'create') {
-            data = await apiSerVice.createWidgets(payload);
-        } else {
-            data = await apiSerVice.updateWidgets(payload, widgetsSetting.id);
+    const createWidget = async () => {
+        setIsLoading(true)
+        const payload = {
+            ...widgetsSetting,
+            project_id: projectDetailsReducer.id,
+            name: widgetsSetting?.name,
+            type
         }
+        const data = await apiSerVice.createWidgets(payload)
         if (data.status === 200) {
-            setIsLoading(false);
-            toast({ description: data.message });
-            navigate(`${baseUrl}/widget`);
+            setIsLoading(false)
+            toast({description: data.message})
+            if (id === "new") {
+                navigate(`${baseUrl}/widget`)
+            }
+
         } else {
-            setIsLoading(false);
+            setIsLoading(false)
         }
-    };
+    }
 
     const handleEsc = (event) => {
         if (event.keyCode === 27) {
@@ -181,40 +162,18 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
         };
     }, []);
 
-    const createWidget = async () => {
-        setIsLoading(true)
-        const payload = {
-            ...widgetsSetting,
-            project_id: projectDetailsReducer.id,
-            name: widgetsSetting?.name
-        }
-        const data = await apiSerVice.createWidgets(payload)
-        if (data.status === 200) {
-            setIsLoading(false)
-            toast({description: data.message})
-            if (id === "type") {
-                navigate(`${baseUrl}/widget`)
-            }
-
-        } else {
-            setIsLoading(false)
-        }
-    }
-
     const onUpdateWidgets = async () => {
         setIsLoading(true)
 
         const payload = {
-            ...widgetsSetting
+            ...widgetsSetting,
+            type
         }
         const data = await apiSerVice.updateWidgets(payload, widgetsSetting.id)
 
         if (data.status === 200) {
             setIsLoading(false)
             toast({description: data.message})
-            // if (id === "type") {
-            //     navigate(`${baseUrl}/widget`)
-            // }
         } else {
             setIsLoading(false)
         }
@@ -224,8 +183,8 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
         return (
             <div>
 
-                    <div className={"border-b px-4 py-6 space-y-6"}>
-                        <div className={"space-y-4"}>
+                <div className={"border-b px-4 py-6 space-y-6"}>
+                    <div className={"space-y-4"}>
                         <div className={"space-y-2"}>
                             <Label className={"text-sm font-medium"}>Title</Label>
                             <Input
@@ -236,35 +195,35 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
                                 autoFocus
                             />
                         </div>
-                            <div className={"flex gap-8"}>
+                        <div className={"flex gap-8"}>
                             {
-                                        widgetsSetting?.type !== "embed" &&
-                                        <div className={"space-y-4"}>
-                                            <div className={"space-y-2"}>
-                                                <Label className={"font-normal"}>Width</Label>
-                                                {
-                                                    widgetsSetting?.type === "popover" &&
-                                                    <Input type={"number"} value={widgetsSetting.popover_width}
-                                                           onChange={(e) => onChange("popover_width", e.target.value)}
-                                                           className={"w-full h-auto"}/>
-                                                }
-                                                {
-                                                    widgetsSetting?.type === "modal" &&
-                                                    <Input type={"number"} value={widgetsSetting.modal_width}
-                                                           onChange={(e) => onChange("modal_width", e.target.value)}
-                                                           className={"w-full h-auto"}/>
-                                                }
-                                                {
-                                                    widgetsSetting?.type === "sidebar" &&
-                                                    <Input type={"number"} value={widgetsSetting.sidebar_width}
-                                                           onChange={(e) => onChange("sidebar_width", e.target.value)}
-                                                           className={"w-full h-auto"}/>
-                                                }
-                                            </div>
-                                        </div>
-                                    }
+                                type !== "embed" &&
+                                <div className={"space-y-4"}>
+                                    <div className={"space-y-2"}>
+                                        <Label className={"font-normal"}>Width</Label>
+                                        {
+                                            type === "popover" &&
+                                            <Input type={"number"} value={widgetsSetting.popover_width}
+                                                   onChange={(e) => onChange("popover_width", e.target.value)}
+                                                   className={"w-full h-auto"}/>
+                                        }
+                                        {
+                                            type === "modal" &&
+                                            <Input type={"number"} value={widgetsSetting.modal_width}
+                                                   onChange={(e) => onChange("modal_width", e.target.value)}
+                                                   className={"w-full h-auto"}/>
+                                        }
+                                        {
+                                            type === "sidebar" &&
+                                            <Input type={"number"} value={widgetsSetting.sidebar_width}
+                                                   onChange={(e) => onChange("sidebar_width", e.target.value)}
+                                                   className={"w-full h-auto"}/>
+                                        }
+                                    </div>
+                                </div>
+                            }
                             {
-                                (widgetsSetting?.type === "popover" || widgetsSetting?.type === "modal") &&
+                                (type === "popover" || type === "modal") &&
                                 <div className={"space-y-2"}>
                                     <Label className={"font-normal"}>Height</Label>
                                     <Input type={"number"} value={widgetsSetting.popover_height}
@@ -272,34 +231,35 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
                                            className={"w-full h-auto"}/>
                                 </div>
                             }
-                                {
-                                    (widgetsSetting?.type === "sidebar") &&
-                                    <div className={"space-y-2"}>*/}
-                                                        <Label className={"font-normal"}>Position</Label>
-                                                        <Select
-                                                            onValueChange={(value) => onChange("sidebar_position", value)}
-                                                            value={widgetsSetting.sidebar_position}
-                                                        >
-                                                            <SelectTrigger>
-                                                                <SelectValue placeholder={1}/>
-                                                            </SelectTrigger>
-                                                            <SelectContent>
-                                                                <SelectItem value={1}>Left</SelectItem>
-                                                                <SelectItem value={2}>Right</SelectItem>
-                                                            </SelectContent>
-                                                        </Select>
-                                                    </div>
-                                }
-                            </div>
+                            {
+                                (type === "sidebar") &&
+                                <div className={"space-y-2"}>
+                                    <Label className={"font-normal"}>Position</Label>
+                                    <Select
+                                        onValueChange={(value) => onChange("sidebar_position", value)}
+                                        value={widgetsSetting.sidebar_position}
+                                    >
+                                        <SelectTrigger>
+                                            <SelectValue placeholder={1}/>
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value={1}>Left</SelectItem>
+                                            <SelectItem value={2}>Right</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            }
                         </div>
-                        <div className={"space-y-3"}>
+                    </div>
+                    <div className={"space-y-3"}>
                         <div>
                             <h3 className={"text-sm font-medium mb-1"}>Show on Widget</h3>
-                            <p className={"text-xs font-normal text-muted-foreground"}>Apply a status to Manage this idea on roadmap.</p>
+                            <p className={"text-xs font-normal text-muted-foreground"}>Apply a status to Manage this
+                                idea on roadmap.</p>
                         </div>
                         <div className={"space-y-3"}>
                             <div className="flex items-center space-x-2">
-                                <Checkbox id="terms" />
+                                <Checkbox id="terms"/>
                                 <label
                                     htmlFor="terms"
                                     className="text-sm font-normal peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
@@ -308,7 +268,7 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
                                 </label>
                             </div>
                             <div className="flex items-center space-x-2">
-                                <Checkbox id="terms" />
+                                <Checkbox id="terms"/>
                                 <label
                                     htmlFor="terms"
                                     className="text-sm font-normal peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
@@ -317,7 +277,7 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
                                 </label>
                             </div>
                             <div className="flex items-center space-x-2">
-                                <Checkbox id="terms" />
+                                <Checkbox id="terms"/>
                                 <label
                                     htmlFor="terms"
                                     className="text-sm font-normal peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
@@ -326,12 +286,12 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
                                 </label>
                             </div>
                         </div>
-                        </div>
-                        <div className={"space-y-3"}>
+                    </div>
+                    <div className={"space-y-3"}>
                         <div className={"space-y-2"}>
                             <h3 className={"text-sm font-medium "}>Show on Widget</h3>
                             <div className="flex items-center space-x-2">
-                                <Checkbox id="terms" />
+                                <Checkbox id="terms"/>
                                 <label
                                     htmlFor="terms"
                                     className="text-xs font-normal text-muted-foreground peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
@@ -343,7 +303,7 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
                         <div className={"space-y-2"}>
                             <h3 className={"text-sm font-medium"}>Hide header</h3>
                             <div className="flex items-center space-x-2">
-                                <Checkbox id="terms" />
+                                <Checkbox id="terms"/>
                                 <label
                                     htmlFor="terms"
                                     className="text-xs font-normal text-muted-foreground peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
@@ -352,11 +312,11 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
                                 </label>
                             </div>
                         </div>
-                        </div>
                     </div>
+                </div>
                 <Accordion type="single" defaultValue={"item-1"} collapsible className="w-full">
                     {
-                        widgetsSetting.type !== "embed" &&
+                        type !== "embed" &&
                         <Fragment>
                             <AccordionItem value="item-2" className={"widget-accordion"}>
                                 <AccordionTrigger className={"hover:no-underline font-medium border-b px-4 py-3"}>Launcher
@@ -675,7 +635,7 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
                                 </div>
                             </div>
                             {
-                                widgetsSetting.type !== "embed" &&
+                                type !== "embed" &&
                                 <div className="flex flex-col gap-3 px-4 py-3 border-t">
                                     <Label className={"font-medium"}>Navigation Menu</Label>
                                     <div className={"flex items-center gap-4 m-0"}>
@@ -734,64 +694,21 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
 
     return (
         <Fragment>
-            {/*<Sheet open={true} onOpenChange={isOpen ? onClose : onOpen}>*/}
-            {/*    <SheetContent*/}
-            {/*        // className={"w-[282px] md:w-[350px] p-0 overflow-y-auto bg-card"}*/}
-            {/*        className={"md:w-[282px] w-full p-0 overflow-y-auto bg-card"}*/}
-            {/*        side={"left"}>*/}
-            {/*        <SheetHeader*/}
-            {/*            className=" px-4 py-3 md:p-4 text-left md:text-center flex-row items-center justify-between border-b">*/}
-            {/*            <div className={"flex gap-2 items-center"}>*/}
-            {/*                {editWidgetName ? (*/}
-            {/*                    <Input*/}
-            {/*                        value={widgetsSetting?.name}*/}
-            {/*                        onChange={(e) => onChange("name", e.target.value)}*/}
-            {/*                        className={"text-sm font-medium w-full max-w-[170px] py-[3px] h-auto"}*/}
-            {/*                        onBlur={handleBlur}*/}
-            {/*                        autoFocus*/}
-            {/*                    />*/}
-            {/*                ) : (*/}
-            {/*                    <h2 className="text-xl text-left font-medium w-full max-w-[170px]">{widgetsSetting?.name}</h2>)}*/}
-            {/*                {editWidgetName ? <Check size={15} className={"cursor-pointer"}/> :*/}
-            {/*                    <Pencil size={15} className={"cursor-pointer"} onClick={handleEditWidgetName}/>}*/}
-            {/*            </div>*/}
-            {/*            <X size={18} onClick={() => navigate(`${baseUrl}/widget`)} className="cursor-pointer m-0"/>*/}
-            {/*        </SheetHeader>*/}
-            {/*        <div*/}
-            {/*            className={"flex h-full max-h-screen flex-col gap-2 lg:gap-8 widget-update-sheet-height overflow-y-auto"}>*/}
-            {/*            {renderSidebarItems()}*/}
-            {/*            <div className={"px-4"}>*/}
-            {/*                <Button className={"font-semibold w-[128px]"}*/}
-            {/*                        onClick={id === "new" ? createWidget : onUpdateWidgets}>*/}
-            {/*                    {*/}
-            {/*                        isLoading ?*/}
-            {/*                            <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : "Save Changes"*/}
-            {/*                    }</Button>*/}
-            {/*            </div>*/}
-            {/*        </div>*/}
-            {/*    </SheetContent>*/}
-            {/*</Sheet>*/}
             <div className={"py-6 px-4 border-b"}>
                 <Breadcrumb>
                     <Breadcrumb>
                         <BreadcrumbList>
                             <BreadcrumbItem className={"cursor-pointer"}>
                                 <BreadcrumbLink>
-                            <span onClick={() => navigate(`${baseUrl}/widget/type`)}>
-                                {createUpdate === 'create' ? 'Create New Widget' : 'Update Widget'}
-                            </span>
+                                    <span onClick={id === 'new' ? () => navigate(`${baseUrl}/widget/type`) : () => navigate(`${baseUrl}/widget`)}>
+                                    {type === 'embed' && 'Embed Widget'}
+                                    {type === 'popover' && 'Popover Widget'}
+                                    {type === 'modal' && 'Modal Widget'}
+                                    {type === 'sidebar' && 'Sidebar Widget'}
+                                    </span>
                                 </BreadcrumbLink>
                             </BreadcrumbItem>
-                            <BreadcrumbSeparator />
-                            <BreadcrumbItem className={"cursor-pointer"}>
-                                <BreadcrumbLink>
-                                    {widgetsSetting.type === 'embed' && 'Embed Widget'}
-                                    {widgetsSetting.type === 'popover' && 'Popover Widget'}
-                                    {widgetsSetting.type === 'modal' && 'Modal Widget'}
-                                    {widgetsSetting.type === 'sidebar' && 'Sidebar Widget'}
-                                </BreadcrumbLink>
-                            </BreadcrumbItem>
-                            <BreadcrumbSeparator />
+                            <BreadcrumbSeparator/>
                             <BreadcrumbItem className={"cursor-pointer"}>
                                 <BreadcrumbPage>{widgetsSetting.name}</BreadcrumbPage>
                             </BreadcrumbItem>
@@ -799,55 +716,57 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
                     </Breadcrumb>
                 </Breadcrumb>
             </div>
-            <div className={"flex"}>
-                <div className={"w-[25%] border-r"}>
+            <div className={"flex h-[calc(100%_-_69px)] overflow-y-auto"}>
+                <div className={"w-[25%] border-r h-full overflow-y-auto"}>
                     {renderSidebarItems()}
                     <div className={"px-4 py-6"}>
                         <Button className={"font-semibold w-[128px]"}
                                 onClick={id === "new" ? createWidget : onUpdateWidgets}>
                             {
                                 isLoading ?
-                                    <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : (id === "new" ? "Create Widget" : "Save Changes")
+                                    <Loader2
+                                        className="mr-2 h-4 w-4 animate-spin"/> : (id === "new" ? "Create Widget" : "Save Changes")
                             }</Button>
                     </div>
                 </div>
-                {/*<div className={"container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-4 h-full relative xl:m-auto ml-[338px]"}>*/}
-                <div className={"md:container xl:max-w-[1005px] lg:max-w-[768px] md:max-w-[639px] md:block hidden pt-8 pb-5 px-4 h-full relative xl:m-auto md:ml-[338px]"}>
-                    <div
-                        className={widgetsSetting.type === "popover" || widgetsSetting.type === "embed" ? "border h-full rounded-lg" : ""}>
-                        {
-                            widgetsSetting.type !== "embed" &&
-                            <div className='QH-floating-trigger' onClick={onToggle} style={{
-                                backgroundColor: widgetsSetting.launcher_icon_bg_color,
-                                left: widgetsSetting.launcher_position === 1 ? widgetsSetting.type === "popover" ? "40px" : 355 : "inherit",
-                                right: widgetsSetting.launcher_position === 2 ? "40px" : "inherit",
-                                position: widgetsSetting.type === "popover" ? "absolute" : "fixed"
-                            }}>
-                                {
-                                    launcherIcon[widgetsSetting.launcher_icon]
-                                }
-                            </div>
-                        }
+                <div className={"bg-muted w-full h-full overflow-y-auto"}>
+                    {
+                        type !== "embed" &&
+                        <div className='QH-floating-trigger' onClick={onToggle} style={{
+                            backgroundColor: widgetsSetting.launcher_icon_bg_color,
+                            left: widgetsSetting.launcher_position === 1 ? type === "popover" ? "40px" : 355 : "inherit",
+                            right: widgetsSetting.launcher_position === 2 ? "40px" : "inherit",
+                            position: type === "popover" ? "absolute" : "fixed"
+                        }}>
+                            {
+                                launcherIcon[widgetsSetting.launcher_icon]
+                            }
+                        </div>
+                    }
 
-                        {
-                            widgetsSetting.type === "popover" &&
-                            <div className={`QH-popover ${toggle ? "QH-popover-open" : ""}`} style={{
-                                left: widgetsSetting.launcher_position === 1 ? "40px" : "inherit",
-                                right: widgetsSetting.launcher_position === 2 ? "40px" : "inherit",
-                                width: `${widgetsSetting.popover_width}px`, height: `${widgetsSetting.popover_height}px`
-                            }}>
-                                <iframe className='QH-frame'
-                                        allow="http://localhost:5173"
-                                        src={`https://${projectDetailsReducer.domain}/ideas?${qs.stringify({...widgetsSetting, widget: id, isPreview: true})}`}/>
-                            </div>
-                        }
+                    {
+                        type === "popover" &&
+                        <div className={`QH-popover ${toggle ? "QH-popover-open" : ""}`} style={{
+                            left: widgetsSetting.launcher_position === 1 ? "40px" : "inherit",
+                            right: widgetsSetting.launcher_position === 2 ? "40px" : "inherit",
+                            width: `${widgetsSetting.popover_width}px`, height: `${widgetsSetting.popover_height}px`
+                        }}>
+                            <iframe className='QH-frame'
+                                    allow="http://localhost:5173"
+                                    src={`https://${projectDetailsReducer.domain}/ideas?${qs.stringify({
+                                        ...widgetsSetting,
+                                        widget: id,
+                                        isPreview: true
+                                    })}`}/>
+                        </div>
+                    }
 
-                        {
-                            widgetsSetting.type === "sidebar" &&
-                            <div className={`QH-sidebar ${toggle ? "QH-sidebar-open" : ""}`} style={{
+                    {
+                        type === "sidebar" &&
+                        <div className={"relative h-full"}>
+                            <div className={`QH-sidebar ${toggle ? "QH-sidebar-open" : ""} relative`} style={{
                                 left: widgetsSetting.sidebar_position === 1 ? "350px" : "inherit",
                                 right: widgetsSetting.sidebar_position === 2 ? "0" : "inherit",
-
                             }}>
                                 <div className="QH-sidebar-content" style={{
                                     left: widgetsSetting.sidebar_position === 1 ? "350px" : "inherit",
@@ -855,15 +774,20 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
                                     width: `${widgetsSetting.sidebar_width}px`,
                                 }}>
                                     <iframe className='QH-frame'
-                                            src={`https://${projectDetailsReducer.domain}/ideas?${qs.stringify({...widgetsSetting, widget: id, isPreview: true})}`}/>
+                                            src={`https://${projectDetailsReducer.domain}/ideas?${qs.stringify({
+                                                ...widgetsSetting,
+                                                widget: id,
+                                                isPreview: true
+                                            })}`}/>
                                 </div>
                                 <div className="QH-sidebar-shadow" onClick={onToggle}>&nbsp;</div>
-
                             </div>
-                        }
+                        </div>
+                    }
 
-                        {
-                            widgetsSetting.type === "modal" &&
+                    {
+                        type === "modal" &&
+                        <div className={"relative h-full"}>
                             <div className={`QH-modal ${toggle ? "QH-modal-open" : ""}`}>
                                 <div className={"QH-modal-content"}
                                      style={{
@@ -871,23 +795,33 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
                                          height: `${widgetsSetting.modal_height}px`,
                                      }}>
                                     <iframe className='QH-frame'
-                                            src={`https://${projectDetailsReducer.domain}/ideas?${qs.stringify({...widgetsSetting, widget: id, isPreview: true})}`}/>
+                                            src={`https://${projectDetailsReducer.domain}/ideas?${qs.stringify({
+                                                ...widgetsSetting,
+                                                widget: id,
+                                                isPreview: true
+                                            })}`}/>
                                 </div>
                             </div>
-                        }
+                        </div>
+                    }
 
-                        {
-                            widgetsSetting.type === "embed" &&
-                            <div className={"QH-widget-embed"}>
+                    {
+                        type === "embed" &&
+                        <div className={"p-[64px] h-full "}>
+                            <div className={"QH-widget-embed border rounded-lg"}>
                                 <div className={"QH-embed"}>
                                     <iframe className='QH-frame rounded-lg'
-                                            src={`https://${projectDetailsReducer.domain}/ideas?${qs.stringify({...widgetsSetting, widget: id, isPreview: true})}`}/>
+                                            src={`https://${projectDetailsReducer.domain}/ideas?${qs.stringify({
+                                                ...widgetsSetting,
+                                                widget: id,
+                                                isPreview: true
+                                            })}`}/>
                                 </div>
                             </div>
+                        </div>
 
-                        }
 
-                    </div>
+                    }
                 </div>
             </div>
         </Fragment>

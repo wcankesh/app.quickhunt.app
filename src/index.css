@@ -339,7 +339,7 @@ span.LinesEllipsis-ellipsis {color: hsl(var(--primary)) !important;font-weight: 
   overflow: hidden;
   padding: 0;
   pointer-events: all;
-  position: fixed;
+
   right: 0;
   top: 0;
   z-index: 99999;
@@ -351,7 +351,7 @@ span.LinesEllipsis-ellipsis {color: hsl(var(--primary)) !important;font-weight: 
   display: flex;
   max-width: 100%;
   overflow: hidden;
-  position: fixed;
+  position: absolute;
   top: 0;
   transform: translateX(0);
   -webkit-transition: -webkit-transform .3s cubic-bezier(.46,.39,.11,.96);
@@ -363,11 +363,9 @@ span.LinesEllipsis-ellipsis {color: hsl(var(--primary)) !important;font-weight: 
 }
 .QH-sidebar-shadow{
   background-color: #28313a;
-  height: 100%;
-  /*left: 350px;*/
-  left: 282px;
+  left: 0;
   opacity: .4;
-  position: fixed;
+  position: absolute;
   top: 0;
   -webkit-transform: translateZ(0);
   transform: translateZ(0);
@@ -375,11 +373,12 @@ span.LinesEllipsis-ellipsis {color: hsl(var(--primary)) !important;font-weight: 
   transition: opacity .3s ease-in-out;
   width: 100%;
   z-index: -1;
+  height: 100vh;
 }
 
 .QH-modal{
   display: none;
-  left: 282px;
+  left: 1px;
   right: 0;
   margin: 0;
   min-height: 100%;
@@ -388,7 +387,7 @@ span.LinesEllipsis-ellipsis {color: hsl(var(--primary)) !important;font-weight: 
   overflow: hidden;
   padding: 0 20px;
   pointer-events: all;
-  position: fixed;
+  position: absolute;
   top: 0;
   -webkit-transition: opacity .3s ease-in-out;
   transition: opacity .3s ease-in-out;

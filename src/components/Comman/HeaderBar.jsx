@@ -58,7 +58,7 @@ const HeaderBar = () => {
     const {setTheme, theme, onProModal} = useTheme()
     let navigate = useNavigate();
     let location = useLocation();
-    const {type} = useParams();
+    const {type, id} = useParams();
     let apiSerVice = new ApiService();
     let url = location.pathname;
     const newUrl = url.replace(/[0-9]/g, '');
@@ -185,9 +185,10 @@ const HeaderBar = () => {
         setTheme(theme === 'light' ? 'dark' : 'light');
     };
 
-    const isActive = (link, subLink ="") => {
-        return  window.location.pathname === subLink || window.location.pathname === link ;
+    const isActive = (link, subLink ="", subLink2 = "") => {
+        return  window.location.pathname === subLink2 || window.location.pathname === subLink || window.location.pathname === link ;
     };
+
     const onChangeText = (event) => {
         const { name, value } = event.target;
         if(name === "project_name" || name === 'domain'){
@@ -374,7 +375,7 @@ const HeaderBar = () => {
                     title: 'Widget',
                     link: '/widget',
                     icon: Icon.widgetsIcon,
-                    selected: isActive(`${baseUrl}/widget`),
+                    selected: isActive(`${baseUrl}/widget`, `${baseUrl}/widget/type`, `${baseUrl}/widget/${type}/${id}`),
                 },
             ]
         },

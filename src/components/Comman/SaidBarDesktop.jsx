@@ -10,13 +10,13 @@ const SaidBarDesktop = () => {
     const {theme} = useTheme()
     let navigate = useNavigate();
     let location = useLocation();
-    const {type} = useParams();
+    const {type, id} = useParams();
     const userDetailsReducer = useSelector(state => state.userDetailsReducer);
     const onRedirect = (link) => {
         navigate(`${baseUrl}${link}`);
     };
-    const isActive = (link, subLink ="") => {
-        return  window.location.pathname === subLink || window.location.pathname === link ;
+    const isActive = (link, subLink ="", subLink2 = "") => {
+        return  window.location.pathname === subLink2 || window.location.pathname === subLink || window.location.pathname === link ;
     };
 
     const menuComponent = [
@@ -67,7 +67,7 @@ const SaidBarDesktop = () => {
                     title: 'Widget',
                     link: '/widget',
                     icon: Icon.widgetsIcon,
-                    selected: isActive(`${baseUrl}/widget`),
+                    selected: isActive(`${baseUrl}/widget`, `${baseUrl}/widget/type`, `${baseUrl}/widget/${type}/${id}`),
                 },
             ]
         },
