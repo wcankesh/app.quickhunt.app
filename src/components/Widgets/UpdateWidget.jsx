@@ -4,7 +4,6 @@ import {Label} from "../ui/label";
 import {Input} from "../ui/input";
 import {Checkbox} from "../ui/checkbox";
 import {Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator} from "../ui/breadcrumb";
-import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from "../ui/accordion";
 import {SelectTrigger, SelectContent, SelectItem, Select, SelectValue} from "../ui/select";
 import {useNavigate, useParams} from "react-router-dom";
 import {baseUrl} from "../../utils/constent";
@@ -236,15 +235,24 @@ const UpdateWidget = () => {
                         </div>
                     </div>
                 </div>
-                <Accordion type="single" defaultValue={"item-1"} collapsible className="w-full">
                     {
                         type !== "embed" &&
                         <Fragment>
-                            <AccordionItem value="item-2" className={"widget-accordion"}>
-                                <AccordionTrigger className={"hover:no-underline font-medium border-b px-4 py-3"}>Launcher
-                                    Type</AccordionTrigger>
-                                <AccordionContent className={"px-4 py-3"}>
+                                <div className={"font-medium border-b px-4 py-3"}>Launcher Type</div>
+                                <div className={"px-4 py-3 border-b"}>
                                     <div className={"flex flex-col gap-4"}>
+                                        <div className="flex gap-4">
+                                            <Checkbox
+                                                checked={widgetsSetting.is_announcement === 1}
+                                                onCheckedChange={(checked, event) => onChangeSwitch({
+                                                    event1: {
+                                                        name: "is_announcement",
+                                                        value: checked ? 1 : 0
+                                                    }
+                                                }, event)}
+                                            />
+                                            <p className="text-sm text-muted-foreground font-medium">Show Launcher Icon</p>
+                                        </div>
                                         <div className={"space-y-2"}>
                                             <Label className={"font-normal"}>Icon</Label>
                                             <Select
@@ -292,14 +300,10 @@ const UpdateWidget = () => {
                                             />
                                         </div>
                                     </div>
-                                </AccordionContent>
-                            </AccordionItem>
-                            <AccordionItem value="item-3" className={"widget-accordion"}>
-                                <AccordionTrigger
-                                    className={"hover:no-underline font-medium border-b px-4 py-3"}>Sections</AccordionTrigger>
-                                <AccordionContent className={"px-4 py-3 space-y-4"}>
+                                </div>
+                                <div className={"font-medium border-b px-4 py-3"}>Sections</div>
+                                <div className={"px-4 py-3 space-y-4 border-b"}>
                                     <div className={"space-y-2"}>
-                                        <h3 className={"text-sm font-medium"}></h3>
                                         <div className="flex items-center gap-4">
                                             <Checkbox
                                                 checked={widgetsSetting.hide_header === 1}
@@ -493,14 +497,11 @@ const UpdateWidget = () => {
                                             </div>
                                         </div>
                                     )}
-                                </AccordionContent>
-                            </AccordionItem>
+                                </div>
                         </Fragment>
                     }
-                    <AccordionItem value="item-4" className={"widget-accordion"}>
-                        <AccordionTrigger
-                            className={"hover:no-underline font-medium border-b px-4 py-3"}>Advanced</AccordionTrigger>
-                        <AccordionContent className={"p-0"}>
+                        <div className={"hover:no-underline font-medium border-b px-4 py-3"}>Advanced</div>
+                        <div className={"p-0"}>
                             <div className={"px-4 py-3 space-y-4 border-b"}>
                                 <div className={"widget-color-picker space-y-2"}>
                                     <Label className={"font-normal"}>Header Background Color</Label>
@@ -547,9 +548,7 @@ const UpdateWidget = () => {
                                     />
                                 </div>
                             </div>
-                        </AccordionContent>
-                    </AccordionItem>
-                </Accordion>
+                        </div>
             </div>
         );
     };
@@ -619,7 +618,7 @@ const UpdateWidget = () => {
             <div className={"flex h-[calc(100%_-_85px)] overflow-y-auto"}>
                 <div className={"max-w-[407px] w-full border-r h-full overflow-y-auto"}>
                     {renderSidebarItems()}
-                    <div className={"px-4 py-6"}>
+                    <div className={"px-4 py-6 border-t"}>
                         <Button className={"font-semibold w-[128px]"}
                                 onClick={() => id === "new" ? createWidget('side') : onUpdateWidgets('side')}>
                             {
