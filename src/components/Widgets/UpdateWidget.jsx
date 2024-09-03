@@ -1,16 +1,9 @@
 import React, {useState, Fragment, useEffect} from 'react';
-import {Check, Link, Loader2, Pencil, X} from "lucide-react";
+import {Loader2} from "lucide-react";
 import {Label} from "../ui/label";
 import {Input} from "../ui/input";
 import {Checkbox} from "../ui/checkbox";
-import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbPage,
-    BreadcrumbSeparator
-} from "../ui/breadcrumb";
+import {Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator} from "../ui/breadcrumb";
 import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from "../ui/accordion";
 import {SelectTrigger, SelectContent, SelectItem, Select, SelectValue} from "../ui/select";
 import {useNavigate, useParams} from "react-router-dom";
@@ -50,27 +43,26 @@ const initialState = {
     sidebar_width: "450",
     idea_title: "Ideas",
     idea_display: 1,
-    idea_open: 1,
     idea_button_label: "Add an Idea",
     roadmap_title: "Roadmap",
     roadmap_display: 1,
-    roadmap_open: 1,
     changelog_title: "Announcement",
     changelog_display: 1,
-    changelog_open: 1,
     changelog_reaction: 1,
     hide_header: 0,
-    show_description: 0,
+    announcement_description: 0,
+    idea_description: 0,
+    roadmap_description: 0,
 }
 
-const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
+const UpdateWidget = () => {
     const navigate = useNavigate();
     let apiSerVice = new ApiService();
     const {toast} = useToast()
     const {id, type} = useParams()
     const [widgetsSetting, setWidgetsSetting] = useState(initialState);
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
-    const [isLoading, setIsLoading] = useState(false);
+    const [loading, setLoading] = useState('');
     const [index, setIndex] = useState(0);
     const [editWidgetName, setEditWidgetName] = useState(false);
     const [toggle, setToggle] = useState(true);
@@ -92,14 +84,12 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
         }
     }, [])
 
-
     const getWidgetsSetting = async () => {
         const data = await apiSerVice.getWidgets(id)
         if (data.status === 200) {
             setWidgetsSetting({...data.data});
-            setIsLoading(false);
         } else {
-            setIsLoading(false);
+
         }
     }
 
@@ -123,12 +113,8 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
         // e.stopPropagation();
     }
 
-    const handleShowInput = (value) => {
-        setWidgetsSetting({...widgetsSetting, type: value});
-    };
-
-    const createWidget = async () => {
-        setIsLoading(true)
+    const createWidget = async (loader) => {
+        setLoading(loader)
         const payload = {
             ...widgetsSetting,
             project_id: projectDetailsReducer.id,
@@ -137,14 +123,14 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
         }
         const data = await apiSerVice.createWidgets(payload)
         if (data.status === 200) {
-            setIsLoading(false)
+            setLoading('')
             toast({description: data.message})
             if (id === "new") {
                 navigate(`${baseUrl}/widget`)
             }
 
         } else {
-            setIsLoading(false)
+            setLoading('')
         }
     }
 
@@ -161,9 +147,8 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
         };
     }, []);
 
-    const onUpdateWidgets = async () => {
-        setIsLoading(true)
-
+    const onUpdateWidgets = async (loader) => {
+        setLoading(loader)
         const payload = {
             ...widgetsSetting,
             type
@@ -171,10 +156,10 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
         const data = await apiSerVice.updateWidgets(payload, widgetsSetting.id)
 
         if (data.status === 200) {
-            setIsLoading(false)
+            setLoading('')
             toast({description: data.message})
         } else {
-            setIsLoading(false)
+            setLoading('')
         }
     }
 
@@ -356,10 +341,10 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
                                             </div>
                                             <div className="flex gap-4">
                                                 <Checkbox
-                                                    checked={widgetsSetting.show_description === 1}
+                                                    checked={widgetsSetting?.announcement_description === 1}
                                                     onCheckedChange={(checked, event) => onChangeSwitch({
                                                         event1: {
-                                                            name: "show_description",
+                                                            name: "announcement_description",
                                                             value: checked ? 1 : 0
                                                         }
                                                     }, event)}
@@ -386,24 +371,6 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
                                                 <p className="text-xs font-medium text-muted-foreground">How should
                                                     Announcement be displayed?</p>
                                             </div>
-                                            {widgetsSetting.changelog_display === 2 && (
-                                                <div className="flex flex-col gap-2">
-                                                    <Label className={"font-normal"}>Ideas</Label>
-                                                    <Select value={widgetsSetting.changelog_open}
-                                                            onValueChange={(value) => onChange("changelog_open", value)}>
-                                                        <SelectTrigger>
-                                                            <SelectValue placeholder={1}/>
-                                                        </SelectTrigger>
-                                                        <SelectContent>
-                                                            <SelectItem value={1}>Open in Widget</SelectItem>
-                                                            <SelectItem value={2}>Link to platform</SelectItem>
-                                                            <SelectItem value={3}>Do not open</SelectItem>
-                                                        </SelectContent>
-                                                    </Select>
-                                                    <p className="text-xs font-medium text-muted-foreground">How should
-                                                        Ideas open in the Announcement?</p>
-                                                </div>
-                                            )}
                                             <div className="flex flex-col gap-2">
                                                 <Label className={"font-normal"}>Reactions</Label>
                                                 <Select value={widgetsSetting.changelog_reaction}
@@ -439,13 +406,13 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
                                             </div>
                                             <div className="flex gap-4">
                                                 <Checkbox
-                                                    // checked={widgetsSetting.is_roadmap === 1}
-                                                    // onCheckedChange={(checked, event) => onChangeSwitch({
-                                                    //     event1: {
-                                                    //         name: "is_roadmap",
-                                                    //         value: checked ? 1 : 0
-                                                    //     }
-                                                    // }, event)}
+                                                    checked={widgetsSetting?.roadmap_description === 1}
+                                                    onCheckedChange={(checked, event) => onChangeSwitch({
+                                                        event1: {
+                                                            name: "roadmap_description",
+                                                            value: checked ? 1 : 0
+                                                        }
+                                                    }, event)}
                                                 />
                                                 <p className="text-sm text-muted-foreground font-medium">Show Description</p>
                                             </div>
@@ -469,24 +436,6 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
                                                 <p className="text-xs font-medium text-muted-foreground">How should the
                                                     Roadmap be displayed?</p>
                                             </div>
-                                            {widgetsSetting.roadmap_display === 2 && (
-                                                <div className="flex flex-col gap-2">
-                                                    <Label className={"font-normal"}>Ideas</Label>
-                                                    <Select value={widgetsSetting.roadmap_open}
-                                                            onValueChange={(value) => onChange("roadmap_open", value)}>
-                                                        <SelectTrigger>
-                                                            <SelectValue placeholder={1}/>
-                                                        </SelectTrigger>
-                                                        <SelectContent>
-                                                            <SelectItem value={1}>Open in Widget</SelectItem>
-                                                            <SelectItem value={2}>Link to platform</SelectItem>
-                                                            <SelectItem value={3}>Do not open</SelectItem>
-                                                        </SelectContent>
-                                                    </Select>
-                                                    <p className="text-xs font-medium text-muted-foreground">How should
-                                                        the Ideas open in the Roadmap?</p>
-                                                </div>
-                                            )}
                                         </div>
                                     )}
 
@@ -507,13 +456,13 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
                                             </div>
                                             <div className="flex gap-4">
                                                 <Checkbox
-                                                    // checked={widgetsSetting.is_idea === 1}
-                                                    // onCheckedChange={(checked, event) => onChangeSwitch({
-                                                    //     event1: {
-                                                    //         name: "is_idea",
-                                                    //         value: checked ? 1 : 0
-                                                    //     }
-                                                    // }, event)}
+                                                    checked={widgetsSetting?.idea_description === 1}
+                                                    onCheckedChange={(checked, event) => onChangeSwitch({
+                                                        event1: {
+                                                            name: "idea_description",
+                                                            value: checked ? 1 : 0
+                                                        }
+                                                    }, event)}
                                                 />
                                                 <p className="text-sm text-muted-foreground font-medium">Show Description</p>
                                             </div>
@@ -537,24 +486,6 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
                                                 <p className="text-xs font-medium text-muted-foreground">How should
                                                     Ideas be displayed?</p>
                                             </div>
-                                            {widgetsSetting.idea_display === 2 && (
-                                                <div className="flex flex-col gap-2">
-                                                    <Label className={"font-normal"}>Ideas</Label>
-                                                    <Select value={widgetsSetting.idea_open}
-                                                            onValueChange={(value) => onChange("idea_open", value)}>
-                                                        <SelectTrigger>
-                                                            <SelectValue placeholder="Popover"/>
-                                                        </SelectTrigger>
-                                                        <SelectContent>
-                                                            <SelectItem value={1}>Open in Widget</SelectItem>
-                                                            <SelectItem value={2}>Link to platform</SelectItem>
-                                                            <SelectItem value={3}>Do not open</SelectItem>
-                                                        </SelectContent>
-                                                    </Select>
-                                                    <p className="text-xs font-medium text-muted-foreground">How should
-                                                        the Ideas open?</p>
-                                                </div>
-                                            )}
                                             <div className="flex flex-col gap-3">
                                                 <Label className={"font-normal"}>Button Label</Label>
                                                 <Input value={widgetsSetting.idea_button_label} name="idea_button_label"
@@ -616,31 +547,11 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
                                     />
                                 </div>
                             </div>
-                            {
-                                type !== "embed" &&
-                                <div className="flex flex-col gap-3 px-4 py-3 border-t">
-                                    <Label className={"font-medium"}>Navigation Menu</Label>
-                                    <div className={"flex items-center gap-4 m-0"}>
-                                        <Checkbox id="terms" checked={widgetsSetting.is_navigate === 1}
-                                                  onCheckedChange={(value) => onChange("is_navigate", value ? 1 : 0)}/>
-                                        <label
-                                            htmlFor="terms"
-                                            className="text-sm font-normal text-muted-foreground peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                                        >
-                                            Open links in new window
-                                        </label>
-                                    </div>
-                                </div>
-                            }
                         </AccordionContent>
                     </AccordionItem>
                 </Accordion>
             </div>
         );
-    };
-
-    const handleEditWidgetName = () => {
-        setEditWidgetName(!editWidgetName)
     };
 
     const handleBlur = () => {
@@ -676,7 +587,7 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
 
     return (
         <Fragment>
-            <div className={"py-6 px-4 border-b"}>
+            <div className={"py-6 px-4 border-b flex items-center justify-between"}>
                 <Breadcrumb>
                     <Breadcrumb>
                         <BreadcrumbList>
@@ -697,15 +608,22 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
                         </BreadcrumbList>
                     </Breadcrumb>
                 </Breadcrumb>
+                    <Button size={"sm"} className={"font-semibold w-[128px]"}
+                            onClick={() => id === "new" ? createWidget('head') : onUpdateWidgets('head')}>
+                        {
+                            loading === 'head' ?
+                                <Loader2
+                                    className="mr-2 h-4 w-4 animate-spin"/> : (id === "new" ? "Create Widget" : "Save Changes")
+                        }</Button>
             </div>
-            <div className={"flex h-[calc(100%_-_69px)] overflow-y-auto"}>
+            <div className={"flex h-[calc(100%_-_85px)] overflow-y-auto"}>
                 <div className={"max-w-[407px] w-full border-r h-full overflow-y-auto"}>
                     {renderSidebarItems()}
                     <div className={"px-4 py-6"}>
                         <Button className={"font-semibold w-[128px]"}
-                                onClick={id === "new" ? createWidget : onUpdateWidgets}>
+                                onClick={() => id === "new" ? createWidget('side') : onUpdateWidgets('side')}>
                             {
-                                isLoading ?
+                                loading === 'side' ?
                                     <Loader2
                                         className="mr-2 h-4 w-4 animate-spin"/> : (id === "new" ? "Create Widget" : "Save Changes")
                             }</Button>
@@ -801,8 +719,6 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
                                 </div>
                             </div>
                         </div>
-
-
                     }
                 </div>
             </div>
