@@ -9,7 +9,7 @@ import {
     ChevronsRight,
     Copy,
     Ellipsis,
-    Loader2,
+    Loader2, Plus,
     X
 } from "lucide-react";
 import {useTheme} from "../theme-provider";
@@ -413,10 +413,10 @@ const Widgets = () => {
                         <div className={"flex items-center justify-between"}>
                             <h1 className={"text-2xl font-medium"}>Widgets</h1>
                             <Button
-                                className={"text-sm font-semibold hover:bg-primary px-3 h-auto"}
+                                size="sm" className={"gap-2 font-semibold hover:bg-primary"}
                                 onClick={() => handleCreateNew("type")}
                             >
-                                Create New
+                                <Plus size={20} strokeWidth={3}/>Create New
                             </Button>
                         </div>
                         <div className={"flex flex-col space-y-4"}>

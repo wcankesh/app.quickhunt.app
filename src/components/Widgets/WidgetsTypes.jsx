@@ -6,7 +6,8 @@ import popover_img from "../../img/widget_popover.png";
 import modal_img from "../../img/widget_modal.png";
 import sidebar_img from "../../img/widget_sidebar.png";
 import {useNavigate} from "react-router-dom";
-
+import {Button} from "../ui/button";
+import {ArrowLeft} from "lucide-react";
 
 const WidgetsTypes = () => {
     const navigate = useNavigate();
@@ -46,8 +47,11 @@ const WidgetsTypes = () => {
         <Fragment>
             <div className={"roadmap-container height-inherit h-svh overflow-y-auto container-secondary xl:max-w-[1605px] lg:max-w-[1230px] md:max-w-[960px] max-w-[639px] pt-6 pb-5 px-3 md:px-4"}>
                 <div className={"flex flex-col gap-4"}>
-                    <div className={"space-x-4"}>
-                        <h2 className={"font-semibold"}>Create New Widget</h2>
+                    <div className={"space-x-4 flex items-center"}>
+                        <Button className={"h-8 w-8"} variant={"outline"} size={"icon"} onClick={() => navigate(`${baseUrl}/widget`)}>
+                            <ArrowLeft size={16} />
+                        </Button>
+                        <h1 className="text-2xl font-medium">Create New Widget</h1>
                     </div>
                     <div className={"w-full flex flex-wrap md:flex-nowrap gap-4"}>
                         {
@@ -65,14 +69,11 @@ const WidgetsTypes = () => {
                                 )
                             })
                         }
-
-
                     </div>
                 </div>
             </div>
         </Fragment>
     );
 };
-
 
 export default WidgetsTypes;

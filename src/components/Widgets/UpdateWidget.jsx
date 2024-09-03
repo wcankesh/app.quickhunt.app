@@ -2,7 +2,6 @@ import React, {useState, Fragment, useEffect} from 'react';
 import {Check, Link, Loader2, Pencil, X} from "lucide-react";
 import {Label} from "../ui/label";
 import {Input} from "../ui/input";
-import {Switch} from "../ui/switch";
 import {Checkbox} from "../ui/checkbox";
 import {
     Breadcrumb,
@@ -59,7 +58,9 @@ const initialState = {
     changelog_title: "Announcement",
     changelog_display: 1,
     changelog_open: 1,
-    changelog_reaction: 1
+    changelog_reaction: 1,
+    hide_header: 0,
+    show_description: 0,
 }
 
 const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
@@ -67,7 +68,6 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
     let apiSerVice = new ApiService();
     const {toast} = useToast()
     const {id, type} = useParams()
-    console.log("type", type)
     const [widgetsSetting, setWidgetsSetting] = useState(initialState);
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const [isLoading, setIsLoading] = useState(false);
@@ -75,7 +75,6 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
     const [editWidgetName, setEditWidgetName] = useState(false);
     const [toggle, setToggle] = useState(true);
     const [selectedToggle, setSelectedToggle] = useState('announcement');
-    const [createUpdate, setCreateUpdate] = useState('create');
 
     const handleToggle = (value) => {
         setSelectedToggle(value);
@@ -121,7 +120,7 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
 
     const onChangeSwitch = (event, e) => {
         setWidgetsSetting({...widgetsSetting, [event.event1.name]: event.event1.value})
-        e.stopPropagation();
+        // e.stopPropagation();
     }
 
     const handleShowInput = (value) => {
@@ -195,45 +194,45 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
                                 autoFocus
                             />
                         </div>
-                        <div className={"flex gap-8"}>
+                        <div className={"flex gap-4 "}>
                             {
                                 type !== "embed" &&
-                                <div className={"space-y-4"}>
+                                <div className={"space-y-4 w-1/2"}>
                                     <div className={"space-y-2"}>
                                         <Label className={"font-normal"}>Width</Label>
                                         {
                                             type === "popover" &&
                                             <Input type={"number"} value={widgetsSetting.popover_width}
                                                    onChange={(e) => onChange("popover_width", e.target.value)}
-                                                   className={"w-full h-auto"}/>
+                                                   className={"w-full"}/>
                                         }
                                         {
                                             type === "modal" &&
                                             <Input type={"number"} value={widgetsSetting.modal_width}
                                                    onChange={(e) => onChange("modal_width", e.target.value)}
-                                                   className={"w-full h-auto"}/>
+                                                   className={"w-full"}/>
                                         }
                                         {
                                             type === "sidebar" &&
                                             <Input type={"number"} value={widgetsSetting.sidebar_width}
                                                    onChange={(e) => onChange("sidebar_width", e.target.value)}
-                                                   className={"w-full h-auto"}/>
+                                                   className={"w-full"}/>
                                         }
                                     </div>
                                 </div>
                             }
                             {
                                 (type === "popover" || type === "modal") &&
-                                <div className={"space-y-2"}>
+                                <div className={"space-y-2 w-1/2"}>
                                     <Label className={"font-normal"}>Height</Label>
                                     <Input type={"number"} value={widgetsSetting.popover_height}
                                            onChange={(e) => onChange('popover_height', e.target.value)}
-                                           className={"w-full h-auto"}/>
+                                           className={"w-full"}/>
                                 </div>
                             }
                             {
                                 (type === "sidebar") &&
-                                <div className={"space-y-2"}>
+                                <div className={"space-y-2 w-1/2"}>
                                     <Label className={"font-normal"}>Position</Label>
                                     <Select
                                         onValueChange={(value) => onChange("sidebar_position", value)}
@@ -249,68 +248,6 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
                                     </Select>
                                 </div>
                             }
-                        </div>
-                    </div>
-                    <div className={"space-y-3"}>
-                        <div>
-                            <h3 className={"text-sm font-medium mb-1"}>Show on Widget</h3>
-                            <p className={"text-xs font-normal text-muted-foreground"}>Apply a status to Manage this
-                                idea on roadmap.</p>
-                        </div>
-                        <div className={"space-y-3"}>
-                            <div className="flex items-center space-x-2">
-                                <Checkbox id="terms"/>
-                                <label
-                                    htmlFor="terms"
-                                    className="text-sm font-normal peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                                >
-                                    Ideas
-                                </label>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                                <Checkbox id="terms"/>
-                                <label
-                                    htmlFor="terms"
-                                    className="text-sm font-normal peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                                >
-                                    Roadmap
-                                </label>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                                <Checkbox id="terms"/>
-                                <label
-                                    htmlFor="terms"
-                                    className="text-sm font-normal peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                                >
-                                    Announcements
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                    <div className={"space-y-3"}>
-                        <div className={"space-y-2"}>
-                            <h3 className={"text-sm font-medium "}>Show on Widget</h3>
-                            <div className="flex items-center space-x-2">
-                                <Checkbox id="terms"/>
-                                <label
-                                    htmlFor="terms"
-                                    className="text-xs font-normal text-muted-foreground peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                                >
-                                    Open links in new window
-                                </label>
-                            </div>
-                        </div>
-                        <div className={"space-y-2"}>
-                            <h3 className={"text-sm font-medium"}>Hide header</h3>
-                            <div className="flex items-center space-x-2">
-                                <Checkbox id="terms"/>
-                                <label
-                                    htmlFor="terms"
-                                    className="text-xs font-normal text-muted-foreground peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                                >
-                                    Open links in new window
-                                </label>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -375,7 +312,22 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
                             <AccordionItem value="item-3" className={"widget-accordion"}>
                                 <AccordionTrigger
                                     className={"hover:no-underline font-medium border-b px-4 py-3"}>Sections</AccordionTrigger>
-                                <AccordionContent className={"px-4 py-3 space-y-2"}>
+                                <AccordionContent className={"px-4 py-3 space-y-4"}>
+                                    <div className={"space-y-2"}>
+                                        <h3 className={"text-sm font-medium"}></h3>
+                                        <div className="flex items-center gap-4">
+                                            <Checkbox
+                                                checked={widgetsSetting.hide_header === 1}
+                                                onCheckedChange={(checked, event) => onChangeSwitch({
+                                                    event1: {
+                                                        name: "hide_header",
+                                                        value: checked ? 1 : 0
+                                                    }
+                                                }, event)}
+                                            />
+                                            <p className="text-sm text-muted-foreground font-medium">Hide header</p>
+                                        </div>
+                                    </div>
 
                                     <ToggleGroup type="single" className={"justify-between gap-2"}
                                                  onValueChange={handleToggle}>
@@ -390,6 +342,30 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
                                     {/* Content for Announcement */}
                                     {selectedToggle === 'announcement' && (
                                         <div className="space-y-4">
+                                            <div className="flex gap-4">
+                                                <Checkbox
+                                                    checked={widgetsSetting.is_announcement === 1}
+                                                    onCheckedChange={(checked, event) => onChangeSwitch({
+                                                        event1: {
+                                                            name: "is_announcement",
+                                                            value: checked ? 1 : 0
+                                                        }
+                                                    }, event)}
+                                                />
+                                                <p className="text-sm text-muted-foreground font-medium">Show Announcement</p>
+                                            </div>
+                                            <div className="flex gap-4">
+                                                <Checkbox
+                                                    checked={widgetsSetting.show_description === 1}
+                                                    onCheckedChange={(checked, event) => onChangeSwitch({
+                                                        event1: {
+                                                            name: "show_description",
+                                                            value: checked ? 1 : 0
+                                                        }
+                                                    }, event)}
+                                                />
+                                                <p className="text-sm text-muted-foreground font-medium">Show Description</p>
+                                            </div>
                                             <div className="space-y-2">
                                                 <Label className={"font-normal"}>Title</Label>
                                                 <Input value={widgetsSetting.changelog_title}
@@ -443,26 +419,36 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
                                                 <p className="text-xs font-medium text-muted-foreground">Choose whether
                                                     or not reactions are shown</p>
                                             </div>
-                                            <div className="announce-create-switch flex gap-4">
-                                                <Switch
-                                                    className="w-[38px] h-[20px]"
-                                                    checked={widgetsSetting.is_announcement === 1}
-                                                    onCheckedChange={(checked, event) => onChangeSwitch({
-                                                        event1: {
-                                                            name: "is_announcement",
-                                                            value: checked ? 1 : 0
-                                                        }
-                                                    }, event)}
-                                                />
-                                                <p className="text-sm text-muted-foreground font-medium">Show Your
-                                                    Announcement</p>
-                                            </div>
                                         </div>
                                     )}
 
                                     {/* Content for Roadmap */}
                                     {selectedToggle === 'roadmap' && (
                                         <div className="space-y-4">
+                                            <div className="flex gap-4">
+                                                <Checkbox
+                                                    checked={widgetsSetting.is_roadmap === 1}
+                                                    onCheckedChange={(checked, event) => onChangeSwitch({
+                                                        event1: {
+                                                            name: "is_roadmap",
+                                                            value: checked ? 1 : 0
+                                                        }
+                                                    }, event)}
+                                                />
+                                                <p className="text-sm text-muted-foreground font-medium">Show Roadmap</p>
+                                            </div>
+                                            <div className="flex gap-4">
+                                                <Checkbox
+                                                    // checked={widgetsSetting.is_roadmap === 1}
+                                                    // onCheckedChange={(checked, event) => onChangeSwitch({
+                                                    //     event1: {
+                                                    //         name: "is_roadmap",
+                                                    //         value: checked ? 1 : 0
+                                                    //     }
+                                                    // }, event)}
+                                                />
+                                                <p className="text-sm text-muted-foreground font-medium">Show Description</p>
+                                            </div>
                                             <div className="space-y-2">
                                                 <Label className={"font-normal"}>Title</Label>
                                                 <Input value={widgetsSetting.roadmap_title}
@@ -501,26 +487,36 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
                                                         the Ideas open in the Roadmap?</p>
                                                 </div>
                                             )}
-                                            <div className="announce-create-switch flex gap-4">
-                                                <Switch
-                                                    className="w-[38px] h-[20px]"
-                                                    checked={widgetsSetting.is_roadmap === 1}
-                                                    onCheckedChange={(checked, event) => onChangeSwitch({
-                                                        event1: {
-                                                            name: "is_roadmap",
-                                                            value: checked ? 1 : 0
-                                                        }
-                                                    }, event)}
-                                                />
-                                                <p className="text-sm text-muted-foreground font-medium">Show Your
-                                                    Roadmap</p>
-                                            </div>
                                         </div>
                                     )}
 
                                     {/* Content for Ideas */}
                                     {selectedToggle === 'ideas' && (
                                         <div className="space-y-4">
+                                            <div className="flex gap-4">
+                                                <Checkbox
+                                                    checked={widgetsSetting.is_idea === 1}
+                                                    onCheckedChange={(checked, event) => onChangeSwitch({
+                                                        event1: {
+                                                            name: "is_idea",
+                                                            value: checked ? 1 : 0
+                                                        }
+                                                    }, event)}
+                                                />
+                                                <p className="text-sm text-muted-foreground font-medium">Show Ideas</p>
+                                            </div>
+                                            <div className="flex gap-4">
+                                                <Checkbox
+                                                    // checked={widgetsSetting.is_idea === 1}
+                                                    // onCheckedChange={(checked, event) => onChangeSwitch({
+                                                    //     event1: {
+                                                    //         name: "is_idea",
+                                                    //         value: checked ? 1 : 0
+                                                    //     }
+                                                    // }, event)}
+                                                />
+                                                <p className="text-sm text-muted-foreground font-medium">Show Description</p>
+                                            </div>
                                             <div className="space-y-2">
                                                 <Label className={"font-normal"}>Title</Label>
                                                 <Input value={widgetsSetting.idea_title}
@@ -563,20 +559,6 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
                                                 <Label className={"font-normal"}>Button Label</Label>
                                                 <Input value={widgetsSetting.idea_button_label} name="idea_button_label"
                                                        onChange={(e) => onChange("idea_button_label", e.target.value)}/>
-                                            </div>
-                                            <div className="announce-create-switch flex gap-4">
-                                                <Switch
-                                                    className="w-[38px] h-[20px]"
-                                                    checked={widgetsSetting.is_idea === 1}
-                                                    onCheckedChange={(checked, event) => onChangeSwitch({
-                                                        event1: {
-                                                            name: "is_idea",
-                                                            value: checked ? 1 : 0
-                                                        }
-                                                    }, event)}
-                                                />
-                                                <p className="text-sm text-muted-foreground font-medium">Show Your
-                                                    Ideas</p>
                                             </div>
                                         </div>
                                     )}
@@ -717,7 +699,7 @@ const UpdateWidget = ({isOpen, onOpen, onClose,}) => {
                 </Breadcrumb>
             </div>
             <div className={"flex h-[calc(100%_-_69px)] overflow-y-auto"}>
-                <div className={"w-[25%] border-r h-full overflow-y-auto"}>
+                <div className={"max-w-[407px] w-full border-r h-full overflow-y-auto"}>
                     {renderSidebarItems()}
                     <div className={"px-4 py-6"}>
                         <Button className={"font-semibold w-[128px]"}

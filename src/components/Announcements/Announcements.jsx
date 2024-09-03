@@ -296,8 +296,8 @@ const Announcements = () => {
                         </div>
                     </div>
                     <div className={"flex flex-grow gap-2 items-center"}>
-                        <Button size={"sm"} onClick={openSheet} className={"flex gap-2 px-3 md:px-6 md:w-auto hover:bg-primary"}>
-                            <Plus className={"w-[15px] h-[15px] md:w-[20px] md:h-[20px]"} size={20} strokeWidth={3}/>
+                        <Button size={"sm"} onClick={openSheet} className={"gap-2 font-semibold hover:bg-primary"}>
+                            <Plus size={20} strokeWidth={3}/>
                             <span className={"text-xs md:text-sm font-semibold"}>New Announcement</span>
                         </Button>
                     </div>

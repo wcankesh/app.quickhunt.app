@@ -261,7 +261,7 @@ const InAppMessage = () => {
                 <div className={""}>
                     <div className={"flex justify-between items-center"}>
                         <h4 className={"font-medium text-lg sm:text-2xl leading-8"}>In App Messages</h4>
-                        <Button onClick={()=>handleCreateNew("type")} className={"hover:bg-violet-600"}> <Plus className={"mr-4"} />New Content</Button>
+                        <Button size="sm" onClick={()=>handleCreateNew("type")} className={"gap-2 font-semibold hover:bg-primary"}> <Plus size={20} strokeWidth={3}/>New Content</Button>
                     </div>
                     <div className={"flex justify-between pt-7"}>
                         <div className={"flex gap-4"}>
