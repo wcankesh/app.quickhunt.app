@@ -28,6 +28,7 @@ const initialState = {
     is_roadmap: true,
     is_announcement: true,
     is_navigate: true,
+    is_launcher_icon: 0,
     header_bg_color: "#ffffff",
     header_text_color: "#000000",
     header_btn_background_color: "#7c3aed",
@@ -243,10 +244,10 @@ const UpdateWidget = () => {
                                     <div className={"flex flex-col gap-4"}>
                                         <div className="flex gap-4">
                                             <Checkbox
-                                                checked={widgetsSetting.is_announcement === 1}
+                                                checked={widgetsSetting.is_launcher_icon === 1}
                                                 onCheckedChange={(checked, event) => onChangeSwitch({
                                                     event1: {
-                                                        name: "is_announcement",
+                                                        name: "is_launcher_icon",
                                                         value: checked ? 1 : 0
                                                     }
                                                 }, event)}
