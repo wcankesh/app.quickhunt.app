@@ -148,9 +148,9 @@ const SidebarInAppMessage = ({messageType, inAppMsgSetting, setInAppMsgSetting, 
 
     return (
         <Fragment>
-            <div className={"border-b px-4 py-6 space-y-4"}>
-                <h5 className={"text-base font-medium"}>Content</h5>
-                <div className="grid w-full max-w-sm items-center gap-1.5">
+            <div className={"border-b"}>
+                <h5 className={"text-base font-medium border-b px-4 py-3"}>Content</h5>
+                <div className={"px-4 py-3 border-b space-y-1"}>
                     <Label htmlFor="title">Title</Label>
                     <Input className={"h-9"} id="title" placeholder="Title" value={inAppMsgSetting.title} onChange={(e) => onChange("title", e.target.value)} />
                 </div>
@@ -191,42 +191,44 @@ const SidebarInAppMessage = ({messageType, inAppMsgSetting, setInAppMsgSetting, 
                 }
                 {messageType == 1 &&
                 <Fragment>
-                    <div className="grid w-full max-w-sm items-center gap-1.5">
-                        <Label className={"font-normal"}>From</Label>
-                        <Select
-                            value={Number(inAppMsgSetting.from)}
-                            name={"from"}
-                            onValueChange={(value) => handleStatusChange(value, "from")}
-                        >
-                            <SelectTrigger className="w-full h-9">
-                                <SelectValue/>
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectGroup>
-                                    {allStatusAndTypes.members.map((x) => (
-                                        <SelectItem key={Number(x.id)} value={Number(x.id)}>
-                                            {x.user_first_name} {x.user_last_name}
-                                        </SelectItem>
-                                    ))}
-                                </SelectGroup>
-                            </SelectContent>
-                        </Select>
-                    </div>
-                    <div className="grid w-full max-w-sm items-center gap-1.5">
-                        <Label className={"font-normal"}>Reply type</Label>
-                        <Select
-                            onValueChange={(value) => onChange("reply_type", value)}
-                            value={inAppMsgSetting.reply_type}
-                        >
-                            <SelectTrigger>
-                                <SelectValue placeholder={"Select reply type"}/>
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value={1}>Text</SelectItem>
-                                <SelectItem value={2}>Reaction</SelectItem>
-                                <SelectItem value={3}>None</SelectItem>
-                            </SelectContent>
-                        </Select>
+                    <div className={"px-4 py-3 space-y-4"}>
+                        <div className="grid w-full max-w-sm items-center gap-1.5">
+                            <Label className={"font-normal"}>From</Label>
+                            <Select
+                                value={Number(inAppMsgSetting.from)}
+                                name={"from"}
+                                onValueChange={(value) => handleStatusChange(value, "from")}
+                            >
+                                <SelectTrigger className="w-full h-9">
+                                    <SelectValue/>
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectGroup>
+                                        {allStatusAndTypes.members.map((x) => (
+                                            <SelectItem key={Number(x.id)} value={Number(x.id)}>
+                                                {x.user_first_name} {x.user_last_name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectGroup>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="grid w-full max-w-sm items-center gap-1.5">
+                            <Label className={"font-normal"}>Reply type</Label>
+                            <Select
+                                onValueChange={(value) => onChange("reply_type", value)}
+                                value={inAppMsgSetting.reply_type}
+                            >
+                                <SelectTrigger>
+                                    <SelectValue placeholder={"Select reply type"}/>
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value={1}>Text</SelectItem>
+                                    <SelectItem value={2}>Reaction</SelectItem>
+                                    <SelectItem value={3}>None</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
                     </div>
                 </Fragment>
                 }
@@ -455,14 +457,13 @@ const SidebarInAppMessage = ({messageType, inAppMsgSetting, setInAppMsgSetting, 
                 </div>
                 <div className="grid w-full max-w-sm items-center gap-1.5">
                     <Label className={"font-normal"}>Start sending</Label>
-                    <div className={"flex flex-col gap-4"}>
-
+                    <div className={"flex gap-4"}>
                         <Popover>
                             <PopoverTrigger asChild>
                                 <Button
                                     id="start_at_time"
                                     variant={"outline"}
-                                    className={cn("w-full h-9 justify-start text-left font-normal", !date && "text-muted-foreground")}
+                                    className={cn("w-1/2 justify-start text-left font-normal", !date && "text-muted-foreground")}
                                 >
                                     <CalendarIcon className="mr-2 h-4 w-4" />
                                     <>
@@ -482,7 +483,7 @@ const SidebarInAppMessage = ({messageType, inAppMsgSetting, setInAppMsgSetting, 
                                 />
                             </PopoverContent>
                         </Popover>
-                        <div className="custom-time-picker">
+                        <div className="custom-time-picker w-1/2">
                             <Input
                                 type={"time"}
                                 value={moment(inAppMsgSetting.start_at).format("HH:mm")}
@@ -494,13 +495,13 @@ const SidebarInAppMessage = ({messageType, inAppMsgSetting, setInAppMsgSetting, 
                 <div className="grid w-full max-w-sm items-center gap-1.5">
                     <Label className={"font-normal"} htmlFor="email">Stop sending</Label>
                     <div className={"flex flex-col gap-4"}>
-                        <div className={"flex flex-col gap-4"}>
+                        <div className={"flex gap-4"}>
                             <Popover>
                                 <PopoverTrigger asChild>
                                     <Button
                                         id="end_at_time"
                                         variant={"outline"}
-                                        className={cn("w-full h-9 justify-start text-left font-normal", !date && "text-muted-foreground")}
+                                        className={cn("w-1/2 h-9 justify-start text-left font-normal", !date && "text-muted-foreground")}
                                     >
                                         <CalendarIcon className="mr-2 h-4 w-4" />
                                         <>
@@ -520,24 +521,23 @@ const SidebarInAppMessage = ({messageType, inAppMsgSetting, setInAppMsgSetting, 
                                     />
                                 </PopoverContent>
                             </Popover>
+                            <div className="custom-time-picker w-1/2">
                             <Input
                                 type={"time"}
                                 value={moment(inAppMsgSetting.end_at).format("HH:mm")}
                                 onChange={(e) => handleTimeChange(e.target.value, 'end_at')}
                             />
+                            </div>
                         </div>
 
                     </div>
                 </div>
-                <div className="grid w-full max-w-sm items-center gap-1.5">
-                    <Button className={`w-[125px] font-semibold`} onClick={id === "new" ? createMessage : onUpdateMessage}>
-                        {isLoading ? <Loader2 className={"mr-2  h-4 w-4 animate-spin"}/> : "Save Changes"}
-                    </Button>
-                </div>
             </div>
-
-
-
+            <div className="px-4 py-6">
+                <Button className={`w-[125px] font-semibold`} onClick={id === "new" ? createMessage : onUpdateMessage}>
+                    {isLoading ? <Loader2 className={"mr-2  h-4 w-4 animate-spin"}/> : "Save Changes"}
+                </Button>
+            </div>
         </Fragment>
     );
 };
