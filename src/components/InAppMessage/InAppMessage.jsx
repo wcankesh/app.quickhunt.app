@@ -457,7 +457,7 @@ const InAppMessage = () => {
                                                                                 <Ellipsis className={`font-medium`} size={18}/>
                                                                             </DropdownMenuTrigger>
                                                                             <DropdownMenuContent align={"end"}>
-                                                                                <DropdownMenuItem onClick={()=>handleCreateNew(x.id)}>Edit</DropdownMenuItem>
+                                                                                <DropdownMenuItem onClick={()=>handleCreateNew(x.id, x.type)}>Edit</DropdownMenuItem>
                                                                                 <DropdownMenuItem onClick={()=>setDeleteId(x.id)}>Delete</DropdownMenuItem>
                                                                             </DropdownMenuContent>
                                                                         </DropdownMenu>

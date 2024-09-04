@@ -16,16 +16,27 @@ import Surveys from "./Surveys";
 import Checklist from "./Checklist";
 import {Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator} from "../ui/breadcrumb";
 import SidebarInAppMessage from "./SidebarInAppMessage";
+
+
+
 import {DropdownMenuGroup} from "@radix-ui/react-dropdown-menu";
 
 const initialState = {
     project_id: "2",
     title: "In app message",
     type: 1, //1=post,2=banner,3=survey,4=checklist
-    body_text: "",
+    body_text: {blocks: [
+            {
+                type: "paragraph",
+                data: {
+                    text:
+                        "Hey"
+                }
+            },
+        ]},
     from: "",
     reply_to: "",
-    bg_color: "#ffffff",
+    bg_color: "#EEE4FF",
     text_color: "#000000",
     icon_color: "#FD6B65",
     btn_color: "#7c3aed",
@@ -35,7 +46,7 @@ const initialState = {
     position: "top", //top/bottom
     alignment: "left", //left/right
     is_close_button: "", //true/false
-    reply_type: "", //1=Text,2=Reaction
+    reply_type: 1, //1=Text,2=Reaction
     question_type: 1, //1=Net Promoter Score,2=Numeric Scale,3=Star rating scale,4=Emoji rating scale,5=Drop Down / List,6=Questions
     start_number: 1,
     end_number: 10,
@@ -53,18 +64,17 @@ const initialState = {
     reaction: "",
 }
 
-const UpdateInAppMessage = ({ isOpen, onOpen, onClose,}) => {
+
+
+const UpdateInAppMessage = () => {
     const navigate = useNavigate();
     let apiSerVice = new ApiService();
-    const {toast} = useToast()
+
     const {id, type} = useParams()
     const {theme} = useTheme();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
-    const userDetailsReducer = useSelector(state => state.userDetailsReducer);
-
     const [messageType, setMessageType] = useState(Number(type) || 1);
-
     const [inAppMsgSetting, setInAppMsgSetting] = useState(initialState);
     const [openItem,setOpenItem]=useState("");
     const [isLoading, setIsLoading] = useState(false);
@@ -74,7 +84,7 @@ const UpdateInAppMessage = ({ isOpen, onOpen, onClose,}) => {
     const renderContent = (type) => {
         switch (type) {
             case 1:
-                return <Post inAppMsgSetting={inAppMsgSetting} userDetailsReducer={userDetailsReducer}/>;
+                return <Post inAppMsgSetting={inAppMsgSetting} setInAppMsgSetting={setInAppMsgSetting} isLoading={isLoading}/>;
             case 2:
                 return <Banners inAppMsgSetting={inAppMsgSetting} />;
             case 3:
@@ -94,14 +104,12 @@ const UpdateInAppMessage = ({ isOpen, onOpen, onClose,}) => {
 
     useEffect(() => {
         if (id === "new" && projectDetailsReducer.id) {
-            if (allStatusAndTypes.members.length > 0) {
-                setInAppMsgSetting(prevState => ({
-                    ...prevState,
-                    from: allStatusAndTypes.members[0].id
-                }));
-            }
+            setInAppMsgSetting(prevState => ({
+                ...prevState,
+                title: `${type === "1" ? "Post": type === "2" ? "Banner" : type === "3" ? "Survey" : "Checklist"} in app message`
+            }));
         }
-    }, [allStatusAndTypes.members])
+    }, [])
 
     useEffect(() => {
         if (id !== "new" && projectDetailsReducer.id) {
@@ -110,11 +118,13 @@ const UpdateInAppMessage = ({ isOpen, onOpen, onClose,}) => {
     }, [projectDetailsReducer.id]);
 
     const getSingleInAppMessages = async () => {
+        setIsLoading(true)
         const data = await apiSerVice.getSingleInAppMessage(id)
         if (data.status === 200) {
             const payload = {
                 ...data.data,
-                options: data.data.options ?? ['']
+                options: data.data.options ?? [''],
+                body_text: JSON.parse(data.data.body_text)
             }
             setInAppMsgSetting(payload);
             setIsLoading(false);

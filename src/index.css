@@ -512,3 +512,13 @@ input:-webkit-autofill::first-line {
 
 /* Carousal */
 .custom-width {max-width: 706px; width: 100%; margin: 0 auto}
+
+.ce-toolbar__content, .ce-block__content{
+  max-width: 100%;
+}
+.codex-editor__redactor{
+  padding-bottom: 0!important;
+}
+.ce-block__content .cdx-input {
+  display: none;
+}
