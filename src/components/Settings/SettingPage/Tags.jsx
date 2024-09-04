@@ -252,9 +252,7 @@ const Tags = () => {
                         <CardTitle className={"text-lg sm:text-2xl font-medium leading-8"}>Tags</CardTitle>
                         <CardDescription className={"text-sm text-muted-foreground p-0 mt-1 leading-5"}>Add Tags so that users can tag them when creating Ideas.</CardDescription>
                     </div>
-                    <div className={"m-0"}>
-                        <Button onClick={handleNewTopics} disabled={isEdit != null} className={"flex gap-1 items-center text-sm font-semibold m-0"}><Plus size={20} strokeWidth={3}/>New Tag</Button>
-                    </div>
+                    <Button size={"sm"} onClick={handleNewTopics} disabled={isEdit != null} className={"gap-2 font-semibold hover:bg-primary m-0"}><Plus size={18} strokeWidth={3}/>New Tag</Button>
                 </CardHeader>
                 <CardContent className={"p-0"}>
                     <div className={"grid grid-cols-1 overflow-auto whitespace-nowrap"}>

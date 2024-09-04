@@ -256,11 +256,9 @@ const Categories = () => {
                         <CardTitle className={"text-lg sm:text-2xl font-medium leading-8"}>Categories</CardTitle>
                         <CardDescription className={"text-sm text-muted-foreground p-0 mt-1 leading-5"}>Use Categories to organise your Changelog</CardDescription>
                     </div>
-                    <div className={"m-0"}>
-                        <Button disabled={isEdit != null} onClick={addNewTopic} className={"flex gap-1 items-center text-sm font-semibold m-0"}>
-                            <Plus size={20} strokeWidth={3}/>
-                            New Categories</Button>
-                    </div>
+                    <Button size="sm" disabled={isEdit != null} onClick={addNewTopic} className={"gap-2 font-semibold hover:bg-primary m-0"}>
+                        <Plus size={18} strokeWidth={3}/>New Categories
+                    </Button>
                 </CardHeader>
                 <CardContent className={"p-0"}>
                     <div className={"grid grid-cols-1 overflow-auto whitespace-nowrap"}>

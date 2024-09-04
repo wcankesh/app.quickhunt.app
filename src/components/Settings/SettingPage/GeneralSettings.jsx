@@ -70,7 +70,6 @@ const GeneralSettings = () => {
         const payload = {
             ...generalSettingData,
             project_id: projectDetailsReducer.id,
-
         }
         const data = await apiSerVice.updatePortalSetting(generalSettingData.id, payload)
         if (data.status === 200) {
@@ -85,7 +84,6 @@ const GeneralSettings = () => {
                 variant: "destructive"
             })
         }
-
     }
 
     return (
@@ -119,12 +117,7 @@ const GeneralSettings = () => {
                                         <Checkbox
                                             id="is_reaction"
                                             checked={generalSettingData.is_reaction === 1}
-                                            onCheckedChange={(checked, event) => onChangeSwitch({
-                                                event1: {
-                                                    name: "is_reaction",
-                                                    value: checked ? 1 : 0
-                                                }
-                                            }, event)}
+                                            onCheckedChange={(checked) => onChangeSwitch("is_reaction", checked ? 1 : 0)}
                                         />
                                         <label
                                             htmlFor="is_reaction"
@@ -137,12 +130,7 @@ const GeneralSettings = () => {
                                         <Checkbox
                                             id="is_comment"
                                             checked={generalSettingData.is_comment === 1}
-                                            onCheckedChange={(checked, event) => onChangeSwitch({
-                                                event1: {
-                                                    name: "is_comment",
-                                                    value: checked ? 1 : 0
-                                                }
-                                            }, event)}
+                                            onCheckedChange={(checked) => onChangeSwitch("is_comment", checked ? 1 : 0)}
                                         />
                                         <label
                                             htmlFor="is_comment"

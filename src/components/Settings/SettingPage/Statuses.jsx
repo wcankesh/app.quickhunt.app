@@ -356,11 +356,12 @@ const Statuses = () => {
                         </CardDescription>
                     </div>
                     <Button
+                        size={"sm"}
                         disabled={isEdit !== null}
-                        className="flex gap-1 items-center text-sm font-semibold m-0"
+                        className={"gap-2 font-semibold hover:bg-primary m-0"}
                         onClick={handleShowInput}
                     >
-                        <div><Plus strokeWidth={3} size={20} /></div>New Status
+                        <Plus strokeWidth={3} size={18} />New Status
                     </Button>
                 </CardHeader>
                 <CardContent className="p-0">

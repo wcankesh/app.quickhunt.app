@@ -265,15 +265,14 @@ const Board = () => {
                         <CardTitle className={"text-lg sm:text-2xl font-medium"}>Board</CardTitle>
                         <CardDescription className={"text-sm text-muted-foreground p-0"}>Use Boards to track Ideas on your Roadmap.</CardDescription>
                     </div>
-                    <div className={"m-0"}>
-                        <Button
-                            disabled={isEdit != null}
-                            className="flex gap-1 items-center text-sm font-semibold m-0"
-                            onClick={createNewBoard}
-                        >
-                            <div><Plus size={20} strokeWidth={3} /></div>New Board
-                        </Button>
-                    </div>
+                    <Button
+                        size={"sm"}
+                        disabled={isEdit != null}
+                        className={"gap-2 font-semibold hover:bg-primary m-0"}
+                        onClick={createNewBoard}
+                    >
+                        <Plus size={18} strokeWidth={3} />New Board
+                    </Button>
                 </CardHeader>
                 <Separator/>
                 <CardContent className="p-0">

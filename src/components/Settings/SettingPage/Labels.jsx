@@ -279,11 +279,12 @@ const Labels = () => {
                     </CardDescription>
                 </div>
                 <Button
+                    size="sm"
                     disabled={isEdit != null}
-                    className="flex gap-1 items-center text-sm font-semibold m-0"
+                    className={"gap-2 font-semibold hover:bg-primary m-0"}
                     onClick={handleShowInput}
                 >
-                    <div><Plus size={20} strokeWidth={3} /></div>New Label
+                   <Plus size={18} strokeWidth={3} />New Label
                 </Button>
             </CardHeader>
             <CardContent className="p-0">

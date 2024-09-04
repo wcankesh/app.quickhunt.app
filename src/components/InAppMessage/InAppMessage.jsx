@@ -379,7 +379,7 @@ const InAppMessage = () => {
                                                     return(
                                                         <TableRow key={index}>
                                                             {
-                                                                [...Array(7)].map((_, i) => {
+                                                                [...Array(8)].map((_, i) => {
                                                                     return (
                                                                         <TableCell key={i} className={"max-w-[373px] px-2 py-[10px] md:px-3"}>
                                                                             <Skeleton className={"rounded-md  w-full h-7"}/>
@@ -469,7 +469,7 @@ const InAppMessage = () => {
                                                 </Fragment>
                                                 :
                                                 <TableRow>
-                                                    <TableCell colSpan={7}>
+                                                    <TableCell colSpan={8}>
                                                         <EmptyData/>
                                                     </TableCell>
                                                 </TableRow>

@@ -226,9 +226,7 @@ const Emoji = () => {
                         <CardTitle className={"text-lg sm:text-2xl font-medium leading-8"}>Emoji</CardTitle>
                         <CardDescription className={"text-sm text-muted-foreground p-0 mt-1 leading-5"}>Use Emoji to organise your Changelog</CardDescription>
                     </div>
-                    <div className={"m-0"}>
-                        <Button onClick={newEmoji} disabled={editIndex != null} className={"flex gap-1 items-center text-sm font-semibold m-0"}><Plus strokeWidth={3} size={20}/> New Emoji</Button>
-                    </div>
+                    <Button size="sm" onClick={newEmoji} disabled={editIndex != null} className={"gap-2 font-semibold hover:bg-primary m-0"}><Plus strokeWidth={3} size={18}/> New Emoji</Button>
                 </CardHeader>
                 <CardContent className={"p-0"}>
                     <Table>
