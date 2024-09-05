@@ -2,10 +2,10 @@ import React,{useCallback, useRef, useEffect} from 'react';
 import {useTheme} from "../theme-provider";
 import {useSelector} from "react-redux";
 import {Button} from "../ui/button";
-import {MessageCircleMore, Paperclip, Smile, X} from "lucide-react";
+import {MessageCircleMore, Paperclip, Plus, Smile, Trash2, X} from "lucide-react";
 import {Card, CardContent, CardHeader} from "../ui/card";
 import {Avatar, AvatarFallback, AvatarImage} from "../ui/avatar";
-
+import EmojiPicker from "emoji-picker-react";
 import { createReactEditorJS } from 'react-editor-js';
 import Embed from "@editorjs/embed";
 import Table from "@editorjs/table";
@@ -22,6 +22,8 @@ import CheckList from "@editorjs/checklist";
 import Delimiter from "@editorjs/delimiter";
 import InlineCode from "@editorjs/inline-code";
 import SimpleImage from "@editorjs/simple-image";
+import {PopoverTrigger} from "@radix-ui/react-popover";
+import {Popover, PopoverContent} from "../ui/popover";
 //import CustomImageTool from "../../utils/CustomImageTool";
 const EditorJs = createReactEditorJS();
 
@@ -30,7 +32,7 @@ const Post = ({inAppMsgSetting, setInAppMsgSetting, isLoading}) => {
     const {theme} = useTheme();
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
-    const userDetailsReducer =  allStatusAndTypes.members.find((x) => x.id == inAppMsgSetting.from);;
+    const userDetailsReducer =  allStatusAndTypes.members.find((x) => x.user_id == inAppMsgSetting.from);;
 
     const handleInitialize = useCallback((instance) => {
         editorCore.current = instance;
@@ -115,6 +117,35 @@ const Post = ({inAppMsgSetting, setInAppMsgSetting, isLoading}) => {
         simpleImage: SimpleImage
     }
 
+    const handleEmojiSelect = (event) => {
+        const clone = [...inAppMsgSetting.reactions];
+        const obj = {
+                "id": "",
+                "emoji": event.emoji,
+                "emoji_url": event.imageUrl,
+                is_active: 1,
+            }
+        clone.push(obj)
+        setInAppMsgSetting(prevState => ({
+            ...prevState,
+            reactions: clone
+        }));
+
+    }
+    const onDeleteReaction = (record, index) => {
+        let clone = [...inAppMsgSetting.reactions];
+        if(record.id){
+            clone[index] = {...record, is_active: 0}
+        } else {
+            clone.splice(index, 1)
+        }
+        setInAppMsgSetting(prevState => ({
+            ...prevState,
+            reactions: clone
+        }));
+
+    }
+
     return (
         <div>
             <div className={`p-16 border-t bg-muted`}>
@@ -176,12 +207,26 @@ const Post = ({inAppMsgSetting, setInAppMsgSetting, isLoading}) => {
                         </CardContent> : inAppMsgSetting.reply_type === 2 ? <CardContent className={`py-5 pl-8 pr-5   rounded-b-lg flex flex-row justify-between`} style={{background: inAppMsgSetting.bg_color}}>
                             <div className={"flex justify-center gap-5 w-full"}>
                                 {
-                                    (allStatusAndTypes.emoji || []).map((x,i)=>{
+                                    (inAppMsgSetting.reactions || []).map((x,i)=>{
                                         return(
-                                            <img key={i} className={"h-6 w-6 cursor-pointer"} src={x.emoji_url}/>
+                                            x.is_active === 1 ?
+                                            <div className={"relative group hover:cursor-pointer"}>
+                                                <span onClick={() => onDeleteReaction(x, i)} className="absolute hidden group-hover:inline-block py-0.5 leading-none right-[-11px] top-[-13px] border rounded shadow -top-1 text-[9px] font-bold tracking-wide  px-0.5 text-background-accent dark:text-foreground/60 dark:border-gray-500/60  dark:bg-dark-accent bg-white">
+                                                    <Trash2 size={16}/>
+                                                </span>
+                                                <img key={i} className={"h-6 w-6 cursor-pointer"} src={x.emoji_url}/>
+                                            </div> : ""
                                         )
                                     })
                                 }
+                                <Popover>
+                                    <PopoverTrigger asChild>
+                                        <Button variant={"secondary"} className={"h-6 w-6 rounded-[100%] p-1"}><Plus  size={16}/></Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-full p-0 border-none w-[310px]]">
+                                        <EmojiPicker theme={theme === "dark" ? "dark" : "light"} height={350} autoFocusSearch={true} open={true} searchDisabled={false} onEmojiClick={handleEmojiSelect}/>
+                                    </PopoverContent>
+                                </Popover>
                             </div>
                         </CardContent> : inAppMsgSetting.reply_type === 3 ? "" : ""
                     }
