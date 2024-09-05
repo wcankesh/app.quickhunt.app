@@ -19,6 +19,7 @@ import {useTheme} from "../theme-provider";
 import {ApiService} from "../../utils/ApiService";
 import {useToast} from "../ui/use-toast";
 import {useNavigate} from "react-router-dom";
+import {Checkbox} from "../ui/checkbox";
 
 const SidebarInAppMessage = ({messageType, inAppMsgSetting, setInAppMsgSetting, id}) => {
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
@@ -117,6 +118,7 @@ const SidebarInAppMessage = ({messageType, inAppMsgSetting, setInAppMsgSetting, 
             start_at: moment(inAppMsgSetting?.start_at).format('YYYY-MM-DD HH:mm:ss'),
             end_at: moment(inAppMsgSetting?.end_at).format('YYYY-MM-DD HH:mm:ss'),
             project_id: projectDetailsReducer.id,
+            type: messageType
         }
         const data = await apiSerVice.createInAppMessage(payload);
         if (data.status === 200) {
@@ -137,6 +139,7 @@ const SidebarInAppMessage = ({messageType, inAppMsgSetting, setInAppMsgSetting, 
             ...inAppMsgSetting,
             start_at: moment(inAppMsgSetting?.start_at).format('YYYY-MM-DD HH:mm:ss'),
             end_at: moment(inAppMsgSetting?.end_at).format('YYYY-MM-DD HH:mm:ss'),
+            type: messageType
         }
         const data = await apiSerVice.updateInAppMessage(payload, inAppMsgSetting.id)
 
@@ -160,42 +163,19 @@ const SidebarInAppMessage = ({messageType, inAppMsgSetting, setInAppMsgSetting, 
                                onChange={(e) => onChange("title", e.target.value)}/>
                     </div>
                     {
-                        messageType == 2 && <Fragment>
-                            <div className="grid w-full max-w-sm items-center gap-1.5">
-                                <Label className={"font-normal"}>Banner position</Label>
-                                <Select
-                                    value={inAppMsgSetting.position}
-                                    onValueChange={(value) => handleStatusChange(value, "position")}
-                                >
-                                    <SelectTrigger className="w-full h-9">
-                                        <SelectValue placeholder={"Select position"}/>
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value={"top"}>Top</SelectItem>
-                                        <SelectItem value={"bottom"}>Bottom</SelectItem>
-                                    </SelectContent>
-                                </Select>
+                        messageType == 2 && <div className="grid w-full max-w-sm items-center gap-1.5">
+                            <div className="flex items-center gap-2">
+                                <Checkbox id="show_sender"
+                                          checked={inAppMsgSetting.show_sender}
+                                          onCheckedChange={(checked) => onChange("show_sender", checked)}
+                                />
+                                <Label htmlFor="show_sender" className={"font-normal cursor-pointer"}>Show sender</Label>
                             </div>
-                            <div className="grid w-full max-w-sm items-center gap-1.5">
-                                <Label className={"font-normal"}>Alignment</Label>
-                                <Select
-                                    value={inAppMsgSetting.alignment}
-                                    onValueChange={(value) => handleStatusChange(value, "alignment")}
-                                >
-                                    <SelectTrigger className="w-full h-9">
-                                        <SelectValue placeholder={"Select alignment"}/>
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value={"left"}>Left</SelectItem>
-                                        <SelectItem value={"right"}>Right</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                        </Fragment>
+                        </div>
                     }
-                    {messageType == 1 &&
-                    <Fragment>
-                        <div className="grid w-full max-w-sm items-center gap-1.5">
+
+                    {
+                        (messageType == 1 || (messageType == 2 && inAppMsgSetting.show_sender)) && <div className="grid w-full max-w-sm items-center gap-1.5">
                             <Label className={"font-normal"}>From</Label>
                             <Select
                                 value={Number(inAppMsgSetting.from)}
@@ -208,7 +188,7 @@ const SidebarInAppMessage = ({messageType, inAppMsgSetting, setInAppMsgSetting, 
                                 <SelectContent>
                                     <SelectGroup>
                                         {allStatusAndTypes.members.map((x) => (
-                                            <SelectItem key={Number(x.id)} value={Number(x.id)}>
+                                            <SelectItem key={Number(x.user_id)} value={Number(x.user_id)}>
                                                 {x.user_first_name} {x.user_last_name}
                                             </SelectItem>
                                         ))}
@@ -216,29 +196,120 @@ const SidebarInAppMessage = ({messageType, inAppMsgSetting, setInAppMsgSetting, 
                                 </SelectContent>
                             </Select>
                         </div>
+                    }
+                    {
+                        messageType == 1 &&
+                        <Fragment>
+                            <div className="grid w-full max-w-sm items-center gap-1.5">
+                                <Label className={"font-normal"}>Reply type</Label>
+                                <Select
+                                    onValueChange={(value) => onChange("reply_type", value)}
+                                    value={inAppMsgSetting.reply_type}
+                                >
+                                    <SelectTrigger>
+                                        <SelectValue placeholder={"Select reply type"}/>
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value={1}>Text</SelectItem>
+                                        <SelectItem value={2}>Reaction</SelectItem>
+                                        <SelectItem value={3}>None</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        </Fragment>
+                    }
+                    {
+                        messageType == 2 &&
                         <div className="grid w-full max-w-sm items-center gap-1.5">
-                            <Label className={"font-normal"}>Reply type</Label>
-                            <Select
-                                onValueChange={(value) => onChange("reply_type", value)}
-                                value={inAppMsgSetting.reply_type}
-                            >
-                                <SelectTrigger>
-                                    <SelectValue placeholder={"Select reply type"}/>
+                            <Label className={"font-normal"}>Action</Label>
+                            <Select value={inAppMsgSetting?.action_type}
+                                    onValueChange={(value) => handleStatusChange(value, "action_type")}>
+                                <SelectTrigger className="w-full h-9">
+                                    <SelectValue placeholder=""/>
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value={1}>Text</SelectItem>
-                                    <SelectItem value={2}>Reaction</SelectItem>
-                                    <SelectItem value={3}>None</SelectItem>
+                                    <SelectItem value={0}>None</SelectItem>
+                                    <SelectItem value={1}>Open URL</SelectItem>
+                                    <SelectItem value={2}>Ask for Reaction</SelectItem>
+                                    <SelectItem value={3}>Collect visitor email</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
-                    </Fragment>
+                    }
+                    {
+                        messageType == 2 && inAppMsgSetting.action_type == 1 && <Fragment>
+                            <div className="grid w-full max-w-sm items-center gap-1.5">
+                                <Label htmlFor="title">Action Text</Label>
+                                <Input className={"h-9"} id="action_text" placeholder="Enter action text" value={inAppMsgSetting.action_text}
+                                       onChange={(e) => onChange("action_text", e.target.value)}/>
+                            </div>
+                            <div className="grid w-full max-w-sm items-center gap-1.5">
+                                <Label htmlFor="title">Action URL</Label>
+                                <Input className={"h-9"} id="action_url" placeholder="Enter URL address" value={inAppMsgSetting.action_url}
+                                       onChange={(e) => onChange("action_url", e.target.value)}/>
+                            </div>
+                            <div className="grid w-full max-w-sm items-center gap-1.5">
+                                <div className="flex items-center gap-2">
+                                    <Checkbox id="is_redirect"
+                                              checked={inAppMsgSetting.is_redirect}
+                                              onCheckedChange={(checked) => onChange("is_redirect", checked)}
+                                    />
+                                    <Label htmlFor="is_redirect" className={"font-normal cursor-pointer"}>Open URL in a new tab</Label>
+                                </div>
+                            </div>
+                        </Fragment>
+                    }
+                    {
+                        messageType == 2 && inAppMsgSetting.action_type != 0 && <div className="grid w-full max-w-sm items-center gap-1.5">
+                            <div className="flex items-center gap-2">
+                                <Checkbox id="is_banner_close_button"
+                                          checked={inAppMsgSetting.is_banner_close_button}
+                                          onCheckedChange={(checked) => onChange("is_banner_close_button", checked)}
+                                />
+                                <Label htmlFor="is_banner_close_button" className={"font-normal cursor-pointer"}>Dismiss the banner on click</Label>
+                            </div>
+                        </div>
                     }
                 </div>
             </div>
             <div className={"border-b px-4 py-6 space-y-4"}>
                 {(messageType == 2 || messageType == 1) && <h5 className={"text-base font-medium"}>Style</h5>}
                 {(messageType == 3 || messageType == 4) && <h5 className={"text-base font-medium"}>Customization</h5>}
+                {
+                    messageType == 2 && <Fragment>
+                        <div className="grid w-full max-w-sm items-center gap-1.5">
+                            <Label className={"font-normal"}>Banner position</Label>
+                            <Select
+                                value={inAppMsgSetting.position}
+                                onValueChange={(value) => handleStatusChange(value, "position")}
+                            >
+                                <SelectTrigger className="w-full h-9">
+                                    <SelectValue placeholder={"Select position"}/>
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value={"top"}>Top</SelectItem>
+                                    <SelectItem value={"bottom"}>Bottom</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="grid w-full max-w-sm items-center gap-1.5">
+                            <Label className={"font-normal"}>Alignment</Label>
+                            <Select
+                                value={inAppMsgSetting.alignment}
+                                onValueChange={(value) => handleStatusChange(value, "alignment")}
+                            >
+                                <SelectTrigger className="w-full h-9">
+                                    <SelectValue placeholder={"Select alignment"}/>
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value={"left"}>Left</SelectItem>
+                                    <SelectItem value={"right"}>Right</SelectItem>
+                                    <SelectItem value={"center"}>Center</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </Fragment>
+                }
                 <div className="grid w-full max-w-sm items-center gap-1.5">
                     <Label className={"font-normal"}>Background Color</Label>
                     <div className={"w-full text-sm"}>
@@ -291,31 +362,18 @@ const SidebarInAppMessage = ({messageType, inAppMsgSetting, setInAppMsgSetting, 
                     </div>
                 </div>}
 
-                {
-                    messageType == 2 &&
-                    <div className="grid w-full max-w-sm items-center gap-1.5">
-                        <Label className={"font-normal"}>Action</Label>
-                        <Select value={inAppMsgSetting?.action_type}
-                                onValueChange={(value) => handleStatusChange(value, "action_type")}>
-                            <SelectTrigger className="w-full h-9">
-                                <SelectValue placeholder=""/>
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value={1}>Open URL</SelectItem>
-                                <SelectItem value={2}>Ask for Reaction</SelectItem>
-                                <SelectItem value={3}>Collect visitor email</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
-                }
+
 
                 {
                     (messageType == 2 || messageType == 3 || messageType == 4) &&
                     <div className="grid w-full max-w-sm items-center gap-1.5">
-                        <Switch className={"w-[38px] h-[20px]"} id="dismiss_btn"
-                                checked={inAppMsgSetting?.is_close_button} name={"is_close_button"}
-                                onCheckedChange={(checked) => handleStatusChange(checked, "is_close_button")}/>
-                        <Label className={"cursor-pointer"} htmlFor="dismiss_btn">Show a dismiss button</Label>
+                        <div className="flex items-center gap-2">
+                            <Checkbox id="is_close_button"
+                                      checked={inAppMsgSetting.is_close_button}
+                                      onCheckedChange={(checked) => onChange("is_close_button", checked)}
+                            />
+                            <Label htmlFor="is_close_button" className={"font-normal cursor-pointer"}>Show dismiss button</Label>
+                        </div>
                     </div>
                 }
             </div>
