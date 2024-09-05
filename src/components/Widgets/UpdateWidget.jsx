@@ -248,7 +248,7 @@ const UpdateWidget = () => {
                                                 checked={widgetsSetting.is_launcher_icon === 1}
                                                 onCheckedChange={(checked) => onChangeSwitch("is_launcher_icon", checked ? 1 : 0)}
                                             />
-                                            <label htmlFor="show_launcher_icon" className="text-sm text-muted-foreground font-medium">Show Launcher Icon</label>
+                                            <label htmlFor="show_launcher_icon" className="text-sm font-medium">Show Launcher Icon</label>
                                         </div>
                                         <div className={"space-y-2"}>
                                             <Label className={"font-normal"}>Icon</Label>
@@ -307,7 +307,7 @@ const UpdateWidget = () => {
                                                 checked={widgetsSetting.hide_header === 1}
                                                 onCheckedChange={(checked) => onChangeSwitch("hide_header", checked ? 1 : 0)}
                                             />
-                                            <label htmlFor="show_hide_header" className="text-sm text-muted-foreground font-medium">Hide header</label>
+                                            <label htmlFor="show_hide_header" className="text-sm font-medium">Hide header</label>
                                         </div>
                                     </div>
 
@@ -330,7 +330,7 @@ const UpdateWidget = () => {
                                                     checked={widgetsSetting.is_announcement === 1}
                                                     onCheckedChange={(checked) => onChangeSwitch("is_announcement", checked ? 1 : 0)}
                                                 />
-                                                <label htmlFor="show_hide_announcement" className="text-sm text-muted-foreground font-medium">Show Announcement</label>
+                                                <label htmlFor="show_hide_announcement" className="text-sm font-medium">Show Announcement</label>
                                             </div>
                                             <div className={"flex gap-2 items-center"}>
                                                 <Checkbox
@@ -338,7 +338,7 @@ const UpdateWidget = () => {
                                                     checked={widgetsSetting.announcement_description === 1}
                                                     onCheckedChange={(checked) => onChangeSwitch("announcement_description", checked ? 1 : 0)}
                                                 />
-                                                <label htmlFor="show_hide_announcement_description" className="text-sm text-muted-foreground font-medium">Show Description</label>
+                                                <label htmlFor="show_hide_announcement_description" className="text-sm font-medium">Show Description</label>
                                             </div>
                                             <div className="space-y-2">
                                                 <Label className={"font-normal"}>Title</Label>
@@ -387,7 +387,7 @@ const UpdateWidget = () => {
                                                     checked={widgetsSetting.is_roadmap === 1}
                                                     onCheckedChange={(checked) => onChangeSwitch("is_roadmap", checked ? 1 : 0)}
                                                 />
-                                                <label htmlFor="show_hide_roadmap" className="text-sm text-muted-foreground font-medium">Show Roadmap</label>
+                                                <label htmlFor="show_hide_roadmap" className="text-sm font-medium">Show Roadmap</label>
                                             </div>
                                             <div className={"flex gap-2 items-center"}>
                                                 <Checkbox
@@ -395,7 +395,7 @@ const UpdateWidget = () => {
                                                     checked={widgetsSetting.roadmap_description === 1}
                                                     onCheckedChange={(checked) => onChangeSwitch("roadmap_description", checked ? 1 : 0)}
                                                 />
-                                                <label htmlFor="show_hide_roadmap_description" className="text-sm text-muted-foreground font-medium">Show Description</label>
+                                                <label htmlFor="show_hide_roadmap_description" className="text-sm font-medium">Show Description</label>
                                             </div>
                                             <div className="space-y-2">
                                                 <Label className={"font-normal"}>Title</Label>
@@ -429,7 +429,7 @@ const UpdateWidget = () => {
                                                     checked={widgetsSetting.is_idea === 1}
                                                     onCheckedChange={(checked) => onChangeSwitch("is_idea", checked ? 1 : 0)}
                                                 />
-                                                <label htmlFor="show_hide_idea" className="text-sm text-muted-foreground font-medium">Show Ideas</label>
+                                                <label htmlFor="show_hide_idea" className="text-sm font-medium">Show Ideas</label>
                                             </div>
                                             <div className={"flex gap-2 items-center"}>
                                                 <Checkbox
@@ -437,7 +437,7 @@ const UpdateWidget = () => {
                                                     checked={widgetsSetting.idea_description === 1}
                                                     onCheckedChange={(checked) => onChangeSwitch("idea_description", checked ? 1 : 0)}
                                                 />
-                                                <label htmlFor="show_hide_idea_description" className="text-sm text-muted-foreground font-medium">Show Description</label>
+                                                <label htmlFor="show_hide_idea_description" className="text-sm font-medium">Show Description</label>
                                             </div>
                                             <div className="space-y-2">
                                                 <Label className={"font-normal"}>Title</Label>

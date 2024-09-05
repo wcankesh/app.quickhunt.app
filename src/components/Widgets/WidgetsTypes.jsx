@@ -1,10 +1,10 @@
 import React, {Fragment} from 'react';
 import {baseUrl} from "../../utils/constent";
 import {Card, CardContent} from "../ui/card";
-import embed_img from "../../img/widget_embed.png";
-import popover_img from "../../img/widget_popover.png";
-import modal_img from "../../img/widget_modal.png";
-import sidebar_img from "../../img/widget_sidebar.png";
+import embed_img from "../../img/embed_widget.png";
+import popover_img from "../../img/popover_widget.png";
+import modal_img from "../../img/modal_widget.png";
+import sidebar_img from "../../img/sidebar_widget.png";
 import {useNavigate} from "react-router-dom";
 import {Button} from "../ui/button";
 import {ArrowLeft} from "lucide-react";
