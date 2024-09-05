@@ -228,8 +228,8 @@ const Customers = () => {
                         </div>
 
                         <div className={"mt-6 flex items-center"}>
-                            <Switch checked={customerDetails.customer_email_notification == 1} onCheckedChange={(checked) => onChangeText({target: {name: "customer_email_notification", value:checked}})} htmlFor={"switch"} />
-                            <Label id={"switch"} className={"ml-[9px] text-sm font-medium"}>Receive Notifications</Label>
+                            <Switch id={"switch"} checked={customerDetails.customer_email_notification == 1} onCheckedChange={(checked) => onChangeText({target: {name: "customer_email_notification", value:checked}})} htmlFor={"switch"} />
+                            <Label htmlFor={"switch"} className={"ml-[9px] text-sm font-medium"}>Receive Notifications</Label>
                         </div>
                     </div>
                     <div className={"px-3 py-4 sm:p-8"}>
@@ -294,9 +294,9 @@ const Customers = () => {
                                                         }
                                                     </TableRow>
                                                 </TableHeader>
+                                                <TableBody>
                                                 {
-                                                    isLoading ? <TableBody>
-                                                            {
+                                                    isLoading ? (
                                                                 [...Array(10)].map((_, index) => {
                                                                     return (
                                                                         <TableRow key={index}>
@@ -312,9 +312,8 @@ const Customers = () => {
                                                                         </TableRow>
                                                                     )
                                                                 })
-                                                            }
-                                                        </TableBody> :
-                                                        <TableBody className={""}>
+                                                        )
+                                                         : customerList.length > 0 ? <>
                                                             {
                                                                 (customerList || []).map((x,index)=>{
                                                                     return(
@@ -333,50 +332,56 @@ const Customers = () => {
                                                                     )
                                                                 })
                                                             }
-                                                        </TableBody>
+                                                            </> : <TableRow>
+                                                            <TableCell colSpan={6}>
+                                                                <EmptyData/>
+                                                            </TableCell>
+                                                        </TableRow>
                                                 }
-
+                                                </TableBody>
                                         </Table>
-                                            {isLoading ? null : (isLoading === false && customerList?.length > 0 ? "" : <EmptyData/>)}
 
                                         </div>
                                     </CardContent>
-                                    <CardFooter className={`p-0 ${theme === "dark" ? "border-t" : ""}`}>
-                                        <div
-                                            className={`w-full ${theme === "dark" ? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end p-2 md:px-3 md:py-[10px]`}>
-                                            <div className={"w-full flex gap-2 items-center justify-between sm:justify-end"}>
-                                                <div>
-                                                    <h5 className={"text-sm font-semibold"}>Page {customerList.length <= 0 ? 0 : pageNo} of {totalPages}</h5>
+                                    {
+                                        customerList.length > 0 ?
+                                            <CardFooter className={`p-0 ${theme === "dark" ? "border-t" : ""}`}>
+                                                <div
+                                                    className={`w-full ${theme === "dark" ? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end p-2 md:px-3 md:py-[10px]`}>
+                                                    <div className={"w-full flex gap-2 items-center justify-between sm:justify-end"}>
+                                                        <div>
+                                                            <h5 className={"text-sm font-semibold"}>Page {customerList.length <= 0 ? 0 : pageNo} of {totalPages}</h5>
+                                                        </div>
+                                                        <div className={"flex flex-row gap-2 items-center"}>
+                                                            <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
+                                                                    onClick={() => handlePaginationClick(1)}
+                                                                    disabled={pageNo === 1 || isLoading}>
+                                                                <ChevronsLeft
+                                                                    className={pageNo === 1 || isLoading ? "stroke-muted-foreground" : "stroke-primary"} />
+                                                            </Button>
+                                                            <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
+                                                                    onClick={() => handlePaginationClick(pageNo - 1)}
+                                                                    disabled={pageNo === 1 || isLoading}>
+                                                                <ChevronLeft
+                                                                    className={pageNo === 1 || isLoading ? "stroke-muted-foreground" : "stroke-primary"} />
+                                                            </Button>
+                                                            <Button variant={"outline"} className={" h-[30px] w-[30px] p-1.5"}
+                                                                    onClick={() => handlePaginationClick(pageNo + 1)}
+                                                                    disabled={pageNo === totalPages || isLoading || customerList.length <= 0}>
+                                                                <ChevronRight
+                                                                    className={pageNo === totalPages || isLoading || customerList.length <= 0 ? "stroke-muted-foreground" : "stroke-primary"} />
+                                                            </Button>
+                                                            <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
+                                                                    onClick={() => handlePaginationClick(totalPages)}
+                                                                    disabled={pageNo === totalPages || isLoading || customerList.length <= 0}>
+                                                                <ChevronsRight
+                                                                    className={pageNo === totalPages || isLoading || customerList.length <= 0 ? "stroke-muted-foreground" : "stroke-primary"} />
+                                                            </Button>
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                                <div className={"flex flex-row gap-2 items-center"}>
-                                                    <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
-                                                            onClick={() => handlePaginationClick(1)}
-                                                            disabled={pageNo === 1 || isLoading}>
-                                                        <ChevronsLeft
-                                                            className={pageNo === 1 || isLoading ? "stroke-muted-foreground" : "stroke-primary"} />
-                                                    </Button>
-                                                    <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
-                                                            onClick={() => handlePaginationClick(pageNo - 1)}
-                                                            disabled={pageNo === 1 || isLoading}>
-                                                        <ChevronLeft
-                                                            className={pageNo === 1 || isLoading ? "stroke-muted-foreground" : "stroke-primary"} />
-                                                    </Button>
-                                                    <Button variant={"outline"} className={" h-[30px] w-[30px] p-1.5"}
-                                                            onClick={() => handlePaginationClick(pageNo + 1)}
-                                                            disabled={pageNo === totalPages || isLoading || customerList.length <= 0}>
-                                                        <ChevronRight
-                                                            className={pageNo === totalPages || isLoading || customerList.length <= 0 ? "stroke-muted-foreground" : "stroke-primary"} />
-                                                    </Button>
-                                                    <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
-                                                            onClick={() => handlePaginationClick(totalPages)}
-                                                            disabled={pageNo === totalPages || isLoading || customerList.length <= 0}>
-                                                        <ChevronsRight
-                                                            className={pageNo === totalPages || isLoading || customerList.length <= 0 ? "stroke-muted-foreground" : "stroke-primary"} />
-                                                    </Button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </CardFooter>
+                                            </CardFooter> : ""
+                                    }
                                 </Card>
                     </div>
                 </div>

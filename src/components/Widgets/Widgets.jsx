@@ -1,17 +1,7 @@
 import React, {Fragment, useEffect, useState} from 'react';
 import {Button} from "../ui/button";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow,} from "../ui/table";
-import {
-    BarChart,
-    ChevronLeft,
-    ChevronRight,
-    ChevronsLeft,
-    ChevronsRight,
-    Copy,
-    Ellipsis,
-    Loader2, Plus,
-    X
-} from "lucide-react";
+import {BarChart, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Copy, Ellipsis, Loader2, Plus, X} from "lucide-react";
 import {useTheme} from "../theme-provider";
 import {useSelector} from "react-redux";
 import {Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "../ui/dialog";
@@ -462,24 +452,24 @@ const Widgets = () => {
                                             {widgetsSetting.map((x, i) => (
                                                 <TableRow key={i}>
                                                     <TableCell
-                                                        className={"font-medium p-2 px-2 py-[10px] md:px-3 cursor-pointer"}
+                                                        className={"font-medium p-2 py-[10px] md:px-3 cursor-pointer"}
                                                         onClick={() => handleCreateNew(x.id, x.type)}>{x.name}</TableCell>
                                                     <TableCell
-                                                        className={"font-medium p-2 px-2 py-[10px] md:px-3"}>{x.type}</TableCell>
+                                                        className={"font-medium p-2 py-[10px] md:px-3"}>{x.type}</TableCell>
                                                     <TableCell
-                                                        className={"font-medium p-2 px-2 py-[10px] md:px-3"}>{moment(x.created_at).format('D MMM, YYYY')}</TableCell>
-                                                    <TableCell className={" p-2 px-2 py-[10px] md:px-3"}>
+                                                        className={"font-medium p-2 py-[10px] md:px-3"}>{moment(x.created_at).format('D MMM, YYYY')}</TableCell>
+                                                    <TableCell className={" p-2 py-[10px] md:px-3"}>
                                                         <Button
                                                             className={"py-[6px] px-3 h-auto text-xs font-semibold hover:bg-primary"}
                                                             onClick={() => getCodeCopy(x.id)}>Get code</Button>
                                                     </TableCell>
-                                                    <TableCell className={"font-medium p-2 px-2 py-[10px] md:px-3"}>
+                                                    <TableCell className={"font-medium p-2 py-[10px] md:px-3"}>
                                                         <BarChart
                                                             onClick={() => openSheet(x.id)} size={16}
                                                             className={"cursor-pointer"}
                                                         />
                                                     </TableCell>
-                                                    <TableCell className={" p-2 px-2 py-[10px] md:px-3"}>
+                                                    <TableCell className={" p-2 py-[10px] md:px-3"}>
                                                         <DropdownMenu>
                                                             <DropdownMenuTrigger>
                                                                 <Ellipsis size={16} className={"cursor-pointer"}/>
@@ -504,42 +494,45 @@ const Widgets = () => {
                                 </TableBody>
                             </Table>
                         </CardContent>
-                        <CardFooter className={`p-0 ${theme === "dark" ? "border-t" : ""}`}>
-                            <div
-                                className={`w-full ${theme === "dark" ? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end p-2 md:px-3 md:py-[10px]`}>
-                                <div className={"w-full flex gap-2 items-center justify-between sm:justify-end"}>
-                                    <div>
-                                        <h5 className={"text-sm font-semibold"}>Page {widgetsSetting.length <= 0 ? 0 :pageNo} of {totalPages}</h5>
+                        {
+                            widgetsSetting.length > 0 ?
+                                <CardFooter className={`p-0 ${theme === "dark" ? "border-t" : ""}`}>
+                                    <div
+                                        className={`w-full ${theme === "dark" ? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end p-2 md:px-3 md:py-[10px]`}>
+                                        <div className={"w-full flex gap-2 items-center justify-between sm:justify-end"}>
+                                            <div>
+                                                <h5 className={"text-sm font-semibold"}>Page {widgetsSetting.length <= 0 ? 0 :pageNo} of {totalPages}</h5>
+                                            </div>
+                                            <div className={"flex flex-row gap-2 items-center"}>
+                                                <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
+                                                        onClick={() => handlePaginationClick(1)}
+                                                        disabled={pageNo === 1 || isLoading}>
+                                                    <ChevronsLeft
+                                                        className={pageNo === 1 || isLoading ? "stroke-muted-foreground" : "stroke-primary"}/>
+                                                </Button>
+                                                <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
+                                                        onClick={() => handlePaginationClick(pageNo - 1)}
+                                                        disabled={pageNo === 1 || isLoading}>
+                                                    <ChevronLeft
+                                                        className={pageNo === 1 || isLoading ? "stroke-muted-foreground" : "stroke-primary"}/>
+                                                </Button>
+                                                <Button variant={"outline"} className={" h-[30px] w-[30px] p-1.5"}
+                                                        onClick={() => handlePaginationClick(pageNo + 1)}
+                                                        disabled={pageNo === totalPages || isLoading || widgetsSetting.length <= 0}>
+                                                    <ChevronRight
+                                                        className={pageNo === totalPages || isLoading || widgetsSetting.length <= 0 ? "stroke-muted-foreground" : "stroke-primary"}/>
+                                                </Button>
+                                                <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
+                                                        onClick={() => handlePaginationClick(totalPages)}
+                                                        disabled={pageNo === totalPages || isLoading || widgetsSetting.length <= 0}>
+                                                    <ChevronsRight
+                                                        className={pageNo === totalPages || isLoading || widgetsSetting.length <= 0 ? "stroke-muted-foreground" : "stroke-primary"}/>
+                                                </Button>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div className={"flex flex-row gap-2 items-center"}>
-                                        <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
-                                                onClick={() => handlePaginationClick(1)}
-                                                disabled={pageNo === 1 || isLoading}>
-                                            <ChevronsLeft
-                                                className={pageNo === 1 || isLoading ? "stroke-muted-foreground" : "stroke-primary"}/>
-                                        </Button>
-                                        <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
-                                                onClick={() => handlePaginationClick(pageNo - 1)}
-                                                disabled={pageNo === 1 || isLoading}>
-                                            <ChevronLeft
-                                                className={pageNo === 1 || isLoading ? "stroke-muted-foreground" : "stroke-primary"}/>
-                                        </Button>
-                                        <Button variant={"outline"} className={" h-[30px] w-[30px] p-1.5"}
-                                                onClick={() => handlePaginationClick(pageNo + 1)}
-                                                disabled={pageNo === totalPages || isLoading || widgetsSetting.length <= 0}>
-                                            <ChevronRight
-                                                className={pageNo === totalPages || isLoading || widgetsSetting.length <= 0 ? "stroke-muted-foreground" : "stroke-primary"}/>
-                                        </Button>
-                                        <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
-                                                onClick={() => handlePaginationClick(totalPages)}
-                                                disabled={pageNo === totalPages || isLoading || widgetsSetting.length <= 0}>
-                                            <ChevronsRight
-                                                className={pageNo === totalPages || isLoading || widgetsSetting.length <= 0 ? "stroke-muted-foreground" : "stroke-primary"}/>
-                                        </Button>
-                                    </div>
-                                </div>
-                            </div>
-                        </CardFooter>
+                                </CardFooter> : ""
+                        }
                     </Card>
                 </div>
             </div>
