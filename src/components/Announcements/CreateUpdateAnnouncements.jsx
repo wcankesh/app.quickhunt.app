@@ -53,6 +53,7 @@ const CreateUpdateAnnouncements = ({isOpen, onOpen, onClose, selectedRecord, get
 
     const {theme} = useTheme();
     let apiService = new ApiService();
+
     useEffect(() => {
         if (projectDetailsReducer.id) {
             if (selectedRecord?.post_slug_url) {
@@ -110,7 +111,6 @@ const CreateUpdateAnnouncements = ({isOpen, onOpen, onClose, selectedRecord, get
             }
         }
     };
-
 
     const onDeleteImg = async (name, value) => {
         if (changeLogDetails && changeLogDetails?.image && changeLogDetails.image?.name) {
@@ -199,6 +199,10 @@ const CreateUpdateAnnouncements = ({isOpen, onOpen, onClose, selectedRecord, get
 
     const onChangeCategory = (selectedItems) => {
         setChangeLogDetails({...changeLogDetails, category_id: selectedItems})
+    }
+
+    const commonToggle = (name, value) => {
+        setChangeLogDetails({...changeLogDetails, [name]: value})
     }
 
     const onDateChange = (name, date) => {
@@ -383,12 +387,9 @@ const CreateUpdateAnnouncements = ({isOpen, onOpen, onClose, selectedRecord, get
                     className={`px-3 py-4 lg:px-8 lg:py-[20px] flex flex-row justify-between items-center border-b`}>
                     <h5 className={"text-sm md:text-xl font-medium"}>{selectedRecord?.post_slug_url ? "Update Announcement" : "Create New Announcements"}</h5>
                     <div className={"flex items-center gap-6 m-0"}>
-                        <Button className={"h-5 w-5 p-0"} onClick={() => onChangeText({
-                            target: {
-                                name: "post_pin_to_top",
-                                value: changeLogDetails.post_pin_to_top === 1 ? 0 : 1
-                            }
-                        })} variant={"ghost"}>{changeLogDetails.post_pin_to_top === 1 ?
+                        <Button className={"h-5 w-5 p-0"}
+                                onClick={() => commonToggle("post_pin_to_top", changeLogDetails.post_pin_to_top === 1 ? 0 : 1)}
+                                variant={"ghost"}>{changeLogDetails.post_pin_to_top === 1 ?
                             <Pin fill={"bg-card-foreground"} size={15}/> : <Pin size={15}/>}</Button>
                         <X onClick={onClose} size={18} className={"cursor-pointer"}/>
                     </div>
@@ -459,7 +460,7 @@ const CreateUpdateAnnouncements = ({isOpen, onOpen, onClose, selectedRecord, get
                                                                      className="checkbox-icon">
                                                                     {changeLogDetails.labels.includes(x.id.toString()) ?
                                                                         <Check size={18}/> :
-                                                                        <div className={"h-[18px] w-[18px]"}></div>}
+                                                                        <div className={"h-[18px] w-[18px]"}/>}
                                                                 </div>
                                                                 <div className={"flex items-center gap-2"}>
                                                                     <Circle fill={x.label_color_code}
@@ -508,7 +509,7 @@ const CreateUpdateAnnouncements = ({isOpen, onOpen, onClose, selectedRecord, get
                                                              className="checkbox-icon">
                                                             {changeLogDetails.post_assign_to?.includes(x.user_id.toString()) ?
                                                                 <Check size={18}/> :
-                                                                <div className={"h-[18px] w-[18px]"}></div>}
+                                                                <div className={"h-[18px] w-[18px]"}/>}
                                                         </div>
                                                         <span>{x.user_first_name ? x.user_first_name : ''} {x.user_last_name ? x.user_last_name : ''}</span>
                                                     </div>
@@ -622,16 +623,11 @@ const CreateUpdateAnnouncements = ({isOpen, onOpen, onClose, selectedRecord, get
                             {formError.image && <div className={"text-xs text-red-500"}>{formError.image}</div>}
                         </div>
                         <div className={"flex flex-col gap-[18px] w-full"}>
-                            <div className={"announce-create-switch flex gap-6"}>
-                                <Switch className={"w-[38px] h-[20px]"}
+                            <div className={"announce-create-switch flex gap-3"}>
+                                <Switch id={"expire_date"} className={"w-[38px] h-[20px]"}
                                         checked={changeLogDetails.post_expired_boolean === 1}
-                                        onCheckedChange={(checked) => onChangeText({
-                                            target: {
-                                                name: "post_expired_boolean",
-                                                value: checked === true ? 1 : 0
-                                            }
-                                        })}/>
-                                <p className={"text-sm text-muted-foreground font-medium"}>Expire At</p>
+                                        onCheckedChange={(checked) => commonToggle("post_expired_boolean",checked === true ? 1 : 0)}/>
+                                <label htmlFor={"expire_date"} className={"text-sm text-muted-foreground font-medium"}>Expire At</label>
                             </div>
 
                             {
