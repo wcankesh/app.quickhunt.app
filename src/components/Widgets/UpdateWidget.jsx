@@ -51,8 +51,11 @@ const initialState = {
     changelog_reaction: 1,
     hide_header: 0,
     announcement_description: 0,
+    announcement_image: 0,
     idea_description: 0,
-    roadmap_description: 0,
+    roadmap_image: 0,
+    is_comment: 0,
+
 }
 
 const UpdateWidget = () => {
@@ -307,7 +310,7 @@ const UpdateWidget = () => {
                                                 checked={widgetsSetting.hide_header === 1}
                                                 onCheckedChange={(checked) => onChangeSwitch("hide_header", checked ? 1 : 0)}
                                             />
-                                            <label htmlFor="show_hide_header" className="text-sm font-medium">Hide header</label>
+                                            <label htmlFor="show_hide_header" className="text-sm font-medium">Show header</label>
                                         </div>
                                     </div>
 
@@ -340,6 +343,30 @@ const UpdateWidget = () => {
                                                 />
                                                 <label htmlFor="show_hide_announcement_description" className="text-sm font-medium">Show Description</label>
                                             </div>
+                                            <div className={"flex gap-2 items-center"}>
+                                                <Checkbox
+                                                    id={"show_hide_announcement_image"}
+                                                    checked={widgetsSetting.announcement_image === 1}
+                                                    onCheckedChange={(checked) => onChangeSwitch("announcement_image", checked ? 1 : 0)}
+                                                />
+                                                <label htmlFor="show_hide_announcement_image" className="text-sm font-medium">Show Image</label>
+                                            </div>
+                                            <div className={"flex gap-2 items-center"}>
+                                                <Checkbox
+                                                    id={"show_hide_changelog_reaction"}
+                                                    checked={widgetsSetting.changelog_reaction === 1}
+                                                    onCheckedChange={(checked) => onChangeSwitch("changelog_reaction", checked ? 1 : 0)}
+                                                />
+                                                <label htmlFor="show_hide_changelog_reaction" className="text-sm font-medium">Show Reaction</label>
+                                            </div>
+                                            <div className={"flex gap-2 items-center"}>
+                                                <Checkbox
+                                                    id={"is_comment"}
+                                                    checked={widgetsSetting.is_comment === 1}
+                                                    onCheckedChange={(checked) => onChangeSwitch("is_comment", checked ? 1 : 0)}
+                                                />
+                                                <label htmlFor="is_comment" className="text-sm font-medium">Show Comment</label>
+                                            </div>
                                             <div className="space-y-2">
                                                 <Label className={"font-normal"}>Title</Label>
                                                 <Input value={widgetsSetting.changelog_title}
@@ -360,21 +387,6 @@ const UpdateWidget = () => {
                                                 <p className="text-xs font-medium text-muted-foreground">How should
                                                     Announcement be displayed?</p>
                                             </div>
-                                            <div className="flex flex-col gap-2">
-                                                <Label className={"font-normal"}>Reactions</Label>
-                                                <Select value={widgetsSetting.changelog_reaction}
-                                                        onValueChange={(value) => onChange("changelog_reaction", value)}>
-                                                    <SelectTrigger>
-                                                        <SelectValue placeholder={1}/>
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        <SelectItem value={1}>Enable Reactions</SelectItem>
-                                                        <SelectItem value={2}>Disable Reactions</SelectItem>
-                                                    </SelectContent>
-                                                </Select>
-                                                <p className="text-xs font-medium text-muted-foreground">Choose whether
-                                                    or not reactions are shown</p>
-                                            </div>
                                         </div>
                                     )}
 
@@ -392,10 +404,10 @@ const UpdateWidget = () => {
                                             <div className={"flex gap-2 items-center"}>
                                                 <Checkbox
                                                     id={"show_hide_roadmap_description"}
-                                                    checked={widgetsSetting.roadmap_description === 1}
-                                                    onCheckedChange={(checked) => onChangeSwitch("roadmap_description", checked ? 1 : 0)}
+                                                    checked={widgetsSetting.roadmap_image === 1}
+                                                    onCheckedChange={(checked) => onChangeSwitch("roadmap_image", checked ? 1 : 0)}
                                                 />
-                                                <label htmlFor="show_hide_roadmap_description" className="text-sm font-medium">Show Description</label>
+                                                <label htmlFor="show_hide_roadmap_description" className="text-sm font-medium">Show Image</label>
                                             </div>
                                             <div className="space-y-2">
                                                 <Label className={"font-normal"}>Title</Label>

@@ -9,7 +9,6 @@ import {Card} from "../ui/card";
 import {useSelector} from "react-redux";
 import moment from "moment";
 import {ApiService} from "../../utils/ApiService";
-import {useToast} from "../ui/use-toast";
 import Post from "./Post";
 import Banners from "./Banners";
 import Surveys from "./Surveys";
@@ -17,14 +16,12 @@ import Checklist from "./Checklist";
 import {Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator} from "../ui/breadcrumb";
 import SidebarInAppMessage from "./SidebarInAppMessage";
 
-
-
 import {DropdownMenuGroup} from "@radix-ui/react-dropdown-menu";
 
 const initialState = {
     project_id: "2",
     title: "In app message",
-    type: 1, //1=post,2=banner,3=survey,4=checklist
+    type: 1,
     body_text: "",
     from: "",
     reply_to: "",
@@ -32,28 +29,29 @@ const initialState = {
     text_color: "#000000",
     icon_color: "#FD6B65",
     btn_color: "#7c3aed",
-    delay: 1, //time in seconds
+    delay: 1,
     start_at: moment().toISOString(),
     end_at: moment().add(1, 'hour').toISOString(),
-    position: "top", //top/bottom
-    alignment: "center", //left/right
-    is_close_button: true, //true/false
-    reply_type: 1, //1=Text,2=Reaction
-    question_type: 1, //1=Net Promoter Score,2=Numeric Scale,3=Star rating scale,4=Emoji rating scale,5=Drop Down / List,6=Questions
+    position: "top",
+    alignment: "center",
+    is_close_button: true,
+    reply_type: 1,
+    question_type: 1,
     start_number: 1,
     end_number: 10,
     start_label: "",
     end_label: "",
     placeholder_text: "",
     options: [''],
-    show_sender: true, //boolean
-    action_type: 0, //1=Open URL,2=Ask for Reaction,3=Collect visitor email
+    show_sender: true,
+    action_type: 0,
     action_text: "",
     action_url: "",
-    is_redirect: "", //boolean
-    is_banner_close_button: false, //boolean
-    banner_style: "", //1=Inline,2=Floating,3=Top,4=Bottom
+    is_redirect: "",
+    is_banner_close_button: false,
+    banner_style: "",
     reactions: [],
+    status: 1
 }
 
 const reactionPost = [
@@ -88,6 +86,7 @@ const reactionPost = [
         is_active: 1
     }
 ];
+
 const reactionBanner = [
     {
         "id": "",
@@ -106,14 +105,11 @@ const reactionBanner = [
 const UpdateInAppMessage = () => {
     const navigate = useNavigate();
     let apiSerVice = new ApiService();
-
     const {id, type} = useParams()
+    const messageType = Number(type) || 1;
     const {theme} = useTheme();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
-    const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
-    const [messageType, setMessageType] = useState(Number(type) || 1);
     const [inAppMsgSetting, setInAppMsgSetting] = useState(initialState);
-    const [openItem,setOpenItem]=useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [addSteps, setAddSteps] = useState([]);
     const [selectedQuestionTypes, setSelectedQuestionTypes] = useState(1);
@@ -145,15 +141,7 @@ const UpdateInAppMessage = () => {
                 ...prevState,
                 title: `${type === "1" ? "Post": type === "2" ? "Banner" : type === "3" ? "Survey" : "Checklist"} in app message`,
                 reactions: type === "1" ? reactionPost : type === "2" ? reactionBanner : [],
-                body_text: type === "1" ? {blocks: [
-                        {
-                            type: "paragraph",
-                            data: {
-                                text:
-                                    "Hey"
-                            }
-                        },
-                    ]} : "",
+                body_text: type === "1" ? { blocks: [{type: "paragraph", data: {text: "Hey"}}]} : "",
             }));
         }
     }, [])
@@ -198,7 +186,6 @@ const UpdateInAppMessage = () => {
     };
 
     return (
-        // <div className={"xl:container-2 xl:w-[1100px] container overflow-y-auto"}>
         <Fragment>
             <div className={"py-6 px-4 border-b flex items-center justify-between"}>
                 <Breadcrumb>
@@ -260,10 +247,6 @@ const UpdateInAppMessage = () => {
                     </Card>
                     {(messageType === 3 || messageType === 4) ? (
                         <div className={"flex justify-center"}>
-                            {/*<Button className={"flex gap-[6px] font-semibold"} onClick={handleAddStep}>*/}
-                            {/*    <Plus size={16} strokeWidth={3}/>*/}
-                            {/*    Add Steps*/}
-                            {/*</Button>*/}
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                     <Button className={"flex gap-[6px] font-semibold"} onClick={handleAddStep}>

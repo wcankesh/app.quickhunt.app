@@ -125,8 +125,7 @@ const Surveys = ({inAppMsgSetting, setInAppMsgSetting}) => {
                                                                 <h5 className={"text-xs font-normal"}>{inAppMsgSetting?.end_number} -
                                                                     very good</h5>
                                                             </div>
-                                                        </Card><Button variant={"outline"} className={"h-8"}>Add
-                                                        question</Button>
+                                                        </Card>
                                                     </div>
                                                     <div>
                                                         <Button className={"h-8"}>Submit</Button>
@@ -136,12 +135,10 @@ const Surveys = ({inAppMsgSetting, setInAppMsgSetting}) => {
                                                     <div className={"px-4 pb-8 pt-6 space-y-6"}>
                                                         <div>
                                                             <Card className={"py-2 px-4 relative mb-4"}>
-                                                                <Button variant={"outline"}
-                                                                        className={`absolute right-[-12px] top-[40%] p-0 h-6 w-6 ${theme == "dark" ? "" : "text-muted-foregrounds"}`}>
+                                                                <Button variant={"outline"} className={`absolute right-[-12px] top-[40%] p-0 h-6 w-6 ${theme == "dark" ? "" : "text-muted-foregrounds"}`}>
                                                                     <Trash2 size={12} className={""}/>
                                                                 </Button>
-                                                                <h5 className={"text-sm font-normal"}>How satisfied are
-                                                                    you with our product?</h5>
+                                                                <h5 className={"text-sm font-normal"}>How satisfied are you with our product?</h5>
                                                                 <div className={"flex gap-4 mt-4 justify-center"}>
                                                                     {Array.from({length: 5}, (_, index) => (
                                                                         <RatingStar
@@ -155,14 +152,11 @@ const Surveys = ({inAppMsgSetting, setInAppMsgSetting}) => {
                                                                 </div>
 
                                                                 <div className={"flex justify-between mt-[18px]"}>
-                                                                    <h5 className={"text-xs font-normal"}>{inAppMsgSetting?.start_number} -
-                                                                        very bad</h5>
-                                                                    <h5 className={"text-xs font-normal"}>{inAppMsgSetting?.end_number} -
-                                                                        very good</h5>
+                                                                    <h5 className={"text-xs font-normal"}>{inAppMsgSetting?.start_number} - very bad</h5>
+                                                                    <h5 className={"text-xs font-normal"}>{inAppMsgSetting?.end_number} - very good</h5>
                                                                 </div>
                                                             </Card>
-                                                            <Button variant={"outline"} className={"h-8"}>Add
-                                                                question</Button>
+                                                            <Button variant={"outline"} className={"h-8"}>Add question</Button>
                                                         </div>
                                                         <div>
                                                             <Button className={"h-8"}>Submit</Button>
@@ -172,26 +166,22 @@ const Surveys = ({inAppMsgSetting, setInAppMsgSetting}) => {
                                                         <div className={"px-4 pb-8 pt-6 space-y-6"}>
                                                             <div>
                                                                 <Card className={"py-2 px-4 relative mb-4"}>
-                                                                    <Button variant={"outline"}
-                                                                            className={`absolute right-[-12px] top-[40%] p-0 h-6 w-6 ${theme == "dark" ? "" : "text-muted-foregrounds"}`}>
+                                                                    <Button variant={"outline"} className={`absolute right-[-12px] top-[40%] p-0 h-6 w-6 ${theme == "dark" ? "" : "text-muted-foregrounds"}`}>
                                                                         <Trash2 size={12} className={""}/>
                                                                     </Button>
-                                                                    <h5 className={"text-sm font-normal"}>How satisfied
-                                                                        are you with our product?</h5>
+                                                                    <h5 className={"text-sm font-normal"}>How satisfied are you with our product?</h5>
                                                                     <div
                                                                         className={"flex justify-center gap-6 mt-6 mb-6"}>
                                                                         {
                                                                             (allStatusAndTypes?.emoji || []).slice(0, 5).map((x, i) => {
                                                                                 return (
-                                                                                    <img key={i} className={"h-8 w-8"}
-                                                                                         src={x?.emoji_url}/>
+                                                                                    <img key={i} className={"h-8 w-8"} src={x?.emoji_url}/>
                                                                                 )
                                                                             })
                                                                         }
                                                                     </div>
                                                                 </Card>
-                                                                <Button variant={"outline"} className={"h-8"}>Add
-                                                                    question</Button>
+                                                                <Button variant={"outline"} className={"h-8"}>Add question</Button>
                                                             </div>
                                                             <div>
                                                                 <Button className={"h-8"}>Submit</Button>

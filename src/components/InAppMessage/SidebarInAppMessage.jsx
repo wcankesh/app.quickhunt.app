@@ -87,7 +87,6 @@ const SidebarInAppMessage = ({messageType, inAppMsgSetting, setInAppMsgSetting, 
         numbers.push(i);
     }
 
-
     const handleTimeChange = (time, type) => {
         const currentDateTime = moment(inAppMsgSetting[type]);
 
@@ -104,13 +103,13 @@ const SidebarInAppMessage = ({messageType, inAppMsgSetting, setInAppMsgSetting, 
         });
     };
 
-
     const onDateChange = (name, date) => {
         if (date) {
             let obj = {...inAppMsgSetting, [name]: date};
             setInAppMsgSetting(obj);
         }
     };
+
     const createMessage = async () => {
         setIsLoading(true)
         const payload = {
@@ -163,7 +162,7 @@ const SidebarInAppMessage = ({messageType, inAppMsgSetting, setInAppMsgSetting, 
                                onChange={(e) => onChange("title", e.target.value)}/>
                     </div>
                     {
-                        messageType == 2 && <div className="grid w-full max-w-sm items-center gap-1.5">
+                        (messageType === 2 || messageType === 3 ) && <div className="grid w-full max-w-sm items-center gap-1.5">
                             <div className="flex items-center gap-2">
                                 <Checkbox id="show_sender"
                                           checked={inAppMsgSetting.show_sender}
@@ -175,7 +174,7 @@ const SidebarInAppMessage = ({messageType, inAppMsgSetting, setInAppMsgSetting, 
                     }
 
                     {
-                        (messageType == 1 || (messageType == 2 && inAppMsgSetting.show_sender)) && <div className="grid w-full max-w-sm items-center gap-1.5">
+                        (messageType === 1 || (messageType === 2 && inAppMsgSetting.show_sender) || (messageType === 3 && inAppMsgSetting.show_sender)) && <div className="grid w-full max-w-sm items-center gap-1.5">
                             <Label className={"font-normal"}>From</Label>
                             <Select
                                 value={Number(inAppMsgSetting.from)}
@@ -198,7 +197,7 @@ const SidebarInAppMessage = ({messageType, inAppMsgSetting, setInAppMsgSetting, 
                         </div>
                     }
                     {
-                        messageType == 1 &&
+                        messageType === 1 &&
                         <Fragment>
                             <div className="grid w-full max-w-sm items-center gap-1.5">
                                 <Label className={"font-normal"}>Reply type</Label>
@@ -219,7 +218,7 @@ const SidebarInAppMessage = ({messageType, inAppMsgSetting, setInAppMsgSetting, 
                         </Fragment>
                     }
                     {
-                        messageType == 2 &&
+                        messageType === 2 &&
                         <div className="grid w-full max-w-sm items-center gap-1.5">
                             <Label className={"font-normal"}>Action</Label>
                             <Select value={inAppMsgSetting?.action_type}
@@ -237,7 +236,7 @@ const SidebarInAppMessage = ({messageType, inAppMsgSetting, setInAppMsgSetting, 
                         </div>
                     }
                     {
-                        messageType == 2 && inAppMsgSetting.action_type == 1 && <Fragment>
+                        messageType === 2 && inAppMsgSetting.action_type == 1 && <Fragment>
                             <div className="grid w-full max-w-sm items-center gap-1.5">
                                 <Label htmlFor="title">Action Text</Label>
                                 <Input className={"h-9"} id="action_text" placeholder="Enter action text" value={inAppMsgSetting.action_text}
@@ -260,7 +259,7 @@ const SidebarInAppMessage = ({messageType, inAppMsgSetting, setInAppMsgSetting, 
                         </Fragment>
                     }
                     {
-                        messageType == 2 && inAppMsgSetting.action_type != 0 && <div className="grid w-full max-w-sm items-center gap-1.5">
+                        messageType === 2 && inAppMsgSetting.action_type != 0 && <div className="grid w-full max-w-sm items-center gap-1.5">
                             <div className="flex items-center gap-2">
                                 <Checkbox id="is_banner_close_button"
                                           checked={inAppMsgSetting.is_banner_close_button}
@@ -272,113 +271,8 @@ const SidebarInAppMessage = ({messageType, inAppMsgSetting, setInAppMsgSetting, 
                     }
                 </div>
             </div>
-            <div className={"border-b px-4 py-6 space-y-4"}>
-                {(messageType == 2 || messageType == 1) && <h5 className={"text-base font-medium"}>Style</h5>}
-                {(messageType == 3 || messageType == 4) && <h5 className={"text-base font-medium"}>Customization</h5>}
-                {
-                    messageType == 2 && <Fragment>
-                        <div className="grid w-full max-w-sm items-center gap-1.5">
-                            <Label className={"font-normal"}>Banner position</Label>
-                            <Select
-                                value={inAppMsgSetting.position}
-                                onValueChange={(value) => handleStatusChange(value, "position")}
-                            >
-                                <SelectTrigger className="w-full h-9">
-                                    <SelectValue placeholder={"Select position"}/>
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value={"top"}>Top</SelectItem>
-                                    <SelectItem value={"bottom"}>Bottom</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-                        <div className="grid w-full max-w-sm items-center gap-1.5">
-                            <Label className={"font-normal"}>Alignment</Label>
-                            <Select
-                                value={inAppMsgSetting.alignment}
-                                onValueChange={(value) => handleStatusChange(value, "alignment")}
-                            >
-                                <SelectTrigger className="w-full h-9">
-                                    <SelectValue placeholder={"Select alignment"}/>
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value={"left"}>Left</SelectItem>
-                                    <SelectItem value={"right"}>Right</SelectItem>
-                                    <SelectItem value={"center"}>Center</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-                    </Fragment>
-                }
-                <div className="grid w-full max-w-sm items-center gap-1.5">
-                    <Label className={"font-normal"}>Background Color</Label>
-                    <div className={"w-full text-sm"}>
-                        <ColorInput style={{width: '100%', height: "36px"}} value={inAppMsgSetting.bg_color}
-                                    onChange={onChange} name={"bg_color"}/>
-                    </div>
-                </div>
-                {
-                    (messageType == 3 || messageType == 4) &&
-                    <div className="grid w-full max-w-sm items-center gap-1.5">
-                        <Label className={"font-normal"}>Button Color</Label>
-                        <div className={"w-full text-sm"}>
-                            <ColorInput style={{width: '100%', height: "36px"}} value={inAppMsgSetting.btn_color_picker}
-                                        onChange={onChange}
-                                        name={"btn_color_picker"}/>
-                        </div>
-                    </div>
-                }
-
-                {(messageType == 1 || messageType == 2) &&
-                <div className="grid w-full max-w-sm items-center gap-1.5">
-                    <Label className={"font-normal"}>Text Color</Label>
-                    <div className={"w-full text-sm widget-color-picker space-y-2"}>
-                        <ColorInput
-                            value={inAppMsgSetting.text_color}
-                            onChange={onChange}
-                            name={"text_color"}
-                        />
-                    </div>
-                </div>}
-
-                {messageType == 1 && <div className="grid w-full max-w-sm items-center gap-1.5">
-                    <Label className={"font-normal "}>Icon Color </Label>
-                    <div className={"w-full text-sm widget-color-picker space-y-2"}>
-                        <ColorInput
-                            value={inAppMsgSetting.icon_color}
-                            onChange={onChange}
-                            name={"icon_color"}/>
-                    </div>
-                </div>}
-
-                {(messageType == 1 || messageType == 2) && <div className="grid w-full max-w-sm items-center gap-1.5">
-                    <Label className={"font-normal"}>Button Color</Label>
-                    <div className={"w-full text-sm widget-color-picker space-y-2"}>
-                        <ColorInput
-                            name={"btn_color"}
-                            value={inAppMsgSetting.btn_color}
-                            onChange={onChange}
-                        />
-                    </div>
-                </div>}
-
-
-
-                {
-                    (messageType == 2 || messageType == 3 || messageType == 4) &&
-                    <div className="grid w-full max-w-sm items-center gap-1.5">
-                        <div className="flex items-center gap-2">
-                            <Checkbox id="is_close_button"
-                                      checked={inAppMsgSetting.is_close_button}
-                                      onCheckedChange={(checked) => onChange("is_close_button", checked)}
-                            />
-                            <Label htmlFor="is_close_button" className={"font-normal cursor-pointer"}>Show dismiss button</Label>
-                        </div>
-                    </div>
-                }
-            </div>
             {
-                messageType == 3 && <div className={"border-b px-4 py-6 space-y-4"}>
+                messageType === 3 && <div className={"border-b px-4 py-6 space-y-4"}>
                     <h5 className={"text-base font-medium"}>Question Setting</h5>
                     <div className="grid w-full max-w-sm items-center gap-1.5">
                         <Label className={"font-normal text-sm"}>Question</Label>
@@ -474,8 +368,98 @@ const SidebarInAppMessage = ({messageType, inAppMsgSetting, setInAppMsgSetting, 
                     }
                 </div>
             }
+            <div className={"border-b px-4 py-6 space-y-4"}>
+                <h5 className={"text-base font-medium"}>Style</h5>
+                {
+                    messageType === 2 && <Fragment>
+                        <div className="grid w-full max-w-sm items-center gap-1.5">
+                            <Label className={"font-normal"}>Banner position</Label>
+                            <Select
+                                value={inAppMsgSetting.position}
+                                onValueChange={(value) => handleStatusChange(value, "position")}
+                            >
+                                <SelectTrigger className="w-full h-9">
+                                    <SelectValue placeholder={"Select position"}/>
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value={"top"}>Top</SelectItem>
+                                    <SelectItem value={"bottom"}>Bottom</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="grid w-full max-w-sm items-center gap-1.5">
+                            <Label className={"font-normal"}>Alignment</Label>
+                            <Select
+                                value={inAppMsgSetting.alignment}
+                                onValueChange={(value) => handleStatusChange(value, "alignment")}
+                            >
+                                <SelectTrigger className="w-full h-9">
+                                    <SelectValue placeholder={"Select alignment"}/>
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value={"left"}>Left</SelectItem>
+                                    <SelectItem value={"right"}>Right</SelectItem>
+                                    <SelectItem value={"center"}>Center</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </Fragment>
+                }
+                <div className="grid w-full max-w-sm items-center gap-1.5">
+                    <Label className={"font-normal"}>Background Color</Label>
+                    <div className={"w-full text-sm"}>
+                        <ColorInput style={{width: '100%', height: "36px"}} value={inAppMsgSetting.bg_color}
+                                    onChange={onChange} name={"bg_color"}/>
+                    </div>
+                </div>
+
+
+                {(messageType === 1 || messageType === 2 || messageType === 3) &&
+                <div className="grid w-full max-w-sm items-center gap-1.5">
+                    <Label className={"font-normal"}>Text Color</Label>
+                    <div className={"w-full text-sm widget-color-picker space-y-2"}>
+                        <ColorInput
+                            value={inAppMsgSetting.text_color}
+                            onChange={onChange}
+                            name={"text_color"}
+                        />
+                    </div>
+                </div>}
+
+                {messageType === 1 && <div className="grid w-full max-w-sm items-center gap-1.5">
+                    <Label className={"font-normal "}>Icon Color </Label>
+                    <div className={"w-full text-sm widget-color-picker space-y-2"}>
+                        <ColorInput
+                            value={inAppMsgSetting.icon_color}
+                            onChange={onChange}
+                            name={"icon_color"}/>
+                    </div>
+                </div>}
+
+                <div className="grid w-full max-w-sm items-center gap-1.5">
+                    <Label className={"font-normal"}>Button Color</Label>
+                    <div className={"w-full text-sm widget-color-picker space-y-2"}>
+                        <ColorInput
+                            name={"btn_color"}
+                            value={inAppMsgSetting.btn_color}
+                            onChange={onChange}
+                        />
+                    </div>
+                </div>
+
+                {
+                    (messageType === 2 || messageType === 3 || messageType === 4) &&
+                    <div className="grid w-full max-w-sm items-center gap-1.5">
+                        <div className="flex items-center gap-2">
+                            <Checkbox id="is_close_button" checked={inAppMsgSetting.is_close_button} onCheckedChange={(checked) => onChange("is_close_button", checked)}/>
+                            <Label htmlFor="is_close_button" className={"font-normal cursor-pointer"}>Show dismiss button</Label>
+                        </div>
+                    </div>
+                }
+            </div>
+
             {
-                messageType == 4 && <div className={"border-b px-4 py-6 space-y-4"}>
+                messageType === 4 && <div className={"border-b px-4 py-6 space-y-4"}>
                     <h5 className={"text-base font-medium"}>General Setting</h5>
                     <div className="grid w-full max-w-sm items-center gap-1.5">
                         <Label className={"font-normal"}>Link step to Action?</Label>

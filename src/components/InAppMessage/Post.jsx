@@ -6,7 +6,7 @@ import {MessageCircleMore, Paperclip, Plus, Smile, Trash2, X} from "lucide-react
 import {Card, CardContent, CardHeader} from "../ui/card";
 import {Avatar, AvatarFallback, AvatarImage} from "../ui/avatar";
 import EmojiPicker from "emoji-picker-react";
-import { createReactEditorJS } from 'react-editor-js';
+import EditorJS from '@editorjs/editorjs';
 import Embed from "@editorjs/embed";
 import Table from "@editorjs/table";
 import List from "@editorjs/list";
@@ -25,7 +25,7 @@ import SimpleImage from "@editorjs/simple-image";
 import {PopoverTrigger} from "@radix-ui/react-popover";
 import {Popover, PopoverContent} from "../ui/popover";
 //import CustomImageTool from "../../utils/CustomImageTool";
-const EditorJs = createReactEditorJS();
+
 
 const Post = ({inAppMsgSetting, setInAppMsgSetting, isLoading}) => {
     const editorCore = useRef(null);
@@ -34,9 +34,9 @@ const Post = ({inAppMsgSetting, setInAppMsgSetting, isLoading}) => {
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const userDetailsReducer =  allStatusAndTypes.members.find((x) => x.user_id == inAppMsgSetting.from);;
 
-    const handleInitialize = useCallback((instance) => {
-        editorCore.current = instance;
-    }, []);
+    // const handleInitialize = useCallback((instance) => {
+    //     editorCore.current = instance;
+    // }, []);
 
     const handleSave = React.useCallback(async () => {
         const savedData = await editorCore.current.save();
@@ -48,7 +48,6 @@ const Post = ({inAppMsgSetting, setInAppMsgSetting, isLoading}) => {
 
 
     const handleImageDelete = async (editorCore,blockId) => {
-        debugger
         const block = await editorCore.current.blocks.getBlockById(blockId);
         const imageUrl = block.data.file.url;
 
@@ -132,6 +131,7 @@ const Post = ({inAppMsgSetting, setInAppMsgSetting, isLoading}) => {
         }));
 
     }
+
     const onDeleteReaction = (record, index) => {
         let clone = [...inAppMsgSetting.reactions];
         if(record.id){
@@ -145,7 +145,29 @@ const Post = ({inAppMsgSetting, setInAppMsgSetting, isLoading}) => {
         }));
 
     }
+    useEffect(() => {
+       if(!isLoading){
+           editorCore.current = new EditorJS({
+               holder: 'editorjs',
+               autofocus: true,
+               tools:editorConstants,
+               enableReInitialize:true,
+               onChange:handleSave,
+               data:{
+                   time: new Date().getTime(),
+                   blocks: inAppMsgSetting.body_text.blocks || [{type: "paragraph", data: {text: "Hey"}}],
+                   version: "2.12.4"
+               }
+           });
 
+           return () => {
+               if (editorCore.current && typeof editorCore.current.destroy === 'function') {
+                   editorCore.current.destroy(); // Destroy the editor instance
+               }
+           };
+       }
+
+    }, [isLoading]);
     return (
         <div>
             <div className={`p-16 border-t bg-muted`}>
@@ -177,17 +199,7 @@ const Post = ({inAppMsgSetting, setInAppMsgSetting, isLoading}) => {
 
                         <div className={"pl-14 pt-6 m-0 w-full"}>
                             {
-                                isLoading ? "" : <EditorJs
-                                    onInitialize={handleInitialize}
-                                    tools={editorConstants}
-                                    enableReInitialize={true}
-                                    onChange={handleSave}
-                                    data={{
-                                        time: new Date().getTime(),
-                                        blocks: inAppMsgSetting.body_text.blocks || [],
-                                        version: "2.12.4"
-                                    }}
-                                />
+                                isLoading ? "" :  <div id="editorjs"></div>
                             }
 
                         </div>

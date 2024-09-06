@@ -62,8 +62,8 @@ const WidgetsTypes = () => {
                                             <h2 className={"text-base font-medium mb-2"}>{x.title}</h2>
                                             <p className={"text-sm font-normal text-muted-foreground"}>{x.description}</p>
                                         </div>
-                                        <CardContent className={"p-4 pb-0 bg-muted/50"}>
-                                            <img className={"w-[706px] rounded-tl-[5px] rounded-tr-[5px] border border-text-muted border-b-0"} src={x.img} alt=''/>
+                                        <CardContent className={"p-4 bg-muted/50"}>
+                                            <img className={"w-[706px]"} src={x.img} alt=''/>
                                         </CardContent>
                                     </Card>
                                 )

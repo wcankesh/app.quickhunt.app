@@ -37,11 +37,10 @@ import {toast} from "../ui/use-toast";
 const perPageLimit = 10;
 
 const status = [
-    {name: "Any", value: 0, fillColor: "", strokeColor: "",},
-    {name: "Draft", value: 1, fillColor: "#CF1322", strokeColor: "#CF1322",},
-    {name: "Live", value: 2, fillColor: "#CEF291", strokeColor: "#CEF291",},
-    {name: "Paused", value: 3, fillColor: "#6392D9", strokeColor: "#6392D9",},
-    {name: "Scheduled", value: 4, fillColor: "#63C8D9", strokeColor: "#63C8D9",},
+    {name: "Draft", value: 3, fillColor: "#CF1322", strokeColor: "#CF1322",},
+    {name: "Live", value: 1, fillColor: "#CEF291", strokeColor: "#CEF291",},
+    {name: "Paused", value: 4, fillColor: "#6392D9", strokeColor: "#6392D9",},
+    {name: "Scheduled", value: 2, fillColor: "#63C8D9", strokeColor: "#63C8D9",},
 ];
 
 const contentType = [
@@ -92,11 +91,6 @@ const filterType = [
     }
 ]
 
-// const initialState = {
-//     content_type:"",
-//     add_filter:"",
-//     search:""
-// }
 
 const initialState = {
     project_id: "2",
@@ -128,6 +122,12 @@ const typeNames = {
     2: "Banner",
     3: "Survey",
     4: "Checklist"
+};
+const typeIcon = {
+    1: <ScrollText size={16}/>,
+    2: <ClipboardList size={16}/>,
+    3: <BookCheck size={16}/>,
+    4: <SquareMousePointer size={16}/>,
 };
 
 const InAppMessage = () => {
@@ -162,11 +162,7 @@ const InAppMessage = () => {
         });
         if(data.status === 200) {
             setMessageList(data.data);
-            setTotalRecord(data.total);
-            // const id = urlParams.get('id') || "";
-            // if (id) {
-            //     getSingleInAppMessage()
-            // }
+            setTotalRecord(data.total || 1);
             setIsLoading(false)
         }
         else{
@@ -396,12 +392,12 @@ const InAppMessage = () => {
                                                 <Fragment>
                                                     {
                                                         messageList.map((x,i)=>{
-                                                            const sender = allStatusAndTypes?.members.find((y)=> y.id == x.from);
+                                                            const sender = allStatusAndTypes?.members.find((y)=> y.user_id == x.from);
                                                             return(
                                                                 <TableRow key={x.id}>
                                                                     <TableCell className={"px-2 py-[10px] md:px-3 font-medium cursor-pointer"} onClick={()=>handleCreateNew(x.id, x.type)}>{x.title}</TableCell>
                                                                     <TableCell className={"px-2 py-[10px] md:px-3"}>
-                                                                        <Select value={x.state}
+                                                                        <Select value={x.status}
                                                                                 onValueChange={(value) => handleStatusChange(x, value)}>
                                                                             <SelectTrigger className="w-[135px] h-7">
                                                                                 <SelectValue placeholder="Publish"/>
@@ -409,7 +405,7 @@ const InAppMessage = () => {
                                                                             <SelectContent>
                                                                                 <SelectGroup>
                                                                                     {
-                                                                                        (   status || []).map((x, i) => {
+                                                                                        (status || []).map((x, i) => {
                                                                                             return (
                                                                                                 <Fragment key={i}>
                                                                                                     <SelectItem value={x.value}>
@@ -440,7 +436,7 @@ const InAppMessage = () => {
                                                                         <p className={"font-medium"}>{sender && sender?.user_first_name}</p>
                                                                     </TableCell>
                                                                     <TableCell className={`px-2 py-[10px] md:px-3 font-medium`}>
-                                                                        <div className={"flex items-center gap-1"}><ScrollText  size={16}/>{typeNames[x.type] || "-"}</div>
+                                                                        <div className={"flex items-center gap-1"}>{typeIcon[x.type]}{typeNames[x.type] || "-"}</div>
                                                                     </TableCell>
                                                                     <TableCell className={"px-2 py-[10px] md:px-3"}>
                                                                         {x.seen ? x.seen : "-"}
@@ -475,96 +471,6 @@ const InAppMessage = () => {
                                                 </TableRow>
                                     }
                                 </TableBody>
-
-
-
-                                {/*{*/}
-                                {/*    isLoading ? <TableBody>*/}
-                                {/*            {*/}
-                                {/*                [...Array(10)].map((_, index) => {*/}
-                                {/*                    return (*/}
-                                {/*                        <TableRow key={index}>*/}
-                                {/*                            {*/}
-                                {/*                                [...Array(8)].map((_, i) => {*/}
-                                {/*                                    return (*/}
-                                {/*                                        <TableCell key={i} className={"px-2"}>*/}
-                                {/*                                            <Skeleton className={"rounded-md  w-full h-[24px]"}/>*/}
-                                {/*                                        </TableCell>*/}
-                                {/*                                    )*/}
-                                {/*                                })*/}
-                                {/*                            }*/}
-                                {/*                        </TableRow>*/}
-                                {/*                    )*/}
-                                {/*                })*/}
-                                {/*            }*/}
-                                {/*        </TableBody>*/}
-                                {/*    :*/}
-                                {/*    <TableBody>*/}
-                                {/*        {*/}
-                                {/*            (messageList || []).map((x,i)=>{*/}
-                                {/*                return(*/}
-                                {/*                    <TableRow key={i}>*/}
-                                {/*                        <TableCell className={`px-2 py-[10px] md:px-3 font-medium ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.title}</TableCell>*/}
-                                {/*                        <TableCell className={"px-2 py-[10px] md:px-3"}>*/}
-                                {/*                            <Select value={x.state}*/}
-                                {/*                                    onValueChange={(value) => handleStatusChange(x, value)}>*/}
-                                {/*                                <SelectTrigger className="w-[135px] h-7">*/}
-                                {/*                                    <SelectValue placeholder="Publish"/>*/}
-                                {/*                                </SelectTrigger>*/}
-                                {/*                                <SelectContent>*/}
-                                {/*                                    <SelectGroup>*/}
-                                {/*                                        {*/}
-                                {/*                                            (   status || []).map((x, i) => {*/}
-                                {/*                                                return (*/}
-                                {/*                                                    <Fragment key={i}>*/}
-                                {/*                                                        <SelectItem value={x.value}>*/}
-                                {/*                                                            <div*/}
-                                {/*                                                                className={"flex items-center gap-2"}>*/}
-                                {/*                                                                {x.fillColor && <Circle fill={x.fillColor}*/}
-                                {/*                                                                         stroke={x.strokeColor}*/}
-                                {/*                                                                         className={`${theme === "dark" ? "" : "text-muted-foreground"} w-2 h-2`}/>}*/}
-                                {/*                                                                {x.name}*/}
-                                {/*                                                            </div>*/}
-                                {/*                                                        </SelectItem>*/}
-                                {/*                                                    </Fragment>*/}
-                                {/*                                                )*/}
-                                {/*                                            })*/}
-                                {/*                                        }*/}
-                                {/*                                    </SelectGroup>*/}
-                                {/*                                </SelectContent>*/}
-                                {/*                            </Select>*/}
-                                {/*                        </TableCell>*/}
-                                {/*                        <TableCell className={`flex items-center mt-1 px-2 py-[10px] md:px-3`}>*/}
-                                {/*                            <img className={"h-5 w-5 rounded-full mr-2"} src={x?.avatar} alt={"not_found"}/>*/}
-                                {/*                            <p className={`font-medium ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.sender ? x.sender : "-"}</p>*/}
-                                {/*                        </TableCell>*/}
-                                {/*                        <TableCell className={`px-2 py-[10px] md:px-3 font-medium ${theme === "dark" ? "" : "text-muted-foreground"}`}>*/}
-                                {/*                            {*/}
-                                {/*                                x.content_type === 1 ? <div className={"flex items-center gap-1"}><ScrollText  size={16}/>Post</div> : x.content_type === 2 ? <div className={"flex items-center gap-1"}><ClipboardList  size={16}/>Survey</div> : x.content_type === 3 ? <div className={"flex items-center gap-1"}><BookCheck size={16}/>Checklist</div> : x.content_type === 4 ? <div className={"flex items-center gap-1"}><SquareMousePointer size={16}/>Banners</div> : ""*/}
-                                {/*                            }*/}
-                                {/*                        </TableCell>*/}
-                                {/*                        <TableCell className={`px-2 py-[10px] md:px-3 font-medium ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.seen}</TableCell>*/}
-                                {/*                        <TableCell className={`px-2 py-[10px] md:px-3 font-medium ${theme === "dark" ? "" : "text-muted-foreground"}`}>*/}
-                                {/*                            {x?.created_at ? moment.utc(x.created_at).local().startOf('seconds').fromNow() : "-"}*/}
-                                {/*                        </TableCell>*/}
-                                {/*                        <TableCell className={`px-2 py-[10px] md:px-3 font-medium ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.live_at ? x.live_at : "-"}</TableCell>*/}
-                                {/*                        <TableCell className={`px-2 py-[10px] md:px-3 font-medium ${theme === "dark" ? "" : "text-muted-foreground"}`}>*/}
-                                {/*                            <DropdownMenu>*/}
-                                {/*                                <DropdownMenuTrigger>*/}
-                                {/*                                    <Ellipsis className={`font-medium`} size={18}/>*/}
-                                {/*                                </DropdownMenuTrigger>*/}
-                                {/*                                <DropdownMenuContent align={"end"}>*/}
-                                {/*                                    <DropdownMenuItem onClick={()=>handleCreateNew(x.id)}>Edit</DropdownMenuItem>*/}
-                                {/*                                    <DropdownMenuItem>Delete</DropdownMenuItem>*/}
-                                {/*                                </DropdownMenuContent>*/}
-                                {/*                            </DropdownMenu>*/}
-                                {/*                        </TableCell>*/}
-                                {/*                    </TableRow>*/}
-                                {/*                )*/}
-                                {/*            })*/}
-                                {/*        }*/}
-                                {/*    </TableBody>*/}
-                                {/*}*/}
                             </Table>
                         </div>
                         {
