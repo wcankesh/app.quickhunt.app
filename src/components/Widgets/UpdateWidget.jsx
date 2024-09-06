@@ -182,61 +182,64 @@ const UpdateWidget = () => {
                                 autoFocus
                             />
                         </div>
-                        <div className={"flex gap-4 "}>
-                            {
-                                type !== "embed" &&
-                                <div className={"space-y-4 w-1/2"}>
-                                    <div className={"space-y-2"}>
-                                        <Label className={"font-normal"}>Width</Label>
-                                        {
-                                            type === "popover" &&
-                                            <Input type={"number"} value={widgetsSetting.popover_width}
-                                                   onChange={(e) => onChange("popover_width", e.target.value)}
-                                                   className={"w-full"}/>
-                                        }
-                                        {
-                                            type === "modal" &&
-                                            <Input type={"number"} value={widgetsSetting.modal_width}
-                                                   onChange={(e) => onChange("modal_width", e.target.value)}
-                                                   className={"w-full"}/>
-                                        }
-                                        {
-                                            type === "sidebar" &&
-                                            <Input type={"number"} value={widgetsSetting.sidebar_width}
-                                                   onChange={(e) => onChange("sidebar_width", e.target.value)}
-                                                   className={"w-full"}/>
-                                        }
+                        {
+                            (type !== "embed") &&
+                            <div className={"flex gap-4 "}>
+                                {
+                                    (type !== "embed") &&
+                                    <div className={"space-y-4 w-1/2"}>
+                                        <div className={"space-y-2"}>
+                                            <Label className={"font-normal"}>Width</Label>
+                                            {
+                                                type === "popover" &&
+                                                <Input type={"number"} value={widgetsSetting.popover_width}
+                                                       onChange={(e) => onChange("popover_width", e.target.value)}
+                                                       className={"w-full"}/>
+                                            }
+                                            {
+                                                type === "modal" &&
+                                                <Input type={"number"} value={widgetsSetting.modal_width}
+                                                       onChange={(e) => onChange("modal_width", e.target.value)}
+                                                       className={"w-full"}/>
+                                            }
+                                            {
+                                                type === "sidebar" &&
+                                                <Input type={"number"} value={widgetsSetting.sidebar_width}
+                                                       onChange={(e) => onChange("sidebar_width", e.target.value)}
+                                                       className={"w-full"}/>
+                                            }
+                                        </div>
                                     </div>
-                                </div>
-                            }
-                            {
-                                (type === "popover" || type === "modal") &&
-                                <div className={"space-y-2 w-1/2"}>
-                                    <Label className={"font-normal"}>Height</Label>
-                                    <Input type={"number"} value={widgetsSetting.popover_height}
-                                           onChange={(e) => onChange('popover_height', e.target.value)}
-                                           className={"w-full"}/>
-                                </div>
-                            }
-                            {
-                                (type === "sidebar") &&
-                                <div className={"space-y-2 w-1/2"}>
-                                    <Label className={"font-normal"}>Position</Label>
-                                    <Select
-                                        onValueChange={(value) => onChange("sidebar_position", value)}
-                                        value={widgetsSetting.sidebar_position}
-                                    >
-                                        <SelectTrigger>
-                                            <SelectValue placeholder={1}/>
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value={1}>Left</SelectItem>
-                                            <SelectItem value={2}>Right</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                            }
-                        </div>
+                                }
+                                {
+                                    (type === "popover" || type === "modal") &&
+                                    <div className={"space-y-2 w-1/2"}>
+                                        <Label className={"font-normal"}>Height</Label>
+                                        <Input type={"number"} value={widgetsSetting.popover_height}
+                                               onChange={(e) => onChange('popover_height', e.target.value)}
+                                               className={"w-full"}/>
+                                    </div>
+                                }
+                                {
+                                    (type === "sidebar") &&
+                                    <div className={"space-y-2 w-1/2"}>
+                                        <Label className={"font-normal"}>Position</Label>
+                                        <Select
+                                            onValueChange={(value) => onChange("sidebar_position", value)}
+                                            value={widgetsSetting.sidebar_position}
+                                        >
+                                            <SelectTrigger>
+                                                <SelectValue placeholder={1}/>
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value={1}>Left</SelectItem>
+                                                <SelectItem value={2}>Right</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                }
+                            </div>
+                        }
                     </div>
                 </div>
                     {
@@ -251,7 +254,7 @@ const UpdateWidget = () => {
                                                 checked={widgetsSetting.is_launcher_icon === 1}
                                                 onCheckedChange={(checked) => onChangeSwitch("is_launcher_icon", checked ? 1 : 0)}
                                             />
-                                            <label htmlFor="show_launcher_icon" className="text-sm font-medium">Show Launcher Icon</label>
+                                            <label htmlFor="show_launcher_icon" className="text-sm">Show Launcher Icon</label>
                                         </div>
                                         <div className={"space-y-2"}>
                                             <Label className={"font-normal"}>Icon</Label>
@@ -310,7 +313,7 @@ const UpdateWidget = () => {
                                                 checked={widgetsSetting.hide_header === 1}
                                                 onCheckedChange={(checked) => onChangeSwitch("hide_header", checked ? 1 : 0)}
                                             />
-                                            <label htmlFor="show_hide_header" className="text-sm font-medium">Show header</label>
+                                            <label htmlFor="show_hide_header" className="text-sm">Show header</label>
                                         </div>
                                     </div>
 
@@ -333,48 +336,52 @@ const UpdateWidget = () => {
                                                     checked={widgetsSetting.is_announcement === 1}
                                                     onCheckedChange={(checked) => onChangeSwitch("is_announcement", checked ? 1 : 0)}
                                                 />
-                                                <label htmlFor="show_hide_announcement" className="text-sm font-medium">Show Announcement</label>
+                                                <label htmlFor="show_hide_announcement" className="text-sm">Show Announcement</label>
                                             </div>
                                             <div className={"flex gap-2 items-center"}>
                                                 <Checkbox
+                                                    disabled={widgetsSetting.is_announcement !== 1}
                                                     id={"show_hide_announcement_description"}
                                                     checked={widgetsSetting.announcement_description === 1}
                                                     onCheckedChange={(checked) => onChangeSwitch("announcement_description", checked ? 1 : 0)}
                                                 />
-                                                <label htmlFor="show_hide_announcement_description" className="text-sm font-medium">Show Description</label>
+                                                <label htmlFor="show_hide_announcement_description" className="text-sm">Show Description</label>
                                             </div>
                                             <div className={"flex gap-2 items-center"}>
                                                 <Checkbox
+                                                    disabled={widgetsSetting.is_announcement !== 1}
                                                     id={"show_hide_announcement_image"}
                                                     checked={widgetsSetting.announcement_image === 1}
                                                     onCheckedChange={(checked) => onChangeSwitch("announcement_image", checked ? 1 : 0)}
                                                 />
-                                                <label htmlFor="show_hide_announcement_image" className="text-sm font-medium">Show Image</label>
+                                                <label htmlFor="show_hide_announcement_image" className="text-sm">Show Image</label>
                                             </div>
                                             <div className={"flex gap-2 items-center"}>
                                                 <Checkbox
+                                                    disabled={widgetsSetting.is_announcement !== 1}
                                                     id={"show_hide_changelog_reaction"}
                                                     checked={widgetsSetting.changelog_reaction === 1}
                                                     onCheckedChange={(checked) => onChangeSwitch("changelog_reaction", checked ? 1 : 0)}
                                                 />
-                                                <label htmlFor="show_hide_changelog_reaction" className="text-sm font-medium">Show Reaction</label>
+                                                <label htmlFor="show_hide_changelog_reaction" className="text-sm">Show Reaction</label>
                                             </div>
                                             <div className={"flex gap-2 items-center"}>
                                                 <Checkbox
                                                     id={"is_comment"}
+                                                    disabled={widgetsSetting.is_announcement !== 1}
                                                     checked={widgetsSetting.is_comment === 1}
                                                     onCheckedChange={(checked) => onChangeSwitch("is_comment", checked ? 1 : 0)}
                                                 />
-                                                <label htmlFor="is_comment" className="text-sm font-medium">Show Comment</label>
+                                                <label htmlFor="is_comment" className="text-sm">Show Comment</label>
                                             </div>
                                             <div className="space-y-2">
                                                 <Label className={"font-normal"}>Title</Label>
-                                                <Input value={widgetsSetting.changelog_title}
+                                                <Input value={widgetsSetting.changelog_title} disabled={widgetsSetting.is_announcement !== 1}
                                                        onChange={(e) => onChange("changelog_title", e.target.value)}/>
                                             </div>
                                             <div className="flex flex-col gap-2">
                                                 <Label className={"font-normal"}>Display</Label>
-                                                <Select value={widgetsSetting.changelog_display}
+                                                <Select value={widgetsSetting.changelog_display} disabled={widgetsSetting.is_announcement !== 1}
                                                         onValueChange={(value) => onChange("changelog_display", value)}>
                                                     <SelectTrigger>
                                                         <SelectValue placeholder={1}/>
@@ -399,24 +406,25 @@ const UpdateWidget = () => {
                                                     checked={widgetsSetting.is_roadmap === 1}
                                                     onCheckedChange={(checked) => onChangeSwitch("is_roadmap", checked ? 1 : 0)}
                                                 />
-                                                <label htmlFor="show_hide_roadmap" className="text-sm font-medium">Show Roadmap</label>
+                                                <label htmlFor="show_hide_roadmap" className="text-sm">Show Roadmap</label>
                                             </div>
                                             <div className={"flex gap-2 items-center"}>
                                                 <Checkbox
+                                                    disabled={widgetsSetting.is_roadmap !== 1}
                                                     id={"show_hide_roadmap_description"}
                                                     checked={widgetsSetting.roadmap_image === 1}
                                                     onCheckedChange={(checked) => onChangeSwitch("roadmap_image", checked ? 1 : 0)}
                                                 />
-                                                <label htmlFor="show_hide_roadmap_description" className="text-sm font-medium">Show Image</label>
+                                                <label htmlFor="show_hide_roadmap_description" className="text-sm">Show Image</label>
                                             </div>
                                             <div className="space-y-2">
                                                 <Label className={"font-normal"}>Title</Label>
-                                                <Input value={widgetsSetting.roadmap_title}
+                                                <Input value={widgetsSetting.roadmap_title} disabled={widgetsSetting.is_roadmap !== 1}
                                                        onChange={(e) => onChange("roadmap_title", e.target.value)}/>
                                             </div>
                                             <div className="flex flex-col gap-3">
                                                 <Label className={"font-normal"}>Display</Label>
-                                                <Select value={widgetsSetting.roadmap_display}
+                                                <Select value={widgetsSetting.roadmap_display} disabled={widgetsSetting.is_roadmap !== 1}
                                                         onValueChange={(value) => onChange("roadmap_display", value)}>
                                                     <SelectTrigger>
                                                         <SelectValue placeholder={1}/>
@@ -441,24 +449,25 @@ const UpdateWidget = () => {
                                                     checked={widgetsSetting.is_idea === 1}
                                                     onCheckedChange={(checked) => onChangeSwitch("is_idea", checked ? 1 : 0)}
                                                 />
-                                                <label htmlFor="show_hide_idea" className="text-sm font-medium">Show Ideas</label>
+                                                <label htmlFor="show_hide_idea" className="text-sm">Show Ideas</label>
                                             </div>
                                             <div className={"flex gap-2 items-center"}>
                                                 <Checkbox
+                                                    disabled={widgetsSetting.is_idea !== 1}
                                                     id={"show_hide_idea_description"}
                                                     checked={widgetsSetting.idea_description === 1}
                                                     onCheckedChange={(checked) => onChangeSwitch("idea_description", checked ? 1 : 0)}
                                                 />
-                                                <label htmlFor="show_hide_idea_description" className="text-sm font-medium">Show Description</label>
+                                                <label htmlFor="show_hide_idea_description" className="text-sm">Show Description</label>
                                             </div>
                                             <div className="space-y-2">
                                                 <Label className={"font-normal"}>Title</Label>
-                                                <Input value={widgetsSetting.idea_title}
+                                                <Input value={widgetsSetting.idea_title} disabled={widgetsSetting.is_idea !== 1}
                                                        onChange={(e) => onChange("idea_title", e.target.value)}/>
                                             </div>
                                             <div className="flex flex-col gap-3">
                                                 <Label className={"font-normal"}>Display</Label>
-                                                <Select value={widgetsSetting.idea_display}
+                                                <Select value={widgetsSetting.idea_display} disabled={widgetsSetting.is_idea !== 1}
                                                         onValueChange={(value) => onChange("idea_display", value)}>
                                                     <SelectTrigger>
                                                         <SelectValue placeholder={1}/>
@@ -473,7 +482,7 @@ const UpdateWidget = () => {
                                             </div>
                                             <div className="flex flex-col gap-3">
                                                 <Label className={"font-normal"}>Button Label</Label>
-                                                <Input value={widgetsSetting.idea_button_label} name="idea_button_label"
+                                                <Input value={widgetsSetting.idea_button_label} name="idea_button_label" disabled={widgetsSetting.is_idea !== 1}
                                                        onChange={(e) => onChange("idea_button_label", e.target.value)}/>
                                             </div>
                                         </div>
@@ -483,36 +492,39 @@ const UpdateWidget = () => {
                     }
                         <div className={"hover:no-underline font-medium border-b px-4 py-3"}>Advanced</div>
                         <div className={"p-0"}>
-                            <div className={"px-4 py-3 space-y-4 border-b"}>
-                                <div className={"widget-color-picker space-y-2"}>
-                                    <Label className={"font-normal"}>Header Background Color</Label>
-                                    <ColorInput name="header_bg_color"
-                                                onChange={onChange}
-                                                value={widgetsSetting.header_bg_color}
-                                    />
+                            {
+                                widgetsSetting.hide_header === 1 &&
+                                <div className={"px-4 py-3 space-y-4 border-b"}>
+                                    <div className={"widget-color-picker space-y-2"}>
+                                        <Label className={"font-normal"}>Header Background Color</Label>
+                                        <ColorInput name="header_bg_color"
+                                                    onChange={onChange}
+                                                    value={widgetsSetting.header_bg_color}
+                                        />
+                                    </div>
+                                    <div className={"widget-color-picker space-y-2"}>
+                                        <Label className={"font-normal"}>Header Text Color</Label>
+                                        <ColorInput type="color" name="header_text_color"
+                                                    onChange={onChange}
+                                                    value={widgetsSetting.header_text_color}
+                                        />
+                                    </div>
+                                    <div className={"widget-color-picker space-y-2"}>
+                                        <Label className={"font-normal"}>Header Button Background Color</Label>
+                                        <ColorInput name="header_btn_background_color"
+                                                    onChange={onChange}
+                                                    value={widgetsSetting.header_btn_background_color}
+                                        />
+                                    </div>
+                                    <div className={"widget-color-picker space-y-2"}>
+                                        <Label className={"font-normal"}>Header Button Text Color</Label>
+                                        <ColorInput type="color" name="header_btn_text_color"
+                                                    onChange={onChange}
+                                                    value={widgetsSetting.header_btn_text_color}
+                                        />
+                                    </div>
                                 </div>
-                                <div className={"widget-color-picker space-y-2"}>
-                                    <Label className={"font-normal"}>Header Text Color</Label>
-                                    <ColorInput type="color" name="header_text_color"
-                                                onChange={onChange}
-                                                value={widgetsSetting.header_text_color}
-                                    />
-                                </div>
-                                <div className={"widget-color-picker space-y-2"}>
-                                    <Label className={"font-normal"}>Header Button Background Color</Label>
-                                    <ColorInput name="header_btn_background_color"
-                                                onChange={onChange}
-                                                value={widgetsSetting.header_btn_background_color}
-                                    />
-                                </div>
-                                <div className={"widget-color-picker space-y-2"}>
-                                    <Label className={"font-normal"}>Header Button Text Color</Label>
-                                    <ColorInput type="color" name="header_btn_text_color"
-                                                onChange={onChange}
-                                                value={widgetsSetting.header_btn_text_color}
-                                    />
-                                </div>
-                            </div>
+                            }
                             <div className={"px-4 py-3 space-y-4"}>
                                 <div className={"widget-color-picker space-y-2"}>
                                     <Label className={"font-normal"}>Button Background Color</Label>
