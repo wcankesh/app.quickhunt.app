@@ -61,7 +61,7 @@ const IdeaWidgetPreview = ({widgetsSetting}) => {
 
             </div>
 
-            <div className="block">
+            <div className="block max-h-[385px] overflow-y-auto">
                 {
                     isLoading ? <Card className={cardClass}>
                         {Array.from(Array(8)).map((_, r) => {

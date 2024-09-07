@@ -54,7 +54,7 @@ const AnnouncementWidgetPreview = ({widgetsSetting}) => {
                 </div>
             </div>
 
-            <div className={"block max-h-[600px] overflow-y-auto"}>
+            <div className={"block max-h-[385px] overflow-y-auto"}>
                 {
                     isLoading ? <Card className={cardClass}>
                         {Array.from(Array(8)).map((_, r) => {
@@ -74,7 +74,7 @@ const AnnouncementWidgetPreview = ({widgetsSetting}) => {
                                         <div key={`announcement_${x.id}`} className={`box-border  ${index != 0 ? 'border-t border-zinc-200' : ''}`}>
                                             {
                                                 (x.feature_image !== '' && widgetsSetting?.announcement_image === 1) &&
-                                                <AspectRatio ratio={10 / 5} className="bg-muted rounded-ss-md rounded-se-md mb-1">
+                                                <AspectRatio ratio={10 / 5} className="bg-muted dark:bg-slate-50 rounded-ss-md rounded-se-md mb-1">
                                                     <img src={x.feature_image} alt={x.post_title} className="w-full h-full object-contain object-center"/>
                                                 </AspectRatio>
                                             }
@@ -114,7 +114,7 @@ const AnnouncementWidgetPreview = ({widgetsSetting}) => {
                                                 {widgetsSetting?.changelog_reaction === 1 || widgetsSetting?.is_comment === 1 ? <div className={"pt-6"}>
                                                     <Accordion type="single"  className={"border-t border-b  rounded-lg border-[#e2e8f0]"}>
                                                         <AccordionItem value="item-1" className={"border-0 border-l border-r rounded-lg py-2 border-[#e2e8f0]"}>
-                                                            <div className={"flex items-centergap-3 pl-2 pr-3"}>
+                                                            <div className={"flex items-center justify-between gap-3 pl-2 pr-3"}>
                                                                 {
                                                                     widgetsSetting?.changelog_reaction === 1 ? <div className={"flex gap-2.5 items-center"}>
                                                                         {
@@ -125,7 +125,7 @@ const AnnouncementWidgetPreview = ({widgetsSetting}) => {
                                                                                         key={`emoji_${x.id}_${e.id}`}
 
                                                                                         variant={"ghost"}
-                                                                                        className={`px-2  w-8 h-8 py-0 z-10 text-center items-center justify-center text-base rounded-lg border border-transparent relative hover:bg-white hover:border-gray-100 dark:hover:bg-dark-accent dark:hover:border-dark-accent border-gray-100`}>
+                                                                                        className={`hover:text-card px-2  w-8 h-8 py-0 z-10 text-center items-center justify-center text-base rounded-lg border border-transparent relative hover:bg-white hover:border-gray-100 dark:hover:bg-dark-accent dark:hover:border-dark-accent border-gray-100`}>
                                                                                         {/*<span className={`absolute py-0.5 leading-none -right-1 border rounded shadow -top-1 text-[9px] font-bold tracking-wide  px-0.5 text-background-accent dark:text-foreground/60 dark:border-gray-500/60  dark:bg-dark-accent bg-white`}>{findEmoji?.count}</span>*/}
                                                                                         <span className={`absolute py-0.5 leading-none -right-1 border rounded shadow -top-1 text-[9px] font-bold tracking-wide  px-0.5 text-background-accent dark:border-white  dark:bg-dark-accent bg-white`}>{findEmoji?.count}</span>
                                                                                         <Avatar className="w-[22px] h-[22px]">
@@ -166,7 +166,7 @@ const AnnouncementWidgetPreview = ({widgetsSetting}) => {
                                                                 }
                                                                 {
                                                                     widgetsSetting?.is_comment === 1 ? <AccordionTrigger className={`flex w-full relative items-center justify-end no-underline hover:no-underline py-1 `}>
-                                                                        <div className={`text-left ${widgetsSetting?.changelog_reaction === 0 ? 'border-l px-3' : 'px-3'} text-sm leading-5 truncate absolute left-5 right-5`} style={{overflow: "visible"}}>Write a comment...</div>
+                                                                        <div className={`text-left ${widgetsSetting?.changelog_reaction === 0 ? 'border-l px-3' : 'px-3'} text-sm leading-5 truncate absolute -left-15 right-5`} style={{overflow: "visible"}}>Write a comment...</div>
                                                                     </AccordionTrigger> : ''
                                                                 }
                                                             </div>
