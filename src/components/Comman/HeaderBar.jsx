@@ -434,7 +434,7 @@ const HeaderBar = () => {
     ];
 
     return (
-        <header className={`z-50 ltr:xl:ml-[282px] rtl:xl:mr-[282px] sticky top-0 pr-3 lg:pr-4 ${scrollingDown ? 'bg-background' : ''} ${theme === "dark" ? "border-b" : ""}`}>
+        <header className={`z-50 ltr:xl:ml-[282px] rtl:xl:mr-[282px] sticky top-0 pr-3 lg:pr-4 ${scrollingDown ? 'bg-background' : ''}`}>
 
             {
                 isOpenDeleteAlert &&

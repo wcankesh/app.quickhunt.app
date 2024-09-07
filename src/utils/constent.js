@@ -1,5 +1,5 @@
 import {ApiService} from "./ApiService";
-
+import moment from "moment"
 export const baseUrl = '';
 export const urlParams = new URLSearchParams(window.location.search);
 export const googleClientId = "637779819102-5mjjs6cdp723t5cm8nsb7vrop370sam2.apps.googleusercontent.com";
@@ -50,3 +50,38 @@ export const isTokenAboutToExpire = () => {
 
 
 export const apiService = new ApiService();
+
+export const getDateFormat = (date) => {
+    const now = moment();
+    let localDatetime = moment(date + '+00:00').local();
+    let NewDate = localDatetime || new Date();
+
+    const diffInSeconds = now.diff(NewDate, 'seconds');
+    const diffInMinutes = now.diff(NewDate, 'minutes');
+    const diffInHours = now.diff(NewDate, 'hours');
+    const diffInDays = now.diff(NewDate, 'days');
+    const currentYear = moment().year();
+
+    if (diffInSeconds < 30) {
+        return 'a few seconds ago';
+    } else if (diffInSeconds < 60) {
+        return 'Less than a minute ago';
+    } else if (diffInMinutes === 1) {
+        return '1 minute ago';
+    } else if (diffInMinutes < 60) {
+        return `${diffInMinutes} minutes ago`;
+    } else if (diffInHours === 1) {
+        return '1 hour ago';
+    } else if (diffInHours < 24) {
+        return `${diffInHours} hours ago`;
+    } else if (diffInDays === 1) {
+        return '1 day ago';
+    } else if(diffInDays < 30){
+        return `${diffInDays} days ago`;
+    } else if(NewDate.year() === currentYear){
+        NewDate = moment(NewDate).format('DD MMM');
+    }else{
+        NewDate = moment(NewDate).format('DD MMM, YYYY');
+    }
+    return NewDate;
+};

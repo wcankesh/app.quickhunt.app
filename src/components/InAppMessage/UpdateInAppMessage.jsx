@@ -36,13 +36,6 @@ const initialState = {
     alignment: "center",
     is_close_button: true,
     reply_type: 1,
-    question_type: 1,
-    start_number: 1,
-    end_number: 10,
-    start_label: "",
-    end_label: "",
-    placeholder_text: "",
-    options: [''],
     show_sender: true,
     action_type: 0,
     action_text: "",
@@ -51,7 +44,8 @@ const initialState = {
     is_banner_close_button: false,
     banner_style: "",
     reactions: [],
-    status: 1
+    status: 1,
+    steps:[]
 }
 
 const reactionPost = [
@@ -102,28 +96,46 @@ const reactionBanner = [
 
 ];
 
+const stepBoj = {
+    question_type: 1,
+    text: "How likely are you to recommend us to family and friends?",
+    placeholder_text: "",
+    start_number: "1",
+    end_number: "5",
+    start_label: "Not likely",
+    end_label: "Very likely",
+    is_answer_required: "",
+    step: 1,
+    options: [
+        {id: "", value: ""}
+    ],
+    reactions: [],
+}
+
 const UpdateInAppMessage = () => {
     const navigate = useNavigate();
     let apiSerVice = new ApiService();
     const {id, type} = useParams()
-    const messageType = Number(type) || 1;
     const {theme} = useTheme();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const [inAppMsgSetting, setInAppMsgSetting] = useState(initialState);
     const [isLoading, setIsLoading] = useState(false);
     const [addSteps, setAddSteps] = useState([]);
     const [selectedQuestionTypes, setSelectedQuestionTypes] = useState(1);
+    const [selectedStepIndex, setSelectedStepIndex] = useState(0);
+    const [selectedStep, setSelectedStep] = useState(null);
+
 
     const renderContent = (type) => {
         switch (type) {
-            case 1:
-                return <Post inAppMsgSetting={inAppMsgSetting} setInAppMsgSetting={setInAppMsgSetting} isLoading={isLoading}/>;
-            case 2:
+            case "1":
+                return <Post inAppMsgSetting={inAppMsgSetting} setInAppMsgSetting={setInAppMsgSetting} isLoading={isLoading}  />;
+            case "2":
                 return <Banners inAppMsgSetting={inAppMsgSetting} setInAppMsgSetting={setInAppMsgSetting} isLoading={isLoading} />;
-            case 3:
-                return <Surveys inAppMsgSetting={inAppMsgSetting} setInAppMsgSetting={setInAppMsgSetting} isLoading={isLoading}/>;
-            case 4:
-                return <Checklist inAppMsgSetting={inAppMsgSetting} setInAppMsgSetting={setInAppMsgSetting} isLoading={isLoading}/>;
+            case "3":
+                return <Surveys inAppMsgSetting={inAppMsgSetting} setInAppMsgSetting={setInAppMsgSetting} isLoading={isLoading} selectedStepIndex={selectedStepIndex} setSelectedStepIndex={setSelectedStepIndex} selectedStep={selectedStep} setSelectedStep={setSelectedStep}/>;
+            case "4":
+                return <Checklist inAppMsgSetting={inAppMsgSetting} setInAppMsgSetting={setInAppMsgSetting} isLoading={isLoading} selectedStepIndex={selectedStepIndex} setSelectedStepIndex={setSelectedStepIndex}/>;
             default:
                 return null;
         }
@@ -142,8 +154,10 @@ const UpdateInAppMessage = () => {
                 title: `${type === "1" ? "Post": type === "2" ? "Banner" : type === "3" ? "Survey" : "Checklist"} in app message`,
                 reactions: type === "1" ? reactionPost : type === "2" ? reactionBanner : [],
                 body_text: type === "1" ? { blocks: [{type: "paragraph", data: {text: "Hey"}}]} : "",
+                steps: type === "3" ?  [stepBoj] : [],
             }));
         }
+        setSelectedStep(stepBoj)
     }, [])
 
     useEffect(() => {
@@ -159,9 +173,10 @@ const UpdateInAppMessage = () => {
             const payload = {
                 ...data.data,
                 options: data.data.options ?? [''],
-                body_text: type === "1" ? JSON.parse(data.data.body_text) : data.data.body_text
+                body_text: type === "1" ? JSON.parse(data.data.body_text) : data.data.body_text,
             }
             setInAppMsgSetting(payload);
+            setSelectedStep(payload.steps[0])
             setIsLoading(false);
         } else {
             setIsLoading(false);
@@ -211,11 +226,11 @@ const UpdateInAppMessage = () => {
             </div>
             <div className={"flex h-[calc(100%_-_69px)] overflow-y-auto"}>
                 <div className={"max-w-[407px] w-full border-r h-full overflow-y-auto"}>
-                    <SidebarInAppMessage id={id} messageType={messageType} inAppMsgSetting={inAppMsgSetting} setInAppMsgSetting={setInAppMsgSetting}/>
+                    <SidebarInAppMessage id={id} type={type} inAppMsgSetting={inAppMsgSetting} setInAppMsgSetting={setInAppMsgSetting} selectedStepIndex={selectedStepIndex} setSelectedStepIndex={setSelectedStepIndex} selectedStep={selectedStep} setSelectedStep={setSelectedStep}/>
                 </div>
                 <div className={"bg-muted w-full h-full overflow-y-auto"}>
 
-                    {(messageType === 3 || messageType === 4) ? (
+                    {(type === "3" || type === "4") ? (
                         <div className={"my-6 mx-4 flex justify-center gap-4"}>
                             {addSteps.map((step, index) => (
                                 <div key={index} className="my-2">
@@ -242,10 +257,10 @@ const UpdateInAppMessage = () => {
                                     <div className={"h-7 w-7 rounded-full border border-inherit"}/>
                                 </div>
                             </div>
-                            {renderContent(messageType)}
+                            {renderContent(type)}
                         </Card>
                     </Card>
-                    {(messageType === 3 || messageType === 4) ? (
+                    {(type === "3" || type === "4") ? (
                         <div className={"flex justify-center"}>
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
@@ -257,7 +272,7 @@ const UpdateInAppMessage = () => {
                                 <DropdownMenuContent className="w-56">
                                     <DropdownMenuGroup>
                                         {
-                                            (messageType === 3) && <Fragment>
+                                            (type === "3") && <Fragment>
                                                 {questionTypeOptions.map(option => (
                                                     <DropdownMenuCheckboxItem
                                                         key={option.value}

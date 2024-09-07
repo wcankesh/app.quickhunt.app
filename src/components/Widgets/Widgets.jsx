@@ -452,10 +452,10 @@ const Widgets = () => {
                                             {widgetsSetting.map((x, i) => (
                                                 <TableRow key={i}>
                                                     <TableCell
-                                                        className={"font-medium p-2 py-[10px] md:px-3 cursor-pointer"}
+                                                        className={"font-medium p-2 py-[10px] md:px-3 cursor-pointer capitalize"}
                                                         onClick={() => handleCreateNew(x.id, x.type)}>{x.name}</TableCell>
                                                     <TableCell
-                                                        className={"font-medium p-2 py-[10px] md:px-3"}>{x.type}</TableCell>
+                                                        className={"font-medium p-2 py-[10px] md:px-3 capitalize"}>{x.type}</TableCell>
                                                     <TableCell
                                                         className={"font-medium p-2 py-[10px] md:px-3"}>{moment(x.created_at).format('D MMM, YYYY')}</TableCell>
                                                     <TableCell className={" p-2 py-[10px] md:px-3"}>

@@ -151,9 +151,6 @@
       font-family: 'Geist' !important;
       @apply bg-background text-foreground;
     }
-    .main-content{
-
-    }
   }
 
 .sidebar {transition: transform 0.3s ease;transform: translateX(0);}

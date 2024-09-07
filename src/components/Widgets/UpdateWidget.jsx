@@ -3,7 +3,14 @@ import {Loader2} from "lucide-react";
 import {Label} from "../ui/label";
 import {Input} from "../ui/input";
 import {Checkbox} from "../ui/checkbox";
-import {Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator} from "../ui/breadcrumb";
+import {
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList,
+    BreadcrumbPage,
+    BreadcrumbSeparator
+} from "../ui/breadcrumb";
 import {SelectTrigger, SelectContent, SelectItem, Select, SelectValue} from "../ui/select";
 import {useNavigate, useParams} from "react-router-dom";
 import {baseUrl} from "../../utils/constent";
@@ -14,6 +21,7 @@ import {useToast} from "../ui/use-toast";
 import {useSelector} from "react-redux";
 import {ToggleGroup, ToggleGroupItem} from "../ui/toggle-group";
 import qs from 'qs';
+import WidgetPreview from "./WidgetPreview/WidgetPreview";
 
 const initialState = {
     project_id: "",
@@ -24,11 +32,11 @@ const initialState = {
     launcher_position: 2,
     launcher_icon_bg_color: "#7c3aed",
     launcher_icon_color: "#ffffff",
-    is_idea: true,
-    is_roadmap: true,
-    is_announcement: true,
-    is_navigate: true,
-    is_launcher_icon: 0,
+    is_idea: 1,
+    is_roadmap: 1,
+    is_announcement: 1,
+    is_navigate: 1,
+    is_launcher_icon: 1,
     header_bg_color: "#ffffff",
     header_text_color: "#000000",
     header_btn_background_color: "#7c3aed",
@@ -48,7 +56,7 @@ const initialState = {
     roadmap_display: 1,
     changelog_title: "Announcement",
     changelog_display: 1,
-    changelog_reaction: 1,
+    changelog_reaction: 0,
     hide_header: 0,
     announcement_description: 0,
     announcement_image: 0,
@@ -69,7 +77,7 @@ const UpdateWidget = () => {
     const [index, setIndex] = useState(0);
     const [editWidgetName, setEditWidgetName] = useState(false);
     const [toggle, setToggle] = useState(true);
-    const [selectedToggle, setSelectedToggle] = useState('announcement');
+    const [selectedToggle, setSelectedToggle] = useState('ideas');
 
     const handleToggle = (value) => {
         setSelectedToggle(value);
@@ -242,306 +250,318 @@ const UpdateWidget = () => {
                         }
                     </div>
                 </div>
-                    {
-                        type !== "embed" &&
-                        <Fragment>
-                                <div className={"font-medium border-b px-4 py-3"}>Launcher Type</div>
-                                <div className={"px-4 py-3 border-b"}>
-                                    <div className={"flex flex-col gap-4"}>
-                                        <div className={"flex gap-2 items-center"}>
-                                            <Checkbox
-                                                id={"show_launcher_icon"}
-                                                checked={widgetsSetting.is_launcher_icon === 1}
-                                                onCheckedChange={(checked) => onChangeSwitch("is_launcher_icon", checked ? 1 : 0)}
-                                            />
-                                            <label htmlFor="show_launcher_icon" className="text-sm">Show Launcher Icon</label>
-                                        </div>
-                                        <div className={"space-y-2"}>
-                                            <Label className={"font-normal"}>Icon</Label>
-                                            <Select
-                                                onValueChange={(value) => onChange("launcher_icon", value)}
-                                                value={widgetsSetting.launcher_icon}
-                                            >
-                                                <SelectTrigger className="">
-                                                    <SelectValue placeholder={widgetsSetting?.launcher_icon}/>
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="bolt">Bolt</SelectItem>
-                                                    <SelectItem value="roadmap">Roadmap</SelectItem>
-                                                    <SelectItem value="idea">Idea</SelectItem>
-                                                    <SelectItem value="announcement">Announcement</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-                                        <div className={"space-y-2"}>
-                                            <Label className={"font-normal"}>Position</Label>
-                                            <Select
-                                                value={widgetsSetting.launcher_position}
-                                                onValueChange={(value) => onChange("launcher_position", value)}
-                                            >
-                                                <SelectTrigger className="">
-                                                    <SelectValue placeholder={1}/>
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value={1}>Bottom Left</SelectItem>
-                                                    <SelectItem value={2}>Bottom Right</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-                                        <div className={"widget-color-picker space-y-2"}>
-                                            <Label className={"font-normal"}>Background Color</Label>
-                                            <ColorInput name="launcher_icon_bg_color"
-                                                        value={widgetsSetting.launcher_icon_bg_color}
-                                                        onChange={onChange}
-                                            />
-                                        </div>
-                                        <div className={"widget-color-picker space-y-2"}>
-                                            <Label className={"font-normal"}>Icon Color</Label>
-                                            <ColorInput name="launcher_icon_color"
-                                                        value={widgetsSetting.launcher_icon_color}
-                                                        onChange={onChange}
-                                            />
-                                        </div>
-                                    </div>
+                {
+                    type !== "embed" &&
+                    <Fragment>
+                        <div className={"font-medium border-b px-4 py-3"}>Launcher Type</div>
+                        <div className={"px-4 py-3 border-b"}>
+                            <div className={"flex flex-col gap-4"}>
+                                <div className={"flex gap-2 items-center"}>
+                                    <Checkbox
+                                        id={"show_launcher_icon"}
+                                        checked={widgetsSetting.is_launcher_icon === 1}
+                                        onCheckedChange={(checked) => onChangeSwitch("is_launcher_icon", checked ? 1 : 0)}
+                                    />
+                                    <label htmlFor="show_launcher_icon" className="text-sm">Show Launcher Icon</label>
                                 </div>
-                                <div className={"font-medium border-b px-4 py-3"}>Sections</div>
-                                <div className={"px-4 py-3 space-y-4 border-b"}>
-                                    <div className={"space-y-2"}>
-                                        <div className={"flex gap-2 items-center"}>
-                                            <Checkbox
-                                                id={"show_hide_header"}
-                                                checked={widgetsSetting.hide_header === 1}
-                                                onCheckedChange={(checked) => onChangeSwitch("hide_header", checked ? 1 : 0)}
-                                            />
-                                            <label htmlFor="show_hide_header" className="text-sm">Show header</label>
-                                        </div>
-                                    </div>
-
-                                    <ToggleGroup type="single" className={"justify-between gap-2"}
-                                                 onValueChange={handleToggle}>
-                                        <ToggleGroupItem value="announcement"
-                                                         className={`w-full px-[9px] h-8 text-[12px] ${selectedToggle === 'announcement' ? 'bg-muted' : ''}`}>Announcement</ToggleGroupItem>
-                                        <ToggleGroupItem value="roadmap"
-                                                         className={`w-full px-[9px] h-8 text-[12px] ${selectedToggle === 'roadmap' ? '' : ''}`}>Roadmap</ToggleGroupItem>
-                                        <ToggleGroupItem value="ideas"
-                                                         className={`w-full px-[9px] h-8 text-[12px] ${selectedToggle === 'ideas' ? '' : ''}`}>Ideas</ToggleGroupItem>
-                                    </ToggleGroup>
-
-                                    {/* Content for Announcement */}
-                                    {selectedToggle === 'announcement' && (
-                                        <div className="space-y-4">
-                                            <div className={"flex gap-2 items-center"}>
-                                                <Checkbox
-                                                    id={"show_hide_announcement"}
-                                                    checked={widgetsSetting.is_announcement === 1}
-                                                    onCheckedChange={(checked) => onChangeSwitch("is_announcement", checked ? 1 : 0)}
-                                                />
-                                                <label htmlFor="show_hide_announcement" className="text-sm">Show Announcement</label>
-                                            </div>
-                                            <div className={"flex gap-2 items-center"}>
-                                                <Checkbox
-                                                    disabled={widgetsSetting.is_announcement !== 1}
-                                                    id={"show_hide_announcement_description"}
-                                                    checked={widgetsSetting.announcement_description === 1}
-                                                    onCheckedChange={(checked) => onChangeSwitch("announcement_description", checked ? 1 : 0)}
-                                                />
-                                                <label htmlFor="show_hide_announcement_description" className="text-sm">Show Description</label>
-                                            </div>
-                                            <div className={"flex gap-2 items-center"}>
-                                                <Checkbox
-                                                    disabled={widgetsSetting.is_announcement !== 1}
-                                                    id={"show_hide_announcement_image"}
-                                                    checked={widgetsSetting.announcement_image === 1}
-                                                    onCheckedChange={(checked) => onChangeSwitch("announcement_image", checked ? 1 : 0)}
-                                                />
-                                                <label htmlFor="show_hide_announcement_image" className="text-sm">Show Image</label>
-                                            </div>
-                                            <div className={"flex gap-2 items-center"}>
-                                                <Checkbox
-                                                    disabled={widgetsSetting.is_announcement !== 1}
-                                                    id={"show_hide_changelog_reaction"}
-                                                    checked={widgetsSetting.changelog_reaction === 1}
-                                                    onCheckedChange={(checked) => onChangeSwitch("changelog_reaction", checked ? 1 : 0)}
-                                                />
-                                                <label htmlFor="show_hide_changelog_reaction" className="text-sm">Show Reaction</label>
-                                            </div>
-                                            <div className={"flex gap-2 items-center"}>
-                                                <Checkbox
-                                                    id={"is_comment"}
-                                                    disabled={widgetsSetting.is_announcement !== 1}
-                                                    checked={widgetsSetting.is_comment === 1}
-                                                    onCheckedChange={(checked) => onChangeSwitch("is_comment", checked ? 1 : 0)}
-                                                />
-                                                <label htmlFor="is_comment" className="text-sm">Show Comment</label>
-                                            </div>
-                                            <div className="space-y-2">
-                                                <Label className={"font-normal"}>Title</Label>
-                                                <Input value={widgetsSetting.changelog_title} disabled={widgetsSetting.is_announcement !== 1}
-                                                       onChange={(e) => onChange("changelog_title", e.target.value)}/>
-                                            </div>
-                                            <div className="flex flex-col gap-2">
-                                                <Label className={"font-normal"}>Display</Label>
-                                                <Select value={widgetsSetting.changelog_display} disabled={widgetsSetting.is_announcement !== 1}
-                                                        onValueChange={(value) => onChange("changelog_display", value)}>
-                                                    <SelectTrigger>
-                                                        <SelectValue placeholder={1}/>
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        <SelectItem value={1}>In Widget</SelectItem>
-                                                        <SelectItem value={2}>Link to Platform</SelectItem>
-                                                    </SelectContent>
-                                                </Select>
-                                                <p className="text-xs font-medium text-muted-foreground">How should
-                                                    Announcement be displayed?</p>
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    {/* Content for Roadmap */}
-                                    {selectedToggle === 'roadmap' && (
-                                        <div className="space-y-4">
-                                            <div className={"flex gap-2 items-center"}>
-                                                <Checkbox
-                                                    id={"show_hide_roadmap"}
-                                                    checked={widgetsSetting.is_roadmap === 1}
-                                                    onCheckedChange={(checked) => onChangeSwitch("is_roadmap", checked ? 1 : 0)}
-                                                />
-                                                <label htmlFor="show_hide_roadmap" className="text-sm">Show Roadmap</label>
-                                            </div>
-                                            <div className={"flex gap-2 items-center"}>
-                                                <Checkbox
-                                                    disabled={widgetsSetting.is_roadmap !== 1}
-                                                    id={"show_hide_roadmap_description"}
-                                                    checked={widgetsSetting.roadmap_image === 1}
-                                                    onCheckedChange={(checked) => onChangeSwitch("roadmap_image", checked ? 1 : 0)}
-                                                />
-                                                <label htmlFor="show_hide_roadmap_description" className="text-sm">Show Image</label>
-                                            </div>
-                                            <div className="space-y-2">
-                                                <Label className={"font-normal"}>Title</Label>
-                                                <Input value={widgetsSetting.roadmap_title} disabled={widgetsSetting.is_roadmap !== 1}
-                                                       onChange={(e) => onChange("roadmap_title", e.target.value)}/>
-                                            </div>
-                                            <div className="flex flex-col gap-3">
-                                                <Label className={"font-normal"}>Display</Label>
-                                                <Select value={widgetsSetting.roadmap_display} disabled={widgetsSetting.is_roadmap !== 1}
-                                                        onValueChange={(value) => onChange("roadmap_display", value)}>
-                                                    <SelectTrigger>
-                                                        <SelectValue placeholder={1}/>
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        <SelectItem value={1}>In Widget</SelectItem>
-                                                        <SelectItem value={2}>Link to Platform</SelectItem>
-                                                    </SelectContent>
-                                                </Select>
-                                                <p className="text-xs font-medium text-muted-foreground">How should the
-                                                    Roadmap be displayed?</p>
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    {/* Content for Ideas */}
-                                    {selectedToggle === 'ideas' && (
-                                        <div className="space-y-4">
-                                            <div className={"flex gap-2 items-center"}>
-                                                <Checkbox
-                                                    id={"show_hide_idea"}
-                                                    checked={widgetsSetting.is_idea === 1}
-                                                    onCheckedChange={(checked) => onChangeSwitch("is_idea", checked ? 1 : 0)}
-                                                />
-                                                <label htmlFor="show_hide_idea" className="text-sm">Show Ideas</label>
-                                            </div>
-                                            <div className={"flex gap-2 items-center"}>
-                                                <Checkbox
-                                                    disabled={widgetsSetting.is_idea !== 1}
-                                                    id={"show_hide_idea_description"}
-                                                    checked={widgetsSetting.idea_description === 1}
-                                                    onCheckedChange={(checked) => onChangeSwitch("idea_description", checked ? 1 : 0)}
-                                                />
-                                                <label htmlFor="show_hide_idea_description" className="text-sm">Show Description</label>
-                                            </div>
-                                            <div className="space-y-2">
-                                                <Label className={"font-normal"}>Title</Label>
-                                                <Input value={widgetsSetting.idea_title} disabled={widgetsSetting.is_idea !== 1}
-                                                       onChange={(e) => onChange("idea_title", e.target.value)}/>
-                                            </div>
-                                            <div className="flex flex-col gap-3">
-                                                <Label className={"font-normal"}>Display</Label>
-                                                <Select value={widgetsSetting.idea_display} disabled={widgetsSetting.is_idea !== 1}
-                                                        onValueChange={(value) => onChange("idea_display", value)}>
-                                                    <SelectTrigger>
-                                                        <SelectValue placeholder={1}/>
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        <SelectItem value={1}>In Widget</SelectItem>
-                                                        <SelectItem value={2}>Link to Platform</SelectItem>
-                                                    </SelectContent>
-                                                </Select>
-                                                <p className="text-xs font-medium text-muted-foreground">How should
-                                                    Ideas be displayed?</p>
-                                            </div>
-                                            <div className="flex flex-col gap-3">
-                                                <Label className={"font-normal"}>Button Label</Label>
-                                                <Input value={widgetsSetting.idea_button_label} name="idea_button_label" disabled={widgetsSetting.is_idea !== 1}
-                                                       onChange={(e) => onChange("idea_button_label", e.target.value)}/>
-                                            </div>
-                                        </div>
-                                    )}
+                                <div className={"space-y-2"}>
+                                    <Label className={"font-normal"}>Icon</Label>
+                                    <Select
+                                        onValueChange={(value) => onChange("launcher_icon", value)}
+                                        value={widgetsSetting.launcher_icon}
+                                    >
+                                        <SelectTrigger className="">
+                                            <SelectValue placeholder={widgetsSetting?.launcher_icon}/>
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="bolt">Bolt</SelectItem>
+                                            <SelectItem value="roadmap">Roadmap</SelectItem>
+                                            <SelectItem value="idea">Idea</SelectItem>
+                                            <SelectItem value="announcement">Announcement</SelectItem>
+                                        </SelectContent>
+                                    </Select>
                                 </div>
-                        </Fragment>
-                    }
-                        <div className={"hover:no-underline font-medium border-b px-4 py-3"}>Advanced</div>
-                        <div className={"p-0"}>
-                            {
-                                widgetsSetting.hide_header === 1 &&
-                                <div className={"px-4 py-3 space-y-4 border-b"}>
-                                    <div className={"widget-color-picker space-y-2"}>
-                                        <Label className={"font-normal"}>Header Background Color</Label>
-                                        <ColorInput name="header_bg_color"
-                                                    onChange={onChange}
-                                                    value={widgetsSetting.header_bg_color}
-                                        />
-                                    </div>
-                                    <div className={"widget-color-picker space-y-2"}>
-                                        <Label className={"font-normal"}>Header Text Color</Label>
-                                        <ColorInput type="color" name="header_text_color"
-                                                    onChange={onChange}
-                                                    value={widgetsSetting.header_text_color}
-                                        />
-                                    </div>
-                                    <div className={"widget-color-picker space-y-2"}>
-                                        <Label className={"font-normal"}>Header Button Background Color</Label>
-                                        <ColorInput name="header_btn_background_color"
-                                                    onChange={onChange}
-                                                    value={widgetsSetting.header_btn_background_color}
-                                        />
-                                    </div>
-                                    <div className={"widget-color-picker space-y-2"}>
-                                        <Label className={"font-normal"}>Header Button Text Color</Label>
-                                        <ColorInput type="color" name="header_btn_text_color"
-                                                    onChange={onChange}
-                                                    value={widgetsSetting.header_btn_text_color}
-                                        />
-                                    </div>
+                                <div className={"space-y-2"}>
+                                    <Label className={"font-normal"}>Position</Label>
+                                    <Select
+                                        value={widgetsSetting.launcher_position}
+                                        onValueChange={(value) => onChange("launcher_position", value)}
+                                    >
+                                        <SelectTrigger className="">
+                                            <SelectValue placeholder={1}/>
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value={1}>Bottom Left</SelectItem>
+                                            <SelectItem value={2}>Bottom Right</SelectItem>
+                                        </SelectContent>
+                                    </Select>
                                 </div>
-                            }
-                            <div className={"px-4 py-3 space-y-4"}>
                                 <div className={"widget-color-picker space-y-2"}>
-                                    <Label className={"font-normal"}>Button Background Color</Label>
-                                    <ColorInput name="btn_background_color"
+                                    <Label className={"font-normal"}>Background Color</Label>
+                                    <ColorInput name="launcher_icon_bg_color"
+                                                value={widgetsSetting.launcher_icon_bg_color}
                                                 onChange={onChange}
-                                                value={widgetsSetting.btn_background_color}
                                     />
                                 </div>
                                 <div className={"widget-color-picker space-y-2"}>
-                                    <Label className={"font-normal"}>Button Text Color</Label>
-                                    <ColorInput type="color" name="btn_text_color"
+                                    <Label className={"font-normal"}>Icon Color</Label>
+                                    <ColorInput name="launcher_icon_color"
+                                                value={widgetsSetting.launcher_icon_color}
                                                 onChange={onChange}
-                                                value={widgetsSetting.btn_text_color}
                                     />
                                 </div>
                             </div>
                         </div>
+                    </Fragment>
+                }
+                <div className={"font-medium border-b px-4 py-3"}>Sections</div>
+                <div className={"px-4 py-3 space-y-4 border-b"}>
+                    <div className={"space-y-2"}>
+                        <div className={"flex gap-2 items-center"}>
+                            <Checkbox
+                                id={"show_hide_header"}
+                                checked={widgetsSetting.hide_header === 1}
+                                onCheckedChange={(checked) => onChangeSwitch("hide_header", checked ? 1 : 0)}
+                            />
+                            <label htmlFor="show_hide_header" className="text-sm">Show header</label>
+                        </div>
+                    </div>
+
+                    <ToggleGroup type="single" className={"justify-between gap-2"}
+                                 onValueChange={handleToggle}>
+                        <ToggleGroupItem value="ideas" className={`w-full px-[9px] h-8 text-[12px] ${selectedToggle === 'ideas' ? 'bg-muted' : ''}`}>Ideas</ToggleGroupItem>
+                        <ToggleGroupItem value="roadmap"
+                                         className={`w-full px-[9px] h-8 text-[12px] ${selectedToggle === 'roadmap' ? 'bg-muted' : ''}`}>Roadmap</ToggleGroupItem>
+                        <ToggleGroupItem value="announcement"
+                            className={`w-full px-[9px] h-8 text-[12px] ${selectedToggle === 'announcement' ? 'bg-muted' : ''}`}>Announcement</ToggleGroupItem>
+
+                    </ToggleGroup>
+
+                    {/* Content for Announcement */}
+                    {selectedToggle === 'announcement' && (
+                        <div className="space-y-4">
+                            <div className={"flex gap-2 items-center"}>
+                                <Checkbox
+                                    id={"show_hide_announcement"}
+                                    checked={widgetsSetting.is_announcement === 1}
+                                    onCheckedChange={(checked) => onChangeSwitch("is_announcement", checked ? 1 : 0)}
+                                />
+                                <label htmlFor="show_hide_announcement" className="text-sm">Show
+                                    Announcement</label>
+                            </div>
+                            <div className={"flex gap-2 items-center"}>
+                                <Checkbox
+                                    disabled={widgetsSetting.is_announcement !== 1}
+                                    id={"show_hide_announcement_description"}
+                                    checked={widgetsSetting.announcement_description === 1}
+                                    onCheckedChange={(checked) => onChangeSwitch("announcement_description", checked ? 1 : 0)}
+                                />
+                                <label htmlFor="show_hide_announcement_description" className="text-sm">Show
+                                    Description</label>
+                            </div>
+                            <div className={"flex gap-2 items-center"}>
+                                <Checkbox
+                                    disabled={widgetsSetting.is_announcement !== 1}
+                                    id={"show_hide_announcement_image"}
+                                    checked={widgetsSetting.announcement_image === 1}
+                                    onCheckedChange={(checked) => onChangeSwitch("announcement_image", checked ? 1 : 0)}
+                                />
+                                <label htmlFor="show_hide_announcement_image" className="text-sm">Show
+                                    Image</label>
+                            </div>
+                            <div className={"flex gap-2 items-center"}>
+                                <Checkbox
+                                    disabled={widgetsSetting.is_announcement !== 1}
+                                    id={"show_hide_changelog_reaction"}
+                                    checked={widgetsSetting.changelog_reaction === 1}
+                                    onCheckedChange={(checked) => onChangeSwitch("changelog_reaction", checked ? 1 : 0)}
+                                />
+                                <label htmlFor="show_hide_changelog_reaction" className="text-sm">Show
+                                    Reaction</label>
+                            </div>
+                            <div className={"flex gap-2 items-center"}>
+                                <Checkbox
+                                    id={"is_comment"}
+                                    disabled={widgetsSetting.is_announcement !== 1}
+                                    checked={widgetsSetting.is_comment === 1}
+                                    onCheckedChange={(checked) => onChangeSwitch("is_comment", checked ? 1 : 0)}
+                                />
+                                <label htmlFor="is_comment" className="text-sm">Show Comment</label>
+                            </div>
+                            <div className="space-y-2">
+                                <Label className={"font-normal"}>Title</Label>
+                                <Input value={widgetsSetting.changelog_title}
+                                       disabled={widgetsSetting.is_announcement !== 1}
+                                       onChange={(e) => onChange("changelog_title", e.target.value)}/>
+                            </div>
+                            <div className="flex flex-col gap-2">
+                                <Label className={"font-normal"}>Display</Label>
+                                <Select value={widgetsSetting.changelog_display}
+                                        disabled={widgetsSetting.is_announcement !== 1}
+                                        onValueChange={(value) => onChange("changelog_display", value)}>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder={1}/>
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value={1}>In Widget</SelectItem>
+                                        <SelectItem value={2}>Link to Platform</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                                <p className="text-xs font-medium text-muted-foreground">How should
+                                    Announcement be displayed?</p>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Content for Roadmap */}
+                    {selectedToggle === 'roadmap' && (
+                        <div className="space-y-4">
+                            <div className={"flex gap-2 items-center"}>
+                                <Checkbox
+                                    id={"show_hide_roadmap"}
+                                    checked={widgetsSetting.is_roadmap === 1}
+                                    onCheckedChange={(checked) => onChangeSwitch("is_roadmap", checked ? 1 : 0)}
+                                />
+                                <label htmlFor="show_hide_roadmap" className="text-sm">Show Roadmap</label>
+                            </div>
+                            <div className={"flex gap-2 items-center"}>
+                                <Checkbox
+                                    disabled={widgetsSetting.is_roadmap !== 1}
+                                    id={"show_hide_roadmap_description"}
+                                    checked={widgetsSetting.roadmap_image === 1}
+                                    onCheckedChange={(checked) => onChangeSwitch("roadmap_image", checked ? 1 : 0)}
+                                />
+                                <label htmlFor="show_hide_roadmap_description" className="text-sm">Show
+                                    Image</label>
+                            </div>
+                            <div className="space-y-2">
+                                <Label className={"font-normal"}>Title</Label>
+                                <Input value={widgetsSetting.roadmap_title}
+                                       disabled={widgetsSetting.is_roadmap !== 1}
+                                       onChange={(e) => onChange("roadmap_title", e.target.value)}/>
+                            </div>
+                            <div className="flex flex-col gap-3">
+                                <Label className={"font-normal"}>Display</Label>
+                                <Select value={widgetsSetting.roadmap_display}
+                                        disabled={widgetsSetting.is_roadmap !== 1}
+                                        onValueChange={(value) => onChange("roadmap_display", value)}>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder={1}/>
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value={1}>In Widget</SelectItem>
+                                        <SelectItem value={2}>Link to Platform</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                                <p className="text-xs font-medium text-muted-foreground">How should the
+                                    Roadmap be displayed?</p>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Content for Ideas */}
+                    {selectedToggle === 'ideas' && (
+                        <div className="space-y-4">
+                            <div className={"flex gap-2 items-center"}>
+                                <Checkbox
+                                    id={"show_hide_idea"}
+                                    checked={widgetsSetting.is_idea === 1}
+                                    onCheckedChange={(checked) => onChangeSwitch("is_idea", checked ? 1 : 0)}
+                                />
+                                <label htmlFor="show_hide_idea" className="text-sm">Show Ideas</label>
+                            </div>
+                            <div className={"flex gap-2 items-center"}>
+                                <Checkbox
+                                    disabled={widgetsSetting.is_idea !== 1}
+                                    id={"show_hide_idea_description"}
+                                    checked={widgetsSetting.idea_description === 1}
+                                    onCheckedChange={(checked) => onChangeSwitch("idea_description", checked ? 1 : 0)}
+                                />
+                                <label htmlFor="show_hide_idea_description" className="text-sm">Show
+                                    Description</label>
+                            </div>
+                            <div className="space-y-2">
+                                <Label className={"font-normal"}>Title</Label>
+                                <Input value={widgetsSetting.idea_title} disabled={widgetsSetting.is_idea !== 1}
+                                       onChange={(e) => onChange("idea_title", e.target.value)}/>
+                            </div>
+                            <div className="flex flex-col gap-3">
+                                <Label className={"font-normal"}>Display</Label>
+                                <Select value={widgetsSetting.idea_display}
+                                        disabled={widgetsSetting.is_idea !== 1}
+                                        onValueChange={(value) => onChange("idea_display", value)}>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder={1}/>
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value={1}>In Widget</SelectItem>
+                                        <SelectItem value={2}>Link to Platform</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                                <p className="text-xs font-medium text-muted-foreground">How should
+                                    Ideas be displayed?</p>
+                            </div>
+                            <div className="flex flex-col gap-3">
+                                <Label className={"font-normal"}>Button Label</Label>
+                                <Input value={widgetsSetting.idea_button_label} name="idea_button_label"
+                                       disabled={widgetsSetting.is_idea !== 1}
+                                       onChange={(e) => onChange("idea_button_label", e.target.value)}/>
+                            </div>
+                        </div>
+                    )}
+                </div>
+                <div className={"hover:no-underline font-medium border-b px-4 py-3"}>Advanced</div>
+                <div className={"p-0"}>
+                    {
+                        widgetsSetting.hide_header === 1 &&
+                        <div className={"px-4 py-3 space-y-4 border-b"}>
+                            <div className={"widget-color-picker space-y-2"}>
+                                <Label className={"font-normal"}>Header Background Color</Label>
+                                <ColorInput name="header_bg_color"
+                                            onChange={onChange}
+                                            value={widgetsSetting.header_bg_color}
+                                />
+                            </div>
+                            <div className={"widget-color-picker space-y-2"}>
+                                <Label className={"font-normal"}>Header Text Color</Label>
+                                <ColorInput type="color" name="header_text_color"
+                                            onChange={onChange}
+                                            value={widgetsSetting.header_text_color}
+                                />
+                            </div>
+                            <div className={"widget-color-picker space-y-2"}>
+                                <Label className={"font-normal"}>Header Button Background Color</Label>
+                                <ColorInput name="header_btn_background_color"
+                                            onChange={onChange}
+                                            value={widgetsSetting.header_btn_background_color}
+                                />
+                            </div>
+                            <div className={"widget-color-picker space-y-2"}>
+                                <Label className={"font-normal"}>Header Button Text Color</Label>
+                                <ColorInput type="color" name="header_btn_text_color"
+                                            onChange={onChange}
+                                            value={widgetsSetting.header_btn_text_color}
+                                />
+                            </div>
+                        </div>
+                    }
+                    <div className={"px-4 py-3 space-y-4"}>
+                        <div className={"widget-color-picker space-y-2"}>
+                            <Label className={"font-normal"}>Button Background Color</Label>
+                            <ColorInput name="btn_background_color"
+                                        onChange={onChange}
+                                        value={widgetsSetting.btn_background_color}
+                            />
+                        </div>
+                        <div className={"widget-color-picker space-y-2"}>
+                            <Label className={"font-normal"}>Button Text Color</Label>
+                            <ColorInput type="color" name="btn_text_color"
+                                        onChange={onChange}
+                                        value={widgetsSetting.btn_text_color}
+                            />
+                        </div>
+                    </div>
+                </div>
             </div>
         );
     };
@@ -577,145 +597,70 @@ const UpdateWidget = () => {
         </svg>
     }
 
-    return (
-        <Fragment>
-            <div className={"py-6 px-4 border-b flex items-center justify-between"}>
+return (
+    <Fragment>
+        <div className={"py-6 px-4 border-b flex items-center justify-between"}>
+            <Breadcrumb>
                 <Breadcrumb>
-                    <Breadcrumb>
-                        <BreadcrumbList>
-                            <BreadcrumbItem className={"cursor-pointer"}>
-                                <BreadcrumbLink>
-                                    <span onClick={id === 'new' ? () => navigate(`${baseUrl}/widget/type`) : () => navigate(`${baseUrl}/widget`)}>
+                    <BreadcrumbList>
+                        <BreadcrumbItem className={"cursor-pointer"}>
+                            <BreadcrumbLink>
+                                    <span
+                                        onClick={id === 'new' ? () => navigate(`${baseUrl}/widget/type`) : () => navigate(`${baseUrl}/widget`)}>
                                     {type === 'embed' && 'Embed Widget'}
-                                    {type === 'popover' && 'Popover Widget'}
-                                    {type === 'modal' && 'Modal Widget'}
-                                    {type === 'sidebar' && 'Sidebar Widget'}
+                                        {type === 'popover' && 'Popover Widget'}
+                                        {type === 'modal' && 'Modal Widget'}
+                                        {type === 'sidebar' && 'Sidebar Widget'}
                                     </span>
-                                </BreadcrumbLink>
-                            </BreadcrumbItem>
-                            <BreadcrumbSeparator/>
-                            <BreadcrumbItem className={"cursor-pointer"}>
-                                <BreadcrumbPage>{widgetsSetting.name}</BreadcrumbPage>
-                            </BreadcrumbItem>
-                        </BreadcrumbList>
-                    </Breadcrumb>
+                            </BreadcrumbLink>
+                        </BreadcrumbItem>
+                        <BreadcrumbSeparator/>
+                        <BreadcrumbItem className={"cursor-pointer"}>
+                            <BreadcrumbPage>{widgetsSetting.name}</BreadcrumbPage>
+                        </BreadcrumbItem>
+                    </BreadcrumbList>
                 </Breadcrumb>
-                    <Button size={"sm"} className={"font-semibold w-[128px]"}
-                            onClick={() => id === "new" ? createWidget('head') : onUpdateWidgets('head')}>
+            </Breadcrumb>
+            <Button size={"sm"} className={"font-semibold w-[128px]"}
+                    onClick={() => id === "new" ? createWidget('head') : onUpdateWidgets('head')}>
+                {
+                    loading === 'head' ?
+                        <Loader2
+                            className="mr-2 h-4 w-4 animate-spin"/> : (id === "new" ? "Create Widget" : "Save Changes")
+                }</Button>
+        </div>
+        <div className={"flex h-[calc(100%_-_85px)] overflow-y-auto"}>
+            <div className={"max-w-[407px] w-full border-r h-full overflow-y-auto"}>
+                {renderSidebarItems()}
+                <div className={"px-4 py-6 border-t"}>
+                    <Button className={"font-semibold w-[128px]"}
+                            onClick={() => id === "new" ? createWidget('side') : onUpdateWidgets('side')}>
                         {
-                            loading === 'head' ?
+                            loading === 'side' ?
                                 <Loader2
                                     className="mr-2 h-4 w-4 animate-spin"/> : (id === "new" ? "Create Widget" : "Save Changes")
                         }</Button>
+                </div>
             </div>
-            <div className={"flex h-[calc(100%_-_85px)] overflow-y-auto"}>
-                <div className={"max-w-[407px] w-full border-r h-full overflow-y-auto"}>
-                    {renderSidebarItems()}
-                    <div className={"px-4 py-6 border-t"}>
-                        <Button className={"font-semibold w-[128px]"}
-                                onClick={() => id === "new" ? createWidget('side') : onUpdateWidgets('side')}>
-                            {
-                                loading === 'side' ?
-                                    <Loader2
-                                        className="mr-2 h-4 w-4 animate-spin"/> : (id === "new" ? "Create Widget" : "Save Changes")
-                            }</Button>
+            <div className={"bg-muted w-full h-full overflow-y-auto"}>
+                {
+                    (type !== "embed" && widgetsSetting?.is_launcher_icon == 1) &&
+                    <div className='QH-floating-trigger' onClick={onToggle} style={{
+                        backgroundColor: widgetsSetting.launcher_icon_bg_color,
+                        left: widgetsSetting.launcher_position === 1 ? type === "popover" ? "40px" : 355 : "inherit",
+                        right: widgetsSetting.launcher_position === 2 ? "40px" : "inherit",
+                        position: type === "popover" ? "absolute" : "fixed"
+                    }}>
+                        {
+                            launcherIcon[widgetsSetting.launcher_icon]
+                        }
                     </div>
-                </div>
-                <div className={"bg-muted w-full h-full overflow-y-auto"}>
-                    {
-                        (type !== "embed" && widgetsSetting?.is_launcher_icon == 1) &&
-                        <div className='QH-floating-trigger' onClick={onToggle} style={{
-                            backgroundColor: widgetsSetting.launcher_icon_bg_color,
-                            left: widgetsSetting.launcher_position === 1 ? type === "popover" ? "40px" : 355 : "inherit",
-                            right: widgetsSetting.launcher_position === 2 ? "40px" : "inherit",
-                            position: type === "popover" ? "absolute" : "fixed"
-                        }}>
-                            {
-                                launcherIcon[widgetsSetting.launcher_icon]
-                            }
-                        </div>
-                    }
-
-                    {
-                        type === "popover" &&
-                        <div className={`QH-popover ${toggle ? "QH-popover-open" : ""}`} style={{
-                            left: widgetsSetting.launcher_position === 1 ? "40px" : "inherit",
-                            right: widgetsSetting.launcher_position === 2 ? "40px" : "inherit",
-                            width: `${widgetsSetting.popover_width}px`, height: `${widgetsSetting.popover_height}px`
-                        }}>
-                            <iframe className='QH-frame'
-                                    allow="http://localhost:5173"
-                                    src={`https://${projectDetailsReducer.domain}/ideas?${qs.stringify({
-                                        ...widgetsSetting,
-                                        widget: id,
-                                        isPreview: true
-                                    })}`}/>
-                        </div>
-                    }
-
-                    {
-                        type === "sidebar" &&
-                        <div className={"relative h-full"}>
-                            <div className={`QH-sidebar ${toggle ? "QH-sidebar-open" : ""} relative`} style={{
-                                left: widgetsSetting.sidebar_position === 1 ? "350px" : "inherit",
-                                right: widgetsSetting.sidebar_position === 2 ? "0" : "inherit",
-                            }}>
-                                <div className="QH-sidebar-content" style={{
-                                    left: widgetsSetting.sidebar_position === 1 ? "350px" : "inherit",
-                                    right: widgetsSetting.sidebar_position === 2 ? "0" : "inherit",
-                                    width: `${widgetsSetting.sidebar_width}px`,
-                                }}>
-                                    <iframe className='QH-frame'
-                                            src={`https://${projectDetailsReducer.domain}/ideas?${qs.stringify({
-                                                ...widgetsSetting,
-                                                widget: id,
-                                                isPreview: true
-                                            })}`}/>
-                                </div>
-                                <div className="QH-sidebar-shadow" onClick={onToggle}>&nbsp;</div>
-                            </div>
-                        </div>
-                    }
-
-                    {
-                        type === "modal" &&
-                        <div className={"relative h-full"}>
-                            <div className={`QH-modal ${toggle ? "QH-modal-open" : ""}`}>
-                                <div className={"QH-modal-content"}
-                                     style={{
-                                         width: `${widgetsSetting.modal_width}px`,
-                                         height: `${widgetsSetting.modal_height}px`,
-                                     }}>
-                                    <iframe className='QH-frame'
-                                            src={`https://${projectDetailsReducer.domain}/ideas?${qs.stringify({
-                                                ...widgetsSetting,
-                                                widget: id,
-                                                isPreview: true
-                                            })}`}/>
-                                </div>
-                            </div>
-                        </div>
-                    }
-
-                    {
-                        type === "embed" &&
-                        <div className={"p-[64px] h-full "}>
-                            <div className={"QH-widget-embed border rounded-lg"}>
-                                <div className={"QH-embed"}>
-                                    <iframe className='QH-frame rounded-lg'
-                                            src={`https://${projectDetailsReducer.domain}/ideas?${qs.stringify({
-                                                ...widgetsSetting,
-                                                widget: id,
-                                                isPreview: true
-                                            })}`}/>
-                                </div>
-                            </div>
-                        </div>
-                    }
-                </div>
+                }
+                <WidgetPreview widgetsSetting={widgetsSetting} type={type} toggle={toggle} onToggle={onToggle}/>
             </div>
-        </Fragment>
-    );
+        </div>
+    </Fragment>
+);
 };
 
 export default UpdateWidget;

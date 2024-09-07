@@ -7,14 +7,14 @@ import {Input} from "../ui/input";
 import {Card} from "../ui/card";
 import RatingStar from "../Comman/Star";
 
-const Surveys = ({inAppMsgSetting, setInAppMsgSetting}) => {
+const Surveys = ({inAppMsgSetting, setInAppMsgSetting, selectedStepIndex, setSelectedStepIndex, setSelectedStep, selectedStep, isLoading}) => {
         const {theme} = useTheme();
         const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
         const [starRating, setStarRating] = useState(0);
         const [hoverRating, setHoverRating] = useState(0);
 
         const numbers = [];
-        for (let i = inAppMsgSetting.start_number; i <= inAppMsgSetting.end_number; i++) {
+        for (let i = Number(selectedStep?.question_type === 1 ? "0" : selectedStep?.start_number); i <= Number(selectedStep?.question_type === 1 ? "10" : selectedStep?.end_number); i++) {
             numbers.push(i);
         }
 
@@ -36,7 +36,7 @@ const Surveys = ({inAppMsgSetting, setInAppMsgSetting}) => {
         const handleMouseLeave = () => {
             setHoverRating(0);
         };
-
+    console.log(selectedStep)
         return (
             <div className={"my-6 flex flex-col gap-8"}>
                 <div className={"pt-8 px-4 pb-10 border-t"}>
@@ -45,9 +45,119 @@ const Surveys = ({inAppMsgSetting, setInAppMsgSetting}) => {
                             <div
                                 className={`${theme == "dark" ? "bg-primary/15" : "bg-[#EEE4FF]"}  w-[498px] px-4 pb-4 rounded-[10px]`}>
                                 <div className={"flex justify-end"}><X className={"my-2"} size={12}/></div>
-                                <div
-                                    className={` rounded-[10px] ${theme == "dark" ? "bg-[#020817]" : "bg-[#fff]"}`}>
-                                    {inAppMsgSetting.question_type == 5 ?
+                                <div className={` rounded-[10px] ${theme == "dark" ? "bg-[#020817]" : "bg-[#fff]"}`}>
+                                    {
+                                        selectedStep?.question_type === 1 &&   <div className={"px-4 pb-8 pt-6 space-y-6"}>
+                                            <div>
+                                                <Card className={"py-2 px-4 relative mb-4"}>
+                                                    <Button variant={"outline"}
+                                                            className={`absolute right-[-12px] top-[40%] p-0 h-6 w-6 ${theme == "dark" ? "" : "text-muted-foregrounds"}`}>
+                                                        <Trash2 size={12} className={""}/>
+                                                    </Button>
+                                                    <h5 className={"text-sm font-normal"}>{selectedStep?.text}</h5>
+                                                    <div className={"flex gap-3 px-[30px] pt-[18px]"}>
+                                                        {numbers.map(num => (
+                                                            <Button key={num} variant={"outline"} className={"w-5 h-5 text-xs p-0"}>{num}</Button>
+                                                        ))}
+                                                    </div>
+                                                    <div className={"flex justify-between mt-[18px]"}>
+                                                        <h5 className={"text-xs font-normal"}>{selectedStep?.start_label}</h5>
+                                                        <h5 className={"text-xs font-normal"}>{selectedStep?.end_label}</h5>
+                                                    </div>
+                                                </Card>
+                                            </div>
+                                        </div>
+                                    }
+                                    {
+                                        selectedStep?.question_type === 2 && <div className={"px-4 pb-8 pt-6 space-y-6"}>
+                                            <div>
+                                                <Card className={"py-2 px-4 relative mb-4"}>
+                                                    <Button variant={"outline"}
+                                                            className={`absolute right-[-12px] top-[40%] p-0 h-6 w-6 ${theme == "dark" ? "" : "text-muted-foregrounds"}`}>
+                                                        <Trash2 size={12} className={""}/>
+                                                    </Button>
+                                                    <h5 className={"text-sm font-normal"}>How satisfied are you
+                                                        with our product?</h5>
+                                                    <div
+                                                        className={"flex justify-center gap-3 px-[30px] pt-[18px]"}>
+                                                        {numbers.map(num => (
+                                                            <Button key={num} variant={"outline"}
+                                                                    className={"w-5 h-5 text-xs p-0"}>{num}</Button>
+                                                        ))}
+                                                    </div>
+                                                    <div className={"flex justify-between mt-[18px]"}>
+                                                        <h5 className={"text-xs font-normal"}>{selectedStep?.start_number} -
+                                                            very bad</h5>
+                                                        <h5 className={"text-xs font-normal"}>{selectedStep?.end_number} -
+                                                            very good</h5>
+                                                    </div>
+                                                </Card>
+                                            </div>
+                                            <div>
+                                                <Button className={"h-8"}>Submit</Button>
+                                            </div>
+                                        </div>
+                                    }
+                                    {
+                                        selectedStep?.question_type === 3 && <div className={"px-4 pb-8 pt-6 space-y-6"}>
+                                                <div>
+                                                    <Card className={"py-2 px-4 relative mb-4"}>
+                                                        <Button variant={"outline"} className={`absolute right-[-12px] top-[40%] p-0 h-6 w-6 ${theme == "dark" ? "" : "text-muted-foregrounds"}`}>
+                                                            <Trash2 size={12} className={""}/>
+                                                        </Button>
+                                                        <h5 className={"text-sm font-normal"}>How satisfied are you with our product?</h5>
+                                                        <div className={"flex gap-4 mt-4 justify-center"}>
+                                                            {Array.from({length: 5}, (_, index) => (
+                                                                <RatingStar
+                                                                    key={index}
+                                                                    filled={index < (hoverRating || starRating)}
+                                                                    onClick={() => handleClick(index + 1)}
+                                                                    onMouseEnter={() => handleMouseEnter(index + 1)}
+                                                                    onMouseLeave={handleMouseLeave}
+                                                                />
+                                                            ))}
+                                                        </div>
+
+                                                        <div className={"flex justify-between mt-[18px]"}>
+                                                            <h5 className={"text-xs font-normal"}>{selectedStep?.start_number} - very bad</h5>
+                                                            <h5 className={"text-xs font-normal"}>{selectedStep?.end_number} - very good</h5>
+                                                        </div>
+                                                    </Card>
+                                                    <Button variant={"outline"} className={"h-8"}>Add question</Button>
+                                                </div>
+                                                <div>
+                                                    <Button className={"h-8"}>Submit</Button>
+                                                </div>
+                                            </div>
+                                    }
+                                    {
+                                        selectedStep?.question_type === 4 &&
+                                            <div className={"px-4 pb-8 pt-6 space-y-6"}>
+                                                <div>
+                                                    <Card className={"py-2 px-4 relative mb-4"}>
+                                                        <Button variant={"outline"} className={`absolute right-[-12px] top-[40%] p-0 h-6 w-6 ${theme == "dark" ? "" : "text-muted-foregrounds"}`}>
+                                                            <Trash2 size={12} className={""}/>
+                                                        </Button>
+                                                        <h5 className={"text-sm font-normal"}>How satisfied are you with our product?</h5>
+                                                        <div
+                                                            className={"flex justify-center gap-6 mt-6 mb-6"}>
+                                                            {
+                                                                (allStatusAndTypes?.emoji || []).slice(0, 5).map((x, i) => {
+                                                                    return (
+                                                                        <img key={i} className={"h-8 w-8"} src={x?.emoji_url}/>
+                                                                    )
+                                                                })
+                                                            }
+                                                        </div>
+                                                    </Card>
+                                                    <Button variant={"outline"} className={"h-8"}>Add question</Button>
+                                                </div>
+                                                <div>
+                                                    <Button className={"h-8"}>Submit</Button>
+                                                </div>
+                                            </div>
+                                    }
+                                    {selectedStep?.question_type === 5 &&
                                         <div className={"px-4 pb-8 pt-6 space-y-6"}>
                                             <div>
                                                 <Card className={"py-2 px-4 pb-6 relative mb-4"}>
@@ -58,7 +168,7 @@ const Surveys = ({inAppMsgSetting, setInAppMsgSetting}) => {
                                                     <h5 className={"text-sm font-normal"}>Ask question here?</h5>
                                                     <div className="mt-3">
                                                         <ul className={"space-y-3"}>
-                                                            {inAppMsgSetting.options.map((option, index) => (
+                                                            {selectedStep?.options.map((option, index) => (
                                                                 <li key={index}>
                                                                     <Input value={option || "Select one"}/>
                                                                 </li>
@@ -73,121 +183,7 @@ const Surveys = ({inAppMsgSetting, setInAppMsgSetting}) => {
                                                 <Button className={"h-8"}>Submit</Button>
                                             </div>
                                         </div>
-                                        : inAppMsgSetting.question_type == 1 ?
-                                            <div className={"px-4 pb-8 pt-6 space-y-6"}>
-                                                <div>
-                                                    <Card className={"py-2 px-4 relative mb-4"}>
-                                                        <Button variant={"outline"}
-                                                                className={`absolute right-[-12px] top-[40%] p-0 h-6 w-6 ${theme == "dark" ? "" : "text-muted-foregrounds"}`}>
-                                                            <Trash2 size={12} className={""}/>
-                                                        </Button>
-                                                        <h5 className={"text-sm font-normal"}>How satisfied are you with
-                                                            our product?</h5>
-                                                        <div className={"flex gap-3 px-[30px] pt-[18px]"}>
-                                                            {numbers.map(num => (
-                                                                <Button key={num} variant={"outline"}
-                                                                        className={"w-5 h-5 text-xs p-0"}>{num}</Button>
-                                                            ))}
-                                                        </div>
-                                                        <div className={"flex justify-between mt-[18px]"}>
-                                                            <h5 className={"text-xs font-normal"}>{inAppMsgSetting?.start_number} -
-                                                                very bad</h5>
-                                                            <h5 className={"text-xs font-normal"}>{inAppMsgSetting?.end_number} -
-                                                                very good</h5>
-                                                        </div>
-                                                    </Card>
-                                                    <Button variant={"outline"} className={"h-8"}>Add question</Button>
-                                                </div>
-                                                <div>
-                                                    <Button className={"h-8"}>Submit</Button>
-                                                </div>
-                                            </div>
-                                            : inAppMsgSetting.question_type == 2 ?
-                                                <div className={"px-4 pb-8 pt-6 space-y-6"}>
-                                                    <div>
-                                                        <Card className={"py-2 px-4 relative mb-4"}>
-                                                            <Button variant={"outline"}
-                                                                    className={`absolute right-[-12px] top-[40%] p-0 h-6 w-6 ${theme == "dark" ? "" : "text-muted-foregrounds"}`}>
-                                                                <Trash2 size={12} className={""}/>
-                                                            </Button>
-                                                            <h5 className={"text-sm font-normal"}>How satisfied are you
-                                                                with our product?</h5>
-                                                            <div
-                                                                className={"flex justify-center gap-3 px-[30px] pt-[18px]"}>
-                                                                {numbers.map(num => (
-                                                                    <Button key={num} variant={"outline"}
-                                                                            className={"w-5 h-5 text-xs p-0"}>{num}</Button>
-                                                                ))}
-                                                            </div>
-                                                            <div className={"flex justify-between mt-[18px]"}>
-                                                                <h5 className={"text-xs font-normal"}>{inAppMsgSetting?.start_number} -
-                                                                    very bad</h5>
-                                                                <h5 className={"text-xs font-normal"}>{inAppMsgSetting?.end_number} -
-                                                                    very good</h5>
-                                                            </div>
-                                                        </Card>
-                                                    </div>
-                                                    <div>
-                                                        <Button className={"h-8"}>Submit</Button>
-                                                    </div>
-                                                </div>
-                                                : inAppMsgSetting.question_type == 3 ?
-                                                    <div className={"px-4 pb-8 pt-6 space-y-6"}>
-                                                        <div>
-                                                            <Card className={"py-2 px-4 relative mb-4"}>
-                                                                <Button variant={"outline"} className={`absolute right-[-12px] top-[40%] p-0 h-6 w-6 ${theme == "dark" ? "" : "text-muted-foregrounds"}`}>
-                                                                    <Trash2 size={12} className={""}/>
-                                                                </Button>
-                                                                <h5 className={"text-sm font-normal"}>How satisfied are you with our product?</h5>
-                                                                <div className={"flex gap-4 mt-4 justify-center"}>
-                                                                    {Array.from({length: 5}, (_, index) => (
-                                                                        <RatingStar
-                                                                            key={index}
-                                                                            filled={index < (hoverRating || starRating)}
-                                                                            onClick={() => handleClick(index + 1)}
-                                                                            onMouseEnter={() => handleMouseEnter(index + 1)}
-                                                                            onMouseLeave={handleMouseLeave}
-                                                                        />
-                                                                    ))}
-                                                                </div>
-
-                                                                <div className={"flex justify-between mt-[18px]"}>
-                                                                    <h5 className={"text-xs font-normal"}>{inAppMsgSetting?.start_number} - very bad</h5>
-                                                                    <h5 className={"text-xs font-normal"}>{inAppMsgSetting?.end_number} - very good</h5>
-                                                                </div>
-                                                            </Card>
-                                                            <Button variant={"outline"} className={"h-8"}>Add question</Button>
-                                                        </div>
-                                                        <div>
-                                                            <Button className={"h-8"}>Submit</Button>
-                                                        </div>
-                                                    </div>
-                                                    : inAppMsgSetting.question_type == 4 ?
-                                                        <div className={"px-4 pb-8 pt-6 space-y-6"}>
-                                                            <div>
-                                                                <Card className={"py-2 px-4 relative mb-4"}>
-                                                                    <Button variant={"outline"} className={`absolute right-[-12px] top-[40%] p-0 h-6 w-6 ${theme == "dark" ? "" : "text-muted-foregrounds"}`}>
-                                                                        <Trash2 size={12} className={""}/>
-                                                                    </Button>
-                                                                    <h5 className={"text-sm font-normal"}>How satisfied are you with our product?</h5>
-                                                                    <div
-                                                                        className={"flex justify-center gap-6 mt-6 mb-6"}>
-                                                                        {
-                                                                            (allStatusAndTypes?.emoji || []).slice(0, 5).map((x, i) => {
-                                                                                return (
-                                                                                    <img key={i} className={"h-8 w-8"} src={x?.emoji_url}/>
-                                                                                )
-                                                                            })
-                                                                        }
-                                                                    </div>
-                                                                </Card>
-                                                                <Button variant={"outline"} className={"h-8"}>Add question</Button>
-                                                            </div>
-                                                            <div>
-                                                                <Button className={"h-8"}>Submit</Button>
-                                                            </div>
-                                                        </div>
-                                                        : ""}
+                                        }
                                 </div>
                             </div>
                         </div>

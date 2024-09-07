@@ -86,6 +86,13 @@ module.exports = {
           to: { height: "0" },
         },
       },
+      margin:{
+        "b-1": "-1px",
+        "l-8": "-8px",
+      },
+      fontSize:{
+        "exm": "8px",
+      },
       animation: {
         "accordion-down": "accordion-down 0.1s ease-out",
         "accordion-up": "accordion-up 0.1s ease-out",
