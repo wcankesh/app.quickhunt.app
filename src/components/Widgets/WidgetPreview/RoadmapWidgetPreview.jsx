@@ -32,29 +32,34 @@ const RoadmapWidgetPreview = ({widgetsSetting}) => {
             setIsLoading(false)
         }
     }
+
+    const btnClass = `bg-[#f8fafc] border-[#e2e8f0] text-black hover:bg-[#f8fafc] hover:text-black`;
+    const cardClass = `bg-white text-black border-[#e2e8f0]`
+
     return (
         <div className={" px-3"}>
-            <Card className="p-4">
+            <Card className={`p-4 ${cardClass}`}>
                 {
                     isLoading ? <div className="flex gap-4 items-start overflow-auto ">
                             {Array.from(Array(5)).map((_, r) => {
                                 const loadCount = (r === 0 || r === 3) ? 3 : (r === 2 || r === 5) ? 5 : 4;
                                 return (
                                     <div key={`roadmapLoad_${r}`} className="shrink-0">
-                                        <Card className="py-3 px-2 shadow-inner min-w-60">
-                                            <h4 className={"text-sm text-slate-700 font-semibold flex gap-2 items-center"}><Skeleton className="h-3 w-3/5"/></h4>
+                                        {/*<Card className="py-3 px-2 shadow-inner min-w-60">*/}
+                                        <Card className={`${cardClass} py-3 px-2 shadow-inner min-w-60`}>
+                                            <h4 className={`text-sm text-slate-700 font-semibold flex gap-2 items-center`}><Skeleton className="h-3 w-3/5 bg-[#f1f5f9]"/></h4>
                                             <div className={"flex gap-2 flex-col mt-4"}>
                                                 {
                                                     Array.from(Array(loadCount)).map((_, p) => {
                                                         return (
-                                                            <Card className="p-2" key={`roadmapLoad_${r}_${p}`}>
+                                                            <Card className={`p-2 ${cardClass}`} key={`roadmapLoad_${r}_${p}`}>
                                                                 <div className="flex gap-2 items-center">
-                                                                    <Skeleton className="w-7 h-7 rounded"/>
-                                                                    <Skeleton className="h-4 w-4/5"/>
+                                                                    <Skeleton className="w-7 h-7 rounded bg-[#f1f5f9]"/>
+                                                                    <Skeleton className="h-4 w-4/5 bg-[#f1f5f9]"/>
                                                                 </div>
                                                                 <div className="flex flex-col gap-2 mt-3 mb-1">
-                                                                    <Skeleton className="h-2 w-full"/>
-                                                                    <Skeleton className="h-2 w-3/5"/>
+                                                                    <Skeleton className="h-2 w-full bg-[#f1f5f9]"/>
+                                                                    <Skeleton className="h-2 w-3/5 bg-[#f1f5f9]"/>
                                                                 </div>
                                                             </Card>
                                                         )
@@ -72,7 +77,7 @@ const RoadmapWidgetPreview = ({widgetsSetting}) => {
                                 (roadmapList || []).map((data, Rindex) => {
                                     return (
                                         <div key={`roadmap_${data.id}`} className="shrink-0 ">
-                                            <Card className="py-3 px-2 shadow-inner ">
+                                            <Card className={`py-3 px-2 shadow-inner ${cardClass}`}>
                                                 <h4 className={"text-sm text-slate-700 font-semibold flex gap-2 items-center"}>
                                                     <span className={"w-2.5 h-2.5 rounded-full"} style={{backgroundColor: data.color_code}}/>{data.title} ({data.ideas.length})</h4>
                                                 <div className={"flex gap-2 flex-col mt-4"}>
@@ -81,10 +86,10 @@ const RoadmapWidgetPreview = ({widgetsSetting}) => {
                                                             {
                                                                 (data.ideas || []).map((idea, Dindex) => {
                                                                     return (
-                                                                        <Card className="cursor-pointer w-[320px]" key={`roadmap_idea_${idea.id}`}>
+                                                                        <Card className={`cursor-pointer w-[320px] ${cardClass}`} key={`roadmap_idea_${idea.id}`}>
                                                                             {
                                                                                 (idea.cover_image !== '' && widgetsSetting.roadmap_image === 1) &&
-                                                                                <AspectRatio ratio={10 / 5} className="bg-muted rounded-ss-md rounded-se-md mb-1">
+                                                                                <AspectRatio ratio={10 / 5} className={`bg-muted rounded-ss-md rounded-se-md mb-1 ${cardClass}`}>
                                                                                     <img src={idea.cover_image} alt={idea.title} className="w-full h-full object-contain object-center"/>
                                                                                 </AspectRatio>
                                                                             }

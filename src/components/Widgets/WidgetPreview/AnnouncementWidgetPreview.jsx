@@ -54,15 +54,15 @@ const AnnouncementWidgetPreview = ({widgetsSetting}) => {
                 </div>
             </div>
 
-            <div className="block">
+            <div className={"block max-h-[600px] overflow-y-auto"}>
                 {
                     isLoading ? <Card className={cardClass}>
                         {Array.from(Array(8)).map((_, r) => {
                             return (
                                 <div key={`idea_${r}`} className={`box-border flex flex-col gap-2 p-3 ${r != 0 ? 'border-t border-zinc-200' : ''}`}>
-                                    <Skeleton className="h-2 w-full"/>
-                                    <Skeleton className="h-2 w-full"/>
-                                    <Skeleton className="h-2 w-6/12"/>
+                                    <Skeleton className="h-2 w-full bg-[#f1f5f9]"/>
+                                    <Skeleton className="h-2 w-full bg-[#f1f5f9]"/>
+                                    <Skeleton className="h-2 w-6/12 bg-[#f1f5f9]"/>
                                 </div>
                             )
                         })}
@@ -126,7 +126,8 @@ const AnnouncementWidgetPreview = ({widgetsSetting}) => {
 
                                                                                         variant={"ghost"}
                                                                                         className={`px-2  w-8 h-8 py-0 z-10 text-center items-center justify-center text-base rounded-lg border border-transparent relative hover:bg-white hover:border-gray-100 dark:hover:bg-dark-accent dark:hover:border-dark-accent border-gray-100`}>
-                                                                                        <span className={`absolute py-0.5 leading-none -right-1 border rounded shadow -top-1 text-[9px] font-bold tracking-wide  px-0.5 text-background-accent dark:text-foreground/60 dark:border-gray-500/60  dark:bg-dark-accent bg-white`}>{findEmoji?.count}</span>
+                                                                                        {/*<span className={`absolute py-0.5 leading-none -right-1 border rounded shadow -top-1 text-[9px] font-bold tracking-wide  px-0.5 text-background-accent dark:text-foreground/60 dark:border-gray-500/60  dark:bg-dark-accent bg-white`}>{findEmoji?.count}</span>*/}
+                                                                                        <span className={`absolute py-0.5 leading-none -right-1 border rounded shadow -top-1 text-[9px] font-bold tracking-wide  px-0.5 text-background-accent dark:border-white  dark:bg-dark-accent bg-white`}>{findEmoji?.count}</span>
                                                                                         <Avatar className="w-[22px] h-[22px]">
                                                                                             <AvatarImage src={e.emoji_url}/>
                                                                                         </Avatar>
@@ -138,7 +139,7 @@ const AnnouncementWidgetPreview = ({widgetsSetting}) => {
                                                                             <PopoverTrigger className="w-8 h-8 px-1 z-10 text-center flex items-center justify-center text-base rounded-lg border relative hover:bg-white hover:border-gray-100 dark:hover:bg-dark-accent dark:hover:border-dark-accent border-gray-100">
                                                                                 <SmilePlus width={"22"} height={"22"}/>
                                                                             </PopoverTrigger>
-                                                                            <PopoverContent className={"w-full p-2"}>
+                                                                            <PopoverContent className={`w-full p-2 ${cardClass}`}>
                                                                                 <div className="flex gap-2">
                                                                                     {
                                                                                         (allStatusAndTypes.emoji || []).map((e, i) => {
@@ -150,7 +151,7 @@ const AnnouncementWidgetPreview = ({widgetsSetting}) => {
 
                                                                                                         variant={"ghost"}
                                                                                                         className={`w-8 h-8 px-2 py-0 z-10 text-center items-center justify-center text-base rounded-lg border border-transparent relative hover:bg-white hover:border-gray-100 dark:hover:bg-dark-accent dark:hover:border-dark-accent border-gray-100`}>
-                                                                                                        <span className={`absolute py-0.5 leading-none -right-1 border rounded shadow -top-1 text-[9px] font-bold tracking-wide  px-0.5 text-background-accent dark:text-foreground/60 dark:border-gray-500/60  dark:bg-dark-accent bg-white`}>{findEmoji?.count}</span>
+                                                                                                        <span className={`absolute py-0.5 leading-none -right-1 border rounded shadow -top-1 text-[9px] font-bold tracking-wide  px-0.5 text-background-accent dark:border-white dark:bg-dark-accent bg-white`}>{findEmoji?.count}</span>
                                                                                                         <Avatar className="w-[22px] h-[22px]">
                                                                                                             <AvatarImage src={e.emoji_url}/>
                                                                                                         </Avatar>
@@ -164,16 +165,16 @@ const AnnouncementWidgetPreview = ({widgetsSetting}) => {
                                                                     </div> : ''
                                                                 }
                                                                 {
-                                                                    widgetsSetting?.is_comment === 1 ? <AccordionTrigger className={"flex w-full relative items-center justify-end no-underline hover:no-underline py-1 "}>
-                                                                        <div className={`text-left ${widgetsSetting?.changelog_reaction === 1 ? 'border-l px-3' : 'px-3'} text-sm leading-5 text-muted-foreground text-400  truncate absolute left-0 right-5`} style={{overflow: "visible"}}>Write a comment...</div>
+                                                                    widgetsSetting?.is_comment === 1 ? <AccordionTrigger className={`flex w-full relative items-center justify-end no-underline hover:no-underline py-1 `}>
+                                                                        <div className={`text-left ${widgetsSetting?.changelog_reaction === 0 ? 'border-l px-3' : 'px-3'} text-sm leading-5 truncate absolute left-5 right-5`} style={{overflow: "visible"}}>Write a comment...</div>
                                                                     </AccordionTrigger> : ''
                                                                 }
                                                             </div>
                                                             {
                                                                 widgetsSetting?.is_comment === 1 ?
                                                                     <AccordionContent className={"p-0"}>
-                                                                        <div className="relative overflow-hidden  border-t mt-2">
-                                                                            <Textarea on id="message" placeholder="Type your message here..." className="min-h-12 resize-none border-0 p-3 shadow-none focus-visible:ring-0 "/>
+                                                                        <div className="relative overflow-hidden  border-t mt-2 border-[#e2e8f0]">
+                                                                            <Textarea on id="message" placeholder="Type your message here..." className={`${cardClass} min-h-12 resize-none border-0 p-3 shadow-none focus-visible:ring-0 ring-offset-color-0`}/>
                                                                             <div className="flex items-center p-3 pt-0">
                                                                                 <Button size="sm" className="ml-auto gap-1.5"  style={{backgroundColor: widgetsSetting?.btn_background_color, color: widgetsSetting?.btn_text_color}}>Send</Button>
                                                                             </div>
