@@ -34,7 +34,6 @@ const CreateRoadmapIdea = ({isOpen, onOpen, onClose, closeCreateIdea, selectedRo
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
     const [ideaDetail, setIdeaDetail] = useState(initialState);
     const [topicLists, setTopicLists] = useState([]);
-    const [description, setDescription] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const [formError, setFormError] = useState(initialStateError);
@@ -47,15 +46,6 @@ const CreateRoadmapIdea = ({isOpen, onOpen, onClose, closeCreateIdea, selectedRo
         }
     }, [projectDetailsReducer.id, allStatusAndTypes]);
 
-    const handleUpdate = (event) => {
-        const { value } = event.target;
-        setDescription(value);
-        setIdeaDetail(ideaDetail => ({...ideaDetail, description: value}));
-        setFormError(formError => ({
-            ...formError,
-            description: formValidate("description", value)
-        }));
-    };
 
     const handleChange = (id) => {
         const clone = [...ideaDetail.topic];
@@ -94,7 +84,7 @@ const CreateRoadmapIdea = ({isOpen, onOpen, onClose, closeCreateIdea, selectedRo
         let formData = new FormData();
         formData.append('title', ideaDetail.title);
         formData.append('slug_url', ideaDetail.title ? ideaDetail.title.replace(/ /g,"-").replace(/\?/g, "-") :"");
-        formData.append('description', description);
+        formData.append('description', ideaDetail.description);
         formData.append('project_id', projectDetailsReducer.id);
         formData.append('board', ideaDetail.board);
         formData.append('topic', ideaDetail.topic.join());
@@ -111,7 +101,6 @@ const CreateRoadmapIdea = ({isOpen, onOpen, onClose, closeCreateIdea, selectedRo
             }
             setIsLoading(false)
             setIdeaDetail(initialState)
-            setDescription("")
             setRoadmapList({columns: cloneRoadmap});
             closeCreateIdea()
             toast({description: data.message})
@@ -126,12 +115,6 @@ const CreateRoadmapIdea = ({isOpen, onOpen, onClose, closeCreateIdea, selectedRo
             case "title":
                 if (!value || value.trim() === "") {
                     return "Title is required";
-                } else {
-                    return "";
-                }
-            case "description":
-                if (!value || value.trim() === "") {
-                    return "Description is required";
                 } else {
                     return "";
                 }

@@ -36,27 +36,33 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
     };
 
     const onChangeAddOption = (index, value) => {
-        setInAppMsgSetting(prevState => ({
-            ...prevState,
-            options: prevState.options.map((option, i) => (i === index ? value : option))
-        }));
+        const clone = [...selectedStep.options];
+        clone[index] = {...clone[index], title: value}
+        const obj = {...selectedStep, options: clone,}
+        setSelectedStep(obj);
+        updateStepRecord(obj)
+
     };
 
     const addOption = () => {
-        setInAppMsgSetting({
-            ...inAppMsgSetting,
-            options: [...inAppMsgSetting.options || [], ""]
-        });
+        const clone = [...selectedStep.options];
+        clone.push({id: "", title: "", is_active: 1})
+        const obj = {...selectedStep, options: clone,}
+        setSelectedStep(obj);
+        updateStepRecord(obj)
+
     };
 
-    const removeOption = (index) => {
-        if (inAppMsgSetting.options.length > 1) {
-            const updatedOptions = inAppMsgSetting.options.filter((_, i) => i !== index);
-            setInAppMsgSetting({
-                ...inAppMsgSetting,
-                options: updatedOptions
-            });
+    const removeOption = (record, index) => {
+        const clone = [...selectedStep.options];
+        if (record.id) {
+            clone[index] = {...record, is_active: 0}
+        } else {
+            clone.splice(index, 1)
         }
+        const obj = {...selectedStep, options: clone,}
+        setSelectedStep(obj);
+        updateStepRecord(obj)
     };
 
     const handleTimeChange = (time, type) => {
@@ -113,7 +119,6 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
             type: type
         }
         const data = await apiSerVice.updateInAppMessage(payload, inAppMsgSetting.id)
-
         if (data.status === 200) {
             setIsLoading(false)
             toast({description: data.message})
@@ -134,10 +139,11 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
     }
 
     const onChangeQuestion = (name, value) => {
-        const obj = {...selectedStep, [name]: value}
+        const obj = {...selectedStep, [name]: value, }
         setSelectedStep(obj);
         updateStepRecord(obj)
     }
+
     return (
         <Fragment>
             <div className={"border-b"}>
@@ -152,8 +158,8 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                         (type === "2" || type === "3" ) && <div className="grid w-full max-w-sm items-center gap-1.5">
                             <div className="flex items-center gap-2">
                                 <Checkbox id="show_sender"
-                                          checked={inAppMsgSetting.show_sender}
-                                          onCheckedChange={(checked) => onChange("show_sender", checked)}
+                                          checked={inAppMsgSetting.show_sender === 1}
+                                          onCheckedChange={(checked) => onChange("show_sender", checked ? 1 : 0)}
                                 />
                                 <Label htmlFor="show_sender" className={"font-normal cursor-pointer"}>Show sender</Label>
                             </div>
@@ -161,12 +167,12 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                     }
 
                     {
-                        (type === "1" || (type === "2" && inAppMsgSetting.show_sender) || (type === "3" && inAppMsgSetting.show_sender)) && <div className="grid w-full max-w-sm items-center gap-1.5">
+                        (type === "1" || (type === "2" && inAppMsgSetting.show_sender === 1) || (type === "3" && inAppMsgSetting.show_sender === 1)) && <div className="grid w-full max-w-sm items-center gap-1.5">
                             <Label className={"font-normal"}>From</Label>
                             <Select
                                 value={Number(inAppMsgSetting.from)}
                                 name={"from"}
-                                onValueChange={(value) => onChange(value, "from")}
+                                onValueChange={(value) => onChange("from", value, )}
                             >
                                 <SelectTrigger className="w-full h-9">
                                     <SelectValue/>
@@ -209,7 +215,7 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                         <div className="grid w-full max-w-sm items-center gap-1.5">
                             <Label className={"font-normal"}>Action</Label>
                             <Select value={inAppMsgSetting?.action_type}
-                                    onValueChange={(value) => onChange(value, "action_type")}>
+                                    onValueChange={(value) => onChange("action_type",value)}>
                                 <SelectTrigger className="w-full h-9">
                                     <SelectValue placeholder=""/>
                                 </SelectTrigger>
@@ -261,40 +267,25 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
             {
                 type === "3" && <div className={"border-b px-4 py-6 space-y-4"}>
                     <h5 className={"text-base font-medium"}>Question Setting</h5>
-                    <div className="grid w-full max-w-sm items-center gap-1.5">
-                        <Label className={"font-normal text-sm"}>Question</Label>
-                        <Select value={selectedStep?.question_type}
-                                onValueChange={(value) => onChangeQuestion("question_type",value)}>
-                            <SelectTrigger className="w-full h-9">
-                                <SelectValue placeholder={0}/>
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value={1}>Net Promoter Score</SelectItem>
-                                <SelectItem value={2}>Numeric Scale</SelectItem>
-                                <SelectItem value={3}>Star rating scale</SelectItem>
-                                <SelectItem value={4}>Emoji rating scale</SelectItem>
-                                <SelectItem value={5}>Drop Down</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
                     {
-                        inAppMsgSetting.question_type == 5 &&
+                        selectedStep?.question_type === 5 &&
                         <div className="grid w-full max-w-sm items-center gap-1.5">
                             <Label className={"font-normal text-sm"}>Answer Options</Label>
                             <div>
                                 <div className={"space-y-[6px]"}>
-                                    {(inAppMsgSetting?.options || []).map((option, index) => (
+
+                                    {(selectedStep?.options || []).map((option, index) => (
                                         <div key={index} className="relative mt-2">
                                             <Input
                                                 className="h-9"
                                                 placeholder={`Option ${index + 1}`}
-                                                value={option}
+                                                value={option.title}
                                                 onChange={(e) => onChangeAddOption(index, e.target.value)}
                                             />
                                             <Button
                                                 variant="ghost hover:none"
                                                 className="absolute top-0 right-0"
-                                                onClick={() => removeOption(index)}
+                                                onClick={() => removeOption(option, index)}
                                             >
                                                 <Trash2 size={16}/>
                                             </Button>
@@ -307,13 +298,16 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                                     </Button>
                                 </div>
                             </div>
-                            <div className="grid w-full max-w-sm items-center gap-1.5 mt-2">
-                                <Label className={"font-normal text-sm"} htmlFor="placeholder_text">Placeholder
-                                    text</Label>
-                                <Input value={inAppMsgSetting.placeholder_text}
-                                       onChange={(e) => onChange("placeholder_text", e.target.value)} type="text"
-                                       className={"h-9"} id="placeholder_text" placeholder="Select One..."/>
-                            </div>
+
+                        </div>
+                    }
+                    {
+                        (selectedStep?.question_type === 5 || selectedStep?.question_type === 6 || selectedStep?.question_type === 7) && <div className="grid w-full max-w-sm items-center gap-1.5 mt-2">
+                            <Label className={"font-normal text-sm"} htmlFor="placeholder_text">Placeholder
+                                text</Label>
+                            <Input value={inAppMsgSetting.placeholder_text}
+                                   onChange={(e) => onChange("placeholder_text", e.target.value)} type="text"
+                                   className={"h-9"} id="placeholder_text" placeholder="Select One..."/>
                         </div>
                     }
                     {
@@ -323,15 +317,17 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                                 selectedStep?.question_type === 2 &&
                                 <div className={"flex gap-4"}>
                                     <div className="grid w-full max-w-sm items-center gap-1.5">
-                                        <Label className={"font-normal text-sm"} htmlFor="start_no">Start Number</Label>
+                                        <Label className={"font-normal text-sm"} htmlFor="start_number">Start Number</Label>
                                         <Input value={selectedStep?.start_number} name={"start_number"}
-                                               onChange={onChangeQuestion} type="number" id="start_no"
+                                               type="number" id="start_number"
+                                               onChange={(e) => onChangeQuestion("start_number", e.target.value)}
                                                placeholder="1" className={"h-8"}/>
                                     </div>
                                     <div className="grid w-full max-w-sm items-center gap-1.5">
-                                        <Label className={"font-normal text-sm"} htmlFor="end_no">End Number</Label>
+                                        <Label className={"font-normal text-sm"} htmlFor="end_number">End Number</Label>
                                         <Input value={selectedStep?.end_number} name={"end_number"}
-                                               onChange={onChangeQuestion} type="number" id="end_no"
+                                               onChange={(e) => onChangeQuestion("end_number", e.target.value)}
+                                                type="number" id="end_number"
                                                placeholder="10" className={"h-8"}/>
                                     </div>
                                 </div>
@@ -352,6 +348,17 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
 
                         </div>
                     }
+                    <div className="grid w-full max-w-sm items-center gap-1.5">
+                        <div className={"flex gap-2 items-center"}>
+                            <Checkbox
+                                id={"is_answer_required"}
+                                checked={selectedStep?.is_answer_required === 1}
+                                onCheckedChange={(checked) => onChangeQuestion("is_answer_required", checked ? 1 : 0)}
+                            />
+                            <label htmlFor="is_answer_required" className="text-sm">Make answer required</label>
+                        </div>
+                    </div>
+
                 </div>
             }
             <div className={"border-b px-4 py-6 space-y-4"}>
@@ -362,7 +369,7 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                             <Label className={"font-normal"}>Banner position</Label>
                             <Select
                                 value={inAppMsgSetting.position}
-                                onValueChange={(value) => onChange(value, "position")}
+                                onValueChange={(value) => onChange("position",value, )}
                             >
                                 <SelectTrigger className="w-full h-9">
                                     <SelectValue placeholder={"Select position"}/>
@@ -377,7 +384,7 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                             <Label className={"font-normal"}>Alignment</Label>
                             <Select
                                 value={inAppMsgSetting.alignment}
-                                onValueChange={(value) => onChange(value, "alignment")}
+                                onValueChange={(value) => onChange("alignment",value, )}
                             >
                                 <SelectTrigger className="w-full h-9">
                                     <SelectValue placeholder={"Select alignment"}/>
@@ -450,7 +457,7 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                     <div className="grid w-full max-w-sm items-center gap-1.5">
                         <Label className={"font-normal"}>Link step to Action?</Label>
                         <Select value={inAppMsgSetting?.action_type}
-                                onValueChange={(value) => onChange(value, "action_type")}>
+                                onValueChange={(value) => onChange("action_type",value)}>
                             <SelectTrigger className="w-full h-9">
                                 <SelectValue placeholder=""/>
                             </SelectTrigger>
@@ -483,7 +490,7 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                 <h5 className={"text-base font-medium"}>Trigger Setting</h5>
                 <div className="grid w-full max-w-sm items-center gap-1.5">
                     <Label className={"font-normal"}>Add delay</Label>
-                    <Select value={inAppMsgSetting.delay} onValueChange={(value) => onChange(value, "delay")}>
+                    <Select value={inAppMsgSetting.delay} onValueChange={(value) => onChange("delay",value, )}>
                         <SelectTrigger className="w-full h-9">
                             <SelectValue defaultValue={1}/>
                         </SelectTrigger>

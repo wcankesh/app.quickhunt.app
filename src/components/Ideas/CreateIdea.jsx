@@ -115,12 +115,7 @@ const CreateIdea = ({isOpen, onOpen, onClose, closeCreateIdea, setIdeasList, ide
                 } else {
                     return "";
                 }
-            case "description":
-                if (!value || value.trim() === "") {
-                    return "Description is required";
-                } else {
-                    return "";
-                }
+
             case "board":
                 if (!value || value.toString().trim() === "") {
                     return "Board is required";

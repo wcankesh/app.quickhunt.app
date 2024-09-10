@@ -504,12 +504,6 @@ const UpdateIdea = ({
                 } else {
                     return "";
                 }
-            case "description":
-                if (!value || value.trim() === "") {
-                    return "Description is required";
-                } else {
-                    return "";
-                }
             case "board":
                 if (!value || value?.toString()?.trim() === "") {
                     return "Board is required";

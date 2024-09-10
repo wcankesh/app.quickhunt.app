@@ -57,9 +57,9 @@ export function ThemeProvider({children, defaultTheme = "system", storageKey = "
                         </DialogTitle>
                         <div className={"grid grid-cols-2 gap-4 mt-0 pb-4"}>
                             {
-                                planList.map((x) => {
+                                planList.map((x, i) => {
                                     return(
-                                        <div className={"flex  gap-2 items-center text-sm text-muted-foreground"}> <CircleCheck size={16}/> {x}</div>
+                                        <div key={i} className={"flex  gap-2 items-center text-sm text-muted-foreground"}> <CircleCheck size={16}/> {x}</div>
                                     )
                                 })
                             }

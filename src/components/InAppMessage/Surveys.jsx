@@ -1,197 +1,382 @@
-import React, {useState} from 'react';
+import React, {Fragment, useState} from 'react';
 import {useTheme} from "../theme-provider";
 import {useSelector} from "react-redux";
 import {Button} from "../ui/button";
-import {Trash2, X} from "lucide-react";
+import {Plus, Trash2, X} from "lucide-react";
 import {Input} from "../ui/input";
-import {Card} from "../ui/card";
+import {Textarea} from "../ui/textarea";
 import RatingStar from "../Comman/Star";
+import {DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger} from "../ui/dropdown-menu";
+import {DropdownMenuGroup} from "@radix-ui/react-dropdown-menu";
+import {Avatar, AvatarFallback, AvatarImage} from "../ui/avatar";
+import {Popover, PopoverContent} from "../ui/popover";
+import {PopoverTrigger} from "@radix-ui/react-popover";
+import EmojiPicker from "emoji-picker-react";
+import {Select, SelectValue} from "@radix-ui/react-select";
+import {SelectContent, SelectItem, SelectTrigger} from "../ui/select";
 
 const Surveys = ({inAppMsgSetting, setInAppMsgSetting, selectedStepIndex, setSelectedStepIndex, setSelectedStep, selectedStep, isLoading}) => {
-        const {theme} = useTheme();
-        const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
-        const [starRating, setStarRating] = useState(0);
-        const [hoverRating, setHoverRating] = useState(0);
+    const {theme} = useTheme();
+    const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
+    const userDetailsReducer = allStatusAndTypes.members.find((x) => x.user_id == inAppMsgSetting.from);
+    const [starRating, setStarRating] = useState(0);
+    const [hoverRating, setHoverRating] = useState(0);
 
+
+    const renderNumber = (x) => {
         const numbers = [];
-        for (let i = Number(selectedStep?.question_type === 1 ? "0" : selectedStep?.start_number); i <= Number(selectedStep?.question_type === 1 ? "10" : selectedStep?.end_number); i++) {
+        for (let i = Number(x?.question_type === 1 ? "0" : x?.start_number); i <= Number(x?.question_type === 1 ? "10" : x?.end_number); i++) {
             numbers.push(i);
         }
-
-        const addOption = () => {
-            setInAppMsgSetting({
-                ...inAppMsgSetting,
-                options: [...inAppMsgSetting.options || [], ""]
-            });
-        };
-
-        const handleClick = (value) => {
-            setStarRating(value);
-        };
-
-        const handleMouseEnter = (value) => {
-            setHoverRating(value);
-        };
-
-        const handleMouseLeave = () => {
-            setHoverRating(0);
-        };
-    console.log(selectedStep)
-        return (
-            <div className={"my-6 flex flex-col gap-8"}>
-                <div className={"pt-8 px-4 pb-10 border-t"}>
-                    <Card className={"rounded-md border-b bg-muted"}>
-                        <div className={`py-16 flex justify-center`}>
-                            <div
-                                className={`${theme == "dark" ? "bg-primary/15" : "bg-[#EEE4FF]"}  w-[498px] px-4 pb-4 rounded-[10px]`}>
-                                <div className={"flex justify-end"}><X className={"my-2"} size={12}/></div>
-                                <div className={` rounded-[10px] ${theme == "dark" ? "bg-[#020817]" : "bg-[#fff]"}`}>
-                                    {
-                                        selectedStep?.question_type === 1 &&   <div className={"px-4 pb-8 pt-6 space-y-6"}>
-                                            <div>
-                                                <Card className={"py-2 px-4 relative mb-4"}>
-                                                    <Button variant={"outline"}
-                                                            className={`absolute right-[-12px] top-[40%] p-0 h-6 w-6 ${theme == "dark" ? "" : "text-muted-foregrounds"}`}>
-                                                        <Trash2 size={12} className={""}/>
-                                                    </Button>
-                                                    <h5 className={"text-sm font-normal"}>{selectedStep?.text}</h5>
-                                                    <div className={"flex gap-3 px-[30px] pt-[18px]"}>
-                                                        {numbers.map(num => (
-                                                            <Button key={num} variant={"outline"} className={"w-5 h-5 text-xs p-0"}>{num}</Button>
-                                                        ))}
-                                                    </div>
-                                                    <div className={"flex justify-between mt-[18px]"}>
-                                                        <h5 className={"text-xs font-normal"}>{selectedStep?.start_label}</h5>
-                                                        <h5 className={"text-xs font-normal"}>{selectedStep?.end_label}</h5>
-                                                    </div>
-                                                </Card>
-                                            </div>
-                                        </div>
-                                    }
-                                    {
-                                        selectedStep?.question_type === 2 && <div className={"px-4 pb-8 pt-6 space-y-6"}>
-                                            <div>
-                                                <Card className={"py-2 px-4 relative mb-4"}>
-                                                    <Button variant={"outline"}
-                                                            className={`absolute right-[-12px] top-[40%] p-0 h-6 w-6 ${theme == "dark" ? "" : "text-muted-foregrounds"}`}>
-                                                        <Trash2 size={12} className={""}/>
-                                                    </Button>
-                                                    <h5 className={"text-sm font-normal"}>How satisfied are you
-                                                        with our product?</h5>
-                                                    <div
-                                                        className={"flex justify-center gap-3 px-[30px] pt-[18px]"}>
-                                                        {numbers.map(num => (
-                                                            <Button key={num} variant={"outline"}
-                                                                    className={"w-5 h-5 text-xs p-0"}>{num}</Button>
-                                                        ))}
-                                                    </div>
-                                                    <div className={"flex justify-between mt-[18px]"}>
-                                                        <h5 className={"text-xs font-normal"}>{selectedStep?.start_number} -
-                                                            very bad</h5>
-                                                        <h5 className={"text-xs font-normal"}>{selectedStep?.end_number} -
-                                                            very good</h5>
-                                                    </div>
-                                                </Card>
-                                            </div>
-                                            <div>
-                                                <Button className={"h-8"}>Submit</Button>
-                                            </div>
-                                        </div>
-                                    }
-                                    {
-                                        selectedStep?.question_type === 3 && <div className={"px-4 pb-8 pt-6 space-y-6"}>
-                                                <div>
-                                                    <Card className={"py-2 px-4 relative mb-4"}>
-                                                        <Button variant={"outline"} className={`absolute right-[-12px] top-[40%] p-0 h-6 w-6 ${theme == "dark" ? "" : "text-muted-foregrounds"}`}>
-                                                            <Trash2 size={12} className={""}/>
-                                                        </Button>
-                                                        <h5 className={"text-sm font-normal"}>How satisfied are you with our product?</h5>
-                                                        <div className={"flex gap-4 mt-4 justify-center"}>
-                                                            {Array.from({length: 5}, (_, index) => (
-                                                                <RatingStar
-                                                                    key={index}
-                                                                    filled={index < (hoverRating || starRating)}
-                                                                    onClick={() => handleClick(index + 1)}
-                                                                    onMouseEnter={() => handleMouseEnter(index + 1)}
-                                                                    onMouseLeave={handleMouseLeave}
-                                                                />
-                                                            ))}
-                                                        </div>
-
-                                                        <div className={"flex justify-between mt-[18px]"}>
-                                                            <h5 className={"text-xs font-normal"}>{selectedStep?.start_number} - very bad</h5>
-                                                            <h5 className={"text-xs font-normal"}>{selectedStep?.end_number} - very good</h5>
-                                                        </div>
-                                                    </Card>
-                                                    <Button variant={"outline"} className={"h-8"}>Add question</Button>
-                                                </div>
-                                                <div>
-                                                    <Button className={"h-8"}>Submit</Button>
-                                                </div>
-                                            </div>
-                                    }
-                                    {
-                                        selectedStep?.question_type === 4 &&
-                                            <div className={"px-4 pb-8 pt-6 space-y-6"}>
-                                                <div>
-                                                    <Card className={"py-2 px-4 relative mb-4"}>
-                                                        <Button variant={"outline"} className={`absolute right-[-12px] top-[40%] p-0 h-6 w-6 ${theme == "dark" ? "" : "text-muted-foregrounds"}`}>
-                                                            <Trash2 size={12} className={""}/>
-                                                        </Button>
-                                                        <h5 className={"text-sm font-normal"}>How satisfied are you with our product?</h5>
-                                                        <div
-                                                            className={"flex justify-center gap-6 mt-6 mb-6"}>
-                                                            {
-                                                                (allStatusAndTypes?.emoji || []).slice(0, 5).map((x, i) => {
-                                                                    return (
-                                                                        <img key={i} className={"h-8 w-8"} src={x?.emoji_url}/>
-                                                                    )
-                                                                })
-                                                            }
-                                                        </div>
-                                                    </Card>
-                                                    <Button variant={"outline"} className={"h-8"}>Add question</Button>
-                                                </div>
-                                                <div>
-                                                    <Button className={"h-8"}>Submit</Button>
-                                                </div>
-                                            </div>
-                                    }
-                                    {selectedStep?.question_type === 5 &&
-                                        <div className={"px-4 pb-8 pt-6 space-y-6"}>
-                                            <div>
-                                                <Card className={"py-2 px-4 pb-6 relative mb-4"}>
-                                                    <Button variant={"outline"}
-                                                            className={`absolute right-[-12px] top-[40%] p-0 h-6 w-6 ${theme == "dark" ? "" : "text-muted-foregrounds"}`}>
-                                                        <Trash2 size={12} className={""}/>
-                                                    </Button>
-                                                    <h5 className={"text-sm font-normal"}>Ask question here?</h5>
-                                                    <div className="mt-3">
-                                                        <ul className={"space-y-3"}>
-                                                            {selectedStep?.options.map((option, index) => (
-                                                                <li key={index}>
-                                                                    <Input value={option || "Select one"}/>
-                                                                </li>
-                                                            ))}
-                                                        </ul>
-                                                    </div>
-                                                </Card>
-                                                <Button variant={"outline"} className={"h-8"} onClick={addOption}>Add
-                                                    question</Button>
-                                            </div>
-                                            <div>
-                                                <Button className={"h-8"}>Submit</Button>
-                                            </div>
-                                        </div>
-                                        }
-                                </div>
-                            </div>
-                        </div>
-                    </Card>
-                </div>
-            </div>
-        );
+        return numbers
     }
-;
 
+
+
+
+    const handleClick = (value) => {
+        setStarRating(value);
+    };
+
+    const handleMouseEnter = (value) => {
+        setHoverRating(value);
+    };
+
+    const handleMouseLeave = () => {
+        setHoverRating(0);
+    };
+
+    const updateStepRecord = (record) => {
+        let clone = [...inAppMsgSetting.steps];
+        clone[selectedStepIndex] = record;
+        setInAppMsgSetting(prevState => ({
+            ...prevState,
+            steps: clone
+        }));
+
+    }
+
+    const onChangeQuestion = (name, value) => {
+        const obj = {...selectedStep, [name]: value}
+        setSelectedStep(obj);
+        updateStepRecord(obj)
+    }
+
+    const reactionPost = [
+        {
+            "id": "",
+            "emoji": "👌",
+            "emoji_url": "https://cdn.jsdelivr.net/npm/emoji-datasource-apple/img/apple/64/1f44c.png",
+            is_active: 1,
+        },
+        {
+            "id": "",
+            "emoji": "🙏",
+            "emoji_url": "https://cdn.jsdelivr.net/npm/emoji-datasource-apple/img/apple/64/1f64f.png",
+            is_active: 1
+        },
+        {
+            "id": "",
+            "emoji": "👍",
+            "emoji_url": "https://cdn.jsdelivr.net/npm/emoji-datasource-apple/img/apple/64/1f44d.png",
+            is_active: 1
+        },
+        {
+            "id": "",
+            "emoji": "😀",
+            "emoji_url": "https://cdn.jsdelivr.net/npm/emoji-datasource-apple/img/apple/64/1f600.png",
+            is_active: 1
+        },
+        {
+            "id": "",
+            "emoji": "❤️",
+            "emoji_url": "https://cdn.jsdelivr.net/npm/emoji-datasource-apple/img/apple/64/2764-fe0f.png",
+            is_active: 1
+        }
+    ];
+    const questionTypeOptions = [
+        {label: "Net Promoter Score", value: 1},
+        {label: "Numeric Scale", value: 2},
+        {label: "Star Rating Scale", value: 3},
+        {label: "Emoji Rating Scale", value: 4},
+        {label: "Drop Down / List", value: 5},
+        {label: "Short text entry", value: 6},
+        {label: "Long text entry", value: 7},
+    ];
+
+    const question = {
+        1: "How likely are you to recommend us to family and friends?",
+        2: "How satisfied are you with our product?",
+        3: "How satisfied are you with our product?",
+        4: "How satisfied are you with our product?",
+        5: "",
+        6: "",
+        7: "",
+    }
+
+    const handleSelectQuestionType = (value) => {
+        let clone = [...inAppMsgSetting.steps];
+        const stepBoj = {
+            question_type: value,
+            text: question[value],
+            placeholder_text: value == 5 ? "Select one": "Enter text...",
+            start_number: "1",
+            end_number: "5",
+            start_label: "Not likely",
+            end_label: "Very likely",
+            is_answer_required: "",
+            step: clone.length + 1,
+            options: value == 5 ? [
+                {id: "", title: "", is_active: 1}
+            ] : [],
+            reactions: value == 4 ? reactionPost : [],
+            is_active: 1,
+            step_id: ""
+        };
+        clone.push(stepBoj);
+        setSelectedStep(stepBoj);
+        setSelectedStepIndex(clone.length - 1);
+        setInAppMsgSetting(prevState => ({
+            ...prevState,
+            steps: clone
+        }));
+    };
+
+    const onSelectStep = (stepBoj, i) => {
+        setSelectedStep(stepBoj);
+        setSelectedStepIndex(i);
+    }
+
+    const handleEmojiSelect = (event) => {
+        const clone = [...selectedStep.reactions];
+        const obj = {
+            "id": "",
+            "emoji": event.emoji,
+            "emoji_url": event.imageUrl,
+            is_active: 1,
+        }
+        clone.push(obj)
+        const objData = {...selectedStep,  reactions: clone}
+        setSelectedStep(objData);
+        updateStepRecord(objData)
+
+    }
+
+    const onDeleteReaction = (record, index) => {
+        let clone = [...selectedStep.reactions];
+        if (record.id) {
+            clone[index] = {...record, is_active: 0}
+        } else {
+            clone.splice(index, 1)
+        }
+        const obj = {...selectedStep,  reactions: clone}
+        setSelectedStep(obj);
+        updateStepRecord(obj)
+    }
+
+    const onDeleteStep = (record, index) => {
+        let clone = [...inAppMsgSetting.steps];
+        if (record.step_id) {
+            clone[index] = {...record, is_active: 0};
+        } else {
+            clone.splice(index, 1)
+        }
+        setInAppMsgSetting(prevState => ({
+            ...prevState,
+            steps: clone
+        }));
+        let newRecord = clone.filter((x) => x.is_active === 1);
+
+        setSelectedStep({...newRecord[index]});
+        setSelectedStepIndex(index);
+
+    }
+
+
+    return (
+        <div className={"flex flex-col gap-4 py-8 bg-muted justify-start overflow-y-auto h-[calc(100%_-_94px)]"}>
+            {
+                inAppMsgSetting.steps.filter((x) => x.is_active === 1).map((x, i) => {
+                    return(
+                        <div className={`flex flex-col mx-auto gap-8 w-full max-w-[550px]`} key={i}>
+                            <div onClick={(e) => onSelectStep(x, i)} className={"relative rounded-[10px] pt-8 p-6 cursor-pointer"} style={{backgroundColor: selectedStep.step === x.step ? inAppMsgSetting.bg_color : "#fff", color: selectedStep.step === x.step ?inAppMsgSetting.text_color : "#000"}}>
+                                <div className={"absolute top-[8px] right-[8px]"}><X  size={16}/></div>
+                                <div className={"flex gap-3"}>
+                                    <div className={"flex-none pt-2 flex-1 w-8"}>
+                                        {
+                                            inAppMsgSetting.show_sender ? <Avatar className={"w-[32px] h-[32px]"}>
+                                                {
+                                                    userDetailsReducer?.user_photo ?
+                                                        <AvatarImage src={userDetailsReducer?.user_photo} alt="@shadcn"/>
+                                                        :
+                                                        <AvatarFallback>{userDetailsReducer && userDetailsReducer?.name && userDetailsReducer?.name.substring(0, 1)}</AvatarFallback>
+                                                }
+                                            </Avatar> : <div>&nbsp;</div>
+                                        }
+                                    </div>
+                                    <div className={`shrink p-2 border border-transparent hover:border hover:border-[#FFFFFF] w-full`} >
+                                        <Input placeholder={"What's your question?"}
+                                               value={x?.text || ""}
+                                               onChange={(event) => onChangeQuestion("text", event.target.value)}
+                                               className={"w-full text-sm border-none p-0 h-auto focus-visible:ring-offset-0 focus-visible:ring-0"}
+                                               style={{backgroundColor: selectedStep.step === x.step ? inAppMsgSetting.bg_color : "#fff", color: selectedStep.step === x.step ?inAppMsgSetting.text_color : "#000"}}
+                                        />
+                                        {
+                                            x?.question_type === 1 && <Fragment>
+                                                <div className={"flex gap-3 px-[30px] pt-[18px]"}>
+                                                    {
+                                                        renderNumber(x).map(num => (
+                                                            <Button key={num} variant={"outline"} className={"w-5 h-5 text-xs p-0"}>{num}</Button>
+                                                        ))
+                                                    }
+                                                </div>
+                                                <div className={"flex justify-between mt-[18px]"}>
+                                                    <h5 className={"text-xs font-normal"}>{x?.start_label}</h5>
+                                                    <h5 className={"text-xs font-normal"}>{x?.end_label}</h5>
+                                                </div>
+                                            </Fragment>
+                                        }
+                                        {
+                                            x?.question_type === 2 &&
+                                            <Fragment>
+                                                <div
+                                                    className={"flex justify-center gap-3 px-[30px] pt-[18px]"}>
+                                                    {
+                                                        renderNumber(x).map(num => (
+                                                            <Button key={num} variant={"outline"} className={"w-5 h-5 text-xs p-0"}>{num}</Button>
+                                                        ))
+                                                    }
+                                                </div>
+                                                <div className={"flex justify-between mt-[18px]"}>
+                                                    <h5 className={"text-xs font-normal"}>{x?.start_label}</h5>
+                                                    <h5 className={"text-xs font-normal"}>{x?.end_label}</h5>
+                                                </div>
+                                            </Fragment>
+                                        }
+                                        {
+                                            x?.question_type === 3 &&
+                                            <Fragment>
+                                                <div className={"flex gap-4 mt-4 justify-center"}>
+                                                    {Array.from({length: 5}, (_, index) => (
+                                                        <RatingStar
+                                                            key={index}
+                                                            filled={index < (hoverRating || starRating)}
+                                                            onClick={() => handleClick(index + 1)}
+                                                            onMouseEnter={() => handleMouseEnter(index + 1)}
+                                                            onMouseLeave={handleMouseLeave}
+                                                        />
+                                                    ))}
+                                                </div>
+                                            </Fragment>
+                                        }
+                                        {
+                                            x?.question_type === 4 &&
+                                            <Fragment>
+                                                <div className={"flex justify-center gap-6 mt-6 mb-6 flex-wrap"}>
+                                                        {
+                                                            (x?.reactions || []).map((r, ind) => {
+                                                                return (
+                                                                    r.is_active === 1 ?
+                                                                        <div className={"relative group hover:cursor-pointer"} key={ind}>
+                                                                                <span onClick={() => onDeleteReaction(r, ind, i)}
+                                                                                      className="absolute hidden group-hover:inline-block py-0.5 leading-none right-[-11px] top-[-13px] border rounded shadow -top-1 text-[9px] font-bold tracking-wide  px-0.5 text-background-accent dark:text-foreground/60 dark:border-gray-500/60  dark:bg-dark-accent bg-white">
+                                                                                    <Trash2 size={16}/>
+                                                                                </span>
+                                                                            <img key={ind} className={"h-6 w-6 cursor-pointer"} src={r.emoji_url}/>
+                                                                        </div> : ""
+                                                                )
+                                                            })
+                                                        }
+                                                        <Popover>
+                                                            <PopoverTrigger asChild>
+                                                                <Button variant={"secondary"} className={"h-6 w-6 rounded-[100%] p-1"}><Plus
+                                                                    size={16}/></Button>
+                                                            </PopoverTrigger>
+                                                            <PopoverContent className="w-full p-0 border-none w-[310px]]">
+                                                                <EmojiPicker theme={theme === "dark" ? "dark" : "light"} height={350}
+                                                                             autoFocusSearch={true} open={true} searchDisabled={false}
+                                                                             onEmojiClick={handleEmojiSelect}/>
+                                                            </PopoverContent>
+                                                        </Popover>
+                                                    </div>
+
+                                            </Fragment>
+                                        }
+                                        {
+                                            x?.question_type === 5 &&
+                                            <Fragment>
+                                                <div className="mt-3">
+                                                    <Select placeholder={x.placeholder_text} value={""}>
+                                                        <SelectTrigger>
+                                                            <SelectValue placeholder={x.placeholder_text}/>
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            {x?.options.map((option, index) => (
+                                                                option.is_active === 1 && <SelectItem key={index} value={index}>{option.title}</SelectItem>
+                                                            ))}
+                                                        </SelectContent>
+                                                    </Select>
+                                                </div>
+                                            </Fragment>
+                                        }
+                                        {
+                                            x?.question_type === 6 &&
+                                            <Fragment>
+                                                <div className="mt-3">
+                                                    <Input placeholder={x.placeholder_text} value={""}/>
+                                                </div>
+                                            </Fragment>
+                                        }
+                                        {
+                                            x?.question_type === 7 &&
+                                            <Fragment>
+                                                <div className="mt-3">
+                                                    <Textarea placeholder={x.placeholder_text} value={""}/>
+                                                </div>
+                                            </Fragment>
+                                        }
+                                    </div>
+                                    <div className={"flex-1 pt-2"}>
+                                        <Button variant={"outline"} className={`p-0 h-6 w-6`} onClick={(e) => {
+                                            e.stopPropagation();
+                                            onDeleteStep( x, i)
+                                        }}>
+                                            <Trash2 size={12} className={""}/>
+                                        </Button>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    )
+                })
+            }
+            <div className={`flex justify-center mt-3`}>
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button className={"flex gap-[6px] font-semibold"}>
+                            <Plus size={16} strokeWidth={3}/>
+                            Add Steps
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-56">
+                        <DropdownMenuGroup>
+                            {questionTypeOptions.map(option => (
+                                <DropdownMenuCheckboxItem
+                                    key={option.value}
+                                    // checked={selectedQuestionTypes.includes(option.value)}
+                                    // checked={selectedQuestionTypes === option.value}
+                                    onCheckedChange={() => handleSelectQuestionType(option.value)}
+                                >
+                                    {option.label}
+                                </DropdownMenuCheckboxItem>
+                            ))}
+                        </DropdownMenuGroup>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            </div>
+        </div>
+    );
+};
 export default Surveys;

@@ -106,10 +106,9 @@ const stepBoj = {
     end_label: "Very likely",
     is_answer_required: "",
     step: 1,
-    options: [
-        {id: "", value: ""}
-    ],
+    options: [],
     reactions: [],
+    step_id: ""
 }
 
 const UpdateInAppMessage = () => {
@@ -120,8 +119,6 @@ const UpdateInAppMessage = () => {
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const [inAppMsgSetting, setInAppMsgSetting] = useState(initialState);
     const [isLoading, setIsLoading] = useState(false);
-    const [addSteps, setAddSteps] = useState([]);
-    const [selectedQuestionTypes, setSelectedQuestionTypes] = useState(1);
     const [selectedStepIndex, setSelectedStepIndex] = useState(0);
     const [selectedStep, setSelectedStep] = useState(null);
 
@@ -183,22 +180,7 @@ const UpdateInAppMessage = () => {
         }
     }
 
-    const handleAddStep = () => {
-        setAddSteps( [...addSteps, `Step ${addSteps.length + 1}`]);
-    };
 
-    const questionTypeOptions = [
-        { label: "Net Promoter Score", value: 1 },
-        { label: "Numeric Scale", value: 2 },
-        { label: "Star Rating Scale", value: 3 },
-        { label: "Emoji Rating Scale", value: 4 },
-        { label: "Drop Down / List", value: 5 },
-    ];
-
-    const handleSelectQuestionType = (value) => {
-        setInAppMsgSetting({ ...inAppMsgSetting, question_type: value });
-        setSelectedQuestionTypes(value);
-    };
 
     return (
         <Fragment>
@@ -228,26 +210,15 @@ const UpdateInAppMessage = () => {
                 <div className={"max-w-[407px] w-full border-r h-full overflow-y-auto"}>
                     <SidebarInAppMessage id={id} type={type} inAppMsgSetting={inAppMsgSetting} setInAppMsgSetting={setInAppMsgSetting} selectedStepIndex={selectedStepIndex} setSelectedStepIndex={setSelectedStepIndex} selectedStep={selectedStep} setSelectedStep={setSelectedStep}/>
                 </div>
-                <div className={"bg-muted w-full h-full overflow-y-auto"}>
-
-                    {(type === "3" || type === "4") ? (
-                        <div className={"my-6 mx-4 flex justify-center gap-4"}>
-                            {addSteps.map((step, index) => (
-                                <div key={index} className="my-2">
-                                    <Button size={"sm"} className={"hover:bg-primary"}>{step}</Button>
-                                </div>
-                            ))}
-                        </div>
-                    ) : null}
-
-                    <Card className={"my-6 mx-4 rounded-md px-4 pt-6 pb-16"}>
-                        <Card className={"rounded-md border-b"}>
+                <div className={"bg-muted w-full h-full"}>
+                    <Card className={"my-6 mx-4 rounded-md px-4 pt-6 pb-8 h-[calc(100%_-_48px)]"}>
+                        <Card className={"rounded-md border-b h-full"}>
                             <div className={"p-4 flex gap-2 border-b"}>
                                 <div className={"w-3 h-3 rounded-full border border-inherit"}/>
                                 <div className={"w-3 h-3 rounded-full border border-inherit"}/>
                                 <div className={"w-3 h-3 rounded-full border border-inherit"}/>
                             </div>
-                            <div className={"p-2"}>
+                            <div className={"p-2 border-b"}>
                                 <div className="flex items-center space-x-3">
                                     <ArrowLeft className={`${theme === "dark" ? "" : "text-[#CBD5E1]"}`}/>
                                     <ArrowRight className={`${theme === "dark" ? "" : "text-[#CBD5E1]"}`}/>
@@ -260,36 +231,7 @@ const UpdateInAppMessage = () => {
                             {renderContent(type)}
                         </Card>
                     </Card>
-                    {(type === "3" || type === "4") ? (
-                        <div className={"flex justify-center"}>
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button className={"flex gap-[6px] font-semibold"} onClick={handleAddStep}>
-                                        <Plus size={16} strokeWidth={3}/>
-                                        Add Steps
-                                    </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent className="w-56">
-                                    <DropdownMenuGroup>
-                                        {
-                                            (type === "3") && <Fragment>
-                                                {questionTypeOptions.map(option => (
-                                                    <DropdownMenuCheckboxItem
-                                                        key={option.value}
-                                                        // checked={selectedQuestionTypes.includes(option.value)}
-                                                        checked={selectedQuestionTypes === option.value}
-                                                        onCheckedChange={() => handleSelectQuestionType(option.value)}
-                                                    >
-                                                        {option.label}
-                                                    </DropdownMenuCheckboxItem>
-                                                ))}
-                                            </Fragment>
-                                        }
-                                    </DropdownMenuGroup>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
-                        </div>
-                    ) : null}
+
                 </div>
             </div>
         </Fragment>
