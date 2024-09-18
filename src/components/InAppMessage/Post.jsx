@@ -32,7 +32,7 @@ const Post = ({inAppMsgSetting, setInAppMsgSetting, isLoading}) => {
     const {theme} = useTheme();
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
-    const userDetailsReducer =  allStatusAndTypes.members.find((x) => x.user_id == inAppMsgSetting.from);;
+    const userDetailsReducer =  allStatusAndTypes.members.find((x) => x.user_id == inAppMsgSetting.from);
 
     // const handleInitialize = useCallback((instance) => {
     //     editorCore.current = instance;
@@ -177,7 +177,7 @@ const Post = ({inAppMsgSetting, setInAppMsgSetting, isLoading}) => {
                 </CardHeader>
                 <CardHeader className={"pt-0"}>
                     {
-                        inAppMsgSetting.from ? <div className={"pt-0 flex flex-row gap-2"}>
+                        inAppMsgSetting.show_sender === 1 && userDetailsReducer?.user_photo ? <div className={"pt-0 flex flex-row gap-2"}>
                             <Avatar className={"w-[32px] h-[32px]"}>
                                 {
                                     userDetailsReducer?.user_photo ?

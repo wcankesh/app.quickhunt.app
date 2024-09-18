@@ -223,9 +223,18 @@ const UpdateWidget = () => {
                                     (type === "popover" || type === "modal") &&
                                     <div className={"space-y-2 w-1/2"}>
                                         <Label className={"font-normal"}>Height</Label>
-                                        <Input type={"number"} value={widgetsSetting.popover_height}
-                                               onChange={(e) => onChange('popover_height', e.target.value)}
-                                               className={"w-full"}/>
+                                        {
+                                            type === "modal" &&
+                                            <Input type={"number"} value={widgetsSetting.modal_height}
+                                                   onChange={(e) => onChange("modal_height", e.target.value)}
+                                                   className={"w-full"}/>
+                                        }
+                                        {
+                                            type === "popover" && <Input type={"number"} value={widgetsSetting.popover_height}
+                                                                         onChange={(e) => onChange('popover_height', e.target.value)}
+                                                                         className={"w-full"}/>
+                                        }
+
                                     </div>
                                 }
                                 {
@@ -258,11 +267,11 @@ const UpdateWidget = () => {
                             <div className={"flex flex-col gap-4"}>
                                 <div className={"flex gap-2 items-center"}>
                                     <Checkbox
-                                        id={"show_launcher_icon"}
+                                        id={"is_launcher_icon"}
                                         checked={widgetsSetting.is_launcher_icon === 1}
                                         onCheckedChange={(checked) => onChangeSwitch("is_launcher_icon", checked ? 1 : 0)}
                                     />
-                                    <label htmlFor="show_launcher_icon" className="text-sm">Show Launcher Icon</label>
+                                    <label htmlFor="is_launcher_icon" className="text-sm">Show Launcher Icon</label>
                                 </div>
                                 <div className={"space-y-2"}>
                                     <Label className={"font-normal"}>Icon</Label>
@@ -512,9 +521,8 @@ const UpdateWidget = () => {
                 </div>
                 <div className={"hover:no-underline font-medium border-b px-4 py-3"}>Advanced</div>
                 <div className={"p-0"}>
-                    {
-                        widgetsSetting.hide_header === 1 &&
-                        <div className={"px-4 py-3 space-y-4 border-b"}>
+
+                    <div className={"px-4 py-3 space-y-4 border-b"}>
                             <div className={"widget-color-picker space-y-2"}>
                                 <Label className={"font-normal"}>Header Background Color</Label>
                                 <ColorInput name="header_bg_color"
@@ -544,7 +552,6 @@ const UpdateWidget = () => {
                                 />
                             </div>
                         </div>
-                    }
                     <div className={"px-4 py-3 space-y-4"}>
                         <div className={"widget-color-picker space-y-2"}>
                             <Label className={"font-normal"}>Button Background Color</Label>

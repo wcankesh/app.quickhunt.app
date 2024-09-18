@@ -26,7 +26,8 @@ const PricingPlans = () => {
             description: "Essential features you need to get started",
             features: ["Unlimited posts", "1 Ideas board", "Public Roadmap", "1 Project", "1 Manager", "All core features"],
             planType: 0,
-            productId: "",
+            priceIdMonthly: "",
+            priceIdYearly: "",
             disabled: userDetailsReducer.plan === 0,
             btnText:  0 < userDetailsReducer.plan ? "Downgrade" : "Activated"
         },
@@ -37,7 +38,8 @@ const PricingPlans = () => {
             description: "Perfect for owners of small & medium businesses",
             features: ["Unlimited Ideas board", "Unlimited Project", "Public Roadmap", "Unlimited Manager", "All core features", "Custom Domain"],
             planType: 1,
-            productId: "price_1Pi8vSKS40mIQp5T8LrFd5QC",
+            priceIdMonthly: "price_1PzW6fKS40mIQp5TIJDvqEVr",
+            priceIdYearly: "price_1PzWDWKS40mIQp5T2OUEiOYK",
             disabled: tab === userDetailsReducer.subscr_type && userDetailsReducer.plan === 1 && userDetailsReducer.final_expiration_time !== "" ? false : userDetailsReducer.plan === 1,
             btnText:  tab === userDetailsReducer.subscr_type && userDetailsReducer.plan === 1 && userDetailsReducer.final_expiration_time !== "" ? "Resubscribe" : userDetailsReducer.plan === 1 ? "Activated" : userDetailsReducer.plan > 1 ? "Downgrade" :"Upgrade"
         },
@@ -56,7 +58,7 @@ const PricingPlans = () => {
             }
         } else {
             if (userDetailsReducer.plan === id && userDetailsReducer.final_expiration_time !== "") {
-                const data = await apiService.resubscribe({ plan: id });
+                const data = await apiService.resubscribe({ plan: id, subscr_type: tab });
                 if (data.status === 200) {
                     setLoading("");
                     dispatch(userDetailsAction({ ...data.data.user_detail }));
@@ -67,7 +69,7 @@ const PricingPlans = () => {
                 }
             } else {
                 if (userDetailsReducer.plan === 0) {
-                    const data = await apiService.checkout({ plan: id });
+                    const data = await apiService.checkout({ plan: id, subscr_type: tab });
                     if (data.status === 200) {
                         window.open(data.url, "_self");
                         setLoading("");
@@ -75,11 +77,11 @@ const PricingPlans = () => {
                         setLoading("");
                     }
                 } else {
-                    const data = await apiService.upcomingInvoice({ plan: id });
+                    const data = await apiService.upcomingInvoice({ plan: id, subscr_type: tab });
                     if (data.status === 201) {
                         setLoading("");
                     } else {
-                        const res = await apiService.changePlan({ plan: id });
+                        const res = await apiService.changePlan({ plan: id, subscr_type: tab });
                         if (res.status === 436) {
                             toast({ description: data.message });
                             setLoading("");
@@ -152,7 +154,7 @@ const PricingPlans = () => {
                                 className={`w-full font-semibold`}
                                 disabled={isActivated && x.disabled}
                                 variant={isActivated ? "outline" : ""}
-                                onClick={() =>redirectToCheckout(x.productId, x.planType)}
+                                onClick={() =>redirectToCheckout(tab === 2 ? x.priceIdYearly : tab === 1 ? x.priceMonthly : "", x.planType)}
                             >
                                 {x.btnText}
                             </Button>

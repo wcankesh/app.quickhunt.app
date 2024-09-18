@@ -44,7 +44,7 @@ const AnnouncementWidgetPreview = ({widgetsSetting}) => {
     const cardClass = `bg-white text-black border-[#e2e8f0]`
 
     return (
-        <div className={"px-3"}>
+        <div className={"px-3 flex flex-col h-full"}>
             <div className="flex items-center gap-2 mb-3 justify-between relative">
                 <div className="flex gap-2 flex-1 w-full justify-end">
 
@@ -54,7 +54,7 @@ const AnnouncementWidgetPreview = ({widgetsSetting}) => {
                 </div>
             </div>
 
-            <div className={"block max-h-[385px] overflow-y-auto"}>
+            <div className={"block overflow-y-auto"}>
                 {
                     isLoading ? <Card className={cardClass}>
                         {Array.from(Array(8)).map((_, r) => {

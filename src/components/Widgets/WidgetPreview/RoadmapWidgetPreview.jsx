@@ -37,10 +37,10 @@ const RoadmapWidgetPreview = ({widgetsSetting}) => {
     const cardClass = `bg-white text-black border-[#e2e8f0]`
 
     return (
-        <div className={" px-3"}>
-            <Card className={`p-4 ${cardClass}`}>
+        <div className={"px-3 flex flex-col h-full"}>
+            <Card className={`p-4 ${cardClass} max-h-full`}>
                 {
-                    isLoading ? <div className="flex gap-4 items-start overflow-auto ">
+                    isLoading ? <div className="flex gap-4 items-start overflow-auto max-h-full">
                             {Array.from(Array(5)).map((_, r) => {
                                 const loadCount = (r === 0 || r === 3) ? 3 : (r === 2 || r === 5) ? 5 : 4;
                                 return (
@@ -72,7 +72,7 @@ const RoadmapWidgetPreview = ({widgetsSetting}) => {
                             })
                             }
                         </div> :
-                        <div className="flex gap-4 items-start overflow-auto">
+                        <div className="flex gap-4 items-start overflow-auto max-h-full">
                             {
                                 (roadmapList || []).map((data, Rindex) => {
                                     return (

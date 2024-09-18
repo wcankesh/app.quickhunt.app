@@ -13,9 +13,9 @@ const WidgetPreview = ({widgetsSetting, type, toggle,onToggle }) => {
 
     const renderContent = () => {
         return(
-            <div className="flex flex-col min-h-screen w-full">
+            <div className="flex flex-col h-full w-full">
                 <WidgetHeader selected={selected} setSelected={setSelected} widgetsSetting={widgetsSetting}/>
-                <main className="flex-1 block bg-slate-50 py-4">
+                <main className="flex-1 block bg-slate-50 py-4 overflow-hidden">
                     {
                         selected === "ideas" && <IdeaWidgetPreview widgetsSetting={widgetsSetting}/>
                     }

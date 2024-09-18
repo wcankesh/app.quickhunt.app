@@ -28,7 +28,7 @@ const initialState = {
     post_expired_at: undefined,
     post_browser: '',
     post_ip_address: '',
-    category_id: '',
+    category_id: "",
     labels: [],
     image: '',
 };
@@ -78,7 +78,7 @@ const CreateUpdateAnnouncements = ({isOpen, onOpen, onClose, selectedRecord, get
             post_assign_to: selectedRecord.post_assign_to !== null ? selectedRecord.post_assign_to.split(',') : [],
             post_published_at: selectedRecord.post_published_at ? moment(selectedRecord.post_published_at).format('YYYY-MM-DD') : moment(new Date()),
             post_expired_at: selectedRecord.post_expired_at ? moment(selectedRecord.post_expired_at).format('YYYY-MM-DD') : undefined,
-            category_id: selectedRecord.category_id == "0" ? "" : selectedRecord.category_id,
+            category_id: selectedRecord.category_id,
             labels: labelId,
 
         });
@@ -198,7 +198,7 @@ const CreateUpdateAnnouncements = ({isOpen, onOpen, onClose, selectedRecord, get
     };
 
     const onChangeCategory = (selectedItems) => {
-        setChangeLogDetails({...changeLogDetails, category_id: selectedItems})
+        setChangeLogDetails({...changeLogDetails, category_id: selectedItems === null ? "" : selectedItems})
     }
 
     const commonToggle = (name, value) => {
@@ -528,10 +528,11 @@ const CreateUpdateAnnouncements = ({isOpen, onOpen, onClose, selectedRecord, get
                                     value={changeLogDetails && changeLogDetails.category_id && changeLogDetails.category_id.toString()}
                                     onValueChange={onChangeCategory}>
                                     <SelectTrigger className="h-9">
-                                        <SelectValue placeholder="Category"/>
+                                        <SelectValue/>
                                     </SelectTrigger>
                                     <SelectContent>
                                         <SelectGroup>
+                                            <SelectItem value={null}>None</SelectItem>
                                             {
                                                 (categoriesList || []).map((x, i) => {
                                                     return (

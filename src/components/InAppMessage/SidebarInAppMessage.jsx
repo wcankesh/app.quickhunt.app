@@ -97,6 +97,7 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
             project_id: projectDetailsReducer.id,
             type: type
         }
+        console.log(payload)
         const data = await apiSerVice.createInAppMessage(payload);
         if (data.status === 200) {
             setIsLoading(false);
@@ -144,6 +145,8 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
         updateStepRecord(obj)
     }
 
+
+
     return (
         <Fragment>
             <div className={"border-b"}>
@@ -154,20 +157,18 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                         <Input className={"h-9"} id="title" placeholder="Title" value={inAppMsgSetting.title}
                                onChange={(e) => onChange("title", e.target.value)}/>
                     </div>
-                    {
-                        (type === "2" || type === "3" ) && <div className="grid w-full max-w-sm items-center gap-1.5">
-                            <div className="flex items-center gap-2">
-                                <Checkbox id="show_sender"
-                                          checked={inAppMsgSetting.show_sender === 1}
-                                          onCheckedChange={(checked) => onChange("show_sender", checked ? 1 : 0)}
-                                />
-                                <Label htmlFor="show_sender" className={"font-normal cursor-pointer"}>Show sender</Label>
-                            </div>
+                    <div className="grid w-full max-w-sm items-center gap-1.5">
+                        <div className="flex items-center gap-2">
+                            <Checkbox id="show_sender"
+                                      checked={inAppMsgSetting.show_sender === 1}
+                                      onCheckedChange={(checked) => onChange("show_sender", checked ? 1 : 0)}
+                            />
+                            <Label htmlFor="show_sender" className={"font-normal cursor-pointer"}>Show sender</Label>
                         </div>
-                    }
+                    </div>
 
                     {
-                        (type === "1" || (type === "2" && inAppMsgSetting.show_sender === 1) || (type === "3" && inAppMsgSetting.show_sender === 1)) && <div className="grid w-full max-w-sm items-center gap-1.5">
+                        inAppMsgSetting.show_sender === 1 && <div className="grid w-full max-w-sm items-center gap-1.5">
                             <Label className={"font-normal"}>From</Label>
                             <Select
                                 value={Number(inAppMsgSetting.from)}
@@ -229,7 +230,52 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                         </div>
                     }
                     {
-                        type === "2" && inAppMsgSetting.action_type == 1 && <Fragment>
+                        type === "4" &&
+                            <Fragment>
+                                <div className="grid w-full max-w-sm items-center gap-1.5">
+                                    <Label className={"font-normal"}>Action</Label>
+                                    <Select value={selectedStep?.action_type}
+                                            onValueChange={(value) => onChangeQuestion("action_type",value)}>
+                                        <SelectTrigger className="w-full h-9">
+                                            <SelectValue placeholder=""/>
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value={0}>None</SelectItem>
+                                            <SelectItem value={1}>Open URL</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+
+                                </div>
+                                {
+                                    selectedStep?.action_type === 1 &&
+                                    <Fragment>
+                                        <div className="grid w-full max-w-sm items-center gap-1.5">
+                                            <Label htmlFor="title">Action Text</Label>
+                                            <Input className={"h-9"} id="action_text" placeholder="Enter action text" value={selectedStep?.action_text}
+                                                   onChange={(e) => onChangeQuestion("action_text", e.target.value)}/>
+                                        </div>
+                                        <div className="grid w-full max-w-sm items-center gap-1.5">
+                                            <Label htmlFor="title">Action URL</Label>
+                                            <Input className={"h-9"} id="action_url" placeholder="Enter URL address" value={selectedStep?.action_url}
+                                                   onChange={(e) => onChangeQuestion("action_url", e.target.value)}/>
+                                        </div>
+                                        <div className="grid w-full max-w-sm items-center gap-1.5">
+                                            <div className="flex items-center gap-2">
+                                                <Checkbox id="is_redirect"
+                                                          checked={selectedStep.is_redirect === 1}
+                                                          onCheckedChange={(checked) => onChangeQuestion("is_redirect", checked ? 1 : 0)}
+                                                />
+                                                <Label htmlFor="is_redirect" className={"font-normal cursor-pointer"}>Open URL in a new tab</Label>
+                                            </div>
+                                        </div>
+                                    </Fragment>
+                                }
+
+                            </Fragment>
+
+                    }
+                    {
+                        (type === "2" && inAppMsgSetting.action_type == 1) && <Fragment>
                             <div className="grid w-full max-w-sm items-center gap-1.5">
                                 <Label htmlFor="title">Action Text</Label>
                                 <Input className={"h-9"} id="action_text" placeholder="Enter action text" value={inAppMsgSetting.action_text}
@@ -243,8 +289,8 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                             <div className="grid w-full max-w-sm items-center gap-1.5">
                                 <div className="flex items-center gap-2">
                                     <Checkbox id="is_redirect"
-                                              checked={inAppMsgSetting.is_redirect}
-                                              onCheckedChange={(checked) => onChange("is_redirect", checked)}
+                                              checked={inAppMsgSetting.is_redirect === 1}
+                                              onCheckedChange={(checked) => onChange("is_redirect", checked ? 1 : 0)}
                                     />
                                     <Label htmlFor="is_redirect" className={"font-normal cursor-pointer"}>Open URL in a new tab</Label>
                                 </div>
@@ -255,8 +301,8 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                         type === "2" && inAppMsgSetting.action_type != 0 && <div className="grid w-full max-w-sm items-center gap-1.5">
                             <div className="flex items-center gap-2">
                                 <Checkbox id="is_banner_close_button"
-                                          checked={inAppMsgSetting.is_banner_close_button}
-                                          onCheckedChange={(checked) => onChange("is_banner_close_button", checked)}
+                                          checked={inAppMsgSetting.is_banner_close_button === 1}
+                                          onCheckedChange={(checked) => onChange("is_banner_close_button", checked ? 1 : 0)}
                                 />
                                 <Label htmlFor="is_banner_close_button" className={"font-normal cursor-pointer"}>Dismiss the banner on click</Label>
                             </div>
@@ -306,7 +352,7 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                             <Label className={"font-normal text-sm"} htmlFor="placeholder_text">Placeholder
                                 text</Label>
                             <Input value={inAppMsgSetting.placeholder_text}
-                                   onChange={(e) => onChange("placeholder_text", e.target.value)} type="text"
+                                   onChange={(e) => onChangeQuestion("placeholder_text", e.target.value)} type="text"
                                    className={"h-9"} id="placeholder_text" placeholder="Select One..."/>
                         </div>
                     }
@@ -406,10 +452,8 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                     </div>
                 </div>
 
-
-                {(type === "1" || type === "2" || type === "3") &&
                 <div className="grid w-full max-w-sm items-center gap-1.5">
-                    <Label className={"font-normal"}>Text Color</Label>
+                    <Label className={"font-normal"}>{type === "4" ? "Button Text Color": "Text Color"}</Label>
                     <div className={"w-full text-sm widget-color-picker space-y-2"}>
                         <ColorInput
                             value={inAppMsgSetting.text_color}
@@ -417,7 +461,7 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                             name={"text_color"}
                         />
                     </div>
-                </div>}
+                </div>
 
                 {type === "1" && <div className="grid w-full max-w-sm items-center gap-1.5">
                     <Label className={"font-normal "}>Icon Color </Label>
@@ -430,7 +474,7 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                 </div>}
 
                 <div className="grid w-full max-w-sm items-center gap-1.5">
-                    <Label className={"font-normal"}>Button Color</Label>
+                    <Label className={"font-normal"}>{type === "4" ? "Button Background Color": "Button Color"} </Label>
                     <div className={"w-full text-sm widget-color-picker space-y-2"}>
                         <ColorInput
                             name={"btn_color"}
@@ -444,47 +488,12 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                     (type === "2" || type === "3" || type === "4") &&
                     <div className="grid w-full max-w-sm items-center gap-1.5">
                         <div className="flex items-center gap-2">
-                            <Checkbox id="is_close_button" checked={inAppMsgSetting.is_close_button} onCheckedChange={(checked) => onChange("is_close_button", checked)}/>
+                            <Checkbox id="is_close_button" checked={inAppMsgSetting.is_close_button === 1} onCheckedChange={(checked) => onChange("is_close_button", checked ? 1 : 0)}/>
                             <Label htmlFor="is_close_button" className={"font-normal cursor-pointer"}>Show dismiss button</Label>
                         </div>
                     </div>
                 }
             </div>
-
-            {
-                type === "4" && <div className={"border-b px-4 py-6 space-y-4"}>
-                    <h5 className={"text-base font-medium"}>General Setting</h5>
-                    <div className="grid w-full max-w-sm items-center gap-1.5">
-                        <Label className={"font-normal"}>Link step to Action?</Label>
-                        <Select value={inAppMsgSetting?.action_type}
-                                onValueChange={(value) => onChange("action_type",value)}>
-                            <SelectTrigger className="w-full h-9">
-                                <SelectValue placeholder=""/>
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value={1}>Open URL</SelectItem>
-                                <SelectItem value={2}>Ask for Reaction</SelectItem>
-                                <SelectItem value={3}>Collect visitor email</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
-                    {inAppMsgSetting.link_step_action === "Add url button" && <div className={"space-y-3"}>
-
-                        <div className="announce-create-switch flex items-center space-x-2">
-                            <Switch className={"w-[38px] h-[20px]"} id="open_url"/>
-                            <Label htmlFor="open_url"
-                                   className={`cursor-pointer ${theme == "dark" ? "" : "text-muted-foreground"}`}>Open
-                                URL in New page</Label>
-                        </div>
-                    </div>}
-                    <div className="announce-create-switch flex items-center space-x-2">
-                        <Switch className={"w-[38px] h-[20px]"} id="allow_user"/>
-                        <Label htmlFor="allow_user"
-                               className={`cursor-pointer ${theme == "dark" ? "" : "text-muted-foreground"}`}>Allow
-                            users to manually Complete Step</Label>
-                    </div>
-                </div>
-            }
 
             <div className={"border-b px-4 py-6 space-y-4"}>
                 <h5 className={"text-base font-medium"}>Trigger Setting</h5>

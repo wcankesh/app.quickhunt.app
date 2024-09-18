@@ -46,9 +46,8 @@ const IdeaWidgetPreview = ({widgetsSetting}) => {
     const btnClass = `bg-[#f8fafc] border-[#e2e8f0] text-black hover:bg-[#f8fafc] hover:text-black`;
     const cardClass = `bg-white text-black border-[#e2e8f0]`
     return (
-        <div className={"px-3"}>
+        <div className={"px-3 flex flex-col h-full"}>
             <div className="flex flex-wrap items-center gap-2 mb-3 justify-between">
-
                 <div className="flex gap-1 flex-1 w-full justify-start relative">
                     <Button size="icon" variant="outline"  className={`w-9 h-9 flex ${btnClass}`}><Search className='w-4 h-4'/></Button>
                     <Button variant="outline" size="icon" className={`w-9 h-9 flex ${btnClass}`}><Filter fill="true" className='w-4 h-4'/></Button>
@@ -61,7 +60,7 @@ const IdeaWidgetPreview = ({widgetsSetting}) => {
 
             </div>
 
-            <div className="block max-h-[385px] overflow-y-auto">
+            <div className="block overflow-y-auto">
                 {
                     isLoading ? <Card className={cardClass}>
                         {Array.from(Array(8)).map((_, r) => {

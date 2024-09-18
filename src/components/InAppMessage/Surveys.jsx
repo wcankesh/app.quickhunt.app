@@ -95,13 +95,14 @@ const Surveys = ({inAppMsgSetting, setInAppMsgSetting, selectedStepIndex, setSel
         }
     ];
     const questionTypeOptions = [
-        {label: "Net Promoter Score", value: 1},
-        {label: "Numeric Scale", value: 2},
-        {label: "Star Rating Scale", value: 3},
-        {label: "Emoji Rating Scale", value: 4},
-        {label: "Drop Down / List", value: 5},
-        {label: "Short text entry", value: 6},
-        {label: "Long text entry", value: 7},
+        {label: "Net Promoter Score", value: 1, disabled: false},
+        {label: "Numeric Scale", value: 2, disabled: false},
+        {label: "Star Rating Scale", value: 3, disabled: false},
+        {label: "Emoji Rating Scale", value: 4, disabled: false},
+        {label: "Drop Down / List", value: 5, disabled: false},
+        {label: "Short text entry", value: 6, disabled: false},
+        {label: "Long text entry", value: 7, disabled: false},
+        {label: "Thank you", value: 8, disabled: inAppMsgSetting.steps.filter((x) =>  x.question_type === 8).length > 0},
     ];
 
     const question = {
@@ -112,6 +113,7 @@ const Surveys = ({inAppMsgSetting, setInAppMsgSetting, selectedStepIndex, setSel
         5: "",
         6: "",
         7: "",
+        8: "Thanks for taking the survey!",
     }
 
     const handleSelectQuestionType = (value) => {
@@ -125,7 +127,7 @@ const Surveys = ({inAppMsgSetting, setInAppMsgSetting, selectedStepIndex, setSel
             start_label: "Not likely",
             end_label: "Very likely",
             is_answer_required: "",
-            step: clone.length + 1,
+            step: value === 8 ? 1000 : clone.length + 1,
             options: value == 5 ? [
                 {id: "", title: "", is_active: 1}
             ] : [],
@@ -133,7 +135,12 @@ const Surveys = ({inAppMsgSetting, setInAppMsgSetting, selectedStepIndex, setSel
             is_active: 1,
             step_id: ""
         };
-        clone.push(stepBoj);
+        const index = clone.findIndex(item => item.question_type === 8);
+        if(index !== -1){
+            clone.splice(index, 0, stepBoj);
+        } else {
+            clone.push(stepBoj);
+        }
         setSelectedStep(stepBoj);
         setSelectedStepIndex(clone.length - 1);
         setInAppMsgSetting(prevState => ({
@@ -204,7 +211,7 @@ const Surveys = ({inAppMsgSetting, setInAppMsgSetting, selectedStepIndex, setSel
                                 <div className={"flex gap-3"}>
                                     <div className={"flex-none pt-2 flex-1 w-8"}>
                                         {
-                                            inAppMsgSetting.show_sender ? <Avatar className={"w-[32px] h-[32px]"}>
+                                            inAppMsgSetting.show_sender === 1 ? <Avatar className={"w-[32px] h-[32px]"}>
                                                 {
                                                     userDetailsReducer?.user_photo ?
                                                         <AvatarImage src={userDetailsReducer?.user_photo} alt="@shadcn"/>
@@ -339,7 +346,7 @@ const Surveys = ({inAppMsgSetting, setInAppMsgSetting, selectedStepIndex, setSel
                                     <div className={"flex-1 pt-2"}>
                                         <Button variant={"outline"} className={`p-0 h-6 w-6`} onClick={(e) => {
                                             e.stopPropagation();
-                                            onDeleteStep( x, i)
+                                            onDeleteStep(x, i)
                                         }}>
                                             <Trash2 size={12} className={""}/>
                                         </Button>
@@ -365,6 +372,7 @@ const Surveys = ({inAppMsgSetting, setInAppMsgSetting, selectedStepIndex, setSel
                             {questionTypeOptions.map(option => (
                                 <DropdownMenuCheckboxItem
                                     key={option.value}
+                                    disabled={option.disabled}
                                     // checked={selectedQuestionTypes.includes(option.value)}
                                     // checked={selectedQuestionTypes === option.value}
                                     onCheckedChange={() => handleSelectQuestionType(option.value)}

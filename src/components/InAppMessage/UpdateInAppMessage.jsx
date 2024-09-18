@@ -16,8 +16,6 @@ import Checklist from "./Checklist";
 import {Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator} from "../ui/breadcrumb";
 import SidebarInAppMessage from "./SidebarInAppMessage";
 
-import {DropdownMenuGroup} from "@radix-ui/react-dropdown-menu";
-
 const initialState = {
     project_id: "2",
     title: "In app message",
@@ -45,7 +43,10 @@ const initialState = {
     banner_style: "",
     reactions: [],
     status: 1,
-    steps:[]
+    steps:[],
+    checklist_title: "",
+    checklist_description : "",
+    checklists: []
 }
 
 const reactionPost = [
@@ -108,7 +109,19 @@ const stepBoj = {
     step: 1,
     options: [],
     reactions: [],
-    step_id: ""
+    step_id: "",
+    is_active: 1
+}
+
+const checkListObj =  {
+    title: "",
+    description: [{type: "paragraph", data: {text: ""}}],
+    action_type: 0,
+    action_text: "Open",
+    action_url: "",
+    is_redirect: 0,
+    is_active: 1,
+    checklist_id: ""
 }
 
 const UpdateInAppMessage = () => {
@@ -118,10 +131,9 @@ const UpdateInAppMessage = () => {
     const {theme} = useTheme();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const [inAppMsgSetting, setInAppMsgSetting] = useState(initialState);
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
     const [selectedStepIndex, setSelectedStepIndex] = useState(0);
     const [selectedStep, setSelectedStep] = useState(null);
-
 
     const renderContent = (type) => {
         switch (type) {
@@ -132,17 +144,13 @@ const UpdateInAppMessage = () => {
             case "3":
                 return <Surveys inAppMsgSetting={inAppMsgSetting} setInAppMsgSetting={setInAppMsgSetting} isLoading={isLoading} selectedStepIndex={selectedStepIndex} setSelectedStepIndex={setSelectedStepIndex} selectedStep={selectedStep} setSelectedStep={setSelectedStep}/>;
             case "4":
-                return <Checklist inAppMsgSetting={inAppMsgSetting} setInAppMsgSetting={setInAppMsgSetting} isLoading={isLoading} selectedStepIndex={selectedStepIndex} setSelectedStepIndex={setSelectedStepIndex}/>;
+                return <Checklist inAppMsgSetting={inAppMsgSetting} setInAppMsgSetting={setInAppMsgSetting} isLoading={isLoading} selectedStepIndex={selectedStepIndex} setSelectedStepIndex={setSelectedStepIndex} selectedStep={selectedStep} setSelectedStep={setSelectedStep}/>;
             default:
                 return null;
         }
     };
 
-    useEffect(() => {
-        setTimeout(() => {
-            document.body.style.pointerEvents = 'auto';
-        }, 500)
-    },[]);
+
 
     useEffect(() => {
         if (id === "new") {
@@ -151,10 +159,16 @@ const UpdateInAppMessage = () => {
                 title: `${type === "1" ? "Post": type === "2" ? "Banner" : type === "3" ? "Survey" : "Checklist"} in app message`,
                 reactions: type === "1" ? reactionPost : type === "2" ? reactionBanner : [],
                 body_text: type === "1" ? { blocks: [{type: "paragraph", data: {text: "Hey"}}]} : "",
+                text_color: type === "4" ? "#FFFFFF" : "#000000",
                 steps: type === "3" ?  [stepBoj] : [],
+                checklists: type === "4" ? [
+                    checkListObj
+                ] : [],
             }));
+            setSelectedStep(type === "3" ? stepBoj : type === "4" ? checkListObj : {})
+            setIsLoading(false)
         }
-        setSelectedStep(stepBoj)
+
     }, [])
 
     useEffect(() => {
@@ -169,18 +183,19 @@ const UpdateInAppMessage = () => {
         if (data.status === 200) {
             const payload = {
                 ...data.data,
-                options: data.data.options ?? [''],
                 body_text: type === "1" ? JSON.parse(data.data.body_text) : data.data.body_text,
             }
             setInAppMsgSetting(payload);
-            setSelectedStep(payload.steps[0])
+            if(type === "3"){
+                setSelectedStep(payload.steps[0])
+            } else if(type === "4"){
+                setSelectedStep(payload.checklists[0])
+            }
             setIsLoading(false);
         } else {
             setIsLoading(false);
         }
     }
-
-
 
     return (
         <Fragment>
