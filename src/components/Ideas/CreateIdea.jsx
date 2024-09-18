@@ -55,11 +55,11 @@ const CreateIdea = ({isOpen, onOpen, onClose, closeCreateIdea, setIdeasList, ide
         setIdeaDetail({ ...ideaDetail, topic: clone });
     };
 
-    const onChangeText = (event) => {
-        setIdeaDetail(ideaDetail => ({...ideaDetail, [event.target.name]:event.target.value}))
+    const onChangeText = (name, value) => {
+        setIdeaDetail({...ideaDetail, [name]: value})
         setFormError(formError => ({
             ...formError,
-            [event.target.name]: formValidate(event.target.name, event.target.value)
+            [name]: formValidate(name, value)
         }));
     }
 
@@ -145,12 +145,13 @@ const CreateIdea = ({isOpen, onOpen, onClose, closeCreateIdea, setIdeasList, ide
                             <X onClick={onCancel} className={"cursor-pointer"}/>
                         </div>
                     </SheetHeader>
-                    <div className={"w-full overflow-y-auto comm-sheet-height"}>
+                    {/*<div className={"w-full overflow-y-auto comm-sheet-height"}>*/}
+                    <div className={"w-full overflow-y-auto h-[calc(100vh_-_69px)]"}>
                             <div className={"pb-[60px] sm:p-0"}>
                                 <div className={"px-4 py-3 lg:py-6 lg:px-8 flex flex-col gap-6 border-b"}>
                                     <div className="space-y-2">
                                         <Label htmlFor="text">Title</Label>
-                                        <Input type="text" id="text" placeholder="" value={ideaDetail.title} name={"title"} onChange={onChangeText} />
+                                        <Input type="text" id="text" placeholder="" value={ideaDetail.title} onChange={(e) => onChangeText("title", e.target.value)} />
                                         {
                                             formError.title && <span className="text-red-500 text-sm">{formError.title}</span>
                                         }
@@ -158,14 +159,14 @@ const CreateIdea = ({isOpen, onOpen, onClose, closeCreateIdea, setIdeasList, ide
                                     <div className="space-y-2">
                                         <Label htmlFor="message">Description</Label>
 
-                                        <ReactQuillEditor value={ideaDetail.description} name={"description"} onChange={onChangeText}/>
+                                        <ReactQuillEditor value={ideaDetail.description} onChange={(e) => onChangeText("description", e.target.value)}/>
 
                                         {formError.description && <span className="text-red-500 text-sm">{formError.description}</span>}
                                     </div>
                                     <div className={"space-y-2"}>
                                         <Label>Choose Board for this Idea</Label>
                                         <Select
-                                            onValueChange={(value) => onChangeText({target:{name: "board", value}})}
+                                            onValueChange={(value) => onChangeText( "board", value)}
                                             value={ideaDetail.board}>
                                             <SelectTrigger className="bg-card">
                                                 <SelectValue/>

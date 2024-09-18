@@ -1,10 +1,11 @@
-import React, {Fragment} from 'react';
+import React, {Fragment, useState, useEffect} from 'react';
 import {Button} from "../ui/button";
 import {Icon} from "../../utils/Icon";
 import {baseUrl} from "../../utils/constent";
 import {useNavigate, useLocation, useParams} from "react-router-dom";
 import {useTheme} from "../theme-provider";
 import {useSelector} from "react-redux";
+import Articles from "../HelpCenter/Articles/Articles";
 
 const SaidBarDesktop = () => {
     const {theme} = useTheme()
@@ -12,12 +13,17 @@ const SaidBarDesktop = () => {
     let location = useLocation();
     const {type, id} = useParams();
     const userDetailsReducer = useSelector(state => state.userDetailsReducer);
+
     const onRedirect = (link) => {
         navigate(`${baseUrl}${link}`);
     };
-    const isActive = (link, subLink ="", subLink2 = "") => {
-        return  window.location.pathname === subLink2 || window.location.pathname === subLink || window.location.pathname === link ;
+
+    const isActive = (link, subLink = "", subLink2 = "") => {
+        return window.location.pathname === subLink2 || window.location.pathname === subLink || window.location.pathname === link;
     };
+
+    const isHelpCenterActive = isActive(`${baseUrl}/help-center/articles`, `${baseUrl}/help-center/category`) ||
+        isActive(`${baseUrl}/help-center/articles/${id}`, `${baseUrl}/help-center/category/${id}`);
 
     const menuComponent = [
         {
@@ -69,6 +75,25 @@ const SaidBarDesktop = () => {
                     icon: Icon.widgetsIcon,
                     selected: isActive(`${baseUrl}/widget`, `${baseUrl}/widget/type`, `${baseUrl}/widget/${type}/${id}`),
                 },
+                {
+                    title: 'Help Center',
+                    link: '/help-center/articles',
+                    icon: Icon.helpCenter,
+                    // selected: isActive(`${baseUrl}/help-center/articles`,`${baseUrl}/help-center/category`) || isActive(`${baseUrl}/help-center/articles/${id}`,`${baseUrl}/help-center/category/${id}`),
+                    selected: isHelpCenterActive,
+                    subItems: [
+                        {
+                            title: 'Articles',
+                            link: `/help-center/articles`,
+                            selected: isActive(`${baseUrl}/help-center/articles`, `${baseUrl}/help-center/articles/${id}`),
+                        },
+                        {
+                            title: 'Category',
+                            link: `/help-center/category`,
+                            selected: isActive(`${baseUrl}/help-center/category`, `${baseUrl}/help-center/category/${id}`),
+                        }
+                    ]
+                },
             ]
         },
     ];
@@ -78,7 +103,7 @@ const SaidBarDesktop = () => {
             title: 'Import / Export',
             link: '/import-export',
             icon: Icon.importExport,
-            selected: isActive(`${baseUrl}/import-export` , `${baseUrl}/import`),
+            selected: isActive(`${baseUrl}/import-export`, `${baseUrl}/import`),
             isDisplay: true,
         },
         {
@@ -120,17 +145,37 @@ const SaidBarDesktop = () => {
             title: 'Settings',
             link: '/settings/profile',
             icon: Icon.settingIcon,
-            selected: window.location.pathname === `${baseUrl}/settings/team` ? false :isActive(`${baseUrl}/settings/profile`, `${baseUrl}/settings/${type}`),
+            selected: window.location.pathname === `${baseUrl}/settings/team` ? false : isActive(`${baseUrl}/settings/profile`, `${baseUrl}/settings/${type}`),
             isDisplay: true,
         }
     ];
 
+    const renderSubItems = (subItems) => {
+        return (
+            <div className={"pl-4"}>
+                {subItems.map((subItem, index) => (
+                    <Button
+                        key={index}
+                        variant={"link hover:no-underline"}
+                        className={`w-full flex gap-4 h-9 justify-start transition-none items-center rounded-md`}
+                        onClick={() => onRedirect(subItem.link)}
+                    >
+                        <div className={`${subItem.selected ? "active-menu" : "menu-icon"}`}>{subItem.icon}</div>
+                        <div className={`text-sm font-medium ${subItem.selected ? "text-primary " : ""}`}>{subItem.title}</div>
+                    </Button>
+                ))}
+            </div>
+        );
+    };
+
     return (
-        <div className={`main-sidebar pointer-events-none fixed start-0 top-0 z-[60] flex h-full xl:z-10 hidden md:block ${location.pathname.includes("widget/") ? "overflow-hidden" : "overflow-auto"}`}>
-            <div className="pointer-events-auto relative z-30 flex h-full w-[282px] flex-col ltr:-translate-x-full rtl:translate-x-full ltr:xl:translate-x-0 rtl:xl:translate-x-0">
+        <div
+            className={`main-sidebar pointer-events-none fixed start-0 top-0 z-[60] flex h-full xl:z-10 hidden md:block ${location.pathname.includes("widget/") ? "overflow-hidden" : "overflow-auto"}`}>
+            <div
+                className="pointer-events-auto relative z-30 flex h-full w-[282px] flex-col ltr:-translate-x-full rtl:translate-x-full ltr:xl:translate-x-0 rtl:xl:translate-x-0">
                 <div className={"flex gap-3 items-center px-4"}>
                     <div className="flex h-14 items-center lg:h-[60px]">
-                        <div className={"app-logo cursor-pointer"}  onClick={() => onRedirect("/dashboard")}>
+                        <div className={"app-logo cursor-pointer"} onClick={() => onRedirect("/dashboard")}>
                             {theme === "dark" ? Icon.whiteLogo : Icon.blackLogo}
                         </div>
                     </div>
@@ -150,8 +195,10 @@ const SaidBarDesktop = () => {
                                                         className={`${z.selected ? "flex justify-start gap-4 h-9 rounded-md bg-primary/15 transition-none" : 'flex items-center gap-4 h-9 justify-start transition-none'}`}
                                                         onClick={() => onRedirect(z.link)}
                                                     >
-                                                        <div className={`${z.selected ? "active-menu" : "menu-icon"}`}>{z.icon}</div>
-                                                        <div className={`${z.selected ? "text-primary text-sm font-medium" : "text-sm font-medium"}`}>{z.title}</div>
+                                                        <div
+                                                            className={`${z.selected ? "active-menu" : "menu-icon"}`}>{z.icon}</div>
+                                                        <div
+                                                            className={`${z.selected ? "text-primary text-sm font-medium" : "text-sm font-medium"}`}>{z.title}</div>
                                                     </Button>
                                                 )
                                             })
@@ -164,15 +211,30 @@ const SaidBarDesktop = () => {
                                                         {
                                                             (x.items || []).map((y, i) => {
                                                                 return (
-                                                                    <Button
-                                                                        key={i}
-                                                                        variant={"link hover:no-underline"}
-                                                                        className={`${y.selected ? "flex justify-start gap-4 h-9 rounded-md bg-primary/15 transition-none" : 'flex items-center gap-4 h-9 justify-start transition-none'}`}
-                                                                        onClick={() => onRedirect(y.link)}
-                                                                    >
-                                                                        <div className={`${y.selected ? "active-menu" : "menu-icon"}`}>{y.icon}</div>
-                                                                        <div className={`${y.selected ? "text-primary text-sm font-medium" : "text-sm font-medium"}`}>{y.title}</div>
-                                                                    </Button>
+                                                                    <Fragment>
+                                                                        {/*// <Button*/}
+                                                                        {/*//     key={i}*/}
+                                                                        {/*//     variant={"link hover:no-underline"}*/}
+                                                                        {/*//     className={`${y.selected ? "flex justify-start gap-4 h-9 rounded-md bg-primary/15 transition-none" : 'flex items-center gap-4 h-9 justify-start transition-none'}`}*/}
+                                                                        {/*//     onClick={() => onRedirect(y.link)}*/}
+                                                                        {/*// >*/}
+                                                                        {/*//     <div className={`${y.selected ? "active-menu" : "menu-icon"}`}>{y.icon}</div>*/}
+                                                                        {/*//     <div className={`${y.selected ? "text-primary text-sm font-medium" : "text-sm font-medium"}`}>{y.title}</div>*/}
+                                                                        {/*// </Button>*/}
+                                                                        <Button
+                                                                            key={i}
+                                                                            variant={"link hover:no-underline"}
+                                                                            className={`${y.selected ? "flex justify-start gap-4 h-9 rounded-md bg-primary/15 transition-none" : 'flex items-center gap-4 h-9 justify-start transition-none'} ${y.title === 'Announcements' ? 'gap-[10px]' : ''}`}
+                                                                            onClick={() => onRedirect(y.link)}
+                                                                        >
+                                                                            <div
+                                                                                className={`${y.selected ? "active-menu" : "menu-icon"}`}>{y.icon}</div>
+                                                                            <div
+                                                                                className={`${y.selected ? "text-primary text-sm font-medium" : "text-sm font-medium"}`}>{y.title}</div>
+                                                                        </Button>
+                                                                        {/*{y.title === 'Help Center' && y.subItems && renderSubItems(y.subItems)}*/}
+                                                                        {y.title === 'Help Center' && isHelpCenterActive && y.subItems && renderSubItems(y.subItems)}
+                                                                    </Fragment>
                                                                 )
                                                             })
                                                         }
@@ -180,34 +242,37 @@ const SaidBarDesktop = () => {
                                                 </Fragment>
                                         }
                                     </div>
-                                )
+                            )
                             })
-                        }
-                    </nav>
-                    <div className="mt-auto px-4 pb-4">
-                        <nav className="grid gap-1">
-                            {
-                                (footerMenuComponent || []).map((x, i) => {
-                                    return (
-                                        x.isDisplay ?
-                                        <Button
-                                            key={i}
-                                            variant={"link hover:no-underline"}
-                                            className={`${x.selected  ? "flex justify-start gap-4 h-9 rounded-md bg-primary/15 transition-none" : 'flex items-center gap-4 h-9 justify-start transition-none'}`}
-                                            onClick={() => onRedirect(x.link)}
-                                            >
-                                            <div className={`${x.selected ? "active-menu" : "menu-icon"}`}>{x.icon}</div>
-                                            <div className={`${x.selected ? "text-primary text-sm font-medium" : "text-sm font-medium"}`}>{x.title}</div>
-                                        </Button> : ''
-                                    )
-                                })
                             }
-                        </nav>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-};
+                            </nav>
+                                <div className="mt-auto px-4 pb-4">
+                                    <nav className="grid gap-1">
+                                        {
+                                            (footerMenuComponent || []).map((x, i) => {
+                                                return (
+                                                    x.isDisplay ?
+                                                        <Button
+                                                            key={i}
+                                                            variant={"link hover:no-underline"}
+                                                            className={`${x.selected ? "flex justify-start gap-4 h-9 rounded-md bg-primary/15 transition-none" : 'flex items-center gap-4 h-9 justify-start transition-none'}`}
+                                                            onClick={() => onRedirect(x.link)}
+                                                        >
+                                                            <div
+                                                                className={`${x.selected ? "active-menu" : "menu-icon"}`}>{x.icon}</div>
+                                                            <div
+                                                                className={`${x.selected ? "text-primary text-sm font-medium" : "text-sm font-medium"}`}>{x.title}</div>
+                                                        </Button> : ''
+                                                )
+                                            })
+                                        }
+                                    </nav>
+                                </div>
+                            </div>
+                            </div>
+                            </div>
+                            )
+                                ;
+                            };
 
-export default SaidBarDesktop;
+                            export default SaidBarDesktop;

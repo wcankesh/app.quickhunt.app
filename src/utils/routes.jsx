@@ -16,6 +16,9 @@ import ImportExport from "../components/ImportExport/ImportExport";
 import ImportIdea from "../components/ImportExport/ImportIdea";
 import MessageTypes from "../components/InAppMessage/MessageTypes";
 import WidgetsTypes from "../components/Widgets/WidgetsTypes";
+import Articles from "../components/HelpCenter/Articles/Articles";
+import Category from "../components/HelpCenter/Category/Category";
+import ArticleDetail from "../components/HelpCenter/Articles/ArticleDetail";
 
 export const routes = [
      {path: `${baseUrl}/dashboard`, component: <Dashboard/>},
@@ -26,6 +29,9 @@ export const routes = [
      {path: `${baseUrl}/widget`, component: <Widgets/>},
      {path: `${baseUrl}/widget/type`, component: <WidgetsTypes/>},
      {path: `${baseUrl}/widget/:type/:id`, component: <UpdateWidget/>},
+     {path: `${baseUrl}/help-center/articles`, component: <Articles/>},
+     {path: `${baseUrl}/help-center/articles/:id`, component: <ArticleDetail/>},
+     {path: `${baseUrl}/help-center/category`, component: <Category/>},
      {path: `${baseUrl}/notification`, component: <Notification/>},
      {path: `${baseUrl}/help-support`, component: <HelpSupport/>},
      {path: `${baseUrl}/pricing-plan`, component: <PricingPlans/>},

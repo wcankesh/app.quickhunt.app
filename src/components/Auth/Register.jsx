@@ -133,7 +133,7 @@ const Register = () => {
             if (token) {
                 navigate(`${baseUrl}/login?token=${token}`);
             } else {
-                navigate(`${baseUrl}/login`);
+                navigate(`${baseUrl}/on-boarding`);
                 localStorage.setItem("token", data.access_token);
             }
             setIsLoading(false)

@@ -518,3 +518,18 @@ input:-webkit-autofill::first-line {
 .codex-editor__redactor{
   padding-bottom: 0!important;
 }
+
+.ce-block__content .cdx-input {
+  display: none;
+}
+
+.cate-ellipsis{
+  max-width: 200px;
+  display: block;
+}
+
+.cate-ellipsis * {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

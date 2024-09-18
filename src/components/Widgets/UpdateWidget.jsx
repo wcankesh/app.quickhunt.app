@@ -119,7 +119,7 @@ const UpdateWidget = () => {
         }
     };
 
-    const onChangeSwitch = (name, value) => {
+    const onChangeCheckBox = (name, value) => {
         setWidgetsSetting({...widgetsSetting, [name]: value})
         // e.stopPropagation();
     }
@@ -269,7 +269,7 @@ const UpdateWidget = () => {
                                     <Checkbox
                                         id={"is_launcher_icon"}
                                         checked={widgetsSetting.is_launcher_icon === 1}
-                                        onCheckedChange={(checked) => onChangeSwitch("is_launcher_icon", checked ? 1 : 0)}
+                                        onCheckedChange={(checked) => onChangeCheckBox("is_launcher_icon", checked ? 1 : 0)}
                                     />
                                     <label htmlFor="is_launcher_icon" className="text-sm">Show Launcher Icon</label>
                                 </div>
@@ -330,7 +330,7 @@ const UpdateWidget = () => {
                             <Checkbox
                                 id={"show_hide_header"}
                                 checked={widgetsSetting.hide_header === 1}
-                                onCheckedChange={(checked) => onChangeSwitch("hide_header", checked ? 1 : 0)}
+                                onCheckedChange={(checked) => onChangeCheckBox("hide_header", checked ? 1 : 0)}
                             />
                             <label htmlFor="show_hide_header" className="text-sm">Show header</label>
                         </div>
@@ -353,7 +353,7 @@ const UpdateWidget = () => {
                                 <Checkbox
                                     id={"show_hide_announcement"}
                                     checked={widgetsSetting.is_announcement === 1}
-                                    onCheckedChange={(checked) => onChangeSwitch("is_announcement", checked ? 1 : 0)}
+                                    onCheckedChange={(checked) => onChangeCheckBox("is_announcement", checked ? 1 : 0)}
                                 />
                                 <label htmlFor="show_hide_announcement" className="text-sm">Show
                                     Announcement</label>
@@ -363,7 +363,7 @@ const UpdateWidget = () => {
                                     disabled={widgetsSetting.is_announcement !== 1}
                                     id={"show_hide_announcement_description"}
                                     checked={widgetsSetting.announcement_description === 1}
-                                    onCheckedChange={(checked) => onChangeSwitch("announcement_description", checked ? 1 : 0)}
+                                    onCheckedChange={(checked) => onChangeCheckBox("announcement_description", checked ? 1 : 0)}
                                 />
                                 <label htmlFor="show_hide_announcement_description" className="text-sm">Show
                                     Description</label>
@@ -373,7 +373,7 @@ const UpdateWidget = () => {
                                     disabled={widgetsSetting.is_announcement !== 1}
                                     id={"show_hide_announcement_image"}
                                     checked={widgetsSetting.announcement_image === 1}
-                                    onCheckedChange={(checked) => onChangeSwitch("announcement_image", checked ? 1 : 0)}
+                                    onCheckedChange={(checked) => onChangeCheckBox("announcement_image", checked ? 1 : 0)}
                                 />
                                 <label htmlFor="show_hide_announcement_image" className="text-sm">Show
                                     Image</label>
@@ -383,7 +383,7 @@ const UpdateWidget = () => {
                                     disabled={widgetsSetting.is_announcement !== 1}
                                     id={"show_hide_changelog_reaction"}
                                     checked={widgetsSetting.changelog_reaction === 1}
-                                    onCheckedChange={(checked) => onChangeSwitch("changelog_reaction", checked ? 1 : 0)}
+                                    onCheckedChange={(checked) => onChangeCheckBox("changelog_reaction", checked ? 1 : 0)}
                                 />
                                 <label htmlFor="show_hide_changelog_reaction" className="text-sm">Show
                                     Reaction</label>
@@ -393,7 +393,7 @@ const UpdateWidget = () => {
                                     id={"is_comment"}
                                     disabled={widgetsSetting.is_announcement !== 1}
                                     checked={widgetsSetting.is_comment === 1}
-                                    onCheckedChange={(checked) => onChangeSwitch("is_comment", checked ? 1 : 0)}
+                                    onCheckedChange={(checked) => onChangeCheckBox("is_comment", checked ? 1 : 0)}
                                 />
                                 <label htmlFor="is_comment" className="text-sm">Show Comment</label>
                             </div>
@@ -429,7 +429,7 @@ const UpdateWidget = () => {
                                 <Checkbox
                                     id={"show_hide_roadmap"}
                                     checked={widgetsSetting.is_roadmap === 1}
-                                    onCheckedChange={(checked) => onChangeSwitch("is_roadmap", checked ? 1 : 0)}
+                                    onCheckedChange={(checked) => onChangeCheckBox("is_roadmap", checked ? 1 : 0)}
                                 />
                                 <label htmlFor="show_hide_roadmap" className="text-sm">Show Roadmap</label>
                             </div>
@@ -438,7 +438,7 @@ const UpdateWidget = () => {
                                     disabled={widgetsSetting.is_roadmap !== 1}
                                     id={"show_hide_roadmap_description"}
                                     checked={widgetsSetting.roadmap_image === 1}
-                                    onCheckedChange={(checked) => onChangeSwitch("roadmap_image", checked ? 1 : 0)}
+                                    onCheckedChange={(checked) => onChangeCheckBox("roadmap_image", checked ? 1 : 0)}
                                 />
                                 <label htmlFor="show_hide_roadmap_description" className="text-sm">Show
                                     Image</label>
@@ -475,7 +475,7 @@ const UpdateWidget = () => {
                                 <Checkbox
                                     id={"show_hide_idea"}
                                     checked={widgetsSetting.is_idea === 1}
-                                    onCheckedChange={(checked) => onChangeSwitch("is_idea", checked ? 1 : 0)}
+                                    onCheckedChange={(checked) => onChangeCheckBox("is_idea", checked ? 1 : 0)}
                                 />
                                 <label htmlFor="show_hide_idea" className="text-sm">Show Ideas</label>
                             </div>
@@ -484,7 +484,7 @@ const UpdateWidget = () => {
                                     disabled={widgetsSetting.is_idea !== 1}
                                     id={"show_hide_idea_description"}
                                     checked={widgetsSetting.idea_description === 1}
-                                    onCheckedChange={(checked) => onChangeSwitch("idea_description", checked ? 1 : 0)}
+                                    onCheckedChange={(checked) => onChangeCheckBox("idea_description", checked ? 1 : 0)}
                                 />
                                 <label htmlFor="show_hide_idea_description" className="text-sm">Show
                                     Description</label>
@@ -649,7 +649,7 @@ return (
                         }</Button>
                 </div>
             </div>
-            <div className={"bg-muted w-full h-full overflow-y-auto"}>
+            <div className={"bg-muted w-full h-full hidden md:block overflow-y-auto"}>
                 {
                     (type !== "embed" && widgetsSetting?.is_launcher_icon == 1) &&
                     <div className='QH-floating-trigger' onClick={onToggle} style={{

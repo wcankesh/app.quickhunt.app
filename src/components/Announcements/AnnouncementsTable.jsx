@@ -151,7 +151,7 @@ const AnnouncementsTable = ({data, isLoading, setSelectedRecord, handleDelete, s
                             {
                                 ["Title", "Last Updated", "Published At", "Status", "", "", ""].map((x, i) => {
                                     return (
-                                        <TableHead className={`font-semibold px-2 py-[10px] md:px-3 `}
+                                        <TableHead className={`font-semibold px-2 py-[10px] md:px-3 `} key={i}
                                                    onClick={() => x === "Published At" && toggleSort("Published At")}>
                                             {x}
                                             {x === "Published At" && (

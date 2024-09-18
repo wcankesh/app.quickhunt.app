@@ -13,6 +13,7 @@ import RestPassword from "./components/Auth/RestPassword";
 import 'quill/dist/quill.snow.css'
 import Setup from "./components/Auth/Setup";
 import Project from "./components/Auth/Project";
+import OnBoarding from "./components/OnBoarding/OnBoarding";
 
 function App() {
 
@@ -35,10 +36,11 @@ function App() {
                     </Route>
                     <Route path={`${baseUrl}/project`} element={<Project/>}/>
                     <Route path={`${baseUrl}/setup`} element={<Setup/>}/>
+                    <Route path={`${baseUrl}/on-boarding`} element={<OnBoarding/>}/>
                 </Route>
                 <Route element={<ThemeProvider defaultTheme="system" storageKey="vite-ui-theme"><PublicRoutes/></ThemeProvider>}>
                     <Route path={`${baseUrl}/register`} element={<Register/>}/>
-
+                    <Route path={`${baseUrl}/on-boarding`} element={<OnBoarding/>}/>
                     <Route path={`${baseUrl}/login`} element={<Login/>}/>
                     <Route path={`${baseUrl}/forgot-password`} element={<Forgot/>}/>
                     <Route path={`${baseUrl}/reset-verify`} element={<RestPassword/>}/>
@@ -47,9 +49,6 @@ function App() {
                 {/*<Route path="*" element={<PageNotFound/>}/>*/}
             </Routes>
         </BrowserRouter>
-
-
-
     </>
   )
 }

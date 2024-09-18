@@ -625,7 +625,8 @@ const UpdateIdea = ({
                         <X onClick={onCloseBoth} className={"cursor-pointer"}/>
                     </SheetHeader>
                     {/*<div className={"grid lg:grid-cols-12 md:grid-cols-1 overflow-auto h-[100vh]"}>*/}
-                    <div className={"grid lg:grid-cols-12 md:grid-cols-1 overflow-auto idea-sheet-height"}>
+                    {/*<div className={"grid lg:grid-cols-12 md:grid-cols-1 overflow-auto idea-sheet-height"}>*/}
+                    <div className={`grid lg:grid-cols-12 md:grid-cols-1 overflow-auto ${selectedIdea?.comments?.length > 2 ? "h-[calc(100vh_-_100px)]" : "h-[calc(100vh_-_50px)]"} sm:h-[calc(100vh_-_65px)]`}>
                         <div className={`col-span-4 lg:block hidden ${theme === "dark" ? "" : "bg-muted"} border-r lg:overflow-auto idea-sheet-height`}>
                             <div className={"border-b py-4 pl-8 pr-6 flex flex-col gap-3"}>
                                 <div className={"flex flex-col gap-1"}>

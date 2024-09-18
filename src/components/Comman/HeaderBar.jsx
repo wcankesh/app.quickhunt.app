@@ -516,7 +516,8 @@ const HeaderBar = () => {
                                                                                         <Button
                                                                                             key={i}
                                                                                             variant={"link hover:no-underline"}
-                                                                                            className={`${y.selected ? "flex justify-start gap-4 h-9 rounded-md bg-primary/15 transition-none" : 'flex items-center gap-4 h-9 justify-start transition-none'}`}
+                                                                                            // className={`${y.selected ? "flex justify-start gap-4 h-9 rounded-md bg-primary/15 transition-none" : 'flex items-center gap-4 h-9 justify-start transition-none'}`}
+                                                                                            className={`${y.selected ? "flex justify-start gap-4 h-9 rounded-md bg-primary/15 transition-none" : 'flex items-center gap-4 h-9 justify-start transition-none'} ${y.title === 'Announcements' ? 'gap-[10px]' : ''}`}
                                                                                             onClick={() => onRedirect(y.link)}
                                                                                         >
                                                                                             <div className={`${y.selected ? "active-menu" : "menu-icon"}`}>{y.icon}</div>
