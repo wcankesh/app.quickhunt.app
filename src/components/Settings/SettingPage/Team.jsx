@@ -17,7 +17,6 @@ import {DropdownMenu, DropdownMenuTrigger} from "@radix-ui/react-dropdown-menu";
 import {DropdownMenuContent, DropdownMenuItem} from "../../ui/dropdown-menu";
 import {toast} from "../../ui/use-toast";
 import {Skeleton} from "../../ui/skeleton";
-import {AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle,} from "../../ui/alert-dialog"
 import NoDataThumbnail from "../../../img/Frame.png";
 import EmptyData from "../../Comman/EmptyData";
 import {Dialog} from "@radix-ui/react-dialog";
@@ -181,6 +180,7 @@ const Team = () => {
         setInviteTeamDetails({...inviteTeamDetails, [event.target.name]: event.target.value});
         setFormError(formError => ({...formError, [event.target.name]: ""}));
     }
+
     const onBlur = (event) => {
         const {name, value} = event.target;
         setFormError({
@@ -244,21 +244,6 @@ const Team = () => {
 
     return (
         <Fragment>
-            {/*<AlertDialog open={isOpenDeleteAlert} onOpenChange={setIsOpenDeleteAlert}>*/}
-            {/*    <AlertDialogContent className={"w-[310px] md:w-full rounded-lg"}>*/}
-            {/*        <AlertDialogHeader>*/}
-            {/*            <AlertDialogTitle>You really want revoke invitation?</AlertDialogTitle>*/}
-            {/*            <AlertDialogDescription>*/}
-            {/*                This action can't be undone.*/}
-            {/*            </AlertDialogDescription>*/}
-            {/*        </AlertDialogHeader>*/}
-            {/*        <div className={"flex justify-end gap-2"}>*/}
-            {/*            <AlertDialogCancel>Cancel</AlertDialogCancel>*/}
-            {/*            <AlertDialogAction className={"bg-red-600 hover:bg-red-600"} onClick={onDelete}>Revoke</AlertDialogAction>*/}
-            {/*        </div>*/}
-            {/*    </AlertDialogContent>*/}
-            {/*</AlertDialog>*/}
-
             {
                 openDelete &&
                 <Fragment>
@@ -296,7 +281,7 @@ const Team = () => {
                             help manage ideas.</CardDescription>
                     </div>
                     <div className={"mt-1 md:m-0"}>
-                        <Button className={"text-sm font-semibold"} onClick={openSheet}>Invite Team</Button>
+                        <Button className={"text-sm font-semibold hover:bg-primary"} onClick={openSheet}>Invite Team</Button>
                     </div>
                 </CardHeader>
                 <CardContent className={"p-0"}>
@@ -478,7 +463,7 @@ const Team = () => {
                         <div className="overflow-auto comm-sheet-height">
                         <div className="grid gap-6 px-3 py-4 sm:px-8 sm:py-6 border-b">
                             <div className="flex flex-col gap-2">
-                                <div>
+                                <div className={"space-y-1"}>
                                     <Label htmlFor="name" className="text-right">Add emails of users you want to invite to test, and click on Invite</Label>
                                     <Input
                                         type={"email"}
@@ -497,15 +482,15 @@ const Team = () => {
                         </div>
                         <div className={"flex px-3 py-4 sm:px-[32px] gap-[16px] sm:justify-start"}>
                             <Button
-                                className={`${isSave === true ? "py-2 px-4" : "py-2 px-4 "} w-[69px] text-sm font-semibold`}
-                                type="submit" onClick={onInviteUser}
+                                className={`py-2 px-4 w-[69px] text-sm font-semibold hover:bg-primary`}
+                                onClick={onInviteUser}
                             >
-                                {isSave ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : "Invite"}
+                                {isSave ? <Loader2 className="h-4 w-4 animate-spin"/> : "Invite"}
                             </Button>
                                 <Button
+                                    variant={"ghost hover:bg-none"}
                                     onClick={closeSheet}
-                                    className={`text-sm font-semibold hover:bg-card border border-primary bg-card ml-0 m-inline-0 ${theme === "dark" ? "" : "text-primary"}`}
-                                    type="submit"
+                                    className={`text-sm font-semibold border border-primary`}
                                 >Cancel</Button>
 
                         </div>

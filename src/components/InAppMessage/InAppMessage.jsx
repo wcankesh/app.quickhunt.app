@@ -1,14 +1,6 @@
 import React, {useState, useEffect, Fragment} from 'react';
 import {Button} from "../ui/button";
-import {
-    BookCheck, Calendar, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight,
-    Circle,
-    ClipboardList,
-    Ellipsis, Filter, Loader2,
-    Plus,
-    ScrollText,
-    SquareMousePointer, User, Users, X
-} from "lucide-react";
+import {BookCheck, Calendar, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Circle, ClipboardList, Ellipsis, Filter, Loader2, Plus, ScrollText, SquareMousePointer, User, Users, X} from "lucide-react";
 import {Input} from "../ui/input";
 import {Popover, PopoverContent, PopoverTrigger} from "../ui/popover";
 import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList} from "../ui/command";
@@ -16,7 +8,6 @@ import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "../
 import {Card, CardFooter} from "../ui/card";
 import {useTheme} from "../theme-provider";
 import {Skeleton} from "../ui/skeleton";
-import {Separator} from "../ui/separator";
 import {Checkbox} from "../ui/checkbox";
 import {Badge} from "../ui/badge";
 import {useNavigate} from "react-router-dom";
@@ -253,7 +244,7 @@ const InAppMessage = () => {
                 </Fragment>
             }
 
-            <div className={"pt-8 container xl:max-w-[1574px]  lg:max-w-[992px]  md:max-w-[768px] sm:max-w-[639px] px-4"}>
+            <div className={"container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-3 md:px-4"}>
                 <div className={""}>
                     <div className={"flex justify-between items-center"}>
                         <h4 className={"font-medium text-lg sm:text-2xl leading-8"}>In App Messages</h4>
@@ -360,9 +351,9 @@ const InAppMessage = () => {
                                 <TableHeader className={`${theme === "dark" ? "" : "bg-muted"}`}>
                                     <TableRow>
                                         {
-                                            ["Title","State","Sender","Content type","Seen","Created at","Live at", "Action"].map((x,i)=>{
+                                            ["Title","State","Sender","Content type","Created at","Action"].map((x,i)=>{
                                                 return(
-                                                    <TableHead  className={`font-semibold px-2 py-[10px] md:px-3 ${theme === "dark"? "text-[]" : "bg-muted"} ${i == 0 ? "rounded-tl-lg" : i == 9 ? "rounded-tr-lg" : ""}`} key={i}>{x}</TableHead>
+                                                    <TableHead  className={`px-2 py-[10px] md:px-3 font-semibold ${i >= 5 ? 'text-center' : ''}`} key={i}>{x}</TableHead>
                                                 )
                                             })
                                         }
@@ -375,7 +366,7 @@ const InAppMessage = () => {
                                                     return(
                                                         <TableRow key={index}>
                                                             {
-                                                                [...Array(8)].map((_, i) => {
+                                                                [...Array(6)].map((_, i) => {
                                                                     return (
                                                                         <TableCell key={i} className={"max-w-[373px] px-2 py-[10px] md:px-3"}>
                                                                             <Skeleton className={"rounded-md  w-full h-7"}/>
@@ -425,29 +416,39 @@ const InAppMessage = () => {
                                                                             </SelectContent>
                                                                         </Select>
                                                                     </TableCell>
-                                                                    <TableCell className={`flex items-center mt-1 px-2 py-[10px] md:px-3 flex gap-2`}>
-                                                                        <Avatar className={"w-[20px] h-[20px] "}>
-                                                                            {
-                                                                                sender?.user_photo ? <AvatarImage src={sender?.user_photo} alt="@shadcn"/>
-                                                                                    :
-                                                                                    <AvatarFallback>{sender && sender.user_first_name && sender.user_first_name.substring(0, 1)}</AvatarFallback>
-                                                                            }
-                                                                        </Avatar>
-                                                                        <p className={"font-medium"}>{sender && sender?.user_first_name}</p>
+                                                                    {/*<TableCell className={`flex items-center mt-1 px-2 py-[10px] md:px-3 flex gap-2`}>*/}
+                                                                    {/*    <Avatar className={"w-[20px] h-[20px] "}>*/}
+                                                                    {/*        {*/}
+                                                                    {/*            sender?.user_photo ? <AvatarImage src={sender?.user_photo} alt="@shadcn"/>*/}
+                                                                    {/*                :*/}
+                                                                    {/*                <AvatarFallback>{sender && sender.user_first_name && sender.user_first_name.substring(0, 1)}</AvatarFallback>*/}
+                                                                    {/*        }*/}
+                                                                    {/*    </Avatar>*/}
+                                                                    {/*    <p className={"font-medium"}>{sender && sender?.user_first_name}</p>*/}
+                                                                    {/*</TableCell>*/}
+                                                                    <TableCell className={`flex items-center mt-1 px-2 py-[10px] md:px-3 gap-2 ${sender ? sender : "justify-center"}`}>
+                                                                        {sender ? (
+                                                                            <>
+                                                                                <Avatar className={"w-[20px] h-[20px]"}>
+                                                                                    {sender.user_photo ? (
+                                                                                        <AvatarImage src={sender.user_photo} alt="@shadcn" />
+                                                                                    ) : (
+                                                                                        <AvatarFallback>{sender.user_first_name.substring(0, 1)}</AvatarFallback>
+                                                                                    )}
+                                                                                </Avatar>
+                                                                                <p className={"font-medium"}>{sender.user_first_name}</p>
+                                                                            </>
+                                                                        ) : (
+                                                                            <p className={"font-medium"}>-</p>
+                                                                        )}
                                                                     </TableCell>
                                                                     <TableCell className={`px-2 py-[10px] md:px-3 font-medium`}>
                                                                         <div className={"flex items-center gap-1"}>{typeIcon[x.type]}{typeNames[x.type] || "-"}</div>
                                                                     </TableCell>
-                                                                    <TableCell className={"px-2 py-[10px] md:px-3"}>
-                                                                        {x.seen ? x.seen : "-"}
-                                                                    </TableCell>
                                                                     <TableCell className={`px-2 py-[10px] md:px-3 font-medium`}>
                                                                         {x?.created_at ? moment.utc(x.created_at).local().startOf('seconds').fromNow() : "-"}
                                                                     </TableCell>
-                                                                    <TableCell className={"px-2 py-[10px] md:px-3"}>
-                                                                        {x?.live_at ? x?.live_at : "-"}
-                                                                    </TableCell>
-                                                                    <TableCell className={`px-2 py-[10px] md:px-3`}>
+                                                                    <TableCell className={`px-2 py-[10px] md:px-3 text-center`}>
                                                                         <DropdownMenu>
                                                                             <DropdownMenuTrigger>
                                                                                 <Ellipsis className={`font-medium`} size={18}/>
@@ -465,7 +466,7 @@ const InAppMessage = () => {
                                                 </Fragment>
                                                 :
                                                 <TableRow>
-                                                    <TableCell colSpan={8}>
+                                                    <TableCell colSpan={6}>
                                                         <EmptyData/>
                                                     </TableCell>
                                                 </TableRow>
@@ -474,13 +475,13 @@ const InAppMessage = () => {
                             </Table>
                         </div>
                         {
-                            messageList.length >  0 ?
+                            messageList.length > 0 ?
                                 <CardFooter className={`p-0 ${theme === "dark" ? "border-t" : ""}`}>
                                     <div
                                         className={`w-full ${theme === "dark" ? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end p-2 md:px-3 md:py-[10px]`}>
                                         <div className={"w-full flex gap-2 items-center justify-between sm:justify-end"}>
                                             <div>
-                                                <h5 className={"text-sm font-semibold"}>Page {pageNo} of {totalPages}</h5>
+                                                <h5 className={"text-sm font-semibold"}>Page {messageList.length <= 0 ? 0 :pageNo} of {totalPages}</h5>
                                             </div>
                                             <div className={"flex flex-row gap-2 items-center"}>
                                                 <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
@@ -497,15 +498,15 @@ const InAppMessage = () => {
                                                 </Button>
                                                 <Button variant={"outline"} className={" h-[30px] w-[30px] p-1.5"}
                                                         onClick={() => handlePaginationClick(pageNo + 1)}
-                                                        disabled={pageNo === totalPages || isLoading}>
+                                                        disabled={pageNo === totalPages || isLoading || messageList.length <= 0}>
                                                     <ChevronRight
-                                                        className={pageNo === totalPages || isLoading ? "stroke-muted-foreground" : "stroke-primary"} />
+                                                        className={pageNo === totalPages || isLoading || messageList.length <= 0 ? "stroke-muted-foreground" : "stroke-primary"} />
                                                 </Button>
                                                 <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
                                                         onClick={() => handlePaginationClick(totalPages)}
-                                                        disabled={pageNo === totalPages || isLoading}>
+                                                        disabled={pageNo === totalPages || isLoading || messageList.length <= 0}>
                                                     <ChevronsRight
-                                                        className={pageNo === totalPages || isLoading ? "stroke-muted-foreground" : "stroke-primary"} />
+                                                        className={pageNo === totalPages || isLoading || messageList.length <= 0 ? "stroke-muted-foreground" : "stroke-primary"} />
                                                 </Button>
                                             </div>
                                         </div>

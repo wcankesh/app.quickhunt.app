@@ -169,7 +169,7 @@ const AnalyticsView = ({isOpen, onOpen, onClose, selectedViewAnalyticsRecord}) =
                                                         )
                                                     })
                                                 }
-                                                <div className={"flex flex-row justify-end items-center gap-3 "}>
+                                                <div className={"flex flex-row justify-end items-center gap-3 py-4"}>
                                                     <Button
                                                         disabled={pageNo === 1 || isLoading}
                                                         variant={"outline"}

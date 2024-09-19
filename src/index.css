@@ -162,6 +162,7 @@
 
 p {margin: 0 !important;}
 .m-0{margin: 0 !important;}
+.p-r{padding-right: 0 !important;}
 
 /*.bodyScreenHeight{height: calc(100vh - 60px);}*/
 .bodyScreenHeight{height: calc(100vh - 64px);}
@@ -253,13 +254,13 @@ em {color: var(--muted-foreground) !important;}
 .upload-img {width: 100%;height: 100%; /*position: absolute;*/left: 0;top: 0;object-fit: contain;object-position: center;}
 .board-container {display: flex;flex-direction: column;gap: 1rem;}
 
-.react-kanban-board {height: 100%}
+.react-kanban-board {height: 100%;padding-right: 32px;}
 .react-kanban-board > :nth-child(1) > div {width: 342px;}
 /*.react-kanban-column {border-radius: 10px!important;border: 1px solid!important;border-color:  var(--border-color)!important;background: var(--background)!important;box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)!important;padding: 9px  !important;padding-bottom: 56px!important;position: relative;}*/
 .react-kanban-column {border-radius: 10px!important;border: 1px solid!important;border-color:  var(--border-color)!important;background: var(--background)!important;box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)!important;padding: 9px  !important;position: relative;}
 .react-kanban-column .add-idea{position: absolute;bottom: 0;left: 0;padding: 14px 12px;border-top: 1px solid!important;border-color:  var(--border-color)!important;width: 100%;}
 /*.react-kanban-column>div:nth-child(2){max-height: calc(100vh - 291px) !important;overflow: auto;display: block;scrollbar-width: none;-ms-overflow-style: none;}*/
-.react-kanban-column>div:nth-child(2){max-height: calc(100vh - 200px) !important;overflow: auto;display: block;scrollbar-width: none;-ms-overflow-style: none;padding-top: 9px;}
+.react-kanban-column>div:nth-child(2){max-height: calc(100vh - 229px) !important;overflow: auto;display: block;scrollbar-width: none;-ms-overflow-style: none;padding-top: 9px;}
 .react-kanban-column>div:nth-child(2)::-webkit-scrollbar {display: none;}
 .react-kanban-column > :nth-child(2) > div > div {width: 100%;}
 /*.kanban-card {width: 100%;display: flex;flex-direction: column;border-radius: 10px !important;;border: 1px solid!important;border-color:  var(--border-color)!important;background: var(--background);box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)!important;padding: 9px!important;gap:12px;margin-top: 12px}*/

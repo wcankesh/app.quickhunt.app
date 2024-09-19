@@ -136,6 +136,7 @@ const UpdateInAppMessage = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [selectedStepIndex, setSelectedStepIndex] = useState(0);
     const [selectedStep, setSelectedStep] = useState(null);
+    const [isSave, setIsSave] = useState(false);
 
     const renderContent = (type) => {
         switch (type) {
@@ -152,47 +153,6 @@ const UpdateInAppMessage = () => {
         }
     };
 
-    const createMessage = async () => {
-        setIsLoading(true)
-        const payload = {
-            ...inAppMsgSetting,
-            start_at: moment(inAppMsgSetting?.start_at).format('YYYY-MM-DD HH:mm:ss'),
-            end_at: moment(inAppMsgSetting?.end_at).format('YYYY-MM-DD HH:mm:ss'),
-            project_id: projectDetailsReducer.id,
-            type: type
-        }
-        console.log(payload)
-        const data = await apiSerVice.createInAppMessage(payload);
-        if (data.status === 200) {
-            setIsLoading(false);
-            toast({description: data.message})
-            if (id === "new") {
-                navigate(`${baseUrl}/in-app-message`)
-            }
-        } else {
-            toast({variant: "destructive", description: data.message})
-            setIsLoading(false);
-        }
-    }
-
-    const onUpdateMessage = async () => {
-        setIsLoading(true)
-        const payload = {
-            ...inAppMsgSetting,
-            start_at: moment(inAppMsgSetting?.start_at).format('YYYY-MM-DD HH:mm:ss'),
-            end_at: moment(inAppMsgSetting?.end_at).format('YYYY-MM-DD HH:mm:ss'),
-            type: type
-        }
-        const data = await apiSerVice.updateInAppMessage(payload, inAppMsgSetting.id)
-        if (data.status === 200) {
-            setIsLoading(false)
-            toast({description: data.message})
-        } else {
-            toast({variant: "destructive", description: data.message})
-            setIsLoading(false)
-        }
-    }
-
     useEffect(() => {
         if (id === "new") {
             setInAppMsgSetting(prevState => ({
@@ -207,7 +167,7 @@ const UpdateInAppMessage = () => {
                 ] : [],
             }));
             setSelectedStep(type === "3" ? stepBoj : type === "4" ? checkListObj : {})
-            setIsLoading(false)
+            setIsSave(false)
         }
 
     }, [])
@@ -238,9 +198,61 @@ const UpdateInAppMessage = () => {
         }
     }
 
+    const createMessage = async () => {
+        setIsSave(true)
+        const payload = {
+            ...inAppMsgSetting,
+            start_at: moment(inAppMsgSetting?.start_at).format('YYYY-MM-DD HH:mm:ss'),
+            end_at: moment(inAppMsgSetting?.end_at).format('YYYY-MM-DD HH:mm:ss'),
+            project_id: projectDetailsReducer.id,
+            type: type
+        }
+        console.log(payload)
+        const data = await apiSerVice.createInAppMessage(payload);
+
+        if (data.status === 200) {
+            toast({description: data.message})
+            if (id === "new") {
+                navigate(`${baseUrl}/in-app-message`)
+            }
+        } else {
+            toast({variant: "destructive", description: data.message})
+            // setIsSave(false);
+        }
+        setIsSave(false);
+    }
+
+    const onUpdateMessage = async () => {
+        setIsSave(true)
+        const payload = {
+            ...inAppMsgSetting,
+            start_at: moment(inAppMsgSetting?.start_at).format('YYYY-MM-DD HH:mm:ss'),
+            end_at: moment(inAppMsgSetting?.end_at).format('YYYY-MM-DD HH:mm:ss'),
+            type: type
+        }
+        const data = await apiSerVice.updateInAppMessage(payload, inAppMsgSetting.id)
+
+        if (data.status === 200) {
+            toast({description: data.message})
+        } else {
+            toast({variant: "destructive", description: data.message})
+            // setIsLoading(false)
+        }
+        setIsSave(false)
+    }
+
+    const handleCancel = () => {
+        setInAppMsgSetting(inAppMsgSetting);
+        if (id === "new") {
+            navigate(`${baseUrl}/in-app-message/type`)
+        } else {
+            navigate(`${baseUrl}/in-app-message`)
+        }
+    }
+
     return (
         <Fragment>
-            <div className={"py-6 px-4 border-b flex items-center justify-between"}>
+            <div className={"py-6 px-4 border-b flex items-center justify-between flex-wrap"}>
                 <Breadcrumb>
                     <Breadcrumb>
                         <BreadcrumbList>
@@ -261,13 +273,14 @@ const UpdateInAppMessage = () => {
                         </BreadcrumbList>
                     </Breadcrumb>
                 </Breadcrumb>
-                <div className="">
-                    <Button size={"sm"} className={`w-[125px] font-semibold`} onClick={id === "new" ? createMessage : onUpdateMessage}>
-                        {isLoading ? <Loader2 className={"mr-2  h-4 w-4 animate-spin"}/> : "Save Changes"}
+                <div className={"flex items-center gap-2"}>
+                    <Button size={"sm"} className={`w-[125px] font-semibold hover:bg-primary`} onClick={id === "new" ? createMessage : onUpdateMessage}>
+                        {isSave ? <Loader2 size={16} className={"animate-spin"}/> : "Save Changes"}
                     </Button>
+                    <Button size={"sm"} variant={"ghost hover-none"} className={"font-semibold border border-primary"} onClick={handleCancel}>Cancel</Button>
                 </div>
             </div>
-            <div className={"flex h-[calc(100%_-_69px)] overflow-y-auto"}>
+            <div className={"flex h-[calc(100%_-_85px)] overflow-y-auto"}>
                 <div className={"max-w-[407px] w-full border-r h-full overflow-y-auto"}>
                     <SidebarInAppMessage id={id} type={type} inAppMsgSetting={inAppMsgSetting} setInAppMsgSetting={setInAppMsgSetting} selectedStepIndex={selectedStepIndex} setSelectedStepIndex={setSelectedStepIndex} selectedStep={selectedStep} setSelectedStep={setSelectedStep}/>
                 </div>

@@ -27,7 +27,7 @@ const Articles = () => {
     const handleDelete = () => {}
 
     return (
-        <div className={"container xl:max-w-[1574px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-3 md:px-4"}>
+        <div className={"container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-3 md:px-4"}>
             <div className={"space-y-6"}>
                 <h4 className={"font-medium text-lg sm:text-2xl"}>All Articles</h4>
                 <div className={"flex justify-between items-center flex-wrap md:flex-nowrap gap-4"}>
@@ -41,7 +41,7 @@ const Articles = () => {
                         />
 
                         <Select value={categoryFilter} onValueChange={(value) => setCategoryFilter(value)}>
-                            <SelectTrigger className={"min-w-[236px] w-full px-4 h-auto"}>
+                            <SelectTrigger className={"min-w-[236px] w-full px-4 py-[7px] h-auto"}>
                                 <SelectValue placeholder="Filter by Category" />
                             </SelectTrigger>
                             <SelectContent>

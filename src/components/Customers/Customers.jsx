@@ -233,12 +233,12 @@ const Customers = () => {
                         </div>
                     </div>
                     <div className={"px-3 py-4 sm:p-8"}>
-                        <Button onClick={addCustomer} className={` border w-[127px] font-semibold ${isSave ? "justify-center items-center" : ""}`}>{isSave ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Add Customer"}</Button>
+                        <Button onClick={addCustomer} className={` border w-[127px] font-semibold hover:bg-primary`}>{isSave ? <Loader2 className="h-4 w-4 animate-spin" /> : "Add Customer"}</Button>
                     </div>
                 </SheetContent>
             </Sheet>}
 
-            <div className={"container xl:max-w-[1574px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-3 md:px-4"}>
+            <div className={"container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-3 md:px-4"}>
                 {/*<NewCustomerSheet isOpen={isSheetOpen} onOpen={openSheet} callback={getAllCustomers} onClose={closeSheet}/>*/}
 
                 {

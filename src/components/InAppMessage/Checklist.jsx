@@ -32,14 +32,11 @@ const checklists = ({inAppMsgSetting, setInAppMsgSetting, isLoading, selectedSte
     }
 
     const onChangechecklists = (name, value, record) => {
-       debugger
         const obj = {...record, [name]: value};
         setSelectedStep(obj)
         updateStepRecord(obj)
 
     };
-
-    console.log(inAppMsgSetting.checklists)
 
     const handleAddStep = () => {
         let clone = [...inAppMsgSetting.checklists];

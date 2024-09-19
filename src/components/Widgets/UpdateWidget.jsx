@@ -607,7 +607,7 @@ const UpdateWidget = () => {
 
 return (
     <Fragment>
-        <div className={"py-6 px-4 border-b flex items-center justify-between"}>
+        <div className={"py-6 px-4 border-b flex items-center justify-between flex-wrap gap-2"}>
             <Breadcrumb>
                 <Breadcrumb>
                     <BreadcrumbList>
@@ -638,7 +638,7 @@ return (
                             className="mr-2 h-4 w-4 animate-spin"/> : (id === "new" ? "Create Widget" : "Save Changes")
                 }
             </Button>
-                <Button size={"sm"} variant={"ghost hover-none"} className={"font-semibold border"} onClick={handleCancel}>Cancel</Button>
+                <Button size={"sm"} variant={"ghost hover-none"} className={"font-semibold border border-primary"} onClick={handleCancel}>Cancel</Button>
             </div>
         </div>
         <div className={"flex h-[calc(100%_-_85px)] overflow-y-auto"}>
@@ -653,7 +653,7 @@ return (
                                     className="mr-2 h-4 w-4 animate-spin"/> : (id === "new" ? "Create Widget" : "Save Changes")
                         }
                     </Button>
-                    <Button variant={"ghost hover-none"} className={"font-semibold border"} onClick={handleCancel}>Cancel</Button>
+                    <Button variant={"ghost hover-none"} className={"font-semibold border border-primary"} onClick={handleCancel}>Cancel</Button>
                 </div>
             </div>
             <div className={"bg-muted w-full h-full hidden md:block overflow-y-auto"}>

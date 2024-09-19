@@ -606,7 +606,7 @@ const Ideas = () => {
                                                                                     Archive
                                                                                 </Badge>
                                                                             }
-                                                                            {x.pin_to_top === 1 && <Pin size={16} fill={"bg-card-foreground"}/>}
+                                                                            {x.pin_to_top === 1 && <Pin size={16} className={`${theme === "dark" ? "fill-card-foreground" : "fill-card-foreground"}`}/>}
                                                                             <DropdownMenu>
                                                                                 <DropdownMenuTrigger>
                                                                                     <Ellipsis size={16}/>

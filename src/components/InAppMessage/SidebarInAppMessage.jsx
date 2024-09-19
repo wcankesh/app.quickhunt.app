@@ -145,7 +145,14 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
         updateStepRecord(obj)
     }
 
-
+    const handleCancel = () => {
+        setInAppMsgSetting(inAppMsgSetting);
+        if (id === "new") {
+            navigate(`${baseUrl}/in-app-message/type`)
+        } else {
+            navigate(`${baseUrl}/in-app-message`)
+        }
+    }
 
     return (
         <Fragment>
@@ -590,10 +597,11 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                     </div>
                 </div>
             </div>
-            <div className="px-4 py-6">
-                <Button className={`w-[125px] font-semibold`} onClick={id === "new" ? createMessage : onUpdateMessage}>
+            <div className={"px-4 py-6 flex justify-between gap-2"}>
+                <Button className={`w-[125px] font-semibold hover:bg-primary`} onClick={id === "new" ? createMessage : onUpdateMessage}>
                     {isLoading ? <Loader2 className={"mr-2  h-4 w-4 animate-spin"}/> : "Save Changes"}
                 </Button>
+                <Button variant={"ghost hover-none"} className={"font-semibold border border-primary"} onClick={handleCancel}>Cancel</Button>
             </div>
         </Fragment>
     );

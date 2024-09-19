@@ -11,15 +11,15 @@ import { Card, CardContent } from "../../ui/card";
 
 const statusOptions = [
     { name: "Publish", value: 1, fillColor: "#389E0D", strokeColor: "#389E0D" },
-    { name: "Draft", value: 3, fillColor: "#CF1322", strokeColor: "#CF1322" },
+    { name: "Draft", value: 2, fillColor: "#CF1322", strokeColor: "#CF1322" },
 ];
 const categoryOptions = [
-    { name: "Category 1", value: "category1" },
-    { name: "Category 2", value: "category2" },
+    { name: "Category 1", value: 1 },
+    { name: "Category 2", value: 2 },
 ];
 const subcategoryOptions = [
-    { name: "Subcategory 1", value: "subcategory1" },
-    { name: "Subcategory 2", value: "subcategory2" },
+    { name: "Subcategory 1", value: 1 },
+    { name: "Subcategory 2", value: 2 },
 ];
 
 const ArticleDetail = () => {
@@ -27,10 +27,10 @@ const ArticleDetail = () => {
     const { type, id } = useParams();
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
-        title: '',
-        category: '',
-        subcategory: '',
-        status: 3
+        title: 'New Article',
+        category: 1,
+        subcategory: 1,
+        status: 1,
     });
 
     const commonHandleChange = (name, value) => {
@@ -62,7 +62,7 @@ const ArticleDetail = () => {
                     </div>
                     <div className={"space-y-2"}>
                         <Label className={"text-sm font-medium"}>Select Category</Label>
-                        <Select onValueChange={(value) => commonHandleChange('category', value)}>
+                        <Select defaultValue={1} onValueChange={(value) => commonHandleChange('category', value)}>
                             <SelectTrigger className="h-auto">
                                 <SelectValue placeholder="" />
                             </SelectTrigger>
@@ -79,7 +79,7 @@ const ArticleDetail = () => {
                     </div>
                     <div className={"space-y-2"}>
                         <Label className={"text-sm font-medium"}>Subcategory</Label>
-                        <Select onValueChange={(value) => commonHandleChange('subcategory', value)}>
+                        <Select defaultValue={1} onValueChange={(value) => commonHandleChange('subcategory', value)}>
                             <SelectTrigger className="h-auto">
                                 <SelectValue placeholder="" />
                             </SelectTrigger>
@@ -116,8 +116,8 @@ const ArticleDetail = () => {
                     </BreadcrumbList>
                 </Breadcrumb>
                 <div className={"flex gap-4 items-center"}>
-                    <Select onValueChange={(value) => commonHandleChange('status', Number(value))}>
-                        <SelectTrigger className="w-[106px] h-auto">
+                    <Select defaultValue={1} onValueChange={(value) => commonHandleChange('status', Number(value))}>
+                        <SelectTrigger className={"w-[106px] h-auto py-[6px]"}>
                             <SelectValue placeholder="Draft" />
                         </SelectTrigger>
                         <SelectContent>
@@ -134,13 +134,13 @@ const ArticleDetail = () => {
                         </SelectContent>
                     </Select>
                     <Button variant={"ghost hover:bg-none"} className={"px-3 py-[6px] border font-medium h-auto"}><Play size={16} className={"mr-3"} /> Preview</Button>
-                    <Button className={"py-[6px] font-semibold h-auto hover:bg-primary"} onClick={handlePublish}>
+                    <Button className={"py-[7px] font-semibold h-auto hover:bg-primary"} onClick={handlePublish}>
                         {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Publish"}
                     </Button>
                     <Button variant={"ghost hover:bg-none"} className={"p-1 h-auto border"}><Trash2 size={16} /></Button>
                 </div>
             </div>
-            <div className={"flex h-[calc(100%_-_85px)] overflow-y-auto"}>
+            <div className={"flex h-[calc(100%_-_83px)] overflow-y-auto"}>
                 <div className={"max-w-[407px] w-full border-r h-full overflow-y-auto"}>
                     {renderSidebarItems()}
                 </div>

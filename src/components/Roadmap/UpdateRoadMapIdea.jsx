@@ -1010,7 +1010,7 @@ const UpdateRoadMapIdea = ({
                                         </div>
                                         <div className={"p-4 lg:p-8 flex gap-3"}>
                                             <Button
-                                                className={`${isLoadingCreateIdea === true ? "py-2 px-6" : "py-2 px-6"} w-[81px] text-sm font-semibold`}
+                                                className={`py-2 px-6 w-[81px] text-sm font-semibold hover:bg-primary`}
                                                 onClick={onCreateIdea}
                                             >
                                                 {
@@ -1031,9 +1031,8 @@ const UpdateRoadMapIdea = ({
                                     <Fragment>
                                         <div className={"px-4 py-3 lg:py-6 lg:px-8"}>
                                             <div className={"flex flex-col gap-6"}>
-                                                <div
-                                                    className={"flex justify-between items-center gap-4 md:flex-nowrap flex-wrap"}>
-                                                    <div className={"flex gap-2"}>
+                                                <div className={"flex justify-between items-center gap-4 md:flex-nowrap flex-wrap"}>
+                                                    <div className={"flex gap-2 items-center"}>
                                                         <Button
                                                             className={"p-[7px] bg-white shadow border hover:bg-white w-[30px] h-[30px]"}
                                                             variant={"outline"}
@@ -1043,6 +1042,80 @@ const UpdateRoadMapIdea = ({
                                                                 className={"fill-primary stroke-primary"}/>
                                                         </Button>
                                                         <p className={"text-xl font-medium"}>{selectedIdea?.vote}</p>
+                                                        {
+                                                            selectedIdea && selectedIdea?.vote_list && selectedIdea?.vote_list.length ?
+                                                                <Popover>
+                                                                    <PopoverTrigger asChild>
+                                                                        <Button variant="ghost hover-none"
+                                                                                className={"rounded-full p-0 h-[24px]"}>
+                                                                            {
+                                                                                (selectedIdea.vote_list.slice(0, 1) || []).map((x, i) => {
+                                                                                    return (
+                                                                                        <div className={"flex"}
+                                                                                             key={i}>
+                                                                                            <div
+                                                                                                className={"relative"}>
+                                                                                                <div
+                                                                                                    className={"update-idea text-sm rounded-full border text-center"}>
+                                                                                                    <Avatar>
+                                                                                                        {
+                                                                                                            x.user_photo ?
+                                                                                                                <AvatarImage
+                                                                                                                    src={x.user_photo}
+                                                                                                                    alt={x && x.name && x.name.substring(0, 1)}/> :
+                                                                                                                <AvatarFallback>{x && x.name && x.name.substring(0, 1).toUpperCase()}</AvatarFallback>
+                                                                                                        }
+                                                                                                    </Avatar>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                            <div
+                                                                                                className={"update-idea  text-sm rounded-full border text-center ml-[-5px]"}>
+                                                                                                <Avatar><AvatarFallback>+{selectedIdea?.vote_list.length}</AvatarFallback></Avatar>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    )
+                                                                                })
+                                                                            }
+                                                                        </Button>
+                                                                    </PopoverTrigger>
+                                                                    <PopoverContent className="p-0" align={"start"}>
+                                                                        <div className="">
+                                                                            <div className="py-3 px-4">
+                                                                                {/*<h4 className="font-medium leading-none text-sm">{`Voters (${selectedIdea?.vote})`}</h4>*/}
+                                                                                <h4 className="font-medium leading-none text-sm">{`Voters (${selectedIdea?.vote_list.length})`}</h4>
+                                                                            </div>
+                                                                            <div
+                                                                                className="border-t px-4 py-3 space-y-2">
+                                                                                {
+                                                                                    (selectedIdea?.vote_list || []).map((x, i) => {
+                                                                                        return (
+                                                                                            <div
+                                                                                                className={"flex gap-2"}>
+                                                                                                <div
+                                                                                                    className={"update-idea text-sm rounded-full border text-center"}>
+                                                                                                    <Avatar
+                                                                                                        className={"w-[20px] h-[20px]"}>
+                                                                                                        {
+                                                                                                            x?.user_photo ?
+                                                                                                                <AvatarImage
+                                                                                                                    src={x?.user_photo}
+                                                                                                                    alt="@shadcn"/>
+                                                                                                                :
+                                                                                                                <AvatarFallback>{x && x?.name && x?.name?.substring(0, 1).toUpperCase()}</AvatarFallback>
+                                                                                                        }
+                                                                                                    </Avatar>
+                                                                                                </div>
+                                                                                                <h4 className={"text-sm font-normal"}>{x.name}</h4>
+                                                                                            </div>
+                                                                                        )
+                                                                                    })
+                                                                                }
+                                                                            </div>
+                                                                        </div>
+                                                                    </PopoverContent>
+                                                                </Popover>
+                                                                : ""
+                                                        }
                                                     </div>
                                                     <div className={"flex gap-2"}>
                                                         {
@@ -1052,7 +1125,7 @@ const UpdateRoadMapIdea = ({
                                                                     className={"w-[30px] h-[30px] p-1"}
                                                                     onClick={() => setIsEditIdea(true)}
                                                                 >
-                                                                    <Pencil className={"w-[16px] h-[16px]"}/>
+                                                                    <Pencil size={16}/>
                                                                 </Button> : ""
                                                         }
 
@@ -1062,9 +1135,8 @@ const UpdateRoadMapIdea = ({
                                                             onClick={() => onChangeStatus("pin_to_top", selectedIdea?.pin_to_top === 0 ? 1 : 0)}
                                                         >
                                                             {selectedIdea?.pin_to_top == 0 ?
-                                                                <Pin className={"w-[16px] h-[16px]"}/> :
-                                                                <Pin fill={"bg-card-foreground"}
-                                                                     className={"w-[16px] h-[16px]"}/>}
+                                                                <Pin size={16}/> :
+                                                                <Pin size={16} className={`${theme === "dark" ? "fill-card-foreground" : "fill-card-foreground"}`}/>}
                                                         </Button>
                                                         {/*<Button*/}
                                                         {/*    variant={"outline"}*/}
@@ -1081,9 +1153,9 @@ const UpdateRoadMapIdea = ({
                                                         <h2 className={"text-xl font-medium"}>{selectedIdea?.title}</h2>
                                                     </div>
                                                     <div
-                                                        className={"description-container text-xs text-muted-foreground"}>
-                                                        <ReadMoreText html={selectedIdea?.description}/>
-                                                    </div>
+                                                        className={`description-container text-sm ${theme === "dark" ? "" : "text-muted-foreground" }`}
+                                                        dangerouslySetInnerHTML={{ __html: selectedIdea.description }}
+                                                    />
                                                 </div>
                                                 {
                                                     selectedIdea && selectedIdea?.images && selectedIdea?.images.length > 0 ?
@@ -1136,80 +1208,6 @@ const UpdateRoadMapIdea = ({
                                                                     {moment(selectedIdea?.created_at).format('D MMM')}
                                                                 </p>
                                                             </div>
-                                                            {
-                                                                selectedIdea && selectedIdea?.vote_list && selectedIdea?.vote_list.length ?
-                                                                    <Popover>
-                                                                        <PopoverTrigger asChild>
-                                                                            <Button variant="ghost hover-none"
-                                                                                    className={"rounded-full p-0 h-[24px]"}>
-                                                                                {
-                                                                                    (selectedIdea.vote_list.slice(0, 1) || []).map((x, i) => {
-                                                                                        return (
-                                                                                            <div className={"flex"}
-                                                                                                 key={i}>
-                                                                                                <div
-                                                                                                    className={"relative"}>
-                                                                                                    <div
-                                                                                                        className={"update-idea text-sm rounded-full border text-center"}>
-                                                                                                        <Avatar>
-                                                                                                            {
-                                                                                                                x.user_photo ?
-                                                                                                                    <AvatarImage
-                                                                                                                        src={x.user_photo}
-                                                                                                                        alt={x && x.name && x.name.substring(0, 1)}/> :
-                                                                                                                    <AvatarFallback>{x && x.name && x.name.substring(0, 1).toUpperCase()}</AvatarFallback>
-                                                                                                            }
-                                                                                                        </Avatar>
-                                                                                                    </div>
-                                                                                                </div>
-                                                                                                <div
-                                                                                                    className={"update-idea  text-sm rounded-full border text-center ml-[-5px]"}>
-                                                                                                    <Avatar><AvatarFallback>+{selectedIdea?.vote_list.length}</AvatarFallback></Avatar>
-                                                                                                </div>
-                                                                                            </div>
-                                                                                        )
-                                                                                    })
-                                                                                }
-                                                                            </Button>
-                                                                        </PopoverTrigger>
-                                                                        <PopoverContent className="p-0" align={"end"}>
-                                                                            <div className="">
-                                                                                <div
-                                                                                    className="space-y-2 px-4 py-[5px]">
-                                                                                    <h4 className="font-medium leading-none text-sm">{`Voters (${selectedIdea?.vote})`}</h4>
-                                                                                </div>
-                                                                                <div
-                                                                                    className="border-t px-4 py-3 space-y-2">
-                                                                                    {
-                                                                                        (selectedIdea?.vote_list || []).map((x, i) => {
-                                                                                            return (
-                                                                                                <div
-                                                                                                    className={"flex gap-2"}>
-                                                                                                    <div
-                                                                                                        className={"update-idea text-sm rounded-full border text-center"}>
-                                                                                                        <Avatar
-                                                                                                            className={"w-[20px] h-[20px]"}>
-                                                                                                            {
-                                                                                                                x?.user_photo ?
-                                                                                                                    <AvatarImage
-                                                                                                                        src={x?.user_photo}
-                                                                                                                        alt="@shadcn"/>
-                                                                                                                    :
-                                                                                                                    <AvatarFallback>{x && x?.name && x?.name?.substring(0, 1).toUpperCase()}</AvatarFallback>
-                                                                                                            }
-                                                                                                        </Avatar>
-                                                                                                    </div>
-                                                                                                    <h4 className={"text-sm font-normal"}>{x.name}</h4>
-                                                                                                </div>
-                                                                                            )
-                                                                                        })
-                                                                                    }
-                                                                                </div>
-                                                                            </div>
-                                                                        </PopoverContent>
-                                                                    </Popover>
-                                                                    : ""
-                                                            }
                                                         </div>
                                                         <Select
                                                             onValueChange={(value) => onChangeStatus('roadmap_id', value)}
@@ -1412,16 +1410,14 @@ const UpdateRoadMapIdea = ({
                                                                                                             className={"w-[30px] h-[30px] p-1"}
                                                                                                             onClick={() => onEditComment(x, i)}
                                                                                                         >
-                                                                                                            <Pencil
-                                                                                                                className={"w-[16px] h-[16px]"}/>
+                                                                                                            <Pencil size={16}/>
                                                                                                         </Button>
                                                                                                             <Button
                                                                                                                 variant={"outline"}
                                                                                                                 className={"w-[30px] h-[30px] p-1"}
                                                                                                                 onClick={() => deleteComment(x.id, i)}
                                                                                                             >
-                                                                                                                <Trash2
-                                                                                                                    className={"w-[16px] h-[16px]"}/>
+                                                                                                                <Trash2 size={16}/>
                                                                                                             </Button></Fragment> : ""
                                                                                             }
                                                                                         </div>
@@ -1441,7 +1437,7 @@ const UpdateRoadMapIdea = ({
                                                                                                     {
                                                                                                         selectedComment && selectedComment.images && selectedComment.images.length ?
                                                                                                             <div
-                                                                                                                className={"flex gap-2"}>
+                                                                                                                className={"flex gap-2 flex-wrap"}>
                                                                                                                 {
                                                                                                                     (selectedComment.images || []).map((x, i) => {
                                                                                                                         return (
@@ -1480,7 +1476,7 @@ const UpdateRoadMapIdea = ({
                                                                                                     <div
                                                                                                         className={"flex gap-2"}>
                                                                                                         <Button
-                                                                                                            className={`${isSaveUpdateComment === true ? "py-2 px-6" : "py-2 px-6"} w-[81px] h-[30px] text-sm font-semibold`}
+                                                                                                            className={`py-2 px-6 w-[81px] h-[30px] text-sm font-semibold hover:bg-primary`}
                                                                                                             onClick={onUpdateComment}
                                                                                                             disabled={selectedComment.comment.trim() === "" || selectedComment.comment === ""}>
                                                                                                             {
@@ -1516,11 +1512,7 @@ const UpdateRoadMapIdea = ({
                                                                                                 </div>
                                                                                                 : <div
                                                                                                     className={"space-y-2"}>
-                                                                                                    <p className={"text-xs"}>
-                                                                                                        <ReadMoreText
-                                                                                                            className={"text-xs"}
-                                                                                                            html={x.comment}/>
-                                                                                                    </p>
+                                                                                                    <p className={"text-xs"}>{x.comment}</p>
                                                                                                     <div
                                                                                                         className={"flex gap-2 flex-wrap"}>
                                                                                                         {
@@ -1607,15 +1599,13 @@ const UpdateRoadMapIdea = ({
                                                                                                                                                 variant={"outline"}
                                                                                                                                                 className={"w-[30px] h-[30px] p-1"}
                                                                                                                                                 onClick={() => onEditSubComment(x, y, i, j)}>
-                                                                                                                                                <Pencil
-                                                                                                                                                    className={"w-[16px] h-[16px]"}/>
+                                                                                                                                                <Pencil size={16}/>
                                                                                                                                             </Button>
                                                                                                                                             <Button
                                                                                                                                                 variant={"outline"}
                                                                                                                                                 className={"w-[30px] h-[30px] p-1"}
                                                                                                                                                 onClick={() => deleteSubComment(y.id, x, i, j)}>
-                                                                                                                                                <Trash2
-                                                                                                                                                    className={"w-[16px] h-[16px]"}/>
+                                                                                                                                                <Trash2 size={16}/>
                                                                                                                                             </Button>
                                                                                                                                         </div> : ''
                                                                                                                             }
@@ -1631,7 +1621,7 @@ const UpdateRoadMapIdea = ({
                                                                                                                                     {
                                                                                                                                         selectedSubComment && selectedSubComment.images && selectedSubComment.images.length ?
                                                                                                                                             <div
-                                                                                                                                                className={"flex gap-2"}>
+                                                                                                                                                className={"flex gap-2 flex-wrap"}>
                                                                                                                                                 {
                                                                                                                                                     (selectedSubComment.images || []).map((x, ind) => {
                                                                                                                                                         return (
@@ -1672,7 +1662,7 @@ const UpdateRoadMapIdea = ({
                                                                                                                                     <div
                                                                                                                                         className={"flex gap-2"}>
                                                                                                                                         <Button
-                                                                                                                                            className={`${isSaveUpdateSubComment === true ? "py-2 px-6" : "py-2 px-6"} w-[81px] h-[30px] text-sm font-semibold`}
+                                                                                                                                            className={`py-2 px-6 w-[81px] h-[30px] text-sm font-semibold hover:bg-primary`}
                                                                                                                                             onClick={onUpdateSubComment}
                                                                                                                                             disabled={selectedSubComment.comment.trim() === "" || selectedSubComment.comment === ""}>
                                                                                                                                             {
@@ -1704,11 +1694,8 @@ const UpdateRoadMapIdea = ({
                                                                                                                                         </div>
                                                                                                                                     </div>
                                                                                                                                 </div> :
-                                                                                                                                <div
-                                                                                                                                    className={"space-y-2"}>
-                                                                                                                                    <p className={"text-xs"}>
-                                                                                                                                        <ReadMoreText className={"text-xs"} html={y.comment}/>
-                                                                                                                                    </p>
+                                                                                                                                <div className={"space-y-2"}>
+                                                                                                                                    <p className={"text-xs"}>{y.comment}</p>
                                                                                                                                     <div
                                                                                                                                         className={"flex gap-2 flex-wrap"}>
                                                                                                                                         {
@@ -1786,7 +1773,7 @@ const UpdateRoadMapIdea = ({
                                                                                                     <div
                                                                                                         className={"flex gap-2"}>
                                                                                                         <Button
-                                                                                                            className={`${isSaveSubComment === true ? "py-2 px-6" : "py-2 px-6"} w-[86px] h-[30px] text-sm font-semibold`}
+                                                                                                            className={`py-2 px-6 w-[86px] h-[30px] text-sm font-semibold`}
                                                                                                             disabled={subCommentText.trim() === "" || subCommentText === ""}
                                                                                                             onClick={() => onCreateSubComment(x, i)}
                                                                                                         >

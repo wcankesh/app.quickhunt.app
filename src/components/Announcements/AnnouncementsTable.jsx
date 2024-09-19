@@ -193,7 +193,7 @@ const AnnouncementsTable = ({data, isLoading, setSelectedRecord, handleDelete, s
                                                 <span
                                                     className={"cursor-pointer text-ellipsis overflow-hidden whitespace-nowrap"}
                                                     onClick={() => onEdit(x, index)}>{x?.post_title}</span>
-                                                {x.post_pin_to_top === 1 && <Pin size={14} fill={"bg-card-foreground"}/>}
+                                                {x.post_pin_to_top === 1 && <Pin size={14} className={`${theme === "dark" ? "fill-card-foreground" : "fill-card-foreground"}`}/>}
                                                 {
                                                     x.labels && x.labels.length > 0 ?
                                                         <div className={"flex flex-wrap gap-1"}>

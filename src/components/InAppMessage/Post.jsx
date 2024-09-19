@@ -155,7 +155,7 @@ const Post = ({inAppMsgSetting, setInAppMsgSetting, isLoading}) => {
                onChange:handleSave,
                data:{
                    time: new Date().getTime(),
-                   blocks: inAppMsgSetting.body_text.blocks || [{type: "paragraph", data: {text: "Hey"}}],
+                   blocks: inAppMsgSetting?.body_text?.blocks || [{type: "paragraph", data: {text: "Hey"}}],
                    version: "2.12.4"
                }
            });
@@ -168,6 +168,7 @@ const Post = ({inAppMsgSetting, setInAppMsgSetting, isLoading}) => {
        }
 
     }, [isLoading]);
+
     return (
         <div className={`px-16 flex flex-col gap-4 py-8 bg-muted justify-start overflow-y-auto h-[calc(100%_-_94px)]`}>
             <Card className={`rounded-[10px] p-0`} >

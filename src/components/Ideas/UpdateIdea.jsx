@@ -14,7 +14,6 @@ import {useTheme} from "../theme-provider";
 import {useToast} from "../ui/use-toast";
 import {ApiService} from "../../utils/ApiService";
 import {useSelector} from "react-redux";
-import ReadMoreText from "../Comman/ReadMoreText";
 import moment from "moment";
 import {DropdownMenu, DropdownMenuTrigger} from "@radix-ui/react-dropdown-menu";
 import {DropdownMenuContent, DropdownMenuItem} from "../ui/dropdown-menu";
@@ -831,7 +830,7 @@ const UpdateIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedIdea, ide
                                         </div>
                                         <div className={"p-4 lg:p-8 flex gap-3"}>
                                             <Button
-                                                className={`${isLoadingCreateIdea === true ? "py-2 px-6" : "py-2 px-6"} w-[81px] text-sm font-semibold`}
+                                                className={`py-2 px-6 w-[81px] text-sm font-semibold hover:bg-primary`}
                                                 onClick={onCreateIdea}
                                             >
                                                 {
@@ -1020,9 +1019,8 @@ const UpdateIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedIdea, ide
                                                                     onClick={() => onChangeStatus("pin_to_top", selectedIdea.pin_to_top === 0 ? 1 : 0)}
                                                                 >
                                                                     {selectedIdea.pin_to_top == 0 ?
-                                                                        <Pin className={"w-[16px] h-[16px]"}/> :
-                                                                        <Pin fill={"bg-card-foreground"}
-                                                                             className={"w-[16px] h-[16px]"}/>}
+                                                                        <Pin size={16}/> :
+                                                                        <Pin size={16} className={`${theme === "dark" ? "fill-card-foreground" : "fill-card-foreground"}`}/>}
                                                                 </Button>
                                                             </div>
                                                         </div>
@@ -1046,9 +1044,8 @@ const UpdateIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedIdea, ide
                                                                 onClick={() => onChangeStatus("pin_to_top", selectedIdea.pin_to_top === 0 ? 1 : 0)}
                                                             >
                                                                 {selectedIdea.pin_to_top == 0 ?
-                                                                    <Pin className={"w-[16px] h-[16px]"}/> :
-                                                                    <Pin fill={"bg-card-foreground"}
-                                                                         className={"w-[16px] h-[16px]"}/>}
+                                                                    <Pin size={16}/> :
+                                                                    <Pin size={16} className={`${theme === "dark" ? "fill-card-foreground" : "fill-card-foreground"}`}/>}
                                                             </Button>
                                                         </div>
                                                     </div>
@@ -1345,7 +1342,7 @@ const UpdateIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedIdea, ide
                                                                                                     {
                                                                                                         selectedComment && selectedComment.images && selectedComment.images.length ?
                                                                                                             <div
-                                                                                                                className={"flex gap-3"}>
+                                                                                                                className={"flex gap-3 flex-wrap"}>
                                                                                                                 {
                                                                                                                     (selectedComment.images || []).map((x, i) => {
                                                                                                                         return (
@@ -1384,7 +1381,7 @@ const UpdateIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedIdea, ide
                                                                                                     <div
                                                                                                         className={"flex gap-2"}>
                                                                                                         <Button
-                                                                                                            className={`${isSaveUpdateComment === true ? "py-2 px-6" : "py-2 px-6"} w-[81px] h-[30px] text-sm font-semibold`}
+                                                                                                            className={`py-2 px-6 w-[81px] h-[30px] text-sm font-semibold hover:bg-primary`}
                                                                                                             onClick={onUpdateComment}
                                                                                                             disabled={selectedComment.comment.trim() === "" || selectedComment.comment === ""}>
                                                                                                             {
@@ -1421,9 +1418,7 @@ const UpdateIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedIdea, ide
                                                                                                 : <div
                                                                                                     className={"space-y-2"}>
                                                                                                     <p className={"text-xs"}>
-                                                                                                        <ReadMoreText
-                                                                                                            className={"text-xs"}
-                                                                                                            html={x.comment}/>
+                                                                                                        {x.comment}
                                                                                                     </p>
                                                                                                     <div
                                                                                                         className={"flex gap-2 flex-wrap"}>
@@ -1538,7 +1533,7 @@ const UpdateIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedIdea, ide
                                                                                                                                         {
                                                                                                                                             selectedSubComment && selectedSubComment.images && selectedSubComment.images.length ?
                                                                                                                                                 <div
-                                                                                                                                                    className={"flex gap-2"}>
+                                                                                                                                                    className={"flex gap-2 flex-wrap"}>
                                                                                                                                                     {
                                                                                                                                                         (selectedSubComment.images || []).map((x, ind) => {
                                                                                                                                                             return (
@@ -1579,7 +1574,7 @@ const UpdateIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedIdea, ide
                                                                                                                                         <div
                                                                                                                                             className={"flex gap-2"}>
                                                                                                                                             <Button
-                                                                                                                                                className={`${isSaveUpdateSubComment === true ? "py-2 px-6" : "py-2 px-6"} w-[81px] h-[30px] text-sm font-semibold`}
+                                                                                                                                                className={`py-2 px-6 w-[81px] h-[30px] text-sm font-semibold hover:bg-primary`}
                                                                                                                                                 onClick={onUpdateSubComment}
                                                                                                                                                 disabled={selectedSubComment.comment.trim() === "" || selectedSubComment.comment === ""}>
                                                                                                                                                 {
@@ -1614,7 +1609,7 @@ const UpdateIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedIdea, ide
                                                                                                                                     <div
                                                                                                                                         className={"space-y-2"}>
                                                                                                                                         <p className={"text-xs"}>
-                                                                                                                                            <ReadMoreText className={"text-xs"} html={y.comment}/>
+                                                                                                                                            {y.comment}
                                                                                                                                         </p>
                                                                                                                                         <div
                                                                                                                                             className={"flex gap-2 flex-wrap"}>

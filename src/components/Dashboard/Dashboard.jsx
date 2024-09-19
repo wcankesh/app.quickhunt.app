@@ -207,9 +207,9 @@ export function Dashboard() {
                                 }
                             </div>
                             <div className={"flex flex-wrap gap-4 lg:gap-8 md:flex-nowrap"}>
-                                <Card className={"lg:basis-2/3 basis-full min-w-[270px] p-4 md:pr-8 shadow border"}>
-                                    <CardHeader className={"p-0 pb-4 border-b"}>
-                                        <CardTitle className={"text-base font-bold"}>Comments</CardTitle>
+                                <Card className={"lg:basis-2/3 basis-full min-w-[270px] shadow border"}>
+                                    <CardHeader className={"p-6 py-3 border-b"}>
+                                        <CardTitle className={"text-base font-bold"}>Comments ({isLoading ? 0 : chartList.feedbacks.length})</CardTitle>
                                     </CardHeader>
                                     <div className={"max-h-[300px] overflow-y-auto"}>
                                     {
@@ -219,7 +219,7 @@ export function Dashboard() {
                                                     {isLoading ? (
                                                         <CardContent className={"p-0"}>{CommSkel.commonParagraphTwo}</CardContent>
                                                     ) : (
-                                                        <CardContent className={"p-2 pl-6 pr-4 flex flex-col gap-2 border-b"}>
+                                                        <CardContent className={"py-2.5 px-6 flex flex-col gap-2 border-b"}>
                                                             <div className="flex gap-2 items-center">
                                                                 <div
                                                                     className={"update-idea text-sm rounded-full border text-center"}>
@@ -236,10 +236,11 @@ export function Dashboard() {
                                                                     </Avatar>
                                                                 </div>
                                                                 <h4 className="text-sm font-semibold">{x.customer_name}</h4>
-                                                                <p className="text-xs font-medium text-muted-foreground">{x.customer_email_id}</p>
+                                                                <p className="text-xs font-medium text-muted-foreground">{x?.customer_email}</p>
+                                                                <p className="text-xs font-medium text-muted-foreground">{x.type === 1 ? "Post Comment" : "Idea Comment"}</p>
                                                             </div>
                                                             <p className={"text-xs font-medium text-foreground"}>
-                                                                <ReadMoreText className={"text-xs"} html={`${x.feedback}`}/>
+                                                                {x.comment}
                                                             </p>
                                                         </CardContent>
                                                     )}
@@ -250,15 +251,15 @@ export function Dashboard() {
                                         )
                                     }
                                     </div>
-                                    <div className={"p-4 pb-0 text-end"}>
+                                    <div className={"p-6 py-3 text-end"}>
                                         <Button variant={"ghost hover:none"} className={"p-0 h-auto text-primary font-semibold"} onClick={handleSeeAllFeedbacks}>
                                             {showAllFeedbacks ? "Show Less" : "See All"}
                                         </Button>
                                     </div>
                                 </Card>
-                                <Card className={"lg:basis-1/3 basis-full min-w-[270px] p-4 md:pr-8 shadow border"}>
-                                    <CardHeader className={"p-0 pb-4 border-b"}>
-                                        <CardTitle className={"text-base font-bold"}>Reaction</CardTitle>
+                                <Card className={"lg:basis-1/3 basis-full min-w-[270px] shadow border"}>
+                                    <CardHeader className={"p-6 py-3 border-b"}>
+                                        <CardTitle className={"text-base font-bold"}>Reaction ({isLoading ? 0 : chartList.reactions.length})</CardTitle>
                                     </CardHeader>
                                     <div className={"max-h-[300px] overflow-y-auto"}>
                                     {
@@ -270,7 +271,7 @@ export function Dashboard() {
                                                         {isLoading ? (
                                                             <CardContent className={"p-0"}>{CommSkel.commonParagraphTwoAvatar}</CardContent>
                                                         ) : (
-                                                            <CardContent className={"py-2.5 px-0 border-b"}>
+                                                            <CardContent className={"py-2.5 px-6 border-b"}>
                                                                 <div className={"flex gap-4"}>
                                                                     <Avatar className={"w-[35px] h-[35px]"}>
                                                                         <AvatarImage src={emoji.emoji_url} />
@@ -291,7 +292,7 @@ export function Dashboard() {
                                         ) : <EmptyData />
                                     }
                                     </div>
-                                    <div className={"p-4 pb-0 text-end"}>
+                                    <div className={"p-6 py-3 text-end"}>
                                         <Button variant={"ghost hover:none"} className={"p-0 h-auto text-primary font-semibold"} onClick={handleSeeAllReactions}>
                                             {showAllReactions ? "Show Less" : "See All"}
                                         </Button>

@@ -35,6 +35,8 @@ const Roadmap = () => {
     const [selectedRoadmap, setSelectedRoadmap] = useState({});
     const [isLoading, setIsLoading] = useState(false);
 
+    console.log("roadmapList", roadmapList.columns.map((x) => x.ideas.length))
+
     const openSheet = () => setSheetOpen(true);
     const closeSheet = () => setSheetOpen(false);
 
@@ -101,7 +103,8 @@ const Roadmap = () => {
     return (
         <div
             // className={"roadmap-container height-inherit h-svh  overflow-y-auto xl:container-secondary xl:max-w-[1605px] lg:container lg:max-w-[992px] md:container md:max-w-[768px] sm:container max-w-[639px]"}>
-            className={"roadmap-container height-inherit h-svh overflow-y-auto container-secondary xl:max-w-[1605px] lg:max-w-[1230px] md:max-w-[960px] max-w-[639px]"}>
+            // className={"roadmap-container height-inherit h-svh overflow-y-auto container-secondary xl:max-w-[1605px] lg:max-w-[1230px] md:max-w-[960px] max-w-[639px]"}>
+            className={"roadmap-container height-inherit h-svh max-w-[100%] pl-8 p-r"}>
             <UpdateRoadMapIdea
                 isOpen={isSheetOpen}
                 onOpen={openSheet}
@@ -123,8 +126,8 @@ const Roadmap = () => {
                 setRoadmapList={setRoadmapList}
 
             />
-            <div className={"p-4"}><h1 className={"text-2xl font-medium"}>Roadmap</h1></div>
-            <div className={"p-[11px] pt-[3px] h-[calc(100%_-_64px)] overflow-auto"}>
+            <div className={"p-4 px-2.5"}><h1 className={"text-2xl font-medium"}>Roadmap</h1></div>
+            <div className={"py-[11px] pt-[3px]"}>
                 {
                     isLoading ?
                         <Board
@@ -196,6 +199,10 @@ const Roadmap = () => {
                             }}
 
                             renderColumnHeader={({title, color_code, id}) => {
+
+                                const column = roadmapList?.columns?.find(col => col.id === id);
+                                const cardCount = column ? column?.cards?.length : 0;
+
                                 return (
                                     <React.Fragment>
                                         <div className={"flex justify-between gap-2 border-b"}>
@@ -203,7 +210,7 @@ const Roadmap = () => {
                                             className={"flex items-center gap-2 text-sm font-semibold px-[7px] mb-[16px]"}>
                                             <Circle fill={color_code} stroke={color_code}
                                                     className={"w-[10px] h-[10px]"}/>
-                                            {title}
+                                            {title} ({cardCount})
                                         </CardTitle>
                                         {/*<div className={"add-idea"}>*/}
                                         <div className={""}>

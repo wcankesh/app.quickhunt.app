@@ -207,17 +207,15 @@ const Category = () => {
                         </div>
                         <div className={"px-3 py-4 sm:py-6 sm:px-8 space-x-4"}>
                             <Button
-                                size={"sm"}
                                 className={`border w-[127px] font-semibold ${isSave ? "justify-center items-center" : ""}`}
                                 onClick={handleSaveCategory}
                             >
                                 {isSave ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Save Category"}
                             </Button>
                             <Button
-                                size={"sm"}
                                 variant={"ghost hover:bg-none"}
                                 onClick={closeSheet}
-                                className={`border font-semibold`}
+                                className={`border border-primary font-semibold`}
                             >
                                 Cancel
                             </Button>
@@ -225,7 +223,7 @@ const Category = () => {
                     </SheetContent>
                 </Sheet>
             )}
-            <div className={"container xl:max-w-[1574px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-3 md:px-4"}>
+            <div className={"container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-3 md:px-4"}>
 
                 {
                     openDelete &&

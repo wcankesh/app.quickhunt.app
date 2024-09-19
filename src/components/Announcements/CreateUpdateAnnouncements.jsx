@@ -390,7 +390,7 @@ const CreateUpdateAnnouncements = ({isOpen, onOpen, onClose, selectedRecord, get
                         <Button className={"h-5 w-5 p-0"}
                                 onClick={() => commonToggle("post_pin_to_top", changeLogDetails.post_pin_to_top === 1 ? 0 : 1)}
                                 variant={"ghost"}>{changeLogDetails.post_pin_to_top === 1 ?
-                            <Pin fill={"bg-card-foreground"} size={15}/> : <Pin size={15}/>}</Button>
+                            <Pin size={15}/> : <Pin size={15} className={`${theme === "dark" ? "fill-card-foreground" : "fill-card-foreground"}`}/>}</Button>
                         <X onClick={onClose} size={18} className={"cursor-pointer"}/>
                     </div>
                 </SheetHeader>
