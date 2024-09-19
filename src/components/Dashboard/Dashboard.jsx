@@ -1,5 +1,5 @@
 import React, {Fragment, useEffect, useState} from "react"
-import {Card, CardContent, CardHeader, CardTitle} from "../ui/card"
+import {Card, CardContent, CardFooter, CardHeader, CardTitle} from "../ui/card"
 import moment from "moment";
 import {ApiService} from "../../utils/ApiService";
 import {useSelector} from "react-redux";
@@ -7,10 +7,11 @@ import EmptyData from "../Comman/EmptyData";
 import {CommSkel} from "../Comman/CommSkel";
 import {Bar, BarChart, CartesianGrid, XAxis, YAxis} from "recharts"
 import {ChartContainer, ChartTooltip, ChartTooltipContent,} from "../ui/chart"
-import {Avatar, AvatarImage} from "../ui/avatar";
+import {Avatar, AvatarFallback, AvatarImage} from "../ui/avatar";
 import {useTheme} from "../theme-provider";
 import ReadMoreText from "../Comman/ReadMoreText";
 import {DateRangePicker} from "../ui/date-range-picker";
+import {Button} from "../ui/button";
 
 const chartConfig = {
     totalView: {
@@ -30,6 +31,8 @@ export function Dashboard() {
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
     const [isLoading, setIsLoading] = useState(false);
     const [dataAvailable, setDataAvailable] = useState(true);
+    const [showAllFeedbacks, setShowAllFeedbacks] = useState(false);
+    const [showAllReactions, setShowAllReactions] = useState(false);
     const [state, setState] = useState({from: new Date(new Date().setDate(new Date().getDate() - 29)), to: new Date(),});
     const [chartList, setChartList] = useState({
         reactionAnalytic: [],
@@ -108,28 +111,52 @@ export function Dashboard() {
         {
             id: 1,
             title: "Total Views",
-            compareText: `${chartList.totalViewCountDiff} from last month`,
+            compareText: (<span>
+                <span className={chartList.totalViewCountDiff < 0 ? 'text-destructive' : 'text-primary'}>
+                    {parseFloat(chartList.totalViewCountDiff).toFixed(2)}%
+            </span> {" from last month"} </span>
+            ),
             count : chartList.totalViewCount || 0,
         },
         {
             id: 2,
             title: "Unique Views",
-            compareText: `${chartList.uniqueViewDiff} from last month`,
+            compareText: (<span>
+                <span className={chartList.uniqueViewDiff < 0 ? 'text-destructive' : 'text-primary'}>
+                    {parseFloat(chartList.uniqueViewDiff).toFixed(2)}%
+            </span> {" from last month"} </span>
+            ),
             count : chartList.uniqueViewCount || 0,
         },
         {
             id: 3,
             title: "Feedback",
-            compareText: `${chartList.feedbackCountDiff} from last month`,
+            compareText: (<span>
+                <span className={chartList.feedbackCountDiff < 0 ? 'text-destructive' : 'text-primary'}>
+                    {parseFloat(chartList.feedbackCountDiff).toFixed(2)}%
+            </span> {" from last month"} </span>
+            ),
             count : chartList.feedbackCount || 0,
         },
         {
             id: 4,
             title: "Total Reaction",
-            compareText: `${chartList.reactionCountDiff} from last month`,
+            compareText: (<span>
+                <span className={chartList.reactionCountDiff < 0 ? 'text-destructive' : 'text-primary'}>
+                    {parseFloat(chartList.reactionCountDiff).toFixed(2)}%
+            </span> {" from last month"} </span>
+            ),
             count : chartList.reactionCount || 0,
         },
     ]
+
+    const handleSeeAllFeedbacks = () => {
+        setShowAllFeedbacks(!showAllFeedbacks);
+    };
+
+    const handleSeeAllReactions = () => {
+        setShowAllReactions(!showAllReactions);
+    };
 
     return (
         <Fragment>
@@ -180,30 +207,42 @@ export function Dashboard() {
                                 }
                             </div>
                             <div className={"flex flex-wrap gap-4 lg:gap-8 md:flex-nowrap"}>
-                                <Card className={"lg:basis-2/3 basis-full min-w-[270px] p-4 md:pr-8 divide-y shadow border"}>
-                                    <CardHeader className={"p-0 pb-4"}>
-                                        <CardTitle className={"text-base font-bold"}>New Feedbacks</CardTitle>
+                                <Card className={"lg:basis-2/3 basis-full min-w-[270px] p-4 md:pr-8 shadow border"}>
+                                    <CardHeader className={"p-0 pb-4 border-b"}>
+                                        <CardTitle className={"text-base font-bold"}>Comments</CardTitle>
                                     </CardHeader>
-                                    <div className={"max-h-[300px] overflow-hidden hover:overflow-auto transition-all duration-300"}>
+                                    <div className={"max-h-[300px] overflow-y-auto"}>
                                     {
                                         (chartList.feedbacks && chartList.feedbacks.length > 0) ? (
-                                            (chartList.feedbacks || []).map((x, i) => (
-                                                <Fragment>
-                                                    {
-                                                        isLoading ? <CardContent className={"p-0"} key={i}>{CommSkel.commonParagraphTwo}</CardContent> :
-                                                            <CardContent className={"p-2 pl-6 pr-4 flex flex-col gap-2 border-b"} key={i}>
-                                                                <div className="flex gap-2 items-center">
-                                                                    <h4 className="text-sm font-semibold">{x.customer_name}</h4>
-                                                                    <p className="text-xs font-medium text-muted-foreground">{x.customer_email_id}</p>
+                                            (showAllFeedbacks ? chartList.feedbacks : chartList.feedbacks.slice(0, 5)).map((x, i) => (
+                                                <Fragment key={i}>
+                                                    {isLoading ? (
+                                                        <CardContent className={"p-0"}>{CommSkel.commonParagraphTwo}</CardContent>
+                                                    ) : (
+                                                        <CardContent className={"p-2 pl-6 pr-4 flex flex-col gap-2 border-b"}>
+                                                            <div className="flex gap-2 items-center">
+                                                                <div
+                                                                    className={"update-idea text-sm rounded-full border text-center"}>
+                                                                    <Avatar
+                                                                        className={"w-[20px] h-[20px]"}>
+                                                                        {
+                                                                            x.user_photo ?
+                                                                                <AvatarImage
+                                                                                    src={x.user_photo}
+                                                                                    alt=""/>
+                                                                                :
+                                                                                <AvatarFallback>{x && x.customer_name && x.customer_name.substring(0, 1).toUpperCase()}</AvatarFallback>
+                                                                        }
+                                                                    </Avatar>
                                                                 </div>
-                                                                {/*<p className="text-xs font-medium text-foreground">“{x.feedback}”</p>*/}
-                                                                <p className={"text-xs font-medium text-foreground"}>
-                                                                    <ReadMoreText
-                                                                        className={"text-xs"}
-                                                                        html={`${x.feedback}`}/>
-                                                                </p>
-                                                            </CardContent>
-                                                    }
+                                                                <h4 className="text-sm font-semibold">{x.customer_name}</h4>
+                                                                <p className="text-xs font-medium text-muted-foreground">{x.customer_email_id}</p>
+                                                            </div>
+                                                            <p className={"text-xs font-medium text-foreground"}>
+                                                                <ReadMoreText className={"text-xs"} html={`${x.feedback}`}/>
+                                                            </p>
+                                                        </CardContent>
+                                                    )}
                                                 </Fragment>
                                             ))
                                         ) : (
@@ -211,19 +250,26 @@ export function Dashboard() {
                                         )
                                     }
                                     </div>
+                                    <div className={"p-4 pb-0 text-end"}>
+                                        <Button variant={"ghost hover:none"} className={"p-0 h-auto text-primary font-semibold"} onClick={handleSeeAllFeedbacks}>
+                                            {showAllFeedbacks ? "Show Less" : "See All"}
+                                        </Button>
+                                    </div>
                                 </Card>
-                                <Card className={"lg:basis-1/3 basis-full min-w-[270px] p-4 md:pr-8 divide-y shadow border"}>
-                                    <CardHeader className={"p-0 pb-4"}>
+                                <Card className={"lg:basis-1/3 basis-full min-w-[270px] p-4 md:pr-8 shadow border"}>
+                                    <CardHeader className={"p-0 pb-4 border-b"}>
                                         <CardTitle className={"text-base font-bold"}>Reaction</CardTitle>
                                     </CardHeader>
-                                    <div className={"max-h-[300px] overflow-hidden hover:overflow-auto transition-all duration-300"}>
+                                    <div className={"max-h-[300px] overflow-y-auto"}>
                                     {
                                         (chartList.reactions && chartList.reactions.length > 0) ? (
-                                            (chartList.reactions || []).map((x, i) => {
+                                            (showAllReactions ? chartList.reactions : chartList.reactions.slice(0, 5)).map((x, i) => {
                                                 const emoji = allStatusAndTypes.emoji.find((e) => e.id === x.reaction_id) || { emoji_url: "" };
                                                 return (
                                                     <Fragment key={i}>
-                                                        {isLoading ? <CardContent className={"p-0"} key={i}>{CommSkel.commonParagraphTwoAvatar}</CardContent> :
+                                                        {isLoading ? (
+                                                            <CardContent className={"p-0"}>{CommSkel.commonParagraphTwoAvatar}</CardContent>
+                                                        ) : (
                                                             <CardContent className={"py-2.5 px-0 border-b"}>
                                                                 <div className={"flex gap-4"}>
                                                                     <Avatar className={"w-[35px] h-[35px]"}>
@@ -238,12 +284,17 @@ export function Dashboard() {
                                                                     </div>
                                                                 </div>
                                                             </CardContent>
-                                                        }
+                                                        )}
                                                     </Fragment>
                                                 );
                                             })
                                         ) : <EmptyData />
                                     }
+                                    </div>
+                                    <div className={"p-4 pb-0 text-end"}>
+                                        <Button variant={"ghost hover:none"} className={"p-0 h-auto text-primary font-semibold"} onClick={handleSeeAllReactions}>
+                                            {showAllReactions ? "Show Less" : "See All"}
+                                        </Button>
                                     </div>
                                 </Card>
                             </div>

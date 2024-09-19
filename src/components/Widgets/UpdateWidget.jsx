@@ -573,12 +573,13 @@ const UpdateWidget = () => {
         );
     };
 
-    const handleBlur = () => {
-        setEditWidgetName(false);
-    };
+    const handleBlur = () => {setEditWidgetName(false);};
 
-    const onToggle = () => {
-        setToggle(!toggle)
+    const onToggle = () => {setToggle(!toggle)}
+
+    const handleCancel = () => {
+        setWidgetsSetting(initialState);
+        navigate(`${baseUrl}/widget`)
     }
 
     const launcherIcon = {
@@ -628,25 +629,31 @@ return (
                     </BreadcrumbList>
                 </Breadcrumb>
             </Breadcrumb>
-            <Button size={"sm"} className={"font-semibold w-[128px]"}
+            <div className={"flex justify-between gap-2 items-center"}>
+            <Button size={"sm"} className={"font-semibold w-[128px] hover:bg-primary"}
                     onClick={() => id === "new" ? createWidget('head') : onUpdateWidgets('head')}>
                 {
                     loading === 'head' ?
                         <Loader2
                             className="mr-2 h-4 w-4 animate-spin"/> : (id === "new" ? "Create Widget" : "Save Changes")
-                }</Button>
+                }
+            </Button>
+                <Button size={"sm"} variant={"ghost hover-none"} className={"font-semibold border"} onClick={handleCancel}>Cancel</Button>
+            </div>
         </div>
         <div className={"flex h-[calc(100%_-_85px)] overflow-y-auto"}>
             <div className={"max-w-[407px] w-full border-r h-full overflow-y-auto"}>
                 {renderSidebarItems()}
-                <div className={"px-4 py-6 border-t"}>
-                    <Button className={"font-semibold w-[128px]"}
+                <div className={"px-4 py-6 border-t flex justify-between gap-2"}>
+                    <Button className={"font-semibold w-[128px] hover:bg-primary"}
                             onClick={() => id === "new" ? createWidget('side') : onUpdateWidgets('side')}>
                         {
                             loading === 'side' ?
                                 <Loader2
                                     className="mr-2 h-4 w-4 animate-spin"/> : (id === "new" ? "Create Widget" : "Save Changes")
-                        }</Button>
+                        }
+                    </Button>
+                    <Button variant={"ghost hover-none"} className={"font-semibold border"} onClick={handleCancel}>Cancel</Button>
                 </div>
             </div>
             <div className={"bg-muted w-full h-full hidden md:block overflow-y-auto"}>

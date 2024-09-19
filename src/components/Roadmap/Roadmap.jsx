@@ -124,7 +124,7 @@ const Roadmap = () => {
 
             />
             <div className={"p-4"}><h1 className={"text-2xl font-medium"}>Roadmap</h1></div>
-            <div className={"p-[11px] pt-[3px]"}>
+            <div className={"p-[11px] pt-[3px] h-[calc(100%_-_64px)] overflow-auto"}>
                 {
                     isLoading ?
                         <Board
@@ -198,20 +198,23 @@ const Roadmap = () => {
                             renderColumnHeader={({title, color_code, id}) => {
                                 return (
                                     <React.Fragment>
+                                        <div className={"flex justify-between gap-2 border-b"}>
                                         <CardTitle
                                             className={"flex items-center gap-2 text-sm font-semibold px-[7px] mb-[16px]"}>
                                             <Circle fill={color_code} stroke={color_code}
                                                     className={"w-[10px] h-[10px]"}/>
                                             {title}
                                         </CardTitle>
-                                        <div className={"add-idea"}>
+                                        {/*<div className={"add-idea"}>*/}
+                                        <div className={""}>
                                             <Button
                                                 variant={"ghost hover:bg-transparent"}
-                                                className={`gap-2 p-0 ${theme === "dark" ? "" : "text-muted-foreground"} text-sm font-semibold h-auto`}
+                                                className={`gap-2 p-0 ${theme === "dark" ? "" : "text-muted-foreground"} text-sm font-semibold h-auto border`}
                                                 onClick={() => onCreateIdea(id)}
                                             >
-                                                <Plus className={"w-[20px] h-[20px]"}/>Create Idea
+                                                <Plus className={"w-[20px] h-[20px]"}/>
                                             </Button>
+                                        </div>
                                         </div>
                                     </React.Fragment>
 

@@ -2,7 +2,7 @@ import React, {useEffect, useState, Fragment} from 'react';
 import {useNavigate, useParams} from "react-router-dom";
 import {Button} from "../ui/button";
 import {DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger,} from "../ui/dropdown-menu";
-import {ArrowLeft, ArrowRight, Plus, RotateCcw} from "lucide-react";
+import {ArrowLeft, ArrowRight, Loader2, Plus, RotateCcw} from "lucide-react";
 import {useTheme} from "../theme-provider";
 import {baseUrl} from "../../utils/constent";
 import {Card} from "../ui/card";
@@ -15,6 +15,7 @@ import Surveys from "./Surveys";
 import Checklist from "./Checklist";
 import {Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator} from "../ui/breadcrumb";
 import SidebarInAppMessage from "./SidebarInAppMessage";
+import {useToast} from "../ui/use-toast";
 
 const initialState = {
     project_id: "2",
@@ -125,6 +126,7 @@ const checkListObj =  {
 }
 
 const UpdateInAppMessage = () => {
+    const {toast} = useToast()
     const navigate = useNavigate();
     let apiSerVice = new ApiService();
     const {id, type} = useParams()
@@ -150,7 +152,46 @@ const UpdateInAppMessage = () => {
         }
     };
 
+    const createMessage = async () => {
+        setIsLoading(true)
+        const payload = {
+            ...inAppMsgSetting,
+            start_at: moment(inAppMsgSetting?.start_at).format('YYYY-MM-DD HH:mm:ss'),
+            end_at: moment(inAppMsgSetting?.end_at).format('YYYY-MM-DD HH:mm:ss'),
+            project_id: projectDetailsReducer.id,
+            type: type
+        }
+        console.log(payload)
+        const data = await apiSerVice.createInAppMessage(payload);
+        if (data.status === 200) {
+            setIsLoading(false);
+            toast({description: data.message})
+            if (id === "new") {
+                navigate(`${baseUrl}/in-app-message`)
+            }
+        } else {
+            toast({variant: "destructive", description: data.message})
+            setIsLoading(false);
+        }
+    }
 
+    const onUpdateMessage = async () => {
+        setIsLoading(true)
+        const payload = {
+            ...inAppMsgSetting,
+            start_at: moment(inAppMsgSetting?.start_at).format('YYYY-MM-DD HH:mm:ss'),
+            end_at: moment(inAppMsgSetting?.end_at).format('YYYY-MM-DD HH:mm:ss'),
+            type: type
+        }
+        const data = await apiSerVice.updateInAppMessage(payload, inAppMsgSetting.id)
+        if (data.status === 200) {
+            setIsLoading(false)
+            toast({description: data.message})
+        } else {
+            toast({variant: "destructive", description: data.message})
+            setIsLoading(false)
+        }
+    }
 
     useEffect(() => {
         if (id === "new") {
@@ -220,6 +261,11 @@ const UpdateInAppMessage = () => {
                         </BreadcrumbList>
                     </Breadcrumb>
                 </Breadcrumb>
+                <div className="">
+                    <Button size={"sm"} className={`w-[125px] font-semibold`} onClick={id === "new" ? createMessage : onUpdateMessage}>
+                        {isLoading ? <Loader2 className={"mr-2  h-4 w-4 animate-spin"}/> : "Save Changes"}
+                    </Button>
+                </div>
             </div>
             <div className={"flex h-[calc(100%_-_69px)] overflow-y-auto"}>
                 <div className={"max-w-[407px] w-full border-r h-full overflow-y-auto"}>

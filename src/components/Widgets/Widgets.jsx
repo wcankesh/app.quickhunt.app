@@ -420,10 +420,10 @@ const Widgets = () => {
                                 <TableHeader className={`p-2 lg:py-5 lg:px-8 ${theme === "dark" ? "" : "bg-muted"}`}>
                                     <TableRow>
                                         {
-                                            ["Name", "Sections", "Last Updated", "", "Analytics", "Actions"].map((x, i) => {
+                                            ["Name", "Type", "Last Updated", "", "Analytics", "Actions"].map((x, i) => {
                                                 return (
                                                     <TableHead
-                                                        className={"px-2 py-[10px] md:px-3 font-semibold"}>{x}</TableHead>
+                                                        className={`px-2 py-[10px] md:px-3 font-semibold ${i >= 4 ? 'text-center' : ''}`}>{x}</TableHead>
                                                 )
                                             })
                                         }
@@ -464,12 +464,14 @@ const Widgets = () => {
                                                             onClick={() => getCodeCopy(x.id)}>Get code</Button>
                                                     </TableCell>
                                                     <TableCell className={"font-medium p-2 py-[10px] md:px-3"}>
+                                                        <div className={"flex justify-center"}>
                                                         <BarChart
                                                             onClick={() => openSheet(x.id)} size={16}
                                                             className={"cursor-pointer"}
                                                         />
+                                                        </div>
                                                     </TableCell>
-                                                    <TableCell className={" p-2 py-[10px] md:px-3"}>
+                                                    <TableCell className={" p-2 py-[10px] md:px-3 text-center"}>
                                                         <DropdownMenu>
                                                             <DropdownMenuTrigger>
                                                                 <Ellipsis size={16} className={"cursor-pointer"}/>

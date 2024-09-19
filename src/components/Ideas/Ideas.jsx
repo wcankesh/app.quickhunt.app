@@ -67,10 +67,20 @@ const Ideas = () => {
     const [openFilterType, setOpenFilterType] = useState('');
 
     const openSheet = () => setSheetOpen(true);
-    const closeSheet = () => setSheetOpen(false);
+    const closeSheet = () => {
+        setSheetOpen(false)
+        navigate(`/ideas`);
+    };
 
-    const openCreateIdea = () => setSheetOpenCreate(true);
-    const closeCreateIdea = () => setSheetOpenCreate(false);
+    const openCreateIdea = () => {
+        setSheetOpenCreate(true)
+        navigate(`/ideas/new`);
+    };
+
+    const closeCreateIdea = () => {
+        setSheetOpenCreate(false)
+        navigate(`/ideas`);
+    };
 
     useEffect(() => {
         if (filter.topic.length || filter.roadmap.length || filter.bug || filter.archive /*|| filter.no_status*/ || filter.all) {
@@ -131,6 +141,7 @@ const Ideas = () => {
         setSelectedIdea(record)
         setOldSelectedIdea(record)
         openSheet();
+        navigate(`/ideas/${record.id}`);
     };
 
     const handleChange = (e) => {
@@ -244,6 +255,24 @@ const Ideas = () => {
             const clone = [...ideasList];
             if (name === "is_archive" || name === "is_active") {
                 clone[index][name] = value;
+
+                // if (filter.bug === 1 && clone[index].is_active === 1) {
+                //     clone.splice(index, 1);
+                // }
+
+                // if (filter.archive === 1 && clone[index].is_archive === 0) {
+                //     clone.splice(index, 1);
+                // }
+
+                const removeStatus =
+                    (filter.bug === 1 && clone[index].is_active === 1) ||
+                    (filter.archive === 1 && clone[index].is_archive === 0);
+
+                if (removeStatus) {
+                    clone.splice(index, 1);
+                    setTotalRecord(clone.length)
+                }
+
             } else if (name === "roadmap_id") {
                 clone[index].roadmap_id = value;
             }
@@ -265,6 +294,7 @@ const Ideas = () => {
                 setOpenDelete(false)
                 setDeleteIsLoading(false)
                 setDeleteRecord(null)
+                setTotalRecord(Number(totalRecord) - 1)
                 toast({description: data.message});
             } else {
                 toast({variant: "destructive", description: data.message});
@@ -330,7 +360,7 @@ const Ideas = () => {
                 />
 
                     <div className="flex items-center gap-4 mb-6 justify-between">
-                        <h1 className="text-2xl font-medium flex-initial w-auto">Ideas</h1>
+                        <h1 className="text-2xl font-medium flex-initial w-auto">Ideas (<span>{totalRecord}</span>)</h1>
                         <div className="flex gap-2 flex-1 w-full justify-end">
                             <Popover
                                 open={openFilter}
@@ -528,7 +558,7 @@ const Ideas = () => {
                                         {
                                             (ideasList || []).map((x, i) => {
                                                 return (
-                                                    <Fragment key={i}>
+                                                    <Fragment key={x.id || i}>
                                                         <div className={"flex gap-[5px] md:gap-8 p-2 sm:p-3 lg:py-6 lg:px-16"}>
                                                             <div className={"flex gap-1 md:gap-2"}>
                                                                 <Button
@@ -548,8 +578,8 @@ const Ideas = () => {
                                                                             onClick={() => openDetailsSheet(x)}
                                                                         >
                                                                             <h3 className={"text-base font-medium"}>{x.title}</h3>
-                                                                            <div className={"flex gap-2"}>
-                                                                                <h4 className={"text-sm font-medium"}>{x.name}</h4>
+                                                                            <div className={"flex gap-2 items-center"}>
+                                                                                <h4 className={"text-xs font-medium text-muted-foreground"}>{x.name}</h4>
                                                                                 <p className={"text-xs font-normal flex items-center text-muted-foreground"}>
                                                                                     <Dot size={20} className={"fill-text-card-foreground stroke-text-card-foreground"}/>
                                                                                     {moment(x.created_at).format('D MMM')}

@@ -1,21 +1,7 @@
 import React, {Fragment, useState, useEffect} from 'react';
 import {Sheet, SheetContent, SheetHeader, SheetOverlay} from "../ui/sheet";
 import {Button} from "../ui/button";
-import {
-    ArrowBigUp,
-    Check,
-    Circle,
-    CircleX,
-    Dot,
-    Ellipsis,
-    Loader2,
-    MessageCircleMore,
-    Paperclip,
-    Pencil,
-    Pin,
-    Trash2,
-    X
-} from "lucide-react";
+import {ArrowBigUp, Check, Circle, CircleX, Dot, Ellipsis, Loader2, MessageCircleMore, Paperclip, Pencil, Pin, Trash2, X} from "lucide-react";
 import {RadioGroup, RadioGroupItem} from "../ui/radio-group";
 import {Label} from "../ui/label";
 import {Input} from "../ui/input";
@@ -33,6 +19,7 @@ import moment from "moment";
 import {DropdownMenu, DropdownMenuTrigger} from "@radix-ui/react-dropdown-menu";
 import {DropdownMenuContent, DropdownMenuItem} from "../ui/dropdown-menu";
 import ReactQuillEditor from "../Comman/ReactQuillEditor";
+import {useParams} from "react-router-dom";
 
 const initialStateError = {
     title: "",
@@ -40,20 +27,11 @@ const initialStateError = {
     board: "",
 }
 
-const UpdateIdea = ({
-                        isOpen,
-                        onOpen,
-                        onClose,
-                        selectedIdea,
-                        setSelectedIdea,
-                        ideasList,
-                        setIdeasList,
-                        setOldSelectedIdea,
-                        oldSelectedIdea,
-                    }) => {
+const UpdateIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedIdea, ideasList, setIdeasList, setOldSelectedIdea, oldSelectedIdea,}) => {
     const {theme} = useTheme()
     let apiSerVice = new ApiService();
-    const {toast} = useToast()
+    const {toast} = useToast();
+    const { id } = useParams();
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const [isLoading, setIsLoading] = useState(false);
@@ -876,7 +854,7 @@ const UpdateIdea = ({
                                             <div className={"flex flex-col gap-6"}>
                                                 <div
                                                     className={"flex justify-between items-center gap-4 md:flex-nowrap flex-wrap"}>
-                                                    <div className={"flex gap-2"}>
+                                                    <div className={"flex gap-2 items-center"}>
                                                         <Button
                                                             className={"p-[7px] bg-white shadow border hover:bg-white w-[30px] h-[30px]"}
                                                             variant={"outline"}
@@ -886,6 +864,80 @@ const UpdateIdea = ({
                                                                 className={"fill-primary stroke-primary"}/>
                                                         </Button>
                                                         <p className={"text-xl font-medium"}>{selectedIdea.vote}</p>
+                                                        {
+                                                            selectedIdea && selectedIdea.vote_list && selectedIdea.vote_list.length ?
+                                                                <Popover>
+                                                                    <PopoverTrigger asChild>
+                                                                        <Button variant={"ghost hover-none"}
+                                                                                className={"rounded-full p-0 h-[24px]"}>
+                                                                            {
+                                                                                (selectedIdea.vote_list.slice(0, 1) || []).map((x, i) => {
+                                                                                    return (
+                                                                                        <div className={"flex"}
+                                                                                             key={i}>
+                                                                                            <div
+                                                                                                className={"relative"}>
+                                                                                                <div
+                                                                                                    className={"update-idea text-sm rounded-full border text-center"}>
+                                                                                                    <Avatar>
+                                                                                                        {
+                                                                                                            x.user_photo ?
+                                                                                                                <AvatarImage
+                                                                                                                    src={x.user_photo}
+                                                                                                                    alt={x && x.name && x.name.substring(0, 1)}/> :
+                                                                                                                <AvatarFallback>{x && x.name && x.name.substring(0, 1).toUpperCase()}</AvatarFallback>
+                                                                                                        }
+                                                                                                    </Avatar>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                            <div
+                                                                                                className={"update-idea text-sm rounded-full border text-center ml-[-5px]"}>
+                                                                                                <Avatar><AvatarFallback>+{selectedIdea.vote_list.length}</AvatarFallback></Avatar>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    )
+                                                                                })
+                                                                            }
+                                                                        </Button>
+                                                                    </PopoverTrigger>
+                                                                    <PopoverContent className="p-0" align={"start"}>
+                                                                        <div className={""}>
+                                                                            <div className={"py-3 px-4"}>
+                                                                                <h4 className="font-medium leading-none text-sm">{`Voters (${selectedIdea.vote_list.length})`}</h4>
+                                                                            </div>
+                                                                            <div
+                                                                                className="border-t px-4 py-3 space-y-2">
+                                                                                {
+                                                                                    (selectedIdea.vote_list || []).map((x, i) => {
+                                                                                        return (
+                                                                                            <div
+                                                                                                className={"flex gap-2"}
+                                                                                                key={i}>
+                                                                                                <div
+                                                                                                    className={"update-idea text-sm rounded-full border text-center"}>
+                                                                                                    <Avatar
+                                                                                                        className={"w-[20px] h-[20px]"}>
+                                                                                                        {
+                                                                                                            x.user_photo ?
+                                                                                                                <AvatarImage
+                                                                                                                    src={x.user_photo}
+                                                                                                                    alt=""/>
+                                                                                                                :
+                                                                                                                <AvatarFallback>{x && x.name && x.name.substring(0, 1).toUpperCase()}</AvatarFallback>
+                                                                                                        }
+                                                                                                    </Avatar>
+                                                                                                </div>
+                                                                                                <h4 className={"text-sm font-normal"}>{x.name}</h4>
+                                                                                            </div>
+                                                                                        )
+                                                                                    })
+                                                                                }
+                                                                            </div>
+                                                                        </div>
+                                                                    </PopoverContent>
+                                                                </Popover>
+                                                                : ""
+                                                        }
                                                     </div>
                                                     <div className={"md:hidden"}>
                                                         <DropdownMenu>
@@ -1006,9 +1058,9 @@ const UpdateIdea = ({
                                                         <h2 className={"text-xl font-medium"}>{selectedIdea.title}</h2>
                                                     </div>
                                                     <div
-                                                        className={"description-container text-sm text-muted-foreground"}>
-                                                        <ReadMoreText html={selectedIdea.description}/>
-                                                    </div>
+                                                        className={`description-container text-sm ${theme === "dark" ? "" : "text-muted-foreground" }`}
+                                                        dangerouslySetInnerHTML={{ __html: selectedIdea.description }}
+                                                    />
                                                 </div>
                                                 {
                                                     selectedIdea && selectedIdea?.images && selectedIdea?.images.length > 0 ?
@@ -1061,81 +1113,6 @@ const UpdateIdea = ({
                                                                     {moment(selectedIdea.created_at).format('D MMM')}
                                                                 </p>
                                                             </div>
-                                                            {
-                                                                selectedIdea && selectedIdea.vote_list && selectedIdea.vote_list.length ?
-                                                                    <Popover>
-                                                                        <PopoverTrigger asChild>
-                                                                            <Button variant="ghost hover-none"
-                                                                                    className={"rounded-full p-0 h-[24px]"}>
-                                                                                {
-                                                                                    (selectedIdea.vote_list.slice(0, 1) || []).map((x, i) => {
-                                                                                        return (
-                                                                                            <div className={"flex"}
-                                                                                                 key={i}>
-                                                                                                <div
-                                                                                                    className={"relative"}>
-                                                                                                    <div
-                                                                                                        className={"update-idea text-sm rounded-full border text-center"}>
-                                                                                                        <Avatar>
-                                                                                                            {
-                                                                                                                x.user_photo ?
-                                                                                                                    <AvatarImage
-                                                                                                                        src={x.user_photo}
-                                                                                                                        alt={x && x.name && x.name.substring(0, 1)}/> :
-                                                                                                                    <AvatarFallback>{x && x.name && x.name.substring(0, 1).toUpperCase()}</AvatarFallback>
-                                                                                                            }
-                                                                                                        </Avatar>
-                                                                                                    </div>
-                                                                                                </div>
-                                                                                                <div
-                                                                                                    className={"update-idea text-sm rounded-full border text-center ml-[-5px]"}>
-                                                                                                    <Avatar><AvatarFallback>+{selectedIdea.vote_list.length}</AvatarFallback></Avatar>
-                                                                                                </div>
-                                                                                            </div>
-                                                                                        )
-                                                                                    })
-                                                                                }
-                                                                            </Button>
-                                                                        </PopoverTrigger>
-                                                                        <PopoverContent className="p-0" align={"end"}>
-                                                                            <div className={""}>
-                                                                                <div
-                                                                                    className="space-y-2 px-4 py-[5px]">
-                                                                                    <h4 className="font-medium leading-none text-sm">{`Voters (${selectedIdea.vote_list.length})`}</h4>
-                                                                                </div>
-                                                                                <div
-                                                                                    className="border-t px-4 py-3 space-y-2">
-                                                                                    {
-                                                                                        (selectedIdea.vote_list || []).map((x, i) => {
-                                                                                            return (
-                                                                                                <div
-                                                                                                    className={"flex gap-2"}
-                                                                                                    key={i}>
-                                                                                                    <div
-                                                                                                        className={"update-idea text-sm rounded-full border text-center"}>
-                                                                                                        <Avatar
-                                                                                                            className={"w-[20px] h-[20px]"}>
-                                                                                                            {
-                                                                                                                x.user_photo ?
-                                                                                                                    <AvatarImage
-                                                                                                                        src={x.user_photo}
-                                                                                                                        alt=""/>
-                                                                                                                    :
-                                                                                                                    <AvatarFallback>{x && x.name && x.name.substring(0, 1).toUpperCase()}</AvatarFallback>
-                                                                                                            }
-                                                                                                        </Avatar>
-                                                                                                    </div>
-                                                                                                    <h4 className={"text-sm font-normal"}>{x.name}</h4>
-                                                                                                </div>
-                                                                                            )
-                                                                                        })
-                                                                                    }
-                                                                                </div>
-                                                                            </div>
-                                                                        </PopoverContent>
-                                                                    </Popover>
-                                                                    : ""
-                                                            }
                                                         </div>
                                                         <Select
                                                             onValueChange={(value) => onChangeStatus('roadmap_id', value)}
@@ -1418,7 +1395,7 @@ const UpdateIdea = ({
                                                                                                             }
                                                                                                         </Button>
                                                                                                         <Button
-                                                                                                            className={"px-3 py-2 h-[30px] text-sm font-semibold text-primary border border-primary"}
+                                                                                                            className={`px-3 py-2 h-[30px] text-sm font-semibold text-primary border border-primary`}
                                                                                                             variant={"outline hover:none"}
                                                                                                             onClick={onCancelComment}>
                                                                                                             Cancel

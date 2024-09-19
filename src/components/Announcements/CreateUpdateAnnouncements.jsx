@@ -410,9 +410,9 @@ const CreateUpdateAnnouncements = ({isOpen, onOpen, onClose, selectedRecord, get
                                        value={changeLogDetails.post_slug_url} onChange={onChangeText}/>
                                 <p className={"text-sm font-normal text-muted-foreground break-words"}>This release will
                                     be available at {projectDetailsReducer.domain ? <a
-                                        href={`https://${projectDetailsReducer.domain}/announcements/${changeLogDetails.post_slug_url}`}
+                                        href={`https://${projectDetailsReducer.domain?.toLowerCase()}/announcements/${changeLogDetails.post_slug_url?.toLowerCase()}`}
                                         target={"_blank"}
-                                        className={"text-primary max-w-[593px] w-full break-words text-sm"}>{`https://${projectDetailsReducer.domain}/announcements/${changeLogDetails.post_slug_url}`}</a> : ""}</p>
+                                        className={"text-primary max-w-[593px] w-full break-words text-sm"}>{`https://${projectDetailsReducer.domain?.toLowerCase()}/announcements/${changeLogDetails.post_slug_url?.toLowerCase()}`}</a> : ""}</p>
                             </div>
                             <div className="w-full flex flex-col gap-2">
                                 <Label htmlFor="description">Description</Label>

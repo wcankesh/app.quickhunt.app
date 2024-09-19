@@ -3,9 +3,10 @@ import {Card, CardContent} from "../ui/card";
 import {useNavigate} from "react-router-dom";
 import {baseUrl} from "../../utils/constent";
 import embed_img from "../../img/widget_embed.png";
-import popover_img from "../../img/widget_popover.png";
-import modal_img from "../../img/widget_modal.png";
-import sidebar_img from "../../img/widget_sidebar.png";
+import post_img from "../../img/Post.png";
+import checklist_img from "../../img/Checklist.png";
+import banner_img from "../../img/banner.png";
+import survey_img from "../../img/Survey.png";
 import {Button} from "../ui/button";
 import {ArrowLeft} from "lucide-react";
 
@@ -20,25 +21,25 @@ const MessageTypes = () => {
         {
             title: "Post",
             description : "Embed Ideas, Roadmap & Announcements inside your site.",
-            img: embed_img,
+            img: post_img,
             type: "1"
         },
         {
             title: "Banners",
             description : "Embed Ideas, Roadmap & Announcements inside your site.",
-            img: popover_img,
+            img: banner_img,
             type: "2"
         },
         {
             title: "Surveys",
             description :"Embed Ideas, Roadmap & Announcements inside your site.",
-            img: modal_img,
+            img: survey_img,
             type: "3"
         },
         {
             title: "Checklist",
             description : "Embed Ideas, Roadmap & Announcements inside your site.",
-            img: sidebar_img,
+            img: checklist_img,
             type: "4"
         }
     ]
@@ -63,7 +64,7 @@ const MessageTypes = () => {
                                             <p className={"text-sm font-normal text-muted-foreground"}>{x.description}</p>
                                         </div>
                                         <CardContent className={"p-4 pb-0 bg-muted/50"}>
-                                            <img className={"w-[706px] rounded-tl-[5px] rounded-tr-[5px] border border-text-muted border-b-0"} src={x.img} alt=''/>
+                                            <img className={"max-w-[706px] w-full"} src={x.img} alt=''/>
                                         </CardContent>
                                     </Card>
                                 )
