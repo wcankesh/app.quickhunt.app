@@ -19,13 +19,18 @@ import WidgetsTypes from "../components/Widgets/WidgetsTypes";
 import Articles from "../components/HelpCenter/Articles/Articles";
 import Category from "../components/HelpCenter/Category/Category";
 import ArticleDetail from "../components/HelpCenter/Articles/ArticleDetail";
-import CreateIdea from "../components/Ideas/CreateIdea";
+import Comments from "../components/Dashboard/Comments";
+import Reactions from "../components/Dashboard/Reactions";
 
 export const routes = [
      {path: `${baseUrl}/dashboard`, component: <Dashboard/>},
+     {path: `${baseUrl}/dashboard/comments`, component: <Comments/>},
+     {path: `${baseUrl}/dashboard/reactions`, component: <Reactions/>},
      {path: `${baseUrl}/announcements`, component: <Announcements/>},
+     {path: `${baseUrl}/announcements/:post_id`, component: <Announcements/>},
      {path: `${baseUrl}/ideas`, component: <Ideas/>},
      {path: `${baseUrl}/ideas/:id`, component: <Ideas/>},
+     {path: `${baseUrl}/ideas/:post_id`, component: <Ideas/>},
      {path: `${baseUrl}/roadmap`, component: <Roadmap/>},
      {path: `${baseUrl}/customers`, component: <Customers/>},
      {path: `${baseUrl}/widget`, component: <Widgets/>},

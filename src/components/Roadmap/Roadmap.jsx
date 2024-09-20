@@ -205,9 +205,9 @@ const Roadmap = () => {
 
                                 return (
                                     <React.Fragment>
-                                        <div className={"flex justify-between gap-2 border-b"}>
+                                        <div className={"flex justify-between items-center gap-2 border-b pb-4"}>
                                         <CardTitle
-                                            className={"flex items-center gap-2 text-sm font-semibold px-[7px] mb-[16px]"}>
+                                            className={"flex items-center gap-2 text-sm font-semibold px-[7px]"}>
                                             <Circle fill={color_code} stroke={color_code}
                                                     className={"w-[10px] h-[10px]"}/>
                                             {title} ({cardCount})
@@ -216,10 +216,10 @@ const Roadmap = () => {
                                         <div className={""}>
                                             <Button
                                                 variant={"ghost hover:bg-transparent"}
-                                                className={`gap-2 p-0 ${theme === "dark" ? "" : "text-muted-foreground"} text-sm font-semibold h-auto border`}
+                                                className={`p-1 h-auto border`}
                                                 onClick={() => onCreateIdea(id)}
                                             >
-                                                <Plus className={"w-[20px] h-[20px]"}/>
+                                                <Plus size={15} strokeWidth={2}/>
                                             </Button>
                                         </div>
                                         </div>

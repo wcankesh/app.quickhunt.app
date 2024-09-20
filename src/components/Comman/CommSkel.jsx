@@ -53,6 +53,71 @@ export const CommSkel = {
             })
         }
     </div>,
+    commonParagraphFourComments: <div className={"flex flex-col"}>
+        {
+            Array.from(Array(4)).map((_, r) => {
+                return (
+                    <div className={"md:p-6 p-3 border-b space-y-4"} key={r}>
+                        <div className="flex gap-2 items-center justify-between">
+                            <div className={"flex gap-2 items-center w-full"}>
+                                <Skeleton className="h-[30px] w-[30px] rounded-full"/>
+                                <Skeleton className="h-4 w-full"/>
+                            </div>
+                            <Skeleton className="h-[20px] w-[100px] rounded-full "/>
+                        </div>
+                        <div className="flex flex-col w-full gap-6">
+                            <div className="space-y-2 w-full">
+                                <Skeleton className="h-4"/>
+                                <Skeleton className="h-4"/>
+                                <Skeleton className="h-4"/>
+                            </div>
+                        </div>
+                    </div>
+                )
+            })
+        }
+    </div>,
+    reactionsPageLoading: <div className={"flex flex-col"}>
+        {
+            Array.from(Array(7)).map((_, r) => {
+                return (
+                    <div className={"flex gap-[5px] md:gap-4 md:p-6 p-3 border-b "} key={r}>
+                        <Skeleton className="h-[30px] w-[30px] rounded-full"/>
+                        <div className="flex flex-col w-full gap-6">
+                            <div className="space-y-2 w-full">
+                                <Skeleton className="h-4"/>
+                                <Skeleton className="h-4"/>
+                            </div>
+                        </div>
+                    </div>
+                )
+            })
+        }
+    </div>,
+    dashboardComments: <div className={"flex flex-col"}>
+        {
+            Array.from(Array(4)).map((_, r) => {
+                return (
+                    <div className={"py-2.5 px-6 flex flex-col gap-4 border-b"} key={r}>
+                        <div className="flex gap-2 items-center justify-between">
+                            <div className={"flex gap-2 items-center w-full"}>
+                                <Skeleton className="h-[30px] w-[30px] rounded-full"/>
+                                <Skeleton className="h-4 w-full"/>
+                            </div>
+                            <Skeleton className="h-[20px] w-[100px] rounded-full "/>
+                        </div>
+                        <div className="flex flex-col w-full gap-6">
+                            <div className="space-y-2 w-full">
+                                <Skeleton className="h-4"/>
+                                <Skeleton className="h-4"/>
+                                <Skeleton className="h-4"/>
+                            </div>
+                        </div>
+                    </div>
+                )
+            })
+        }
+    </div>,
     commonParagraphThree: <div className={"flex flex-col gap-2 p-6"}>
         {
             Array.from(Array(1)).map((_, r) => {
@@ -100,13 +165,14 @@ export const CommSkel = {
             })
         }
     </div>,
-    commonParagraphTwoAvatar: <div className={"flex gap-2 py-[10px]"}>
+    commonParagraphTwoAvatar: <div className={"flex gap-4 py-[10px] px-6 border-b"}>
         {
             Array.from(Array(1)).map((_, r) => {
                 return (
                     <Fragment key={r}>
                         <Skeleton className="h-8 w-8 rounded-full"/>
                         <div className="space-y-2 w-full">
+                            <Skeleton className="h-4"/>
                             <Skeleton className="h-4"/>
                             <Skeleton className="h-4"/>
                         </div>

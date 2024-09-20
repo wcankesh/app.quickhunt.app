@@ -15,6 +15,7 @@ import {PopoverContent} from "../ui/popover";
 import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList} from "../ui/command";
 import {Checkbox} from "../ui/checkbox";
 import {Badge} from "../ui/badge";
+import {useParams} from "react-router-dom";
 
 const initialStateFilter = {
     l: "",
@@ -40,6 +41,7 @@ const status = [
 ];
 
 const Announcements = () => {
+    const { id } = useParams();
     const {theme} = useTheme();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
@@ -66,6 +68,14 @@ const Announcements = () => {
                 }
             }
     }, [projectDetailsReducer.id, allStatusAndTypes, pageNo]);
+
+    useEffect(() => {
+        if (id && announcementList.length > 0) {
+            setSelectedRecord(true);
+            const clone = announcementList.find((x) => x.id == id);
+            setAnnouncementList(clone);
+        }
+    }, [id, announcementList]);
 
     const getAllPosts = async () => {
         setIsLoading(true);
@@ -200,12 +210,15 @@ const Announcements = () => {
         <div
             className={"container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-3 md:px-4"}>
             {selectedRecord.id &&
-            <CreateUpdateAnnouncements isOpen={selectedRecord.id}
-                                       selectedRecord={selectedRecord}
-                                       onOpen={openSheet}
-                                       onClose={closeSheet}
-                                       getAllPosts={getAllPosts}
-                                       announcementList={announcementList}
+            <CreateUpdateAnnouncements
+                isOpen={selectedRecord.id}
+                selectedRecord={selectedRecord}
+                setSelectedRecord={setSelectedRecord}
+                onOpen={openSheet}
+                onClose={closeSheet}
+                getAllPosts={getAllPosts}
+                announcementList={announcementList}
+                setAnnouncementList={setAnnouncementList}
             />}
             {analyticsObj.id && <AnalyticsView selectedViewAnalyticsRecord={analyticsObj}
                                                analyticsObj={analyticsObj}

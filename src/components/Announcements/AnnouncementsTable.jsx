@@ -28,6 +28,7 @@ const status2 = [
 ]
 
 const AnnouncementsTable = ({data, isLoading, setSelectedRecord, handleDelete, setAnalyticsObj,isLoadingDelete}) => {
+
     const {theme} = useTheme();
     const [announcementData, setAnnouncementData] = useState(data);
     const [idToDelete, setIdToDelete] = useState(null);

@@ -16,6 +16,7 @@ import {Calendar} from "../ui/calendar";
 import {toast} from "../ui/use-toast";
 import {Badge} from "../ui/badge";
 import ReactQuillEditor from "../Comman/ReactQuillEditor";
+import {useLocation, useParams} from "react-router-dom";
 //post_status: 1=Publish/active,2=Scheduled/unpublished,3=Draft,4=Expired
 const initialState = {
     post_description: '',
@@ -38,7 +39,9 @@ const initialStateError = {
     post_slug_url: "",
 }
 
-const CreateUpdateAnnouncements = ({isOpen, onOpen, onClose, selectedRecord, getAllPosts, announcementList}) => {
+const CreateUpdateAnnouncements = ({isOpen, onOpen, onClose, selectedRecord, getAllPosts, announcementList, setSelectedRecord, setAnnouncementList}) => {
+
+    const { id } = useParams();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
     const userDetailsReducer = useSelector(state => state.userDetailsReducer);
@@ -69,6 +72,14 @@ const CreateUpdateAnnouncements = ({isOpen, onOpen, onClose, selectedRecord, get
             setCategoriesList(allStatusAndTypes.categories);
         }
     }, [projectDetailsReducer.id, allStatusAndTypes, userDetailsReducer.id])
+
+    useEffect(() => {
+        if (id && announcementList.length > 0) {
+            setSelectedRecord(true);
+            const clone = announcementList.find((x) => x.id == id);
+            setAnnouncementList(clone);
+        }
+    }, [id, announcementList]);
 
     const getSinglePosts = () => {
         const labelId = selectedRecord.labels.map(x => x?.id?.toString());

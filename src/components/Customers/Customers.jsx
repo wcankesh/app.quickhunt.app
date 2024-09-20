@@ -288,7 +288,7 @@ const Customers = () => {
                                                         {
                                                             (tableHeadingsArray || []).map((x,i)=>{
                                                                 return(
-                                                                    <TableHead className={`font-semibold px-2 py-[10px] md:px-3 ${i == 5 ? "text-center" : ""}  ${theme === "dark"? "text-[]" : "bg-muted"} `} key={x.label}>{x.label}</TableHead>
+                                                                    <TableHead className={`font-semibold px-2 py-[10px] md:px-3 ${i >= 2 ? "text-center" : ""}  ${theme === "dark"? "text-[]" : "bg-muted"} `} key={x.label}>{x.label}</TableHead>
                                                                 )
                                                             })
                                                         }
@@ -320,9 +320,9 @@ const Customers = () => {
                                                                         <TableRow key={x.id} className={"font-medium"}>
                                                                             <TableCell className={`px-2 py-[10px] md:px-3 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.customer_name ? x.customer_name : "-"}</TableCell>
                                                                             <TableCell className={`px-2 py-[10px] md:px-3 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x?.customer_email_id}</TableCell>
-                                                                            <TableCell className={`px-2 py-[10px] md:px-3 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.customer_country ? x.customer_country : "-"}</TableCell>
-                                                                            <TableCell className={`px-2 py-[10px] md:px-3 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.customer_browser ? x.customer_browser : "-"}</TableCell>
-                                                                            <TableCell className={`px-2 py-[10px] md:px-3 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.os ? x.os : "-"}</TableCell>
+                                                                            <TableCell className={`px-2 py-[10px] md:px-3 ${theme === "dark" ? "" : "text-muted-foreground"} text-center`}>{x.customer_country ? x.customer_country : "-"}</TableCell>
+                                                                            <TableCell className={`px-2 py-[10px] md:px-3 ${theme === "dark" ? "" : "text-muted-foreground"} text-center`}>{x.customer_browser ? x.customer_browser : "-"}</TableCell>
+                                                                            <TableCell className={`px-2 py-[10px] md:px-3 ${theme === "dark" ? "" : "text-muted-foreground"} text-center`}>{x.os ? x.os : "-"}</TableCell>
                                                                             <TableCell className={`px-2 py-[10px] md:px-3 ${theme === "dark" ? "" : "text-muted-foreground flex justify-center"}`}>
                                                                                 <Button onClick={() => deleteCustomer(x.id,index)} variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px]`}>
                                                                                     <Trash2 size={16}/>

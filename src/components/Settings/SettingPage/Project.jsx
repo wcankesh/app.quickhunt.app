@@ -37,6 +37,7 @@ const Project = () => {
     const [createProjectDetails, setCreateProjectDetails] = useState(initialState);
     const [formError, setFormError] = useState(initialStateError);
     const [isSave, setIsSave] = useState(false);
+    const [isDel, setIsDel] = useState(false);
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const allProjectReducer = useSelector(state => state.allProjectReducer);
     const [openDelete,setOpenDelete] = useState(false);
@@ -158,7 +159,14 @@ const Project = () => {
 
     const deleteAlert =()=>{
         setOpenDelete(true);
+        setIsDel(true);
     }
+
+    const closeDialog = () => {
+        setOpenDelete(false);
+        setIsDel(false);
+    }
+
     const onDelete = async () => {
         setIsLoadingDelete(true);
         const data = await apiService.deleteProjects(projectDetailsReducer.id)
@@ -171,6 +179,7 @@ const Project = () => {
                 dispatch(projectDetailsAction(cloneProject[0]))
                 dispatch(allProjectAction({projectList: cloneProject}))
             }
+            setIsDel(false);
             toast({
                 title:"Project delete successfully"
             })
@@ -200,7 +209,7 @@ const Project = () => {
                             <DialogFooter className={"flex-row justify-end space-x-2"}>
                                 <Button variant={"outline hover:none"}
                                         className={"text-sm font-semibold border"}
-                                        onClick={() => setOpenDelete(false)}>Cancel</Button>
+                                        onClick={closeDialog}>Cancel</Button>
                                 <Button
                                     variant={"hover:bg-destructive"}
                                     className={` ${theme === "dark" ? "text-card-foreground" : "text-card"} ${isLoadingDelete === true ? "py-2 px-6" : "py-2 px-6"} w-[76px] text-sm font-semibold bg-destructive`}
@@ -362,11 +371,11 @@ const Project = () => {
             <CardFooter className={"pt-4 flex flex-wrap justify-end sm:justify-end gap-4 sm:p-5 p-4"}>
                 <Button
                     variant={"outline hover:bg-transparent"} onClick={deleteAlert}
-                    className={`text-sm font-semibold ${theme === "dark" ? "text-card-foreground" : "text-primary border-primary"} border  text-sm font-semibold`}
-                >Delete project</Button>
+                    className={`text-sm font-semibold border w-[130px] ${theme === "dark" ? "text-card-foreground" : "text-primary border-primary"}`}
+                >{isDel ? <Loader2 className="h-4 w-4 animate-spin" /> : "Delete project"}</Button>
                 <Button
                     className={`w-[132px] text-sm font-semibold`}
-                    onClick={() => updateProjects('')}>{isSave ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Update project"}</Button>
+                    onClick={() => updateProjects('')}>{isSave ? <Loader2 className="h-4 w-4 animate-spin" /> : "Update project"}</Button>
             </CardFooter>
         </Card>
     );

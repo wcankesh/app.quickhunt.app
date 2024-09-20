@@ -274,15 +274,13 @@ const Team = () => {
             }
 
             <Card>
-                <CardHeader className={"flex flex-row flex-wrap md:flex-nowrap justify-between gap-x-6 items-center p-4 sm:p-6"}>
+                <CardHeader className={"flex flex-row flex-wrap md:flex-nowrap justify-between gap-2 items-center p-4 sm:p-6"}>
                     <div>
                         <CardTitle className={"text-lg sm:text-2xl font-medium"}>Invite Team</CardTitle>
                         <CardDescription className={"text-sm text-muted-foreground p-0"}>Add members to your company to
                             help manage ideas.</CardDescription>
                     </div>
-                    <div className={"mt-1 md:m-0"}>
-                        <Button className={"text-sm font-semibold hover:bg-primary"} onClick={openSheet}>Invite Team</Button>
-                    </div>
+                    <Button className={"text-sm font-semibold hover:bg-primary m-0"} onClick={openSheet}>Invite Team</Button>
                 </CardHeader>
                 <CardContent className={"p-0"}>
                     <Tabs defaultValue="users" className="space-y-6">

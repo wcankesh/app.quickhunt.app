@@ -458,7 +458,7 @@ const Widgets = () => {
                                                         className={"font-medium p-2 py-[10px] md:px-3 capitalize"}>{x.type}</TableCell>
                                                     <TableCell
                                                         className={"font-medium p-2 py-[10px] md:px-3"}>{moment(x.created_at).format('D MMM, YYYY')}</TableCell>
-                                                    <TableCell className={" p-2 py-[10px] md:px-3"}>
+                                                    <TableCell className={" p-2 py-[10px] md:px-3 text-center"}>
                                                         <Button
                                                             className={"py-[6px] px-3 h-auto text-xs font-semibold hover:bg-primary"}
                                                             onClick={() => getCodeCopy(x.id)}>Get code</Button>

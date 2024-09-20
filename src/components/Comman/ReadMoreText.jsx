@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from "react";
 import HTMLEllipsis from 'react-lines-ellipsis/lib/html';
 import { Button } from "../ui/button";
 
-const ReadMoreText = ({ html }) => {
+const ReadMoreText = ({ html ,maxLine ="3"}) => {
     const [isExpanded, setIsExpanded] = useState(false);
     const [isTruncated, setIsTruncated] = useState(false);
     const contentRef = useRef(null);
@@ -40,7 +40,7 @@ const ReadMoreText = ({ html }) => {
                 <div onClick={() => setIsExpanded(true)}>
                     <HTMLEllipsis
                         unsafeHTML={html}
-                        maxLine='3'
+                        maxLine={maxLine}
                         isClamped="true"
                         ellipsis="...Read more"
                         basedOn='letters'

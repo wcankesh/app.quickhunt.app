@@ -18,7 +18,7 @@ import moment from "moment";
 import {DropdownMenu, DropdownMenuTrigger} from "@radix-ui/react-dropdown-menu";
 import {DropdownMenuContent, DropdownMenuItem} from "../ui/dropdown-menu";
 import ReactQuillEditor from "../Comman/ReactQuillEditor";
-import {useParams} from "react-router-dom";
+import {useLocation, useParams} from "react-router-dom";
 
 const initialStateError = {
     title: "",
@@ -26,11 +26,13 @@ const initialStateError = {
     board: "",
 }
 
-const UpdateIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedIdea, ideasList, setIdeasList, setOldSelectedIdea, oldSelectedIdea,}) => {
+const UpdateIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedIdea, ideasList, setIdeasList, setOldSelectedIdea, oldSelectedIdea, setSheetOpen}) => {
+
     const {theme} = useTheme()
     let apiSerVice = new ApiService();
     const {toast} = useToast();
     const { id } = useParams();
+
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const [isLoading, setIsLoading] = useState(false);
@@ -62,6 +64,14 @@ const UpdateIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedIdea, ide
             setRoadmapStatus(allStatusAndTypes.roadmap_status)
         }
     }, [projectDetailsReducer.id, allStatusAndTypes]);
+
+    useEffect(() => {
+        if (id && ideasList.length > 0) {
+            setSheetOpen(true);
+            const clone = ideasList.find((x) => x.id == id);
+            setSelectedIdea(clone);
+        }
+    }, [id, ideasList]);
 
     const handleChangeTopic = (id) => {
         const clone = [...selectedIdea.topic];
@@ -615,7 +625,7 @@ const UpdateIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedIdea, ide
                                 <div className={"flex flex-col "}>
                                     <RadioGroup
                                         onValueChange={(value) => onChangeStatus('roadmap_id', value)}
-                                        value={selectedIdea.roadmap_id}
+                                        value={selectedIdea?.roadmap_id}
                                     >
                                         {
                                             (roadmapStatus || []).map((x, i) => {
@@ -638,7 +648,7 @@ const UpdateIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedIdea, ide
                                     <div className="w-[282px] h-[128px] flex gap-1">
 
                                         {
-                                            selectedIdea.cover_image ?
+                                            selectedIdea?.cover_image ?
                                                 <div>
                                                     {selectedIdea && selectedIdea.cover_image && selectedIdea.cover_image.name ?
                                                         <div className={"w-[282px] h-[128px] relative border p-[5px]"}>
@@ -697,12 +707,12 @@ const UpdateIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedIdea, ide
                                         className={`hover:bg-muted w-[132px] ${theme === "dark" ? "" : "border-muted-foreground text-muted-foreground"} text-sm font-semibold`}
                                         onClick={() => onChangeStatus(
                                             "is_active",
-                                            selectedIdea.is_active === 1 ? 0 : 1
+                                            selectedIdea?.is_active === 1 ? 0 : 1
                                         )}
                                     >
                                         {
                                             isLoading ? <Loader2
-                                                className="h-4 w-4 animate-spin"/> : (selectedIdea.is_active === 0 ? "Convert to Idea" : "Mark as bug")
+                                                className="h-4 w-4 animate-spin"/> : (selectedIdea?.is_active === 0 ? "Convert to Idea" : "Mark as bug")
                                         }
                                     </Button>
                                 </div>
@@ -718,12 +728,12 @@ const UpdateIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedIdea, ide
                                         className={`w-[100px] hover:bg-muted ${theme === "dark" ? "" : "border-muted-foreground text-muted-foreground"} text-sm font-semibold`}
                                         onClick={() => onChangeStatus(
                                             "is_archive",
-                                            selectedIdea.is_archive === 1 ? 0 : 1
+                                            selectedIdea?.is_archive === 1 ? 0 : 1
                                         )}
                                     >
                                         {
                                             isLoadingArchive ? <Loader2
-                                                className="h-4 w-4 animate-spin"/> : (selectedIdea.is_archive === 1 ? "Unarchive" : "Archive")
+                                                className="h-4 w-4 animate-spin"/> : (selectedIdea?.is_archive === 1 ? "Unarchive" : "Archive")
                                         }
                                     </Button>
                                 </div>
@@ -862,15 +872,15 @@ const UpdateIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedIdea, ide
                                                             <ArrowBigUp
                                                                 className={"fill-primary stroke-primary"}/>
                                                         </Button>
-                                                        <p className={"text-xl font-medium"}>{selectedIdea.vote}</p>
+                                                        <p className={"text-xl font-medium"}>{selectedIdea?.vote}</p>
                                                         {
-                                                            selectedIdea && selectedIdea.vote_list && selectedIdea.vote_list.length ?
+                                                            selectedIdea && selectedIdea?.vote_list && selectedIdea?.vote_list.length ?
                                                                 <Popover>
                                                                     <PopoverTrigger asChild>
                                                                         <Button variant={"ghost hover-none"}
                                                                                 className={"rounded-full p-0 h-[24px]"}>
                                                                             {
-                                                                                (selectedIdea.vote_list.slice(0, 1) || []).map((x, i) => {
+                                                                                (selectedIdea?.vote_list.slice(0, 1) || []).map((x, i) => {
                                                                                     return (
                                                                                         <div className={"flex"}
                                                                                              key={i}>
@@ -891,7 +901,7 @@ const UpdateIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedIdea, ide
                                                                                             </div>
                                                                                             <div
                                                                                                 className={"update-idea text-sm rounded-full border text-center ml-[-5px]"}>
-                                                                                                <Avatar><AvatarFallback>+{selectedIdea.vote_list.length}</AvatarFallback></Avatar>
+                                                                                                <Avatar><AvatarFallback>+{selectedIdea?.vote_list.length}</AvatarFallback></Avatar>
                                                                                             </div>
                                                                                         </div>
                                                                                     )
@@ -902,12 +912,12 @@ const UpdateIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedIdea, ide
                                                                     <PopoverContent className="p-0" align={"start"}>
                                                                         <div className={""}>
                                                                             <div className={"py-3 px-4"}>
-                                                                                <h4 className="font-medium leading-none text-sm">{`Voters (${selectedIdea.vote_list.length})`}</h4>
+                                                                                <h4 className="font-medium leading-none text-sm">{`Voters (${selectedIdea?.vote_list.length})`}</h4>
                                                                             </div>
                                                                             <div
                                                                                 className="border-t px-4 py-3 space-y-2">
                                                                                 {
-                                                                                    (selectedIdea.vote_list || []).map((x, i) => {
+                                                                                    (selectedIdea?.vote_list || []).map((x, i) => {
                                                                                         return (
                                                                                             <div
                                                                                                 className={"flex gap-2"}
@@ -947,22 +957,22 @@ const UpdateIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedIdea, ide
                                                                 <DropdownMenuItem className={"cursor-pointer"}
                                                                                   onClick={() => setIsEditIdea(true)}>Edit</DropdownMenuItem>
                                                                 <DropdownMenuItem className={"cursor-pointer"}
-                                                                                  onClick={() => onChangeStatus("pin_to_top", selectedIdea.pin_to_top === 0 ? 1 : 0)}>
-                                                                    {selectedIdea.pin_to_top == 0 ? "Pinned" : "Unpinned"}
+                                                                                  onClick={() => onChangeStatus("pin_to_top", selectedIdea?.pin_to_top === 0 ? 1 : 0)}>
+                                                                    {selectedIdea?.pin_to_top == 0 ? "Pinned" : "Unpinned"}
                                                                 </DropdownMenuItem>
                                                                 <DropdownMenuItem className={"cursor-pointer"}
                                                                                   onClick={() => onChangeStatus(
                                                                                       "is_active",
-                                                                                      selectedIdea.is_active === 1 ? 0 : 1
+                                                                                      selectedIdea?.is_active === 1 ? 0 : 1
                                                                                   )}>
-                                                                    {selectedIdea.is_active === 0 ? "Convert to Idea" : "Mark as bug"}
+                                                                    {selectedIdea?.is_active === 0 ? "Convert to Idea" : "Mark as bug"}
                                                                 </DropdownMenuItem>
                                                                 <DropdownMenuItem className={"cursor-pointer"}
                                                                                   onClick={() => onChangeStatus(
                                                                                       "is_archive",
-                                                                                      selectedIdea.is_archive === 1 ? 0 : 1
+                                                                                      selectedIdea?.is_archive === 1 ? 0 : 1
                                                                                   )}>
-                                                                    {selectedIdea.is_archive === 1 ? "Unarchive" : "Archive"}
+                                                                    {selectedIdea?.is_archive === 1 ? "Unarchive" : "Archive"}
                                                                 </DropdownMenuItem>
                                                             </DropdownMenuContent>
                                                         </DropdownMenu>
@@ -976,12 +986,12 @@ const UpdateIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedIdea, ide
                                                                         className={`hover:bg-muted p-2 h-auto ${theme === "dark" ? "" : "border-muted-foreground text-muted-foreground"} text-xs font-semibold`}
                                                                         onClick={() => onChangeStatus(
                                                                             "is_active",
-                                                                            selectedIdea.is_active === 1 ? 0 : 1
+                                                                            selectedIdea?.is_active === 1 ? 0 : 1
                                                                         )}
                                                                     >
                                                                         {
                                                                             isLoading ? <Loader2
-                                                                                className="h-4 w-4 animate-spin"/> : (selectedIdea.is_active === 0 ? "Convert to Idea" : "Mark as bug")
+                                                                                className="h-4 w-4 animate-spin"/> : (selectedIdea?.is_active === 0 ? "Convert to Idea" : "Mark as bug")
                                                                         }
                                                                     </Button>
                                                                 </div>
@@ -991,19 +1001,19 @@ const UpdateIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedIdea, ide
                                                                         className={`hover:bg-muted p-2 h-auto ${theme === "dark" ? "" : "border-muted-foreground text-muted-foreground"} text-xs font-semibold`}
                                                                         onClick={() => onChangeStatus(
                                                                             "is_archive",
-                                                                            selectedIdea.is_archive === 1 ? 0 : 1
+                                                                            selectedIdea?.is_archive === 1 ? 0 : 1
                                                                         )}
                                                                     >
                                                                         {
                                                                             isLoadingArchive ? <Loader2
-                                                                                className="h-4 w-4 animate-spin"/> : (selectedIdea.is_archive === 1 ? "Unarchive" : "Archive")
+                                                                                className="h-4 w-4 animate-spin"/> : (selectedIdea?.is_archive === 1 ? "Unarchive" : "Archive")
                                                                         }
                                                                     </Button>
                                                                 </div>
                                                             </div>
                                                             <div className={"flex gap-2"}>
                                                                 {
-                                                                    selectedIdea.is_edit === 1 ?
+                                                                    selectedIdea?.is_edit === 1 ?
                                                                         <Button
                                                                             variant={"outline"}
                                                                             className={"w-[30px] h-[30px] p-1"}
@@ -1016,9 +1026,9 @@ const UpdateIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedIdea, ide
                                                                 <Button
                                                                     variant={"outline"}
                                                                     className={`w-[30px] h-[30px] p-1`}
-                                                                    onClick={() => onChangeStatus("pin_to_top", selectedIdea.pin_to_top === 0 ? 1 : 0)}
+                                                                    onClick={() => onChangeStatus("pin_to_top", selectedIdea?.pin_to_top === 0 ? 1 : 0)}
                                                                 >
-                                                                    {selectedIdea.pin_to_top == 0 ?
+                                                                    {selectedIdea?.pin_to_top == 0 ?
                                                                         <Pin size={16}/> :
                                                                         <Pin size={16} className={`${theme === "dark" ? "fill-card-foreground" : "fill-card-foreground"}`}/>}
                                                                 </Button>
@@ -1028,7 +1038,7 @@ const UpdateIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedIdea, ide
                                                     <div className={"hidden lg:block"}>
                                                         <div className={"flex gap-2"}>
                                                             {
-                                                                selectedIdea.is_edit === 1 ?
+                                                                selectedIdea?.is_edit === 1 ?
                                                                     <Button
                                                                         variant={"outline"}
                                                                         className={"w-[30px] h-[30px] p-1"}
@@ -1041,9 +1051,9 @@ const UpdateIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedIdea, ide
                                                             <Button
                                                                 variant={"outline"}
                                                                 className={`w-[30px] h-[30px] p-1`}
-                                                                onClick={() => onChangeStatus("pin_to_top", selectedIdea.pin_to_top === 0 ? 1 : 0)}
+                                                                onClick={() => onChangeStatus("pin_to_top", selectedIdea?.pin_to_top === 0 ? 1 : 0)}
                                                             >
-                                                                {selectedIdea.pin_to_top == 0 ?
+                                                                {selectedIdea?.pin_to_top == 0 ?
                                                                     <Pin size={16}/> :
                                                                     <Pin size={16} className={`${theme === "dark" ? "fill-card-foreground" : "fill-card-foreground"}`}/>}
                                                             </Button>
@@ -1052,15 +1062,15 @@ const UpdateIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedIdea, ide
                                                 </div>
                                                 <div className={"flex flex-col gap-4"}>
                                                     <div className={"flex items-center gap-2"}>
-                                                        <h2 className={"text-xl font-medium"}>{selectedIdea.title}</h2>
+                                                        <h2 className={"text-xl font-medium"}>{selectedIdea?.title}</h2>
                                                     </div>
                                                     <div
                                                         className={`description-container text-sm ${theme === "dark" ? "" : "text-muted-foreground" }`}
-                                                        dangerouslySetInnerHTML={{ __html: selectedIdea.description }}
+                                                        dangerouslySetInnerHTML={{ __html: selectedIdea?.description }}
                                                     />
                                                 </div>
                                                 {
-                                                    selectedIdea && selectedIdea?.images && selectedIdea?.images.length > 0 ?
+                                                    selectedIdea && selectedIdea?.images && selectedIdea?.images?.length > 0 ?
                                                         <div className={"flex gap-2 flex-wrap"}>
                                                             {
                                                                 (selectedIdea?.images || []).map((x, i) => {
@@ -1095,25 +1105,25 @@ const UpdateIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedIdea, ide
                                                         <div className={"flex items-center gap-2"}>
                                                             <Avatar className={"w-[20px] h-[20px]"}>
                                                                 {
-                                                                    selectedIdea.user_photo ?
-                                                                        <AvatarImage src={selectedIdea.user_photo}
+                                                                    selectedIdea?.user_photo ?
+                                                                        <AvatarImage src={selectedIdea?.user_photo}
                                                                                      alt="@shadcn"/>
                                                                         :
-                                                                        <AvatarFallback>{selectedIdea && selectedIdea.name && selectedIdea.name.substring(0, 1)}</AvatarFallback>
+                                                                        <AvatarFallback>{selectedIdea && selectedIdea?.name && selectedIdea?.name.substring(0, 1)}</AvatarFallback>
                                                                 }
                                                             </Avatar>
                                                             <div className={"flex items-center"}>
-                                                                <h4 className={"text-sm font-medium"}>{selectedIdea.name}</h4>
+                                                                <h4 className={"text-sm font-medium"}>{selectedIdea?.name}</h4>
                                                                 <p className={"text-sm font-normal flex items-center text-muted-foreground"}>
                                                                     <Dot size={20}
                                                                          className={"fill-text-card-foreground stroke-text-card-foreground"}/>
-                                                                    {moment(selectedIdea.created_at).format('D MMM')}
+                                                                    {moment(selectedIdea?.created_at).format('D MMM')}
                                                                 </p>
                                                             </div>
                                                         </div>
                                                         <Select
                                                             onValueChange={(value) => onChangeStatus('roadmap_id', value)}
-                                                            value={selectedIdea.roadmap_id}
+                                                            value={selectedIdea?.roadmap_id}
                                                         >
                                                             <SelectTrigger className="w-[234px] h-[24px] px-3 py-1">
                                                                 <SelectValue/>
@@ -1297,17 +1307,17 @@ const UpdateIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedIdea, ide
                                                                                         className={"flex gap-1 flex-wrap justify-between"}>
                                                                                         <div
                                                                                             className={"flex items-start"}>
-                                                                                            <h4 className={"text-sm font-medium"}>{x.name}</h4>
+                                                                                            <h4 className={"text-sm font-medium"}>{x?.name}</h4>
                                                                                             <p className={"text-sm font-normal flex items-center text-muted-foreground"}>
                                                                                                 <Dot size={20}
                                                                                                      className={"fill-text-card-foreground stroke-text-card-foreground"}/>
-                                                                                                {moment.utc(x.created_at).local().startOf('seconds').fromNow()}
+                                                                                                {moment.utc(x?.created_at).local().startOf('seconds').fromNow()}
                                                                                             </p>
                                                                                         </div>
                                                                                         <div className={"flex gap-2"}>
                                                                                             {
                                                                                                 selectedCommentIndex === i && isEditComment ? "" :
-                                                                                                    x.is_edit === 1 ?
+                                                                                                    x?.is_edit === 1 ?
                                                                                                         <><Button
                                                                                                             variant={"outline"}
                                                                                                             className={"w-[30px] h-[30px] p-1"}
@@ -1340,11 +1350,11 @@ const UpdateIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedIdea, ide
                                                                                                         })}
                                                                                                     />
                                                                                                     {
-                                                                                                        selectedComment && selectedComment.images && selectedComment.images.length ?
+                                                                                                        selectedComment && selectedComment?.images && selectedComment?.images?.length ?
                                                                                                             <div
                                                                                                                 className={"flex gap-3 flex-wrap"}>
                                                                                                                 {
-                                                                                                                    (selectedComment.images || []).map((x, i) => {
+                                                                                                                    (selectedComment?.images || []).map((x, i) => {
                                                                                                                         return (
                                                                                                                             <Fragment>
                                                                                                                                 {
