@@ -133,7 +133,7 @@ const UpdateInAppMessage = () => {
     const {theme} = useTheme();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const [inAppMsgSetting, setInAppMsgSetting] = useState(initialState);
-    const [isLoading, setIsLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
     const [selectedStepIndex, setSelectedStepIndex] = useState(0);
     const [selectedStep, setSelectedStep] = useState(null);
     const [isSave, setIsSave] = useState(false);

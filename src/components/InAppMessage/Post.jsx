@@ -14,17 +14,12 @@ import Warning from "@editorjs/warning";
 import Code from "@editorjs/code";
 import LinkTool from "@editorjs/link";
 import Image from "@editorjs/image";
-import Raw from "@editorjs/raw";
 import Header from "@editorjs/header";
 import Quote from "@editorjs/quote";
 import Marker from "@editorjs/marker";
-import CheckList from "@editorjs/checklist";
-import Delimiter from "@editorjs/delimiter";
 import InlineCode from "@editorjs/inline-code";
-import SimpleImage from "@editorjs/simple-image";
 import {PopoverTrigger} from "@radix-ui/react-popover";
 import {Popover, PopoverContent} from "../ui/popover";
-//import CustomImageTool from "../../utils/CustomImageTool";
 
 
 const Post = ({inAppMsgSetting, setInAppMsgSetting, isLoading}) => {
@@ -40,6 +35,9 @@ const Post = ({inAppMsgSetting, setInAppMsgSetting, isLoading}) => {
 
     const handleSave = React.useCallback(async () => {
         const savedData = await editorCore.current.save();
+        console.log(
+            savedData.blocks
+        )
         setInAppMsgSetting(prevState => ({
             ...prevState,
             body_text: JSON.stringify({blocks: savedData.blocks})
@@ -47,30 +45,19 @@ const Post = ({inAppMsgSetting, setInAppMsgSetting, isLoading}) => {
     }, []);
 
 
-    const handleImageDelete = async (editorCore,blockId) => {
-        const block = await editorCore.current.blocks.getBlockById(blockId);
-        const imageUrl = block.data.file.url;
 
-        // Make a DELETE request to your API to delete the image
-        try {
-            await fetch('https://your-api.com/deleteFile', {
-                method: 'DELETE',
-                body: JSON.stringify({ url: imageUrl }),
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
-            console.log('Image deleted:', imageUrl);
-
-            // Remove the block from the editor
-            editorCore.current.blocks.delete(blockId);
-        } catch (error) {
-            console.error('Error deleting image:', error);
-        }
-    };
 
     const editorConstants = {
         embed: Embed,
+        header: {
+            class: Header,
+            inlineToolbar: true,
+            config: {
+                placeholder: 'Enter a header',
+                levels: [2, 3, 4], // Available header levels
+                defaultLevel: 2,   // Default level
+            },
+        },
         table: Table,
         marker: Marker,
         list: List,
@@ -107,13 +94,8 @@ const Post = ({inAppMsgSetting, setInAppMsgSetting, isLoading}) => {
             //     },
             // ],
         },
-        raw: Raw,
-        header: Header,
         quote: Quote,
-        checklist: CheckList,
-        delimiter: Delimiter,
         inlineCode: InlineCode,
-        simpleImage: SimpleImage
     }
 
     const handleEmojiSelect = (event) => {
@@ -145,6 +127,7 @@ const Post = ({inAppMsgSetting, setInAppMsgSetting, isLoading}) => {
         }));
 
     }
+    console.log("inAppMsgSetting?.body_text?.blocks", inAppMsgSetting?.body_text?.blocks, isLoading)
     useEffect(() => {
        if(!isLoading){
            editorCore.current = new EditorJS({

@@ -21,6 +21,7 @@ import Category from "../components/HelpCenter/Category/Category";
 import ArticleDetail from "../components/HelpCenter/Articles/ArticleDetail";
 import Comments from "../components/Dashboard/Comments";
 import Reactions from "../components/Dashboard/Reactions";
+import UpdateIdea from "../components/Ideas/UpdateIdea";
 
 export const routes = [
      {path: `${baseUrl}/dashboard`, component: <Dashboard/>},
@@ -29,8 +30,7 @@ export const routes = [
      {path: `${baseUrl}/announcements`, component: <Announcements/>},
      {path: `${baseUrl}/announcements/:post_id`, component: <Announcements/>},
      {path: `${baseUrl}/ideas`, component: <Ideas/>},
-     {path: `${baseUrl}/ideas/:id`, component: <Ideas/>},
-     {path: `${baseUrl}/ideas/:post_id`, component: <Ideas/>},
+     {path: `${baseUrl}/ideas/:id`, component: <UpdateIdea/>},
      {path: `${baseUrl}/roadmap`, component: <Roadmap/>},
      {path: `${baseUrl}/customers`, component: <Customers/>},
      {path: `${baseUrl}/widget`, component: <Widgets/>},

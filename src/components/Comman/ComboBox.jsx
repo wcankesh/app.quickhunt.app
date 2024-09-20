@@ -1,6 +1,6 @@
 import * as React from "react";
 import { CaretSortIcon, CheckIcon } from "@radix-ui/react-icons";
-import { Button } from "@/components/ui/button";
+import { Button } from "../ui/button";
 import {
     Command,
     CommandEmpty,
@@ -8,13 +8,13 @@ import {
     CommandInput,
     CommandItem,
     CommandList,
-} from "@/components/ui/command";
+} from "../ui/command";
 import {
     Popover,
     PopoverContent,
     PopoverTrigger,
-} from "@/components/ui/popover";
-import { cn } from "@/lib/utils";
+} from "../ui/popover";
+import { cn } from "../../lib/utils";
 import {Fragment, useState} from "react";
 
 const ComboBox = ({ items, placeholder, onSelect, value, setValue,classNames,isSearchBar=true }) => {

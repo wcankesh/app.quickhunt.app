@@ -376,7 +376,7 @@ export class ApiService{
         return await this.postData(`${baseUrlApi}/dashboard`,payload)
     }
     async dashboardDataFeed (payload){
-        return await this.getData(`${baseUrlApi}/dashboard/comments?${qs.stringify(payload)}`)
+        return await this.postData(`${baseUrlApi}/feedbacks`, payload)
     }
     async payment (payload){
         return await this.postData(`${baseUrlApi}/payment`,payload)

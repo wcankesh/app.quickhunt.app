@@ -5,7 +5,7 @@ import {Card, CardContent, CardFooter} from "../ui/card";
 import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "../ui/select";
 import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList} from "../ui/command";
 import {Checkbox} from "../ui/checkbox";
-import UpdateIdea from "./UpdateIdea";
+
 import {useTheme} from "../theme-provider";
 import {ApiService} from "../../utils/ApiService";
 import {useNavigate} from "react-router";
@@ -22,7 +22,7 @@ import {DropdownMenuContent, DropdownMenuItem,} from "../ui/dropdown-menu";
 import {Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "../ui/dialog";
 import {Badge} from "../ui/badge";
 import {Popover, PopoverContent, PopoverTrigger} from "../ui/popover";
-import {useLocation} from "react-router-dom";
+
 
 const filterByStatus = [
     {name: "Archived", value: "archive",},
@@ -67,20 +67,14 @@ const Ideas = () => {
     const [openFilter, setOpenFilter] = useState('');
     const [openFilterType, setOpenFilterType] = useState('');
 
-    const openSheet = () => setSheetOpen(true);
-    const closeSheet = () => {
-        setSheetOpen(false)
-        navigate(`/ideas`);
-    };
-
     const openCreateIdea = () => {
         setSheetOpenCreate(true)
-        navigate(`/ideas/new`);
+
     };
 
     const closeCreateIdea = () => {
         setSheetOpenCreate(false)
-        navigate(`/ideas`);
+
     };
 
     useEffect(() => {
@@ -96,6 +90,7 @@ const Ideas = () => {
         setRoadmapStatus(allStatusAndTypes.roadmap_status)
     }, [projectDetailsReducer.id, pageNo, allStatusAndTypes])
 
+
     const getAllIdea = async () => {
         const data = await apiSerVice.getAllIdea({
             project_id: projectDetailsReducer.id,
@@ -105,25 +100,13 @@ const Ideas = () => {
         if (data.status === 200) {
             setIdeasList(data.data)
             setTotalRecord(data.total)
-            const id = urlParams.get('id') || "";
-            if (id) {
-                getSingleIdea()
-            }
             setIsLoading(false)
         } else {
             setIsLoading(false)
         }
     }
 
-    const getSingleIdea = async () => {
-        const id = urlParams.get('id') || "";
-        const data = await apiSerVice.getSingleIdea(id);
-        if (data.status === 200) {
-            setSelectedIdea(data.data)
-            setOldSelectedIdea(data.data)
-            navigate(`${baseUrl}/ideas`)
-        }
-    }
+
 
     const ideaSearch = async (payload) => {
         setIsLoadingSearch(true)
@@ -139,10 +122,9 @@ const Ideas = () => {
     }
 
     const openDetailsSheet = (record) => {
-        setSelectedIdea(record)
-        setOldSelectedIdea(record)
-        openSheet();
-        navigate(`/ideas/${record.id}`);
+
+        navigate(`${baseUrl}/ideas/${record.id}`)
+
     };
 
     const handleChange = (e) => {
@@ -339,18 +321,7 @@ const Ideas = () => {
                 </Fragment>
             }
             <div className={"container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-3 md:px-4"}>
-                <UpdateIdea
-                    isOpen={isSheetOpen}
-                    onOpen={openSheet}
-                    onClose={closeSheet}
-                    selectedIdea={selectedIdea}
-                    setSelectedIdea={setSelectedIdea}
-                    ideasList={ideasList}
-                    setIdeasList={setIdeasList}
-                    setOldSelectedIdea={setOldSelectedIdea}
-                    oldSelectedIdea={oldSelectedIdea}
-                    setSheetOpen={setSheetOpen}
-                />
+
                 <CreateIdea
                     isOpen={isSheetOpenCreate}
                     onOpen={openCreateIdea}

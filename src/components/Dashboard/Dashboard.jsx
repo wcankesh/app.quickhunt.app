@@ -14,8 +14,7 @@ import {Button} from "../ui/button";
 import {useNavigate} from "react-router-dom";
 import {baseUrl} from "../../utils/constent";
 import {Badge} from "../ui/badge";
-import UpdateIdea from "../Ideas/UpdateIdea";
-import CreateUpdateAnnouncements from "../Announcements/CreateUpdateAnnouncements";
+
 
 const chartConfig = {
     totalView: {
@@ -192,36 +191,10 @@ export function Dashboard() {
         navigate(`${baseUrl}/dashboard/reactions`);
     };
 
-    const openSheet = () => setSheetOpen(true);
-    const openSheetAnnounce = () => setSheetOpenAnnounce(true);
-    const closeSheet = () => {
-        setSheetOpen(false)
-        navigate(`/ideas`);
-    };
 
     return (
         <Fragment>
-            <UpdateIdea
-                isOpen={isSheetOpen}
-                onOpen={openSheet}
-                onClose={closeSheet}
-                selectedIdea={selectedIdea}
-                setSelectedIdea={setSelectedIdea}
-                ideasList={ideasList}
-                setIdeasList={setIdeasList}
-                setOldSelectedIdea={setOldSelectedIdea}
-                oldSelectedIdea={oldSelectedIdea}
-            />
-            {selectedRecord.id &&
-            <CreateUpdateAnnouncements
-                isOpen={selectedRecord.id}
-                selectedRecord={selectedRecord}
-                setSelectedRecord={setSelectedRecord}
-                onOpen={openSheetAnnounce}
-                onClose={closeSheet}
-                getAllPosts={getAllPosts}
-                announcementList={announcementList}
-            />}
+
             <div className={"md:py-8 py-4 border-b"}>
                 <div
                     className='container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] px-3 md:px-4'>
@@ -295,7 +268,7 @@ export function Dashboard() {
                                                                 className="flex gap-2 items-center"
                                                                 onClick={() => {
                                                                     if (x.type === 1) {
-                                                                        navigate(`${baseUrl}/announcements/${x.post_id}`);
+                                                                        navigate(`${baseUrl}/announcements?id=${x.post_id}`);
                                                                     } else if (x.type === 2) {
                                                                         setSelectedIdea(x);
                                                                         navigate(`${baseUrl}/ideas/${x.post_id}`);

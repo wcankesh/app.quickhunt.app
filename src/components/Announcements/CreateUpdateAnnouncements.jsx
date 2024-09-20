@@ -282,6 +282,8 @@ const CreateUpdateAnnouncements = ({isOpen, onOpen, onClose, selectedRecord, get
                     formData.append("post_expired_at", changeLogDetails.post_expired_boolean === 1 ? moment(changeLogDetails.post_expired_at).format("YYYY-MM-DD") : "");
                 } else if (x === "delete_image" && changeLogDetails?.image?.name) {
 
+                } else if (x === "category_id" && (changeLogDetails[x] === null || changeLogDetails[x] === "null")) {
+                    formData.append("category_id", "");
                 } else {
                     formData.append(x, changeLogDetails[x]);
                 }
@@ -335,6 +337,8 @@ const CreateUpdateAnnouncements = ({isOpen, onOpen, onClose, selectedRecord, get
                     formData.append("post_expired_at", changeLogDetails.post_expired_boolean === 1 ? moment(changeLogDetails.post_expired_at).format("YYYY-MM-DD") : "");
                 } else if (x === "delete_image" && changeLogDetails?.image?.name) {
 
+                } else if (x === "category_id" && (changeLogDetails[x] === null || changeLogDetails[x] === "null")) {
+                    formData.append("category_id", "");
                 } else {
                     formData.append(x, changeLogDetails[x]);
                 }

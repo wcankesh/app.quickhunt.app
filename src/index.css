@@ -525,9 +525,6 @@ input:-webkit-autofill::first-line {
   padding-bottom: 0!important;
 }
 
-.ce-block__content .cdx-input {
-  display: none;
-}
 
 .cate-ellipsis{
   max-width: 200px;
@@ -538,4 +535,34 @@ input:-webkit-autofill::first-line {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+h1.ce-header {
+  font-size: 32px;
+  font-weight: bold;
+}
+
+h2.ce-header {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+h3.ce-header {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+h4.ce-header {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+h5.ce-header {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+h6.ce-header {
+  font-size: 14px;
+  font-weight: bold;
 }
