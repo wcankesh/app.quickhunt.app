@@ -269,6 +269,9 @@ em {color: var(--muted-foreground) !important;}
 .column-header {width: 100%;display: flex;justify-content: space-between;padding: 0px 8px;}
 .column-header > svg {cursor: pointer;}
 
+/*Ideas Tab BgCol*/
+.ideas-tab-comm-bgCol.data-\[state\=active\]\:bg-background[data-state="active"] {background-color: transparent}
+
 @media (max-width: 993px) {
   .idea-sheet-height{height: calc(100vh - 65px);}
 }

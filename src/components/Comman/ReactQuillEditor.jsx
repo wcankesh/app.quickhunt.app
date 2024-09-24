@@ -1,11 +1,16 @@
 import React from 'react';
 import ReactQuill from "react-quill";
+import {cn} from "../../lib/utils";
 
-const ReactQuillEditor = ({name, value, onChange}) => {
+const ReactQuillEditor = ({name, value, onChange, className}) => {
     return (
-        <div>
+        <>
             <ReactQuill
-                theme="snow" className={"rounded-md border bg-card  "}
+                className={cn(
+                    "rounded-md border bg-card", className
+                )}
+                placeholder="Type here..."
+                theme="snow" /*className={"rounded-md border bg-card"}*/
                 modules={
                     {
                         toolbar: [
@@ -13,7 +18,7 @@ const ReactQuillEditor = ({name, value, onChange}) => {
                             ["bold", "italic", "underline"],
                             [{ align: [] }],
                             [{ list: "ordered" }, { list: "bullet" }],
-                            [{ "color": [] }],
+                            [{ "color": [] }, { 'background': [] }],
                             ["link", 'image'],
 
                         ]
@@ -22,7 +27,7 @@ const ReactQuillEditor = ({name, value, onChange}) => {
                 formats={[
                     "header", "height", "bold", "italic",
                     "underline", "strike", "blockquote",
-                    "list", "color", "bullet", "indent",
+                    "list", "color", 'background', "bullet", "indent",
                     "link", "image", "align", "size",
                 ]}
                 value={value}
@@ -32,7 +37,7 @@ const ReactQuillEditor = ({name, value, onChange}) => {
                     }
                 }}
             />
-        </div>
+        </>
     );
 };
 

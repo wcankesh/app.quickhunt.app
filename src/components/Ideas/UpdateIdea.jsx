@@ -1,5 +1,4 @@
 import React, {Fragment, useState, useEffect} from 'react';
-
 import {Button} from "../ui/button";
 import {ArrowBigUp, Check, Circle, CircleX, Dot, Ellipsis, Loader2, MessageCircleMore, Paperclip, Pencil, Pin, Trash2, X} from "lucide-react";
 import {RadioGroup, RadioGroupItem} from "../ui/radio-group";
@@ -18,7 +17,16 @@ import moment from "moment";
 import {DropdownMenu, DropdownMenuTrigger} from "@radix-ui/react-dropdown-menu";
 import {DropdownMenuContent, DropdownMenuItem} from "../ui/dropdown-menu";
 import ReactQuillEditor from "../Comman/ReactQuillEditor";
-import {useParams} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
+import {
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList,
+    BreadcrumbPage,
+    BreadcrumbSeparator
+} from "../ui/breadcrumb";
+import {baseUrl} from "../../utils/constent";
 
 const initialStateError = {
     title: "",
@@ -32,6 +40,7 @@ const UpdateIdea = () => {
     let apiSerVice = new ApiService();
     const {toast} = useToast();
     const { id } = useParams();
+    const navigate = useNavigate();
 
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
@@ -59,7 +68,6 @@ const UpdateIdea = () => {
     const [formError, setFormError] = useState(initialStateError);
     const [selectedIdea, setSelectedIdea] = useState({}); // update idea
     const [oldSelectedIdea, setOldSelectedIdea] = useState({});
-
 
     useEffect(() => {
         if (projectDetailsReducer.id) {
@@ -465,9 +473,6 @@ const UpdateIdea = () => {
         }));
     }
 
-
-
-
     const onCreateIdea = async () => {
         setIsLoadingCreateIdea(true)
         let validationErrors = {};
@@ -523,17 +528,30 @@ const UpdateIdea = () => {
         setSubCommentFiles(clone)
     }
 
-
-
     const handleImageClick = (imageSrc) => {
         window.open(imageSrc, '_blank');
     };
 
     return (
         <Fragment>
-            <div className={`grid lg:grid-cols-12 md:grid-cols-1 overflow-auto ${selectedIdea?.comments?.length > 2 ? "h-[calc(100vh_-_100px)]" : "h-[calc(100vh_-_50px)]"} sm:h-[calc(100vh_-_65px)]`}>
-                <div className={`col-span-4 lg:block hidden ${theme === "dark" ? "" : "bg-muted"} border-r lg:overflow-auto idea-sheet-height`}>
-                    <div className={"border-b py-4 pl-8 pr-6 flex flex-col gap-3"}>
+            <div className={"p-6 border-b"}>
+                <Breadcrumb>
+                    <BreadcrumbList>
+                        <BreadcrumbItem className={"cursor-pointer"}>
+                            <BreadcrumbLink onClick={() => navigate(`${baseUrl}/ideas`)}>
+                                Ideas
+                            </BreadcrumbLink>
+                        </BreadcrumbItem>
+                        <BreadcrumbSeparator />
+                        <BreadcrumbItem className={"cursor-pointer"}>
+                            <BreadcrumbPage>{selectedIdea?.title}</BreadcrumbPage>
+                        </BreadcrumbItem>
+                    </BreadcrumbList>
+                </Breadcrumb>
+            </div>
+            <div className={`flex h-[calc(100%_-_69px)] overflow-y-auto`}>
+                <div className={`max-w-[407px] w-full h-full border-r lg:block hidden lg:overflow-auto`}>
+                    <div className={"border-b py-4 px-6 flex flex-col gap-3"}>
                         <div className={"flex flex-col gap-1"}>
                             <h3 className={"text-sm font-medium"}>Status</h3>
                             <p className={"text-muted-foreground text-xs font-normal"}>Apply a status to Manage
@@ -561,7 +579,7 @@ const UpdateIdea = () => {
                         </div>
                     </div>
                     <div className={"border-b"}>
-                        <div className="py-4 pl-8 pr-6 w-full items-center gap-1.5">
+                        <div className="py-4 px-6 w-full items-center gap-1.5">
                             <Label htmlFor="picture">Featured image</Label>
                             <div className="w-[282px] h-[128px] flex gap-1">
 
@@ -613,7 +631,7 @@ const UpdateIdea = () => {
                             </div>
                         </div>
                     </div>
-                    <div className={"py-4 pl-8 pr-6 flex flex-col gap-[26px]"}>
+                    <div className={"py-4 px-6 flex flex-col gap-[26px]"}>
                         <div className={"flex gap-1 justify-between"}>
                             <div className={"flex flex-col gap-1"}>
                                 <h4 className={"text-sm font-medium"}>Mark as bug</h4>
@@ -657,11 +675,10 @@ const UpdateIdea = () => {
                         </div>
                     </div>
                 </div>
-                {/*<div className={"col-span-8 lg:overflow-auto"}>*/}
-                <div className={"col-span-8 lg:overflow-auto"}>
+                <div className={"w-full h-full overflow-y-auto"}>
                     {
                         isEditIdea ?
-                            <div className={"pb-100px"}>
+                            <Fragment>
                                 <div
                                     className={"px-4 py-3 lg:py-6 lg:px-8 flex flex-col gap-4 ld:gap-6 border-b"}>
                                     <div className="space-y-2">
@@ -774,7 +791,7 @@ const UpdateIdea = () => {
                                         Cancel
                                     </Button>
                                 </div>
-                            </div>
+                            </Fragment>
                             :
                             <Fragment>
                                 <div className={"px-4 py-3 lg:py-6 lg:px-8"}>
@@ -1184,11 +1201,11 @@ const UpdateIdea = () => {
                                     </div>
                                 </div>
                                 <div className={"tabs"}>
-                                    <Tabs defaultValue="comment" className="">
+                                    <Tabs defaultValue="comment">
                                         <div className={"px-4 lg:px-8"}>
                                             <TabsList
-                                                className="bg-transparent border-b-2 border-b-primary rounded-none">
-                                                <TabsTrigger value="comment">Comment</TabsTrigger>
+                                                className={"bg-transparent border-b-2 border-b-primary rounded-none"}>
+                                                <TabsTrigger className={"ideas-tab-comm-bgCol"} value="comment">Comment</TabsTrigger>
                                             </TabsList>
                                         </div>
 

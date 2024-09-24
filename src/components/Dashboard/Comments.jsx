@@ -60,33 +60,19 @@ const Comments = () => {
 
     useEffect(() => {
         if(projectDetailsReducer.id){
-            // dashboardData();
             getComments();
         }
 
-    },[projectDetailsReducer.id])
-
-    const dashboardData = async () => {
-        setIsLoading(true)
-        const payload = {
-            project_id:projectDetailsReducer.id,
-        }
-        const data = await apiSerVice.dashboardData(payload)
-        if(data.status === 200){
-            setChartList({...data.data})
-            setTotalRecord(data.total)
-            setIsLoading(false)
-        } else {
-
-        }
-    }
+    },[projectDetailsReducer.id, pageNo])
 
     const getComments = async () => {
+        setIsLoading(true);
         const data = await apiSerVice.dashboardDataFeed({
             project_id: projectDetailsReducer.id,
             page: pageNo,
             limit: perPageLimit
         });
+        setIsLoading(false);
         if (data.status === 200) {
             setChartList(data.data)
             setTotalRecord(data.total)
@@ -108,14 +94,14 @@ const Comments = () => {
         <div className={"container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-3 md:px-4"}>
             <div className={"flex gap-4 items-center mb-6"}>
                 <MoveLeft size={20} onClick={() => navigate(`${baseUrl}/dashboard`)} className={"cursor-pointer"}/>
-                <h1 className="text-2xl font-medium flex-initial w-auto">Comments (<span>{chartList.feedbacks.length}</span>)</h1>
+                <h1 className="text-2xl font-medium flex-initial w-auto">Comments (<span>{totalRecord}</span>)</h1>
             </div>
             <Card>
                 {
-                    (isLoading) ? CommSkel.commonParagraphFourComments : chartList.feedbacks.length > 0 ?
+                    (isLoading) ? CommSkel.commonParagraphFourComments : chartList?.length > 0 ?
                         <CardContent className={"p-0"}>
                             {
-                                (chartList.feedbacks || []).map((x, i) => (
+                                (chartList || []).map((x, i) => (
                                     <CardContent className={"p-6 flex flex-col gap-4 border-b"}>
                                         <div className="flex gap-2 items-center justify-between">
                                             <div className="flex gap-2 items-center">
@@ -139,7 +125,7 @@ const Comments = () => {
                                                 variant={"outline"}
                                                 className={`text-xs font-medium text-muted-foreground ${x.type === 1 ? "text-[#3b82f6] border-[#3b82f6]" : "text-[#63c8d9] border-[#63c8d9]"}`}
                                             >
-                                                {x.type === 1 ? "Announcement" : "Idea"}
+                                                {x.type == 1 ? "Announcement" : "Idea"}
                                             </Badge>
                                         </div>
                                         <p className={"text-xs font-medium text-foreground"}>
@@ -152,12 +138,12 @@ const Comments = () => {
                 }
 
                 {
-                    chartList?.feedbacks?.length > 0 ?
+                    chartList?.length > 0 ?
                         <CardFooter className={`p-0`}>
                             <div className={`w-full ${theme === "dark" ? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end p-2 md:px-3 md:py-[10px]`}>
                                 <div className={"w-full flex gap-2 items-center justify-between sm:justify-end"}>
                                     <div>
-                                        <h5 className={"text-sm font-semibold"}>Page {chartList?.feedbacks?.length <= 0 ? 0 :pageNo} of {totalPages}</h5>
+                                        <h5 className={"text-sm font-semibold"}>Page {chartList?.length <= 0 ? 0 :pageNo} of {totalPages}</h5>
                                     </div>
                                     <div className={"flex flex-row gap-2 items-center"}>
                                         <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
@@ -174,15 +160,15 @@ const Comments = () => {
                                         </Button>
                                         <Button variant={"outline"} className={" h-[30px] w-[30px] p-1.5"}
                                                 onClick={() => handlePaginationClick(pageNo + 1)}
-                                                disabled={pageNo === totalPages || isLoading || chartList?.feedbacks?.length <= 0}>
+                                                disabled={pageNo === totalPages || isLoading || chartList?.length <= 0}>
                                             <ChevronRight
-                                                className={pageNo === totalPages || isLoading || chartList?.feedbacks?.length <= 0 ? "stroke-muted-foreground" : "stroke-primary"} />
+                                                className={pageNo === totalPages || isLoading || chartList?.length <= 0 ? "stroke-muted-foreground" : "stroke-primary"} />
                                         </Button>
                                         <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
                                                 onClick={() => handlePaginationClick(totalPages)}
-                                                disabled={pageNo === totalPages || isLoading || chartList?.feedbacks?.length <= 0}>
+                                                disabled={pageNo === totalPages || isLoading || chartList?.length <= 0}>
                                             <ChevronsRight
-                                                className={pageNo === totalPages || isLoading || chartList?.feedbacks?.length <= 0 ? "stroke-muted-foreground" : "stroke-primary"} />
+                                                className={pageNo === totalPages || isLoading || chartList?.length <= 0 ? "stroke-muted-foreground" : "stroke-primary"} />
                                         </Button>
                                     </div>
                                 </div>

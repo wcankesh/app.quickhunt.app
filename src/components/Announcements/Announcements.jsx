@@ -3,7 +3,7 @@ import {Button} from "../ui/button";
 import {Input} from "../ui/input";
 import AnnouncementsTable from "./AnnouncementsTable";
 import {ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Circle, Filter, Plus, X} from "lucide-react";
-import CreateUpdateAnnouncements from "./CreateUpdateAnnouncements";
+import CreateAnnouncement from "./CreateAnnouncement";
 import {useTheme} from "../theme-provider";
 import {useSelector} from "react-redux";
 import {ApiService} from "../../utils/ApiService";
@@ -207,10 +207,9 @@ const Announcements = () => {
     const matchedObject = allStatusAndTypes.labels ? allStatusAndTypes.labels.find(x => x.id === filter.l) : null;
 
     return (
-        <div
-            className={"container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-3 md:px-4"}>
+        <div className={"container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-3 md:px-4"}>
             {selectedRecord.id &&
-            <CreateUpdateAnnouncements
+            <CreateAnnouncement
                 isOpen={selectedRecord.id}
                 selectedRecord={selectedRecord}
                 setSelectedRecord={setSelectedRecord}
@@ -226,7 +225,7 @@ const Announcements = () => {
                                                onClose={onCloseAnalyticsSheet}/>}
             <div className={"flex items-center justify-between flex-wrap gap-6"}>
                 <div className={"flex justify-between items-center w-full md:w-auto"}>
-                    <h3 className={"text-2xl font-medium leading-8"}>Announcement</h3>
+                    <h3 className={"text-2xl font-medium leading-8"}>Announcement ({totalRecord})</h3>
                 </div>
                 <div className={"flex gap-2 flex-wrap items-center"}>
                     <div className={"flex gap-2 items-center w-full md:w-auto"}>

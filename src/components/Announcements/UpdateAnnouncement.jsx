@@ -1,22 +1,31 @@
-import React, {useEffect, useState} from 'react';
-import {Sheet, SheetContent, SheetHeader, SheetOverlay,} from "../ui/sheet";
-import {CalendarIcon, Check, Circle, Pin, X, Loader2, CircleX} from "lucide-react";
+import React, {useEffect, useState, Fragment} from 'react';
 import {Label} from "../ui/label";
 import {Input} from "../ui/input";
-import {Switch} from "../ui/switch";
+import ReactQuillEditor from "../Comman/ReactQuillEditor";
+import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "../ui/select";
+import {Badge} from "../ui/badge";
+import {CalendarIcon, Check, Circle, CircleX, Loader2, Pin, X} from "lucide-react";
+import {Popover, PopoverContent, PopoverTrigger} from "../ui/popover";
 import {Button} from "../ui/button";
-import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue,} from "../ui/select";
+import {cn} from "../../lib/utils";
 import moment from "moment";
-import {ApiService} from "../../utils/ApiService";
+import {Calendar} from "../ui/calendar";
+import {Switch} from "../ui/switch";
+import {useNavigate, useParams} from "react-router-dom";
 import {useSelector} from "react-redux";
 import {useTheme} from "../theme-provider";
-import {Popover, PopoverContent, PopoverTrigger} from "../ui/popover";
-import {cn} from "../../lib/utils";
-import {Calendar} from "../ui/calendar";
+import {ApiService} from "../../utils/ApiService";
 import {toast} from "../ui/use-toast";
-import {Badge} from "../ui/badge";
-import ReactQuillEditor from "../Comman/ReactQuillEditor";
-import {useLocation, useParams} from "react-router-dom";
+import {
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList,
+    BreadcrumbPage,
+    BreadcrumbSeparator
+} from "../ui/breadcrumb";
+import {baseUrl} from "../../utils/constent";
+
 //post_status: 1=Publish/active,2=Scheduled/unpublished,3=Draft,4=Expired
 const initialState = {
     post_description: '',
@@ -39,9 +48,10 @@ const initialStateError = {
     post_slug_url: "",
 }
 
-const CreateUpdateAnnouncements = ({isOpen, onOpen, onClose, selectedRecord, getAllPosts, announcementList, setSelectedRecord, setAnnouncementList}) => {
+const UpdateAnnouncement = ({onClose}) => {
 
     const { id } = useParams();
+    const navigate = useNavigate();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
     const userDetailsReducer = useSelector(state => state.userDetailsReducer);
@@ -57,42 +67,51 @@ const CreateUpdateAnnouncements = ({isOpen, onOpen, onClose, selectedRecord, get
     const {theme} = useTheme();
     let apiService = new ApiService();
 
+    console.log("changeLogDetails", changeLogDetails)
+
     useEffect(() => {
         if (projectDetailsReducer.id) {
-            if (selectedRecord?.post_slug_url) {
-                getSinglePosts();
-            } else {
-                setChangeLogDetails({
-                    ...changeLogDetails,
-                    post_assign_to: [userDetailsReducer.id.toString()],
-                });
-            }
+            // if (changeLogDetails?.post_slug_url) {
+            //     getSinglePosts();
+            // } else {
+            //     setChangeLogDetails({
+            //         ...changeLogDetails,
+            //         post_assign_to: [userDetailsReducer.id.toString()],
+            //     });
+            // }
             setLabelList(allStatusAndTypes.labels);
             setMemberList(allStatusAndTypes.members);
             setCategoriesList(allStatusAndTypes.categories);
+            getSinglePosts();
         }
     }, [projectDetailsReducer.id, allStatusAndTypes, userDetailsReducer.id])
 
-    useEffect(() => {
-        if (id && announcementList.length > 0) {
-            setSelectedRecord(true);
-            const clone = announcementList.find((x) => x.id == id);
-            setAnnouncementList(clone);
+    // useEffect(() => {
+    //     if (id && announcementList?.length > 0) {
+    //         // setChangeLogDetails(true);
+    //         const clone = announcementList.find((x) => x.id == id);
+    //         setAnnouncementList(clone);
+    //     }
+    // }, [id, announcementList]);
+
+    const getSinglePosts = async () => {
+        // const url = changeLogDetails?.post_slug_url
+        //     ? `${baseUrl}/posts/${changeLogDetails.post_slug_url}`
+        //     : `${baseUrl}/posts/${id}`;
+
+        const data = await apiService.getSinglePosts(id);
+        if (data.status === 200) {
+            const labelId = changeLogDetails.labels.map(x => x?.id?.toString());
+            setChangeLogDetails({
+                ...changeLogDetails,
+                image: changeLogDetails.feature_image,
+                post_assign_to: changeLogDetails.post_assign_to !== null ? changeLogDetails.post_assign_to.split(',') : [],
+                post_published_at: changeLogDetails.post_published_at ? moment(changeLogDetails.post_published_at).format('YYYY-MM-DD') : moment(new Date()),
+                post_expired_at: changeLogDetails.post_expired_at ? moment(changeLogDetails.post_expired_at).format('YYYY-MM-DD') : undefined,
+                category_id: changeLogDetails.category_id,
+                labels: labelId,
+            });
         }
-    }, [id, announcementList]);
-
-    const getSinglePosts = () => {
-        const labelId = selectedRecord.labels.map(x => x?.id?.toString());
-        setChangeLogDetails({
-            ...selectedRecord,
-            image: selectedRecord.feature_image,
-            post_assign_to: selectedRecord.post_assign_to !== null ? selectedRecord.post_assign_to.split(',') : [],
-            post_published_at: selectedRecord.post_published_at ? moment(selectedRecord.post_published_at).format('YYYY-MM-DD') : moment(new Date()),
-            post_expired_at: selectedRecord.post_expired_at ? moment(selectedRecord.post_expired_at).format('YYYY-MM-DD') : undefined,
-            category_id: selectedRecord.category_id,
-            labels: labelId,
-
-        });
         // setPreviewImage(selectedRecord.feature_image);
     }
 
@@ -232,84 +251,6 @@ const CreateUpdateAnnouncements = ({isOpen, onOpen, onClose, selectedRecord, get
         }
     };
 
-    const createPosts = async () => {
-        let validationErrors = {};
-        Object.keys(changeLogDetails).forEach(name => {
-            const error = formValidate(name, changeLogDetails[name]);
-            if (error && error.length > 0) {
-                validationErrors[name] = error;
-            }
-        });
-        const imageError = formValidate('image', changeLogDetails.image);
-        if (imageError) {
-            validationErrors['image'] = imageError;
-        }
-        if (Object.keys(validationErrors).length > 0) {
-            setFormError(validationErrors);
-            return;
-        }
-
-        // const existingSlugs = new Set((announcementList || []).map(x => x.post_slug_url));
-        // if (existingSlugs.has(changeLogDetails.post_slug_url)) {
-        //     toast({
-        //         description: "The post slug url has already been taken.",
-        //         variant: "destructive",
-        //     });
-        //     return;
-        // }
-
-        const isSlugTaken = (announcementList || []).some(x => x.post_slug_url === changeLogDetails.post_slug_url);
-        if (isSlugTaken) {
-            toast({
-                description: "The post slug url has already been taken.",
-                variant: "destructive",
-            });
-            return;
-        }
-
-        setIsSave(true)
-        let formData = new FormData();
-        formData.append("post_project_id", projectDetailsReducer.id);
-        Object.keys(changeLogDetails).map((x) => {
-            if (x !== "labels") {
-                if (x === "post_assign_to") {
-                    formData.append(x, changeLogDetails[x].join());
-                } else if (x === "post_slug_url") {
-                    formData.append("post_slug_url", changeLogDetails.post_slug_url ? changeLogDetails.post_slug_url : changeLogDetails.post_title.replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-').replace(/\//g, "-").toLowerCase());
-                } else if (x === "post_published_at") {
-                    formData.append("post_published_at", moment(changeLogDetails.post_published_at).format("YYYY-MM-DD"));
-                } else if (x === "post_expired_at") {
-                    formData.append("post_expired_at", changeLogDetails.post_expired_boolean === 1 ? moment(changeLogDetails.post_expired_at).format("YYYY-MM-DD") : "");
-                } else if (x === "delete_image" && changeLogDetails?.image?.name) {
-
-                } else if (x === "category_id" && (changeLogDetails[x] === null || changeLogDetails[x] === "null")) {
-                    formData.append("category_id", "");
-                } else {
-                    formData.append(x, changeLogDetails[x]);
-                }
-            }
-        })
-        for (let i = 0; i < changeLogDetails.labels.length; i++) {
-            formData.append('labels[]', changeLogDetails.labels[i]);
-        }
-        const data = await apiService.createPosts(formData);
-        if (data.status === 200) {
-            setChangeLogDetails(initialState)
-            setIsSave(false)
-            await getAllPosts()
-            toast({
-                description: data.message,
-            });
-        } else {
-            setIsSave(false);
-            // toast({
-            //     description: data.message,
-            //     variant: "destructive",
-            // });
-        }
-        onClose("", data.data);
-    }
-
     const updatePost = async () => {
         let validationErrors = {};
         Object.keys(changeLogDetails).forEach(name => {
@@ -394,24 +335,37 @@ const CreateUpdateAnnouncements = ({isOpen, onOpen, onClose, selectedRecord, get
         e.stopPropagation();
     }
 
+    const onCancel = () => {
+        setChangeLogDetails(initialState);
+        navigate(`${baseUrl}/announcements`);
+    }
+
     return (
-        <Sheet open={isOpen} onOpenChange={isOpen ? onClose : onOpen}>
-            <SheetOverlay className={"inset-0"}/>
-            <SheetContent className={"pt-6 p-0 lg:max-w-[663px] md:max-w-[720px] sm:max-w-[520px]"}>
-                <SheetHeader
-                    className={`px-3 py-4 lg:px-8 lg:py-[20px] flex flex-row justify-between items-center border-b`}>
-                    <h5 className={"text-sm md:text-xl font-medium"}>{selectedRecord?.post_slug_url ? "Update Announcement" : "Create New Announcements"}</h5>
-                    <div className={"flex items-center gap-6 m-0"}>
-                        <Button className={"h-5 w-5 p-0"}
-                                onClick={() => commonToggle("post_pin_to_top", changeLogDetails.post_pin_to_top === 1 ? 0 : 1)}
-                                variant={"ghost"}>{changeLogDetails.post_pin_to_top === 1 ?
-                            <Pin size={15}/> : <Pin size={15} className={`${theme === "dark" ? "fill-card-foreground" : "fill-card-foreground"}`}/>}</Button>
-                        <X onClick={onClose} size={18} className={"cursor-pointer"}/>
-                    </div>
-                </SheetHeader>
-                <div className={"comm-sheet-height overflow-y-auto"}>
-                    <div className={"px-3 py-6 lg:px-8 border-b"}>
-                        <div className={"flex flex-col gap-6"}>
+        <Fragment>
+            <div className={"py-6 px-8 border-b flex justify-between"}>
+                <Breadcrumb>
+                    <BreadcrumbList>
+                        <BreadcrumbItem className={"cursor-pointer"}>
+                            <BreadcrumbLink onClick={() => navigate(`${baseUrl}/announcements`)}>
+                                Announcement
+                            </BreadcrumbLink>
+                        </BreadcrumbItem>
+                        <BreadcrumbSeparator />
+                        <BreadcrumbItem className={"cursor-pointer"}>
+                            <BreadcrumbPage>{changeLogDetails.post_title}</BreadcrumbPage>
+                        </BreadcrumbItem>
+                    </BreadcrumbList>
+                </Breadcrumb>
+                <Button className={"h-5 w-5 p-0"}
+                        onClick={() => commonToggle("post_pin_to_top", changeLogDetails.post_pin_to_top === 1 ? 0 : 1)}
+                        variant={"ghost hover:bg-none"}>{changeLogDetails.post_pin_to_top === 1 ?
+                    <Pin size={15}/> : <Pin size={15} className={`${theme === "dark" ? "fill-card-foreground" : "fill-card-foreground"}`}/>}
+                </Button>
+            </div>
+            <div className={"h-[calc(100%_-_69px)] overflow-y-auto"}>
+                <div className={"px-3 py-6 lg:px-8 border-b"}>
+                    <div className={"flex gap-4"}>
+                        <div className="w-full flex flex-col gap-4">
                             <div className="w-full flex flex-col gap-2">
                                 <Label htmlFor="title">Title</Label>
                                 <Input type="text" id="title" className={"h-9"} name={"post_title"}
@@ -429,19 +383,21 @@ const CreateUpdateAnnouncements = ({isOpen, onOpen, onClose, selectedRecord, get
                                         target={"_blank"}
                                         className={"text-primary max-w-[593px] w-full break-words text-sm"}>{`https://${projectDetailsReducer.domain?.toLowerCase()}/announcements/${changeLogDetails.post_slug_url?.toLowerCase()}`}</a> : ""}</p>
                             </div>
-                            <div className="w-full flex flex-col gap-2">
-                                <Label htmlFor="description">Description</Label>
-                                <ReactQuillEditor value={changeLogDetails.post_description} onChange={onChangeText}
-                                                  name={"post_description"}/>
-                                {formError.post_description &&
-                                <span className="text-sm text-red-500">{formError.post_description}</span>}
-                            </div>
+                        </div>
+                        <div className="w-full flex flex-col gap-2">
+                            <Label htmlFor="description">Description</Label>
+                            <ReactQuillEditor className={"h-full"} value={changeLogDetails.post_description} onChange={onChangeText}
+                                              name={"post_description"}/>
+                            {formError.post_description &&
+                            <span className="text-sm text-red-500">{formError.post_description}</span>}
                         </div>
                     </div>
-                    <div className={"px-3 py-6 lg:px-8 flex flex-col gap-4 border-b"}>
-                        <div className={"flex flex-wrap md:flex-nowrap gap-4 items-start"}>
-                            <div className="grid w-full gap-2 md:basis-1/2">
-                                <Label htmlFor="label">Label</Label>
+                </div>
+                <div className={"px-3 py-6 lg:px-8 flex flex-col gap-4 border-b"}>
+                    <div className={"flex flex-wrap md:flex-nowrap gap-4 items-start"}>
+                        <div className="w-full flex flex-col gap-4">
+                            <div className={"w-full space-y-1.5"}>
+                                <Label>Label</Label>
                                 <Select value={[]} onValueChange={onChangeLabel}>
                                     <SelectTrigger className="h-9">
                                         <SelectValue className={"text-muted-foreground text-sm"}
@@ -492,8 +448,8 @@ const CreateUpdateAnnouncements = ({isOpen, onOpen, onClose, selectedRecord, get
                                     </SelectContent>
                                 </Select>
                             </div>
-                            <div className="grid w-full gap-2 md:basis-1/2">
-                                <Label htmlFor="label">Assign to</Label>
+                            <div className={"w-full space-y-1.5"}>
+                                <Label>Assign to</Label>
                                 <Select onValueChange={handleValueChange} value={[]}>
                                     <SelectTrigger className={"h-9"}>
                                         <SelectValue className={"text-muted-foreground text-sm"}
@@ -535,10 +491,8 @@ const CreateUpdateAnnouncements = ({isOpen, onOpen, onClose, selectedRecord, get
                                     </SelectContent>
                                 </Select>
                             </div>
-                        </div>
-                        <div className={"flex flex-wrap md:flex-nowrap gap-4 items-start"}>
-                            <div className={"grid w-full gap-2 md:basis-1/2"}>
-                                <Label htmlFor="label">Category</Label>
+                            <div className={"w-full space-y-1.5"}>
+                                <Label>Category</Label>
                                 <Select
                                     value={changeLogDetails && changeLogDetails.category_id && changeLogDetails.category_id.toString()}
                                     onValueChange={onChangeCategory}>
@@ -560,7 +514,7 @@ const CreateUpdateAnnouncements = ({isOpen, onOpen, onClose, selectedRecord, get
                                     </SelectContent>
                                 </Select>
                             </div>
-                            <div className="grid w-full gap-2 md:basis-1/2">
+                            <div className={"space-x-4"}>
                                 <Label htmlFor="date">Published at</Label>
                                 <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
                                     <PopoverTrigger asChild>
@@ -587,115 +541,112 @@ const CreateUpdateAnnouncements = ({isOpen, onOpen, onClose, selectedRecord, get
                                 </Popover>
                             </div>
                         </div>
-                    </div>
-                    <div className={"px-3 lg:px-8 flex flex-wrap items-center gap-4 md:flex-nowrap border-b py-6"}>
-                        <div className={"space-y-3"}>
-                            <h5 className={"text-sm font-medium"}>Featured Image</h5>
-                            <div className="w-[282px] h-[128px] flex gap-1">
+                        <div className="w-full flex items-center gap-4">
+                            <div className={"space-y-3"}>
+                                <h5 className={"text-sm font-medium"}>Featured Image</h5>
+                                <div className="w-[282px] h-[128px] flex gap-1">
+                                    {
+                                        changeLogDetails?.image ?
+                                            <div>
+                                                {changeLogDetails && changeLogDetails.image && changeLogDetails.image.name ?
+                                                    <div className={"w-[282px] h-[128px] relative border p-[5px]"}>
+                                                        <img
+                                                            className={"upload-img"}
+                                                            src={changeLogDetails && changeLogDetails.image && changeLogDetails.image.name ? URL.createObjectURL(changeLogDetails.image) : changeLogDetails.image}
+                                                            alt=""
+                                                        />
+                                                        <CircleX
+                                                            size={20}
+                                                            className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
+                                                            onClick={() => onDeleteImg('delete_image', changeLogDetails && changeLogDetails?.image && changeLogDetails.image?.name ? "" : changeLogDetails.image.replace("https://code.quickhunt.app/public/storage/post/", ""))}
+                                                        />
+                                                    </div> :
+                                                    <div className={"w-[282px] h-[128px] relative border p-[5px]"}>
+                                                        <img className={"upload-img"} src={changeLogDetails.image}
+                                                             alt=""/>
+                                                        <CircleX
+                                                            size={20}
+                                                            className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
+                                                            onClick={() => onDeleteImg('delete_image', changeLogDetails && changeLogDetails?.image && changeLogDetails.image?.name ? "" : changeLogDetails.image.replace("https://code.quickhunt.app/public/storage/post/", ""))}
+                                                        />
+                                                    </div>
+                                                }
+                                            </div> :
+                                            <div>
+                                                <input
+                                                    id="pictureInput"
+                                                    type="file"
+                                                    className="hidden"
+                                                    accept="image/*"
+                                                    onChange={handleFileChange}
+                                                />
+                                                <label
+                                                    htmlFor="pictureInput"
+                                                    className="border-dashed w-[282px] h-[128px] py-[52px] flex items-center justify-center bg-muted border border-muted-foreground rounded cursor-pointer"
+                                                >
+                                                    <h4 className="text-xs font-semibold">Upload</h4>
+                                                </label>
+                                            </div>
+                                    }
+                                </div>
+                                {formError.image && <div className={"text-xs text-red-500"}>{formError.image}</div>}
+                            </div>
+                            <div className={"flex flex-col gap-[18px] w-full"}>
+                                <div className={"announce-create-switch flex gap-3"}>
+                                    <Switch id={"expire_date"} className={"w-[38px] h-[20px]"}
+                                            checked={changeLogDetails.post_expired_boolean === 1}
+                                            onCheckedChange={(checked) => commonToggle("post_expired_boolean",checked === true ? 1 : 0)}/>
+                                    <label htmlFor={"expire_date"} className={"text-sm text-muted-foreground font-medium"}>Expire At</label>
+                                </div>
                                 {
-                                    changeLogDetails?.image ?
-                                        <div>
-                                            {changeLogDetails && changeLogDetails.image && changeLogDetails.image.name ?
-                                                <div className={"w-[282px] h-[128px] relative border p-[5px]"}>
-                                                    <img
-                                                        className={"upload-img"}
-                                                        src={changeLogDetails && changeLogDetails.image && changeLogDetails.image.name ? URL.createObjectURL(changeLogDetails.image) : changeLogDetails.image}
-                                                        alt=""
+                                    changeLogDetails.post_expired_boolean === 1 ?
+                                        <div className="grid w-full gap-2 basis-1/2">
+                                            <Popover open={popoverOpenExpired} onOpenChange={setPopoverOpenExpired}>
+                                                <PopoverTrigger asChild>
+                                                    <Button
+                                                        id="date"
+                                                        variant={"outline"}
+                                                        className={cn("justify-between text-left font-normal d-flex", "text-muted-foreground")}
+                                                    >
+                                                        {moment(changeLogDetails.post_expired_at).format("LL")}
+                                                        <CalendarIcon className="mr-2 h-4 w-4"/>
+                                                    </Button>
+                                                </PopoverTrigger>
+                                                <PopoverContent className="w-auto p-0" align="start">
+                                                    <Calendar
+                                                        mode="single"
+                                                        showOutsideDays={false}
+                                                        captionLayout="dropdown"
+                                                        selected={changeLogDetails.post_expired_at}
+                                                        onSelect={(date) => onDateChange("post_expired_at", date)}
+                                                        startMonth={new Date(2024, 0)}
+                                                        endMonth={new Date(2050, 12)}
+                                                        hideNavigation
                                                     />
-                                                    <CircleX
-                                                        size={20}
-                                                        className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
-                                                        onClick={() => onDeleteImg('delete_image', changeLogDetails && changeLogDetails?.image && changeLogDetails.image?.name ? "" : changeLogDetails.image.replace("https://code.quickhunt.app/public/storage/post/", ""))}
-                                                    />
-                                                </div> :
-                                                <div className={"w-[282px] h-[128px] relative border p-[5px]"}>
-                                                    <img className={"upload-img"} src={changeLogDetails.image}
-                                                         alt=""/>
-                                                    <CircleX
-                                                        size={20}
-                                                        className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
-                                                        onClick={() => onDeleteImg('delete_image', changeLogDetails && changeLogDetails?.image && changeLogDetails.image?.name ? "" : changeLogDetails.image.replace("https://code.quickhunt.app/public/storage/post/", ""))}
-                                                    />
-                                                </div>
-                                            }
-                                        </div> :
-                                        <div>
-                                            <input
-                                                id="pictureInput"
-                                                type="file"
-                                                className="hidden"
-                                                accept="image/*"
-                                                onChange={handleFileChange}
-                                            />
-                                            <label
-                                                htmlFor="pictureInput"
-                                                className="border-dashed w-[282px] h-[128px] py-[52px] flex items-center justify-center bg-muted border border-muted-foreground rounded cursor-pointer"
-                                            >
-                                                <h4 className="text-xs font-semibold">Upload</h4>
-                                            </label>
-                                        </div>
+                                                </PopoverContent>
+                                            </Popover>
+                                        </div> : ""
                                 }
                             </div>
-                            {formError.image && <div className={"text-xs text-red-500"}>{formError.image}</div>}
                         </div>
-                        <div className={"flex flex-col gap-[18px] w-full"}>
-                            <div className={"announce-create-switch flex gap-3"}>
-                                <Switch id={"expire_date"} className={"w-[38px] h-[20px]"}
-                                        checked={changeLogDetails.post_expired_boolean === 1}
-                                        onCheckedChange={(checked) => commonToggle("post_expired_boolean",checked === true ? 1 : 0)}/>
-                                <label htmlFor={"expire_date"} className={"text-sm text-muted-foreground font-medium"}>Expire At</label>
-                            </div>
-
-                            {
-                                changeLogDetails.post_expired_boolean === 1 ?
-                                    <div className="grid w-full gap-2 basis-1/2">
-                                        <Popover open={popoverOpenExpired} onOpenChange={setPopoverOpenExpired}>
-                                            <PopoverTrigger asChild>
-                                                <Button
-                                                    id="date"
-                                                    variant={"outline"}
-                                                    className={cn("justify-between text-left font-normal d-flex", "text-muted-foreground")}
-                                                >
-                                                    {moment(changeLogDetails.post_expired_at).format("LL")}
-                                                    <CalendarIcon className="mr-2 h-4 w-4"/>
-                                                </Button>
-                                            </PopoverTrigger>
-                                            <PopoverContent className="w-auto p-0" align="start">
-                                                <Calendar
-                                                    mode="single"
-                                                    showOutsideDays={false}
-                                                    captionLayout="dropdown"
-                                                    selected={changeLogDetails.post_expired_at}
-                                                    onSelect={(date) => onDateChange("post_expired_at", date)}
-                                                    startMonth={new Date(2024, 0)}
-                                                    endMonth={new Date(2050, 12)}
-                                                    hideNavigation
-                                                />
-                                            </PopoverContent>
-                                        </Popover>
-                                    </div> : ""
-                            }
-
-                        </div>
-                    </div>
-                    <div className={"p-3 pb-[60px] lg:p-8 sm:pb-0 flex flex-row gap-4"}>
-                        <Button
-                            variant={"outline "}
-                            disabled={isSave}
-                            onClick={selectedRecord?.post_slug_url ? updatePost : createPosts}
-                            className={` bg-primary ${theme === "dark" ? "text-card-foreground" : "text-card"} w-[115px] font-semibold`}
-                        >
-                            {isSave ? <Loader2
-                                className="mr-2 h-4 w-4 animate-spin"/> : selectedRecord?.post_slug_url ? "Update Post" : "Publish Post"}
-                        </Button>
-                        <Button onClick={onClose} variant={"outline "}
-                                className={`border border-primary ${theme === "dark" ? "" : "text-primary"} text-sm font-semibold`}>Cancel</Button>
                     </div>
                 </div>
-            </SheetContent>
-        </Sheet>
-
+                <div className={"p-3 pb-[60px] lg:p-8 sm:pb-0 flex flex-row gap-4"}>
+                    <Button
+                        variant={"outline "}
+                        disabled={isSave}
+                        onClick={updatePost}
+                        className={` bg-primary ${theme === "dark" ? "text-card-foreground" : "text-card"} w-[115px] font-semibold`}
+                    >
+                        {isSave ? <Loader2
+                            className="mr-2 h-4 w-4 animate-spin"/> : "Update Post"}
+                    </Button>
+                    <Button onClick={onCancel} variant={"outline "}
+                            className={`border border-primary ${theme === "dark" ? "" : "text-primary"} text-sm font-semibold`}>Cancel</Button>
+                </div>
+            </div>
+        </Fragment>
     );
 };
 
-export default CreateUpdateAnnouncements;
+export default UpdateAnnouncement;

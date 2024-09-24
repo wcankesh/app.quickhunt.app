@@ -9,13 +9,14 @@ import {DropdownMenu, DropdownMenuTrigger} from "@radix-ui/react-dropdown-menu";
 import {DropdownMenuContent, DropdownMenuItem} from "../ui/dropdown-menu";
 import {Select, SelectItem, SelectGroup, SelectContent, SelectTrigger, SelectValue} from "../ui/select";
 import moment from "moment";
-import {apiService} from "../../utils/constent";
+import {apiService, baseUrl} from "../../utils/constent";
 import {Toaster} from "../ui/toaster";
 import {toast} from "../ui/use-toast";
 import {Skeleton} from "../ui/skeleton";
 import {Dialog} from "@radix-ui/react-dialog";
 import {DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "../ui/dialog";
 import EmptyData from "../Comman/EmptyData";
+import {useNavigate} from "react-router";
 
 const status = [
     {name: "Publish", value: 1, fillColor: "#389E0D", strokeColor: "#389E0D",},
@@ -28,7 +29,7 @@ const status2 = [
 ]
 
 const AnnouncementsTable = ({data, isLoading, setSelectedRecord, handleDelete, setAnalyticsObj,isLoadingDelete}) => {
-
+    const navigate = useNavigate();
     const {theme} = useTheme();
     const [announcementData, setAnnouncementData] = useState(data);
     const [idToDelete, setIdToDelete] = useState(null);
@@ -93,6 +94,7 @@ const AnnouncementsTable = ({data, isLoading, setSelectedRecord, handleDelete, s
 
     const onEdit = (record) => {
         setSelectedRecord(record);
+        navigate(`${baseUrl}/announcements/${record.id}`)
     };
 
     const shareFeedback = (domain, slug) => {

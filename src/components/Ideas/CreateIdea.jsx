@@ -159,7 +159,7 @@ const CreateIdea = ({isOpen, onOpen, onClose, closeCreateIdea, setIdeasList, ide
                                     <div className="space-y-2">
                                         <Label htmlFor="message">Description</Label>
 
-                                        <ReactQuillEditor value={ideaDetail.description} onChange={(e) => onChangeText("description", e.target.value)}/>
+                                        <ReactQuillEditor className={"min-h-[130px] h-full"} value={ideaDetail.description} onChange={(e) => onChangeText("description", e.target.value)}/>
 
                                         {formError.description && <span className="text-red-500 text-sm">{formError.description}</span>}
                                     </div>

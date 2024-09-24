@@ -156,6 +156,9 @@ export class ApiService{
     async getSinglePosts (id){
         return await this.getData(`${baseUrlApi}/posts/${id}`)
     }
+    // async getSinglePosts (url){
+    //     return await this.getData(url)
+    // }
     async createPosts (payload){
         return await this.postData(`${baseUrlApi}/posts`,payload, true)
     }
@@ -238,7 +241,7 @@ export class ApiService{
         return await this.postData(`${baseUrlApi}/get-feedback`, payload)
     }
     async getReaction (payload){
-        return await this.getData(`${baseUrlApi}/get-reaction?post_id=${payload.post_id}`)
+        return await this.getData(`${baseUrlApi}/get-reaction}`, payload)
     }
 
     async getMember (payload){
@@ -376,7 +379,10 @@ export class ApiService{
         return await this.postData(`${baseUrlApi}/dashboard`,payload)
     }
     async dashboardDataFeed (payload){
-        return await this.postData(`${baseUrlApi}/feedbacks`, payload)
+        return await this.postData(`${baseUrlApi}/feedbacks?${qs.stringify(payload)}`)
+    }
+    async dashboardDataReactions (payload){
+        return await this.postData(`${baseUrlApi}/reactions?${qs.stringify(payload)}`)
     }
     async payment (payload){
         return await this.postData(`${baseUrlApi}/payment`,payload)

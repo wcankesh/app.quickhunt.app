@@ -32,7 +32,7 @@ const SaidBarDesktop = () => {
                     title: 'Dashboard',
                     link: '/dashboard',
                     icon: Icon.homeIcon,
-                    selected: isActive(`${baseUrl}/dashboard`),
+                    selected: isActive(`${baseUrl}/dashboard`, `${baseUrl}/dashboard/comments`,`${baseUrl}/dashboard/reactions`,),
                 }
             ]
         },
@@ -43,7 +43,7 @@ const SaidBarDesktop = () => {
                     title: 'Ideas',
                     link: '/ideas',
                     icon: Icon.ideasIcon,
-                    selected: isActive(`${baseUrl}/ideas`),
+                    selected: isActive(`${baseUrl}/ideas`, `${baseUrl}/ideas/${id}`),
                 },
                 {
                     title: 'Roadmap',
@@ -55,7 +55,7 @@ const SaidBarDesktop = () => {
                     title: 'Announcements',
                     link: '/announcements',
                     icon: Icon.announcement,
-                    selected: isActive(`${baseUrl}/announcements`),
+                    selected: isActive(`${baseUrl}/announcements`, `${baseUrl}/announcements/${id}`),
                 },
                 {
                     title: 'Customers',

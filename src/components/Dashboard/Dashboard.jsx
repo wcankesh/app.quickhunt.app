@@ -41,15 +41,6 @@ export function Dashboard() {
         to: new Date(),
     });
 
-    const [isSheetOpen, setSheetOpen] = useState(false);
-    const [isSheetOpenAnnounce, setSheetOpenAnnounce] = useState(false);
-    const [selectedIdea, setSelectedIdea] = useState({});
-    const [ideasList, setIdeasList] = useState([]);
-    const [oldSelectedIdea, setOldSelectedIdea] = useState({});
-
-    const [selectedRecord, setSelectedRecord] = useState({})
-    const [announcementList, setAnnouncementList] = useState([]);
-
     const [chartList, setChartList] = useState({
         reactionAnalytic: [],
         guest: [],
@@ -118,17 +109,6 @@ export function Dashboard() {
         }
     }
 
-    const getAllPosts = async () => {
-        setIsLoading(true);
-        const data = await apiSerVice.getAllPosts({
-            project_id: projectDetailsReducer.id,
-        })
-        if (data.status === 200) {
-            setAnnouncementList(data.data)
-        }
-        setIsLoading(false)
-    }
-
     const onChangeDate = (selected) => {
         if (selected && selected.from && selected.to) {
             setState({
@@ -180,16 +160,6 @@ export function Dashboard() {
             count: chartList.reactionCount || 0,
         },
     ]
-
-    const handleSeeAllFeedbacks = () => {
-        // setShowAllFeedbacks(!showAllFeedbacks);
-        navigate(`${baseUrl}/dashboard/comments`);
-    };
-
-    const handleSeeAllReactions = () => {
-        // setShowAllReactions(!showAllReactions);
-        navigate(`${baseUrl}/dashboard/reactions`);
-    };
 
 
     return (
@@ -254,43 +224,35 @@ export function Dashboard() {
                             </CardHeader>
                             <div className={"max-h-[300px] overflow-y-auto"}>
                                 {
-                                    (chartList.feedbacks && chartList.feedbacks.length > 0) ? (
-                                        (showAllFeedbacks ? chartList.feedbacks : chartList.feedbacks.slice(0, 5)).map((x, i) => (
-                                            <Fragment key={i}>
-                                                {isLoading ? (
-                                                    <CardContent
-                                                        className={"p-0"}>{CommSkel.dashboardComments}</CardContent>
-                                                ) : (
+                                    isLoading ? (
+                                        <CardContent className={"p-0"}>{CommSkel.dashboardComments}</CardContent>
+                                    ) : (
+                                        (chartList.feedbacks && chartList.feedbacks.length > 0) ? (
+                                            (showAllFeedbacks ? chartList.feedbacks : chartList.feedbacks.slice(0, 5)).map((x, i) => (
+                                                <Fragment key={i}>
                                                     <CardContent className={"py-2.5 px-6 flex flex-col gap-4 border-b"}>
-                                                        <div
-                                                            className="flex gap-2 items-center justify-between cursor-pointer">
+                                                        <div className="flex gap-2 items-center justify-between cursor-pointer">
                                                             <div
                                                                 className="flex gap-2 items-center"
                                                                 onClick={() => {
                                                                     if (x.type === 1) {
-                                                                        navigate(`${baseUrl}/announcements?id=${x.post_id}`);
+                                                                        navigate(`${baseUrl}/announcements/${x.post_id}`);
                                                                     } else if (x.type === 2) {
-                                                                        setSelectedIdea(x);
                                                                         navigate(`${baseUrl}/ideas/${x.post_id}`);
                                                                     }
                                                                 }}
                                                             >
-                                                                <div
-                                                                    className={"update-idea text-sm rounded-full border text-center"}>
-                                                                    <Avatar
-                                                                        className={"w-[20px] h-[20px]"}>
-                                                                        {
-                                                                            x.user_photo ?
-                                                                                <AvatarImage
-                                                                                    src={x.user_photo}
-                                                                                    alt=""/>
-                                                                                :
-                                                                                <AvatarFallback>{x && x.customer_name && x.customer_name.substring(0, 1).toUpperCase()}</AvatarFallback>
-                                                                        }
+                                                                <div className={"update-idea text-sm rounded-full border text-center"}>
+                                                                    <Avatar className={"w-[20px] h-[20px]"}>
+                                                                        {x.user_photo ? (
+                                                                            <AvatarImage src={x.user_photo} alt=""/>
+                                                                        ) : (
+                                                                            <AvatarFallback>{x.customer_name && x.customer_name.substring(0, 1).toUpperCase()}</AvatarFallback>
+                                                                        )}
                                                                     </Avatar>
                                                                 </div>
                                                                 <h4 className="text-sm font-semibold">{x.customer_name}</h4>
-                                                                <p className="text-xs font-medium text-muted-foreground">{x?.customer_email}</p>
+                                                                <p className="text-xs font-medium text-muted-foreground">{x.customer_email}</p>
                                                             </div>
                                                             <Badge
                                                                 variant={"outline"}
@@ -300,21 +262,20 @@ export function Dashboard() {
                                                             </Badge>
                                                         </div>
                                                         <p className={"text-xs font-medium text-foreground"}>
-                                                            {/*{x.comment}*/}
                                                             <ReadMoreText html={x.comment} maxLine={"1"}/>
                                                         </p>
                                                     </CardContent>
-                                                )}
-                                            </Fragment>
-                                        ))
-                                    ) : (
-                                        <EmptyData/>
+                                                </Fragment>
+                                            ))
+                                        ) : (
+                                            <EmptyData/>
+                                        )
                                     )
                                 }
                             </div>
                             <div className={"p-6 py-3 text-end"}>
                                 <Button variant={"ghost hover:none"} className={"p-0 h-auto text-primary font-semibold"}
-                                        onClick={handleSeeAllFeedbacks}>
+                                        onClick={() => navigate(`${baseUrl}/dashboard/comments`)}>
                                     {showAllFeedbacks ? "Show Less" : "See All"}
                                 </Button>
                             </div>
@@ -326,14 +287,14 @@ export function Dashboard() {
                             </CardHeader>
                             <div className={"max-h-[300px] overflow-y-auto"}>
                                 {
-                                    (chartList.reactions && chartList.reactions.length > 0) ? (
-                                        (showAllReactions ? chartList.reactions : chartList.reactions.slice(0, 5)).map((x, i) => {
-                                            const emoji = allStatusAndTypes.emoji.find((e) => e.id === x.reaction_id) || {emoji_url: ""};
-                                            return (
-                                                <Fragment key={i}>
-                                                    {isLoading ? (
-                                                        <CardContent className={"p-0"}>{CommSkel.commonParagraphTwoAvatar}</CardContent>
-                                                    ) : (
+                                    isLoading ? (
+                                        <CardContent className={"p-0"}>{CommSkel.commonParagraphTwoAvatar}</CardContent>
+                                    ) : (
+                                        (chartList.reactions && chartList.reactions.length > 0) ? (
+                                            (showAllReactions ? chartList.reactions : chartList.reactions.slice(0, 5)).map((x, i) => {
+                                                const emoji = allStatusAndTypes.emoji.find((e) => e.id === x.reaction_id) || {emoji_url: ""};
+                                                return (
+                                                    <Fragment key={i}>
                                                         <CardContent className={"py-2.5 px-6 border-b"}>
                                                             <div className={"flex gap-4"}>
                                                                 <Avatar className={"w-[35px] h-[35px]"}>
@@ -349,16 +310,16 @@ export function Dashboard() {
                                                                 </div>
                                                             </div>
                                                         </CardContent>
-                                                    )}
-                                                </Fragment>
-                                            );
-                                        })
-                                    ) : <EmptyData/>
+                                                    </Fragment>
+                                                );
+                                            })
+                                        ) : <EmptyData/>
+                                    )
                                 }
                             </div>
                             <div className={"p-6 py-3 text-end"}>
                                 <Button variant={"ghost hover:none"} className={"p-0 h-auto text-primary font-semibold"}
-                                        onClick={handleSeeAllReactions}>
+                                        onClick={() => navigate(`${baseUrl}/dashboard/reactions`)}>
                                     {showAllReactions ? "Show Less" : "See All"}
                                 </Button>
                             </div>

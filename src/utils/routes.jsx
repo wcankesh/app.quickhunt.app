@@ -22,13 +22,14 @@ import ArticleDetail from "../components/HelpCenter/Articles/ArticleDetail";
 import Comments from "../components/Dashboard/Comments";
 import Reactions from "../components/Dashboard/Reactions";
 import UpdateIdea from "../components/Ideas/UpdateIdea";
+import UpdateAnnouncement from "../components/Announcements/UpdateAnnouncement";
 
 export const routes = [
      {path: `${baseUrl}/dashboard`, component: <Dashboard/>},
      {path: `${baseUrl}/dashboard/comments`, component: <Comments/>},
      {path: `${baseUrl}/dashboard/reactions`, component: <Reactions/>},
      {path: `${baseUrl}/announcements`, component: <Announcements/>},
-     {path: `${baseUrl}/announcements/:post_id`, component: <Announcements/>},
+     {path: `${baseUrl}/announcements/:id`, component: <UpdateAnnouncement/>},
      {path: `${baseUrl}/ideas`, component: <Ideas/>},
      {path: `${baseUrl}/ideas/:id`, component: <UpdateIdea/>},
      {path: `${baseUrl}/roadmap`, component: <Roadmap/>},

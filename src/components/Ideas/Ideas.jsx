@@ -46,15 +46,12 @@ const Ideas = () => {
     const navigate = useNavigate();
     let apiSerVice = new ApiService();
     const {toast} = useToast()
-    const [isSheetOpen, setSheetOpen] = useState(false);
     const [isSheetOpenCreate, setSheetOpenCreate] = useState(false);
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
     const [ideasList, setIdeasList] = useState([]);
     const [isDeleteLoading, setDeleteIsLoading] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [isLoadingSearch, setIsLoadingSearch] = useState(false);
-    const [selectedIdea, setSelectedIdea] = useState({}); // update idea
-    const [oldSelectedIdea, setOldSelectedIdea] = useState({});
     const [topicLists, setTopicLists] = useState([]);
     const [pageNo, setPageNo] = useState(1);
     const [totalRecord, setTotalRecord] = useState(0);
