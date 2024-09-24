@@ -241,7 +241,7 @@ export class ApiService{
         return await this.postData(`${baseUrlApi}/get-feedback`, payload)
     }
     async getReaction (payload){
-        return await this.getData(`${baseUrlApi}/get-reaction}`, payload)
+        return await this.getData(`${baseUrlApi}/get-reaction?${qs.stringify(payload)}`)
     }
 
     async getMember (payload){
