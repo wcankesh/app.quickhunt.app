@@ -32,10 +32,8 @@ export function Dashboard() {
     const navigate = useNavigate();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
     const [dataAvailable, setDataAvailable] = useState(true);
-    const [showAllFeedbacks, setShowAllFeedbacks] = useState(false);
-    const [showAllReactions, setShowAllReactions] = useState(false);
     const [state, setState] = useState({
         from: new Date(new Date().setDate(new Date().getDate() - 29)),
         to: new Date(),
@@ -80,32 +78,30 @@ export function Dashboard() {
         if (projectDetailsReducer.id) {
             dashboardData()
         }
-
     }, [projectDetailsReducer.id, state])
 
     const dashboardData = async () => {
-        setIsLoading(true)
         const payload = {
             project_id: projectDetailsReducer.id,
             start_date: moment(state.from).format("DD-MM-YYYY"),
             end_date: moment(state.to).format("DD-MM-YYYY"),
         }
+        setIsLoading(true)
         const data = await apiSerVice.dashboardData(payload)
         if (data.status === 200) {
+            setIsLoading(false)
             const feedbackAnalytics = data.data.feedbackAnalytics.map((j) => ({
                 x: new Date(j.x),
                 y: parseInt(j.y),
             }));
-
             setChartList({
                 ...data.data,
                 totalViewViewList: data.data.viewsAnalytic,
                 feedbackAnalytics: feedbackAnalytics
             })
-            setIsLoading(false)
             setDataAvailable(data.data.viewsAnalytic.length > 0);
         } else {
-
+            setIsLoading(false)
         }
     }
 
@@ -254,8 +250,10 @@ export function Dashboard() {
                                                                         )}
                                                                     </Avatar>
                                                                 </div>
+                                                                <div className={"flex items-center flex-wrap gap-1 md:gap-2"}>
                                                                 <h4 className="text-sm font-semibold">{x.customer_name}</h4>
                                                                 <p className="text-xs font-medium text-muted-foreground">{x.customer_email}</p>
+                                                                </div>
                                                             </div>
                                                             <Badge
                                                                 variant={"outline"}
@@ -279,7 +277,7 @@ export function Dashboard() {
                             <div className={"p-6 py-3 text-end"}>
                                 <Button variant={"ghost hover:none"} className={"p-0 h-auto text-primary font-semibold"}
                                         onClick={() => navigate(`${baseUrl}/dashboard/comments`)}>
-                                    {showAllFeedbacks ? "Show Less" : "See All"}
+                                    See All
                                 </Button>
                             </div>
                         </Card>
@@ -326,7 +324,7 @@ export function Dashboard() {
                             <div className={"p-6 py-3 text-end"}>
                                 <Button variant={"ghost hover:none"} className={"p-0 h-auto text-primary font-semibold"}
                                         onClick={() => navigate(`${baseUrl}/dashboard/reactions`)}>
-                                    {showAllReactions ? "Show Less" : "See All"}
+                                    See All
                                 </Button>
                             </div>
                         </Card>

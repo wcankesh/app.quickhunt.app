@@ -1,4 +1,4 @@
-import React, {Fragment, useState, useEffect} from 'react';
+import React, {useState, useEffect} from 'react';
 import {Button} from "../ui/button";
 import {Label} from "../ui/label";
 import {Input} from "../ui/input";
@@ -144,7 +144,7 @@ const CreateRoadmapIdea = ({isOpen, onOpen, onClose, closeCreateIdea, selectedRo
                     <SheetHeader className={"px-4 py-5 lg:px-8 lg:py-[20px] border-b"}>
                         <div className={"flex justify-between items-center w-full"}>
                             <h2 className={"text-xl font-medium"}>Tell us your Idea!</h2>
-                            <X onClick={onCancel} className={"cursor-pointer"}/>
+                            <X size={18} onClick={onCancel} className={"cursor-pointer"}/>
                         </div>
                     </SheetHeader>
                     <div className={"w-full overflow-y-auto comm-sheet-height"}>

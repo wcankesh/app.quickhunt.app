@@ -2,7 +2,6 @@ import React, {useState, useEffect, Fragment} from 'react';
 import {Card, CardContent, CardHeader, CardTitle} from "../ui/card";
 import {Circle, Plus} from "lucide-react";
 import {Button} from "../ui/button";
-import {useTheme} from "../theme-provider";
 import UpdateRoadMapIdea from "./UpdateRoadMapIdea";
 import {useSelector} from "react-redux";
 import {ApiService} from "../../utils/ApiService";
@@ -24,7 +23,6 @@ const loading = {
 };
 
 const Roadmap = () => {
-    const {theme} = useTheme()
     const {toast} = useToast()
     const apiService = new ApiService();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
@@ -34,8 +32,6 @@ const Roadmap = () => {
     const [selectedIdea, setSelectedIdea] = useState({});
     const [selectedRoadmap, setSelectedRoadmap] = useState({});
     const [isLoading, setIsLoading] = useState(false);
-
-    console.log("roadmapList", roadmapList.columns.map((x) => x.ideas.length))
 
     const openSheet = () => setSheetOpen(true);
     const closeSheet = () => setSheetOpen(false);
@@ -77,7 +73,6 @@ const Roadmap = () => {
         }
     }
 
-
     const callApi = async (columnId, payload) => {
         let formData = new FormData();
         formData.append("roadmap_id", columnId);
@@ -102,7 +97,6 @@ const Roadmap = () => {
 
     return (
         <div
-            // className={"roadmap-container height-inherit h-svh  overflow-y-auto xl:container-secondary xl:max-w-[1605px] lg:container lg:max-w-[992px] md:container md:max-w-[768px] sm:container max-w-[639px]"}>
             // className={"roadmap-container height-inherit h-svh overflow-y-auto container-secondary xl:max-w-[1605px] lg:max-w-[1230px] md:max-w-[960px] max-w-[639px]"}>
             className={"roadmap-container height-inherit h-svh max-w-[100%] pl-8 p-r"}>
             <UpdateRoadMapIdea
@@ -219,7 +213,7 @@ const Roadmap = () => {
                                                 className={`p-1 h-auto border`}
                                                 onClick={() => onCreateIdea(id)}
                                             >
-                                                <Plus size={15} strokeWidth={2}/>
+                                                <Plus size={20} strokeWidth={2}/>
                                             </Button>
                                         </div>
                                         </div>

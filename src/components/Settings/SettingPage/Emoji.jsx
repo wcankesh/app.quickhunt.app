@@ -133,7 +133,7 @@ const Emoji = () => {
         }
     };
 
-    const onEdit = (record,index) => {
+    const onEdit = (record = {},index = null) => {
         setSelectedEmoji(record);
         setIsEdit(true);
         const clone = [...emojiList]
@@ -268,7 +268,7 @@ const Emoji = () => {
                                                                                                             </div>
                                                                                      :
                                                                                      <Input placeholder="Choose Emoji"/>}
-                                                                                 {validationError && <span className={"text-red-500 text-sm"}>{validationError}</span>}
+                                                                                 {validationError && <span className={"text-destructive text-sm"}>{validationError}</span>}
                                                                              </div>
                                                                          </PopoverTrigger>
                                                                          <PopoverContent className="w-full p-0 border-none w-[310px]]">
@@ -276,29 +276,29 @@ const Emoji = () => {
                                                                          </PopoverContent>
                                                                      </Popover>
                                                                  </TableCell>
-                                                                <TableCell className={`pr-4 ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                                                <TableCell className={`pr-4 align-top ${theme === "dark" ? "" : "text-muted-foreground"}`}>
                                                                     <div className={"flex justify-end items-center gap-2"}>
                                                                         <Fragment>
                                                                             {
                                                                                 x.id ? <Button
                                                                                     variant="outline hover:bg-transparent"
-                                                                                    className={`p-1 border w-[30px] h-[30px] ${isSave ? "justify-center items-center" : ""}`}
+                                                                                    className={`p-1 border w-[30px] h-[30px]`}
                                                                                    onClick={() => handleSaveEmoji(i)}
                                                                                 >
-                                                                                    {isSave ? <Loader2 className="mr-1 h-4 w-4 animate-spin justify-center"/> : <Check size={16}/>}
+                                                                                    {isSave ? <Loader2 className="h-4 w-4 animate-spin"/> : <Check size={16}/>}
                                                                                 </Button> : <Button
                                                                                     variant=""
-                                                                                    className="text-sm font-semibold h-[30px] w-[99px]"
+                                                                                    className="text-sm font-semibold h-[30px] w-[99px] hover:bg-primary"
                                                                                     onClick={()=>addEmoji(i)}
                                                                                 >
-                                                                                    {isSave ? <Loader2 className={"mr-2  h-4 w-4 animate-spin"}/> : "Add emoji"}
+                                                                                    {isSave ? <Loader2 className={"h-4 w-4 animate-spin"}/> : "Add emoji"}
                                                                                 </Button>
                                                                             }
 
                                                                             <Button
                                                                                 variant="outline hover:bg-transparent"
                                                                                 className="p-1 border w-[30px] h-[30px]"
-                                                                                 onClick={() =>  x.id ? onEditCancel() : onEdit({})}
+                                                                                 onClick={() =>  x.id ? onEditCancel() : onEdit()}
                                                                             >
                                                                                 <X size={16}/>
                                                                             </Button>

@@ -5,12 +5,11 @@ import {Card, CardContent, CardFooter} from "../ui/card";
 import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "../ui/select";
 import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList} from "../ui/command";
 import {Checkbox} from "../ui/checkbox";
-
 import {useTheme} from "../theme-provider";
 import {ApiService} from "../../utils/ApiService";
 import {useNavigate} from "react-router";
 import {useSelector} from "react-redux";
-import {baseUrl, urlParams} from "../../utils/constent";
+import {baseUrl} from "../../utils/constent";
 import moment from "moment";
 import {useToast} from "../ui/use-toast";
 import ReadMoreText from "../Comman/ReadMoreText";
@@ -22,7 +21,6 @@ import {DropdownMenuContent, DropdownMenuItem,} from "../ui/dropdown-menu";
 import {Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "../ui/dialog";
 import {Badge} from "../ui/badge";
 import {Popover, PopoverContent, PopoverTrigger} from "../ui/popover";
-
 
 const filterByStatus = [
     {name: "Archived", value: "archive",},
@@ -541,7 +539,7 @@ const Ideas = () => {
                                                     </div>
                                                     <div className={"flex flex-col w-full gap-6"}>
                                                         <div className={"flex flex-col gap-[11px]"}>
-                                                            <div className={"flex flex-wrap items-center justify-between gap-3 md:flex-nowrap"}>
+                                                            <div className={"flex items-center justify-between gap-3"}>
                                                                 <div
                                                                     className={"flex flex-wrap items-center gap-1 cursor-pointer xl:gap-3"}
                                                                     onClick={() => openDetailsSheet(x)}

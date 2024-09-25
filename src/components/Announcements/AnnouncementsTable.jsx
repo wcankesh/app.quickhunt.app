@@ -16,7 +16,7 @@ import {Skeleton} from "../ui/skeleton";
 import {Dialog} from "@radix-ui/react-dialog";
 import {DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "../ui/dialog";
 import EmptyData from "../Comman/EmptyData";
-import {useNavigate, useLocation} from "react-router";
+import {useNavigate} from "react-router";
 
 const status = [
     {name: "Publish", value: 1, fillColor: "#389E0D", strokeColor: "#389E0D",},
@@ -30,9 +30,6 @@ const status2 = [
 
 const AnnouncementsTable = ({data, isLoading, setSelectedRecord, handleDelete, setAnalyticsObj,isLoadingDelete}) => {
     const navigate = useNavigate();
-    const location = useLocation();
-    const UrlParams = new URLSearchParams(location.search);
-    const postId = UrlParams.get("postId") || '';
     const {theme} = useTheme();
     const [announcementData, setAnnouncementData] = useState(data);
     const [idToDelete, setIdToDelete] = useState(null);
@@ -41,18 +38,18 @@ const AnnouncementsTable = ({data, isLoading, setSelectedRecord, handleDelete, s
     const [sortedColumn, setSortedColumn] = useState('');
 
     useEffect(() => {
-        const updatedData = data.map(item => ({
-            ...item,
-            post_status: item.post_status ?? 1,
-        }));
-        setAnnouncementData(updatedData);
+        // const updatedData = data.map(item => ({
+        //     ...item,
+        //     post_status: item.post_status ?? 1,
+        // }));
+        // setAnnouncementData(updatedData);
+        setAnnouncementData(data.map((item) => ({...item, post_status: item.post_status ?? 1})));
     }, [data]);
-
 
     const toggleSort = (column) => {
         let sortedData = [...announcementData];
         if (sortedColumn === column) {
-            setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+            setSortOrder((prev) => prev === 'asc' ? 'desc' : 'asc');
         } else {
             setSortedColumn(column);
             setSortOrder('asc');

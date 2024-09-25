@@ -43,9 +43,6 @@ const UpdateAnnouncement = () => {
     const [popoverOpen, setPopoverOpen] = useState(false);
     const [popoverOpenExpired, setPopoverOpenExpired] = useState(false);
 
-    console.log("selectedRecord", selectedRecord?.labels)
-    console.log("labellist", labelList)
-
     useEffect(() => {
         if (projectDetailsReducer.id) {
             // if (selectedRecord?.post_slug_url) {
@@ -292,9 +289,8 @@ const UpdateAnnouncement = () => {
     const deleteAssignTo = (e, index) => {e.stopPropagation();}
 
     return (
-        <Fragment>
-            <div className={"container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-3 md:px-4"}>
-            <div className={"flex justify-between items-center"}>
+        <div className={"container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-3 md:px-4"}>
+            <div className={"flex justify-between items-center gap-2"}>
                 <Breadcrumb>
                     <BreadcrumbList>
                         <BreadcrumbItem className={"cursor-pointer"}>
@@ -309,317 +305,314 @@ const UpdateAnnouncement = () => {
                     </BreadcrumbList>
                 </Breadcrumb>
                 <div className={"flex items-center gap-4"}>
-                <Button className={"p-0 h-auto"}
-                        onClick={() => commonToggle("post_pin_to_top", selectedRecord.post_pin_to_top === 1 ? 0 : 1)}
-                        variant={"ghost hover:bg-none"}>{selectedRecord.post_pin_to_top === 1 ?
-                    <Pin size={18} className={`${theme === "dark" ? "fill-card-foreground" : "fill-card-foreground"}`}/> : <Pin size={18}/>}
-                </Button>
-                        <Button
-                            size={"sm"}
-                            variant={"outline "}
-                            disabled={isLoad === 'head'}
-                            onClick={() => updatePost('head')}
-                            className={` bg-primary ${theme === "dark" ? "text-card-foreground" : "text-card"} w-[115px] font-semibold`}
-                        >
-                            {isLoad === 'head' ? <Loader2
-                                className="h-4 w-4 animate-spin"/> : "Update Post"}
-                        </Button>
-                        <Button size={"sm"} onClick={() => navigate(`${baseUrl}/announcements`)} variant={"outline "}
-                                className={`border border-primary ${theme === "dark" ? "" : "text-primary"} text-sm font-semibold`}>Cancel</Button>
+                    <Button className={"p-0 h-auto"}
+                            onClick={() => commonToggle("post_pin_to_top", selectedRecord.post_pin_to_top === 1 ? 0 : 1)}
+                            variant={"ghost hover:bg-none"}>{selectedRecord.post_pin_to_top === 1 ?
+                        <Pin size={18} className={`${theme === "dark" ? "fill-card-foreground" : "fill-card-foreground"}`}/> : <Pin size={18}/>}
+                    </Button>
+                    <Button
+                        size={"sm"}
+                        variant={"outline "}
+                        disabled={isLoad === 'head'}
+                        onClick={() => updatePost('head')}
+                        className={`bg-primary w-[115px] font-semibold hidden md:block ${theme === "dark" ? "text-card-foreground" : "text-card"}`}
+                    >
+                        {isLoad === 'head' ? <Loader2
+                            className="h-4 w-4 animate-spin"/> : "Update Post"}
+                    </Button>
+                    <Button size={"sm"} onClick={() => navigate(`${baseUrl}/announcements`)} variant={"outline "}
+                            className={`text-sm font-semibold border border-primary hidden md:block ${theme === "dark" ? "" : "text-primary"}`}>Cancel</Button>
 
                 </div>
             </div>
-                <Card className={"mt-4"}>
-                    <CardContent className={"p-0"}>
-                        <div className={"px-3 lg:p-6 border-b"}>
-                            <div className={"flex gap-4"}>
-                                <div className="w-full flex flex-col gap-4">
-                                    <div className="w-full flex flex-col gap-2">
-                                        <Label htmlFor="title">Title</Label>
-                                        <Input type="text" id="title" className={"h-9"} name={"post_title"}
-                                               value={selectedRecord.post_title} onChange={onChangeText}/>
-                                        {formError.post_title &&
-                                        <span className="text-sm text-red-500">{formError.post_title}</span>}
-                                    </div>
-                                    <div className="w-full flex flex-col gap-2">
-                                        <Label htmlFor="link">Permalink / Slug</Label>
-                                        <Input type="text" className={"h-9"} id="link" name={"post_slug_url"}
-                                               value={selectedRecord.post_slug_url} onChange={onChangeText}/>
-                                        <p className={"text-sm font-normal text-muted-foreground break-words"}>This release will
-                                            be available at {projectDetailsReducer.domain ? <a
-                                                href={`https://${projectDetailsReducer.domain?.toLowerCase()}/announcements/${selectedRecord.post_slug_url?.toLowerCase()}`}
-                                                target={"_blank"}
-                                                className={"text-primary max-w-[593px] w-full break-words text-sm"}>{`https://${projectDetailsReducer.domain?.toLowerCase()}/announcements/${selectedRecord.post_slug_url?.toLowerCase()}`}</a> : ""}</p>
-                                    </div>
-                                    <div className="w-full flex flex-col gap-2">
-                                        <Label htmlFor="description">Description</Label>
-                                        <ReactQuillEditor className={"min-h-[145px] h-full"} value={selectedRecord.post_description} onChange={onChangeText}
-                                                          name={"post_description"}/>
-                                        {formError.post_description &&
-                                        <span className="text-sm text-red-500">{formError.post_description}</span>}
-                                    </div>
+            <Card className={"mt-4"}>
+                <CardContent className={"p-0"}>
+                    <div className={"p-2 sm:p-3 lg:p-6 border-b"}>
+                        <div className={"flex gap-4"}>
+                            <div className="w-full flex flex-col gap-4">
+                                <div className="w-full flex flex-col gap-2">
+                                    <Label htmlFor="title">Title</Label>
+                                    <Input type="text" id="title" className={"h-9"} name={"post_title"}
+                                           value={selectedRecord.post_title} onChange={onChangeText}/>
+                                    {formError.post_title &&
+                                    <span className="text-sm text-red-500">{formError.post_title}</span>}
+                                </div>
+                                <div className="w-full flex flex-col gap-2">
+                                    <Label htmlFor="link">Permalink / Slug</Label>
+                                    <Input type="text" className={"h-9"} id="link" name={"post_slug_url"}
+                                           value={selectedRecord.post_slug_url} onChange={onChangeText}/>
+                                    <p className={"text-sm font-normal text-muted-foreground break-words"}>This release will
+                                        be available at {projectDetailsReducer.domain ? <a
+                                            href={`https://${projectDetailsReducer.domain?.toLowerCase()}/announcements/${selectedRecord.post_slug_url?.toLowerCase()}`}
+                                            target={"_blank"}
+                                            className={"text-primary max-w-[593px] w-full break-words text-sm"}>{`https://${projectDetailsReducer.domain?.toLowerCase()}/announcements/${selectedRecord.post_slug_url?.toLowerCase()}`}</a> : ""}</p>
+                                </div>
+                                <div className="w-full flex flex-col gap-2">
+                                    <Label htmlFor="description">Description</Label>
+                                    <ReactQuillEditor className={"min-h-[145px] h-full"} value={selectedRecord.post_description} onChange={onChangeText}
+                                                      name={"post_description"}/>
+                                    {formError.post_description &&
+                                    <span className="text-sm text-red-500">{formError.post_description}</span>}
                                 </div>
                             </div>
                         </div>
-                        <div className={"px-3 lg:p-6 flex flex-col gap-4 border-b"}>
-                            <div className={"flex flex-wrap md:flex-nowrap gap-4 items-start items-center"}>
-                                <div className="w-full flex flex-col gap-4">
-                                    <div className={"w-full space-y-1.5"}>
-                                        <Label>Label</Label>
-                                        <Select value={[]} onValueChange={onChangeLabel}>
-                                            <SelectTrigger className="h-9">
-                                                <SelectValue className={"text-muted-foreground text-sm"}
-                                                             placeholder="Nothing selected">
-                                                    <div className={"flex gap-[2px]"}>
-                                                        {
-                                                            (selectedRecord.labels || []).map((x) => {
-                                                                const findObj = labelList.find((y) => y.id == x);
-                                                                return (
-                                                                    <Badge variant={"outline"} style={{
-                                                                        color: findObj?.label_color_code,
-                                                                        borderColor: findObj?.label_color_code,
-                                                                        textTransform: "capitalize"
-                                                                    }}
-                                                                           className={`h-[20px] py-0 px-2 text-xs rounded-[5px]  font-medium text-[${findObj?.label_color_code}] border-[${findObj?.label_color_code}] capitalize`}>{findObj?.label_name}</Badge>
-                                                                )
-                                                            })
-                                                        }
-                                                    </div>
-                                                </SelectValue>
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectGroup>
+                    </div>
+                    <div className={"p-2 sm:p-3 lg:p-6 flex flex-col gap-4 border-b"}>
+                        <div className={"flex flex-wrap md:flex-nowrap gap-4 items-start"}>
+                            <div className="w-full flex flex-col gap-4">
+                                <div className={"w-full space-y-1.5"}>
+                                    <Label>Label</Label>
+                                    <Select value={[]} onValueChange={onChangeLabel}>
+                                        <SelectTrigger className="h-9">
+                                            <SelectValue className={"text-muted-foreground text-sm"}
+                                                         placeholder="Nothing selected">
+                                                <div className={"flex gap-[2px]"}>
                                                     {
-                                                        (labelList || []).map((x, i) => {
+                                                        (selectedRecord.labels || []).map((x) => {
+                                                            const findObj = labelList.find((y) => y.id == x);
                                                             return (
-                                                                <SelectItem className={"p-2"} key={i} value={x.id}>
-                                                                    <div className={"flex gap-1"}>
-                                                                        <div onClick={() => onChangeLabel(x.id)}
-                                                                             className="checkbox-icon">
-                                                                            {selectedRecord?.labels?.includes(x.id) ?
-                                                                                <Check size={18}/> :
-                                                                                <div className={"h-[18px] w-[18px]"}/>}
-                                                                        </div>
-                                                                        <div className={"flex items-center gap-2"}>
-                                                                            <Circle fill={x.label_color_code}
-                                                                                    stroke={x.label_color_code}
-                                                                                    className={`${theme === "dark" ? "" : "text-muted-foreground"} w-[10px] h-[10px]`}/>
-                                                                            {x.label_name}
-                                                                        </div>
-                                                                    </div>
-                                                                </SelectItem>
+                                                                <Badge variant={"outline"} style={{
+                                                                    color: findObj?.label_color_code,
+                                                                    borderColor: findObj?.label_color_code,
+                                                                    textTransform: "capitalize"
+                                                                }}
+                                                                       className={`h-[20px] py-0 px-2 text-xs rounded-[5px]  font-medium text-[${findObj?.label_color_code}] border-[${findObj?.label_color_code}] capitalize`}>{findObj?.label_name}</Badge>
                                                             )
                                                         })
                                                     }
-                                                </SelectGroup>
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-                                    <div className={"w-full space-y-1.5"}>
-                                        <Label>Assign to</Label>
-                                        <Select onValueChange={handleValueChange} value={[]}>
-                                            <SelectTrigger className={"h-9"}>
-                                                <SelectValue className={"text-muted-foreground text-sm"}
-                                                             placeholder="Assign to">
-                                                    <div className={"flex gap-[2px]"}>
-                                                        {
-                                                            Array.isArray(selectedRecord?.post_assign_to) && (selectedRecord?.post_assign_to || []).map((x, index) => {
-                                                                const findObj = memberList.find((y,) => y.user_id == x);
-                                                                return (
-                                                                    <div key={index}
-                                                                         className={`${theme === "dark" ? "text-card bg-accent-foreground" : "bg-muted-foreground/30"} text-sm flex gap-[2px] items-center rounded py-0 px-2`}
-                                                                         onClick={(e) => deleteAssignTo(e, index)}>
-                                                                        {findObj?.user_first_name ? findObj?.user_first_name : ''}
+                                                </div>
+                                            </SelectValue>
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectGroup>
+                                                {
+                                                    (labelList || []).map((x, i) => {
+                                                        return (
+                                                            <SelectItem className={"p-2"} key={i} value={x.id}>
+                                                                <div className={"flex gap-1"}>
+                                                                    <div onClick={() => onChangeLabel(x.id)}
+                                                                         className="checkbox-icon">
+                                                                        {selectedRecord?.labels?.includes(x.id) ?
+                                                                            <Check size={18}/> :
+                                                                            <div className={"h-[18px] w-[18px]"}/>}
                                                                     </div>
-                                                                )
-                                                            })
-                                                        }
-                                                    </div>
-                                                </SelectValue>
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectGroup>
-                                                    {(memberList || []).map((x, i) => (
-                                                        <SelectItem className={"p-2"} key={i} value={x.user_id}>
-                                                            <div className={"flex gap-2"}>
-                                                                <div onClick={() => handleValueChange(x.user_id)}
-                                                                     className="checkbox-icon">
-                                                                    {selectedRecord?.post_assign_to?.includes(x.user_id) ?
-                                                                        <Check size={18}/> :
-                                                                        <div className={"h-[18px] w-[18px]"}/>}
+                                                                    <div className={"flex items-center gap-2"}>
+                                                                        <Circle fill={x.label_color_code}
+                                                                                stroke={x.label_color_code}
+                                                                                className={`${theme === "dark" ? "" : "text-muted-foreground"} w-[10px] h-[10px]`}/>
+                                                                        {x.label_name}
+                                                                    </div>
                                                                 </div>
-                                                                <span>{x.user_first_name ? x.user_first_name : ''} {x.user_last_name ? x.user_last_name : ''}</span>
-                                                            </div>
-                                                        </SelectItem>
-                                                    ))}
-
-                                                </SelectGroup>
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-                                    <div className={"w-full space-y-1.5"}>
-                                        <Label>Category</Label>
-                                        <Select
-                                            value={selectedRecord && selectedRecord?.category_id && selectedRecord?.category_id?.toString()}
-                                            onValueChange={onChangeCategory}>
-                                            <SelectTrigger className="h-9">
-                                                <SelectValue/>
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectGroup>
-                                                    <SelectItem value={null}>None</SelectItem>
+                                                            </SelectItem>
+                                                        )
+                                                    })
+                                                }
+                                            </SelectGroup>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div className={"w-full space-y-1.5"}>
+                                    <Label>Assign to</Label>
+                                    <Select onValueChange={handleValueChange} value={[]}>
+                                        <SelectTrigger className={"h-9"}>
+                                            <SelectValue className={"text-muted-foreground text-sm"}
+                                                         placeholder="Assign to">
+                                                <div className={"flex gap-[2px]"}>
                                                     {
-                                                        (categoriesList || []).map((x, i) => {
+                                                        Array.isArray(selectedRecord?.post_assign_to) && (selectedRecord?.post_assign_to || []).map((x, index) => {
+                                                            const findObj = memberList.find((y,) => y.user_id == x);
                                                             return (
-                                                                <SelectItem key={i}
-                                                                            value={x.id.toString()}>{x.name}</SelectItem>
+                                                                <div key={index}
+                                                                     className={`${theme === "dark" ? "text-card bg-accent-foreground" : "bg-muted-foreground/30"} text-sm flex gap-[2px] items-center rounded py-0 px-2`}
+                                                                     onClick={(e) => deleteAssignTo(e, index)}>
+                                                                    {findObj?.user_first_name ? findObj?.user_first_name : ''}
+                                                                </div>
                                                             )
                                                         })
                                                     }
-                                                </SelectGroup>
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-                                </div>
-                                <div className="w-full flex items-stretch gap-4 h-full">
-                                    <div className="space-y-3 h-full">
-                                        <h5 className="text-sm font-medium">Featured Image</h5>
-                                        <div className="w-[282px] h-[128px] flex gap-1 items-stretch">
-                                            {selectedRecord?.image ? (
-                                                <div className="h-full">
-                                                    {selectedRecord?.image.name ? (
-                                                        <div className="w-[282px] h-[128px] relative border p-[5px]">
-                                                            <img
-                                                                className="upload-img h-full"
-                                                                src={URL.createObjectURL(selectedRecord?.image)}
-                                                                alt=""
-                                                            />
-                                                            <CircleX
-                                                                size={20}
-                                                                className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-0 left-full transform -translate-x-1/2 -translate-y-1/2 z-10`}
-                                                                onClick={() => onDeleteImg('delete_image', selectedRecord?.image?.name ? "" : selectedRecord?.image?.replace("https://code.quickhunt.app/public/storage/post/", ""))}
-                                                            />
+                                                </div>
+                                            </SelectValue>
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectGroup>
+                                                {(memberList || []).map((x, i) => (
+                                                    <SelectItem className={"p-2"} key={i} value={x.user_id}>
+                                                        <div className={"flex gap-2"}>
+                                                            <div onClick={() => handleValueChange(x.user_id)}
+                                                                 className="checkbox-icon">
+                                                                {selectedRecord?.post_assign_to?.includes(x.user_id) ?
+                                                                    <Check size={18}/> :
+                                                                    <div className={"h-[18px] w-[18px]"}/>}
+                                                            </div>
+                                                            <span>{x.user_first_name ? x.user_first_name : ''} {x.user_last_name ? x.user_last_name : ''}</span>
                                                         </div>
-                                                    ) : (
-                                                        <div className="w-[282px] h-[128px] relative border p-[5px]">
-                                                            <img className="upload-img h-full" src={selectedRecord?.image} alt="" />
-                                                            <CircleX
-                                                                size={20}
-                                                                className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-0 left-full transform -translate-x-1/2 -translate-y-1/2 z-10`}
-                                                                onClick={() => onDeleteImg('delete_image', selectedRecord?.image?.name ? "" : selectedRecord?.image?.replace("https://code.quickhunt.app/public/storage/post/", ""))}
-                                                            />
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            ) : (
-                                                <div className="h-full">
-                                                    <input
-                                                        id="pictureInput"
-                                                        type="file"
-                                                        className="hidden"
-                                                        accept="image/*"
-                                                        onChange={handleFileChange}
-                                                    />
-                                                    <label
-                                                        htmlFor="pictureInput"
-                                                        className="border-dashed w-[282px] h-[128px] py-[52px] flex items-center justify-center bg-muted border border-muted-foreground rounded cursor-pointer"
-                                                    >
-                                                        <h4 className="text-xs font-semibold">Upload</h4>
-                                                    </label>
-                                                </div>
-                                            )}
-                                        </div>
-                                        {formError.image && <div className="text-xs text-red-500">{formError.image}</div>}
-                                    </div>
-                                    <div className="flex flex-col gap-[18px] w-full h-full">
-                                        <div className="space-y-1.5 flex flex-col">
-                                            <Label htmlFor="date">Published at</Label>
-                                            <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
-                                                <PopoverTrigger asChild>
-                                                    <Button
-                                                        id="date"
-                                                        variant="outline"
-                                                        className={cn("justify-between text-left font-normal d-flex", "text-muted-foreground")}
-                                                    >
-                                                        {moment(selectedRecord?.post_published_at).format("LL")}
-                                                    </Button>
-                                                </PopoverTrigger>
-                                                <PopoverContent className="w-auto p-0" align="start">
-                                                    <Calendar
-                                                        mode="single"
-                                                        captionLayout="dropdown"
-                                                        showOutsideDays={false}
-                                                        selected={selectedRecord?.post_published_at ? new Date(selectedRecord?.post_published_at) : new Date()}
-                                                        onSelect={(date) => onDateChange("post_published_at", date)}
-                                                        startMonth={new Date(2024, 0)}
-                                                        endMonth={new Date(2050, 12)}
-                                                        hideNavigation
-                                                    />
-                                                </PopoverContent>
-                                            </Popover>
-                                        </div>
-                                        <div className="space-y-1.5">
-                                            <div className="flex items-center space-x-2">
-                                                <Checkbox
-                                                    id="expire_date"
-                                                    checked={selectedRecord?.post_expired_boolean === 1}
-                                                    onCheckedChange={(checked) => commonToggle("post_expired_boolean", checked ? 1 : 0)}
-                                                />
-                                                <label htmlFor="expire_date" className="text-sm text-muted-foreground font-medium">Expire At</label>
-                                            </div>
-                                            {selectedRecord?.post_expired_boolean === 1 && (
-                                                <div className="grid w-full gap-2 basis-1/2">
-                                                    <Popover open={popoverOpenExpired} onOpenChange={setPopoverOpenExpired}>
-                                                        <PopoverTrigger asChild>
-                                                            <Button
-                                                                id="date"
-                                                                variant="outline"
-                                                                className={cn("justify-between text-left font-normal d-flex", "text-muted-foreground")}
-                                                            >
-                                                                {moment(selectedRecord?.post_expired_at).format("LL")}
-                                                                <CalendarIcon className="mr-2 h-4 w-4" />
-                                                            </Button>
-                                                        </PopoverTrigger>
-                                                        <PopoverContent className="w-auto p-0" align="start">
-                                                            <Calendar
-                                                                mode="single"
-                                                                showOutsideDays={false}
-                                                                captionLayout="dropdown"
-                                                                selected={selectedRecord?.post_expired_at}
-                                                                onSelect={(date) => onDateChange("post_expired_at", date)}
-                                                                startMonth={new Date(2024, 0)}
-                                                                endMonth={new Date(2050, 12)}
-                                                                hideNavigation
-                                                            />
-                                                        </PopoverContent>
-                                                    </Popover>
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
+                                                    </SelectItem>
+                                                ))}
 
+                                            </SelectGroup>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div className={"w-full space-y-1.5"}>
+                                    <Label>Category</Label>
+                                    <Select
+                                        value={selectedRecord && selectedRecord?.category_id && selectedRecord?.category_id?.toString()}
+                                        onValueChange={onChangeCategory}>
+                                        <SelectTrigger className="h-9">
+                                            <SelectValue/>
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectGroup>
+                                                <SelectItem value={null}>None</SelectItem>
+                                                {
+                                                    (categoriesList || []).map((x, i) => {
+                                                        return (
+                                                            <SelectItem key={i}
+                                                                        value={x.id.toString()}>{x.name}</SelectItem>
+                                                        )
+                                                    })
+                                                }
+                                            </SelectGroup>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
                             </div>
+                            <div className="w-full flex flex-col gap-4 items-stretch h-full">
+                                <div className="space-y-3 h-full">
+                                    <h5 className="text-sm font-medium">Featured Image</h5>
+                                    <div className="w-[282px] h-[128px] flex gap-1 items-stretch">
+                                        {selectedRecord?.image ? (
+                                            <div className="h-full">
+                                                {selectedRecord?.image.name ? (
+                                                    <div className="w-[282px] h-[128px] relative border p-[5px]">
+                                                        <img
+                                                            className="upload-img h-full"
+                                                            src={URL.createObjectURL(selectedRecord?.image)}
+                                                            alt=""
+                                                        />
+                                                        <CircleX
+                                                            size={20}
+                                                            className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-0 left-full transform -translate-x-1/2 -translate-y-1/2 z-10`}
+                                                            onClick={() => onDeleteImg('delete_image', selectedRecord?.image?.name ? "" : selectedRecord?.image?.replace("https://code.quickhunt.app/public/storage/post/", ""))}
+                                                        />
+                                                    </div>
+                                                ) : (
+                                                    <div className="w-[282px] h-[128px] relative border p-[5px]">
+                                                        <img className="upload-img h-full" src={selectedRecord?.image} alt="" />
+                                                        <CircleX
+                                                            size={20}
+                                                            className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-0 left-full transform -translate-x-1/2 -translate-y-1/2 z-10`}
+                                                            onClick={() => onDeleteImg('delete_image', selectedRecord?.image?.name ? "" : selectedRecord?.image?.replace("https://code.quickhunt.app/public/storage/post/", ""))}
+                                                        />
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ) : (
+                                            <div className="h-full">
+                                                <input
+                                                    id="pictureInput"
+                                                    type="file"
+                                                    className="hidden"
+                                                    accept="image/*"
+                                                    onChange={handleFileChange}
+                                                />
+                                                <label
+                                                    htmlFor="pictureInput"
+                                                    className="border-dashed w-[282px] h-[128px] py-[52px] flex items-center justify-center bg-muted border border-muted-foreground rounded cursor-pointer"
+                                                >
+                                                    <h4 className="text-xs font-semibold">Upload</h4>
+                                                </label>
+                                            </div>
+                                        )}
+                                    </div>
+                                    {formError.image && <div className="text-xs text-red-500">{formError.image}</div>}
+                                </div>
+                                <div className="flex flex-col gap-[18px] w-full h-full">
+                                    <div className="space-y-1.5 flex flex-col">
+                                        <Label htmlFor="date">Published at</Label>
+                                        <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
+                                            <PopoverTrigger asChild>
+                                                <Button
+                                                    id="date"
+                                                    variant="outline"
+                                                    className={cn("justify-between text-left font-normal d-flex", "text-muted-foreground")}
+                                                >
+                                                    {moment(selectedRecord?.post_published_at).format("LL")}
+                                                </Button>
+                                            </PopoverTrigger>
+                                            <PopoverContent className="w-auto p-0" align="start">
+                                                <Calendar
+                                                    mode="single"
+                                                    captionLayout="dropdown"
+                                                    showOutsideDays={false}
+                                                    selected={selectedRecord?.post_published_at ? new Date(selectedRecord?.post_published_at) : new Date()}
+                                                    onSelect={(date) => onDateChange("post_published_at", date)}
+                                                    startMonth={new Date(2024, 0)}
+                                                    endMonth={new Date(2050, 12)}
+                                                    hideNavigation
+                                                />
+                                            </PopoverContent>
+                                        </Popover>
+                                    </div>
+                                    <div className="space-y-1.5">
+                                        <div className="flex items-center space-x-2">
+                                            <Checkbox
+                                                id="expire_date"
+                                                checked={selectedRecord?.post_expired_boolean === 1}
+                                                onCheckedChange={(checked) => commonToggle("post_expired_boolean", checked ? 1 : 0)}
+                                            />
+                                            <label htmlFor="expire_date" className="text-sm font-medium">Expire At</label>
+                                        </div>
+                                        {selectedRecord?.post_expired_boolean === 1 && (
+                                            <div className="grid w-full gap-2 basis-1/2">
+                                                <Popover open={popoverOpenExpired} onOpenChange={setPopoverOpenExpired}>
+                                                    <PopoverTrigger asChild>
+                                                        <Button
+                                                            id="date"
+                                                            variant="outline"
+                                                            className={cn("justify-between text-left font-normal d-flex", "text-muted-foreground")}
+                                                        >
+                                                            {moment(selectedRecord?.post_expired_at).format("LL")}
+                                                            <CalendarIcon className="mr-2 h-4 w-4" />
+                                                        </Button>
+                                                    </PopoverTrigger>
+                                                    <PopoverContent className="w-auto p-0" align="start">
+                                                        <Calendar
+                                                            mode="single"
+                                                            showOutsideDays={false}
+                                                            captionLayout="dropdown"
+                                                            selected={selectedRecord?.post_expired_at}
+                                                            onSelect={(date) => onDateChange("post_expired_at", date)}
+                                                            startMonth={new Date(2024, 0)}
+                                                            endMonth={new Date(2050, 12)}
+                                                            hideNavigation
+                                                        />
+                                                    </PopoverContent>
+                                                </Popover>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+
                         </div>
-                    </CardContent>
-                    <CardFooter className={"p-0"}>
-                        <div className={"p-3 lg:p-6 flex gap-4"}>
-                            <Button
-                                variant={"outline "}
-                                disabled={isLoad === 'bottom'}
-                                onClick={() => updatePost("bottom")}
-                                className={` bg-primary ${theme === "dark" ? "text-card-foreground" : "text-card"} w-[115px] font-semibold`}
-                            >
-                                {isLoad === 'bottom' ? <Loader2
-                                    className="mr-2 h-4 w-4 animate-spin"/> : "Update Post"}
-                            </Button>
-                            <Button onClick={() => navigate(`${baseUrl}/announcements`)} variant={"outline "}
-                                    className={`border border-primary ${theme === "dark" ? "" : "text-primary"} text-sm font-semibold`}>Cancel</Button>
-                        </div>
-                    </CardFooter>
-                </Card>
-            </div>
-        </Fragment>
+                    </div>
+                </CardContent>
+                <CardFooter className={"px-3 py-4 lg:p-6 gap-4"}>
+                    <Button
+                        variant={"outline "}
+                        disabled={isLoad === 'bottom'}
+                        onClick={() => updatePost("bottom")}
+                        className={` bg-primary ${theme === "dark" ? "text-card-foreground" : "text-card"} w-[115px] font-semibold`}
+                    >
+                        {isLoad === 'bottom' ? <Loader2
+                            className="mr-2 h-4 w-4 animate-spin"/> : "Update Post"}
+                    </Button>
+                    <Button onClick={() => navigate(`${baseUrl}/announcements`)} variant={"outline "}
+                            className={`border border-primary ${theme === "dark" ? "" : "text-primary"} text-sm font-semibold`}>Cancel</Button>
+                </CardFooter>
+            </Card>
+        </div>
     );
 };
 

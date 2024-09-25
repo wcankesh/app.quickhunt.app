@@ -323,10 +323,10 @@ const Labels = () => {
                                                                         onChange={(e) => handleInputChange(e, i)}
                                                                         placeholder={"Enter label name"}
                                                                     />
-                                                                    {labelError.label_name && <span className="text-red-500 text-sm">{labelError.label_name}</span>}
+                                                                    {labelError.label_name && <span className="text-destructive text-sm">{labelError.label_name}</span>}
                                                                 </TableCell>
 
-                                                                <TableCell className={"px-[8.5px] py-[11px]"}>
+                                                                <TableCell className={"px-[8.5px] py-[11px] align-top"}>
                                                                     <div className={"flex justify-center items-center"}>
                                                                         <ColorInput name={"clr"} value={x.label_color_code} onChange={(color) => onChangeColorColor(color, i)}/>
                                                                     </div>
@@ -337,16 +337,16 @@ const Labels = () => {
                                                                         {
                                                                             x.id ? <Button
                                                                                 variant="outline hover:bg-transparent"
-                                                                                className={`p-1 border w-[30px] h-[30px] ${isSave ? "justify-center items-center" : ""}`}
+                                                                                className={`p-1 border w-[30px] h-[30px]`}
                                                                                 onClick={() => handleSaveLabel(i)}
                                                                             >
-                                                                                {isSave ? <Loader2 className="mr-1 h-4 w-4 animate-spin justify-center"/> : <Check size={16}/>}
+                                                                                {isSave ? <Loader2 className="h-4 w-4 animate-spin"/> : <Check size={16}/>}
                                                                             </Button> : <Button
                                                                                 variant=""
-                                                                                className={`text-sm font-semibold h-[30px] ${isSave ? "w-[100px]" : ""} `}
+                                                                                className={`text-sm font-semibold h-[30px] hover:bg-primary w-[100px]`}
                                                                                 onClick={() => handleAddNewLabel(x, i)}
                                                                             >
-                                                                                {isSave ? <Loader2 className={"mr-2  h-4 w-4 animate-spin"}/> : "Add Label"}
+                                                                                {isSave ? <Loader2 className={"h-4 w-4 animate-spin"}/> : "Add Label"}
                                                                             </Button>
                                                                         }
 

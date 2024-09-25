@@ -895,6 +895,7 @@ const UpdateRoadMapIdea = ({
                                                         className="hidden"
                                                         multiple
                                                         onChange={handleFeatureImgUpload}
+                                                        accept={".jpg,.jpeg"}
                                                     />
                                                     <label
                                                         htmlFor="pictureInput"
@@ -1330,6 +1331,7 @@ const UpdateRoadMapIdea = ({
                                                                     type="file"
                                                                     className="hidden"
                                                                     onChange={handleAddCommentImg}
+                                                                    accept={".jpg,.jpeg"}
                                                                 />
                                                                 <label htmlFor="commentFile"
                                                                        className="absolute inset-0 flex items-center justify-center bg-white border border-primary rounded cursor-pointer"
@@ -1499,6 +1501,7 @@ const UpdateRoadMapIdea = ({
                                                                                                                 type="file"
                                                                                                                 className="hidden"
                                                                                                                 onChange={handleAddCommentImg}
+                                                                                                                accept={".jpg,.jpeg"}
                                                                                                             />
                                                                                                             <label
                                                                                                                 htmlFor="selectedCommentImg"
@@ -1683,6 +1686,7 @@ const UpdateRoadMapIdea = ({
                                                                                                                                                 type="file"
                                                                                                                                                 className="hidden"
                                                                                                                                                 onChange={handleSubCommentUploadImg}
+                                                                                                                                                accept={".jpg,.jpeg"}
                                                                                                                                             />
                                                                                                                                             <label
                                                                                                                                                 htmlFor="commentFileInput"
@@ -1790,7 +1794,9 @@ const UpdateRoadMapIdea = ({
                                                                                                                 id="commentFileInput"
                                                                                                                 type="file"
                                                                                                                 className="hidden"
-                                                                                                                onChange={handleSubCommentUploadImg}/>
+                                                                                                                onChange={handleSubCommentUploadImg}
+                                                                                                                accept={".jpg,.jpeg"}
+                                                                                                            />
                                                                                                             <label
                                                                                                                 htmlFor="commentFileInput"
                                                                                                                 className="absolute inset-0 flex items-center justify-center bg-white border border-primary rounded cursor-pointer">

@@ -273,7 +273,7 @@ const Category = () => {
                 </div>
 
                 {tables.map((x, i) => (
-                    <div key={i} className={"mt-[34px]"}>
+                    <div key={i} className={"mt-6"}>
                         <Card className={""}>
                             <CardContent className={"p-0"}>
                                 <div className={"rounded-md grid grid-cols-1 overflow-auto whitespace-nowrap"}>

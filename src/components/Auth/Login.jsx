@@ -5,7 +5,6 @@ import {Label} from "../ui/label"
 import {useNavigate} from "react-router-dom"
 import {Carousel, CarouselContent, CarouselItem} from "../ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
-import widget_01 from "../../img/widget.png";
 import carousel_1 from "../../img/carousel1.png";
 import carousel_2 from "../../img/carousel2.png";
 import carousel_3 from "../../img/carousel3.png";

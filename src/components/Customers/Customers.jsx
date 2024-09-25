@@ -227,8 +227,8 @@ const Customers = () => {
                             {formError.customer_email_id && <span className="text-sm text-red-500">{formError.customer_email_id}</span>}
                         </div>
 
-                        <div className={"mt-6 flex items-center"}>
-                            <Switch id={"switch"} checked={customerDetails.customer_email_notification == 1} onCheckedChange={(checked) => onChangeText({target: {name: "customer_email_notification", value:checked}})} htmlFor={"switch"} />
+                        <div className={"announce-create-switch mt-6 flex items-center"}>
+                            <Switch className={"w-[38px] h-[20px]"} id={"switch"} checked={customerDetails.customer_email_notification == 1} onCheckedChange={(checked) => onChangeText({target: {name: "customer_email_notification", value:checked}})} htmlFor={"switch"} />
                             <Label htmlFor={"switch"} className={"ml-[9px] text-sm font-medium"}>Receive Notifications</Label>
                         </div>
                     </div>
@@ -278,7 +278,7 @@ const Customers = () => {
                         </div>
                         <Button size="sm" onClick={openSheet} className={"gap-2 font-semibold hover:bg-primary"}> <Plus size={20} strokeWidth={3} />New Customer</Button>
                     </div>
-                    <div className={"pt-4 sm:pt-8"}>
+                    <div className={"mt-4 sm:mt-6"}>
                                 <Card className={""}>
                                     <CardContent className={"p-0"}>
                                         <div className={"rounded-md grid grid-cols-1 overflow-auto whitespace-nowrap"}>

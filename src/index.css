@@ -282,9 +282,9 @@ em {color: var(--muted-foreground) !important;}
 }
 
 @media (max-width: 640px) {
-  .bodyScreenHeight {height: auto;}
+  /*.bodyScreenHeight {height: auto;}*/
+  .bodyScreenHeight:not(:has(.www)){height: auto;}
   .idea-sheet-height{height: calc(100vh - 95px);}
-
 }
 
 @media (max-width: 329px) {
@@ -490,6 +490,8 @@ em {color: var(--muted-foreground) !important;}
   -ms-overflow-style: none;
   scrollbar-width: none
 }
+
+.ql-container{height: auto}
 
 .ql-toolbar.ql-snow, .ql-container.ql-snow{
   border: 0;

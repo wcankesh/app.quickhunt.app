@@ -88,12 +88,12 @@ const GeneralSettings = () => {
 
     return (
         <Card>
-            <CardHeader className={"gap-1 border-b p-4 sm:p-6"}>
+            <CardHeader className={"gap-1 border-b p-4 md:p-6"}>
                 <h3 className={"font-medium text-lg sm:text-2xl"}>General Settings</h3>
             </CardHeader>
             <CardContent className={"p-0"}>
-                <div className={"space-y-3 p-4 px-6 border-b"}>
-                    <div className={"flex justify-between"}>
+                <div className={"space-y-3 p-4 md:p-6 border-b"}>
+                    <div className={"flex justify-between items-center gap-2"}>
                         <h3 className={"font-medium"}>Announcement</h3>
                         <div className="announce-create-switch flex gap-4">
                             <Switch
@@ -144,8 +144,8 @@ const GeneralSettings = () => {
                         </Fragment>
                     }
                 </div>
-                <div className={"space-y-3 p-4 px-6 border-b"}>
-                    <div className={"flex justify-between"}>
+                <div className={"space-y-3 p-4 md:p-6 border-b"}>
+                    <div className={"flex justify-between items-center gap-2"}>
                         <h3 className={"font-medium"}>Roadmap</h3>
                         <div className="announce-create-switch flex gap-4">
                             <Switch
@@ -170,8 +170,8 @@ const GeneralSettings = () => {
                     }
 
                 </div>
-                <div className={"space-y-3 p-4 px-6 border-b"}>
-                    <div className={"flex justify-between"}>
+                <div className={"space-y-3 p-4 md:p-6 border-b"}>
+                    <div className={"flex justify-between items-center gap-2"}>
                         <h3 className={"font-medium"}>Ideas</h3>
                         <div className="announce-create-switch flex gap-4">
                             <Switch
@@ -195,7 +195,7 @@ const GeneralSettings = () => {
                         </Fragment>
                     }
                 </div>
-                <div className={"space-y-3 p-4 px-6 border-b"}>
+                <div className={"space-y-3 p-4 md:p-6 border-b"}>
                     <h3 className={"font-medium"}>Header Color</h3>
                     <div className={"flex items-center gap-3 flex-wrap md:flex-nowrap"}>
                         <div className={"widget-color-picker space-y-2 w-full md:basis-1/2"}>
@@ -232,7 +232,7 @@ const GeneralSettings = () => {
                         </div>
                     </div>
                 </div>
-                <div className={"space-y-3 p-4 px-6 border-b"}>
+                <div className={"space-y-3 p-4 md:p-6 border-b"}>
                     <h3 className={"font-medium"}>Global Color</h3>
                     <div className={"flex items-center gap-3 flex-wrap md:flex-nowrap"}>
                         <div className={"widget-color-picker space-y-2 w-full md:basis-1/2"}>
@@ -253,7 +253,7 @@ const GeneralSettings = () => {
                         </div>
                     </div>
                 </div>
-                <div className={"space-y-3 p-4 px-6 border-b"}>
+                <div className={"space-y-3 p-4 md:p-6 border-b"}>
                     <h3 className={"font-medium"}>Branding</h3>
                     <div className="announce-create-switch flex gap-4">
                         <Switch
@@ -267,11 +267,13 @@ const GeneralSettings = () => {
                     </div>
                 </div>
             </CardContent>
-            <CardFooter className={"p-4 sm:p-6 justify-end"}>
+            <CardFooter className={"p-4 md:p-6 justify-end"}>
                 <Button
-                    className={`${isSave === true ? "py-2 px-6" : "py-2 px-6 "} w-[213px] text-sm font-semibold`}
-                    onClick={onUpdatePortal}>{isSave ?
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : "Update General Settings"} </Button>
+                    className={`py-2 px-6 w-[213px] text-sm font-semibold hover:bg-primary`}
+                    onClick={onUpdatePortal}
+                >
+                    {isSave ? <Loader2 className="h-4 w-4 animate-spin"/> : "Update General Settings"}
+                </Button>
             </CardFooter>
         </Card>
     );

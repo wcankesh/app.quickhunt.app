@@ -15,7 +15,8 @@ import {PopoverContent} from "../ui/popover";
 import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList} from "../ui/command";
 import {Checkbox} from "../ui/checkbox";
 import {Badge} from "../ui/badge";
-import {useParams, useLocation} from "react-router-dom";
+import {useLocation, useNavigate} from "react-router-dom";
+import {baseUrl} from "../../utils/constent";
 
 
 const initialStateFilter = {
@@ -42,16 +43,18 @@ const status = [
 ];
 
 const Announcements = () => {
-    const { id } = useParams();
     const location = useLocation();
+    let navigate = useNavigate();
     const {theme} = useTheme();
+    const UrlParams = new URLSearchParams(location.search);
+    const getPageNo = UrlParams.get("pageNo") || 1;
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
     const [announcementList, setAnnouncementList] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isLoadingDelete, setIsLoadingDelete] = useState(false);
     const [filter, setFilter] = useState(initialStateFilter);
-    const [pageNo, setPageNo] = useState(1);
+    const [pageNo, setPageNo] = useState(Number(getPageNo));
     const [totalRecord, setTotalRecord] = useState(0);
     const [selectedRecord, setSelectedRecord] = useState({})
     const [analyticsObj, setAnalyticsObj] = useState({})
@@ -69,6 +72,7 @@ const Announcements = () => {
                     getAllPosts()
                 }
             }
+            navigate(`${baseUrl}/announcements?pageNo=${pageNo}`);
     }, [projectDetailsReducer.id, allStatusAndTypes, pageNo]);
 
     useEffect(() => {
@@ -77,7 +81,6 @@ const Announcements = () => {
         if(postId){
             setAnalyticsObj({id: postId})
         }
-
     }, []);
 
     const getAllPosts = async () => {
@@ -143,6 +146,7 @@ const Announcements = () => {
                 clone.splice(index, 1)
                 setAnnouncementList(clone);
             }
+            setTotalRecord(Number(totalRecord) - 1)
             toast({
                 description: data.message,
             })
@@ -214,18 +218,20 @@ const Announcements = () => {
             {selectedRecord.id &&
             <CreateAnnouncement
                 isOpen={selectedRecord.id}
-                selectedRecord={selectedRecord}
-                setSelectedRecord={setSelectedRecord}
                 onOpen={openSheet}
                 onClose={closeSheet}
                 getAllPosts={getAllPosts}
+                selectedRecord={selectedRecord}
+                setSelectedRecord={setSelectedRecord}
                 announcementList={announcementList}
                 setAnnouncementList={setAnnouncementList}
             />}
-            {analyticsObj?.id && <AnalyticsView
-                                                setAnalyticsObj={setAnalyticsObj}
-                                               analyticsObj={analyticsObj}
-                                               onClose={onCloseAnalyticsSheet}/>}
+            {analyticsObj?.id &&
+            <AnalyticsView
+                onClose={onCloseAnalyticsSheet}
+                analyticsObj={analyticsObj}
+                setAnalyticsObj={setAnalyticsObj}
+            />}
 
             <div className={"flex items-center justify-between flex-wrap gap-6"}>
                 <div className={"flex justify-between items-center w-full md:w-auto"}>
@@ -344,7 +350,7 @@ const Announcements = () => {
 
 
 
-            <Card className={"mt-8"}>
+            <Card className={"mt-6"}>
                 <AnnouncementsTable
                     setAnalyticsObj={setAnalyticsObj}
                     handleDelete={handleDelete}

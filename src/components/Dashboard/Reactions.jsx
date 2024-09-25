@@ -110,7 +110,7 @@ const Reactions = () => {
                                     const emoji = allStatusAndTypes.emoji.find((e) => e.id === x.reaction_id) || { emoji_url: "" };
                                     return (
                                         <Fragment key={i}>
-                                            <CardContent className={"p-6 border-b"}>
+                                            <CardContent className={"p-2 sm:p-3 lg:p-6 border-b"}>
                                                 <div className={"flex gap-4"}>
                                                     <Avatar className={"w-[35px] h-[35px]"}>
                                                         <AvatarImage src={emoji.emoji_url} />

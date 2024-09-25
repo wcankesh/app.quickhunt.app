@@ -262,104 +262,104 @@ const Categories = () => {
                 </CardHeader>
                 <CardContent className={"p-0"}>
                     <div className={"grid grid-cols-1 overflow-auto whitespace-nowrap"}>
-                                    <Table>
-                                        <TableHeader className={""}>
-                                            <TableRow>
+                        <Table>
+                            <TableHeader className={""}>
+                                <TableRow>
+                                    {
+                                        ["Category Name","Last Update","Action"].map((x,i)=>{
+                                            return(
+                                                <TableHead className={`${i == 0 ? "w-2/5" : i == 1 ? "text-center" : i == 2 ? "text-end" : ""}  px-2 py-[10px] md:px-3 ${theme === "dark" ? "" : "text-card-foreground"}`}>{x}</TableHead>
+                                            )
+                                        })
+                                    }
+                                </TableRow>
+                            </TableHeader>
+                                <TableBody>
+                                    {
+                                        categoriesList.length > 0 ?
+                                            <Fragment>
                                                 {
-                                                    ["Category Name","Last Update","Action"].map((x,i)=>{
+                                                    (categoriesList || []).map((x,i)=>{
                                                         return(
-                                                            <TableHead className={`${i == 0 ? "w-2/5" : i == 1 ? "text-center" : i == 2 ? "text-end" : ""}  px-2 py-[10px] md:px-3 ${theme === "dark" ? "" : "text-card-foreground"}`}>{x}</TableHead>
+                                                            <TableRow key={i}>
+                                                                {
+                                                                    isEdit == i ?
+                                                                        <Fragment>
+                                                                            <TableCell className={"px-2 py-[10px] md:px-3"}>
+                                                                                <Input
+                                                                                    placeholder={"Enter category name"}
+                                                                                    className={"bg-card h-9"}
+                                                                                    type="title"
+                                                                                    value={x.name}
+                                                                                    name={"name"}
+                                                                                    onBlur={onBlur}
+                                                                                    onChange={(e) => handleInputChange(e, i)}
+                                                                                />
+                                                                                <div className="grid gap-2">
+                                                                                    {formError.name && <span className="text-red-500 text-sm">{formError.name}</span>}
+                                                                                </div>
+                                                                            </TableCell>
+                                                                            <TableCell/>
+                                                                            <TableCell className={`px-2 py-[10px] pt-[13px] md:px-3 font-medium text-xs align-top ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                                                                <div className={"flex justify-end items-center gap-2"}>
+                                                                                    <Fragment>
+                                                                                        {
+                                                                                            x.id ? <Button
+                                                                                                variant="outline hover:bg-transparent"
+                                                                                                className={`p-1 border w-[30px] h-[30px]`}
+                                                                                                onClick={() => handleSaveCategory(i)}
+                                                                                            >
+                                                                                                {isSave ? <Loader2 className="h-4 w-4 animate-spin"/> : <Check size={16}/>}
+                                                                                            </Button> : <Button
+                                                                                                variant=""
+                                                                                                className="text-sm font-semibold h-[30px] w-[126px] hover:bg-primary"
+                                                                                                onClick={() => addCategory(x, i)}
+                                                                                            >
+                                                                                                {isSave ? <Loader2 className={"h-4 w-4 animate-spin"}/> : "Add Category"}
+                                                                                            </Button>
+                                                                                        }
+
+                                                                                        <Button
+                                                                                            variant="outline hover:bg-transparent"
+                                                                                            className="p-1 border w-[30px] h-[30px]"
+                                                                                            onClick={() =>  x.id ? onEditCancel() : onEdit(null)}
+                                                                                        >
+                                                                                            <X size={16}/>
+                                                                                        </Button>
+                                                                                    </Fragment>
+                                                                                </div>
+                                                                            </TableCell>
+                                                                        </Fragment>
+                                                                        :
+                                                                        <Fragment>
+                                                                            <TableCell className={`font-medium text-xs px-2 py-[10px] md:px-3 ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                                                                {x.name}
+                                                                            </TableCell>
+                                                                            <TableCell className={`px-2 py-[10px] md:px-3 font-medium text-xs leading-normal text-center ${theme === "dark" ? "" : "text-muted-foreground"}`}>{moment.utc(x.updated_at).local().startOf('seconds').fromNow()}</TableCell>
+                                                                            <TableCell className={`px-2 py-[10px] md:px-3  ${theme === "dark" ? "" : "text-muted-foreground"}} `}>
+                                                                                <div className={"flex justify-end items-center"}>
+                                                                                    <div className="pr-0">
+                                                                                        <Button onClick={() => onEdit(i)} variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px] text-muted-foreground`}><Pencil size={16}/></Button>
+                                                                                    </div>
+                                                                                    <div className="pl-2"><Button onClick={()=>deleteCategory(x.id)} variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px] text-muted-foreground`}><Trash2 size={16} /></Button></div>
+                                                                                </div>
+                                                                            </TableCell>
+                                                                        </Fragment>
+                                                                }
+                                                            </TableRow>
                                                         )
                                                     })
                                                 }
-                                            </TableRow>
-                                        </TableHeader>
-                                            <TableBody>
-                                                {
-                                                    categoriesList.length > 0 ?
-                                                        <Fragment>
-                                                            {
-                                                                (categoriesList || []).map((x,i)=>{
-                                                                    return(
-                                                                        <TableRow key={i}>
-                                                                            {
-                                                                                isEdit == i ?
-                                                                                    <Fragment>
-                                                                                        <TableCell className={"px-2 py-[10px] md:px-3"}>
-                                                                                            <Input
-                                                                                                placeholder={"Enter category name"}
-                                                                                                className={"bg-card h-9"}
-                                                                                                type="title"
-                                                                                                value={x.name}
-                                                                                                name={"name"}
-                                                                                                onBlur={onBlur}
-                                                                                                onChange={(e) => handleInputChange(e, i)}
-                                                                                            />
-                                                                                            <div className="grid gap-2">
-                                                                                                {formError.name && <span className="text-red-500 text-sm">{formError.name}</span>}
-                                                                                            </div>
-                                                                                        </TableCell>
-                                                                                        <TableCell/>
-                                                                                        <TableCell className={`px-2 py-[10px] pt-[13px] md:px-3 font-medium text-xs ${theme === "dark" ? "" : "text-muted-foreground"}`}>
-                                                                                            <div className={"flex justify-end items-center gap-2"}>
-                                                                                                <Fragment>
-                                                                                                    {
-                                                                                                        x.id ? <Button
-                                                                                                            variant="outline hover:bg-transparent"
-                                                                                                            className={`p-1 border w-[30px] h-[30px] ${isSave ? "justify-center items-center" : ""}`}
-                                                                                                            onClick={() => handleSaveCategory(i)}
-                                                                                                        >
-                                                                                                            {isSave ? <Loader2 className="mr-1 h-4 w-4 animate-spin justify-center"/> : <Check size={16}/>}
-                                                                                                        </Button> : <Button
-                                                                                                            variant=""
-                                                                                                            className="text-sm font-semibold h-[30px] w-[126px]"
-                                                                                                            onClick={() => addCategory(x, i)}
-                                                                                                        >
-                                                                                                            {isSave ? <Loader2 className={"mr-2  h-4 w-4 animate-spin"}/> : "Add Category"}
-                                                                                                        </Button>
-                                                                                                    }
-
-                                                                                                    <Button
-                                                                                                        variant="outline hover:bg-transparent"
-                                                                                                        className="p-1 border w-[30px] h-[30px]"
-                                                                                                        onClick={() =>  x.id ? onEditCancel() : onEdit(null)}
-                                                                                                    >
-                                                                                                        <X size={16}/>
-                                                                                                    </Button>
-                                                                                                </Fragment>
-                                                                                            </div>
-                                                                                        </TableCell>
-                                                                                    </Fragment>
-                                                                                    :
-                                                                                    <Fragment>
-                                                                                        <TableCell className={`font-medium text-xs px-2 py-[10px] md:px-3 ${theme === "dark" ? "" : "text-muted-foreground"}`}>
-                                                                                            {x.name}
-                                                                                        </TableCell>
-                                                                                        <TableCell className={`px-2 py-[10px] md:px-3 font-medium text-xs leading-normal text-center ${theme === "dark" ? "" : "text-muted-foreground"}`}>{moment.utc(x.updated_at).local().startOf('seconds').fromNow()}</TableCell>
-                                                                                        <TableCell className={`px-2 py-[10px] md:px-3  ${theme === "dark" ? "" : "text-muted-foreground"}} `}>
-                                                                                            <div className={"flex justify-end items-center"}>
-                                                                                                <div className="pr-0">
-                                                                                                    <Button onClick={() => onEdit(i)} variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px] text-muted-foreground`}><Pencil size={16}/></Button>
-                                                                                                </div>
-                                                                                                <div className="pl-2"><Button onClick={()=>deleteCategory(x.id)} variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px] text-muted-foreground`}><Trash2 size={16} /></Button></div>
-                                                                                            </div>
-                                                                                        </TableCell>
-                                                                                    </Fragment>
-                                                                            }
-                                                                        </TableRow>
-                                                                    )
-                                                                })
-                                                            }
-                                                        </Fragment>
-                                                        :
-                                                        (categoriesList.length == 0 && isLoading == false) ? <TableRow>
-                                                            <TableCell colSpan={6}>
-                                                                <EmptyData />
-                                                            </TableCell>
-                                                        </TableRow> :null
-                                                }
-                                            </TableBody>
-                                    </Table>
+                                            </Fragment>
+                                            :
+                                            (categoriesList.length == 0 && isLoading == false) ? <TableRow>
+                                                <TableCell colSpan={6}>
+                                                    <EmptyData />
+                                                </TableCell>
+                                            </TableRow> :null
+                                    }
+                                </TableBody>
+                        </Table>
                     </div>
                 </CardContent>
             </Card>

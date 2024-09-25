@@ -16,7 +16,6 @@ import {Calendar} from "../ui/calendar";
 import {toast} from "../ui/use-toast";
 import {Badge} from "../ui/badge";
 import ReactQuillEditor from "../Comman/ReactQuillEditor";
-import {useLocation, useParams} from "react-router-dom";
 //post_status: 1=Publish/active,2=Scheduled/unpublished,3=Draft,4=Expired
 const initialState = {
     post_description: '',
@@ -39,9 +38,8 @@ const initialStateError = {
     post_slug_url: "",
 }
 
-const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPosts, announcementList, setSelectedRecord, setAnnouncementList}) => {
+const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPosts, announcementList}) => {
 
-    const { id } = useParams();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
     const userDetailsReducer = useSelector(state => state.userDetailsReducer);
@@ -69,19 +67,6 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
         }
     }, [projectDetailsReducer.id, allStatusAndTypes, userDetailsReducer.id])
 
-    // useEffect(() => {
-    //     if (id && announcementList.length > 0) {
-    //         setSelectedRecord(true);
-    //         const clone = announcementList.find((x) => x.id == id);
-    //         setAnnouncementList(clone);
-    //     }
-    // }, [id, announcementList]);
-
-    // const handleFileChange = (file) => {
-    //     setChangeLogDetails({...changeLogDetails, image: file.target.files[0]});
-    //     // setPreviewImage(URL.createObjectURL(file.target.files[0]));
-    // };
-
     const handleFileChange = (file) => {
         const selectedFile = file.target.files[0];
         if (selectedFile) {
@@ -99,7 +84,6 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
                     ...changeLogDetails,
                     image: selectedFile
                 });
-                // setPreviewImage(URL.createObjectURL(selectedFile));
             }
         }
     };
@@ -110,7 +94,6 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
         } else {
             setChangeLogDetails({...changeLogDetails, [name]: value, image: ""})
         }
-
     }
 
     const formValidate = (name, value) => {
@@ -230,15 +213,6 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
             return;
         }
 
-        // const existingSlugs = new Set((announcementList || []).map(x => x.post_slug_url));
-        // if (existingSlugs.has(changeLogDetails.post_slug_url)) {
-        //     toast({
-        //         description: "The post slug url has already been taken.",
-        //         variant: "destructive",
-        //     });
-        //     return;
-        // }
-
         const isSlugTaken = (announcementList || []).some(x => x.post_slug_url === changeLogDetails.post_slug_url);
         if (isSlugTaken) {
             toast({
@@ -283,10 +257,6 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
             });
         } else {
             setIsSave(false);
-            // toast({
-            //     description: data.message,
-            //     variant: "destructive",
-            // });
         }
         onClose("", data.data);
     }
@@ -328,11 +298,12 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
                         <Button className={"h-5 w-5 p-0"}
                                 onClick={() => commonToggle("post_pin_to_top", changeLogDetails.post_pin_to_top === 1 ? 0 : 1)}
                                 variant={"ghost hover:bg-none"}>{changeLogDetails.post_pin_to_top === 1 ?
-                            <Pin size={15} className={`${theme === "dark" ? "fill-card-foreground" : "fill-card-foreground"}`}/> : <Pin size={15}/>}</Button>
+                            <Pin size={15} className={`${theme === "dark" ? "fill-card-foreground" : "fill-card-foreground"}`}/> : <Pin size={15}/>}
+                        </Button>
                         <X onClick={onClose} size={18} className={"cursor-pointer"}/>
                     </div>
                 </SheetHeader>
-                <div className={"comm-sheet-height overflow-y-auto"}>
+                <div className={"h-[calc(100vh_-_53px)] lg:h-[calc(100vh_-_69px)] overflow-y-auto"}>
                     <div className={"px-3 py-6 lg:px-8 border-b"}>
                         <div className={"flex flex-col gap-6"}>
                             <div className="w-full flex flex-col gap-2">
@@ -340,7 +311,7 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
                                 <Input type="text" id="title" className={"h-9"} name={"post_title"}
                                        value={changeLogDetails.post_title} onChange={onChangeText}/>
                                 {formError.post_title &&
-                                <span className="text-sm text-red-500">{formError.post_title}</span>}
+                                <span className="text-sm text-destructive">{formError.post_title}</span>}
                             </div>
                             <div className="w-full flex flex-col gap-2">
                                 <Label htmlFor="link">Permalink / Slug</Label>
@@ -357,7 +328,7 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
                                 <ReactQuillEditor className={"min-h-[130px] h-full"} value={changeLogDetails.post_description} onChange={onChangeText}
                                                   name={"post_description"}/>
                                 {formError.post_description &&
-                                <span className="text-sm text-red-500">{formError.post_description}</span>}
+                                <span className="text-sm text-destructive">{formError.post_description}</span>}
                             </div>
                         </div>
                     </div>
@@ -559,7 +530,7 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
                                         </div>
                                 }
                             </div>
-                            {formError.image && <div className={"text-xs text-red-500"}>{formError.image}</div>}
+                            {formError.image && <div className={"text-xs text-destructive"}>{formError.image}</div>}
                         </div>
                         <div className={"flex flex-col gap-[18px] w-full"}>
                             <div className={"announce-create-switch flex gap-3"}>
@@ -601,7 +572,7 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
 
                         </div>
                     </div>
-                    <div className={"p-3 pb-[60px] lg:p-8 sm:pb-0 flex flex-row gap-4"}>
+                    <div className={"p-3 lg:p-8 sm:pb-0 flex flex-row gap-4"}>
                         <Button
                             variant={"outline "}
                             disabled={isSave}

@@ -25,7 +25,6 @@ const initialState = {
     id: ''
 }
 
-
 const Domain = () => {
     const apiService = new ApiService();
     const {onProModal} = useTheme()
@@ -85,7 +84,6 @@ const Domain = () => {
                 })
             }
         }
-
     }
 
     return (
@@ -112,7 +110,7 @@ const Domain = () => {
                     <span className={"font-bold"}> "cname.quickhunt.app"</span>.</p>
             </CardContent>
             <CardFooter className={"p-4 sm:p-6 justify-end"}>
-                <Button  className={`${isSave === true ? "py-2 px-4" : "py-2 px-4 w-[135px]"} text-sm font-semibold`}
+                <Button  className={`py-2 px-4 text-sm font-semibold hover:bg-primary`}
                         onClick={onUpdatePortal}>{isSave ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Update Domain"} </Button>
             </CardFooter>
         </Card>

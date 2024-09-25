@@ -374,7 +374,7 @@ const Project = () => {
                     className={`text-sm font-semibold border w-[130px] ${theme === "dark" ? "text-card-foreground" : "text-primary border-primary"}`}
                 >{isDel ? <Loader2 className="h-4 w-4 animate-spin" /> : "Delete project"}</Button>
                 <Button
-                    className={`w-[132px] text-sm font-semibold`}
+                    className={`w-[132px] text-sm font-semibold hover:bg-primary`}
                     onClick={() => updateProjects('')}>{isSave ? <Loader2 className="h-4 w-4 animate-spin" /> : "Update project"}</Button>
             </CardFooter>
         </Card>

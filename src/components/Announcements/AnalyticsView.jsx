@@ -105,7 +105,7 @@ const AnalyticsView = ({onClose, analyticsObj, setAnalyticsObj}) => {
                 {/*<SheetHeader className={`px-4 py-5 lg:px-8 lg:py-[20px] border-b text-left flex flex-row justify-between items-center gap-3 border-b`}>*/}
                 <SheetHeader className={`px-4 py-5 lg:p-6 border-b text-left flex flex-row justify-between items-center gap-3 border-b`}>
                     <h5 className={"text-sm md:text-xl font-medium"}>{analyticsObj?.post_title}</h5>
-                    <X size={30} className={"cursor-pointer m-0"} onClick={handleClose}/>
+                    <X size={18} className={"cursor-pointer m-0"} onClick={handleClose}/>
                 </SheetHeader>
                 <div className={"overflow-auto h-[calc(100vh_-_79px)] pb-2"}>
                     {/*<div className={"pt-4 px-4 pb-3 pr-8 md:pt-8 md:px-8 md:pb-6 md:pr-16 flex flex-row justify-between gap-2 border-b "}>*/}

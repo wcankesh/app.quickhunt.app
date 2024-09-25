@@ -102,7 +102,7 @@ const Comments = () => {
                         <CardContent className={"p-0"}>
                             {
                                 (chartList || []).map((x, i) => (
-                                    <CardContent className={"p-6 flex flex-col gap-4 border-b"}>
+                                    <CardContent className={"flex flex-col gap-4 border-b p-2 sm:p-3 lg:p-6"}>
                                         <div className="flex gap-2 items-center justify-between">
                                             <div
                                                 className="flex gap-2 items-center cursor-pointer"
@@ -127,8 +127,10 @@ const Comments = () => {
                                                         }
                                                     </Avatar>
                                                 </div>
-                                                <h4 className="text-sm font-semibold">{x.customer_name}</h4>
-                                                <p className="text-xs font-medium text-muted-foreground">{x?.customer_email}</p>
+                                                <div className={"flex items-center flex-wrap gap-1 md:gap-2"}>
+                                                    <h4 className="text-sm font-semibold">{x.customer_name}</h4>
+                                                    <p className="text-xs font-medium text-muted-foreground">{x.customer_email}</p>
+                                                </div>
                                             </div>
                                             <Badge
                                                 variant={"outline"}

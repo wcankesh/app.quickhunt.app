@@ -59,7 +59,7 @@ const Articles = () => {
                     </Button>
                 </div>
             </div>
-            <div className={"mt-[34px]"}>
+            <div className={"mt-6"}>
                 <Card className={""}>
                     <CardContent className={"p-0"}>
                         <Table>

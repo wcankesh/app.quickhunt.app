@@ -534,7 +534,7 @@ const UpdateIdea = () => {
 
     return (
         <Fragment>
-            <div className={"p-6 border-b"}>
+            <div className={"px-4 py-3 lg:py-6 lg:px-8 border-b"}>
                 <Breadcrumb>
                     <BreadcrumbList>
                         <BreadcrumbItem className={"cursor-pointer"}>
@@ -549,7 +549,7 @@ const UpdateIdea = () => {
                     </BreadcrumbList>
                 </Breadcrumb>
             </div>
-            <div className={`flex h-[calc(100%_-_69px)] overflow-y-auto`}>
+            <div className={`flex h-[calc(100%_-_45px)] lg:h-[calc(100%_-_69px)] overflow-y-auto`}>
                 <div className={`max-w-[407px] w-full h-full border-r lg:block hidden lg:overflow-auto`}>
                     <div className={"border-b py-4 px-6 flex flex-col gap-3"}>
                         <div className={"flex flex-col gap-1"}>
@@ -619,6 +619,7 @@ const UpdateIdea = () => {
                                                 className="hidden"
                                                 multiple
                                                 onChange={handleFeatureImgUpload}
+                                                accept={".jpg,.jpeg"}
                                             />
                                             <label
                                                 htmlFor="pictureInput"
@@ -675,7 +676,7 @@ const UpdateIdea = () => {
                         </div>
                     </div>
                 </div>
-                <div className={"w-full h-full overflow-y-auto"}>
+                <div className={"www w-full h-full overflow-y-auto"}>
                     {
                         isEditIdea ?
                             <Fragment>
@@ -1177,6 +1178,7 @@ const UpdateIdea = () => {
                                                             type="file"
                                                             className="hidden"
                                                             onChange={handleAddCommentImg}
+                                                            accept={".jpg,.jpeg"}
                                                         />
                                                         <label htmlFor="commentFile"
                                                                className="absolute inset-0 flex items-center justify-center bg-white border border-primary rounded cursor-pointer"
@@ -1349,6 +1351,7 @@ const UpdateIdea = () => {
                                                                                                         type="file"
                                                                                                         className="hidden"
                                                                                                         onChange={handleAddCommentImg}
+                                                                                                        accept={".jpg,.jpeg"}
                                                                                                     />
                                                                                                     <label
                                                                                                         htmlFor="selectedCommentImg"
@@ -1540,6 +1543,7 @@ const UpdateIdea = () => {
                                                                                                                                             type="file"
                                                                                                                                             className="hidden"
                                                                                                                                             onChange={handleSubCommentUploadImg}
+                                                                                                                                            accept={".jpg,.jpeg"}
                                                                                                                                         />
                                                                                                                                         <label
                                                                                                                                             htmlFor="commentFileInput"
@@ -1654,7 +1658,9 @@ const UpdateIdea = () => {
                                                                                                         id="commentFileInput"
                                                                                                         type="file"
                                                                                                         className="hidden"
-                                                                                                        onChange={handleSubCommentUploadImg}/>
+                                                                                                        onChange={handleSubCommentUploadImg}
+                                                                                                        accept={".jpg,.jpeg"}
+                                                                                                    />
                                                                                                     <label
                                                                                                         htmlFor="commentFileInput"
                                                                                                         className="absolute inset-0 flex items-center justify-center bg-white border border-primary rounded cursor-pointer">
