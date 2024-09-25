@@ -273,7 +273,7 @@ const Customers = () => {
                 <div className={""}>
                     <div className={"flex flex-row gap-x-4 flex-wrap justify-between gap-y-2 items-center"}>
                         <div>
-                            <h4 className={"font-medium text-lg sm:text-2xl"}>Customers</h4>
+                            <h4 className={"font-medium text-lg sm:text-2xl"}>Customers ({totalRecord})</h4>
                             <h5 className={"text-muted-foreground text-base"}>Last updates</h5>
                         </div>
                         <Button size="sm" onClick={openSheet} className={"gap-2 font-semibold hover:bg-primary"}> <Plus size={20} strokeWidth={3} />New Customer</Button>

@@ -104,7 +104,16 @@ const Comments = () => {
                                 (chartList || []).map((x, i) => (
                                     <CardContent className={"p-6 flex flex-col gap-4 border-b"}>
                                         <div className="flex gap-2 items-center justify-between">
-                                            <div className="flex gap-2 items-center">
+                                            <div
+                                                className="flex gap-2 items-center cursor-pointer"
+                                                onClick={() => {
+                                                    if (x.type === 1) {
+                                                        navigate(`${baseUrl}/announcements/${x.post_id}`);
+                                                    } else if (x.type === 2) {
+                                                        navigate(`${baseUrl}/ideas/${x.post_id}`);
+                                                    }
+                                                }}
+                                            >
                                                 <div className={"update-idea text-sm rounded-full border text-center"}>
                                                     <Avatar
                                                         className={"w-[20px] h-[20px]"}>

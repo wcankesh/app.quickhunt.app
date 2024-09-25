@@ -8,10 +8,13 @@ import {ApiService} from "../../utils/ApiService";
 import {Skeleton} from "../ui/skeleton";
 import {useSelector} from "react-redux";
 import ReadMoreText from "../Comman/ReadMoreText";
+import {useNavigate, useLocation} from "react-router";
 
 const perPageLimit = 10;
 
 const AnalyticsView = ({isOpen, onOpen, onClose, selectedViewAnalyticsRecord}) => {
+    const navigate = useNavigate();
+    const location = useLocation();
     const apiService = new ApiService();
     const [feedbackList, setFeedbackList] = useState([])
     const [reactionList, setReactionList] = useState([])
@@ -68,17 +71,23 @@ const AnalyticsView = ({isOpen, onOpen, onClose, selectedViewAnalyticsRecord}) =
         }
     };
 
+    const handleClose = () => {
+        onClose();
+        navigate(location.pathname);
+    };
+
     return (
-        <Sheet open={isOpen} onOpenChange={isOpen ? onClose : onOpen}>
+        <Sheet open={isOpen} onOpenChange={isOpen ? handleClose : onOpen}>
             <SheetOverlay className={"inset-0"}/>
             <SheetContent className={"pt-6 p-0 lg:max-w-[504px]"}>
-                <SheetHeader className={`px-4 py-5 lg:px-8 lg:py-[20px] border-b text-left flex flex-row justify-between items-center border-b`}>
+                {/*<SheetHeader className={`px-4 py-5 lg:px-8 lg:py-[20px] border-b text-left flex flex-row justify-between items-center gap-3 border-b`}>*/}
+                <SheetHeader className={`px-4 py-5 lg:p-6 border-b text-left flex flex-row justify-between items-center gap-3 border-b`}>
                     <h5 className={"text-sm md:text-xl font-medium"}>{selectedViewAnalyticsRecord?.post_title}</h5>
-                    <X className={"cursor-pointer m-0"} onClick={onClose}/>
+                    <X size={30} className={"cursor-pointer m-0"} onClick={handleClose}/>
                 </SheetHeader>
-                <div className={"overflow-auto comm-sheet-height pb-2"}>
-                    <div
-                        className={"pt-4 px-4 pb-3 pr-8 md:pt-8 md:px-8 md:pb-6 md:pr-16 flex flex-row justify-between gap-2 border-b "}>
+                <div className={"overflow-auto h-[calc(100vh_-_79px)] pb-2"}>
+                    {/*<div className={"pt-4 px-4 pb-3 pr-8 md:pt-8 md:px-8 md:pb-6 md:pr-16 flex flex-row justify-between gap-2 border-b "}>*/}
+                    <div className={"p-6 flex flex-row justify-between gap-2 border-b "}>
                         <div className={"flex flex-col gap-2"}>
                             <h5 className={"text-sm md:text-base font-semibold"}>Total Views</h5>
                             {isLoadingReaction ? <Skeleton className={"w-full h-8 rounded-md"}/> :
@@ -95,7 +104,7 @@ const AnalyticsView = ({isOpen, onOpen, onClose, selectedViewAnalyticsRecord}) =
                                 <h5 className={"text-xl md:text-2xl font-bold"}>{totalFeedback}</h5>}
                         </div>
                     </div>
-                    <div className={"p-4 md:py-6 md:px-8 flex flex-col gap-3 border-b"}>
+                    <div className={"p-6 flex flex-col gap-3 border-b"}>
                         <h5 className={"text-base font-semibold leading-5"}>Reaction</h5>
                         {isLoadingReaction ? <div className="flex items-center space-x-6">
                                 {[...Array(4)].map((_, i) => {
@@ -126,7 +135,7 @@ const AnalyticsView = ({isOpen, onOpen, onClose, selectedViewAnalyticsRecord}) =
                             </div>}
 
                     </div>
-                    <div className={"p-4 md:py-6 md:px-8 flex flex-col gap-4"}>
+                    <div className={"p-6 flex flex-col gap-4"}>
                         <h5 className={"text-base font-semibold leading-5"}>Feedback</h5>
                         {
                             isLoadingFeedBack ?
@@ -153,15 +162,18 @@ const AnalyticsView = ({isOpen, onOpen, onClose, selectedViewAnalyticsRecord}) =
                                                 {
                                                     (feedbackList || []).map((x) => {
                                                         return (
-                                                            <div key={x.id} className={"flex flex-col py-4 first:pt-0 border-b"}>
+                                                            <div key={x.id}
+                                                                 className={"flex flex-col py-4 first:pt-0 border-b"}>
                                                                 <div className={"flex flex-row gap-4 ml-4 mr-[10px]"}>
                                                                     <div className={"flex flex-col gap-1"}>
-                                                                        <div className={"flex flex-row gap-4 items-center"}>
+                                                                        <div
+                                                                            className={"flex flex-row gap-4 items-center"}>
                                                                             <h5 className={"text-sm font-semibold leading-5 capitalize"}>{x?.customer_name}</h5>
                                                                             <p className={"text-muted-foreground text-[10px] leading-5 font-medium"}>{x?.customer_email_id}</p>
                                                                         </div>
                                                                         <p className={"text-muted-foreground text-xs font-medium"}>
-                                                                            <ReadMoreText className={"text-xs"} html={x.feedback}/>
+                                                                            <ReadMoreText className={"text-xs"}
+                                                                                          html={x.feedback}/>
                                                                         </p>
                                                                     </div>
                                                                 </div>
@@ -176,7 +188,8 @@ const AnalyticsView = ({isOpen, onOpen, onClose, selectedViewAnalyticsRecord}) =
                                                         className={"h-[30px] w-[30px] p-1.5"}
                                                         onClick={() => handlePaginationClick(pageNo - 1)}
                                                     >
-                                                        <ChevronLeft className={pageNo === 1 || isLoading ? "stroke-muted-foreground" : "stroke-primary"} />
+                                                        <ChevronLeft
+                                                            className={pageNo === 1 || isLoading ? "stroke-muted-foreground" : "stroke-primary"}/>
                                                     </Button>
                                                     <h5 className={"text-[14px] font-bold"}>{pageNo}</h5>
                                                     <Button
@@ -185,7 +198,8 @@ const AnalyticsView = ({isOpen, onOpen, onClose, selectedViewAnalyticsRecord}) =
                                                         className={"h-[30px] w-[30px] p-1.5"}
                                                         onClick={() => handlePaginationClick(pageNo + 1)}
                                                     >
-                                                        <ChevronRight className={pageNo === totalPages || isLoading ? "stroke-muted-foreground" : "stroke-primary"} />
+                                                        <ChevronRight
+                                                            className={pageNo === totalPages || isLoading ? "stroke-muted-foreground" : "stroke-primary"}/>
                                                     </Button>
                                                 </div>
                                             </div>

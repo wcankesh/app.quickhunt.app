@@ -692,7 +692,7 @@ const UpdateIdea = () => {
                                     </div>
                                     <div className="space-y-2">
                                         <Label htmlFor="message">Description</Label>
-                                        <ReactQuillEditor value={selectedIdea.description} name={"description"}
+                                        <ReactQuillEditor className={"min-h-[145px] h-full"} value={selectedIdea.description} name={"description"}
                                                           onChange={onChangeText}/>
                                         {formError.description &&
                                         <span className="text-red-500 text-sm">{formError.description}</span>}

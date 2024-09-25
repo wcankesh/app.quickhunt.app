@@ -161,6 +161,9 @@ export function Dashboard() {
         },
     ]
 
+    const openReactions = (postId) => {
+        navigate(`${baseUrl}/announcements?postId=${postId}`)
+    }
 
     return (
         <Fragment>
@@ -228,7 +231,7 @@ export function Dashboard() {
                                         <CardContent className={"p-0"}>{CommSkel.dashboardComments}</CardContent>
                                     ) : (
                                         (chartList.feedbacks && chartList.feedbacks.length > 0) ? (
-                                            (showAllFeedbacks ? chartList.feedbacks : chartList.feedbacks.slice(0, 5)).map((x, i) => (
+                                            (chartList.feedbacks || []).map((x, i) => (
                                                 <Fragment key={i}>
                                                     <CardContent className={"py-2.5 px-6 flex flex-col gap-4 border-b"}>
                                                         <div className="flex gap-2 items-center justify-between cursor-pointer">
@@ -291,7 +294,7 @@ export function Dashboard() {
                                         <CardContent className={"p-0"}>{CommSkel.commonParagraphTwoAvatar}</CardContent>
                                     ) : (
                                         (chartList.reactions && chartList.reactions.length > 0) ? (
-                                            (showAllReactions ? chartList.reactions : chartList.reactions.slice(0, 5)).map((x, i) => {
+                                            (chartList.reactions || []).map((x, i) => {
                                                 const emoji = allStatusAndTypes.emoji.find((e) => e.id === x.reaction_id) || {emoji_url: ""};
                                                 return (
                                                     <Fragment key={i}>
@@ -302,7 +305,10 @@ export function Dashboard() {
                                                                 </Avatar>
                                                                 <div className={"flex flex-col gap-1"}>
                                                                     <div className="flex gap-1 items-center">
-                                                                        <h4 className="text-sm font-semibold">{x.customer_name}</h4>
+                                                                        <h4
+                                                                            className="text-sm font-semibold cursor-pointer"
+                                                                            onClick={() => openReactions(x.post_id)}
+                                                                        >{x.customer_name}</h4>
                                                                         <p className="text-xs font-medium text-muted-foreground">Reacted
                                                                             To</p>
                                                                     </div>

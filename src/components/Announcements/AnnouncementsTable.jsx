@@ -16,20 +16,23 @@ import {Skeleton} from "../ui/skeleton";
 import {Dialog} from "@radix-ui/react-dialog";
 import {DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "../ui/dialog";
 import EmptyData from "../Comman/EmptyData";
-import {useNavigate} from "react-router";
+import {useNavigate, useLocation} from "react-router";
 
 const status = [
     {name: "Publish", value: 1, fillColor: "#389E0D", strokeColor: "#389E0D",},
-    {name: "Draft", value: 3, fillColor: "#CF1322", strokeColor: "#CF1322",},
+    {name: "Draft", value: 4, fillColor: "#CF1322", strokeColor: "#CF1322",},
 ];
 const status2 = [
     {name: "Publish", value: 1, fillColor: "#389E0D", strokeColor: "#389E0D",},
     {name: "Scheduled", value: 2, fillColor: "#63C8D9", strokeColor: "#63C8D9",},
-    {name: "Draft", value: 3, fillColor: "#CF1322", strokeColor: "#CF1322",},
+    {name: "Draft", value: 4, fillColor: "#CF1322", strokeColor: "#CF1322",},
 ]
 
 const AnnouncementsTable = ({data, isLoading, setSelectedRecord, handleDelete, setAnalyticsObj,isLoadingDelete}) => {
     const navigate = useNavigate();
+    const location = useLocation();
+    const UrlParams = new URLSearchParams(location.search);
+    const postId = UrlParams.get("postId") || '';
     const {theme} = useTheme();
     const [announcementData, setAnnouncementData] = useState(data);
     const [idToDelete, setIdToDelete] = useState(null);
@@ -44,6 +47,13 @@ const AnnouncementsTable = ({data, isLoading, setSelectedRecord, handleDelete, s
         }));
         setAnnouncementData(updatedData);
     }, [data]);
+
+    useEffect(() => {
+        if (postId && announcementData.length > 0) {
+            const foundAnnouncement = announcementData.find(x => x.id == postId);
+            setAnalyticsObj(foundAnnouncement);
+        }
+    }, [postId, announcementData]);
 
     const toggleSort = (column) => {
         let sortedData = [...announcementData];
@@ -219,15 +229,13 @@ const AnnouncementsTable = ({data, isLoading, setSelectedRecord, handleDelete, s
                                             </TableCell>
                                             <TableCell
                                                 className={`font-medium px-2 py-[10px] md:px-3`}>{x?.post_modified_date ? moment.utc(x.post_modified_date).local().startOf('seconds').fromNow() : "-"}</TableCell>
-                                            {/*<TableCell className={`font-medium px-2 py-[10px] md:px-3`}>{x?.post_published_at ? moment.utc(x.post_published_at).local().startOf('seconds').fromNow() : "-"}</TableCell>*/}
-                                            {/*<TableCell className={`font-medium px-2 py-[10px] md:px-3`}>{moment(x.post_published_at).format('D MMM, YYYY')}</TableCell>*/}
                                             <TableCell className={`font-medium px-2 py-[10px] md:px-3`}>{x.post_published_at ? moment(x.post_published_at).format('D MMM, YYYY') : moment().format('D MMM, YYYY')}</TableCell>
                                             <TableCell className={"px-2 py-[10px] md:px-3"}>
                                                 <Select value={x.post_status}
                                                         onValueChange={(value) => handleStatusChange(x, value)}>
                                                     <SelectTrigger className="w-[137px] h-7">
                                                         <SelectValue
-                                                            placeholder={x.post_status ? status.find(s => s.value === x.post_status)?.name : "Publish"}/>
+                                                            placeholder={x.post_status ? status.find(s => s.value == x.post_status)?.name : "Publish"}/>
                                                     </SelectTrigger>
                                                     <SelectContent>
                                                         <SelectGroup>

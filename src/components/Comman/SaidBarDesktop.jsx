@@ -25,6 +25,8 @@ const SaidBarDesktop = () => {
     const isHelpCenterActive = isActive(`${baseUrl}/help-center/articles`, `${baseUrl}/help-center/category`) ||
         isActive(`${baseUrl}/help-center/articles/${id}`, `${baseUrl}/help-center/category/${id}`);
 
+    const hasRoadmapPath = location.pathname.includes("/roadmap");
+
     const menuComponent = [
         {
             dashBtn: [

@@ -91,6 +91,10 @@ const Reactions = () => {
         }
     };
 
+    const openReactions = (postId) => {
+        navigate(`${baseUrl}/announcements?postId=${postId}`)
+    }
+
     return (
         <div className={"container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-3 md:px-4"}>
             <div className={"flex gap-4 items-center mb-6"}>
@@ -113,7 +117,7 @@ const Reactions = () => {
                                                     </Avatar>
                                                     <div className={"flex flex-col gap-1"}>
                                                         <div className="flex gap-1 items-center">
-                                                            <h4 className="text-sm font-semibold">{x.customer_name}</h4>
+                                                            <h4 className="text-sm font-semibold cursor-pointer" onClick={() => openReactions(x.post_id)}>{x.customer_name}</h4>
                                                             <p className="text-xs font-medium text-muted-foreground">Reacted To</p>
                                                         </div>
                                                         <p className="text-xs font-semibold text-foreground">"{x.post_title}"</p>

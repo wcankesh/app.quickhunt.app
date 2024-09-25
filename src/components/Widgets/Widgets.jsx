@@ -398,7 +398,7 @@ const Widgets = () => {
                     widgetsSetting={widgetsSetting}
                     selectedRecordAnalytics={selectedRecordAnalytics}
                 />
-                <div className={"flex mb-10 flex-col space-y-10"}>
+                <div className={"flex flex-col space-y-10"}>
                     <div className={"flex flex-col gap-2"}>
                         <div className={"flex items-center justify-between"}>
                             <h1 className={"text-2xl font-medium"}>Widgets</h1>

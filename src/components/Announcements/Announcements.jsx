@@ -36,7 +36,7 @@ const status = [
     },
     {
         label: "Draft",
-        value: 3
+        value: 4
     },
 ];
 
@@ -219,9 +219,9 @@ const Announcements = () => {
                 announcementList={announcementList}
                 setAnnouncementList={setAnnouncementList}
             />}
-            {analyticsObj.id && <AnalyticsView selectedViewAnalyticsRecord={analyticsObj}
+            {analyticsObj?.id && <AnalyticsView selectedViewAnalyticsRecord={analyticsObj}
                                                analyticsObj={analyticsObj}
-                                               isOpen={analyticsObj.id}
+                                               isOpen={analyticsObj?.id}
                                                onClose={onCloseAnalyticsSheet}/>}
             <div className={"flex items-center justify-between flex-wrap gap-6"}>
                 <div className={"flex justify-between items-center w-full md:w-auto"}>
@@ -321,7 +321,7 @@ const Announcements = () => {
                     filter.s &&
                     <Badge variant="outline" className="rounded p-0">
                         <span
-                            className="px-3 py-1.5 border-r">{filter.s == 1 ? "Published" : filter.s === 2 ? "Scheduled" : filter.s == 3 ? "Draft" : ""}</span>
+                            className="px-3 py-1.5 border-r">{filter.s == 1 ? "Published" : filter.s === 2 ? "Scheduled" : filter.s == 4 ? "Draft" : ""}</span>
                         <span className="w-7 h-7 flex items-center justify-center cursor-pointer"
                               onClick={() => handleBadge({name: "status", value: "s"})}>
                                             <X className='w-4 h-4'/>

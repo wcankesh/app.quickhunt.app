@@ -156,9 +156,6 @@ export class ApiService{
     async getSinglePosts (id){
         return await this.getData(`${baseUrlApi}/posts/${id}`)
     }
-    // async getSinglePosts (url){
-    //     return await this.getData(url)
-    // }
     async createPosts (payload){
         return await this.postData(`${baseUrlApi}/posts`,payload, true)
     }
