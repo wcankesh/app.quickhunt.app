@@ -9,10 +9,11 @@ import {Skeleton} from "../ui/skeleton";
 import {useSelector} from "react-redux";
 import ReadMoreText from "../Comman/ReadMoreText";
 import {useNavigate, useLocation} from "react-router";
+import moment from "moment";
 
 const perPageLimit = 10;
 
-const AnalyticsView = ({isOpen, onOpen, onClose, selectedViewAnalyticsRecord}) => {
+const AnalyticsView = ({onClose, analyticsObj, setAnalyticsObj}) => {
     const navigate = useNavigate();
     const location = useLocation();
     const apiService = new ApiService();
@@ -28,17 +29,38 @@ const AnalyticsView = ({isOpen, onOpen, onClose, selectedViewAnalyticsRecord}) =
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        if (selectedViewAnalyticsRecord?.id) {
+        if (analyticsObj?.id) {
             getReaction();
             getFeedback();
         }
-    }, [selectedViewAnalyticsRecord?.id, pageNo]);
+    }, [analyticsObj?.id, pageNo]);
+
+    useEffect(() => {
+        if(!analyticsObj?.post_title){
+            const getSinglePosts = async () => {
+                const data = await apiService.getSinglePosts(analyticsObj.id);
+                if (data.status === 200) {
+                    setAnalyticsObj({
+                        ...data.data,
+                        image: data.data?.feature_image,
+                        post_assign_to: data.data?.post_assign_to !== null ? data.data?.post_assign_to?.split(',') : [],
+                        post_published_at: data.data?.post_published_at ? moment(data.data?.post_published_at).format('YYYY-MM-DD') : moment(new Date()),
+                        post_expired_at: data.data?.post_expired_at ? moment(data.data?.post_expired_at).format('YYYY-MM-DD') : undefined,
+                        category_id: data.data?.category_id,
+                        labels: data.data?.labels || [],
+                    });
+                }
+            }
+            getSinglePosts()
+        }
+
+    }, [])
 
     const getFeedback = async () => {
         setIsLoadingFeedBack(true);
         setIsLoading(true);
         const data = await apiService.getFeedback({
-            post_id: selectedViewAnalyticsRecord.id,
+            post_id: analyticsObj.id,
             page: pageNo,
             limit: perPageLimit
         });
@@ -53,7 +75,7 @@ const AnalyticsView = ({isOpen, onOpen, onClose, selectedViewAnalyticsRecord}) =
 
     const getReaction = async () => {
         setIsLoadingReaction(true)
-        const data = await apiService.getReaction({post_id: selectedViewAnalyticsRecord.id})
+        const data = await apiService.getReaction({post_id: analyticsObj.id})
         if (data.status === 200) {
             setReactionList(data.data.reactions)
             setViews(data.data.views)
@@ -77,12 +99,12 @@ const AnalyticsView = ({isOpen, onOpen, onClose, selectedViewAnalyticsRecord}) =
     };
 
     return (
-        <Sheet open={isOpen} onOpenChange={isOpen ? handleClose : onOpen}>
+        <Sheet open={analyticsObj.id ? true : false} onOpenChange={analyticsObj.id ? handleClose : true}>
             <SheetOverlay className={"inset-0"}/>
             <SheetContent className={"pt-6 p-0 lg:max-w-[504px]"}>
                 {/*<SheetHeader className={`px-4 py-5 lg:px-8 lg:py-[20px] border-b text-left flex flex-row justify-between items-center gap-3 border-b`}>*/}
                 <SheetHeader className={`px-4 py-5 lg:p-6 border-b text-left flex flex-row justify-between items-center gap-3 border-b`}>
-                    <h5 className={"text-sm md:text-xl font-medium"}>{selectedViewAnalyticsRecord?.post_title}</h5>
+                    <h5 className={"text-sm md:text-xl font-medium"}>{analyticsObj?.post_title}</h5>
                     <X size={30} className={"cursor-pointer m-0"} onClick={handleClose}/>
                 </SheetHeader>
                 <div className={"overflow-auto h-[calc(100vh_-_79px)] pb-2"}>

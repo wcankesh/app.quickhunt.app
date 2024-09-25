@@ -48,12 +48,6 @@ const AnnouncementsTable = ({data, isLoading, setSelectedRecord, handleDelete, s
         setAnnouncementData(updatedData);
     }, [data]);
 
-    useEffect(() => {
-        if (postId && announcementData.length > 0) {
-            const foundAnnouncement = announcementData.find(x => x.id == postId);
-            setAnalyticsObj(foundAnnouncement);
-        }
-    }, [postId, announcementData]);
 
     const toggleSort = (column) => {
         let sortedData = [...announcementData];

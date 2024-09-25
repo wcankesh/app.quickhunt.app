@@ -15,7 +15,8 @@ import {PopoverContent} from "../ui/popover";
 import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList} from "../ui/command";
 import {Checkbox} from "../ui/checkbox";
 import {Badge} from "../ui/badge";
-import {useParams} from "react-router-dom";
+import {useParams, useLocation} from "react-router-dom";
+
 
 const initialStateFilter = {
     l: "",
@@ -42,6 +43,7 @@ const status = [
 
 const Announcements = () => {
     const { id } = useParams();
+    const location = useLocation();
     const {theme} = useTheme();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
@@ -70,12 +72,13 @@ const Announcements = () => {
     }, [projectDetailsReducer.id, allStatusAndTypes, pageNo]);
 
     useEffect(() => {
-        if (id && announcementList.length > 0) {
-            setSelectedRecord(true);
-            const clone = announcementList.find((x) => x.id == id);
-            setAnnouncementList(clone);
+        const urlParams = new URLSearchParams(location.search);
+        const postId = urlParams.get("postId");
+        if(postId){
+            setAnalyticsObj({id: postId})
         }
-    }, [id, announcementList]);
+
+    }, []);
 
     const getAllPosts = async () => {
         setIsLoading(true);
@@ -219,10 +222,11 @@ const Announcements = () => {
                 announcementList={announcementList}
                 setAnnouncementList={setAnnouncementList}
             />}
-            {analyticsObj?.id && <AnalyticsView selectedViewAnalyticsRecord={analyticsObj}
+            {analyticsObj?.id && <AnalyticsView
+                                                setAnalyticsObj={setAnalyticsObj}
                                                analyticsObj={analyticsObj}
-                                               isOpen={analyticsObj?.id}
                                                onClose={onCloseAnalyticsSheet}/>}
+
             <div className={"flex items-center justify-between flex-wrap gap-6"}>
                 <div className={"flex justify-between items-center w-full md:w-auto"}>
                     <h3 className={"text-2xl font-medium leading-8"}>Announcement ({totalRecord})</h3>
