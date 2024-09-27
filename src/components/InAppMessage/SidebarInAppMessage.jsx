@@ -112,6 +112,12 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
     }
 
     const onUpdateMessage = async () => {
+        if(inAppMsgSetting.type == "3"){
+            if(inAppMsgSetting.steps.filter((x) => x.is_active === 1 && x.question_type !== 8).length <= 0){
+                toast({variant: "destructive", description: "Add minimum 1 step"})
+                return
+            }
+        }
         setIsLoading(true)
         const payload = {
             ...inAppMsgSetting,

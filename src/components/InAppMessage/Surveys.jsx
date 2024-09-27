@@ -184,7 +184,8 @@ const Surveys = ({inAppMsgSetting, setInAppMsgSetting, selectedStepIndex, setSel
     const onDeleteStep = (record, index) => {
         let clone = [...inAppMsgSetting.steps];
         if (record.step_id) {
-            clone[index] = {...record, is_active: 0};
+            const indexFind =  clone.findIndex((x) => x.step_id === record.step_id)
+            clone[indexFind] = {...record, is_active: 0};
         } else {
             clone.splice(index, 1)
         }
@@ -211,7 +212,7 @@ const Surveys = ({inAppMsgSetting, setInAppMsgSetting, selectedStepIndex, setSel
                                 <div className={"flex gap-3"}>
                                     <div className={"flex-none pt-2 flex-1 w-8"}>
                                         {
-                                            inAppMsgSetting.show_sender === 1 ? <Avatar className={"w-[32px] h-[32px]"}>
+                                            (inAppMsgSetting.show_sender === 1 && inAppMsgSetting.from) ? <Avatar className={"w-[32px] h-[32px]"}>
                                                 {
                                                     userDetailsReducer?.user_photo ?
                                                         <AvatarImage src={userDetailsReducer?.user_photo} alt="@shadcn"/>

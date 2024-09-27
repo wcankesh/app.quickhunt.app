@@ -62,7 +62,8 @@ const checklists = ({inAppMsgSetting, setInAppMsgSetting, isLoading, selectedSte
     const onDeleteStep = (record, index) => {
         let clone = [...inAppMsgSetting.checklists];
         if (record.checklist_id) {
-            clone[index] = {...record, is_active: 0};
+            const indexFind =  clone.findIndex((x) => x.checklist_id === record.checklist_id)
+            clone[indexFind] = {...record, is_active: 0};
         } else {
             clone.splice(index, 1)
         }

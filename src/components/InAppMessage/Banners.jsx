@@ -73,7 +73,7 @@ const Banners = ({inAppMsgSetting, setInAppMsgSetting, isLoading}) => {
                  style={{backgroundColor: inAppMsgSetting.bg_color}}>
                 <div className={`flex flex-row items-center gap-3 w-full ${inAppMsgSetting.alignment === "left" ? "justify-start" : inAppMsgSetting.alignment === "right" ? "justify-end" : inAppMsgSetting.alignment === "center" ? "justify-center" : "justify-start"}`}>
                     {
-                        inAppMsgSetting.show_sender === 1 && <Avatar className={"w-[32px] h-[32px]"}>
+                        (inAppMsgSetting.show_sender === 1 && inAppMsgSetting.from) && <Avatar className={"w-[32px] h-[32px]"}>
                             {
                                 userDetailsReducer?.user_photo ?
                                     <AvatarImage src={userDetailsReducer?.user_photo} alt="@shadcn"/>

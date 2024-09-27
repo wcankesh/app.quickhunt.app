@@ -161,7 +161,7 @@ const Post = ({inAppMsgSetting, setInAppMsgSetting, isLoading}) => {
                 </CardHeader>
                 <CardHeader className={"pt-0"}>
                     {
-                        inAppMsgSetting.show_sender === 1 && userDetailsReducer?.user_photo ? <div className={"pt-0 flex flex-row gap-2"}>
+                        (inAppMsgSetting.show_sender === 1 && inAppMsgSetting.from) ? <div className={"pt-0 flex flex-row gap-2"}>
                             <Avatar className={"w-[32px] h-[32px]"}>
                                 {
                                     userDetailsReducer?.user_photo ?
