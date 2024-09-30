@@ -34,7 +34,7 @@ const SaidBarDesktop = () => {
                     title: 'Dashboard',
                     link: '/dashboard',
                     icon: Icon.homeIcon,
-                    selected: isActive(`${baseUrl}/dashboard`, `${baseUrl}/dashboard/comments`,`${baseUrl}/dashboard/reactions`,),
+                    selected: isActive(`${baseUrl}/dashboard`, `${baseUrl}/dashboard/comments`, `${baseUrl}/dashboard/reactions`,),
                 }
             ]
         },
@@ -57,7 +57,7 @@ const SaidBarDesktop = () => {
                     title: 'Announcements',
                     link: '/announcements',
                     icon: Icon.announcement,
-                    selected: isActive(`${baseUrl}/announcements`, `${baseUrl}/announcements/${id}`),
+                    selected: isActive(`${baseUrl}/announcements`, `${baseUrl}/announcements/${id}`, `${baseUrl}/announcements/analytic-view`),
                 },
                 {
                     title: 'Customers',
@@ -101,13 +101,13 @@ const SaidBarDesktop = () => {
     ];
 
     const footerMenuComponent = [
-        {
-            title: 'Import / Export',
-            link: '/import-export',
-            icon: Icon.importExport,
-            selected: isActive(`${baseUrl}/import-export`, `${baseUrl}/import`),
-            isDisplay: true,
-        },
+        // {
+        //     title: 'Import / Export',
+        //     link: '/import-export',
+        //     icon: Icon.importExport,
+        //     selected: isActive(`${baseUrl}/import-export`, `${baseUrl}/import`),
+        //     isDisplay: true,
+        // },
         {
             title: `${userDetailsReducer.trial_days} days trial left`,
             link: '/pricing-plan',
@@ -163,7 +163,8 @@ const SaidBarDesktop = () => {
                         onClick={() => onRedirect(subItem.link)}
                     >
                         <div className={`${subItem.selected ? "active-menu" : "menu-icon"}`}>{subItem.icon}</div>
-                        <div className={`text-sm font-medium ${subItem.selected ? "text-primary " : ""}`}>{subItem.title}</div>
+                        <div
+                            className={`text-sm font-medium ${subItem.selected ? "text-primary " : ""}`}>{subItem.title}</div>
                     </Button>
                 ))}
             </div>
@@ -244,37 +245,37 @@ const SaidBarDesktop = () => {
                                                 </Fragment>
                                         }
                                     </div>
-                            )
+                                )
                             })
+                        }
+                    </nav>
+                    <div className="mt-auto px-4 pb-4">
+                        <nav className="grid gap-1">
+                            {
+                                (footerMenuComponent || []).map((x, i) => {
+                                    return (
+                                        x.isDisplay ?
+                                            <Button
+                                                key={i}
+                                                variant={"link hover:no-underline"}
+                                                className={`${x.selected ? "flex justify-start gap-4 h-9 rounded-md bg-primary/15 transition-none" : 'flex items-center gap-4 h-9 justify-start transition-none'}`}
+                                                onClick={() => onRedirect(x.link)}
+                                            >
+                                                <div
+                                                    className={`${x.selected ? "active-menu" : "menu-icon"}`}>{x.icon}</div>
+                                                <div
+                                                    className={`${x.selected ? "text-primary text-sm font-medium" : "text-sm font-medium"}`}>{x.title}</div>
+                                            </Button> : ''
+                                    )
+                                })
                             }
-                            </nav>
-                                <div className="mt-auto px-4 pb-4">
-                                    <nav className="grid gap-1">
-                                        {
-                                            (footerMenuComponent || []).map((x, i) => {
-                                                return (
-                                                    x.isDisplay ?
-                                                        <Button
-                                                            key={i}
-                                                            variant={"link hover:no-underline"}
-                                                            className={`${x.selected ? "flex justify-start gap-4 h-9 rounded-md bg-primary/15 transition-none" : 'flex items-center gap-4 h-9 justify-start transition-none'}`}
-                                                            onClick={() => onRedirect(x.link)}
-                                                        >
-                                                            <div
-                                                                className={`${x.selected ? "active-menu" : "menu-icon"}`}>{x.icon}</div>
-                                                            <div
-                                                                className={`${x.selected ? "text-primary text-sm font-medium" : "text-sm font-medium"}`}>{x.title}</div>
-                                                        </Button> : ''
-                                                )
-                                            })
-                                        }
-                                    </nav>
-                                </div>
-                            </div>
-                            </div>
-                            </div>
-                            )
-                                ;
-                            };
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    )
+        ;
+};
 
-                            export default SaidBarDesktop;
+export default SaidBarDesktop;

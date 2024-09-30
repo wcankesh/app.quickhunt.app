@@ -22,7 +22,6 @@ const Surveys = ({inAppMsgSetting, setInAppMsgSetting, selectedStepIndex, setSel
     const [starRating, setStarRating] = useState(0);
     const [hoverRating, setHoverRating] = useState(0);
 
-
     const renderNumber = (x) => {
         const numbers = [];
         for (let i = Number(x?.question_type === 1 ? "0" : x?.start_number); i <= Number(x?.question_type === 1 ? "10" : x?.end_number); i++) {
@@ -30,9 +29,6 @@ const Surveys = ({inAppMsgSetting, setInAppMsgSetting, selectedStepIndex, setSel
         }
         return numbers
     }
-
-
-
 
     const handleClick = (value) => {
         setStarRating(value);
@@ -194,12 +190,9 @@ const Surveys = ({inAppMsgSetting, setInAppMsgSetting, selectedStepIndex, setSel
             steps: clone
         }));
         let newRecord = clone.filter((x) => x.is_active === 1);
-
         setSelectedStep({...newRecord[index]});
         setSelectedStepIndex(index);
-
     }
-
 
     return (
         <div className={"flex flex-col gap-4 py-8 bg-muted justify-start overflow-y-auto h-[calc(100%_-_94px)]"}>
@@ -208,7 +201,7 @@ const Surveys = ({inAppMsgSetting, setInAppMsgSetting, selectedStepIndex, setSel
                     return(
                         <div className={`flex flex-col mx-auto gap-8 w-full max-w-[550px]`} key={i}>
                             <div onClick={(e) => onSelectStep(x, i)} className={"relative rounded-[10px] pt-8 p-6 cursor-pointer"} style={{backgroundColor: selectedStep.step === x.step ? inAppMsgSetting.bg_color : "#fff", color: selectedStep.step === x.step ?inAppMsgSetting.text_color : "#000"}}>
-                                <div className={"absolute top-[8px] right-[8px]"}><X  size={16}/></div>
+                                <div className={"absolute top-[8px] right-[8px]"}><X size={16}/></div>
                                 <div className={"flex gap-3"}>
                                     <div className={"flex-none pt-2 flex-1 w-8"}>
                                         {
@@ -217,7 +210,10 @@ const Surveys = ({inAppMsgSetting, setInAppMsgSetting, selectedStepIndex, setSel
                                                     userDetailsReducer?.user_photo ?
                                                         <AvatarImage src={userDetailsReducer?.user_photo} alt="@shadcn"/>
                                                         :
-                                                        <AvatarFallback>{userDetailsReducer && userDetailsReducer?.name && userDetailsReducer?.name.substring(0, 1)}</AvatarFallback>
+                                                        <AvatarFallback>
+                                                            {userDetailsReducer && userDetailsReducer?.user_first_name && userDetailsReducer?.user_first_name.substring(0, 1)}
+                                                            {userDetailsReducer && userDetailsReducer?.user_last_name && userDetailsReducer?.user_last_name?.substring(0, 1)}
+                                                        </AvatarFallback>
                                                 }
                                             </Avatar> : <div>&nbsp;</div>
                                         }

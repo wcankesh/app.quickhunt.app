@@ -12,7 +12,7 @@ import {
     Paperclip,
     Pencil,
     Pin,
-    Trash2,
+    Trash2, Upload,
     X
 } from "lucide-react";
 import {RadioGroup, RadioGroupItem} from "../ui/radio-group";
@@ -901,7 +901,7 @@ const UpdateRoadMapIdea = ({
                                                         htmlFor="pictureInput"
                                                         className="border-dashed w-[282px] h-[128px] py-[52px] flex items-center justify-center bg-muted border border-muted-foreground rounded cursor-pointer"
                                                     >
-                                                        <h4 className="text-xs font-semibold">Upload</h4>
+                                                        <Upload className="h-4 w-4 text-muted-foreground" />
                                                     </label>
                                                 </div>
                                         }
@@ -927,7 +927,7 @@ const UpdateRoadMapIdea = ({
                                             </div>
                                             <div className="space-y-2">
                                                 <Label htmlFor="message">Description</Label>
-                                                <ReactQuillEditor className={"min-h-[145px] h-full"} value={selectedIdea?.description} name={"description"}
+                                                <ReactQuillEditor value={selectedIdea?.description} name={"description"}
                                                                   onChange={handleUpdate}/>
                                                 {formError.description &&
                                                 <span className="text-red-500 text-sm">{formError.description}</span>}

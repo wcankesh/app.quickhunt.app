@@ -11,7 +11,7 @@ import {Avatar, AvatarFallback, AvatarImage} from "../ui/avatar";
 import ReadMoreText from "../Comman/ReadMoreText";
 import {DateRangePicker} from "../ui/date-range-picker";
 import {Button} from "../ui/button";
-import {useNavigate} from "react-router-dom";
+import {useLocation, useNavigate} from "react-router-dom";
 import {baseUrl} from "../../utils/constent";
 import {Badge} from "../ui/badge";
 
@@ -28,6 +28,10 @@ const chartConfig = {
 }
 
 export function Dashboard() {
+    const location = useLocation();
+    const UrlParams = new URLSearchParams(location.search);
+    const getPageNo = UrlParams.get("pageNo");
+
     let apiSerVice = new ApiService();
     const navigate = useNavigate();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
@@ -262,7 +266,16 @@ export function Dashboard() {
                                                                 {x.type === 1 ? "Announcement" : "Idea"}
                                                             </Badge>
                                                         </div>
-                                                        <p className={"text-xs font-medium text-foreground"}>
+                                                        <p
+                                                            className={"text-xs font-medium text-foreground cursor-pointer"}
+                                                            onClick={() => {
+                                                                if (x.type === 1) {
+                                                                    navigate(`${baseUrl}/announcements/${x.post_id}`);
+                                                                } else if (x.type === 2) {
+                                                                    navigate(`${baseUrl}/ideas/${x.post_id}`);
+                                                                }
+                                                            }}
+                                                        >
                                                             <ReadMoreText html={x.comment} maxLine={"1"}/>
                                                         </p>
                                                     </CardContent>
@@ -298,19 +311,24 @@ export function Dashboard() {
                                                     <Fragment key={i}>
                                                         <CardContent className={"py-2.5 px-6 border-b"}>
                                                             <div className={"flex gap-4"}>
-                                                                <Avatar className={"w-[35px] h-[35px]"}>
+                                                                <Avatar className={"rounded-none w-[35px] h-[35px]"}>
                                                                     <AvatarImage src={emoji.emoji_url}/>
                                                                 </Avatar>
                                                                 <div className={"flex flex-col gap-1"}>
                                                                     <div className="flex gap-1 items-center">
                                                                         <h4
                                                                             className="text-sm font-semibold cursor-pointer"
-                                                                            onClick={() => openReactions(x.post_id)}
+                                                                            // onClick={() => openReactions(x.post_id)}
+                                                                            // onClick={() => navigate(`${baseUrl}/announcements?postId=${x.post_id}`)}
+                                                                            onClick={() => navigate(`${baseUrl}/announcements/analytic-view?postId=${x.post_id}`)}
                                                                         >{x.customer_name}</h4>
                                                                         <p className="text-xs font-medium text-muted-foreground">Reacted
                                                                             To</p>
                                                                     </div>
-                                                                    <p className="text-xs font-semibold text-foreground">"{x.post_title}"</p>
+                                                                    <p
+                                                                        className="text-xs font-semibold text-foreground cursor-pointer"
+                                                                        onClick={() => navigate(`${baseUrl}/announcements/analytic-view?postId=${x.post_id}`)}
+                                                                    >"{x.post_title}"</p>
                                                                 </div>
                                                             </div>
                                                         </CardContent>

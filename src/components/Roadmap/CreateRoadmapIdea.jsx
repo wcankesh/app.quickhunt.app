@@ -159,7 +159,7 @@ const CreateRoadmapIdea = ({isOpen, onOpen, onClose, closeCreateIdea, selectedRo
                                     </div>
                                     <div className="space-y-2">
                                         <Label htmlFor="message">Description</Label>
-                                        <ReactQuillEditor className={"min-h-[145px] h-full"} value={ideaDetail?.description} name={"description"} onChange={onChangeText}/>
+                                        <ReactQuillEditor value={ideaDetail?.description} name={"description"} onChange={onChangeText}/>
                                         {formError.description && <span className="text-red-500 text-sm">{formError.description}</span>}
                                     </div>
                                     <div className={"space-y-2"}>

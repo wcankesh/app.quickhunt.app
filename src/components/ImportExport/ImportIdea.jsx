@@ -3,7 +3,7 @@ import Papa from "papaparse";
 import {Button} from "../ui/button";
 import {ScrollArea, ScrollBar} from "../ui/scroll-area";
 import {Card, CardDescription, CardHeader, CardContent} from "../ui/Card";
-import {ChevronsUpDown, Circle, FileUp, Loader2} from "lucide-react";
+import {ArrowLeft, ChevronsUpDown, Circle, FileUp, Loader2} from "lucide-react";
 import {Popover, PopoverContent, PopoverTrigger} from "../ui/popover";
 import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList} from "../ui/command";
 import {useToast} from "../ui/use-toast";
@@ -193,7 +193,12 @@ const ImportIdea = () => {
         return (
             <div className={"container xl:max-w-[1574px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-3 md:px-4"}>
                 <div className={"flex flex-row gap-x-4 flex-wrap justify-between gap-y-2 items-center"}>
-                    <h4 className={"font-medium text-lg sm:text-2xl leading-8"}>Import Data</h4>
+                    <div className={"space-x-4 flex items-center"}>
+                        <Button className={"h-8 w-8"} variant={"outline"} size={"icon"} onClick={() => navigate(`${baseUrl}/settings/import-export`)}>
+                            <ArrowLeft size={16} />
+                        </Button>
+                        <h4 className={"font-medium text-lg sm:text-2xl leading-8"}>Import Data</h4>
+                    </div>
                     {
                         step >=  2 && <div className={"flex items-center gap-2"}>
                             <Button variant={"outline"} className={'flex items-center h-9 justify-start'}

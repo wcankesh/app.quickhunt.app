@@ -42,6 +42,8 @@ const initialStateFilter = {
 const Ideas = () => {
     const {theme} = useTheme()
     const navigate = useNavigate();
+    const UrlParams = new URLSearchParams(location.search);
+    const getPageNo = UrlParams.get("pageNo") || 1;
     let apiSerVice = new ApiService();
     const {toast} = useToast()
     const [isSheetOpenCreate, setSheetOpenCreate] = useState(false);
@@ -51,7 +53,7 @@ const Ideas = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [isLoadingSearch, setIsLoadingSearch] = useState(false);
     const [topicLists, setTopicLists] = useState([]);
-    const [pageNo, setPageNo] = useState(1);
+    const [pageNo, setPageNo] = useState(Number(getPageNo));
     const [totalRecord, setTotalRecord] = useState(0);
     const [roadmapStatus, setRoadmapStatus] = useState([]);
     const [filter, setFilter] = useState(initialStateFilter);
@@ -83,6 +85,7 @@ const Ideas = () => {
         }
         setTopicLists(allStatusAndTypes.topics)
         setRoadmapStatus(allStatusAndTypes.roadmap_status)
+        navigate(`${baseUrl}/ideas?pageNo=${pageNo}`);
     }, [projectDetailsReducer.id, pageNo, allStatusAndTypes])
 
 

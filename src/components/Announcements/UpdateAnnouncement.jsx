@@ -4,13 +4,13 @@ import {Input} from "../ui/input";
 import ReactQuillEditor from "../Comman/ReactQuillEditor";
 import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "../ui/select";
 import {Badge} from "../ui/badge";
-import {CalendarIcon, Check, Circle, CircleX, Loader2, Pin, X} from "lucide-react";
+import {CalendarIcon, Check, Circle, CircleX, Loader2, Pin, Upload, X} from "lucide-react";
 import {Popover, PopoverContent, PopoverTrigger} from "../ui/popover";
 import {Button} from "../ui/button";
 import {cn} from "../../lib/utils";
 import moment from "moment";
 import {Calendar} from "../ui/calendar";
-import {useNavigate, useParams} from "react-router-dom";
+import {useLocation, useNavigate, useParams} from "react-router-dom";
 import {useSelector} from "react-redux";
 import {useTheme} from "../theme-provider";
 import {ApiService} from "../../utils/ApiService";
@@ -27,9 +27,13 @@ const initialStateError = {
 }
 
 const UpdateAnnouncement = () => {
+    const location = useLocation();
+    const UrlParams = new URLSearchParams(location.search);
+    const getPageNo = UrlParams.get("pageNo") || 1;
+
+    const { id } = useParams();
     const {theme} = useTheme();
     let apiService = new ApiService();
-    const { id } = useParams();
     const navigate = useNavigate();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
@@ -58,7 +62,7 @@ const UpdateAnnouncement = () => {
             setMemberList(allStatusAndTypes.members);
             setCategoriesList(allStatusAndTypes.categories);
         }
-    }, [projectDetailsReducer.id, allStatusAndTypes, userDetailsReducer.id])
+    }, [projectDetailsReducer.id, allStatusAndTypes, userDetailsReducer.id, getPageNo])
 
     const getSinglePosts = async () => {
         const data = await apiService.getSinglePosts(id);
@@ -294,7 +298,7 @@ const UpdateAnnouncement = () => {
                 <Breadcrumb>
                     <BreadcrumbList>
                         <BreadcrumbItem className={"cursor-pointer"}>
-                            <BreadcrumbLink onClick={() => navigate(`${baseUrl}/announcements`)}>
+                            <BreadcrumbLink onClick={() => navigate(`${baseUrl}/announcements?pageNo=${getPageNo}`)}>
                                 Announcement
                             </BreadcrumbLink>
                         </BreadcrumbItem>
@@ -320,7 +324,7 @@ const UpdateAnnouncement = () => {
                         {isLoad === 'head' ? <Loader2
                             className="h-4 w-4 animate-spin"/> : "Update Post"}
                     </Button>
-                    <Button size={"sm"} onClick={() => navigate(`${baseUrl}/announcements`)} variant={"outline "}
+                    <Button size={"sm"} onClick={() => navigate(`${baseUrl}/announcements?pageNo=${getPageNo}`)} variant={"outline "}
                             className={`text-sm font-semibold border border-primary hidden md:block ${theme === "dark" ? "" : "text-primary"}`}>Cancel</Button>
 
                 </div>
@@ -478,8 +482,8 @@ const UpdateAnnouncement = () => {
                                 </div>
                             </div>
                             <div className="w-full flex flex-col gap-4 items-stretch h-full">
-                                <div className="space-y-3 h-full">
-                                    <h5 className="text-sm font-medium">Featured Image</h5>
+                                <div className="space-y-1.5 h-full">
+                                    <Label>Featured Image</Label>
                                     <div className="w-[282px] h-[128px] flex gap-1 items-stretch">
                                         {selectedRecord?.image ? (
                                             <div className="h-full">
@@ -513,14 +517,14 @@ const UpdateAnnouncement = () => {
                                                     id="pictureInput"
                                                     type="file"
                                                     className="hidden"
-                                                    accept="image/*"
+                                                    accept={".jpg,.jpeg"}
                                                     onChange={handleFileChange}
                                                 />
                                                 <label
                                                     htmlFor="pictureInput"
                                                     className="border-dashed w-[282px] h-[128px] py-[52px] flex items-center justify-center bg-muted border border-muted-foreground rounded cursor-pointer"
                                                 >
-                                                    <h4 className="text-xs font-semibold">Upload</h4>
+                                                    <Upload className="h-4 w-4 text-muted-foreground" />
                                                 </label>
                                             </div>
                                         )}
@@ -608,7 +612,7 @@ const UpdateAnnouncement = () => {
                         {isLoad === 'bottom' ? <Loader2
                             className="mr-2 h-4 w-4 animate-spin"/> : "Update Post"}
                     </Button>
-                    <Button onClick={() => navigate(`${baseUrl}/announcements`)} variant={"outline "}
+                    <Button onClick={() => navigate(`${baseUrl}/announcements?pageNo=${getPageNo}`)} variant={"outline "}
                             className={`border border-primary ${theme === "dark" ? "" : "text-primary"} text-sm font-semibold`}>Cancel</Button>
                 </CardFooter>
             </Card>

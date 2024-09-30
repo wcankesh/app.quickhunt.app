@@ -17,6 +17,7 @@ import {Dialog} from "@radix-ui/react-dialog";
 import {DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "../ui/dialog";
 import EmptyData from "../Comman/EmptyData";
 import {useNavigate} from "react-router";
+import {useLocation} from "react-router-dom";
 
 const status = [
     {name: "Publish", value: 1, fillColor: "#389E0D", strokeColor: "#389E0D",},
@@ -28,7 +29,12 @@ const status2 = [
     {name: "Draft", value: 4, fillColor: "#CF1322", strokeColor: "#CF1322",},
 ]
 
-const AnnouncementsTable = ({data, isLoading, setSelectedRecord, handleDelete, setAnalyticsObj,isLoadingDelete}) => {
+const AnnouncementsTable = ({data, isLoading, setSelectedRecord, handleDelete, setAnalyticsObj,isLoadingDelete, currentPage, setCurrentPage}) => {
+
+    const location = useLocation();
+    const UrlParams = new URLSearchParams(location.search);
+    const getPageNo = UrlParams.get("pageNo");
+
     const navigate = useNavigate();
     const {theme} = useTheme();
     const [announcementData, setAnnouncementData] = useState(data);
@@ -44,6 +50,7 @@ const AnnouncementsTable = ({data, isLoading, setSelectedRecord, handleDelete, s
         // }));
         // setAnnouncementData(updatedData);
         setAnnouncementData(data.map((item) => ({...item, post_status: item.post_status ?? 1})));
+        navigate(`${baseUrl}/announcements?pageNo=${getPageNo}`);
     }, [data]);
 
     const toggleSort = (column) => {
@@ -94,8 +101,7 @@ const AnnouncementsTable = ({data, isLoading, setSelectedRecord, handleDelete, s
     };
 
     const onEdit = (record) => {
-        setSelectedRecord(record);
-        navigate(`${baseUrl}/announcements/${record.id}`)
+        navigate(`${baseUrl}/announcements/${record.id}?pageNo=${getPageNo}`);
     };
 
     const shareFeedback = (domain, slug) => {
@@ -196,7 +202,7 @@ const AnnouncementsTable = ({data, isLoading, setSelectedRecord, handleDelete, s
                                                 {/*className={`inline-flex gap-2 md:gap-3 flex-wrap items-center px-2 py-[10px] md:px-3 font-medium h-12`}>*/}
                                                 <span
                                                     className={"cursor-pointer text-ellipsis overflow-hidden whitespace-nowrap"}
-                                                    onClick={() => onEdit(x, index)}>{x?.post_title}</span>
+                                                    onClick={() => onEdit(x)}>{x?.post_title}</span>
                                                 {x.post_pin_to_top === 1 && <Pin size={14} className={`${theme === "dark" ? "fill-card-foreground" : "fill-card-foreground"}`}/>}
                                                 {
                                                     x.labels && x.labels.length > 0 ?
@@ -278,7 +284,7 @@ const AnnouncementsTable = ({data, isLoading, setSelectedRecord, handleDelete, s
                                                     </DropdownMenuTrigger>
                                                     <DropdownMenuContent align={"end"}>
                                                         <DropdownMenuItem className={"cursor-pointer"}
-                                                                          onClick={() => onEdit(x, index)}>Edit</DropdownMenuItem>
+                                                                          onClick={() => onEdit(x)}>Edit</DropdownMenuItem>
                                                         <DropdownMenuItem className={"cursor-pointer"}
                                                                           onClick={() => deleteRow(x.id)}>Delete</DropdownMenuItem>
                                                     </DropdownMenuContent>

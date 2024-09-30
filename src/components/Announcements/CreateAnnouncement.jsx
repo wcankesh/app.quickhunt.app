@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {Sheet, SheetContent, SheetHeader, SheetOverlay,} from "../ui/sheet";
-import {CalendarIcon, Check, Circle, Pin, X, Loader2, CircleX} from "lucide-react";
+import {CalendarIcon, Check, Circle, Pin, X, Loader2, CircleX, Upload} from "lucide-react";
 import {Label} from "../ui/label";
 import {Input} from "../ui/input";
 import {Switch} from "../ui/switch";
@@ -293,7 +293,7 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
             <SheetContent className={"pt-6 p-0 lg:max-w-[663px] md:max-w-[720px] sm:max-w-[520px]"}>
                 <SheetHeader
                     className={`px-3 py-4 lg:px-8 lg:py-[20px] flex flex-row justify-between items-center border-b`}>
-                    <h5 className={"text-sm md:text-xl font-medium"}>{selectedRecord?.post_slug_url ? "Update Announcement" : "Create New Announcements"}</h5>
+                    <h5 className={"text-sm md:text-xl font-medium"}>Create New Announcements</h5>
                     <div className={"flex items-center gap-6 m-0"}>
                         <Button className={"h-5 w-5 p-0"}
                                 onClick={() => commonToggle("post_pin_to_top", changeLogDetails.post_pin_to_top === 1 ? 0 : 1)}
@@ -325,7 +325,7 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
                             </div>
                             <div className="w-full flex flex-col gap-2">
                                 <Label htmlFor="description">Description</Label>
-                                <ReactQuillEditor className={"min-h-[130px] h-full"} value={changeLogDetails.post_description} onChange={onChangeText}
+                                <ReactQuillEditor className={"min-h-[145px] h-full"} value={changeLogDetails.post_description} onChange={onChangeText}
                                                   name={"post_description"}/>
                                 {formError.post_description &&
                                 <span className="text-sm text-destructive">{formError.post_description}</span>}
@@ -483,7 +483,7 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
                         </div>
                     </div>
                     <div className={"px-3 lg:px-8 flex flex-wrap items-center gap-4 md:flex-nowrap border-b py-6"}>
-                        <div className={"space-y-3"}>
+                        <div className={"space-y-1.5"}>
                             <h5 className={"text-sm font-medium"}>Featured Image</h5>
                             <div className="w-[282px] h-[128px] flex gap-1">
                                 {
@@ -525,7 +525,7 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
                                                 htmlFor="pictureInput"
                                                 className="border-dashed w-[282px] h-[128px] py-[52px] flex items-center justify-center bg-muted border border-muted-foreground rounded cursor-pointer"
                                             >
-                                                <h4 className="text-xs font-semibold">Upload</h4>
+                                                <Upload className="h-4 w-4 text-muted-foreground" />
                                             </label>
                                         </div>
                                 }

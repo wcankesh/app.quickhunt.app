@@ -382,13 +382,13 @@ const HeaderBar = () => {
     ];
 
     const footerMenuComponent = [
-        {
-            title: 'Import / Export',
-            link: '/import-export',
-            icon: Icon.importExport,
-            selected: isActive(`${baseUrl}/import-export` , `${baseUrl}/import`),
-            isDisplay: true,
-        },
+        // {
+        //     title: 'Import / Export',
+        //     link: '/import-export',
+        //     icon: Icon.importExport,
+        //     selected: isActive(`${baseUrl}/import-export` , `${baseUrl}/import`),
+        //     isDisplay: true,
+        // },
         {
             title: `${userDetailsReducer.trial_days} days trial left`,
             link: '/pricing-plan',

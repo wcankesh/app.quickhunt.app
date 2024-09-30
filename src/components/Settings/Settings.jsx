@@ -18,10 +18,11 @@ import {Kanban, Menu, SmilePlus} from "lucide-react";
 import {  Popover, PopoverContent, PopoverTrigger} from "../ui/popover";
 import Board from "./SettingPage/Board";
 import GeneralSettings from "./SettingPage/GeneralSettings";
+import ImportExport from "../ImportExport/ImportExport";
 
 const Settings = () => {
     let navigate = useNavigate();
-    const {type} = useParams();
+    const {type, subType} = useParams();
     const [windowSize, setWindowSize] = useState({
         width: window.innerWidth,
     });
@@ -37,6 +38,10 @@ const Settings = () => {
         window.addEventListener("resize", handleResize);
         return () => window.removeEventListener("resize", handleResize);
     }, []);
+
+    const isActive = (link) => {
+        return type === link || `${type}/${subType}` === link;;
+    };
 
     const onRedirect = (link) => {
         navigate(`${baseUrl}/settings/${link}`);
@@ -122,12 +127,32 @@ const Settings = () => {
             icon: Icon.setSocialIcon,
             selected: `${baseUrl}/social`,
         },
+        // {
+        //     title: 'Import / Export',
+        //     link: 'import-export',
+        //     icon: Icon.importExport,
+        //     selected: `${baseUrl}/import-export`,
+        //     subLinks: [
+        //         {
+        //             title: 'Import',
+        //             link: 'import',
+        //             selected: `${baseUrl}/import-export/import`,
+        //         },
+        //     ],
+        // },
 
+        {
+            title: 'Import / Export',
+            link: 'import-export',
+            icon: Icon.importExport,
+            subLinks: [
+                {
+                    title: 'Import',
+                    link: 'import-export/import',
+                },
+            ],
+        },
     ];
-
-    const isActive = (link) => {
-        return type === link;
-    };
 
     const renderMenu = (type) => {
         switch (type) {
@@ -155,6 +180,8 @@ const Settings = () => {
                 return <Social />;
             case 'board':
                 return <Board />;
+            case 'import-export':
+                return subType === 'import' ? <ImportExport /> : <ImportExport />;
             default:
                 return null;
         }

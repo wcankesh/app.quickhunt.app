@@ -17,6 +17,7 @@ import {Checkbox} from "../ui/checkbox";
 import {Badge} from "../ui/badge";
 import {useLocation, useNavigate} from "react-router-dom";
 import {baseUrl} from "../../utils/constent";
+import AnnouncementAnalyticsViews from "./AnnouncementAnalyticsViews";
 
 
 const initialStateFilter = {
@@ -113,6 +114,7 @@ const Announcements = () => {
 
     const openSheet = () => {
         setSelectedRecord({id: "new"})
+        navigate(`${baseUrl}/announcements`);
     };
 
     const onCloseAnalyticsSheet = () => {
@@ -133,6 +135,7 @@ const Announcements = () => {
         else {
             setSelectedRecord({});
         }
+        navigate(`${baseUrl}/announcements?pageNo=${pageNo}`);
     };
 
     const handleDelete = async (id) => {
@@ -233,6 +236,13 @@ const Announcements = () => {
                 setAnalyticsObj={setAnalyticsObj}
             />}
 
+            {/*{analyticsObj?.id &&*/}
+            {/*<AnnouncementAnalyticsViews*/}
+            {/*    onClose={onCloseAnalyticsSheet}*/}
+            {/*    analyticsObj={analyticsObj}*/}
+            {/*    setAnalyticsObj={setAnalyticsObj}*/}
+            {/*/>}*/}
+
             <div className={"flex items-center justify-between flex-wrap gap-6"}>
                 <div className={"flex justify-between items-center w-full md:w-auto"}>
                     <h3 className={"text-2xl font-medium leading-8"}>Announcement ({totalRecord})</h3>
@@ -318,10 +328,15 @@ const Announcements = () => {
                         </div>
                     </div>
                     <div className={"flex flex-grow gap-2 items-center"}>
-                        <Button size={"sm"} onClick={openSheet} className={"gap-2 font-semibold hover:bg-primary"}>
-                            <Plus size={20} strokeWidth={3}/>
+                        <Button
+                            size={"sm"}
+                            onClick={openSheet}
+                            className={"gap-2 font-semibold hover:bg-primary"}
+                        >
+                            <Plus size={20} strokeWidth={3} />
                             <span className={"text-xs md:text-sm font-semibold"}>New Announcement</span>
                         </Button>
+
                     </div>
                 </div>
             </div>
@@ -348,10 +363,9 @@ const Announcements = () => {
                 }
             </div>}
 
-
-
             <Card className={"mt-6"}>
                 <AnnouncementsTable
+                    pageNo={pageNo}
                     setAnalyticsObj={setAnalyticsObj}
                     handleDelete={handleDelete}
                     data={announcementList}

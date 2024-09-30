@@ -7,7 +7,7 @@ const ReactQuillEditor = ({name, value, onChange, className}) => {
         <>
             <ReactQuill
                 className={cn(
-                    "rounded-md border bg-card", className
+                    "rounded-md border bg-card min-h-[145px] h-full", className
                 )}
                 placeholder="Type here..."
                 theme="snow" /*className={"rounded-md border bg-card"}*/

@@ -92,7 +92,7 @@ const Reactions = () => {
     };
 
     const openReactions = (postId) => {
-        navigate(`${baseUrl}/announcements?postId=${postId}`)
+        navigate(`${baseUrl}/announcements/analytic-view?postId=${postId}`)
     }
 
     return (

@@ -5,7 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from ".
 import { Card, CardContent } from "../../ui/card";
 import { DropdownMenu, DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
 import { DropdownMenuContent, DropdownMenuItem } from "../../ui/dropdown-menu";
-import { X, Plus, Ellipsis, Loader2, CircleX } from "lucide-react";
+import {X, Plus, Ellipsis, Loader2, CircleX, Upload} from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetOverlay } from "../../ui/sheet";
 import { Label } from "../../ui/label";
 import moment from 'moment';
@@ -157,6 +157,7 @@ const Category = () => {
                             </h5>
                             <X onClick={closeSheet} size={18} className={"cursor-pointer m-0"} />
                         </SheetHeader>
+                        <div className={"h-[calc(100%_-_69px)] overflow-y-auto"}>
                         <div className={"sm:px-8 sm:py-6 px-3 py-4 border-b space-y-6"}>
                             <div className="grid w-full gap-2">
                                 <Label htmlFor="title">Category name</Label>
@@ -176,6 +177,8 @@ const Category = () => {
                                     onChange={(e) => handleOnChange("description", e.target.value)}
                                 />
                             </div>
+                            <div className={"flex flex-col gap-2"}>
+                                <Label>Category Icon</Label>
                             <div className="w-[282px] h-[128px] flex gap-1">
                                 {categoryData.image && categoryData.image instanceof File ? (
                                     <div className={"w-[282px] h-[128px] relative border p-[5px]"}>
@@ -199,10 +202,11 @@ const Category = () => {
                                             htmlFor="imageInput"
                                             className="border-dashed w-[282px] h-[128px] py-[52px] flex items-center justify-center bg-muted border border-muted-foreground rounded cursor-pointer"
                                         >
-                                            <h4 className="text-xs font-semibold">Upload Icon</h4>
+                                            <Upload className="h-4 w-4 text-muted-foreground" />
                                         </label>
                                     </div>
                                 )}
+                            </div>
                             </div>
                         </div>
                         <div className={"px-3 py-4 sm:py-6 sm:px-8 space-x-4"}>
@@ -219,6 +223,7 @@ const Category = () => {
                             >
                                 Cancel
                             </Button>
+                        </div>
                         </div>
                     </SheetContent>
                 </Sheet>
