@@ -39,7 +39,7 @@ const checklists = ({inAppMsgSetting, setInAppMsgSetting, isLoading, selectedSte
     };
 
     const handleAddStep = () => {
-        let clone = [...inAppMsgSetting.checklists];
+        let clone = [...inAppMsgSetting.checklists].filter((x) => x.checklist_id === 1);
         const stepBoj = {
             title: "",
             description: [{type: "paragraph", data: {text: ""}}],

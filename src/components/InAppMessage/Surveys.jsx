@@ -113,7 +113,7 @@ const Surveys = ({inAppMsgSetting, setInAppMsgSetting, selectedStepIndex, setSel
     }
 
     const handleSelectQuestionType = (value) => {
-        let clone = [...inAppMsgSetting.steps];
+        let clone = [...inAppMsgSetting.steps].filter((x) => x.is_active === 1);
         const stepBoj = {
             question_type: value,
             text: question[value],
