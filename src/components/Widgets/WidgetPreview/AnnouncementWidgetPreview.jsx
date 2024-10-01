@@ -81,11 +81,11 @@ const AnnouncementWidgetPreview = ({widgetsSetting}) => {
                                             <div className="p-3">
                                                 <div className="flex flex-wrap gap-2 items-center">
                                                     <div className="w-full flex-initial  flex gap-4 items-center">
-                                                        <h2 className="text-xs cursor-pointer font-semibold">{x.post_title}</h2>
+                                                        <h2 className="text-xs cursor-pointer font-medium">{x.post_title}</h2>
                                                     </div>
                                                     <div className="flex-1 w-full flex flex-wrap gap-4 items-center justify-between">
                                                         <div className="flex-initial w-auto flex items-center gap-2">
-                                                            <div className="text-xs leading-5 text-gray-600 font-medium">{x?.contributors[0]?.user_first_name} {x?.contributors[0]?.user_last_name}</div>
+                                                            <div className="text-xs leading-5 text-gray-600 font-normal">{x?.contributors[0]?.user_first_name} {x?.contributors[0]?.user_last_name}</div>
                                                             <div className="text-xs leading-5 text-muted-foreground">{getDateFormat(moment(x.post_published_at).format("YYYY-MM-DD HH:MM:SS"))}</div>
                                                         </div>
                                                         {
@@ -125,7 +125,7 @@ const AnnouncementWidgetPreview = ({widgetsSetting}) => {
                                                                                         key={`emoji_${x.id}_${e.id}`}
 
                                                                                         variant={"ghost"}
-                                                                                        className={`hover:text-card px-2  w-8 h-8 py-0 z-10 text-center items-center justify-center text-base rounded-lg border border-transparent relative hover:bg-white hover:border-gray-100 dark:hover:bg-dark-accent dark:hover:border-dark-accent border-gray-100`}>
+                                                                                        className={`light:hover:text-card dark:hover:text-card px-2 w-8 h-8 py-0 z-10 text-center items-center justify-center text-base rounded-lg border border-transparent relative hover:bg-white hover:border-gray-100 dark:hover:bg-dark-accent dark:hover:border-dark-accent border-gray-100`}>
                                                                                         {/*<span className={`absolute py-0.5 leading-none -right-1 border rounded shadow -top-1 text-[9px] font-bold tracking-wide  px-0.5 text-background-accent dark:text-foreground/60 dark:border-gray-500/60  dark:bg-dark-accent bg-white`}>{findEmoji?.count}</span>*/}
                                                                                         <span className={`absolute py-0.5 leading-none -right-1 border rounded shadow -top-1 text-[9px] font-bold tracking-wide  px-0.5 text-background-accent dark:border-white  dark:bg-dark-accent bg-white`}>{findEmoji?.count}</span>
                                                                                         <Avatar className="w-[22px] h-[22px]">
@@ -150,7 +150,7 @@ const AnnouncementWidgetPreview = ({widgetsSetting}) => {
                                                                                                         key={`emoji_${x.id}_${e.id}`}
 
                                                                                                         variant={"ghost"}
-                                                                                                        className={`w-8 h-8 px-2 py-0 z-10 text-center items-center justify-center text-base rounded-lg border border-transparent relative hover:bg-white hover:border-gray-100 dark:hover:bg-dark-accent dark:hover:border-dark-accent border-gray-100`}>
+                                                                                                        className={`w-8 h-8 px-2 py-0 z-10 text-center items-center justify-center text-base rounded-lg border border-transparent relative hover:bg-white light:hover:text-card dark:hover:text-card hover:border-gray-100 dark:hover:bg-dark-accent dark:hover:border-dark-accent border-gray-100`}>
                                                                                                         <span className={`absolute py-0.5 leading-none -right-1 border rounded shadow -top-1 text-[9px] font-bold tracking-wide  px-0.5 text-background-accent dark:border-white dark:bg-dark-accent bg-white`}>{findEmoji?.count}</span>
                                                                                                         <Avatar className="w-[22px] h-[22px]">
                                                                                                             <AvatarImage src={e.emoji_url}/>
@@ -192,7 +192,7 @@ const AnnouncementWidgetPreview = ({widgetsSetting}) => {
                             }
                             <div className="box-border px-3 py-3 border-t border-zinc-200 bg-slate-50 rounded-b-md">
                                 <div className="flex justify-between items-center gap-8">
-                                    <small className="text-sm font-medium text-pageCount">Page 1 of 1</small>
+                                    <small className="text-sm font-normal text-pageCount">Page 1 of 1</small>
                                     <div className="flex gap-2 ">
                                         <Button variant="outline" size="icon"  className={`w-8 h-8 ${btnClass}`} style={{color: widgetsSetting?.btn_background_color}}><ChevronsLeft className="w-5 h-5"/></Button>
                                         <Button variant="outline" size="icon"  className={`w-8 h-8 ${btnClass}`} style={{color: widgetsSetting?.btn_background_color}}><ChevronLeft className="w-5 h-5"/></Button>
@@ -206,7 +206,7 @@ const AnnouncementWidgetPreview = ({widgetsSetting}) => {
                         <div className="flex items-center justify-center bg-white py-6">
                             <div className="max-w-md w-full text-center">
                                 {Icon.noData}
-                                <h3 className="mt-2 text-xl font-medium text-gray-900">No Items Found</h3>
+                                <h3 className="mt-2 text-xl font-normal text-gray-900">No Items Found</h3>
                                 <p className="mt-1 text-sm text-gray-500">It looks like you haven't added any items yet. Start by adding new items to see them here.</p>
                             </div>
                         </div>

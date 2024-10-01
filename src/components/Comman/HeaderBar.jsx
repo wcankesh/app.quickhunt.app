@@ -450,11 +450,11 @@ const HeaderBar = () => {
                             </DialogHeader>
                             <DialogFooter className={"flex-row justify-end space-x-2"}>
                                 <Button variant={"outline hover:none"}
-                                        className={"text-sm font-semibold border"}
+                                        className={"text-sm font-medium border"}
                                         onClick={() => setIsOpenDeleteAlert(false)}>Cancel</Button>
                                 <Button
                                     variant={"hover:bg-destructive"}
-                                    className={`${theme === "dark" ? "text-card-foreground" : "text-card"} ${isDeleteLoading === true ? "py-2 px-6" : "py-2 px-6"} w-[76px] text-sm font-semibold bg-destructive`}
+                                    className={`${theme === "dark" ? "text-card-foreground" : "text-card"} py-2 px-6 w-[76px] text-sm font-medium bg-destructive`}
                                     onClick={onDelete}
                                 >
                                     {isDeleteLoading ? <Loader2 size={16} className={"animate-spin"}/> : "Delete"}
@@ -496,11 +496,11 @@ const HeaderBar = () => {
                                                                         <Button
                                                                             key={i}
                                                                             variant={"link hover:no-underline"}
-                                                                            className={`${z.selected ? "flex justify-start gap-4 h-9 rounded-md bg-primary/15 transition-none" : 'flex items-center gap-4 h-9 justify-start transition-none'}`}
+                                                                            className={`${z.selected ? "rounded-md bg-primary/15 transition-none" : 'items-center transition-none'} flex justify-start gap-4 h-9`}
                                                                             onClick={() => onRedirect(z.link)}
                                                                         >
                                                                             <div className={`${z.selected ? "active-menu" : "menu-icon"}`}>{z.icon}</div>
-                                                                            <div className={`${z.selected ? "text-primary text-sm font-medium" : "text-sm font-medium"}`}>{z.title}</div>
+                                                                            <div className={`${z.selected ? "text-primary" : ""}`}>{z.title}</div>
                                                                         </Button>
                                                                     )
                                                                 })
@@ -516,12 +516,11 @@ const HeaderBar = () => {
                                                                                         <Button
                                                                                             key={i}
                                                                                             variant={"link hover:no-underline"}
-                                                                                            // className={`${y.selected ? "flex justify-start gap-4 h-9 rounded-md bg-primary/15 transition-none" : 'flex items-center gap-4 h-9 justify-start transition-none'}`}
-                                                                                            className={`${y.selected ? "flex justify-start gap-4 h-9 rounded-md bg-primary/15 transition-none" : 'flex items-center gap-4 h-9 justify-start transition-none'} ${y.title === 'Announcements' ? 'gap-[10px]' : ''}`}
+                                                                                            className={`flex justify-start gap-4 h-9 ${y.selected ? "rounded-md bg-primary/15 transition-none" : 'items-center transition-none'} ${y.title === 'Announcements' ? 'gap-[10px]' : ''}`}
                                                                                             onClick={() => onRedirect(y.link)}
                                                                                         >
                                                                                             <div className={`${y.selected ? "active-menu" : "menu-icon"}`}>{y.icon}</div>
-                                                                                            <div className={`${y.selected ? "text-primary text-sm font-medium" : "text-sm font-medium"}`}>{y.title}</div>
+                                                                                            <div className={`${y.selected ? "text-primary" : ""}`}>{y.title}</div>
                                                                                         </Button>
                                                                                     )
                                                                                 })
@@ -543,11 +542,11 @@ const HeaderBar = () => {
                                                                 <Button
                                                                     key={i}
                                                                     variant={"link hover:no-underline"}
-                                                                    className={`${x.selected  ? "flex justify-start gap-4 h-9 rounded-md bg-primary/15 transition-none" : 'flex items-center gap-4 h-9 justify-start transition-none'}`}
+                                                                    className={`flex justify-start gap-4 h-9 ${x.selected  ? "rounded-md bg-primary/15 transition-none" : 'items-center transition-none'}`}
                                                                     onClick={() => onRedirect(x.link)}
                                                                 >
                                                                     <div className={`${x.selected ? "active-menu" : "menu-icon"}`}>{x.icon}</div>
-                                                                    <div className={`${x.selected ? "text-primary text-sm font-medium" : "text-sm font-medium"}`}>{x.title}</div>
+                                                                    <div className={`${x.selected ? "text-primary" : ""}`}>{x.title}</div>
                                                                 </Button> : ''
                                                         )
                                                     })
@@ -646,29 +645,29 @@ const HeaderBar = () => {
                                     </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end" className={"w-56 rounded-md shadow"}>
-                                    <DropdownMenuLabel className={"text-sm font-semibold"}>My Account</DropdownMenuLabel>
+                                    <DropdownMenuLabel className={"text-sm font-medium"}>My Account</DropdownMenuLabel>
                                     <DropdownMenuSeparator/>
                                     <DropdownMenuItem
-                                        className={"text-sm font-medium flex gap-2 cursor-pointer"}
+                                        className={"text-sm font-normal flex gap-2 cursor-pointer"}
                                         onClick={() => navigate(`${baseUrl}/settings/profile`)}
                                     >
                                         <span className={`${theme === "dark" ? "profile-menu-icon" : ""}`}>{Icon.accountUserIcon}</span>
                                         Profile
                                     </DropdownMenuItem>
                                     <DropdownMenuItem
-                                        className={"text-sm font-medium flex gap-2 cursor-pointer"}
+                                        className={"text-sm font-normal flex gap-2 cursor-pointer"}
                                         onClick={() => navigate(`${baseUrl}/pricing-plan`)}
                                     >
                                         <span className={`${theme === "dark" ? "profile-menu-icon" : ""}`}>{Icon.bilingIcon}</span>
                                         Billing
                                     </DropdownMenuItem>
                                     <DropdownMenuSeparator/>
-                                    <DropdownMenuItem className={"text-sm font-medium flex gap-2 cursor-pointer"} onClick={openSheet}>
+                                    <DropdownMenuItem className={"text-sm font-normal flex gap-2 cursor-pointer"} onClick={openSheet}>
                                         <span className={`${theme === "dark" ? "profile-menu-icon" : ""}`}>{Icon.projectsIcon}</span>
                                         Projects
                                     </DropdownMenuItem>
                                     <DropdownMenuSeparator/>
-                                    <DropdownMenuItem onClick={onLogout} className={"text-sm font-medium flex gap-2 cursor-pointer"}>
+                                    <DropdownMenuItem onClick={onLogout} className={"text-sm font-normal flex gap-2 cursor-pointer"}>
                                         <span className={`${theme === "dark" ? "profile-menu-icon" : ""}`}>{Icon.logoutIcon}</span>
                                         Logout
                                     </DropdownMenuItem>
@@ -682,7 +681,7 @@ const HeaderBar = () => {
                             <SheetOverlay className={"inset-0"} />
                             <SheetContent className={"sm:max-w-[662px] p-0"}>
                                 <SheetHeader className={"px-4 py-3 md:py-5 lg:px-8 lg:py-[20px] border-b flex flex-row justify-between items-center"}>
-                                    <SheetTitle className={"text-xl font-medium flex justify-between items-center"}>
+                                    <SheetTitle className={"text-xl font-normal flex justify-between items-center"}>
                                         Create new Project
                                     </SheetTitle>
                                     <X className={"cursor-pointer m-0"} onClick={closeSheet}/>
@@ -690,7 +689,7 @@ const HeaderBar = () => {
                                 <div className="overflow-auto comm-sheet-height">
                                 <div className="space-y-6 px-4 py-3 md:py-5 lg:px-8 lg:py-[20px]">
                                     <div className="space-y-1">
-                                        <Label htmlFor="name" className="text-right">Project Name</Label>
+                                        <Label htmlFor="name" className="text-right font-normal">Project Name</Label>
                                         <Input
                                             id="project_name"
                                             placeholder="Project Name"
@@ -706,7 +705,7 @@ const HeaderBar = () => {
                                         }
                                     </div>
                                     <div className="space-y-1">
-                                        <Label htmlFor="website" className="text-right">Project website</Label>
+                                        <Label htmlFor="website" className="text-right font-normal">Project website</Label>
                                         <Input
                                             id="project_website"
                                             placeholder="https://yourcompany.com"
@@ -717,7 +716,7 @@ const HeaderBar = () => {
                                         />
                                     </div>
                                     <div className="space-y-1">
-                                        <Label htmlFor="domain" className="text-right">Project domain</Label>
+                                        <Label htmlFor="domain" className="text-right font-normal">Project domain</Label>
                                         <div className={"relative"}>
                                             <Input
                                                 id="domain"
@@ -727,19 +726,18 @@ const HeaderBar = () => {
                                                 name="domain"
                                                 onChange={onChangeText}
                                             />
-                                            <span className={"absolute top-2 right-2"}>quickhunt.app</span>
+                                            <span className={"absolute top-2 right-2 font-normal"}>quickhunt.app</span>
                                         </div>
                                     </div>
                                 <div className={"gap-4 flex sm:justify-start"}>
                                         <Button
-                                            // className={"text-sm font-semibold hover:bg-primary"}
-                                            className={` bg-primary ${theme === "dark" ? "text-card-foreground" : "text-card"} w-[129px] font-semibold`}
+                                            className={`bg-primary ${theme === "dark" ? "text-card-foreground" : "text-card"} hover:bg-primary w-[129px] font-medium`}
                                             onClick={onCreateProject} type="submit"
                                         >
-                                            {isCreateLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : "Create Project"}
+                                            {isCreateLoading ? <Loader2 className="h-4 w-4 animate-spin"/> : "Create Project"}
                                         </Button>
                                         <Button
-                                            className={`${theme === "dark" ? "" : "text-primary"} text-sm font-semibold hover:bg-card border border-primary bg-card`}
+                                            className={`${theme === "dark" ? "" : "text-primary"} text-sm font-medium hover:bg-card border border-primary bg-card`}
                                             type="submit" onClick={onCancel}
                                         >
                                             Cancel

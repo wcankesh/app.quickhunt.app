@@ -14,21 +14,21 @@ const ImportExport = () => {
     return (
         <Card className={"divide-y"}>
             <CardHeader className={"p-4 sm:p-6"}>
-                <h2 className={`text-lg sm:text-2xl font-medium leading-8`}>Import / Export</h2>
+                <h2 className={`text-lg sm:text-2xl font-normal`}>Import / Export</h2>
             </CardHeader>
             <CardContent className={"p-6 space-y-3"}>
                 <div>
-                    <h5 className={"text-base font-medium"}>Import Data</h5>
+                    <h5 className={"text-base font-normal"}>Import Data</h5>
                     <p className={"text-muted-foreground text-sm"}>We've made it easy to import your data from other tools and spreadsheets.</p>
                 </div>
-                <div><Button className={"font-semibold hover:bg-primary"} onClick={onRedirect}>Import Data</Button></div>
+                <Button className={"font-medium hover:bg-primary"} onClick={onRedirect}>Import Data</Button>
             </CardContent>
             <CardContent className={"p-6 space-y-3"}>
                 <div>
-                    <h5 className={"text-base font-medium"}>Export Data</h5>
+                    <h5 className={"text-base font-normal"}>Export Data</h5>
                     <p className={"text-muted-foreground text-sm"}>You can export all your data in CSV format. (This can take up to 30 sec.)</p>
                 </div>
-                <div><Button className={"font-semibold hover:bg-primary"} onClick={() => window.open(`https://code.quickhunt.app/public/api/idea/export?project_id=${projectDetailsReducer.id}`, "_blank")}>Export Data</Button></div>
+                <Button className={"font-medium hover:bg-primary"} onClick={() => window.open(`https://code.quickhunt.app/public/api/idea/export?project_id=${projectDetailsReducer.id}`, "_blank")}>Export Data</Button>
             </CardContent>
         </Card>
     );

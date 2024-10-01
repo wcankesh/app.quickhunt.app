@@ -3,14 +3,7 @@ import {Loader2} from "lucide-react";
 import {Label} from "../ui/label";
 import {Input} from "../ui/input";
 import {Checkbox} from "../ui/checkbox";
-import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbPage,
-    BreadcrumbSeparator
-} from "../ui/breadcrumb";
+import {Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator} from "../ui/breadcrumb";
 import {SelectTrigger, SelectContent, SelectItem, Select, SelectValue} from "../ui/select";
 import {useNavigate, useParams} from "react-router-dom";
 import {baseUrl} from "../../utils/constent";
@@ -181,11 +174,11 @@ const UpdateWidget = () => {
                 <div className={"border-b px-4 py-6 space-y-6"}>
                     <div className={"space-y-4"}>
                         <div className={"space-y-2"}>
-                            <Label className={"text-sm font-medium"}>Title</Label>
+                            <Label className={"text-sm font-normal"}>Title</Label>
                             <Input
                                 value={widgetsSetting?.name}
                                 onChange={(e) => onChange("name", e.target.value)}
-                                className={"text-sm font-medium w-full h-auto"}
+                                className={"text-sm font-normal w-full h-auto"}
                                 onBlur={handleBlur}
                                 autoFocus
                             />
@@ -262,7 +255,7 @@ const UpdateWidget = () => {
                 {
                     type !== "embed" &&
                     <Fragment>
-                        <div className={"font-medium border-b px-4 py-3"}>Launcher Type</div>
+                        <div className={"font-normal border-b px-4 py-3"}>Launcher Type</div>
                         <div className={"px-4 py-3 border-b"}>
                             <div className={"flex flex-col gap-4"}>
                                 <div className={"flex gap-2 items-center"}>
@@ -323,7 +316,7 @@ const UpdateWidget = () => {
                         </div>
                     </Fragment>
                 }
-                <div className={"font-medium border-b px-4 py-3"}>Sections</div>
+                <div className={"font-normal border-b px-4 py-3"}>Sections</div>
                 <div className={"px-4 py-3 space-y-4 border-b"}>
                     <div className={"space-y-2"}>
                         <div className={"flex gap-2 items-center"}>
@@ -416,7 +409,7 @@ const UpdateWidget = () => {
                                         <SelectItem value={2}>Link to Platform</SelectItem>
                                     </SelectContent>
                                 </Select>
-                                <p className="text-xs font-medium text-muted-foreground">How should
+                                <p className="text-xs font-normal text-muted-foreground">How should
                                     Announcement be displayed?</p>
                             </div>
                         </div>
@@ -462,7 +455,7 @@ const UpdateWidget = () => {
                                         <SelectItem value={2}>Link to Platform</SelectItem>
                                     </SelectContent>
                                 </Select>
-                                <p className="text-xs font-medium text-muted-foreground">How should the
+                                <p className="text-xs font-normal text-muted-foreground">How should the
                                     Roadmap be displayed?</p>
                             </div>
                         </div>
@@ -507,7 +500,7 @@ const UpdateWidget = () => {
                                         <SelectItem value={2}>Link to Platform</SelectItem>
                                     </SelectContent>
                                 </Select>
-                                <p className="text-xs font-medium text-muted-foreground">How should
+                                <p className="text-xs font-normal text-muted-foreground">How should
                                     Ideas be displayed?</p>
                             </div>
                             <div className="flex flex-col gap-3">
@@ -519,7 +512,7 @@ const UpdateWidget = () => {
                         </div>
                     )}
                 </div>
-                <div className={"hover:no-underline font-medium border-b px-4 py-3"}>Advanced</div>
+                <div className={"hover:no-underline font-normal border-b px-4 py-3"}>Advanced</div>
                 <div className={"p-0"}>
 
                     <div className={"px-4 py-3 space-y-4 border-b"}>
@@ -589,7 +582,7 @@ const UpdateWidget = () => {
                 fill={widgetsSetting?.launcher_icon_color}/>
         </svg>,
         "roadmap": <svg width="20" height="20" viewBox="0 0 14 16" fill="none">
-            <path fill-rule="evenodd" clip-rule="evenodd"
+            <path fillRule="evenodd" clipRule="evenodd"
                   d="M0.743328 1.66619C0.855828 1.24514 1.11112 0.876257 1.46554 0.62263C1.81996 0.369002 2.25148 0.246389 2.68631 0.275761C3.12114 0.305133 3.53226 0.484665 3.84935 0.783651C4.16644 1.08264 4.36981 1.4825 4.42466 1.91486L11.018 3.68152C11.396 3.77801 11.751 3.94854 12.0626 4.18325C12.3742 4.41796 12.6361 4.71217 12.8331 5.04883C13.0301 5.38549 13.1584 5.75791 13.2105 6.14451C13.2625 6.53111 13.2373 6.92419 13.1364 7.30098C13.0354 7.67777 12.8607 8.03078 12.6223 8.33955C12.3839 8.64831 12.0866 8.90669 11.7476 9.09972C11.4086 9.29274 11.0347 9.41657 10.6475 9.46403C10.2603 9.51149 9.86756 9.48163 9.49199 9.37619L3.97866 7.89886C3.60524 7.79878 3.20735 7.85115 2.87254 8.04444C2.53772 8.23773 2.2934 8.5561 2.19333 8.92953C2.09325 9.30295 2.14562 9.70084 2.33891 10.0357C2.53219 10.3705 2.85057 10.6148 3.22399 10.7149L9.55866 12.4115C9.82827 12.0641 10.2111 11.8222 10.6407 11.7278C11.0702 11.6335 11.5192 11.6927 11.9096 11.8952C12.3 12.0977 12.607 12.4307 12.7773 12.8361C12.9476 13.2416 12.9703 13.6939 12.8416 14.1144C12.7128 14.5349 12.4407 14.897 12.0726 15.1376C11.7046 15.3783 11.2637 15.4823 10.8269 15.4315C10.3901 15.3807 9.98487 15.1784 9.68178 14.8598C9.37868 14.5412 9.19687 14.1263 9.16799 13.6875L2.87999 12.0022C2.16506 11.8106 1.55551 11.3429 1.18544 10.7019C0.815365 10.0609 0.715086 9.29913 0.906661 8.58419C1.09824 7.86926 1.56597 7.25971 2.20697 6.88963C2.84797 6.51956 3.60973 6.41928 4.32466 6.61086L9.83799 8.08819C10.0444 8.14821 10.2607 8.16642 10.4742 8.14175C10.6877 8.11709 10.8941 8.05004 11.0814 7.94454C11.2687 7.83905 11.433 7.69722 11.5647 7.52739C11.6965 7.35756 11.793 7.16313 11.8486 6.95552C11.9042 6.7479 11.9178 6.53127 11.8886 6.31833C11.8594 6.10539 11.7879 5.90042 11.6785 5.71545C11.569 5.53047 11.4237 5.36922 11.2511 5.24113C11.0785 5.11304 10.8821 5.0207 10.6733 4.96953L4.11333 3.21219C3.86279 3.57844 3.49082 3.84431 3.06318 3.96278C2.63554 4.08125 2.17978 4.04469 1.7765 3.85956C1.37321 3.67444 1.04838 3.35267 0.859431 2.95117C0.670483 2.54966 0.629594 2.09427 0.743994 1.66553L0.743328 1.66619Z"
                   fill={widgetsSetting?.launcher_icon_color}/>
         </svg>,
@@ -599,7 +592,7 @@ const UpdateWidget = () => {
                 fill={widgetsSetting?.launcher_icon_color}/>
         </svg>,
         "announcement": <svg width="20" height="20" viewBox="0 0 16 12" fill="none">
-            <path fill-rule="evenodd" clip-rule="evenodd"
+            <path fillRule="evenodd" clipRule="evenodd"
                   d="M4.15825 8.58002L5.47465 10.8601C5.66003 11.1812 5.549 11.5956 5.2279 11.781C4.90681 11.9663 4.49244 11.8553 4.30703 11.5342L2.81931 8.95739C3.26575 8.83255 3.71069 8.70092 4.15822 8.57999L4.15825 8.58002ZM13.4787 6.20083C13.461 6.19065 13.4454 6.17708 13.433 6.1609C13.4205 6.14471 13.4113 6.12623 13.406 6.10651C13.4007 6.08679 13.3993 6.06621 13.4019 6.04595C13.4045 6.02568 13.4111 6.00614 13.4213 5.98842C13.4315 5.97071 13.4451 5.95517 13.4612 5.9427C13.4774 5.93023 13.4959 5.92107 13.5156 5.91575C13.5354 5.91042 13.5559 5.90903 13.5762 5.91165C13.5965 5.91428 13.616 5.92087 13.6337 5.93105L15.0671 6.75861C15.0848 6.76879 15.1003 6.78236 15.1128 6.79854C15.1253 6.81473 15.1344 6.83321 15.1398 6.85293C15.1451 6.87266 15.1465 6.89324 15.1439 6.9135C15.1412 6.93376 15.1346 6.9533 15.1245 6.97102C15.1143 6.98873 15.1007 7.00427 15.0845 7.01674C15.0684 7.02921 15.0499 7.03837 15.0301 7.0437C15.0104 7.04902 14.9898 7.05041 14.9696 7.04779C14.9493 7.04516 14.9298 7.03857 14.9121 7.02839L13.4787 6.20083ZM12.7127 2.49189C12.7025 2.50961 12.6889 2.52514 12.6727 2.53761C12.6565 2.55008 12.6381 2.55924 12.6183 2.56457C12.5986 2.5699 12.578 2.57129 12.5578 2.56866C12.5375 2.56604 12.518 2.55945 12.5002 2.54927C12.4825 2.53909 12.467 2.52552 12.4545 2.50934C12.4421 2.49315 12.4329 2.47467 12.4276 2.45495C12.4222 2.43522 12.4209 2.41464 12.4235 2.39438C12.4261 2.37412 12.4327 2.35458 12.4429 2.33686L13.2704 0.903486C13.291 0.867711 13.3249 0.841568 13.3648 0.830808C13.4046 0.820048 13.4471 0.825553 13.4828 0.846111C13.5186 0.86667 13.5448 0.900598 13.5555 0.940432C13.5663 0.980266 13.5608 1.02274 13.5402 1.05852L12.7127 2.49189ZM13.8635 4.18827C13.8437 4.19356 13.8231 4.1949 13.8028 4.19221C13.7825 4.18952 13.7629 4.18286 13.7451 4.1726C13.7274 4.16234 13.7119 4.14869 13.6994 4.13242C13.6869 4.11616 13.6778 4.0976 13.6725 4.0778C13.6672 4.058 13.6659 4.03736 13.6686 4.01704C13.6712 3.99673 13.6779 3.97714 13.6882 3.9594C13.6984 3.94167 13.7121 3.92612 13.7283 3.91366C13.7446 3.90119 13.7632 3.89206 13.783 3.88677L15.3817 3.45839C15.4015 3.4531 15.4221 3.45176 15.4424 3.45445C15.4628 3.45714 15.4823 3.4638 15.5001 3.47406C15.5178 3.48432 15.5334 3.49797 15.5458 3.51424C15.5583 3.5305 15.5674 3.54906 15.5727 3.56886C15.578 3.58866 15.5793 3.6093 15.5767 3.62962C15.574 3.64993 15.5673 3.66952 15.557 3.68726C15.5468 3.70499 15.5331 3.72054 15.5169 3.733C15.5006 3.74547 15.482 3.7546 15.4622 3.75989L13.8635 4.18827ZM9.39394 0.149768C9.07569 0.235049 8.88506 0.565174 8.97034 0.883424L11.1975 9.19546C11.2828 9.51371 11.6129 9.7043 11.9312 9.61905C12.2494 9.53377 12.44 9.20361 12.3548 8.88539L10.1276 0.57333C10.0423 0.255111 9.71219 0.0645177 9.39394 0.149768ZM4.8765 8.07789L4.05494 5.01183C3.23087 5.26717 2.38594 5.45196 1.55244 5.67527C0.735904 5.89405 0.246842 6.74111 0.480404 7.61271C0.713967 8.4843 1.561 8.97333 2.37753 8.75455C3.21106 8.53121 4.03512 8.26877 4.8765 8.07789ZM4.35234 4.91583C6.63315 4.14852 8.12178 2.86549 8.86487 1.69714L10.6993 8.54349C9.47162 7.90324 7.5409 7.53642 5.18203 8.0123L4.35234 4.9158V4.91583ZM11.2901 3.70424L12.0903 3.71133C12.1615 3.71195 12.2214 3.75833 12.2398 3.82714L12.5572 5.01146C12.5756 5.08024 12.5469 5.15033 12.4856 5.18652L11.7961 5.59274L11.2901 3.70424Z"
                   fill={widgetsSetting?.launcher_icon_color}/>
         </svg>
@@ -630,30 +623,30 @@ return (
                 </Breadcrumb>
             </Breadcrumb>
             <div className={"flex justify-between gap-2 items-center"}>
-            <Button size={"sm"} className={"font-semibold w-[128px] hover:bg-primary"}
+            <Button size={"sm"} className={"font-medium w-[128px] hover:bg-primary"}
                     onClick={() => id === "new" ? createWidget('head') : onUpdateWidgets('head')}>
                 {
                     loading === 'head' ?
                         <Loader2
-                            className="mr-2 h-4 w-4 animate-spin"/> : (id === "new" ? "Create Widget" : "Save Changes")
+                            className="h-4 w-4 animate-spin"/> : (id === "new" ? "Create Widget" : "Save Changes")
                 }
             </Button>
-                <Button size={"sm"} variant={"ghost hover-none"} className={"font-semibold border border-primary"} onClick={handleCancel}>Cancel</Button>
+                <Button size={"sm"} variant={"ghost hover-none"} className={"font-medium border border-primary"} onClick={handleCancel}>Cancel</Button>
             </div>
         </div>
         <div className={"flex h-[calc(100%_-_85px)] overflow-y-auto"}>
             <div className={"max-w-[407px] w-full border-r h-full overflow-y-auto"}>
                 {renderSidebarItems()}
                 <div className={"px-4 py-6 border-t flex justify-between gap-2"}>
-                    <Button className={"font-semibold w-[128px] hover:bg-primary"}
+                    <Button className={"font-medium w-[128px] hover:bg-primary"}
                             onClick={() => id === "new" ? createWidget('side') : onUpdateWidgets('side')}>
                         {
                             loading === 'side' ?
                                 <Loader2
-                                    className="mr-2 h-4 w-4 animate-spin"/> : (id === "new" ? "Create Widget" : "Save Changes")
+                                    className="h-4 w-4 animate-spin"/> : (id === "new" ? "Create Widget" : "Save Changes")
                         }
                     </Button>
-                    <Button variant={"ghost hover-none"} className={"font-semibold border border-primary"} onClick={handleCancel}>Cancel</Button>
+                    <Button variant={"ghost hover-none"} className={"font-medium border border-primary"} onClick={handleCancel}>Cancel</Button>
                 </div>
             </div>
             <div className={"bg-muted w-full h-full hidden md:block overflow-y-auto"}>

@@ -16,6 +16,7 @@ import {Calendar} from "../ui/calendar";
 import {toast} from "../ui/use-toast";
 import {Badge} from "../ui/badge";
 import ReactQuillEditor from "../Comman/ReactQuillEditor";
+import {Checkbox} from "../ui/checkbox";
 //post_status: 1=Publish/active,2=Scheduled/unpublished,3=Draft,4=Expired
 const initialState = {
     post_description: '',
@@ -293,7 +294,7 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
             <SheetContent className={"pt-6 p-0 lg:max-w-[663px] md:max-w-[720px] sm:max-w-[520px]"}>
                 <SheetHeader
                     className={`px-3 py-4 lg:px-8 lg:py-[20px] flex flex-row justify-between items-center border-b`}>
-                    <h5 className={"text-sm md:text-xl font-medium"}>Create New Announcements</h5>
+                    <h5 className={"text-sm md:text-xl font-normal"}>Create New Announcements</h5>
                     <div className={"flex items-center gap-6 m-0"}>
                         <Button className={"h-5 w-5 p-0"}
                                 onClick={() => commonToggle("post_pin_to_top", changeLogDetails.post_pin_to_top === 1 ? 0 : 1)}
@@ -307,14 +308,14 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
                     <div className={"px-3 py-6 lg:px-8 border-b"}>
                         <div className={"flex flex-col gap-6"}>
                             <div className="w-full flex flex-col gap-2">
-                                <Label htmlFor="title">Title</Label>
+                                <Label htmlFor="title" className={"font-normal"}>Title</Label>
                                 <Input type="text" id="title" className={"h-9"} name={"post_title"}
                                        value={changeLogDetails.post_title} onChange={onChangeText}/>
                                 {formError.post_title &&
                                 <span className="text-sm text-destructive">{formError.post_title}</span>}
                             </div>
                             <div className="w-full flex flex-col gap-2">
-                                <Label htmlFor="link">Permalink / Slug</Label>
+                                <Label htmlFor="link" className={"font-normal"}>Permalink / Slug</Label>
                                 <Input type="text" className={"h-9"} id="link" name={"post_slug_url"}
                                        value={changeLogDetails.post_slug_url} onChange={onChangeText}/>
                                 <p className={"text-sm font-normal text-muted-foreground break-words"}>This release will
@@ -324,7 +325,7 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
                                         className={"text-primary max-w-[593px] w-full break-words text-sm"}>{`https://${projectDetailsReducer.domain?.toLowerCase()}/announcements/${changeLogDetails.post_slug_url?.toLowerCase()}`}</a> : ""}</p>
                             </div>
                             <div className="w-full flex flex-col gap-2">
-                                <Label htmlFor="description">Description</Label>
+                                <Label htmlFor="description" className={"font-normal"}>Description</Label>
                                 <ReactQuillEditor className={"min-h-[145px] h-full"} value={changeLogDetails.post_description} onChange={onChangeText}
                                                   name={"post_description"}/>
                                 {formError.post_description &&
@@ -335,7 +336,7 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
                     <div className={"px-3 py-6 lg:px-8 flex flex-col gap-4 border-b"}>
                         <div className={"flex flex-wrap md:flex-nowrap gap-4 items-start"}>
                             <div className="grid w-full gap-2 md:basis-1/2">
-                                <Label htmlFor="label">Label</Label>
+                                <Label htmlFor="label" className={"font-normal"}>Label</Label>
                                 <Select value={[]} onValueChange={onChangeLabel}>
                                     <SelectTrigger className="h-9">
                                         <SelectValue className={"text-muted-foreground text-sm"}
@@ -350,7 +351,7 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
                                                                 borderColor: findObj?.label_color_code,
                                                                 textTransform: "capitalize"
                                                             }}
-                                                                   className={`h-[20px] py-0 px-2 text-xs rounded-[5px]  font-medium text-[${findObj?.label_color_code}] border-[${findObj?.label_color_code}] capitalize`}>{findObj?.label_name}</Badge>
+                                                                   className={`h-[20px] py-0 px-2 text-xs rounded-[5px]  font-normal text-[${findObj?.label_color_code}] border-[${findObj?.label_color_code}] capitalize`}>{findObj?.label_name}</Badge>
                                                         )
                                                     })
                                                 }
@@ -387,7 +388,7 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
                                 </Select>
                             </div>
                             <div className="grid w-full gap-2 md:basis-1/2">
-                                <Label htmlFor="label">Assign to</Label>
+                                <Label htmlFor="label" className={"font-normal"}>Assign to</Label>
                                 <Select onValueChange={handleValueChange} value={[]}>
                                     <SelectTrigger className={"h-9"}>
                                         <SelectValue className={"text-muted-foreground text-sm"}
@@ -432,7 +433,7 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
                         </div>
                         <div className={"flex flex-wrap md:flex-nowrap gap-4 items-start"}>
                             <div className={"grid w-full gap-2 md:basis-1/2"}>
-                                <Label htmlFor="label">Category</Label>
+                                <Label htmlFor="label" className={"font-normal"}>Category</Label>
                                 <Select
                                     value={changeLogDetails && changeLogDetails.category_id && changeLogDetails.category_id.toString()}
                                     onValueChange={onChangeCategory}>
@@ -455,13 +456,13 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
                                 </Select>
                             </div>
                             <div className="grid w-full gap-2 md:basis-1/2">
-                                <Label htmlFor="date">Published at</Label>
+                                <Label htmlFor="date" className={"font-normal"}>Published at</Label>
                                 <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
                                     <PopoverTrigger asChild>
                                         <Button
                                             id="date"
                                             variant={"outline"}
-                                            className={cn("justify-between text-left font-normal d-flex", "text-muted-foreground")}
+                                            className={cn("justify-between text-left font-normal d-flex px-3 h-9", "text-muted-foreground")}
                                         >
                                             {moment(changeLogDetails.post_published_at).format("LL")}
                                         </Button>
@@ -484,7 +485,7 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
                     </div>
                     <div className={"px-3 lg:px-8 flex flex-wrap items-center gap-4 md:flex-nowrap border-b py-6"}>
                         <div className={"space-y-1.5"}>
-                            <h5 className={"text-sm font-medium"}>Featured Image</h5>
+                            <Label className={"font-normal"}>Featured Image</Label>
                             <div className="w-[282px] h-[128px] flex gap-1">
                                 {
                                     changeLogDetails?.image ?
@@ -533,11 +534,15 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
                             {formError.image && <div className={"text-xs text-destructive"}>{formError.image}</div>}
                         </div>
                         <div className={"flex flex-col gap-[18px] w-full"}>
-                            <div className={"announce-create-switch flex gap-3"}>
-                                <Switch id={"expire_date"} className={"w-[38px] h-[20px]"}
+                            {/*<div className={"announce-create-switch flex gap-3"}>*/}
+                            <div className={"flex items-center gap-3"}>
+                                {/*<Switch id={"expire_date"} className={"w-[38px] h-[20px]"}*/}
+                                {/*        checked={changeLogDetails.post_expired_boolean === 1}*/}
+                                {/*        onCheckedChange={(checked) => commonToggle("post_expired_boolean",checked === true ? 1 : 0)}/>*/}
+                                <Checkbox id={"expire_date"}
                                         checked={changeLogDetails.post_expired_boolean === 1}
                                         onCheckedChange={(checked) => commonToggle("post_expired_boolean",checked === true ? 1 : 0)}/>
-                                <label htmlFor={"expire_date"} className={"text-sm text-muted-foreground font-medium"}>Expire At</label>
+                                <label htmlFor={"expire_date"} className={"text-sm text-muted-foreground font-normal"}>Expire At</label>
                             </div>
 
                             {
@@ -577,12 +582,12 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
                             variant={"outline "}
                             disabled={isSave}
                             onClick={createPosts}
-                            className={` bg-primary ${theme === "dark" ? "text-card-foreground" : "text-card"} w-[115px] font-semibold`}
+                            className={` bg-primary ${theme === "dark" ? "text-card-foreground" : "text-card"} w-[115px] font-medium`}
                         >
                             {isSave ? <Loader2 className=" h-4 w-4 animate-spin"/> : "Publish Post"}
                         </Button>
                         <Button onClick={onClose} variant={"outline "}
-                                className={`border border-primary ${theme === "dark" ? "" : "text-primary"} text-sm font-semibold`}>Cancel</Button>
+                                className={`border border-primary ${theme === "dark" ? "" : "text-primary"} text-sm font-medium`}>Cancel</Button>
                     </div>
                 </div>
             </SheetContent>

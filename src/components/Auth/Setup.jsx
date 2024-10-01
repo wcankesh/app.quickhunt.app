@@ -58,7 +58,7 @@ const Setup = () => {
                 <div className={"flex items-center justify-center"}>
                     {Icon.blackLogo}
                 </div>
-                <h1 className="scroll-m-20 text-2xl md:text-3xl font-semibold text-center lg:text-3xl mb-3.5 mt-6">
+                <h1 className="scroll-m-20 text-2xl md:text-3xl font-medium text-center lg:text-3xl mb-3.5 mt-6">
                     You have 1 invite
                 </h1>
                 <div className={"mb-2.5"}>
@@ -72,13 +72,13 @@ const Setup = () => {
                             <div className={"flex gap-3 items-center"}>
                                 <div>
                                     <Avatar className={"w-[50px] h-[50px]"}>
-                                        <AvatarFallback className={"bg-primary/10 border-primary border text-sm text-primary font-semibold"}>{invitationDetail && invitationDetail.project_name && invitationDetail.project_name.substring(0,1).toUpperCase() }</AvatarFallback>
+                                        <AvatarFallback className={"bg-primary/10 border-primary border text-sm text-primary font-medium"}>{invitationDetail && invitationDetail.project_name && invitationDetail.project_name.substring(0,1).toUpperCase() }</AvatarFallback>
                                     </Avatar>
                                 </div>
                                 <div>
-                                    <h3 className={"text-sm font-medium mb-1"}>{invitationDetail.project_name}</h3>
-                                    <p className={"text-xs font-normal pb-1"}>{invitationDetail.domain}</p>
-                                    <p className={"text-xs font-normal text-muted-foreground"}>Invited by {invitationDetail.user_first_name} {invitationDetail.user_last_name ? invitationDetail.user_last_name : ''}. Expired in 7days </p>
+                                    <h3 className={"text-sm font-normal mb-1"}>{invitationDetail.project_name}</h3>
+                                    <p className={"text-xs pb-1"}>{invitationDetail.domain}</p>
+                                    <p className={"text-xs text-muted-foreground"}>Invited by {invitationDetail.user_first_name} {invitationDetail.user_last_name ? invitationDetail.user_last_name : ''}. Expired in 7days </p>
                                 </div>
                             </div>
                             <div className={"flex gap-2"}>

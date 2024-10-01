@@ -319,13 +319,13 @@ const UpdateAnnouncement = () => {
                         variant={"outline "}
                         disabled={isLoad === 'head'}
                         onClick={() => updatePost('head')}
-                        className={`bg-primary w-[115px] font-semibold hidden md:block ${theme === "dark" ? "text-card-foreground" : "text-card"}`}
+                        className={`bg-primary w-[115px] font-medium hidden md:flex justify-center items-center ${theme === "dark" ? "text-card-foreground" : "text-card"}`}
                     >
                         {isLoad === 'head' ? <Loader2
                             className="h-4 w-4 animate-spin"/> : "Update Post"}
                     </Button>
                     <Button size={"sm"} onClick={() => navigate(`${baseUrl}/announcements?pageNo=${getPageNo}`)} variant={"outline "}
-                            className={`text-sm font-semibold border border-primary hidden md:block ${theme === "dark" ? "" : "text-primary"}`}>Cancel</Button>
+                            className={`text-sm font-medium border border-primary hidden md:block ${theme === "dark" ? "" : "text-primary"}`}>Cancel</Button>
 
                 </div>
             </div>
@@ -335,14 +335,14 @@ const UpdateAnnouncement = () => {
                         <div className={"flex gap-4"}>
                             <div className="w-full flex flex-col gap-4">
                                 <div className="w-full flex flex-col gap-2">
-                                    <Label htmlFor="title">Title</Label>
+                                    <Label htmlFor="title" className={"font-normal"}>Title</Label>
                                     <Input type="text" id="title" className={"h-9"} name={"post_title"}
                                            value={selectedRecord.post_title} onChange={onChangeText}/>
                                     {formError.post_title &&
                                     <span className="text-sm text-red-500">{formError.post_title}</span>}
                                 </div>
                                 <div className="w-full flex flex-col gap-2">
-                                    <Label htmlFor="link">Permalink / Slug</Label>
+                                    <Label htmlFor="link" className={"font-normal"}>Permalink / Slug</Label>
                                     <Input type="text" className={"h-9"} id="link" name={"post_slug_url"}
                                            value={selectedRecord.post_slug_url} onChange={onChangeText}/>
                                     <p className={"text-sm font-normal text-muted-foreground break-words"}>This release will
@@ -352,7 +352,7 @@ const UpdateAnnouncement = () => {
                                             className={"text-primary max-w-[593px] w-full break-words text-sm"}>{`https://${projectDetailsReducer.domain?.toLowerCase()}/announcements/${selectedRecord.post_slug_url?.toLowerCase()}`}</a> : ""}</p>
                                 </div>
                                 <div className="w-full flex flex-col gap-2">
-                                    <Label htmlFor="description">Description</Label>
+                                    <Label htmlFor="description" className={"font-normal"}>Description</Label>
                                     <ReactQuillEditor className={"min-h-[145px] h-full"} value={selectedRecord.post_description} onChange={onChangeText}
                                                       name={"post_description"}/>
                                     {formError.post_description &&
@@ -365,7 +365,7 @@ const UpdateAnnouncement = () => {
                         <div className={"flex flex-wrap md:flex-nowrap gap-4 items-start"}>
                             <div className="w-full flex flex-col gap-4">
                                 <div className={"w-full space-y-1.5"}>
-                                    <Label>Label</Label>
+                                    <Label className={"font-normal"}>Label</Label>
                                     <Select value={[]} onValueChange={onChangeLabel}>
                                         <SelectTrigger className="h-9">
                                             <SelectValue className={"text-muted-foreground text-sm"}
@@ -380,7 +380,7 @@ const UpdateAnnouncement = () => {
                                                                     borderColor: findObj?.label_color_code,
                                                                     textTransform: "capitalize"
                                                                 }}
-                                                                       className={`h-[20px] py-0 px-2 text-xs rounded-[5px]  font-medium text-[${findObj?.label_color_code}] border-[${findObj?.label_color_code}] capitalize`}>{findObj?.label_name}</Badge>
+                                                                       className={`h-[20px] py-0 px-2 text-xs rounded-[5px]  font-normal text-[${findObj?.label_color_code}] border-[${findObj?.label_color_code}] capitalize`}>{findObj?.label_name}</Badge>
                                                             )
                                                         })
                                                     }
@@ -416,7 +416,7 @@ const UpdateAnnouncement = () => {
                                     </Select>
                                 </div>
                                 <div className={"w-full space-y-1.5"}>
-                                    <Label>Assign to</Label>
+                                    <Label className={"font-normal"}>Assign to</Label>
                                     <Select onValueChange={handleValueChange} value={[]}>
                                         <SelectTrigger className={"h-9"}>
                                             <SelectValue className={"text-muted-foreground text-sm"}
@@ -458,7 +458,7 @@ const UpdateAnnouncement = () => {
                                     </Select>
                                 </div>
                                 <div className={"w-full space-y-1.5"}>
-                                    <Label>Category</Label>
+                                    <Label className={"font-normal"}>Category</Label>
                                     <Select
                                         value={selectedRecord && selectedRecord?.category_id && selectedRecord?.category_id?.toString()}
                                         onValueChange={onChangeCategory}>
@@ -483,7 +483,7 @@ const UpdateAnnouncement = () => {
                             </div>
                             <div className="w-full flex flex-col gap-4 items-stretch h-full">
                                 <div className="space-y-1.5 h-full">
-                                    <Label>Featured Image</Label>
+                                    <Label className={"font-normal"}>Featured Image</Label>
                                     <div className="w-[282px] h-[128px] flex gap-1 items-stretch">
                                         {selectedRecord?.image ? (
                                             <div className="h-full">
@@ -533,7 +533,7 @@ const UpdateAnnouncement = () => {
                                 </div>
                                 <div className="flex flex-col gap-[18px] w-full h-full">
                                     <div className="space-y-1.5 flex flex-col">
-                                        <Label htmlFor="date">Published at</Label>
+                                        <Label htmlFor="date" className={"font-normal"}>Published at</Label>
                                         <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
                                             <PopoverTrigger asChild>
                                                 <Button
@@ -565,7 +565,7 @@ const UpdateAnnouncement = () => {
                                                 checked={selectedRecord?.post_expired_boolean === 1}
                                                 onCheckedChange={(checked) => commonToggle("post_expired_boolean", checked ? 1 : 0)}
                                             />
-                                            <label htmlFor="expire_date" className="text-sm font-medium">Expire At</label>
+                                            <label htmlFor="expire_date" className="text-sm font-normal">Expire At</label>
                                         </div>
                                         {selectedRecord?.post_expired_boolean === 1 && (
                                             <div className="grid w-full gap-2 basis-1/2">
@@ -607,13 +607,13 @@ const UpdateAnnouncement = () => {
                         variant={"outline "}
                         disabled={isLoad === 'bottom'}
                         onClick={() => updatePost("bottom")}
-                        className={` bg-primary ${theme === "dark" ? "text-card-foreground" : "text-card"} w-[115px] font-semibold`}
+                        className={` bg-primary ${theme === "dark" ? "text-card-foreground" : "text-card"} w-[115px] font-medium`}
                     >
                         {isLoad === 'bottom' ? <Loader2
-                            className="mr-2 h-4 w-4 animate-spin"/> : "Update Post"}
+                            className="h-4 w-4 animate-spin"/> : "Update Post"}
                     </Button>
                     <Button onClick={() => navigate(`${baseUrl}/announcements?pageNo=${getPageNo}`)} variant={"outline "}
-                            className={`border border-primary ${theme === "dark" ? "" : "text-primary"} text-sm font-semibold`}>Cancel</Button>
+                            className={`border border-primary ${theme === "dark" ? "" : "text-primary"} text-sm font-medium`}>Cancel</Button>
                 </CardFooter>
             </Card>
         </div>

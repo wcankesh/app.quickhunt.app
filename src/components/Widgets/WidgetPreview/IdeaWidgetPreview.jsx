@@ -90,7 +90,7 @@ const IdeaWidgetPreview = ({widgetsSetting}) => {
                                                             } : {fill: 'rgb(148 163 184)'}}
                                                            >
                                                         <Triangle fill="true" className="w-3 h-3"/>
-                                                        <div className="w-full text-sm font-semibold tracking-tight">{idea.vote}</div>
+                                                        <div className="w-full text-sm font-medium tracking-tight">{idea.vote}</div>
                                                     </Button>
                                                 </div>
 
@@ -98,7 +98,7 @@ const IdeaWidgetPreview = ({widgetsSetting}) => {
                                                     <div className="flex w-full flex-wrap gap-1 items-center">
                                                         <div className="w-full flex gap-4 items-center">
                                                             <h2
-                                                                className="text-xs cursor-pointer font-semibold ">{idea.title}</h2>
+                                                                className="text-xs cursor-pointer font-medium ">{idea.title}</h2>
                                                         </div>
                                                         {widgetsSetting?.idea_description === 1 ?
                                                             <div className={'inline-block w-full text-xs'}><ReadMoreText
@@ -109,14 +109,14 @@ const IdeaWidgetPreview = ({widgetsSetting}) => {
                                                             <div
                                                                 className="flex-initial w-auto flex items-center gap-2">
                                                                 <div
-                                                                    className="text-xs leading-5 text-gray-600 font-medium">{idea.name}</div>
+                                                                    className="text-xs text-gray-600 font-normal">{idea.name}</div>
                                                                 <div
-                                                                    className="text-xs leading-5 text-muted-foreground">{getDateFormat(idea.created_at)}</div>
+                                                                    className="text-xs text-muted-foreground">{getDateFormat(idea.created_at)}</div>
                                                             </div>
                                                             {idea.roadmap_id && <span style={{
                                                                 borderColor: idea.roadmap_color,
                                                                 color: idea.roadmap_color
-                                                            }}  className="border px-2 py-1 rounded text-exm font-semibold">{idea.roadmap_title}</span>}
+                                                            }}  className="border px-2 py-1 rounded text-exm font-medium">{idea.roadmap_title}</span>}
                                                         </div>
                                                     </div>
                                                 </div>
@@ -131,7 +131,7 @@ const IdeaWidgetPreview = ({widgetsSetting}) => {
                             <div className="box-border px-3 py-3 border-t border-zinc-200 bg-slate-50 rounded-b-md">
                                 <div className="flex md:justify-end justify-between items-center gap-8">
                                     <small
-                                        className="text-sm font-medium text-pageCount">Page 1 of 1</small>
+                                        className="text-sm font-normal text-pageCount">Page 1 of 1</small>
                                     <div className="flex gap-2 ">
                                         <Button variant="outline" size="icon"
                                               className={`w-8 h-8 text-primary ${btnClass}`}
@@ -158,7 +158,7 @@ const IdeaWidgetPreview = ({widgetsSetting}) => {
                         <div className="flex items-center justify-center bg-white py-6">
                             <div className="max-w-md w-full text-center">
                                 {Icon.noData}
-                                <h3 className="mt-5 sm:text-2xl text-lg font-medium text-slate-900">No Items Found</h3>
+                                <h3 className="mt-5 sm:text-2xl text-lg font-normal text-slate-900">No Items Found</h3>
                                 <p className="mt-2 text-sm text-gray-500">It looks like you haven't added any items yet.
                                     Start by adding new items to see them here.</p>
                                 <div className="mt-6">

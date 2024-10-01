@@ -50,18 +50,18 @@ const ArticleDetail = () => {
             <div>
                 <div className={"border-b px-4 py-6 space-y-6"}>
                     <div className={"space-y-2"}>
-                        <Label className={"text-sm font-medium"}>Title</Label>
+                        <Label className={"text-sm font-normal"}>Title</Label>
                         <Input
                             name="title"
                             placeholder={"The Evolution of Urban Green Spaces: From Parks to Vertical Gardens"}
                             value={formData.title}
                             onChange={(e) => commonHandleChange("title", e.target.value)}
-                            className={"text-sm font-medium w-full h-auto"}
+                            className={"text-sm font-normal w-full h-auto"}
                             autoFocus
                         />
                     </div>
                     <div className={"space-y-2"}>
-                        <Label className={"text-sm font-medium"}>Select Category</Label>
+                        <Label className={"text-sm font-normal"}>Select Category</Label>
                         <Select defaultValue={1} onValueChange={(value) => commonHandleChange('category', value)}>
                             <SelectTrigger className="h-auto">
                                 <SelectValue placeholder="" />
@@ -78,7 +78,7 @@ const ArticleDetail = () => {
                         </Select>
                     </div>
                     <div className={"space-y-2"}>
-                        <Label className={"text-sm font-medium"}>Subcategory</Label>
+                        <Label className={"text-sm font-normal"}>Subcategory</Label>
                         <Select defaultValue={1} onValueChange={(value) => commonHandleChange('subcategory', value)}>
                             <SelectTrigger className="h-auto">
                                 <SelectValue placeholder="" />
@@ -125,7 +125,7 @@ const ArticleDetail = () => {
                                 {statusOptions.map((x) => (
                                     <SelectItem key={x.value} value={x.value}>
                                         <div className={"flex items-center gap-2"}>
-                                            <Circle fill={x.fillColor} stroke={x.strokeColor} className={`font-medium w-2 h-2`} />
+                                            <Circle fill={x.fillColor} stroke={x.strokeColor} className={`font-normal w-2 h-2`} />
                                             {x.name}
                                         </div>
                                     </SelectItem>
@@ -133,9 +133,9 @@ const ArticleDetail = () => {
                             </SelectGroup>
                         </SelectContent>
                     </Select>
-                    <Button variant={"ghost hover:bg-none"} className={"px-3 py-[6px] border font-medium h-auto"}><Play size={16} className={"mr-3"} /> Preview</Button>
-                    <Button className={"py-[7px] font-semibold h-auto hover:bg-primary"} onClick={handlePublish}>
-                        {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Publish"}
+                    <Button variant={"ghost hover:bg-none"} className={"px-3 py-[6px] border font-normal h-auto"}><Play size={16} className={"mr-3"} /> Preview</Button>
+                    <Button className={"py-[7px] font-medium h-auto hover:bg-primary"} onClick={handlePublish}>
+                        {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Publish"}
                     </Button>
                     <Button variant={"ghost hover:bg-none"} className={"p-1 h-auto border"}><Trash2 size={16} /></Button>
                 </div>

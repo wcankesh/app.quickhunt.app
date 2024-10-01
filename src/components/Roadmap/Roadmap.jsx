@@ -120,7 +120,7 @@ const Roadmap = () => {
                 setRoadmapList={setRoadmapList}
 
             />
-            <div className={"p-4 px-2.5"}><h1 className={"text-2xl font-medium"}>Roadmap</h1></div>
+            <div className={"p-4 px-2.5"}><h1 className={"text-2xl font-normal"}>Roadmap</h1></div>
             <div className={"py-[11px] pt-[3px]"}>
                 {
                     isLoading ?
@@ -170,7 +170,7 @@ const Roadmap = () => {
                                                 }
                                                 <div className={"flex gap-2"}>
                                                     <Button variant={"outline hover:transparent"}
-                                                            className={"text-sm font-medium border px-[9px] py-1 w-[28px] h-[28px]"}>{y.vote}</Button>
+                                                            className={"text-sm font-normal border px-[9px] py-1 w-[28px] h-[28px]"}>{y.vote}</Button>
                                                     <h3 className={"text-sm font-normal m-0"}>{y.title}</h3>
                                                 </div>
                                             </CardHeader>
@@ -201,7 +201,7 @@ const Roadmap = () => {
                                     <React.Fragment>
                                         <div className={"flex justify-between items-center gap-2 border-b pb-4"}>
                                         <CardTitle
-                                            className={"flex items-center gap-2 text-sm font-semibold px-[7px]"}>
+                                            className={"flex items-center gap-2 text-sm font-medium px-[7px]"}>
                                             <Circle fill={color_code} stroke={color_code}
                                                     className={"w-[10px] h-[10px]"}/>
                                             {title} ({cardCount})
@@ -235,7 +235,7 @@ const Roadmap = () => {
             {/*        <div key={i}>*/}
             {/*            <Card key={x.id} className={"w-[342px]"}>*/}
             {/*                <CardHeader className={"p-4 px-[9px]"}>*/}
-            {/*                    <CardTitle className={"flex items-center gap-2 text-sm font-semibold px-[7px]"}>*/}
+            {/*                    <CardTitle className={"flex items-center gap-2 text-sm font-medium px-[7px]"}>*/}
             {/*                        <Circle fill={x.color_code} stroke={x.color_code} className={"w-[10px] h-[10px]"} />*/}
             {/*                        {x.title}*/}
             {/*                    </CardTitle>*/}
@@ -245,7 +245,7 @@ const Roadmap = () => {
             {/*                        return(*/}
             {/*                            <Card key={index} onClick={openDetailsSheet} className={"mb-3"}>*/}
             {/*                                <CardHeader className={"flex-row gap-2 p-2 pb-3"}>*/}
-            {/*                                    <Button variant={"outline hover:transparent"} className={"text-sm font-medium border px-[9px] py-1 w-[28px] h-[28px]"}>{y.vote}</Button>*/}
+            {/*                                    <Button variant={"outline hover:transparent"} className={"text-sm font-normal border px-[9px] py-1 w-[28px] h-[28px]"}>{y.vote}</Button>*/}
             {/*                                    <h3 className={"text-sm font-normal"}>{y.title}</h3>*/}
             {/*                                </CardHeader>*/}
             {/*                                <CardContent className={"px-[20px] pb-4"}>*/}
@@ -269,7 +269,7 @@ const Roadmap = () => {
             {/*                <CardFooter className={"px-4 py-3"}>*/}
             {/*                    <Button*/}
             {/*                        variant={"ghost hover:bg-transparent"}*/}
-            {/*                        className={`gap-2 p-0 ${theme === "dark" ? "" : "text-muted-foreground"} text-sm font-semibold h-auto`}*/}
+            {/*                        className={`gap-2 p-0 ${theme === "dark" ? "" : "text-muted-foreground"} text-sm font-medium h-auto`}*/}
             {/*                        onClick={() => onType('createNewRoadMapIdeas')}*/}
             {/*                    >*/}
             {/*                        <Plus className={"w-[20px] h-[20px]"} />Create Idea*/}

@@ -109,13 +109,13 @@ const PricingPlans = () => {
         <div className={"container xl:max-w-[1130px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-3 md:px-4 space-y-8"}>
             <div>
                 <div className={"flex flex-col justify-center items-center"}>
-                        <h3 className={"text-center text-2xl font-medium leading-8"}>Pricing & Plan</h3>
+                        <h3 className={"text-center text-2xl font-normal"}>Pricing & Plan</h3>
                         <p className={`pt-2 text-center flex items-center max-w-[256px] w-full capitalize text-sm ${theme === "dark" ? "" : "text-muted-foreground"}`}>Perfect for owners of small & medium businesses</p>
                 </div>
                 <div className={"flex justify-center pt-6"}>
                     <div className={"flex px-[5px] py-1 border rounded-md gap-1"}>
-                        <Button onClick={() => onChangeTab(1)} variant={"ghost hover:none"} className={`font-medium w-[78px] h-8 ${tab === 1 ? "bg-[#EEE4FF] text-[#7C3AED]" : ""}`}>Monthly</Button>
-                        <Button onClick={() => onChangeTab(2)} variant={"ghost hover:none"} className={`font-medium w-[78px] h-8 ${tab === 2 ? "bg-[#EEE4FF] text-[#7C3AED]" : ""}`}>Yearly</Button>
+                        <Button onClick={() => onChangeTab(1)} variant={"ghost hover:none"} className={`font-normal w-[78px] h-8 ${tab === 1 ? "bg-[#EEE4FF] text-[#7C3AED]" : ""}`}>Monthly</Button>
+                        <Button onClick={() => onChangeTab(2)} variant={"ghost hover:none"} className={`font-normal w-[78px] h-8 ${tab === 2 ? "bg-[#EEE4FF] text-[#7C3AED]" : ""}`}>Yearly</Button>
                     </div>
                 </div>
             </div>
@@ -132,17 +132,17 @@ const PricingPlans = () => {
                                     <p>Activated</p>
                                 </div>
                             )}
-                            <h3 className={"text-2xl font-medium leading-8 mb-4"}>{x.name}</h3>
-                            <h3 className={"text-[32px] font-bold pb-6 leading-8"}>
+                            <h3 className={"text-2xl font-normal mb-4"}>{x.name}</h3>
+                            <h3 className={"text-[32px] font-medium pb-6"}>
                                 ${tab === 1 ? x.priceMonthly: x.priceYearly}
                                 <span className={`text-xl ${theme === "dark" ? "" : "text-muted-foreground"}`}>/month</span>
                             </h3>
-                            <p className={`capitalize text-sm font-medium h-[32px] leading-4 ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                            <p className={`capitalize text-sm font-normal h-[32px] ${theme === "dark" ? "" : "text-muted-foreground"}`}>
                                 {x.description}
                             </p>
                             <div className={`flex flex-col gap-4 pb-[34px] mt-[34px]`}>
                                 {(x.features || []).map((y) => (
-                                    <div key={y} className={`text-sm font-medium leading-4 ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                    <div key={y} className={`text-sm font-normal ${theme === "dark" ? "" : "text-muted-foreground"}`}>
                                         <div className={"flex gap-4"}>
                                             <Check size={18} />
                                             <span>{y}</span>
@@ -151,7 +151,7 @@ const PricingPlans = () => {
                                 ))}
                             </div>
                             <Button
-                                className={`w-full font-semibold`}
+                                className={`w-full font-medium`}
                                 disabled={isActivated && x.disabled}
                                 variant={isActivated ? "outline" : ""}
                                 onClick={() =>redirectToCheckout(tab === 2 ? x.priceIdYearly : tab === 1 ? x.priceMonthly : "", x.planType)}

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {Icon} from "../../../utils/Icon";
 import {useSelector} from "react-redux";
 import {Button} from "../../ui/button";
@@ -48,13 +48,13 @@ const WidgetHeader = ({widgetsSetting, selected, setSelected}) => {
                             <div className="inline-block align-middle cursor-pointer">
                                 {
                                     projectDetailsReducer?.project_logo != '' ?
-                                        <img src={`https://code.quickhunt.app/public/storage/project/${projectDetailsReducer.project_logo}`} alt={projectDetailsReducer?.project_name} className="max-h-10"/> : <div className="text-3xl font-semibold tracking-tight transition-colors">{projectDetailsReducer?.project_name || ''}</div>
+                                        <img src={`https://code.quickhunt.app/public/storage/project/${projectDetailsReducer.project_logo}`} alt={projectDetailsReducer?.project_name} className="max-h-10"/> : <div className="text-3xl font-medium tracking-tight transition-colors">{projectDetailsReducer?.project_name || ''}</div>
                                 }
                             </div>
                             <div className="flex flex-wrap gap-2">
                                 <div className={`gap-2 flex`}>
-                                    <Button size={'xs'} variant={"outline"} style={{ borderColor:widgetsSetting?.header_btn_background_color,color:widgetsSetting?.header_btn_background_color, }} className="text-primary border-primary bg-transparent">Sign in</Button>
-                                    <Button size={'xs'}  style={{ backgroundColor:widgetsSetting?.header_btn_background_color,color:widgetsSetting?.header_btn_text_color}}>Sign up</Button>
+                                    <Button size={'sm'} variant={"outline"} style={{ borderColor:widgetsSetting?.header_btn_background_color,color:widgetsSetting?.header_btn_background_color, }} className="hover:bg-inherit text-primary border-primary bg-transparent">Sign in</Button>
+                                    <Button size={'sm'} style={{ backgroundColor:widgetsSetting?.header_btn_background_color,color:widgetsSetting?.header_btn_text_color}}>Sign up</Button>
                                 </div>
 
 
@@ -67,7 +67,7 @@ const WidgetHeader = ({widgetsSetting, selected, setSelected}) => {
                             if(x.isCheck){
                                 return (
                                     <li key={`Nav_${i}`}>
-                                        <button onClick={() => onRedirect(x.link, x.isRedirect)} style={{color:x.selected ? widgetsSetting.header_btn_background_color : widgetsSetting.header_text_color}} className={`${x.selected ? 'bg-slate-50 border-slate-200 text-primary' : 'border-transparent'}  border border-b-0 rounded-t-md flex items-center gap-1 leading-5  text-sm  py-2 px-2`} >{x.icon}{x.title}</button>
+                                        <button onClick={() => onRedirect(x.link, x.isRedirect)} style={{color:x.selected ? widgetsSetting.header_btn_background_color : widgetsSetting.header_text_color}} className={`${x.selected ? 'bg-slate-50 border-slate-200 text-primary' : 'border-transparent'}  border border-b-0 rounded-t-md flex items-center gap-1 text-sm py-2 px-2`} >{x.icon}{x.title}</button>
                                     </li>
                                 )
                             }

@@ -137,43 +137,43 @@ const Social = () => {
     return (
         <Card>
             <CardHeader className={"p-4 sm:p-6"}>
-                <h2 className={`text-lg sm:text-2xl font-medium leading-8`}>Social links</h2>
+                <h2 className={`text-lg sm:text-2xl font-normal`}>Social links</h2>
             </CardHeader>
             <Separator/>
             <CardContent className={"p-0"}>
                 <div className={"p-4 sm:p-6"}>
-                    <div className="grid w-full">
-                        <Label htmlFor="facebook" className={"mb-[6px]"}>Facebook</Label>
+                    <div className="grid w-full gap-1.5">
+                        <Label htmlFor="facebook" className={" font-normal"}>Facebook</Label>
                         <Input value={socialLink?.facebook} onBlur={onBlur} onChange={onChange} name="facebook" placeholder={"https://facebook.com/"} type="text" id="facebook" className={"h-9"}/>
                         {formError.facebook && <span className="text-destructive text-sm mt-1">{formError.facebook}</span>}
                     </div>
 
-                    <div className="w-full mt-4">
-                        <Label htmlFor="twitter" className={"mb-[6px]"}>Twitter ( X )</Label>
+                    <div className="w-full mt-4 gap-1.5">
+                        <Label htmlFor="twitter" className={" font-normal"}>Twitter ( X )</Label>
                         <Input value={socialLink?.twitter} onChange={onChange} name="twitter" placeholder={"https://x.com/"} type="text" id="twitter" className={"h-9"}/>
                         {formError.twitter && <span className="text-destructive text-sm mt-1">{formError.twitter}</span>}
                     </div>
 
-                    <div className="grid w-full mt-4">
-                        <Label htmlFor="linkedin" className={"mb-[6px]"}>Linkedin</Label>
+                    <div className="grid w-full mt-4 gap-1.5">
+                        <Label htmlFor="linkedin" className={" font-normal"}>Linkedin</Label>
                         <Input value={socialLink?.linkedin} onChange={onChange} name="linkedin" placeholder={"https://linkedin.com/"} type="text" id="linkedin" className={"h-9"}/>
                         {formError.linkedin && <span className="text-destructive text-sm mt-1">{formError.linkedin}</span>}
                     </div>
 
-                    <div className="grid w-full mt-4">
-                        <Label htmlFor="youtube" className={"mb-[6px]"}>YouTube</Label>
+                    <div className="grid w-full mt-4 gap-1.5">
+                        <Label htmlFor="youtube" className={" font-normal"}>YouTube</Label>
                         <Input value={socialLink?.youtube} onChange={onChange} name="youtube" placeholder={"https://youtube.com/"} type="text" id="youtube" className={"h-9"}/>
                         {formError.youtube && <span className="text-destructive text-sm mt-1">{formError.youtube}</span>}
                     </div>
 
-                    <div className="grid w-full mt-4">
-                        <Label htmlFor="instagram" className={"mb-[6px]"}>Instagram</Label>
+                    <div className="grid w-full mt-4 gap-1.5">
+                        <Label htmlFor="instagram" className={" font-normal"}>Instagram</Label>
                         <Input value={socialLink?.instagram} onChange={onChange} name="instagram" placeholder={"https://instagram.com/"} type="text" id="instagram" className={"h-9"}/>
                         {formError.instagram && <span className="text-destructive text-sm mt-1">{formError.instagram}</span>}
                     </div>
 
-                    <div className="grid w-full mt-4">
-                        <Label htmlFor="github" className={"mb-[6px]"}>GitHub</Label>
+                    <div className="grid w-full mt-4 gap-1.5">
+                        <Label htmlFor="github" className={" font-normal"}>GitHub</Label>
                         <Input value={socialLink?.github} onChange={onChange} name="github" placeholder={"https://github.com/"} type="text" id="github" className={"h-9"}/>
                         {formError.github && <span className="text-destructive text-sm mt-1">{formError.github}</span>}
                     </div>
@@ -181,11 +181,11 @@ const Social = () => {
 
                 <Separator className={""}/>
 
-                <div className={"px-6 pt-4 pb-6 flex flex-row justify-end"}>
+                <div className={"px-6 py-4 flex flex-row justify-end"}>
                     <Button
-                        className={`${isSave === true ? "py-2 px-6" : "py-2 px-6"} w-[142px] text-sm font-semibold`}
+                        className={`py-2 px-6 w-[142px] text-sm font-medium`}
                         onClick={onUpdateSocialSetting}>
-                        {isSave ? <Loader2 className="mr-1 h-4 w-4 animate-spin justify-center"/> : "Update Social"}</Button>
+                        {isSave ? <Loader2 className="h-4 w-4 animate-spin"/> : "Update Social"}</Button>
                 </div>
 
 

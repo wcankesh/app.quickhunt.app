@@ -245,7 +245,7 @@ const Announcements = () => {
 
             <div className={"flex items-center justify-between flex-wrap gap-6"}>
                 <div className={"flex justify-between items-center w-full md:w-auto"}>
-                    <h3 className={"text-2xl font-medium leading-8"}>Announcement ({totalRecord})</h3>
+                    <h3 className={"text-2xl font-normal"}>Announcement ({totalRecord})</h3>
                 </div>
                 <div className={"flex gap-2 flex-wrap items-center"}>
                     <div className={"flex gap-2 items-center w-full md:w-auto"}>
@@ -276,14 +276,14 @@ const Announcements = () => {
                                                 openFilterType === 'status' ?
                                                     <CommandGroup className={"w-full"}>
                                                         <CommandItem className={"p-0 flex gap-2 items-center cursor-pointer p-1"} onSelect={() => {setOpenFilterType('');}}>
-                                                            <ChevronLeft className="mr-2 h-4 w-4"  />  <span className={"flex-1 w-full text-sm font-medium cursor-pointer flex gap-2 items-center"}>Back</span>
+                                                            <ChevronLeft className="mr-2 h-4 w-4"  />  <span className={"flex-1 w-full text-sm font-normal cursor-pointer flex gap-2 items-center"}>Back</span>
                                                         </CommandItem>
                                                         {
                                                             (status || []).map((x, index) => {
                                                                 return (
                                                                     <CommandItem className={"p-0 flex gap-1 items-center cursor-pointer"}>
                                                                         <Checkbox className={'m-2'} checked={x.value === filter.s} onClick={(event) => filterPosts({name: "s", value: x.value == filter.s ? "" :x.value })} />
-                                                                        <span className={"flex-1 w-full text-sm font-medium cursor-pointer flex gap-2 items-center"} onClick={(event) => filterPosts({name: "s", value: x.value == filter.s ? "" :x.value })} key={x.label}>{x.label}</span>
+                                                                        <span className={"flex-1 w-full text-sm font-normal cursor-pointer flex gap-2 items-center"} onClick={(event) => filterPosts({name: "s", value: x.value == filter.s ? "" :x.value })} key={x.label}>{x.label}</span>
                                                                     </CommandItem>
                                                                 )
                                                             })
@@ -292,7 +292,7 @@ const Announcements = () => {
                                                     : openFilterType === 'label' ?
                                                     <CommandGroup className={"w-full"}>
                                                         <CommandItem className={"p-0 flex gap-2 items-center cursor-pointer p-1"} onSelect={() => {setOpenFilterType('');}}>
-                                                            <ChevronLeft className="mr-2 h-4 w-4"  />  <span className={"flex-1 w-full text-sm font-medium cursor-pointer flex gap-2 items-center"}>Back</span>
+                                                            <ChevronLeft className="mr-2 h-4 w-4"  />  <span className={"flex-1 w-full text-sm font-normal cursor-pointer flex gap-2 items-center"}>Back</span>
                                                         </CommandItem>
                                                         {
                                                             (allStatusAndTypes.labels || []).map((x, i) => {
@@ -304,7 +304,7 @@ const Announcements = () => {
                                                                                 <Circle fill={x.label_color_code}
                                                                                         stroke={x.label_color_code}
                                                                                         className={`${theme === "dark" ? "" : "text-muted-foreground"} w-[10px] h-[10px]`}/>
-                                                                                <span className={"flex-1 w-full text-sm font-medium cursor-pointer flex gap-2 items-center"}>{x.label_name}</span>
+                                                                                <span className={"flex-1 w-full text-sm font-normal cursor-pointer flex gap-2 items-center"}>{x.label_name}</span>
                                                                             </div>
                                                                         </div>
                                                                     </CommandItem>
@@ -314,10 +314,10 @@ const Announcements = () => {
                                                     </CommandGroup>
                                                     :<CommandGroup>
                                                         <CommandItem onSelect={() => {setOpenFilterType('status');}}>
-                                                            <span className={"text-sm font-medium cursor-pointer"}>Status</span>
+                                                            <span className={"text-sm font-normal cursor-pointer"}>Status</span>
                                                         </CommandItem>
                                                         <CommandItem onSelect={() => {setOpenFilterType('label');}}>
-                                                            <span className={"text-sm font-medium cursor-pointer"}>Labels</span>
+                                                            <span className={"text-sm font-normal cursor-pointer"}>Labels</span>
                                                         </CommandItem>
                                                     </CommandGroup>
                                             }
@@ -331,10 +331,10 @@ const Announcements = () => {
                         <Button
                             size={"sm"}
                             onClick={openSheet}
-                            className={"gap-2 font-semibold hover:bg-primary"}
+                            className={"gap-2 font-medium hover:bg-primary"}
                         >
                             <Plus size={20} strokeWidth={3} />
-                            <span className={"text-xs md:text-sm font-semibold"}>New Announcement</span>
+                            <span className={"text-xs md:text-sm font-medium"}>New Announcement</span>
                         </Button>
 
                     </div>
@@ -344,7 +344,7 @@ const Announcements = () => {
             {(filter.s  || filter.l) && <div className={"flex flex-wrap gap-2 mt-6"}>
                 {
                     filter.s &&
-                    <Badge variant="outline" className="rounded p-0">
+                    <Badge variant="outline" className="rounded p-0 font-medium">
                         <span
                             className="px-3 py-1.5 border-r">{filter.s == 1 ? "Published" : filter.s === 2 ? "Scheduled" : filter.s == 4 ? "Draft" : ""}</span>
                         <span className="w-7 h-7 flex items-center justify-center cursor-pointer"
@@ -354,9 +354,9 @@ const Announcements = () => {
                     </Badge>
                 }
                 {
-                    filter.l && <Badge variant="outline" className="rounded p-0">
+                    filter.l && <Badge variant="outline" className="rounded p-0 font-medium">
                         <span className="px-3 py-1.5 border-r flex gap-2 items-center">
-                            <span className={"w-2.5 h-2.5  rounded-full"} style={{backgroundColor: matchedObject.label_color_code}}/>{matchedObject?.label_name}
+                            <span className={"w-2.5 h-2.5 rounded-full"} style={{backgroundColor: matchedObject.label_color_code}}/>{matchedObject?.label_name}
                         </span>
                         <span className="w-7 h-7 flex items-center justify-center cursor-pointer" onClick={() => handleBadge({name: "label", value: "l"})}><X className='w-4 h-4'/></span>
                     </Badge>
@@ -380,7 +380,7 @@ const Announcements = () => {
                                 className={`w-full ${theme === "dark" ? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end p-2 md:px-3 md:py-[10px]`}>
                                 <div className={"w-full flex gap-2 items-center justify-between sm:justify-end"}>
                                     <div>
-                                        <h5 className={"text-sm font-semibold"}>Page {announcementList.length <= 0 ? 0 :pageNo} of {totalPages}</h5>
+                                        <h5 className={"text-sm font-medium"}>Page {announcementList.length <= 0 ? 0 :pageNo} of {totalPages}</h5>
                                     </div>
                                     <div className={"flex flex-row gap-2 items-center"}>
                                         <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}

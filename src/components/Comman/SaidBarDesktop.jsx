@@ -164,7 +164,7 @@ const SaidBarDesktop = () => {
                     >
                         <div className={`${subItem.selected ? "active-menu" : "menu-icon"}`}>{subItem.icon}</div>
                         <div
-                            className={`text-sm font-medium ${subItem.selected ? "text-primary " : ""}`}>{subItem.title}</div>
+                            className={`text-sm font-normal ${subItem.selected ? "text-primary " : ""}`}>{subItem.title}</div>
                     </Button>
                 ))}
             </div>
@@ -195,13 +195,13 @@ const SaidBarDesktop = () => {
                                                     <Button
                                                         key={i}
                                                         variant={"link hover:no-underline"}
-                                                        className={`${z.selected ? "flex justify-start gap-4 h-9 rounded-md bg-primary/15 transition-none" : 'flex items-center gap-4 h-9 justify-start transition-none'}`}
+                                                        className={`flex justify-start gap-4 h-9 ${z.selected ? "rounded-md bg-primary/15 transition-none" : 'items-center transition-none'}`}
                                                         onClick={() => onRedirect(z.link)}
                                                     >
                                                         <div
                                                             className={`${z.selected ? "active-menu" : "menu-icon"}`}>{z.icon}</div>
                                                         <div
-                                                            className={`${z.selected ? "text-primary text-sm font-medium" : "text-sm font-medium"}`}>{z.title}</div>
+                                                            className={`${z.selected ? "text-primary" : ""}`}>{z.title}</div>
                                                     </Button>
                                                 )
                                             })
@@ -209,7 +209,7 @@ const SaidBarDesktop = () => {
                                         {
                                             x.dashBtn ? "" :
                                                 <Fragment>
-                                                    <h3 className={"text-sm font-bold py-2 px-4"}>{x.mainTitle}</h3>
+                                                    <h3 className={"text-sm font-medium py-2 px-4"}>{x.mainTitle}</h3>
                                                     <div className={"flex flex-col gap-1"}>
                                                         {
                                                             (x.items || []).map((y, i) => {
@@ -227,15 +227,14 @@ const SaidBarDesktop = () => {
                                                                         <Button
                                                                             key={i}
                                                                             variant={"link hover:no-underline"}
-                                                                            className={`${y.selected ? "flex justify-start gap-4 h-9 rounded-md bg-primary/15 transition-none" : 'flex items-center gap-4 h-9 justify-start transition-none'} ${y.title === 'Announcements' ? 'gap-[10px]' : ''}`}
+                                                                            className={`flex justify-start gap-4 h-9 ${y.selected ? "rounded-md bg-primary/15 transition-none" : 'items-center transition-none'} ${y.title === 'Announcements' ? 'gap-[10px]' : ''}`}
                                                                             onClick={() => onRedirect(y.link)}
                                                                         >
                                                                             <div
                                                                                 className={`${y.selected ? "active-menu" : "menu-icon"}`}>{y.icon}</div>
                                                                             <div
-                                                                                className={`${y.selected ? "text-primary text-sm font-medium" : "text-sm font-medium"}`}>{y.title}</div>
+                                                                                className={`${y.selected ? "text-primary" : ""}`}>{y.title}</div>
                                                                         </Button>
-                                                                        {/*{y.title === 'Help Center' && y.subItems && renderSubItems(y.subItems)}*/}
                                                                         {y.title === 'Help Center' && isHelpCenterActive && y.subItems && renderSubItems(y.subItems)}
                                                                     </Fragment>
                                                                 )
@@ -258,13 +257,13 @@ const SaidBarDesktop = () => {
                                             <Button
                                                 key={i}
                                                 variant={"link hover:no-underline"}
-                                                className={`${x.selected ? "flex justify-start gap-4 h-9 rounded-md bg-primary/15 transition-none" : 'flex items-center gap-4 h-9 justify-start transition-none'}`}
+                                                className={`flex justify-start gap-4 h-9 ${x.selected ? "rounded-md bg-primary/15 transition-none" : 'items-center transition-none'}`}
                                                 onClick={() => onRedirect(x.link)}
                                             >
                                                 <div
                                                     className={`${x.selected ? "active-menu" : "menu-icon"}`}>{x.icon}</div>
                                                 <div
-                                                    className={`${x.selected ? "text-primary text-sm font-medium" : "text-sm font-medium"}`}>{x.title}</div>
+                                                    className={`${x.selected ? "text-primary" : ""}`}>{x.title}</div>
                                             </Button> : ''
                                     )
                                 })

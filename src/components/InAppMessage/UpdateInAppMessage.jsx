@@ -280,10 +280,10 @@ const UpdateInAppMessage = () => {
                     </Breadcrumb>
                 </Breadcrumb>
                 <div className={"flex items-center gap-2"}>
-                    <Button size={"sm"} className={`w-[125px] font-semibold hover:bg-primary`} onClick={id === "new" ? createMessage : onUpdateMessage}>
+                    <Button size={"sm"} className={`w-[125px] font-medium hover:bg-primary`} onClick={id === "new" ? createMessage : onUpdateMessage}>
                         {isSave ? <Loader2 size={16} className={"animate-spin"}/> : "Save Changes"}
                     </Button>
-                    <Button size={"sm"} variant={"ghost hover-none"} className={"font-semibold border border-primary"} onClick={handleCancel}>Cancel</Button>
+                    <Button size={"sm"} variant={"ghost hover-none"} className={"font-medium border border-primary"} onClick={handleCancel}>Cancel</Button>
                 </div>
             </div>
             <div className={"flex h-[calc(100%_-_85px)] overflow-y-auto"}>

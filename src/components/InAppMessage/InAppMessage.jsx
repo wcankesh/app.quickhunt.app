@@ -229,11 +229,11 @@ const InAppMessage = () => {
                             </DialogHeader>
                             <DialogFooter className={"flex-row justify-end space-x-2"}>
                                 <Button variant={"outline hover:none"}
-                                        className={"text-sm font-semibold border"}
+                                        className={"text-sm font-medium border"}
                                         onClick={() => setDeleteId(null)}>Cancel</Button>
                                 <Button
                                     variant={"hover:bg-destructive"}
-                                    className={` ${theme === "dark" ? "text-card-foreground" : "text-card"} ${isLoadingDelete === true ? "py-2 px-6" : "py-2 px-6"} w-[76px] text-sm font-semibold bg-destructive`}
+                                    className={` ${theme === "dark" ? "text-card-foreground" : "text-card"} ${isLoadingDelete === true ? "py-2 px-6" : "py-2 px-6"} w-[76px] text-sm font-medium bg-destructive`}
                                     onClick={onDelete}
                                 >
                                     {isLoadingDelete ? <Loader2 size={16} className={"animate-spin"}/> : "Delete"}
@@ -247,8 +247,8 @@ const InAppMessage = () => {
             <div className={"container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-3 md:px-4"}>
                 <div className={""}>
                     <div className={"flex justify-between items-center"}>
-                        <h4 className={"font-medium text-lg sm:text-2xl leading-8"}>In App Messages</h4>
-                        <Button size="sm" onClick={()=>handleCreateNew("type")} className={"gap-2 font-semibold hover:bg-primary"}> <Plus size={20} strokeWidth={3}/>New Content</Button>
+                        <h4 className={"font-normal text-lg sm:text-2xl leading-8"}>In App Messages</h4>
+                        <Button size="sm" onClick={()=>handleCreateNew("type")} className={"gap-2 font-medium hover:bg-primary"}> <Plus size={20} strokeWidth={3}/>New Content</Button>
                     </div>
                     <div className={"flex justify-between pt-7"}>
                         <div className={"flex gap-4"}>
@@ -277,7 +277,7 @@ const InAppMessage = () => {
                                                 openFilterType === 'content_type' ?
                                                     <CommandGroup className={"w-full"}>
                                                         <CommandItem className={"p-0 flex gap-2 items-center cursor-pointer p-1"} onSelect={() => {setOpenFilterType('');}}>
-                                                            <ChevronLeft className="mr-2 h-4 w-4"  />  <span className={"flex-1 w-full text-sm font-medium cursor-pointer flex gap-2 items-center"}>Back</span>
+                                                            <ChevronLeft className="mr-2 h-4 w-4"  />  <span className={"flex-1 w-full text-sm font-normal cursor-pointer flex gap-2 items-center"}>Back</span>
                                                         </CommandItem>
                                                         {
                                                             (contentType || []).map((x, i) => {
@@ -285,7 +285,7 @@ const InAppMessage = () => {
                                                                     <CommandItem key={i} className={"p-0 w-full flex flex-row gap-1 items-center cursor-pointer"}>
                                                                         <div className={"flex"} onClick={(event)=>filterPosts({name:"content_type",value:x.value == formData.content_type ? "" :x.value })}>
                                                                             <Checkbox className={'m-2'} checked={x.value === formData.content_type} onClick={(event)=>filterPosts({name:"content_type",value:x.value == formData.content_type ? "" :x.value })} />
-                                                                            <span onClick={(event)=>filterPosts({name:"content_type",value:x.value == formData.content_type ? "" :x.value })} className={`w-full font-medium flex items-center ${theme === "dark" ? "" : "text-muted-foreground"} hover:none`} onSelect={()=>setOpen(false)}>{x.icon} <span className={"ml-2"}>{x.label}</span></span>
+                                                                            <span onClick={(event)=>filterPosts({name:"content_type",value:x.value == formData.content_type ? "" :x.value })} className={`w-full font-normal flex items-center ${theme === "dark" ? "" : "text-muted-foreground"} hover:none`} onSelect={()=>setOpen(false)}>{x.icon} <span className={"ml-2"}>{x.label}</span></span>
                                                                         </div>
                                                                     </CommandItem>
                                                                 )
@@ -295,7 +295,7 @@ const InAppMessage = () => {
                                                     : openFilterType === 'add_filter' ?
                                                     <CommandGroup className={"w-full"}>
                                                         <CommandItem className={"p-0 flex gap-2 items-center cursor-pointer p-1"} onSelect={() => {setOpenFilterType('');}}>
-                                                            <ChevronLeft className="mr-2 h-4 w-4"  />  <span className={"flex-1 w-full text-sm font-medium cursor-pointer flex gap-2 items-center"}>Back</span>
+                                                            <ChevronLeft className="mr-2 h-4 w-4"  />  <span className={"flex-1 w-full text-sm font-normal cursor-pointer flex gap-2 items-center"}>Back</span>
                                                         </CommandItem>
                                                         {
                                                             (filterType || []).map((x,i)=>{
@@ -303,7 +303,7 @@ const InAppMessage = () => {
                                                                     <CommandItem key={i}  className={"p-0 w-full flex flex-row gap-1 items-center cursor-pointer"}>
                                                                         <div className={"flex"} onClick={(event)=>filterPosts({name:"add_filter",value:x.value == formData.add_filter ? "" :x.value })}>
                                                                             <Checkbox className={'m-2'} checked={x.value === formData.add_filter} onClick={(event)=>filterPosts({name:"add_filter",value:x.value == formData.add_filter ? "" :x.value })} />
-                                                                            <span onClick={(event)=>filterPosts({name:"add_filter",value:x.value == formData.add_filter ? "" :x.value })} className={`w-full font-medium flex items-center ${theme === "dark" ? "" : "text-muted-foreground"} hover:none`} onSelect={()=>setOpen(false)}>{x.icon} <span className={"ml-2"}>{x.label}</span></span>
+                                                                            <span onClick={(event)=>filterPosts({name:"add_filter",value:x.value == formData.add_filter ? "" :x.value })} className={`w-full font-normal flex items-center ${theme === "dark" ? "" : "text-muted-foreground"} hover:none`} onSelect={()=>setOpen(false)}>{x.icon} <span className={"ml-2"}>{x.label}</span></span>
                                                                         </div>
                                                                     </CommandItem>
                                                                 )
@@ -313,10 +313,10 @@ const InAppMessage = () => {
                                                     </CommandGroup>
                                                     :<CommandGroup>
                                                         <CommandItem onSelect={() => {setOpenFilterType('content_type');}}>
-                                                            <span className={"text-sm font-medium cursor-pointer"}>Content Type</span>
+                                                            <span className={"text-sm font-normal cursor-pointer"}>Content Type</span>
                                                         </CommandItem>
                                                         <CommandItem onSelect={() => {setOpenFilterType('add_filter');}}>
-                                                            <span className={"text-sm font-medium cursor-pointer"}>Add Filter</span>
+                                                            <span className={"text-sm font-normal cursor-pointer"}>Add Filter</span>
                                                         </CommandItem>
                                                     </CommandGroup>
                                             }
@@ -330,7 +330,7 @@ const InAppMessage = () => {
                         (formData.add_filter || formData.content_type) && <div className={"flex flex-wrap gap-2 mt-6"}>
                             {
                                 formData.add_filter &&
-                                <Badge variant="outline" className="rounded p-0">
+                                <Badge variant="outline" className="rounded p-0 font-medium">
                                     <span className="px-3 py-1.5 border-r">{formData.add_filter == 1 ? "People" : formData.add_filter === 2 ? "State" : formData.add_filter === 3 ? "Sender" : formData.add_filter === 4 ? "Date" : ""}</span>
                                     <span className="w-7 h-7 flex items-center justify-center cursor-pointer" onClick={() => removeBadge("add_filter")}><X className='w-4 h-4'/></span>
                                 </Badge>
@@ -338,7 +338,7 @@ const InAppMessage = () => {
 
                             {
                                 formData.content_type &&
-                                <Badge variant="outline" className="rounded p-0">
+                                <Badge variant="outline" className="rounded p-0 font-medium">
                                     <span className="px-3 py-1.5 border-r">{formData.content_type === 1 ? "Post" : formData.content_type === 2 ? "Survey": formData.content_type === 3 ? "Checklist" : formData.content_type === 4 ? "Banners" : ""}</span>
                                     <span className="w-7 h-7 flex items-center justify-center cursor-pointer" onClick={() => removeBadge("content_type")}><X className='w-4 h-4'/></span>
                                 </Badge>
@@ -353,7 +353,7 @@ const InAppMessage = () => {
                                         {
                                             ["Title","State","Sender","Content type","Created at","Action"].map((x,i)=>{
                                                 return(
-                                                    <TableHead  className={`px-2 py-[10px] md:px-3 font-semibold ${i >= 5 ? 'text-center' : ''}`} key={i}>{x}</TableHead>
+                                                    <TableHead  className={`px-2 py-[10px] md:px-3 font-medium ${i >= 5 ? 'text-center' : ''}`} key={i}>{x}</TableHead>
                                                 )
                                             })
                                         }
@@ -369,7 +369,7 @@ const InAppMessage = () => {
                                                                 [...Array(6)].map((_, i) => {
                                                                     return (
                                                                         <TableCell key={i} className={"max-w-[373px] px-2 py-[10px] md:px-3"}>
-                                                                            <Skeleton className={"rounded-md  w-full h-7"}/>
+                                                                            <Skeleton className={"rounded-md w-full h-7"}/>
                                                                         </TableCell>
                                                                     )
                                                                 })
@@ -386,7 +386,7 @@ const InAppMessage = () => {
                                                             const sender = allStatusAndTypes?.members.find((y)=> y.user_id == x.from);
                                                             return(
                                                                 <TableRow key={x.id}>
-                                                                    <TableCell className={"px-2 py-[10px] md:px-3 font-medium cursor-pointer"} onClick={()=>handleCreateNew(x.id, x.type)}>{x.title}</TableCell>
+                                                                    <TableCell className={"px-2 py-[10px] md:px-3 font-normal cursor-pointer"} onClick={()=>handleCreateNew(x.id, x.type)}>{x.title}</TableCell>
                                                                     <TableCell className={"px-2 py-[10px] md:px-3"}>
                                                                         <Select value={x.status}
                                                                                 onValueChange={(value) => handleStatusChange(x, value)}>
@@ -424,7 +424,7 @@ const InAppMessage = () => {
                                                                     {/*                <AvatarFallback>{sender && sender.user_first_name && sender.user_first_name.substring(0, 1)}</AvatarFallback>*/}
                                                                     {/*        }*/}
                                                                     {/*    </Avatar>*/}
-                                                                    {/*    <p className={"font-medium"}>{sender && sender?.user_first_name}</p>*/}
+                                                                    {/*    <p className={"font-normal"}>{sender && sender?.user_first_name}</p>*/}
                                                                     {/*</TableCell>*/}
                                                                     <TableCell className={`flex items-center mt-1 px-2 py-[10px] md:px-3 gap-2 ${sender ? sender : "justify-center"}`}>
                                                                         {sender ? (
@@ -436,22 +436,22 @@ const InAppMessage = () => {
                                                                                         <AvatarFallback>{sender.user_first_name.substring(0, 1)}</AvatarFallback>
                                                                                     )}
                                                                                 </Avatar>
-                                                                                <p className={"font-medium"}>{sender.user_first_name}</p>
+                                                                                <p className={"font-normal"}>{sender.user_first_name}</p>
                                                                             </>
                                                                         ) : (
-                                                                            <p className={"font-medium"}>-</p>
+                                                                            <p className={"font-normal"}>-</p>
                                                                         )}
                                                                     </TableCell>
-                                                                    <TableCell className={`px-2 py-[10px] md:px-3 font-medium`}>
+                                                                    <TableCell className={`px-2 py-[10px] md:px-3 font-normal`}>
                                                                         <div className={"flex items-center gap-1"}>{typeIcon[x.type]}{typeNames[x.type] || "-"}</div>
                                                                     </TableCell>
-                                                                    <TableCell className={`px-2 py-[10px] md:px-3 font-medium`}>
+                                                                    <TableCell className={`px-2 py-[10px] md:px-3 font-normal`}>
                                                                         {x?.created_at ? moment.utc(x.created_at).local().startOf('seconds').fromNow() : "-"}
                                                                     </TableCell>
                                                                     <TableCell className={`px-2 py-[10px] md:px-3 text-center`}>
                                                                         <DropdownMenu>
                                                                             <DropdownMenuTrigger>
-                                                                                <Ellipsis className={`font-medium`} size={18}/>
+                                                                                <Ellipsis className={`font-normal`} size={18}/>
                                                                             </DropdownMenuTrigger>
                                                                             <DropdownMenuContent align={"end"}>
                                                                                 <DropdownMenuItem onClick={()=>handleCreateNew(x.id, x.type)}>Edit</DropdownMenuItem>
@@ -481,7 +481,7 @@ const InAppMessage = () => {
                                         className={`w-full ${theme === "dark" ? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end p-2 md:px-3 md:py-[10px]`}>
                                         <div className={"w-full flex gap-2 items-center justify-between sm:justify-end"}>
                                             <div>
-                                                <h5 className={"text-sm font-semibold"}>Page {messageList.length <= 0 ? 0 :pageNo} of {totalPages}</h5>
+                                                <h5 className={"text-sm font-medium"}>Page {messageList.length <= 0 ? 0 :pageNo} of {totalPages}</h5>
                                             </div>
                                             <div className={"flex flex-row gap-2 items-center"}>
                                                 <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}

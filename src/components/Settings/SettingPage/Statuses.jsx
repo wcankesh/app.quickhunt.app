@@ -326,18 +326,18 @@ const Statuses = () => {
                         <DialogContent className="max-w-[350px] w-full sm:max-w-[525px] p-3 md:p-6 rounded-lg">
                             <DialogHeader className={"flex flex-row justify-between gap-2"}>
                                 <div className={"flex flex-col gap-2"}>
-                                    <DialogTitle className={"text-start"}>You really want delete this status ?</DialogTitle>
+                                    <DialogTitle className={"text-start font-medium"}>You really want delete this status ?</DialogTitle>
                                     <DialogDescription className={"text-start"}>This action can't be undone.</DialogDescription>
                                 </div>
                                 <X size={16} className={"m-0 cursor-pointer"} onClick={() => setOpenDelete(false)}/>
                             </DialogHeader>
                             <DialogFooter className={"flex-row justify-end space-x-2"}>
                                 <Button variant={"outline hover:none"}
-                                        className={"text-sm font-semibold border"}
+                                        className={"text-sm font-medium border"}
                                         onClick={() => setOpenDelete(false)}>Cancel</Button>
                                 <Button
                                     variant={"hover:bg-destructive"}
-                                    className={` ${theme === "dark" ? "text-card-foreground" : "text-card"} ${isDeleteLoading ? "py-2 px-6" : "py-2 px-6"} w-[76px] text-sm font-semibold bg-destructive`}
+                                    className={` ${theme === "dark" ? "text-card-foreground" : "text-card"} py-2 px-6 w-[76px] text-sm font-medium bg-destructive`}
                                     onClick={deleteParticularRow}
                                 >
                                     {isDeleteLoading ? <Loader2 size={16} className={"animate-spin"}/> : "Delete"}
@@ -350,7 +350,7 @@ const Statuses = () => {
             <Card>
                 <CardHeader className="flex flex-row flex-wrap gap-y-2 justify-between items-center border-b p-4 sm:p-6">
                     <div>
-                        <CardTitle className="text-lg sm:text-2xl font-medium">Statuses</CardTitle>
+                        <CardTitle className="text-lg sm:text-2xl font-normal">Statuses</CardTitle>
                         <CardDescription className="text-sm text-muted-foreground p-0">
                             Use Statuses to track Ideas on your Roadmap.
                         </CardDescription>
@@ -358,7 +358,7 @@ const Statuses = () => {
                     <Button
                         size={"sm"}
                         disabled={isEdit !== null}
-                        className={"gap-2 font-semibold hover:bg-primary m-0"}
+                        className={"gap-2 font-medium hover:bg-primary m-0"}
                         onClick={handleShowInput}
                     >
                         <Plus strokeWidth={3} size={18} />New Status
@@ -405,7 +405,7 @@ const Statuses = () => {
                                                         </div>
                                                     </TableCell>
                                                     <TableCell
-                                                        className={`font-medium text-xs ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                                        className={`font-normal text-xs ${theme === "dark" ? "" : "text-muted-foreground"}`}>
                                                         <div className={"flex justify-center items-center"}>
                                                             <ColorInput name={"color_code"} value={x.color_code} onChange={(color) => onChangeColorColor(color, i)}/>
                                                         </div>
@@ -419,13 +419,13 @@ const Statuses = () => {
                                                                         className={`p-1 border w-[30px] h-[30px] ${isSave ? "justify-center items-center" : ""}`}
                                                                         onClick={() => handleSaveStatus(i)}
                                                                     >
-                                                                        {isSave ? <Loader2 className="mr-1 h-4 w-4 animate-spin justify-center"/> : <Check size={16}/>}
+                                                                        {isSave ? <Loader2 className="h-4 w-4 animate-spin justify-center"/> : <Check size={16}/>}
                                                                     </Button> : <Button
                                                                         variant=""
-                                                                        className="text-sm font-semibold h-[30px] w-[126px]"
+                                                                        className="text-sm font-medium h-[30px] w-[126px] hover:bg-primary"
                                                                         onClick={() => handleAddNewStatus(x, i)}
                                                                     >
-                                                                        {isSave ? <Loader2 className={"mr-2  h-4 w-4 animate-spin"}/> : "Add Status"}
+                                                                        {isSave ? <Loader2 className={"h-4 w-4 animate-spin"}/> : "Add Status"}
                                                                     </Button>
                                                                 }
 
@@ -442,9 +442,9 @@ const Statuses = () => {
                                                 </Fragment>
                                                 :
                                                 <Fragment>
-                                                    <TableCell className={`font-medium text-xs py-[8.5px] pl-0 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.title}</TableCell>
+                                                    <TableCell className={`font-normal text-xs py-[8.5px] pl-0 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.title}</TableCell>
                                                     <TableCell
-                                                        className={`font-medium text-xs ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                                        className={`font-normal text-xs ${theme === "dark" ? "" : "text-muted-foreground"}`}>
                                                         <div className={"flex justify-center items-center gap-1"}>
                                                             <Square size={16} strokeWidth={1} fill={x.color_code} stroke={x.color_code}/>
                                                             <p>{x.color_code}</p>

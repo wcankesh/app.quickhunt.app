@@ -206,11 +206,11 @@ const Emoji = () => {
                             </DialogHeader>
                             <DialogFooter className={"flex-row justify-end space-x-2"}>
                                 <Button variant={"outline hover:none"}
-                                        className={"text-sm font-semibold border"}
+                                        className={"text-sm font-medium border"}
                                         onClick={() => setOpenDelete(false)}>Cancel</Button>
                                 <Button
                                     variant={"hover:bg-destructive"}
-                                    className={` ${theme === "dark" ? "text-card-foreground" : "text-card"} ${isDeleteLoading === true ? "py-2 px-6" : "py-2 px-6"} w-[76px] text-sm font-semibold bg-destructive`}
+                                    className={` ${theme === "dark" ? "text-card-foreground" : "text-card"} ${isDeleteLoading === true ? "py-2 px-6" : "py-2 px-6"} w-[76px] text-sm font-medium bg-destructive`}
                                     onClick={handleDelete}
                                 >
                                     {isDeleteLoading ? <Loader2 size={16} className={"animate-spin"}/> : "Delete"}
@@ -223,10 +223,10 @@ const Emoji = () => {
             <Card>
                 <CardHeader className={"p-4 sm:p-6 gap-1 border-b flex flex-row justify-between items-center flex-wrap gap-y-2"}>
                     <div>
-                        <CardTitle className={"text-lg sm:text-2xl font-medium leading-8"}>Emoji</CardTitle>
-                        <CardDescription className={"text-sm text-muted-foreground p-0 mt-1 leading-5"}>Use Emoji to organise your Changelog</CardDescription>
+                        <CardTitle className={"text-lg sm:text-2xl font-normal"}>Emoji</CardTitle>
+                        <CardDescription className={"text-sm text-muted-foreground p-0"}>Use Emoji to organise your Changelog</CardDescription>
                     </div>
-                    <Button size="sm" onClick={newEmoji} disabled={editIndex != null} className={"gap-2 font-semibold hover:bg-primary m-0"}><Plus strokeWidth={3} size={18}/> New Emoji</Button>
+                    <Button size="sm" onClick={newEmoji} disabled={editIndex != null} className={"gap-2 font-medium hover:bg-primary m-0"}><Plus strokeWidth={3} size={18}/> New Emoji</Button>
                 </CardHeader>
                 <CardContent className={"p-0"}>
                     <Table>
@@ -288,7 +288,7 @@ const Emoji = () => {
                                                                                     {isSave ? <Loader2 className="h-4 w-4 animate-spin"/> : <Check size={16}/>}
                                                                                 </Button> : <Button
                                                                                     variant=""
-                                                                                    className="text-sm font-semibold h-[30px] w-[99px] hover:bg-primary"
+                                                                                    className="text-sm font-medium h-[30px] w-[99px] hover:bg-primary"
                                                                                     onClick={()=>addEmoji(i)}
                                                                                 >
                                                                                     {isSave ? <Loader2 className={"h-4 w-4 animate-spin"}/> : "Add emoji"}
@@ -335,11 +335,7 @@ const Emoji = () => {
                                             )
                                         })
                                     }
-                                    </> : (emojiList.length == 0 && isLoading == false) ? <TableRow>
-                                    <TableCell colSpan={6}>
-                                        <EmptyData />
-                                    </TableCell>
-                                </TableRow> : null
+                                    </> : <TableRow><TableCell colSpan={6}><EmptyData /></TableCell></TableRow>
                             }
                         </TableBody>
                     </Table>

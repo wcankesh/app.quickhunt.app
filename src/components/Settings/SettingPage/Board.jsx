@@ -237,18 +237,18 @@ const Board = () => {
                         <DialogContent className="max-w-[350px] w-full sm:max-w-[525px] p-3 md:p-6 rounded-lg">
                             <DialogHeader className={"flex flex-row justify-between gap-2"}>
                                 <div className={"flex flex-col gap-2"}>
-                                    <DialogTitle className={"text-start"}>You really want delete this board?</DialogTitle>
+                                    <DialogTitle className={"text-start font-medium"}>You really want delete this board?</DialogTitle>
                                     <DialogDescription className={"text-start"}>This action can't be undone.</DialogDescription>
                                 </div>
                                 <X size={16} className={"m-0 cursor-pointer"} onClick={() => setOpenDelete(false)}/>
                             </DialogHeader>
                             <DialogFooter className={"flex-row justify-end space-x-2"}>
                                 <Button variant={"outline hover:none"}
-                                        className={"text-sm font-semibold border"}
+                                        className={"text-sm font-medium border"}
                                         onClick={() => setOpenDelete(false)}>Cancel</Button>
                                 <Button
                                     variant={"hover:bg-destructive"}
-                                    className={` ${theme === "dark" ? "text-card-foreground" : "text-card"} ${isLoading === true ? "py-2 px-6" : "py-2 px-6"} w-[76px] text-sm font-semibold bg-destructive`}
+                                    className={` ${theme === "dark" ? "text-card-foreground" : "text-card"} py-2 px-6 w-[76px] text-sm font-medium bg-destructive`}
                                     onClick={onDelete}
                                 >
                                     {isLoadingDelete ? <Loader2 size={16} className={"animate-spin"}/> : "Delete"}
@@ -262,13 +262,13 @@ const Board = () => {
             <Card>
                 <CardHeader className={"flex flex-row flex-wrap md:flex-nowrap justify-between gap-x-6 items-center p-4 sm:p-6 gap-y-2"}>
                     <div>
-                        <CardTitle className={"text-lg sm:text-2xl font-medium"}>Board</CardTitle>
+                        <CardTitle className={"text-lg sm:text-2xl font-normal	"}>Board</CardTitle>
                         <CardDescription className={"text-sm text-muted-foreground p-0"}>Use Boards to track Ideas on your Roadmap.</CardDescription>
                     </div>
                     <Button
                         size={"sm"}
                         disabled={isEdit != null}
-                        className={"gap-2 font-semibold hover:bg-primary m-0"}
+                        className={"gap-2 font-medium hover:bg-primary m-0"}
                         onClick={createNewBoard}
                     >
                         <Plus size={18} strokeWidth={3} />New Board
@@ -319,7 +319,7 @@ const Board = () => {
                                                                         </div>
                                                                     </TableCell>
                                                                     <TableCell/>
-                                                                    <TableCell className={`px-2 py-[10px] md:px-3 font-medium text-xs ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                                                    <TableCell className={`px-2 py-[10px] md:px-3 font-normal	 text-xs ${theme === "dark" ? "" : "text-muted-foreground"}`}>
                                                                         <div className={"flex justify-end gap-2 items-center"}>
                                                                             <Fragment>
                                                                                 {
@@ -328,13 +328,13 @@ const Board = () => {
                                                                                         className={`p-1 border w-[30px] h-[30px] ${isSave ? "justify-center items-center" : ""}`}
                                                                                         onClick={() => updateBoard(i)}
                                                                                     >
-                                                                                        {isSave ? <Loader2 className="mr-1 h-4 w-4 animate-spin justify-center"/> : <Check size={16}/>}
+                                                                                        {isSave ? <Loader2 className="h-4 w-4 animate-spin justify-center"/> : <Check size={16}/>}
                                                                                     </Button> : <Button
                                                                                         variant=""
-                                                                                        className="text-sm font-semibold h-[30px] w-[126px]"
+                                                                                        className="text-sm font-medium h-[30px] w-[126px] hover:bg-primary"
                                                                                         onClick={() => addBoard(x, i)}
                                                                                     >
-                                                                                        {isSave ? <Loader2 className={"mr-2  h-4 w-4 animate-spin"}/> : "Add Board"}
+                                                                                        {isSave ? <Loader2 className={"h-4 w-4 animate-spin"}/> : "Add Board"}
                                                                                     </Button>
                                                                                 }
 
@@ -351,10 +351,10 @@ const Board = () => {
                                                                 </Fragment>
                                                                  :
                                                                 <Fragment>
-                                                                    <TableCell className={`font-medium text-xs px-2 py-[10px] md:px-3 ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                                                    <TableCell className={`font-normal	 text-xs px-2 py-[10px] md:px-3 ${theme === "dark" ? "" : "text-muted-foreground"}`}>
                                                                         {x.title}
                                                                     </TableCell>
-                                                                    <TableCell className={`px-2 py-[10px] md:px-3 font-medium text-xs text-center ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                                                    <TableCell className={`px-2 py-[10px] md:px-3 font-normal	 text-xs text-center ${theme === "dark" ? "" : "text-muted-foreground"}`}>
                                                                         {moment.utc(x?.updated_at).local().startOf('seconds').fromNow()}
                                                                     </TableCell>
                                                                     <TableCell className={`flex justify-end px-2 py-[10px] md:px-3 ${theme === "dark" ? "" : "text-muted-foreground"} `}>
@@ -377,11 +377,7 @@ const Board = () => {
                                                 )
                                             })
                                         }
-                                    </Fragment> : (boardList.length == 0 && isLoading == false) ? <TableRow>
-                                            <TableCell colSpan={6}>
-                                                <EmptyData />
-                                            </TableCell>
-                                        </TableRow> :null
+                                    </Fragment> : <TableRow><TableCell colSpan={6}><EmptyData /></TableCell></TableRow>
                                 }
                             </TableBody>
                         </Table>

@@ -211,29 +211,29 @@ const Customers = () => {
                 <SheetOverlay className={"inset-0"}/>
                 <SheetContent className={"sm:max-w-[662px] p-0"}>
                     <SheetHeader className={"px-3 py-4 lg:px-8 lg:py-[20px] flex flex-row justify-between items-center border-b"}>
-                        <h5 className={"text-sm md:text-xl font-medium"}>Add New Customer</h5>
+                        <h5 className={"text-sm md:text-xl font-normal"}>Add New Customer</h5>
                         <X onClick={closeSheet} size={18} className={"cursor-pointer m-0"}/>
                     </SheetHeader>
                     <div className={"sm:px-8 sm:py-6 px-3 py-4 border-b"}>
                         <div className="grid w-full gap-2">
-                            <Label htmlFor="name">Name</Label>
+                            <Label htmlFor="name" className={"font-normal"}>Name</Label>
                             <Input value={customerDetails.customer_name} name="customer_name" onChange={onChangeText} type="text" id="name" className={"h-9"} placeholder={"Enter the full name of customer..."}/>
                             {formError.customer_name && <span className="text-sm text-red-500">{formError.customer_name}</span>}
                         </div>
 
                         <div className="grid w-full gap-2 mt-6">
-                            <Label htmlFor="email">E-mail</Label>
+                            <Label htmlFor="email" className={"font-normal"}>E-mail</Label>
                             <Input value={customerDetails.customer_email_id} name="customer_email_id" onChange={onChangeText} onBlur={onBlur} type="email" id="email" className={"h-9"} placeholder={"Enter the email of customer"}/>
                             {formError.customer_email_id && <span className="text-sm text-red-500">{formError.customer_email_id}</span>}
                         </div>
 
                         <div className={"announce-create-switch mt-6 flex items-center"}>
                             <Switch className={"w-[38px] h-[20px]"} id={"switch"} checked={customerDetails.customer_email_notification == 1} onCheckedChange={(checked) => onChangeText({target: {name: "customer_email_notification", value:checked}})} htmlFor={"switch"} />
-                            <Label htmlFor={"switch"} className={"ml-[9px] text-sm font-medium"}>Receive Notifications</Label>
+                            <Label htmlFor={"switch"} className={"ml-2.5 text-sm font-normal"}>Receive Notifications</Label>
                         </div>
                     </div>
                     <div className={"px-3 py-4 sm:p-8"}>
-                        <Button onClick={addCustomer} className={` border w-[127px] font-semibold hover:bg-primary`}>{isSave ? <Loader2 className="h-4 w-4 animate-spin" /> : "Add Customer"}</Button>
+                        <Button onClick={addCustomer} className={`border w-[127px] font-medium hover:bg-primary`}>{isSave ? <Loader2 className="h-4 w-4 animate-spin" /> : "Add Customer"}</Button>
                     </div>
                 </SheetContent>
             </Sheet>}
@@ -255,11 +255,11 @@ const Customers = () => {
                                 </DialogHeader>
                                 <div className={"flex justify-end gap-2"}>
                                     <Button variant={"outline hover:none"}
-                                            className={"text-sm font-semibold border"}
+                                            className={"text-sm font-medium border"}
                                             onClick={() => setOpenDelete(false)}>Cancel</Button>
                                     <Button
                                         variant={"hover:bg-destructive"}
-                                        className={`${theme === "dark" ? "text-card-foreground" : "text-card"} ${isLoadingDelete === true ? "py-2 px-6" : "py-2 px-6"} w-[76px] text-sm font-semibold bg-destructive`}
+                                        className={`${theme === "dark" ? "text-card-foreground" : "text-card"} py-2 px-6 w-[76px] text-sm font-medium bg-destructive`}
                                         onClick={handleDelete}
                                     >
                                         {isLoadingDelete ? <Loader2 size={16} className={"animate-spin"}/> : "Delete"}
@@ -273,10 +273,10 @@ const Customers = () => {
                 <div className={""}>
                     <div className={"flex flex-row gap-x-4 flex-wrap justify-between gap-y-2 items-center"}>
                         <div>
-                            <h4 className={"font-medium text-lg sm:text-2xl"}>Customers ({totalRecord})</h4>
+                            <h4 className={"font-normal text-lg sm:text-2xl"}>Customers ({totalRecord})</h4>
                             <h5 className={"text-muted-foreground text-base"}>Last updates</h5>
                         </div>
-                        <Button size="sm" onClick={openSheet} className={"gap-2 font-semibold hover:bg-primary"}> <Plus size={20} strokeWidth={3} />New Customer</Button>
+                        <Button size="sm" onClick={openSheet} className={"gap-2 font-medium hover:bg-primary"}> <Plus size={20} strokeWidth={3} />New Customer</Button>
                     </div>
                     <div className={"mt-4 sm:mt-6"}>
                                 <Card className={""}>
@@ -288,7 +288,7 @@ const Customers = () => {
                                                         {
                                                             (tableHeadingsArray || []).map((x,i)=>{
                                                                 return(
-                                                                    <TableHead className={`font-semibold px-2 py-[10px] md:px-3 ${i >= 2 ? "text-center" : ""}  ${theme === "dark"? "text-[]" : "bg-muted"} `} key={x.label}>{x.label}</TableHead>
+                                                                    <TableHead className={`font-medium px-2 py-[10px] md:px-3 ${i >= 2 ? "text-center" : ""}  ${theme === "dark"? "text-[]" : "bg-muted"} `} key={x.label}>{x.label}</TableHead>
                                                                 )
                                                             })
                                                         }
@@ -317,7 +317,7 @@ const Customers = () => {
                                                             {
                                                                 (customerList || []).map((x,index)=>{
                                                                     return(
-                                                                        <TableRow key={x.id} className={"font-medium"}>
+                                                                        <TableRow key={x.id} className={"font-normal"}>
                                                                             <TableCell className={`px-2 py-[10px] md:px-3 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.customer_name ? x.customer_name : "-"}</TableCell>
                                                                             <TableCell className={`px-2 py-[10px] md:px-3 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x?.customer_email_id}</TableCell>
                                                                             <TableCell className={`px-2 py-[10px] md:px-3 ${theme === "dark" ? "" : "text-muted-foreground"} text-center`}>{x.customer_country ? x.customer_country : "-"}</TableCell>
@@ -350,7 +350,7 @@ const Customers = () => {
                                                     className={`w-full ${theme === "dark" ? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end p-2 md:px-3 md:py-[10px]`}>
                                                     <div className={"w-full flex gap-2 items-center justify-between sm:justify-end"}>
                                                         <div>
-                                                            <h5 className={"text-sm font-semibold"}>Page {customerList.length <= 0 ? 0 : pageNo} of {totalPages}</h5>
+                                                            <h5 className={"text-sm font-medium"}>Page {customerList.length <= 0 ? 0 : pageNo} of {totalPages}</h5>
                                                         </div>
                                                         <div className={"flex flex-row gap-2 items-center"}>
                                                             <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}

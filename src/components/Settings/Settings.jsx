@@ -190,7 +190,7 @@ const Settings = () => {
     return (
         <div className='container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-3 md:px-4'>
             <div className={"flex flex-row justify-between items-center px-1 relative"}>
-                <h1 className="text-lg sm:text-2xl font-medium">Settings</h1>
+                <h1 className="text-lg sm:text-2xl font-normal">Settings</h1>
                 {windowSize.width <= 768 && <Popover open={open} onOpenChange={setOpen}>
                     <PopoverTrigger>
                         <Button variant="outline" className={"w-[30px] h-[30px]"} size="icon">
@@ -203,15 +203,15 @@ const Settings = () => {
                                 <Button
                                     key={i}
                                     variant={"link hover:no-underline"}
-                                    className={`${isActive(x.link) ? "flex justify-start gap-4 h-9 rounded-md bg-primary/15 transition-none" : 'flex items-center gap-4 h-9 justify-start transition-none'}`}
+                                    className={`flex justify-start gap-4 h-9 ${isActive(x.link) ? "rounded-md bg-primary/15 transition-none" : 'items-center transition-none'}`}
                                     onClick={() => onRedirect(x.link)}
                                 >
                                     <div
                                         className={`${isActive(x.link) ? "setting-active-menu" : "profile-menu-icon"}`}>{x.icon}</div>
                                     <div
-                                        className={`flex justify-between w-full ${isActive(x.link) ? "text-primary text-sm font-medium" : "text-sm font-medium"}`}>
+                                        className={`flex justify-between w-full ${isActive(x.link) ? "text-primary" : ""}`}>
                                         {x.title}
-                                        <div>{x.useFor}</div>
+                                        <span>{x.useFor}</span>
                                     </div>
                                 </Button>
                             )
@@ -224,7 +224,7 @@ const Settings = () => {
                 {windowSize.width > 768 ? <div className="w-full lg:max-w-[350px]">
                     <Card>
                         <CardHeader className={"p-4 pb-0"}>
-                            <CardTitle className={"text-base font-medium"}>General Settings</CardTitle>
+                            <CardTitle className={"text-base font-normal"}>General Settings</CardTitle>
                         </CardHeader>
                         <CardContent className={"flex flex-col gap-1 p-4"}>
                             {
@@ -233,15 +233,15 @@ const Settings = () => {
                                         <Button
                                             key={i}
                                             variant={"link hover:no-underline"}
-                                            className={`${isActive(x.link) ? "flex justify-start gap-4 h-9 rounded-md bg-primary/15 transition-none" : 'flex items-center gap-4 h-9 justify-start transition-none'}`}
+                                            className={`flex justify-start gap-4 h-9 ${isActive(x.link) ? "rounded-md bg-primary/15 transition-none" : 'items-center transition-none'}`}
                                             onClick={() => onRedirect(x.link)}
                                         >
                                             <div
                                                 className={`${isActive(x.link) ? "setting-active-menu" : "profile-menu-icon"}`}>{x.icon}</div>
                                             <div
-                                                className={`flex justify-between w-full ${isActive(x.link) ? "text-primary text-sm font-medium" : "text-sm font-medium"}`}>
+                                                className={`flex justify-between w-full ${isActive(x.link) ? "text-primary" : ""}`}>
                                                 {x.title}
-                                                <div>{x.useFor}</div>
+                                                <span>{x.useFor}</span>
                                             </div>
                                         </Button>
                                     )

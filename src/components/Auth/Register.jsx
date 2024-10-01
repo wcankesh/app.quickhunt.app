@@ -209,7 +209,7 @@ const Register = () => {
                                             <div className={"w-full flex flex-col gap-8"}>
                                         <div className="gap-2 flex flex-col items-start">
                                             {/*{theme === "dark" ? Icon.whiteLogo : Icon.blackLogo}*/}
-                                            <h1 className="text-2xl md:text-3xl font-medium">Create Your Account</h1>
+                                            <h1 className="text-2xl md:text-3xl">Create Your Account</h1>
                                             {/*<h6 className="font-normal text-sm text-muted-foreground">*/}
                                             {/*    Enhance customer experience now.*/}
                                             {/*</h6>*/}
@@ -217,7 +217,7 @@ const Register = () => {
                                         <div className="grid gap-6">
                                             <div className="grid md:grid-flow-col gap-4">
                                                 <div className="grid gap-2 content-start">
-                                                    <Label htmlFor="email" className={"font-medium"}>First Name</Label>
+                                                    <Label htmlFor="email" className={"font-normal"}>First Name</Label>
                                                     <Input
                                                         id="user_first_name"
                                                         placeholder="John"
@@ -234,7 +234,7 @@ const Register = () => {
                                                     </div>
                                                 </div>
                                                 <div className="grid gap-2 content-start">
-                                                    <Label htmlFor="email" className={"font-medium"}>Last
+                                                    <Label htmlFor="email" className={"font-normal"}>Last
                                                         Name</Label>
                                                     <Input
                                                         id="user_last_name"
@@ -254,7 +254,7 @@ const Register = () => {
                                             </div>
                                             <div className="grid gap-6">
                                                 <div className="grid gap-2">
-                                                    <Label htmlFor="email" className={"font-medium"}>Email</Label>
+                                                    <Label htmlFor="email" className={"font-normal"}>Email</Label>
                                                     <Input
                                                         id="email"
                                                         type="email"
@@ -271,7 +271,7 @@ const Register = () => {
                                                 </div>
                                                 <div className="grid gap-2">
                                                     <div className="flex items-center">
-                                                        <Label htmlFor="password" className={"font-medium"}>Password</Label>
+                                                        <Label htmlFor="password" className={"font-normal"}>Password</Label>
                                                     </div>
                                                     <div className={"relative"}>
                                                         <Input
@@ -297,7 +297,7 @@ const Register = () => {
                                                     }
                                                 </div>
                                                 <div className="grid gap-2">
-                                                    <Label htmlFor="confirmPassword" className={"font-medium"}>Confirm Password</Label>
+                                                    <Label htmlFor="confirmPassword" className={"font-normal"}>Confirm Password</Label>
                                                     <div className={"relative"}>
                                                         <Input
                                                             id="confirmPassword"
@@ -324,15 +324,15 @@ const Register = () => {
                                                 </div>
                                                 <Button
                                                     type="submit"
-                                                    className={"w-full bg-primary hover:bg-primary"}
+                                                    className={"w-full bg-primary hover:bg-primary font-medium"}
                                                     onClick={onRegister}
                                                 >
                                                     {isLoading ? <Loader2 className={"mr-2 h-4 w-4 animate-spin"}/> : ""}
-                                                    <span className={"font-normal font-semibold"}>Continue Registration</span>
+                                                    Continue Registration
                                                 </Button>
                                                 <div className={"or-divider flex items-center"}>
                                                     <div className={"border-t basis-4/12 border-muted-foreground"}/>
-                                                    <p className={"text-xs font-medium text-muted-foreground basis-4/12 text-center"}>
+                                                    <p className={"text-xs text-muted-foreground basis-4/12 text-center"}>
                                                         Or continue with
                                                     </p>
                                                     <div className={"border-t basis-4/12 border-muted-foreground"}/>
@@ -340,14 +340,14 @@ const Register = () => {
                                                 <WithGoogle title={"Signup with Google"}/>
 
                                                 <div className="text-center text-xs md:text-sm">
-                                                    <p className={"font-normal text-sm text-muted-foreground"}>
+                                                    <p className={"text-sm text-muted-foreground"}>
                                                         Already have an account?{" "}
                                                         <Button
                                                             variant={"link"}
-                                                            className="p-0 h-auto hover:no-underline"
+                                                            className="p-0 h-auto hover:no-underline font-medium"
                                                             onClick={() => onRedirect('login')}
                                                         >
-                                                            <span className={"font-bold text-primary"}>Login</span>
+                                                            Login
                                                         </Button>
                                                     </p>
                                                 </div>

@@ -9,7 +9,6 @@ import {ApiService} from "../../utils/ApiService";
 import {Icon} from "../../utils/Icon";
 import {useTheme} from "../theme-provider";
 import {Carousel, CarouselContent, CarouselItem} from "../ui/carousel";
-import widget_01 from "../../img/widget.png";
 import Autoplay from "embla-carousel-autoplay";
 import {baseUrl} from "../../utils/constent";
 import {useNavigate} from "react-router-dom";
@@ -155,7 +154,7 @@ const Forgot = () => {
                                     {/*<div className="mx-auto flex items-center w-[320px] md:w-[384px] px-3 h-full">*/}
                                     <div className="mx-auto flex items-center w-[320px] md:w-[640px] px-3 h-full">
                                         <div className={"w-full flex flex-col gap-8"}>
-                                            <h1 className="scroll-m-20 text-2xl md:text-3xl font-semibold text-center lg:text-3xl">
+                                            <h1 className="scroll-m-20 text-2xl md:text-3xl font-medium text-center lg:text-3xl">
                                                 Forgot Password
                                             </h1>
                                             <div className={"mb-2.5"}>
@@ -166,7 +165,7 @@ const Forgot = () => {
                                             </div>
                                             <div className={"mt-2.5"}>
                                                 <Card>
-                                                    <CardContent className={"p-3 md:p-6"}>
+                                                    <CardContent className={"p-3 md:p-6 space-y-1.5"}>
                                                         <Label htmlFor="email" className={"font-normal"}>Your
                                                             email</Label>
                                                         <Input
@@ -180,7 +179,7 @@ const Forgot = () => {
                                                         />
                                                         {
                                                             formError.email && <span
-                                                                className="text-red-500 text-sm">{formError.email}</span>
+                                                                className="text-destructive text-sm">{formError.email}</span>
                                                         }
                                                         <Button
                                                             className={"w-full mt-2.5 bg-primary"}
@@ -191,21 +190,20 @@ const Forgot = () => {
                                                                 isLoading ? <Loader2
                                                                     className="mr-2 h-4 w-4 animate-spin"/> : ""
                                                             }
-                                                            <span className={"font-normal"}>Reset Password</span>
+                                                            Reset Password
                                                         </Button>
                                                     </CardContent>
                                                 </Card>
                                             </div>
                                                 <div className="text-center text-xs md:text-sm">
-                                                    <p className={"font-normal text-sm text-muted-foreground"}>
+                                                    <p className={"text-sm text-muted-foreground"}>
                                                         Go back to {" "}
                                                         <Button
                                                             variant={"link"}
-                                                            className="p-0 h-auto hover:no-underline"
+                                                            className="p-0 h-auto hover:no-underline font-medium"
                                                             onClick={() => onRedirect('login')}
                                                         >
-                                                <span
-                                                    className={"font-bold text-primary"}>Login</span>
+                                                            Login
                                                         </Button>
                                                     </p>
                                                 </div>

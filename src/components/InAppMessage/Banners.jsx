@@ -93,7 +93,7 @@ const Banners = ({inAppMsgSetting, setInAppMsgSetting, isLoading}) => {
                     </div>
 
                     {
-                        inAppMsgSetting.action_type == 1 && <div><a className={"text-sm font-semibold underline"}
+                        inAppMsgSetting.action_type == 1 && <div><a className={"text-sm font-medium underline"}
                                                                     style={{color: inAppMsgSetting.text_color}}>{inAppMsgSetting.action_text}</a>
                         </div>
                     }
@@ -105,8 +105,8 @@ const Banners = ({inAppMsgSetting, setInAppMsgSetting, isLoading}) => {
                                         x.is_active === 1 ?
                                             <div className={"relative group hover:cursor-pointer"}>
                                                     <span onClick={() => onDeleteReaction(x, i)}
-                                                          className="absolute hidden group-hover:inline-block py-0.5 leading-none right-[-11px] top-[-13px] border rounded shadow -top-1 text-[9px] font-bold tracking-wide  px-0.5 text-background-accent dark:text-foreground/60 dark:border-gray-500/60  dark:bg-dark-accent bg-white">
-                                                        <Trash2 size={16}/>
+                                                          className="absolute hidden group-hover:inline-block py-0.5 leading-none right-[-11px] top-[-13px] border rounded shadow -top-1 text-[9px] font-medium tracking-wide  px-0.5 text-background-accent dark:text-foreground/60 dark:border-gray-500/60  dark:bg-dark-accent bg-white">
+                                                        <Trash2 size={16} className={`${theme === "dark" ? "stroke-muted" : ""}`}/>
                                                     </span>
                                                 <img key={i} className={"h-6 w-6 cursor-pointer"} src={x.emoji_url}/>
                                             </div> : ""
@@ -130,7 +130,7 @@ const Banners = ({inAppMsgSetting, setInAppMsgSetting, isLoading}) => {
                         inAppMsgSetting.action_type == 3 &&
                         <div className={"relative"}>
                             <Input placeholder={"you@company.com"} autofocus
-                                   className={"w-auto h-9  py-1 px-3 focus-visible:ring-offset-0 focus-visible:ring-0"}
+                                   className={"w-auto h-9 py-1 px-3 focus-visible:ring-offset-0 focus-visible:ring-0"}
                                    style={{
                                        backgroundColor: inAppMsgSetting.bg_color,
                                        color: inAppMsgSetting.text_color,
@@ -145,7 +145,7 @@ const Banners = ({inAppMsgSetting, setInAppMsgSetting, isLoading}) => {
 
                 </div>
                 {
-                    inAppMsgSetting.is_close_button && <X size={16} stroke={inAppMsgSetting?.btn_color}/>
+                    inAppMsgSetting.is_close_button ? <X size={16} stroke={inAppMsgSetting?.btn_color}/> : ""
                 }
             </div>
         </div>

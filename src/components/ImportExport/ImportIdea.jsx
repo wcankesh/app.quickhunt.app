@@ -197,7 +197,7 @@ const ImportIdea = () => {
                         <Button className={"h-8 w-8"} variant={"outline"} size={"icon"} onClick={() => navigate(`${baseUrl}/settings/import-export`)}>
                             <ArrowLeft size={16} />
                         </Button>
-                        <h4 className={"font-medium text-lg sm:text-2xl leading-8"}>Import Data</h4>
+                        <h4 className={"font-normal text-lg sm:text-2xl"}>Import Data</h4>
                     </div>
                     {
                         step >=  2 && <div className={"flex items-center gap-2"}>
@@ -234,12 +234,12 @@ const ImportIdea = () => {
                                         htmlFor="pictureInput"
                                         className="border-dashed h-[187px] py-[52px] flex flex-col items-center justify-center border border-muted-foreground rounded cursor-pointer gap-2"
                                     > <FileUp/>
-                                        <h4 className="text-xs font-semibold">Upload your .CSV file</h4>
+                                        <h4 className="text-xs font-medium">Upload your .CSV file</h4>
                                     </label>
                                 </Card>
                                 <Card>
                                     <CardHeader className={" border-b p-3"}>
-                                        <h3 className={"font-medium text-lg"}>Migrating from another tool?</h3>
+                                        <h3 className={"font-normal text-lg"}>Migrating from another tool?</h3>
                                         <CardDescription className={" text-sm text-muted-foreground p-0"}>Check out helpful
                                             articles from our help center that help you do that.</CardDescription>
                                     </CardHeader>
@@ -308,7 +308,7 @@ const ImportIdea = () => {
                                                                                         onSelect={() => onSelectColumn(x, header, index)}
                                                                                     >
                                                                         <span
-                                                                            className={"flex justify-between items-center w-full text-sm font-medium cursor-pointer"}>
+                                                                            className={"flex justify-between items-center w-full text-sm font-normal cursor-pointer"}>
                                                                             {x.columnName}
                                                                         </span>
                                                                                     </CommandItem>
@@ -324,7 +324,7 @@ const ImportIdea = () => {
                                                 </div>
                                                 <ScrollArea className={"h-[700px] w-52 rounded-b-md border border-t-0"}>
                                                     <div className={"border-b p-2 bg-muted/20"}>
-                                                        <h4 className="text-xs font-semibold">{header}</h4>
+                                                        <h4 className="text-xs font-medium">{header}</h4>
                                                     </div>
                                                     {tableData.map((row, rowIndex) => (
                                                         <div className={"border-b p-2 bg-muted/20"}>
@@ -344,7 +344,7 @@ const ImportIdea = () => {
                                 <div className="grid xl:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 sm:grid-cols-1 gap-4">
                                     <Card>
                                         <CardHeader className={" border-b p-3"}>
-                                            <h3 className={"font-medium text-lg"}>Map statuses</h3>
+                                            <h3 className={"font-normal text-lg"}>Map statuses</h3>
                                         </CardHeader>
                                         <CardContent className={"p-0"}>
                                             {
@@ -397,7 +397,7 @@ const ImportIdea = () => {
                                     </Card>
                                     <Card>
                                         <CardHeader className={" border-b p-3"}>
-                                            <h3 className={"font-medium text-lg"}>Map boards</h3>
+                                            <h3 className={"font-normal text-lg"}>Map boards</h3>
                                         </CardHeader>
                                         <CardContent className={"p-0"}>
                                             {

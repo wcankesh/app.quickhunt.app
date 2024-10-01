@@ -89,12 +89,12 @@ const GeneralSettings = () => {
     return (
         <Card>
             <CardHeader className={"gap-1 border-b p-4 md:p-6"}>
-                <h3 className={"font-medium text-lg sm:text-2xl"}>General Settings</h3>
+                <h3 className={"font-normal text-lg sm:text-2xl"}>General Settings</h3>
             </CardHeader>
             <CardContent className={"p-0"}>
                 <div className={"space-y-3 p-4 md:p-6 border-b"}>
                     <div className={"flex justify-between items-center gap-2"}>
-                        <h3 className={"font-medium"}>Announcement</h3>
+                        <h3 className={"font-normal"}>Announcement</h3>
                         <div className="announce-create-switch flex gap-4">
                             <Switch
                                 className="w-[38px] h-[20px]"
@@ -121,7 +121,7 @@ const GeneralSettings = () => {
                                         />
                                         <label
                                             htmlFor="is_reaction"
-                                            className="text-sm text-muted-foreground font-medium"
+                                            className="text-sm text-muted-foreground font-normal"
                                         >
                                             Reactions
                                         </label>
@@ -134,7 +134,7 @@ const GeneralSettings = () => {
                                         />
                                         <label
                                             htmlFor="is_comment"
-                                            className="text-sm text-muted-foreground font-medium"
+                                            className="text-sm text-muted-foreground font-normal"
                                         >
                                             Show Comment
                                         </label>
@@ -146,7 +146,7 @@ const GeneralSettings = () => {
                 </div>
                 <div className={"space-y-3 p-4 md:p-6 border-b"}>
                     <div className={"flex justify-between items-center gap-2"}>
-                        <h3 className={"font-medium"}>Roadmap</h3>
+                        <h3 className={"font-normal"}>Roadmap</h3>
                         <div className="announce-create-switch flex gap-4">
                             <Switch
                                 className="w-[38px] h-[20px]"
@@ -172,7 +172,7 @@ const GeneralSettings = () => {
                 </div>
                 <div className={"space-y-3 p-4 md:p-6 border-b"}>
                     <div className={"flex justify-between items-center gap-2"}>
-                        <h3 className={"font-medium"}>Ideas</h3>
+                        <h3 className={"font-normal"}>Ideas</h3>
                         <div className="announce-create-switch flex gap-4">
                             <Switch
                                 className="w-[38px] h-[20px]"
@@ -196,16 +196,16 @@ const GeneralSettings = () => {
                     }
                 </div>
                 <div className={"space-y-3 p-4 md:p-6 border-b"}>
-                    <h3 className={"font-medium"}>Header Color</h3>
+                    <h3 className={"font-normal"}>Header Color</h3>
                     <div className={"flex items-center gap-3 flex-wrap md:flex-nowrap"}>
-                        <div className={"widget-color-picker space-y-2 w-full md:basis-1/2"}>
+                        <div className={"widget-color-picker space-y-1 w-full md:basis-1/2"}>
                             <Label className={"text-sm font-normal"}>Background Color</Label>
                             <ColorInput name="header_bg_color"
                                         value={generalSettingData.header_bg_color}
                                         onChange={onChange}
                             />
                         </div>
-                        <div className={"widget-color-picker space-y-2 w-full md:basis-1/2"}>
+                        <div className={"widget-color-picker space-y-1 w-full md:basis-1/2"}>
                             <Label className={"text-sm font-normal"}>Text Color</Label>
                             <ColorInput name="header_text_color"
                                         value={generalSettingData.header_text_color}
@@ -214,7 +214,7 @@ const GeneralSettings = () => {
                         </div>
                     </div>
                     <div className={"flex items-center gap-3 flex-wrap md:flex-nowrap"}>
-                        <div className={"widget-color-picker space-y-2 w-full md:basis-1/2"}>
+                        <div className={"widget-color-picker space-y-1 w-full md:basis-1/2"}>
                             <Label className={"text-sm font-normal"}>Button Background Color</Label>
                             <ColorInput
                                 name="header_btn_background_color"
@@ -222,7 +222,7 @@ const GeneralSettings = () => {
                                 onChange={onChange}
                             />
                         </div>
-                        <div className={"widget-color-picker space-y-2 w-full md:basis-1/2"}>
+                        <div className={"widget-color-picker space-y-1 w-full md:basis-1/2"}>
                             <Label className={"text-sm font-normal"}>Button Text Color</Label>
                             <ColorInput
                                 name="header_btn_text_color"
@@ -233,9 +233,9 @@ const GeneralSettings = () => {
                     </div>
                 </div>
                 <div className={"space-y-3 p-4 md:p-6 border-b"}>
-                    <h3 className={"font-medium"}>Global Color</h3>
+                    <h3 className={"font-normal"}>Global Color</h3>
                     <div className={"flex items-center gap-3 flex-wrap md:flex-nowrap"}>
-                        <div className={"widget-color-picker space-y-2 w-full md:basis-1/2"}>
+                        <div className={"widget-color-picker space-y-1 w-full md:basis-1/2"}>
                             <Label className={"text-sm font-normal"}>Button Background Color</Label>
                             <ColorInput
                                 name="btn_background_color"
@@ -243,7 +243,7 @@ const GeneralSettings = () => {
                                 onChange={onChange}
                             />
                         </div>
-                        <div className={"widget-color-picker space-y-2 w-full md:basis-1/2"}>
+                        <div className={"widget-color-picker space-y-1 w-full md:basis-1/2"}>
                             <Label className={"text-sm font-normal"}>Button Text Color</Label>
                             <ColorInput
                                 name="btn_text_color"
@@ -254,7 +254,7 @@ const GeneralSettings = () => {
                     </div>
                 </div>
                 <div className={"space-y-3 p-4 md:p-6 border-b"}>
-                    <h3 className={"font-medium"}>Branding</h3>
+                    <h3 className={"font-normal"}>Branding</h3>
                     <div className="announce-create-switch flex gap-4">
                         <Switch
                             className="w-[38px] h-[20px]"
@@ -263,7 +263,7 @@ const GeneralSettings = () => {
                             onCheckedChange={(checked) => onChangeSwitch("is_branding", checked ? 1 : 0)}
 
                         />
-                        <p className="text-sm text-muted-foreground font-medium">Show Branding</p>
+                        <p className="text-sm text-muted-foreground font-normal">Show Branding</p>
                     </div>
                 </div>
             </CardContent>

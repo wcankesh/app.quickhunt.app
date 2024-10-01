@@ -148,7 +148,7 @@
       @apply border-border;
     }
     body {
-      font-family: 'Geist' !important;
+      font-family: "Inter", sans-serif;
       @apply bg-background text-foreground;
     }
   }
@@ -231,6 +231,9 @@ button.absolute.right-4.top-4.rounded-sm.opacity-70.ring-offset-background.trans
 /*span LinesEllipsis-ellipsis*/
 span.LinesEllipsis-ellipsis {color: hsl(var(--primary)) !important;font-weight: 600;cursor: pointer;font-size: 14px;}
 /*.LinesEllipsis-ellipsis{color: #7C3AED;font-family: "Geist";font-weight: 600;}*/
+
+/*Checklist input Plus Button color*/
+.dark .ce-toolbar__actions .ce-toolbar__plus svg {stroke: white}
 
 /*description bg color*/
 @layer components {

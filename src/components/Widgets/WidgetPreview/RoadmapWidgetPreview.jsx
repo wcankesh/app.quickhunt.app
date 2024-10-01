@@ -47,7 +47,7 @@ const RoadmapWidgetPreview = ({widgetsSetting}) => {
                                     <div key={`roadmapLoad_${r}`} className="shrink-0">
                                         {/*<Card className="py-3 px-2 shadow-inner min-w-60">*/}
                                         <Card className={`${cardClass} py-3 px-2 shadow-inner min-w-60`}>
-                                            <h4 className={`text-sm text-slate-700 font-semibold flex gap-2 items-center`}><Skeleton className="h-3 w-3/5 bg-[#f1f5f9]"/></h4>
+                                            <h4 className={`text-sm text-slate-700 font-medium flex gap-2 items-center`}><Skeleton className="h-3 w-3/5 bg-[#f1f5f9]"/></h4>
                                             <div className={"flex gap-2 flex-col mt-4"}>
                                                 {
                                                     Array.from(Array(loadCount)).map((_, p) => {
@@ -78,7 +78,7 @@ const RoadmapWidgetPreview = ({widgetsSetting}) => {
                                     return (
                                         <div key={`roadmap_${data.id}`} className="shrink-0 ">
                                             <Card className={`py-3 px-2 shadow-inner ${cardClass}`}>
-                                                <h4 className={"text-sm text-slate-700 font-semibold flex gap-2 items-center"}>
+                                                <h4 className={"text-sm text-slate-700 font-medium flex gap-2 items-center"}>
                                                     <span className={"w-2.5 h-2.5 rounded-full"} style={{backgroundColor: data.color_code}}/>{data.title} ({data.ideas.length})</h4>
                                                 <div className={"flex gap-2 flex-col mt-4"}>
                                                     {
@@ -94,7 +94,7 @@ const RoadmapWidgetPreview = ({widgetsSetting}) => {
                                                                                 </AspectRatio>
                                                                             }
                                                                             <div className="flex gap-2 items-center px-2 my-2">
-                                                                                <div className={"w-7 h-7 border border-slate-300 rounded font-medium flex items-center justify-center text-slate-700"}>{idea.vote}</div>
+                                                                                <div className={"w-7 h-7 border border-slate-300 rounded font-normal flex items-center justify-center text-slate-700"}>{idea.vote}</div>
                                                                                 <div className="flex-1 w-full text-sm text-slate-900">{idea.title}</div>
                                                                             </div>
                                                                             {

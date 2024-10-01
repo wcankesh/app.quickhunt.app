@@ -304,11 +304,11 @@ const Ideas = () => {
                             </DialogHeader>
                             <DialogFooter className={"flex-row justify-end space-x-2"}>
                                 <Button variant={"outline hover:none"}
-                                        className={"text-sm font-semibold border"}
+                                        className={"text-sm font-medium border"}
                                         onClick={() => setOpenDelete(false)}>Cancel</Button>
                                 <Button
                                     variant={"hover:bg-destructive"}
-                                    className={`${theme === "dark" ? "text-card-foreground" : "text-card"} ${isDeleteLoading === true ? "py-2 px-6" : "py-2 px-6"} w-[76px] text-sm font-semibold bg-destructive`}
+                                    className={`${theme === "dark" ? "text-card-foreground" : "text-card"} py-2 px-6 w-[76px] text-sm font-medium bg-destructive`}
                                     onClick={() => onDeleteIdea(deleteRecord)}
                                 >
                                     {isDeleteLoading ? <Loader2 size={16} className={"animate-spin"}/> : "Delete"}
@@ -331,7 +331,7 @@ const Ideas = () => {
                 />
 
                     <div className="flex items-center gap-4 mb-6 justify-between">
-                        <h1 className="text-2xl font-medium flex-initial w-auto">Ideas (<span>{totalRecord}</span>)</h1>
+                        <h1 className="text-2xl font-normal flex-initial w-auto">Ideas (<span>{totalRecord}</span>)</h1>
                         <div className="flex gap-2 flex-1 w-full justify-end">
                             <Popover
                                 open={openFilter}
@@ -355,7 +355,7 @@ const Ideas = () => {
                                                         <ChevronLeft className="mr-2 h-4 w-4" />
                                                         <span
                                                             onClick={() => {setOpenFilterType('');}}
-                                                            className={"flex-1 w-full text-sm font-medium cursor-pointer flex gap-2 items-center"}
+                                                            className={"flex-1 w-full text-sm font-normal cursor-pointer flex gap-2 items-center"}
                                                         >
                                                             Back
                                                         </span>
@@ -378,7 +378,7 @@ const Ideas = () => {
                                                                         setOpenFilter(true);
                                                                         setOpenFilterType('topic');
                                                                     }}
-                                                                    className={"flex-1 w-full text-sm font-medium cursor-pointer flex gap-2 items-center"}
+                                                                    className={"flex-1 w-full text-sm font-normal cursor-pointer flex gap-2 items-center"}
                                                                 >
                                                                     {x.title}
                                                                 </span>
@@ -391,7 +391,7 @@ const Ideas = () => {
                                                             <ChevronLeft className="mr-2 h-4 w-4" />
                                                             <span
                                                                 onClick={() => {setOpenFilterType('')}}
-                                                                className={"flex-1 w-full text-sm font-medium cursor-pointer flex gap-2 items-center"}
+                                                                className={"flex-1 w-full text-sm font-normal cursor-pointer flex gap-2 items-center"}
                                                             >
                                                                 Back
                                                             </span>
@@ -414,7 +414,7 @@ const Ideas = () => {
                                                                         setOpenFilter(true);
                                                                         setOpenFilterType('roadmap');
                                                                     }}
-                                                                    className={"flex-1 w-full text-sm font-medium cursor-pointer flex gap-2 items-center"}
+                                                                    className={"flex-1 w-full text-sm font-normal cursor-pointer flex gap-2 items-center"}
                                                                 >
                                                                     <span className={"w-2.5 h-2.5 rounded-full"} style={{backgroundColor: x.color_code}}/>
                                                                     {x.title}
@@ -430,7 +430,7 @@ const Ideas = () => {
                                                                 onClick={() => {
                                                                     setOpenFilterType('');
                                                                 }}
-                                                                className={"flex-1 w-full text-sm font-medium cursor-pointer flex gap-2 items-center"}
+                                                                className={"flex-1 w-full text-sm font-normal cursor-pointer flex gap-2 items-center"}
                                                             >
                                                                 Back
                                                             </span>
@@ -447,19 +447,19 @@ const Ideas = () => {
                                                                         handleChange({name: "status" , value: x.value});
                                                                         setOpenFilter(true);
                                                                         setOpenFilterType('status');
-                                                                    }} className={"flex-1 w-full text-sm font-medium cursor-pointer flex gap-2 items-center"}>{x.name}</span>
+                                                                    }} className={"flex-1 w-full text-sm font-normal cursor-pointer flex gap-2 items-center"}>{x.name}</span>
                                                                 </CommandItem>
                                                             )
                                                         })}
                                                     </CommandGroup> :
                                                         <CommandGroup>
                                                             <CommandItem onSelect={() => {setOpenFilterType('status');}}>
-                                                                <span className={"text-sm font-medium cursor-pointer"}>Status</span>
+                                                                <span className={"text-sm font-normal cursor-pointer"}>Status</span>
                                                             </CommandItem>  <CommandItem onSelect={() => {setOpenFilterType('topic');}}>
-                                                                <span className={"text-sm font-medium cursor-pointer"}>Topics</span>
+                                                                <span className={"text-sm font-normal cursor-pointer"}>Topics</span>
                                                             </CommandItem>
                                                             <CommandItem onSelect={() => {setOpenFilterType('roadmap');}}>
-                                                                <span className={"text-sm font-medium cursor-pointer"}>Roadmap</span>
+                                                                <span className={"text-sm font-normal cursor-pointer"}>Roadmap</span>
                                                             </CommandItem>
                                                         </CommandGroup>
                                             }
@@ -467,7 +467,7 @@ const Ideas = () => {
                                     </Command>
                                 </PopoverContent>
                             </Popover>
-                            <Button size="sm" className={"gap-2 font-semibold hover:bg-primary"} onClick={openCreateIdea}><Plus size={20} strokeWidth={3}/>Create Idea</Button>
+                            <Button size="sm" className={"gap-2 font-medium hover:bg-primary"} onClick={openCreateIdea}><Plus size={20} strokeWidth={3}/>Create Idea</Button>
                         </div>
                     </div>
                     {
@@ -476,7 +476,7 @@ const Ideas = () => {
                                 (filter.topic || []).map((data,index) =>{
                                     const findTopic = (topicLists || []).find((topic) => topic.id === data);
                                     return(
-                                        <Badge key={`selected-${findTopic.id}`} variant="outline" className="rounded p-0"><span className="px-3 py-1.5 border-r">{findTopic.title}</span>
+                                        <Badge key={`selected-${findTopic.id}`} variant="outline" className="rounded p-0 font-medium"><span className="px-3 py-1.5 border-r">{findTopic.title}</span>
                                             <span className="w-7 h-7 flex items-center justify-center cursor-pointer" onClick={() => handleChange({name: "topic" , value: data})}>
                                                 <X className='w-4 h-4'/>
                                             </span>
@@ -488,7 +488,7 @@ const Ideas = () => {
                                 (filter.roadmap || []).map((data,index) =>{
                                     const findRoadmap = (roadmapStatus || []).find((roadmap) => roadmap.id === data);
                                     return(
-                                        <Badge key={`selected-${findRoadmap.id}`} variant="outline" className="rounded p-0">
+                                        <Badge key={`selected-${findRoadmap.id}`} variant="outline" className="rounded p-0 font-medium">
                                             <span className="px-3 py-1.5 border-r flex gap-2 items-center">
                                                 <span className={"w-2.5 h-2.5  rounded-full"} style={{backgroundColor: findRoadmap.color_code}}/>
                                                 {findRoadmap.title}
@@ -502,7 +502,7 @@ const Ideas = () => {
                             }
                             {
                                 filter.archive === 1 &&
-                                <Badge key={`selected-${filter.archive}`} variant="outline" className="rounded p-0">
+                                <Badge key={`selected-${filter.archive}`} variant="outline" className="rounded p-0 font-medium">
                                     <span className="px-3 py-1.5 border-r">Archived</span>
                                     <span className="w-7 h-7 flex items-center justify-center cursor-pointer" onClick={() =>  handleChange({name: "status" , value: "archive"})}>
                                         <X className='w-4 h-4'/>
@@ -511,7 +511,7 @@ const Ideas = () => {
                             }
                             {
                                 filter.bug === 1 &&
-                                <Badge key={`selected-${filter.bug}`} variant="outline" className="rounded p-0">
+                                <Badge key={`selected-${filter.bug}`} variant="outline" className="rounded p-0 font-medium">
                                     <span className="px-3 py-1.5 border-r">Bugs</span>
                                     <span className="w-7 h-7 flex items-center justify-center cursor-pointer" onClick={() =>  handleChange({name: "status" , value: "bug"})}>
                                         <X className='w-4 h-4'/>
@@ -538,7 +538,7 @@ const Ideas = () => {
                                                         >
                                                             <ArrowBigUp size={15} className={"fill-primary stroke-primary"}/>
                                                         </Button>
-                                                        <p className={"text-base md:text-xl font-medium"}>{x.vote}</p>
+                                                        <p className={"text-base md:text-xl font-normal"}>{x.vote}</p>
                                                     </div>
                                                     <div className={"flex flex-col w-full gap-6"}>
                                                         <div className={"flex flex-col gap-[11px]"}>
@@ -547,9 +547,9 @@ const Ideas = () => {
                                                                     className={"flex flex-wrap items-center gap-1 cursor-pointer xl:gap-3"}
                                                                     onClick={() => openDetailsSheet(x)}
                                                                 >
-                                                                    <h3 className={"text-base font-medium"}>{x.title}</h3>
+                                                                    <h3 className={"text-base font-normal"}>{x.title}</h3>
                                                                     <div className={"flex gap-2 items-center"}>
-                                                                        <h4 className={"text-xs font-medium text-muted-foreground"}>{x.name}</h4>
+                                                                        <h4 className={"text-xs font-normal text-muted-foreground"}>{x.name}</h4>
                                                                         <p className={"text-xs font-normal flex items-center text-muted-foreground"}>
                                                                             <Dot size={20} className={"fill-text-card-foreground stroke-text-card-foreground"}/>
                                                                             {moment(x.created_at).format('D MMM')}
@@ -613,7 +613,7 @@ const Ideas = () => {
                                                                     <div className={`flex flex-wrap gap-2`}>
                                                                         {
                                                                             x.topic.map((y, i) => (
-                                                                                <div className={"text-sm font-medium"} key={i}> {y?.title}</div>
+                                                                                <div className={"text-sm font-normal"} key={i}> {y?.title}</div>
                                                                             ))
                                                                         }
                                                                     </div>
@@ -663,7 +663,7 @@ const Ideas = () => {
                                                                                 <MessageCircleMore size={16}
                                                                                                    className={"stroke-primary"}/>
                                                                             </span>
-                                                                    <p className={"text-base font-medium"}>
+                                                                    <p className={"text-base font-normal"}>
                                                                         {x && x.comments && x.comments.length ? x.comments.length : 0}
                                                                     </p>
                                                                 </div>
@@ -685,7 +685,7 @@ const Ideas = () => {
                                 <div className={`w-full ${theme === "dark" ? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end p-2 md:px-3 md:py-[10px]`}>
                                     <div className={"w-full flex gap-2 items-center justify-between sm:justify-end"}>
                                         <div>
-                                            <h5 className={"text-sm font-semibold"}>Page {ideasList.length <= 0 ? 0 :pageNo} of {totalPages}</h5>
+                                            <h5 className={"text-sm font-medium"}>Page {ideasList.length <= 0 ? 0 :pageNo} of {totalPages}</h5>
                                         </div>
                                         <div className={"flex flex-row gap-2 items-center"}>
                                             <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}

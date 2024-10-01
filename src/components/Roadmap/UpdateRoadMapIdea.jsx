@@ -803,12 +803,12 @@ const UpdateRoadMapIdea = ({
             {/*                </DialogHeader>*/}
             {/*                <DialogFooter>*/}
             {/*                    <Button type="submit" variant={"outline"}*/}
-            {/*                            className={"text-sm font-semibold"}*/}
+            {/*                            className={"text-sm font-medium"}*/}
             {/*                            onClick={() => setOpenDelete(false)}>Cancel</Button>*/}
             {/*                    <Button*/}
             {/*                        type="submit"*/}
             {/*                        variant={"hover:bg-destructive"}*/}
-            {/*                        className={`text-sm ${theme === "dark" ? "text-card-foreground" : "text-card"} w-[77px] font-semibold bg-destructive`}*/}
+            {/*                        className={`text-sm ${theme === "dark" ? "text-card-foreground" : "text-card"} w-[77px] font-medium bg-destructive`}*/}
             {/*                        onClick={() => onDeleteIdea(deleteRecord)}*/}
             {/*                    >*/}
             {/*                        {isLoadingSidebar ? <Loader2 size={16} className={"animate-spin"}/> : "Delete"}*/}
@@ -830,7 +830,7 @@ const UpdateRoadMapIdea = ({
                             className={`col-span-4 lg:block hidden ${theme === "dark" ? "" : "bg-muted"} border-r lg:overflow-auto idea-sheet-height`}>
                             <div className={"border-b py-4 pl-8 pr-6 flex flex-col gap-3"}>
                                 <div className={"flex flex-col gap-1"}>
-                                    <h3 className={"text-sm font-medium"}>Status</h3>
+                                    <h3 className={"text-sm font-normal"}>Status</h3>
                                     <p className={"text-muted-foreground text-xs font-normal"}>Apply a status to Manage
                                         this
                                         idea on roadmap.</p>
@@ -856,8 +856,8 @@ const UpdateRoadMapIdea = ({
                                 </div>
                             </div>
                             <div className={"border-b"}>
-                                <div className="py-4 pl-8 pr-6 w-full items-center gap-1.5">
-                                    <Label htmlFor="picture">Featured image</Label>
+                                <div className="py-4 pl-8 pr-6 w-full space-y-1.5">
+                                    <Label htmlFor="picture" className={"font-normal"}>Featured image</Label>
                                     <div className="w-[282px] h-[128px] flex gap-1">
 
                                         {
@@ -917,7 +917,7 @@ const UpdateRoadMapIdea = ({
                                         <div
                                             className={"px-4 py-3 lg:py-6 lg:px-8 flex flex-col gap-4 ld:gap-6 border-b"}>
                                             <div className="space-y-2">
-                                                <Label htmlFor="text">Title</Label>
+                                                <Label htmlFor="text" className={"font-normal"}>Title</Label>
                                                 <Input type="text" id="text" placeholder="" value={selectedIdea?.title}
                                                        name={"title"} onChange={onChangeText}/>
                                                 {
@@ -926,14 +926,14 @@ const UpdateRoadMapIdea = ({
                                                 }
                                             </div>
                                             <div className="space-y-2">
-                                                <Label htmlFor="message">Description</Label>
+                                                <Label htmlFor="message" className={"font-normal"}>Description</Label>
                                                 <ReactQuillEditor value={selectedIdea?.description} name={"description"}
                                                                   onChange={handleUpdate}/>
                                                 {formError.description &&
                                                 <span className="text-red-500 text-sm">{formError.description}</span>}
                                             </div>
                                             <div className={"space-y-2"}>
-                                                <Label>Choose Board for this Idea</Label>
+                                                <Label className={"font-normal"}>Choose Board for this Idea</Label>
                                                 <Select
                                                     onValueChange={(value) => onChangeText({
                                                         target: {
@@ -966,7 +966,7 @@ const UpdateRoadMapIdea = ({
                                             </div>
                                         </div>
                                         <div className={"px-4 py-3 lg:py-6 lg:px-8 border-b space-y-2"}>
-                                            <Label>Choose Topics for this Idea (optional)</Label>
+                                            <Label className={"font-normal"}>Choose Topics for this Idea (optional)</Label>
                                             <Select onValueChange={handleChangeTopic}
                                                     value={selectedIdea?.topic.map(x => x.id)}>
                                                 <SelectTrigger>
@@ -1011,7 +1011,7 @@ const UpdateRoadMapIdea = ({
                                         </div>
                                         <div className={"p-4 lg:p-8 flex gap-3"}>
                                             <Button
-                                                className={`py-2 px-6 w-[81px] text-sm font-semibold hover:bg-primary`}
+                                                className={`py-2 px-6 w-[81px] text-sm font-medium hover:bg-primary`}
                                                 onClick={onCreateIdea}
                                             >
                                                 {
@@ -1021,7 +1021,7 @@ const UpdateRoadMapIdea = ({
                                             </Button>
                                             <Button
                                                 variant={"outline hover:bg-transparent"}
-                                                className={"border border-primary py-2 px-6 text-sm font-semibold"}
+                                                className={"border border-primary py-2 px-6 text-sm font-medium"}
                                                 onClick={handleOnCreateCancel}
                                             >
                                                 Cancel
@@ -1042,7 +1042,7 @@ const UpdateRoadMapIdea = ({
                                                             <ArrowBigUp
                                                                 className={"fill-primary stroke-primary"}/>
                                                         </Button>
-                                                        <p className={"text-xl font-medium"}>{selectedIdea?.vote}</p>
+                                                        <p className={"text-xl font-normal"}>{selectedIdea?.vote}</p>
                                                         {
                                                             selectedIdea && selectedIdea?.vote_list && selectedIdea?.vote_list.length ?
                                                                 <Popover>
@@ -1082,8 +1082,8 @@ const UpdateRoadMapIdea = ({
                                                                     <PopoverContent className="p-0" align={"start"}>
                                                                         <div className="">
                                                                             <div className="py-3 px-4">
-                                                                                {/*<h4 className="font-medium leading-none text-sm">{`Voters (${selectedIdea?.vote})`}</h4>*/}
-                                                                                <h4 className="font-medium leading-none text-sm">{`Voters (${selectedIdea?.vote_list.length})`}</h4>
+                                                                                {/*<h4 className="font-normal leading-none text-sm">{`Voters (${selectedIdea?.vote})`}</h4>*/}
+                                                                                <h4 className="font-normal leading-none text-sm">{`Voters (${selectedIdea?.vote_list.length})`}</h4>
                                                                             </div>
                                                                             <div
                                                                                 className="border-t px-4 py-3 space-y-2">
@@ -1151,7 +1151,7 @@ const UpdateRoadMapIdea = ({
                                                 </div>
                                                 <div className={"flex flex-col gap-4"}>
                                                     <div className={"flex items-center gap-2"}>
-                                                        <h2 className={"text-xl font-medium"}>{selectedIdea?.title}</h2>
+                                                        <h2 className={"text-xl font-normal"}>{selectedIdea?.title}</h2>
                                                     </div>
                                                     <div
                                                         className={`description-container text-sm ${theme === "dark" ? "" : "text-muted-foreground" }`}
@@ -1202,7 +1202,7 @@ const UpdateRoadMapIdea = ({
                                                                 }
                                                             </Avatar>
                                                             <div className={"flex items-center"}>
-                                                                <h4 className={"text-sm font-medium"}>{selectedIdea?.name}</h4>
+                                                                <h4 className={"text-sm font-normal"}>{selectedIdea?.name}</h4>
                                                                 <p className={"text-sm font-normal flex items-center text-muted-foreground"}>
                                                                     <Dot
                                                                         className={"fill-text-card-foreground stroke-text-card-foreground"}/>
@@ -1246,7 +1246,7 @@ const UpdateRoadMapIdea = ({
                                                 </div>
                                                 <div className={"flex flex-col gap-2"}>
                                                     <div className="w-full flex flex-col gap-2">
-                                                        <Label htmlFor="message">Add comment</Label>
+                                                        <Label htmlFor="message" className={"font-normal"}>Add comment</Label>
                                                         {/*{*/}
                                                         {/*    privateNote ?*/}
                                                         {/*        <Card*/}
@@ -1320,7 +1320,7 @@ const UpdateRoadMapIdea = ({
                                                             {/*<Switch id="airplane-mode"*/}
                                                             {/*        onCheckedChange={handlePrivateNote}/>*/}
                                                             {/*<Label htmlFor="airplane-mode"*/}
-                                                            {/*       className={"text-sm font-medium"}>Private*/}
+                                                            {/*       className={"text-sm font-normal"}>Private*/}
                                                             {/*    note</Label>*/}
                                                         </div>
                                                         <div className={"flex gap-2 items-center"}>
@@ -1341,7 +1341,7 @@ const UpdateRoadMapIdea = ({
 
                                                             </div>
                                                             <Button
-                                                                className={"w-[128px] h-[36px] text-sm font-semibold"}
+                                                                className={"w-[128px] h-[36px] text-sm font-medium"}
                                                                 onClick={onCreateComment}
                                                                 disabled={commentText.trim() === "" || commentText === ""}
                                                             >
@@ -1360,7 +1360,7 @@ const UpdateRoadMapIdea = ({
                                                 <div className={"px-4 lg:px-8"}>
                                                     <TabsList
                                                         className="bg-transparent border-b-2 border-b-primary rounded-none">
-                                                        <TabsTrigger value="comment">Comment</TabsTrigger>
+                                                        <TabsTrigger value="comment" className={"font-normal"}>Comment</TabsTrigger>
                                                     </TabsList>
                                                 </div>
 
@@ -1396,7 +1396,7 @@ const UpdateRoadMapIdea = ({
                                                                                     <div
                                                                                         className={"flex gap-1 flex-wrap justify-between"}>
                                                                                         <div className={"flex items-start"}>
-                                                                                            <h4 className={"text-sm font-medium"}>{x.name}</h4>
+                                                                                            <h4 className={"text-sm font-normal"}>{x.name}</h4>
                                                                                             <p className={"text-sm font-normal flex items-center text-muted-foreground"}>
                                                                                                 <Dot size={20}
                                                                                                      className={"fill-text-card-foreground stroke-text-card-foreground"}/>
@@ -1478,7 +1478,7 @@ const UpdateRoadMapIdea = ({
                                                                                                     <div
                                                                                                         className={"flex gap-2"}>
                                                                                                         <Button
-                                                                                                            className={`py-2 px-6 w-[81px] h-[30px] text-sm font-semibold hover:bg-primary`}
+                                                                                                            className={`py-2 px-6 w-[81px] h-[30px] text-sm font-medium hover:bg-primary`}
                                                                                                             onClick={onUpdateComment}
                                                                                                             disabled={selectedComment.comment.trim() === "" || selectedComment.comment === ""}>
                                                                                                             {
@@ -1489,7 +1489,7 @@ const UpdateRoadMapIdea = ({
                                                                                                             }
                                                                                                         </Button>
                                                                                                         <Button
-                                                                                                            className={"px-3 py-2 h-[30px] text-sm font-semibold text-primary border border-primary"}
+                                                                                                            className={"px-3 py-2 h-[30px] text-sm font-medium text-primary border border-primary"}
                                                                                                             variant={"outline hover:none"}
                                                                                                             onClick={onCancelComment}>
                                                                                                             Cancel
@@ -1542,7 +1542,7 @@ const UpdateRoadMapIdea = ({
                                                                                             <div
                                                                                                 className={"flex justify-between"}>
                                                                                                 <Button
-                                                                                                    className="p-0 text-sm h-auto font-semibold text-primary"
+                                                                                                    className="p-0 text-sm h-auto font-medium text-primary"
                                                                                                     variant={"ghost hover-none"}
                                                                                                     onClick={() => onShowSubComment(i)}
                                                                                                     key={`comment-nested-reply-to-${i}`}
@@ -1557,7 +1557,7 @@ const UpdateRoadMapIdea = ({
                                                                                                         <MessageCircleMore
                                                                                                             className={"stroke-primary w-[16px] h-[16px]"}/>
                                                                                                     </span>
-                                                                                                    <p className={"text-base font-medium"}>
+                                                                                                    <p className={"text-base font-normal"}>
                                                                                                         {x.reply.length}
                                                                                                     </p>
                                                                                                 </div>
@@ -1585,7 +1585,7 @@ const UpdateRoadMapIdea = ({
                                                                                                                             className={"flex flex-wrap justify-between items-start gap-2"}>
                                                                                                                             <div
                                                                                                                                 className={"flex gap-2"}>
-                                                                                                                                <h4 className={"text-sm font-medium"}>{y.name}</h4>
+                                                                                                                                <h4 className={"text-sm font-normal"}>{y.name}</h4>
                                                                                                                                 <p className={"text-sm font-normal flex items-center text-muted-foreground"}>
                                                                                                                                     <Dot
                                                                                                                                         size={20}
@@ -1665,7 +1665,7 @@ const UpdateRoadMapIdea = ({
                                                                                                                                     <div
                                                                                                                                         className={"flex gap-2"}>
                                                                                                                                         <Button
-                                                                                                                                            className={`py-2 px-6 w-[81px] h-[30px] text-sm font-semibold hover:bg-primary`}
+                                                                                                                                            className={`py-2 px-6 w-[81px] h-[30px] text-sm font-medium hover:bg-primary`}
                                                                                                                                             onClick={onUpdateSubComment}
                                                                                                                                             disabled={selectedSubComment.comment.trim() === "" || selectedSubComment.comment === ""}>
                                                                                                                                             {
@@ -1676,7 +1676,7 @@ const UpdateRoadMapIdea = ({
                                                                                                                                             }
                                                                                                                                         </Button>
                                                                                                                                         <Button
-                                                                                                                                            className={"px-3 py-2 h-[30px] text-sm font-semibold text-primary border border-primary"}
+                                                                                                                                            className={"px-3 py-2 h-[30px] text-sm font-medium text-primary border border-primary"}
                                                                                                                                             variant={"outline hover:none"}
                                                                                                                                             onClick={onCancelSubComment}>Cancel</Button>
                                                                                                                                         <div
@@ -1777,7 +1777,7 @@ const UpdateRoadMapIdea = ({
                                                                                                     <div
                                                                                                         className={"flex gap-2"}>
                                                                                                         <Button
-                                                                                                            className={`py-2 px-6 w-[86px] h-[30px] text-sm font-semibold`}
+                                                                                                            className={`py-2 px-6 w-[86px] h-[30px] text-sm font-medium`}
                                                                                                             disabled={subCommentText.trim() === "" || subCommentText === ""}
                                                                                                             onClick={() => onCreateSubComment(x, i)}
                                                                                                         >

@@ -175,14 +175,14 @@ const Login = () => {
                                         <div className={"w-full flex flex-col gap-8"}>
                                         <div className="gap-2 flex flex-col items-start">
                                             {/*{theme === "dark" ? Icon.whiteLogo : Icon.blackLogo}*/}
-                                            <h1 className="text-2xl md:text-3xl font-medium ">Login</h1>
+                                            <h1 className="text-2xl md:text-3xl">Login</h1>
                                             {/*<h6 className="text-center font-normal text-sm text-muted-foreground">*/}
                                             {/*    Enter your email below to create your account*/}
                                             {/*</h6>*/}
                                         </div>
                                         <div className="grid gap-6">
                                             <div className="grid gap-2">
-                                                <Label htmlFor="email" className={"font-medium"}>Email</Label>
+                                                <Label htmlFor="email" className={"font-normal"}>Email</Label>
                                                 <Input
                                                     id="email"
                                                     type="email"
@@ -202,7 +202,7 @@ const Login = () => {
                                                 }
                                             </div>
                                             <div className="grid gap-2">
-                                                <Label htmlFor="password" className={"font-medium"}>Password</Label>
+                                                <Label htmlFor="password" className={"font-normal"}>Password</Label>
                                                 <div className={"relative"}>
                                                     <Input
                                                         id="password"
@@ -228,7 +228,7 @@ const Login = () => {
                                                             // onClick={() => navigate(`${baseUrl}/forgot-password`)}
                                                             onClick={() => onRedirect('forgot-password')}
                                                     >
-                                                        <span className={"font-normal text-primary"}>Forgot your password?</span>
+                                                        <span className={"text-primary"}>Forgot your password?</span>
                                                     </Button>
                                                 </div>
                                             </div>
@@ -238,11 +238,11 @@ const Login = () => {
                                                 onClick={onLogin}
                                             >
                                                 {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : ""}
-                                                <span className={"font-semibold"}>Login</span>
+                                                <span className={"font-medium"}>Login</span>
                                             </Button>
                                             <div className={"or-divider flex items-center"}>
                                                 <div className={"border-t basis-4/12 border-muted-foreground"}/>
-                                                <p className={"text-xs font-medium text-muted-foreground basis-4/12 text-center"}>
+                                                <p className={"text-xs text-muted-foreground basis-4/12 text-center"}>
                                                     Or continue with
                                                 </p>
                                                 <div className={"border-t basis-4/12 border-muted-foreground"}/>
@@ -250,15 +250,14 @@ const Login = () => {
                                             <WithGoogle title={"Login With Google"}/>
                                         </div>
                                         <div className="text-center text-xs md:text-sm">
-                                            <p className={"font-normal text-sm text-muted-foreground"}>
+                                            <p className={"text-sm text-muted-foreground"}>
                                                 Don't have an account?{" "}
                                                 <Button
                                                     variant={"link"}
-                                                    className="p-0 h-auto hover:no-underline"
+                                                    className="p-0 h-auto hover:no-underline font-medium"
                                                     onClick={() => onRedirect('register')}
                                                 >
-                                                <span
-                                                    className={"font-bold text-primary"}>Create an account</span>
+                                                    Create an account
                                                 </Button>
                                             </p>
                                         </div>

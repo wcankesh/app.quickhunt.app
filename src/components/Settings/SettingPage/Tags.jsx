@@ -14,9 +14,7 @@ import {Dialog} from "@radix-ui/react-dialog";
 import {DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "../../ui/dialog";
 import EmptyData from "../../Comman/EmptyData";
 
-const initialState ={
-    title:""
-}
+const initialState ={title:""}
 
 const Tags = () => {
     const [formError, setFormError] = useState(initialState);
@@ -224,18 +222,18 @@ const Tags = () => {
                         <DialogContent className="max-w-[350px] w-full sm:max-w-[525px] p-3 md:p-6 rounded-lg">
                             <DialogHeader className={"flex flex-row justify-between gap-2"}>
                                 <div className={"flex flex-col gap-2"}>
-                                    <DialogTitle className={"text-start"}>You really want delete this tag?</DialogTitle>
+                                    <DialogTitle className={"text-start font-medium"}>You really want delete this tag?</DialogTitle>
                                     <DialogDescription className={"text-start"}>This action can't be undone.</DialogDescription>
                                 </div>
                                 <X size={16} className={"m-0 cursor-pointer"} onClick={() => setOpenDelete(false)}/>
                             </DialogHeader>
                             <DialogFooter className={"flex-row justify-end space-x-2"}>
                                 <Button variant={"outline hover:none"}
-                                        className={"text-sm font-semibold border"}
+                                        className={"text-sm font-medium border"}
                                         onClick={() => setOpenDelete(false)}>Cancel</Button>
                                 <Button
                                     variant={"hover:bg-destructive"}
-                                    className={` ${theme === "dark" ? "text-card-foreground" : "text-card"} ${isLoading === true ? "py-2 px-6" : "py-2 px-6"} w-[76px] text-sm font-semibold bg-destructive`}
+                                    className={` ${theme === "dark" ? "text-card-foreground" : "text-card"} py-2 px-6 w-[76px] text-sm font-medium bg-destructive`}
                                     onClick={onDelete}
                                 >
                                     {isLoadingDelete ? <Loader2 size={16} className={"animate-spin"}/> : "Delete"}
@@ -249,10 +247,10 @@ const Tags = () => {
             <Card>
                 <CardHeader className={"p-4 sm:p-6 gap-1 border-b flex flex-row flex-wrap justify-between items-center gap-y-2"}>
                     <div>
-                        <CardTitle className={"text-lg sm:text-2xl font-medium leading-8"}>Tags</CardTitle>
-                        <CardDescription className={"text-sm text-muted-foreground p-0 mt-1 leading-5"}>Add Tags so that users can tag them when creating Ideas.</CardDescription>
+                        <CardTitle className={"text-lg sm:text-2xl font-normal"}>Tags</CardTitle>
+                        <CardDescription className={"text-sm text-muted-foreground p-0"}>Add Tags so that users can tag them when creating Ideas.</CardDescription>
                     </div>
-                    <Button size={"sm"} onClick={handleNewTopics} disabled={isEdit != null} className={"gap-2 font-semibold hover:bg-primary m-0"}><Plus size={18} strokeWidth={3}/>New Tag</Button>
+                    <Button size={"sm"} onClick={handleNewTopics} disabled={isEdit != null} className={"gap-2 font-medium hover:bg-primary m-0"}><Plus size={18} strokeWidth={3}/>New Tag</Button>
                 </CardHeader>
                 <CardContent className={"p-0"}>
                     <div className={"grid grid-cols-1 overflow-auto whitespace-nowrap"}>
@@ -295,7 +293,7 @@ const Tags = () => {
                                                                             </div>
                                                                         </TableCell>
                                                                         <TableCell/>
-                                                                        <TableCell className={`px-2 py-[10px] md:px-3 font-medium text-xs ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                                                        <TableCell className={`px-2 py-[10px] md:px-3 font-normal text-xs ${theme === "dark" ? "" : "text-muted-foreground"}`}>
                                                                             <div className={"flex justify-end gap-2 items-center"}>
                                                                                 <Fragment>
                                                                                     {
@@ -307,7 +305,7 @@ const Tags = () => {
                                                                                             {isSave ? <Loader2 className="mr-1 h-4 w-4 animate-spin justify-center"/> : <Check size={16}/>}
                                                                                         </Button> : <Button
                                                                                             variant=""
-                                                                                            className="text-sm font-semibold h-[30px] w-[89px]"
+                                                                                            className="text-sm font-medium h-[30px] w-[89px] hover:bg-primary"
                                                                                             onClick={() => addTag(x, i)}
                                                                                         >
                                                                                             {isSave ? <Loader2 className={"mr-2  h-4 w-4 animate-spin"}/> : "Add Tag"}
@@ -327,10 +325,10 @@ const Tags = () => {
                                                                     </Fragment>
                                                                     :
                                                                     <Fragment>
-                                                                            <TableCell className={`px-2 py-[10px] md:px-3 font-medium text-xs  ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                                                            <TableCell className={`px-2 py-[10px] md:px-3 font-normal text-xs  ${theme === "dark" ? "" : "text-muted-foreground"}`}>
                                                                                 {x.title}
                                                                             </TableCell>
-                                                                            <TableCell className={`px-2 py-[10px] md:px-3 font-medium text-xs text-center ${theme === "dark" ? "" : "text-muted-foreground"}`}>{moment.utc(x.updated_at).local().startOf('seconds').fromNow()}</TableCell>
+                                                                            <TableCell className={`px-2 py-[10px] md:px-3 font-normal text-xs text-center ${theme === "dark" ? "" : "text-muted-foreground"}`}>{moment.utc(x.updated_at).local().startOf('seconds').fromNow()}</TableCell>
                                                                             <TableCell className={`flex justify-end px-2 py-[10px] md:px-3 ${theme === "dark" ? "" : "text-muted-foreground"}`}>
                                                                                 <Fragment>
                                                                                     <div className="pr-0">
@@ -353,11 +351,7 @@ const Tags = () => {
                                             }
                                         </Fragment>
                                         :
-                                        (topicLists.length == 0 && isLoading == false) ? <TableRow>
-                                            <TableCell colSpan={6}>
-                                                <EmptyData />
-                                            </TableCell>
-                                        </TableRow> :null
+                                        <TableRow><TableCell colSpan={6}><EmptyData /></TableCell></TableRow>
                                 }
                             </TableBody>
                         </Table>

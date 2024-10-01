@@ -1,4 +1,4 @@
-import React,{useCallback, useRef, useEffect} from 'react';
+import React,{useRef, useEffect} from 'react';
 import {useTheme} from "../theme-provider";
 import {useSelector} from "react-redux";
 import {Button} from "../ui/button";
@@ -21,7 +21,6 @@ import InlineCode from "@editorjs/inline-code";
 import {PopoverTrigger} from "@radix-ui/react-popover";
 import {Popover, PopoverContent} from "../ui/popover";
 
-
 const Post = ({inAppMsgSetting, setInAppMsgSetting, isLoading}) => {
     const editorCore = useRef(null);
     const {theme} = useTheme();
@@ -43,9 +42,6 @@ const Post = ({inAppMsgSetting, setInAppMsgSetting, isLoading}) => {
             body_text: JSON.stringify({blocks: savedData.blocks})
         }));
     }, []);
-
-
-
 
     const editorConstants = {
         embed: Embed,
@@ -127,7 +123,9 @@ const Post = ({inAppMsgSetting, setInAppMsgSetting, isLoading}) => {
         }));
 
     }
+
     console.log("inAppMsgSetting?.body_text?.blocks", inAppMsgSetting?.body_text?.blocks, isLoading)
+
     useEffect(() => {
        if(!isLoading){
            editorCore.current = new EditorJS({
@@ -167,47 +165,44 @@ const Post = ({inAppMsgSetting, setInAppMsgSetting, isLoading}) => {
                                     userDetailsReducer?.user_photo ?
                                         <AvatarImage src={userDetailsReducer?.user_photo} alt="@shadcn"/>
                                         :
-                                        <AvatarFallback>{userDetailsReducer && userDetailsReducer?.name && userDetailsReducer?.name.substring(0, 1)}</AvatarFallback>
+                                        <AvatarFallback>
+                                            {userDetailsReducer && userDetailsReducer?.user_first_name && userDetailsReducer?.user_first_name.substring(0, 1)}
+                                            {userDetailsReducer && userDetailsReducer?.user_last_name && userDetailsReducer?.user_last_name?.substring(0, 1)}
+                                        </AvatarFallback>
                                 }
                             </Avatar>
                             <div className={""}>
                                 <div className={"flex flex-row gap-1"}>
-                                    <h5 className={"text-xs leading-5 font-medium"}>{userDetailsReducer?.user_first_name} {userDetailsReducer?.user_last_name}</h5>
-                                    <h5 className={`text-xs leading-5 font-medium ${theme === "dark" ? "" : "text-muted-foreground"}`}>from {projectDetailsReducer?.project_name}</h5>
+                                    <h5 className={"text-xs font-normal"}>{userDetailsReducer?.user_first_name} {userDetailsReducer?.user_last_name}</h5>
+                                    <h5 className={`text-xs font-normal ${theme === "dark" ? "" : "text-muted-foreground"}`}>from {projectDetailsReducer?.project_name}</h5>
                                 </div>
-                                <h5 className={`text-xs leading-5 font-medium ${theme === "dark" ? "" : "text-muted-foreground"}`}>Active</h5>
+                                <h5 className={`text-xs leading-5 font-normal ${theme === "dark" ? "" : "text-muted-foreground"}`}>Active</h5>
                             </div>
                         </div> : ""
                     }
-
-                    <div className={"pl-14 pt-6 m-0 w-full"}>
-                        {
-                            isLoading ? "" :  <div id="editorjs"></div>
-                        }
-
-                    </div>
+                    <div className={"pl-14 pt-6 m-0 w-full"}>{isLoading ? "" :  <div id="editorjs"></div>}</div>
                 </CardHeader>
                 {
                     inAppMsgSetting.reply_type === 1 ? <CardContent className={`py-5 pl-8 pr-5 rounded-b-lg flex flex-row justify-between`} style={{background: inAppMsgSetting.bg_color}}>
                         <div className={""}>
                             <div className={"flex flex-row gap-3 items-center text-xs"}>
                                 <MessageCircleMore size={20} stroke={inAppMsgSetting?.icon_color} />
-                                <h5 className={"font-medium"} style={{color: inAppMsgSetting.text_color}}>Write a reply...</h5>
+                                <h5 className={"font-normal"} style={{color: inAppMsgSetting.text_color}}>Write a reply...</h5>
                             </div>
                         </div>
                         <div className={"flex gap-3 items-center"}>
                             <Smile size={20} stroke={inAppMsgSetting?.icon_color}/>
                             <Paperclip size={20} stroke={inAppMsgSetting?.icon_color}/>
                         </div>
-                    </CardContent> : inAppMsgSetting.reply_type === 2 ? <CardContent className={`py-5 pl-8 pr-5   rounded-b-lg flex flex-row justify-between`} style={{background: inAppMsgSetting.bg_color}}>
+                    </CardContent> : inAppMsgSetting.reply_type === 2 ? <CardContent className={`py-5 pl-8 pr-5 rounded-b-lg flex flex-row justify-between`} style={{background: inAppMsgSetting.bg_color}}>
                         <div className={"flex justify-center gap-5 w-full"}>
                             {
                                 (inAppMsgSetting.reactions || []).map((x,i)=>{
                                     return(
                                         x.is_active === 1 ?
                                             <div className={"relative group hover:cursor-pointer"}>
-                                                <span onClick={() => onDeleteReaction(x, i)} className="absolute hidden group-hover:inline-block py-0.5 leading-none right-[-11px] top-[-13px] border rounded shadow -top-1 text-[9px] font-bold tracking-wide  px-0.5 text-background-accent dark:text-foreground/60 dark:border-gray-500/60  dark:bg-dark-accent bg-white">
-                                                    <Trash2 size={16}/>
+                                                <span onClick={() => onDeleteReaction(x, i)} className="absolute hidden group-hover:inline-block py-0.5 leading-none right-[-11px] top-[-13px] border rounded shadow -top-1 text-[9px] font-semibold tracking-wide px-0.5 text-background-accent dark:text-foreground/60 dark:border-gray-500/60 dark:bg-dark-accent bg-white">
+                                                    <Trash2 size={16} className={`${theme === "dark" ? "stroke-muted" : ""}`}/>
                                                 </span>
                                                 <img key={i} className={"h-6 w-6 cursor-pointer"} src={x.emoji_url}/>
                                             </div> : ""
@@ -225,7 +220,6 @@ const Post = ({inAppMsgSetting, setInAppMsgSetting, isLoading}) => {
                         </div>
                     </CardContent> : inAppMsgSetting.reply_type === 3 ? "" : ""
                 }
-
             </Card>
         </div>
     );

@@ -258,11 +258,11 @@ const Team = () => {
                             </DialogHeader>
                             <DialogFooter className={"flex-row justify-end space-x-2"}>
                                 <Button variant={"outline hover:none"}
-                                        className={"text-sm font-semibold border"}
+                                        className={"text-sm font-medium border"}
                                         onClick={() => setOpenDelete(false)}>Cancel</Button>
                                 <Button
                                     variant={"hover:bg-destructive"}
-                                    className={` ${theme === "dark" ? "text-card-foreground" : "text-card"} ${isLoading === true ? "py-2 px-6" : "py-2 px-6"} w-[76px] text-sm font-semibold bg-destructive`}
+                                    className={` ${theme === "dark" ? "text-card-foreground" : "text-card"} py-2 px-6 w-[76px] text-sm font-medium bg-destructive`}
                                     onClick={onDelete}
                                 >
                                     {isLoadingDelete ? <Loader2 size={16} className={"animate-spin"}/> : "Delete"}
@@ -276,20 +276,20 @@ const Team = () => {
             <Card>
                 <CardHeader className={"flex flex-row flex-wrap md:flex-nowrap justify-between gap-2 items-center p-4 sm:p-6"}>
                     <div>
-                        <CardTitle className={"text-lg sm:text-2xl font-medium"}>Invite Team</CardTitle>
+                        <CardTitle className={"text-lg sm:text-2xl font-normal"}>Invite Team</CardTitle>
                         <CardDescription className={"text-sm text-muted-foreground p-0"}>Add members to your company to
                             help manage ideas.</CardDescription>
                     </div>
-                    <Button className={"text-sm font-semibold hover:bg-primary m-0"} onClick={openSheet}>Invite Team</Button>
+                    <Button className={"text-sm font-medium hover:bg-primary m-0"} onClick={openSheet}>Invite Team</Button>
                 </CardHeader>
                 <CardContent className={"p-0"}>
                     <Tabs defaultValue="users" className="space-y-6">
                         <div className={"px-4 sm:px-6"}>
                             <TabsList className="grid w-[141px] grid-cols-2 bg-card border">
                                 <TabsTrigger value="users"
-                                             className={`text-sm font-medium team-tab-active team-tab-text-active ${theme === "dark" ? "text-card-foreground" : ""}`}>Users</TabsTrigger>
+                                             className={`text-sm font-normal team-tab-active team-tab-text-active ${theme === "dark" ? "text-card-foreground" : ""}`}>Users</TabsTrigger>
                                 <TabsTrigger value="invites"
-                                             className={`text-sm font-medium team-tab-active team-tab-text-active ${theme === "dark" ? "text-card-foreground" : ""}`}>Invites</TabsTrigger>
+                                             className={`text-sm font-normal team-tab-active team-tab-text-active ${theme === "dark" ? "text-card-foreground" : ""}`}>Invites</TabsTrigger>
                             </TabsList>
                         </div>
                         <TabsContent value="users">
@@ -300,7 +300,7 @@ const Team = () => {
                                                 {
                                                     ["Team", "Role" ,isAdmin === true ? "Action" : ""].map((x, i) => {
                                                         return (
-                                                           x?  <TableHead key={x} className={`h-[22px] sm:pl-6 pb-2 text-sm font-medium ${ isAdmin === true && i === 2 ? "text-end" : isAdmin === false && i === 1 ? "text-end" : ""} ${theme === "dark" ? "" : "text-card-foreground"}`}>{x}</TableHead> :""
+                                                           x?  <TableHead key={x} className={`h-[22px] sm:pl-6 pb-2 text-sm font-normal ${ isAdmin === true && i === 2 ? "text-end" : isAdmin === false && i === 1 ? "text-end" : ""} ${theme === "dark" ? "" : "text-card-foreground"}`}>{x}</TableHead> :""
                                                         )
                                                     })
                                                 }
@@ -338,11 +338,11 @@ const Team = () => {
                                                                                              alt={x && x?.user_first_name?.substring(0, 1)?.toUpperCase() && x?.user_last_name?.substring(0, 1)?.toUpperCase()}
                                                                                 />
                                                                                 :
-                                                                                <AvatarFallback className={"bg-primary/10 border-primary border text-sm text-primary font-semibold"}>{x?.user_first_name?.substring(0, 1)?.toUpperCase()}{x?.user_last_name?.substring(0, 1)?.toUpperCase()}</AvatarFallback>
+                                                                                <AvatarFallback className={"bg-primary/10 border-primary border text-sm text-primary font-medium"}>{x?.user_first_name?.substring(0, 1)?.toUpperCase()}{x?.user_last_name?.substring(0, 1)?.toUpperCase()}</AvatarFallback>
                                                                         }
                                                                     </Avatar>
                                                                     <div>
-                                                                        <h3 className={"text-sm font-medium"}>{x.user_first_name} {x.user_last_name}</h3>
+                                                                        <h3 className={"text-sm font-normal"}>{x.user_first_name} {x.user_last_name}</h3>
                                                                         <p className={"text-xs font-normal text-muted-foreground"}>{x.user_email_id}</p>
                                                                     </div>
                                                                 </div>
@@ -376,7 +376,7 @@ const Team = () => {
                                 {isLoading === false && memberList.length === 0 && <div className={"flex flex-row justify-center py-[45px]"}>
                                     <div className={"flex flex-col items-center gap-2"}>
                                         <img src={NoDataThumbnail} className={"flex items-center"}/>
-                                        <h5 className={`text-center text-2xl font-medium leading-8 ${theme === "dark" ? "" : "text-[#A4BBDB]"}`}>No Data</h5>
+                                        <h5 className={`text-center text-2xl font-normal ${theme === "dark" ? "" : "text-[#A4BBDB]"}`}>No Data</h5>
                                     </div>
                                 </div>}
                             </div>
@@ -389,7 +389,7 @@ const Team = () => {
                                             {
                                                 ["Email", "Status", "Invited", "Action"].map((x, i) => {
                                                     return (
-                                                        <TableHead key={i} className={`h-[22px] pb-2 text-sm font-medium ${i === 0 ? "sm:pl-6" : i === 3 ? "pr-3" : ""} ${theme === "dark" ? "" : "text-card-foreground"}`}>{x}</TableHead>
+                                                        <TableHead key={i} className={`h-[22px] pb-2 text-sm font-normal ${i === 0 ? "sm:pl-6" : i === 3 ? "pr-3" : ""} ${theme === "dark" ? "" : "text-card-foreground"}`}>{x}</TableHead>
                                                     )
                                                 })
                                             }
@@ -420,7 +420,7 @@ const Team = () => {
                                         <Fragment>
                                             {(invitationList || []).map((x, i) => (
                                                 <TableRow key={i}>
-                                                    <TableCell className="font-medium sm:pl-6">{x?.member_email}</TableCell>
+                                                    <TableCell className="font-normal sm:pl-6">{x?.member_email}</TableCell>
                                                     <TableCell>Expires in {moment(x?.expire_at).diff(moment(new Date()), 'days')} days</TableCell>
                                                     <TableCell>Invited about {moment.utc(x.created_at).local().startOf('seconds').fromNow()}</TableCell>
                                                     <TableCell className="pr-6 text-right">
@@ -453,7 +453,7 @@ const Team = () => {
                     <SheetOverlay className={"inset-0"} />
                     <SheetContent className={"sm:max-w-[662px] p-0"}>
                         <SheetHeader className={"px-4 py-3 md:py-5 lg:px-8 lg:py-[20px] border-b flex flex-row justify-between items-center"}>
-                            <SheetTitle className={"text-sm md:text-xl font-medium flex justify-between items-center"}>
+                            <SheetTitle className={"text-sm md:text-xl font-normal flex justify-between items-center"}>
                                 Invite Users
                             </SheetTitle>
                             <X className={"cursor-pointer m-0"} onClick={closeSheet}/>
@@ -462,7 +462,7 @@ const Team = () => {
                         <div className="grid gap-6 px-3 py-4 sm:px-8 sm:py-6 border-b">
                             <div className="flex flex-col gap-2">
                                 <div className={"space-y-1"}>
-                                    <Label htmlFor="name" className="text-right">Add emails of users you want to invite to test, and click on Invite</Label>
+                                    <Label htmlFor="inviteEmail" className={"text-right font-normal"}>Add emails of users you want to invite to test, and click on Invite</Label>
                                     <Input
                                         type={"email"}
                                         id="inviteEmail"
@@ -480,7 +480,7 @@ const Team = () => {
                         </div>
                         <div className={"flex px-3 py-4 sm:px-[32px] gap-[16px] sm:justify-start"}>
                             <Button
-                                className={`py-2 px-4 w-[69px] text-sm font-semibold hover:bg-primary`}
+                                className={`py-2 px-4 w-[69px] text-sm font-medium hover:bg-primary`}
                                 onClick={onInviteUser}
                             >
                                 {isSave ? <Loader2 className="h-4 w-4 animate-spin"/> : "Invite"}
@@ -488,7 +488,7 @@ const Team = () => {
                                 <Button
                                     variant={"ghost hover:bg-none"}
                                     onClick={closeSheet}
-                                    className={`text-sm font-semibold border border-primary`}
+                                    className={`text-sm font-medium border border-primary`}
                                 >Cancel</Button>
 
                         </div>

@@ -150,7 +150,7 @@ const Category = () => {
                     <SheetOverlay className={"inset-0"} />
                     <SheetContent className={"sm:max-w-[662px] p-0"}>
                         <SheetHeader className={"px-3 py-4 lg:px-8 lg:py-[20px] flex flex-row justify-between items-center border-b"}>
-                            <h5 className={"text-sm md:text-xl font-medium"}>
+                            <h5 className={"text-sm md:text-xl font-normal"}>
                                 {type === "cate"
                                     ? (editData ? "Update Category" : "Create New Category")
                                     : (editData ? "Update Subcategory" : "Create New Subcategory")}
@@ -160,7 +160,7 @@ const Category = () => {
                         <div className={"h-[calc(100%_-_69px)] overflow-y-auto"}>
                         <div className={"sm:px-8 sm:py-6 px-3 py-4 border-b space-y-6"}>
                             <div className="grid w-full gap-2">
-                                <Label htmlFor="title">Category name</Label>
+                                <Label htmlFor="title" className={"font-normal"}>Category name</Label>
                                 <Input
                                     value={categoryData.title}
                                     onChange={(e) => handleOnChange("title", e.target.value)}
@@ -171,14 +171,14 @@ const Category = () => {
                                 />
                             </div>
                             <div className="grid w-full gap-2">
-                                <Label htmlFor="description">Category description</Label>
+                                <Label htmlFor="description" className={"font-normal"}>Category description</Label>
                                 <ReactQuillEditor
                                     value={categoryData.description}
                                     onChange={(e) => handleOnChange("description", e.target.value)}
                                 />
                             </div>
                             <div className={"flex flex-col gap-2"}>
-                                <Label>Category Icon</Label>
+                                <Label className={"font-normal"}>Category Icon</Label>
                             <div className="w-[282px] h-[128px] flex gap-1">
                                 {categoryData.image && categoryData.image instanceof File ? (
                                     <div className={"w-[282px] h-[128px] relative border p-[5px]"}>
@@ -197,6 +197,7 @@ const Category = () => {
                                             type="file"
                                             className="hidden"
                                             onChange={handleImageUpload}
+                                            accept={".jpg,.jpeg"}
                                         />
                                         <label
                                             htmlFor="imageInput"
@@ -209,17 +210,17 @@ const Category = () => {
                             </div>
                             </div>
                         </div>
-                        <div className={"px-3 py-4 sm:py-6 sm:px-8 space-x-4"}>
+                        <div className={"flex gap-4 px-3 py-4 sm:py-6 sm:px-8"}>
                             <Button
-                                className={`border w-[127px] font-semibold ${isSave ? "justify-center items-center" : ""}`}
+                                className={`border w-[132px] font-medium hover:bg-primary ${isSave ? "justify-center items-center" : ""}`}
                                 onClick={handleSaveCategory}
                             >
-                                {isSave ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Save Category"}
+                                {isSave ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save Category"}
                             </Button>
                             <Button
                                 variant={"ghost hover:bg-none"}
                                 onClick={closeSheet}
-                                className={`border border-primary font-semibold`}
+                                className={`border border-primary font-medium`}
                             >
                                 Cancel
                             </Button>
@@ -244,11 +245,11 @@ const Category = () => {
                                 </DialogHeader>
                                 <div className={"flex justify-end gap-2"}>
                                     <Button variant={"outline hover:none"}
-                                            className={"text-sm font-semibold border"}
+                                            className={"text-sm font-medium border"}
                                             onClick={() => setOpenDelete(false)}>Cancel</Button>
                                     <Button
                                         variant={"hover:bg-destructive"}
-                                        className={`${theme === "dark" ? "text-card-foreground" : "text-card"} w-[76px] text-sm font-semibold bg-destructive`}
+                                        className={`${theme === "dark" ? "text-card-foreground" : "text-card"} w-[76px] text-sm font-medium bg-destructive`}
                                         onClick={handleDelete}
                                     >
                                         Delete
@@ -260,7 +261,7 @@ const Category = () => {
                 }
 
                 <div className={"space-y-6"}>
-                    <h4 className={"font-medium text-lg sm:text-2xl"}>All Category</h4>
+                    <h4 className={"font-normal text-lg sm:text-2xl"}>All Category</h4>
                     <div className={"flex justify-between"}>
                         <Input
                             type="search"
@@ -270,7 +271,7 @@ const Category = () => {
                         <Button
                             size="sm"
                             onClick={() => openSheet("cate")}
-                            className={"gap-2 font-semibold hover:bg-primary"}
+                            className={"gap-2 font-medium hover:bg-primary"}
                         >
                             <Plus size={20} strokeWidth={3} />New Category
                         </Button>
@@ -285,14 +286,14 @@ const Category = () => {
                                     <Table>
                                         <TableHeader className={`${theme === "dark" ? "" : "bg-muted"} py-8 px-5`}>
                                             <TableRow className={""}>
-                                                <TableHead className={`px-2 py-[10px] md:px-3 text-primary font-semibold w-[300px]`}>
+                                                <TableHead className={`px-2 py-[10px] md:px-3 text-primary font-medium w-[300px]`}>
                                                     {x.title}
                                                 </TableHead>
-                                                <TableHead className={`font-semibold px-2 py-[10px] md:px-3 w-[300px]`}>Description</TableHead>
-                                                <TableHead className={`font-semibold px-2 py-[10px] md:px-3 w-[300px]`}>Articles</TableHead>
-                                                <TableHead className={`font-semibold px-2 py-[10px] md:px-3 w-[300px]`}>Created at</TableHead>
-                                                {/*<TableHead className={`font-semibold px-2 py-[10px] md:px-3 w-[300px] text-center`}>*/}
-                                                <TableHead className={`font-semibold px-2 py-[10px] md:px-3 w-[300px]`}>
+                                                <TableHead className={`font-medium px-2 py-[10px] md:px-3 w-[300px]`}>Description</TableHead>
+                                                <TableHead className={`font-medium px-2 py-[10px] md:px-3 w-[300px]`}>Articles</TableHead>
+                                                <TableHead className={`font-medium px-2 py-[10px] md:px-3 w-[300px]`}>Created at</TableHead>
+                                                {/*<TableHead className={`font-medium px-2 py-[10px] md:px-3 w-[300px] text-center`}>*/}
+                                                <TableHead className={`font-medium px-2 py-[10px] md:px-3 w-[300px]`}>
                                                     <div className={"space-x-2"}>
                                                         {/*<TooltipProvider>*/}
                                                         {/*    <Tooltip>*/}
@@ -349,7 +350,7 @@ const Category = () => {
                                                     <TableCell className={"px-2 py-[10px] md:px-3 w-[300px] text-center"}>
                                                         <DropdownMenu>
                                                             <DropdownMenuTrigger>
-                                                                <Ellipsis className={`font-medium`} size={18} />
+                                                                <Ellipsis className={`font-normal`} size={18} />
                                                             </DropdownMenuTrigger>
                                                             <DropdownMenuContent align={"end"}>
                                                                 <DropdownMenuItem className={"cursor-pointer"} onClick={() => openSheet('sub', i,y)}>Edit</DropdownMenuItem>

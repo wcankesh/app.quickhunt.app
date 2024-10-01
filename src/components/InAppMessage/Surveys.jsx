@@ -201,7 +201,10 @@ const Surveys = ({inAppMsgSetting, setInAppMsgSetting, selectedStepIndex, setSel
                     return(
                         <div className={`flex flex-col mx-auto gap-8 w-full max-w-[550px]`} key={i}>
                             <div onClick={(e) => onSelectStep(x, i)} className={"relative rounded-[10px] pt-8 p-6 cursor-pointer"} style={{backgroundColor: selectedStep.step === x.step ? inAppMsgSetting.bg_color : "#fff", color: selectedStep.step === x.step ?inAppMsgSetting.text_color : "#000"}}>
-                                <div className={"absolute top-[8px] right-[8px]"}><X size={16}/></div>
+                                <div className={"absolute top-[8px] right-[8px]"}>
+                                {
+                                    inAppMsgSetting.is_close_button ? <X size={16} stroke={inAppMsgSetting?.btn_color}/> : ""
+                                }</div>
                                 <div className={"flex gap-3"}>
                                     <div className={"flex-none pt-2 flex-1 w-8"}>
                                         {
@@ -210,7 +213,7 @@ const Surveys = ({inAppMsgSetting, setInAppMsgSetting, selectedStepIndex, setSel
                                                     userDetailsReducer?.user_photo ?
                                                         <AvatarImage src={userDetailsReducer?.user_photo} alt="@shadcn"/>
                                                         :
-                                                        <AvatarFallback>
+                                                        <AvatarFallback className={`${theme === "dark" ? "bg-card-foreground" : ""} text-sm`}>
                                                             {userDetailsReducer && userDetailsReducer?.user_first_name && userDetailsReducer?.user_first_name.substring(0, 1)}
                                                             {userDetailsReducer && userDetailsReducer?.user_last_name && userDetailsReducer?.user_last_name?.substring(0, 1)}
                                                         </AvatarFallback>
@@ -230,7 +233,9 @@ const Surveys = ({inAppMsgSetting, setInAppMsgSetting, selectedStepIndex, setSel
                                                 <div className={"flex gap-3 px-[30px] pt-[18px]"}>
                                                     {
                                                         renderNumber(x).map(num => (
-                                                            <Button key={num} variant={"outline"} className={"w-5 h-5 text-xs p-0"}>{num}</Button>
+                                                            <Button key={num} variant={"outline"}
+                                                                    className={`${theme === "dark" ? "bg-card-foreground hover:bg-card-foreground hover:text-muted" : ""} w-5 h-5 text-xs p-0`}
+                                                            >{num}</Button>
                                                         ))
                                                     }
                                                 </div>
@@ -247,7 +252,7 @@ const Surveys = ({inAppMsgSetting, setInAppMsgSetting, selectedStepIndex, setSel
                                                     className={"flex justify-center gap-3 px-[30px] pt-[18px]"}>
                                                     {
                                                         renderNumber(x).map(num => (
-                                                            <Button key={num} variant={"outline"} className={"w-5 h-5 text-xs p-0"}>{num}</Button>
+                                                            <Button key={num} variant={"outline"} className={`${theme === "dark" ? "bg-card-foreground hover:bg-card-foreground hover:text-muted" : ""} w-5 h-5 text-xs p-0`}>{num}</Button>
                                                         ))
                                                     }
                                                 </div>
@@ -276,7 +281,7 @@ const Surveys = ({inAppMsgSetting, setInAppMsgSetting, selectedStepIndex, setSel
                                         {
                                             x?.question_type === 4 &&
                                             <Fragment>
-                                                <div className={"flex justify-center gap-6 mt-6 mb-6 flex-wrap"}>
+                                                <div className={"flex justify-center gap-6 my-6 flex-wrap"}>
                                                         {
                                                             (x?.reactions || []).map((r, ind) => {
                                                                 return (
@@ -284,7 +289,7 @@ const Surveys = ({inAppMsgSetting, setInAppMsgSetting, selectedStepIndex, setSel
                                                                         <div className={"relative group hover:cursor-pointer"} key={ind}>
                                                                                 <span onClick={() => onDeleteReaction(r, ind, i)}
                                                                                       className="absolute hidden group-hover:inline-block py-0.5 leading-none right-[-11px] top-[-13px] border rounded shadow -top-1 text-[9px] font-bold tracking-wide  px-0.5 text-background-accent dark:text-foreground/60 dark:border-gray-500/60  dark:bg-dark-accent bg-white">
-                                                                                    <Trash2 size={16}/>
+                                                                                    <Trash2 size={16} className={`${theme === "dark" ? "stroke-muted" : ""}`}/>
                                                                                 </span>
                                                                             <img key={ind} className={"h-6 w-6 cursor-pointer"} src={r.emoji_url}/>
                                                                         </div> : ""
@@ -311,12 +316,12 @@ const Surveys = ({inAppMsgSetting, setInAppMsgSetting, selectedStepIndex, setSel
                                             <Fragment>
                                                 <div className="mt-3">
                                                     <Select placeholder={x.placeholder_text} value={""}>
-                                                        <SelectTrigger>
+                                                        <SelectTrigger className={`${theme === "dark" ? "bg-card-foreground" : ""} ring-offset-background-0`}>
                                                             <SelectValue placeholder={x.placeholder_text}/>
                                                         </SelectTrigger>
-                                                        <SelectContent>
+                                                        <SelectContent className={`${theme === "dark" ? "bg-card-foreground" : ""}`}>
                                                             {x?.options.map((option, index) => (
-                                                                option.is_active === 1 && <SelectItem key={index} value={index}>{option.title}</SelectItem>
+                                                                option.is_active === 1 && <SelectItem className={`${theme === "dark" ? "focus:bg-card-foreground" : ""}`} key={index} value={index}>{option.title}</SelectItem>
                                                             ))}
                                                         </SelectContent>
                                                     </Select>
@@ -327,7 +332,7 @@ const Surveys = ({inAppMsgSetting, setInAppMsgSetting, selectedStepIndex, setSel
                                             x?.question_type === 6 &&
                                             <Fragment>
                                                 <div className="mt-3">
-                                                    <Input placeholder={x.placeholder_text} value={""}/>
+                                                    <Input placeholder={x.placeholder_text} value={""} className={`${theme === "dark" ? "bg-card-foreground" : ""}`}/>
                                                 </div>
                                             </Fragment>
                                         }
@@ -335,17 +340,17 @@ const Surveys = ({inAppMsgSetting, setInAppMsgSetting, selectedStepIndex, setSel
                                             x?.question_type === 7 &&
                                             <Fragment>
                                                 <div className="mt-3">
-                                                    <Textarea placeholder={x.placeholder_text} value={""}/>
+                                                    <Textarea placeholder={x.placeholder_text} value={""} className={`${theme === "dark" ? "bg-card-foreground" : ""}`}/>
                                                 </div>
                                             </Fragment>
                                         }
                                     </div>
                                     <div className={"flex-1 pt-2"}>
-                                        <Button variant={"outline"} className={`p-0 h-6 w-6`} onClick={(e) => {
+                                        <Button variant={"outline"} className={`${theme === "dark" ? "bg-card-foreground hover:bg-card-foreground" : ""} p-0 h-6 w-6`} onClick={(e) => {
                                             e.stopPropagation();
                                             onDeleteStep(x, i)
                                         }}>
-                                            <Trash2 size={12} className={""}/>
+                                            <Trash2 size={12} className={`${theme === "dark" ? "stroke-muted" : ""}`}/>
                                         </Button>
                                     </div>
                                 </div>

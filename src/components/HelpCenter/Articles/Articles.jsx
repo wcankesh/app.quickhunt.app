@@ -29,7 +29,7 @@ const Articles = () => {
     return (
         <div className={"container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-3 md:px-4"}>
             <div className={"space-y-6"}>
-                <h4 className={"font-medium text-lg sm:text-2xl"}>All Articles</h4>
+                <h4 className={"font-normal text-lg sm:text-2xl"}>All Articles</h4>
                 <div className={"flex justify-between items-center flex-wrap md:flex-nowrap gap-4"}>
                     <div className={"flex flex-wrap md:flex-nowrap gap-4"}>
                         <Input
@@ -54,7 +54,7 @@ const Articles = () => {
                             </SelectContent>
                         </Select>
                     </div>
-                    <Button size="sm" onClick={handleCreateClick} className={"gap-2 font-semibold hover:bg-primary"}>
+                    <Button size="sm" onClick={handleCreateClick} className={"gap-2 font-medium hover:bg-primary"}>
                         <Plus size={20} strokeWidth={3} /> New Article
                     </Button>
                 </div>
@@ -66,7 +66,7 @@ const Articles = () => {
                             <TableHeader className={`${theme === "dark" ? "" : "bg-muted"} py-8 px-5`}>
                                 <TableRow>
                                     {["Title", "Category / Subcategory", "Status", "Seen", "Created At", ""].map((x, i) => (
-                                        <TableHead className={`font-semibold px-2 py-[10px] md:px-3`} key={i}>{x}</TableHead>
+                                        <TableHead className={`font-medium px-2 py-[10px] md:px-3`} key={i}>{x}</TableHead>
                                     ))}
                                 </TableRow>
                             </TableHeader>
@@ -74,9 +74,9 @@ const Articles = () => {
                                 {
                                     articles.map((article, index) => (
                                         <TableRow key={index}>
-                                            <TableCell className={"px-2 py-[10px] md:px-3 font-medium"}>{article.title}</TableCell>
-                                            <TableCell className={"px-2 py-[10px] md:px-3 font-medium"}>{article.category} / {article.subcategory}</TableCell>
-                                            <TableCell className={"px-2 py-[10px] md:px-3 font-medium"}>{article.status}</TableCell>
+                                            <TableCell className={"px-2 py-[10px] md:px-3 font-normal"}>{article.title}</TableCell>
+                                            <TableCell className={"px-2 py-[10px] md:px-3 font-normal"}>{article.category} / {article.subcategory}</TableCell>
+                                            <TableCell className={"px-2 py-[10px] md:px-3 font-normal"}>{article.status}</TableCell>
                                             {/*<TableCell>*/}
                                             {/*    <Select value={x.post_status}*/}
                                             {/*            onValueChange={(value) => handleStatusChange(x, value)}>*/}
@@ -96,7 +96,7 @@ const Articles = () => {
                                             {/*                                        className={"flex items-center gap-2"}>*/}
                                             {/*                                        <Circle fill={x.fillColor}*/}
                                             {/*                                                stroke={x.strokeColor}*/}
-                                            {/*                                                className={`font-medium w-2 h-2`}/>*/}
+                                            {/*                                                className={`font-normal w-2 h-2`}/>*/}
                                             {/*                                        {x.name}*/}
                                             {/*                                    </div>*/}
                                             {/*                                </SelectItem>*/}
@@ -108,9 +108,9 @@ const Articles = () => {
                                             {/*        </SelectContent>*/}
                                             {/*    </Select>*/}
                                             {/*</TableCell>*/}
-                                            <TableCell className={"px-2 py-[10px] md:px-3 font-medium"}>{article.seen}</TableCell>
-                                            <TableCell className={"px-2 py-[10px] md:px-3 font-medium"}>{moment(article.createdAt).format('YYYY-MM-DD')}</TableCell>
-                                            <TableCell className={"px-2 py-[10px] md:px-3 font-medium"}>
+                                            <TableCell className={"px-2 py-[10px] md:px-3 font-normal"}>{article.seen}</TableCell>
+                                            <TableCell className={"px-2 py-[10px] md:px-3 font-normal"}>{moment(article.createdAt).format('YYYY-MM-DD')}</TableCell>
+                                            <TableCell className={"px-2 py-[10px] md:px-3 font-normal"}>
                                                 <DropdownMenu>
                                                     <DropdownMenuTrigger>
                                                         <Ellipsis size={16} />

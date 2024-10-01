@@ -163,10 +163,10 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
     return (
         <Fragment>
             <div className={"border-b"}>
-                <h5 className={"text-base font-medium border-b px-4 py-3"}>Content</h5>
+                <h5 className={"text-base font-normal border-b px-4 py-3"}>Content</h5>
                 <div className={"px-4 py-3 space-y-4"}>
                     <div className="grid w-full max-w-sm items-center gap-1.5">
-                        <Label htmlFor="title">Title</Label>
+                        <Label htmlFor="title" className={"font-normal"}>Title</Label>
                         <Input className={"h-9"} id="title" placeholder="Title" value={inAppMsgSetting.title}
                                onChange={(e) => onChange("title", e.target.value)}/>
                     </div>
@@ -263,12 +263,12 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                                     selectedStep?.action_type === 1 &&
                                     <Fragment>
                                         <div className="grid w-full max-w-sm items-center gap-1.5">
-                                            <Label htmlFor="title">Action Text</Label>
+                                            <Label htmlFor="action_text" className={"font-normal"}>Action Text</Label>
                                             <Input className={"h-9"} id="action_text" placeholder="Enter action text" value={selectedStep?.action_text}
                                                    onChange={(e) => onChangeQuestion("action_text", e.target.value)}/>
                                         </div>
                                         <div className="grid w-full max-w-sm items-center gap-1.5">
-                                            <Label htmlFor="title">Action URL</Label>
+                                            <Label htmlFor="action_url" className={"font-normal"}>Action URL</Label>
                                             <Input className={"h-9"} id="action_url" placeholder="Enter URL address" value={selectedStep?.action_url}
                                                    onChange={(e) => onChangeQuestion("action_url", e.target.value)}/>
                                         </div>
@@ -290,12 +290,12 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                     {
                         (type === "2" && inAppMsgSetting.action_type == 1) && <Fragment>
                             <div className="grid w-full max-w-sm items-center gap-1.5">
-                                <Label htmlFor="title">Action Text</Label>
+                                <Label htmlFor="action_text" className={"font-normal"}>Action Text</Label>
                                 <Input className={"h-9"} id="action_text" placeholder="Enter action text" value={inAppMsgSetting.action_text}
                                        onChange={(e) => onChange("action_text", e.target.value)}/>
                             </div>
                             <div className="grid w-full max-w-sm items-center gap-1.5">
-                                <Label htmlFor="title">Action URL</Label>
+                                <Label htmlFor="action_url" className={"font-normal"}>Action URL</Label>
                                 <Input className={"h-9"} id="action_url" placeholder="Enter URL address" value={inAppMsgSetting.action_url}
                                        onChange={(e) => onChange("action_url", e.target.value)}/>
                             </div>
@@ -325,7 +325,7 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
             </div>
             {
                 type === "3" && <div className={"border-b px-4 py-6 space-y-4"}>
-                    <h5 className={"text-base font-medium"}>Question Setting</h5>
+                    <h5 className={"text-base font-normal"}>Question Setting</h5>
                     {
                         selectedStep?.question_type === 5 &&
                         <div className="grid w-full max-w-sm items-center gap-1.5">
@@ -421,7 +421,7 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                 </div>
             }
             <div className={"border-b px-4 py-6 space-y-4"}>
-                <h5 className={"text-base font-medium"}>Style</h5>
+                <h5 className={"text-base font-normal"}>Style</h5>
                 {
                     type === "2" && <Fragment>
                         <div className="grid w-full max-w-sm items-center gap-1.5">
@@ -509,7 +509,7 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
             </div>
 
             <div className={"border-b px-4 py-6 space-y-4"}>
-                <h5 className={"text-base font-medium"}>Trigger Setting</h5>
+                <h5 className={"text-base font-normal"}>Trigger Setting</h5>
                 <div className="grid w-full max-w-sm items-center gap-1.5">
                     <Label className={"font-normal"}>Add delay</Label>
                     <Select value={inAppMsgSetting.delay} onValueChange={(value) => onChange("delay",value, )}>
@@ -604,10 +604,10 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                 </div>
             </div>
             <div className={"px-4 py-6 flex justify-between gap-2"}>
-                <Button className={`w-[125px] font-semibold hover:bg-primary`} onClick={id === "new" ? createMessage : onUpdateMessage}>
-                    {isLoading ? <Loader2 className={"mr-2  h-4 w-4 animate-spin"}/> : "Save Changes"}
+                <Button className={`w-[125px] font-medium hover:bg-primary`} onClick={id === "new" ? createMessage : onUpdateMessage}>
+                    {isLoading ? <Loader2 className={"h-4 w-4 animate-spin"}/> : "Save Changes"}
                 </Button>
-                <Button variant={"ghost hover-none"} className={"font-semibold border border-primary"} onClick={handleCancel}>Cancel</Button>
+                <Button variant={"ghost hover-none"} className={"font-medium border border-primary"} onClick={handleCancel}>Cancel</Button>
             </div>
         </Fragment>
     );

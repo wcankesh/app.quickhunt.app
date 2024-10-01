@@ -83,8 +83,8 @@ const WithGoogle = ({title}) => {
     }
 
     return (
-        <Button onClick={handleGoogleLogin} variant="outline hover:none" className="w-full border border-primary">
-                                                <span className={"font-normal flex gap-x-1 text-primary font-semibold"}>
+        <Button onClick={handleGoogleLogin} variant="outline hover:none" className="w-full border border-primary font-medium">
+                                                <span className={"flex gap-x-1 text-primary"}>
                                                     {Icon.googleIcon}
                                                     {title}
                                                 </span>

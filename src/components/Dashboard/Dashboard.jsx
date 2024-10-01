@@ -171,13 +171,13 @@ export function Dashboard() {
             <div className={"md:py-8 py-4 border-b"}>
                 <div
                     className='container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] px-3 md:px-4'>
-                    <h1 className="md:text-[32px] text-[26px] font-medium">Welcome to Quickhunt</h1>
+                    <h1 className="md:text-[32px] text-[26px]">Welcome to Quickhunt</h1>
                 </div>
             </div>
             <div
                 className="container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pb-5 px-3 md:px-4">
                 <div className={"flex items-center flex-wrap pb-6 pt-9 gap-2 md:justify-between md:flex-nowrap"}>
-                    <h3 className="text-base font-bold">Here's what has happened to your program</h3>
+                    <h3 className="text-base font-medium">Here's what has happened to your program</h3>
                     <DateRangePicker
                         onUpdate={(values) => onChangeDate(values)}
                         initialDateFrom={state.from}
@@ -200,14 +200,14 @@ export function Dashboard() {
                                                     className={"rounded-lg border bg-card text-card-foreground shadow-sm"}
                                                     x-chunk={"dashboard-05-chunk-0"} key={i}>
                                                     <CardHeader className={"p-6 gap-0.5"}>
-                                                        <CardTitle className={"text-sm font-medium"}>
+                                                        <CardTitle className={"text-sm font-normal"}>
                                                             {x.title}
                                                         </CardTitle>
                                                         <CardContent className={"p-0 flex flex-col gap-2 m-0"}>
-                                                            <h3 className={"text-primary text-2xl font-bold"}>
+                                                            <h3 className={"text-primary text-2xl font-medium"}>
                                                                 {x.count}
                                                             </h3>
-                                                            <p className={"text-xs font-medium"}>
+                                                            <p className={"text-xs"}>
                                                                 {x.compareText}
                                                             </p>
                                                         </CardContent>
@@ -222,7 +222,7 @@ export function Dashboard() {
                     <div className={"flex flex-wrap gap-4 lg:gap-8 md:flex-nowrap"}>
                         <Card className={"lg:basis-2/3 basis-full min-w-[270px] shadow border"}>
                             <CardHeader className={"p-6 py-3 border-b"}>
-                                <CardTitle className={"text-base font-bold"}>Comments
+                                <CardTitle className={"text-base font-medium"}>Comments
                                     ({isLoading ? 0 : chartList.feedbacks.length})</CardTitle>
                             </CardHeader>
                             <div className={"max-h-[300px] overflow-y-auto"}>
@@ -255,19 +255,19 @@ export function Dashboard() {
                                                                     </Avatar>
                                                                 </div>
                                                                 <div className={"flex items-center flex-wrap gap-1 md:gap-2"}>
-                                                                <h4 className="text-sm font-semibold">{x.customer_name}</h4>
-                                                                <p className="text-xs font-medium text-muted-foreground">{x.customer_email}</p>
+                                                                <h4 className="text-sm font-medium">{x.customer_name}</h4>
+                                                                <p className="text-xs text-muted-foreground">{x.customer_email}</p>
                                                                 </div>
                                                             </div>
                                                             <Badge
                                                                 variant={"outline"}
-                                                                className={`text-xs font-medium text-muted-foreground ${x.type === 1 ? "text-[#3b82f6] border-[#3b82f6]" : "text-[#63c8d9] border-[#63c8d9]"}`}
+                                                                className={`text-xs font-normal text-muted-foreground ${x.type === 1 ? "text-[#3b82f6] border-[#3b82f6]" : "text-[#63c8d9] border-[#63c8d9]"}`}
                                                             >
                                                                 {x.type === 1 ? "Announcement" : "Idea"}
                                                             </Badge>
                                                         </div>
                                                         <p
-                                                            className={"text-xs font-medium text-foreground cursor-pointer"}
+                                                            className={"text-xs font-normal text-foreground cursor-pointer"}
                                                             onClick={() => {
                                                                 if (x.type === 1) {
                                                                     navigate(`${baseUrl}/announcements/${x.post_id}`);
@@ -288,7 +288,7 @@ export function Dashboard() {
                                 }
                             </div>
                             <div className={"p-6 py-3 text-end"}>
-                                <Button variant={"ghost hover:none"} className={"p-0 h-auto text-primary font-semibold"}
+                                <Button variant={"ghost hover:none"} className={"p-0 h-auto text-primary font-medium"}
                                         onClick={() => navigate(`${baseUrl}/dashboard/comments`)}>
                                     See All
                                 </Button>
@@ -296,7 +296,7 @@ export function Dashboard() {
                         </Card>
                         <Card className={"lg:basis-1/3 basis-full min-w-[270px] shadow border"}>
                             <CardHeader className={"p-6 py-3 border-b"}>
-                                <CardTitle className={"text-base font-bold"}>Reaction
+                                <CardTitle className={"text-base font-medium"}>Reaction
                                     ({isLoading ? 0 : chartList.reactions.length})</CardTitle>
                             </CardHeader>
                             <div className={"max-h-[300px] overflow-y-auto"}>
@@ -317,16 +317,16 @@ export function Dashboard() {
                                                                 <div className={"flex flex-col gap-1"}>
                                                                     <div className="flex gap-1 items-center">
                                                                         <h4
-                                                                            className="text-sm font-semibold cursor-pointer"
+                                                                            className="text-sm font-medium cursor-pointer"
                                                                             // onClick={() => openReactions(x.post_id)}
                                                                             // onClick={() => navigate(`${baseUrl}/announcements?postId=${x.post_id}`)}
                                                                             onClick={() => navigate(`${baseUrl}/announcements/analytic-view?postId=${x.post_id}`)}
                                                                         >{x.customer_name}</h4>
-                                                                        <p className="text-xs font-medium text-muted-foreground">Reacted
+                                                                        <p className="text-xs text-muted-foreground">Reacted
                                                                             To</p>
                                                                     </div>
                                                                     <p
-                                                                        className="text-xs font-semibold text-foreground cursor-pointer"
+                                                                        className="text-xs font-medium text-foreground cursor-pointer"
                                                                         onClick={() => navigate(`${baseUrl}/announcements/analytic-view?postId=${x.post_id}`)}
                                                                     >"{x.post_title}"</p>
                                                                 </div>
@@ -340,7 +340,7 @@ export function Dashboard() {
                                 }
                             </div>
                             <div className={"p-6 py-3 text-end"}>
-                                <Button variant={"ghost hover:none"} className={"p-0 h-auto text-primary font-semibold"}
+                                <Button variant={"ghost hover:none"} className={"p-0 h-auto text-primary font-medium"}
                                         onClick={() => navigate(`${baseUrl}/dashboard/reactions`)}>
                                     See All
                                 </Button>
@@ -350,7 +350,7 @@ export function Dashboard() {
                     <div>
                         <Card className={"shadow border"}>
                             <CardHeader className={"p-4 pb-0 md:p-6 md:pb-0"}>
-                                <CardTitle className={"text-base font-bold"}>Overview</CardTitle>
+                                <CardTitle className={"text-base font-medium"}>Overview</CardTitle>
                             </CardHeader>
                             {dataAvailable ? (
                                 <CardContent className={"pb-10 px-4 pt-8 m-0 md:px-7"}>

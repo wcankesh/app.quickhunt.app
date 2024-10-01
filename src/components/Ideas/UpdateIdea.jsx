@@ -568,7 +568,7 @@ const UpdateIdea = () => {
                 <div className={`max-w-[407px] w-full h-full border-r lg:block hidden lg:overflow-auto`}>
                     <div className={"border-b py-4 px-6 flex flex-col gap-3"}>
                         <div className={"flex flex-col gap-1"}>
-                            <h3 className={"text-sm font-medium"}>Status</h3>
+                            <h3 className={"text-sm font-normal"}>Status</h3>
                             <p className={"text-muted-foreground text-xs font-normal"}>Apply a status to Manage
                                 this
                                 idea on roadmap.</p>
@@ -594,8 +594,8 @@ const UpdateIdea = () => {
                         </div>
                     </div>
                     <div className={"border-b"}>
-                        <div className="py-4 px-6 w-full items-center gap-1.5">
-                            <Label htmlFor="picture">Featured image</Label>
+                        <div className="py-4 px-6 w-full space-y-1.5">
+                            <Label htmlFor="picture" className={"font-normal"}>Featured image</Label>
                             <div className="w-[282px] h-[128px] flex gap-1">
 
                                 {
@@ -650,13 +650,13 @@ const UpdateIdea = () => {
                     <div className={"py-4 px-6 flex flex-col gap-[26px]"}>
                         <div className={"flex gap-1 justify-between"}>
                             <div className={"flex flex-col gap-1"}>
-                                <h4 className={"text-sm font-medium"}>Mark as bug</h4>
+                                <h4 className={"text-sm font-normal"}>Mark as bug</h4>
                                 <p className={"text-muted-foreground text-xs font-normal"}>Hides Idea from your
                                     users</p>
                             </div>
                             <Button
                                 variant={"outline"}
-                                className={`hover:bg-muted w-[132px] ${theme === "dark" ? "" : "border-muted-foreground text-muted-foreground"} text-sm font-semibold`}
+                                className={`hover:bg-muted w-[132px] ${theme === "dark" ? "" : "border-muted-foreground text-muted-foreground"} text-sm font-medium`}
                                 onClick={() => onChangeStatus(
                                     "is_active",
                                     selectedIdea?.is_active === 1 ? 0 : 1
@@ -670,14 +670,14 @@ const UpdateIdea = () => {
                         </div>
                         <div className={"flex gap-1 justify-between"}>
                             <div className={"flex flex-col gap-1"}>
-                                <h4 className={"text-sm font-medium"}>Archive</h4>
+                                <h4 className={"text-sm font-normal"}>Archive</h4>
                                 <p className={"text-muted-foreground text-xs font-normal"}>Remove Idea from
                                     Board
                                     and Roadmap</p>
                             </div>
                             <Button
                                 variant={"outline"}
-                                className={`w-[100px] hover:bg-muted ${theme === "dark" ? "" : "border-muted-foreground text-muted-foreground"} text-sm font-semibold`}
+                                className={`w-[100px] hover:bg-muted ${theme === "dark" ? "" : "border-muted-foreground text-muted-foreground"} text-sm font-medium`}
                                 onClick={() => onChangeStatus(
                                     "is_archive",
                                     selectedIdea?.is_archive === 1 ? 0 : 1
@@ -698,7 +698,7 @@ const UpdateIdea = () => {
                                 <div
                                     className={"px-4 py-3 lg:py-6 lg:px-8 flex flex-col gap-4 ld:gap-6 border-b"}>
                                     <div className="space-y-2">
-                                        <Label htmlFor="text">Title</Label>
+                                        <Label htmlFor="text" className={"font-normal"}>Title</Label>
                                         <Input type="text" id="text" placeholder="" value={selectedIdea.title}
                                                name={"title"} onChange={onChangeText}/>
                                         {
@@ -707,14 +707,14 @@ const UpdateIdea = () => {
                                         }
                                     </div>
                                     <div className="space-y-2">
-                                        <Label htmlFor="message">Description</Label>
+                                        <Label htmlFor="message" className={"font-normal"}>Description</Label>
                                         <ReactQuillEditor value={selectedIdea.description} name={"description"}
                                                           onChange={onChangeText}/>
                                         {formError.description &&
                                         <span className="text-red-500 text-sm">{formError.description}</span>}
                                     </div>
                                     <div className={"space-y-2"}>
-                                        <Label>Choose Board for this Idea</Label>
+                                        <Label className={"font-normal"}>Choose Board for this Idea</Label>
                                         <Select
                                             onValueChange={(value) => onChangeText({
                                                 target: {
@@ -747,7 +747,7 @@ const UpdateIdea = () => {
                                     </div>
                                 </div>
                                 <div className={"px-4 py-3 lg:py-6 lg:px-8 border-b space-y-2"}>
-                                    <Label>Choose Topics for this Idea (optional)</Label>
+                                    <Label className={"font-normal"}>Choose Topics for this Idea (optional)</Label>
                                     <Select onValueChange={handleChangeTopic}
                                             value={selectedIdea.topic.map(x => x.id)}>
                                         <SelectTrigger className="bg-card">
@@ -791,7 +791,7 @@ const UpdateIdea = () => {
                                 </div>
                                 <div className={"p-4 lg:p-8 flex gap-3"}>
                                     <Button
-                                        className={`py-2 px-6 w-[81px] text-sm font-semibold hover:bg-primary`}
+                                        className={`py-2 px-6 w-[81px] text-sm font-medium hover:bg-primary`}
                                         onClick={onCreateIdea}
                                     >
                                         {
@@ -801,7 +801,7 @@ const UpdateIdea = () => {
                                     </Button>
                                     <Button
                                         variant={"outline hover:bg-transparent"}
-                                        className={"border border-primary py-2 px-6 text-sm font-semibold"}
+                                        className={"border border-primary py-2 px-6 text-sm font-medium"}
                                         onClick={handleOnCreateCancel}
                                     >
                                         Cancel
@@ -823,7 +823,7 @@ const UpdateIdea = () => {
                                                     <ArrowBigUp
                                                         className={"fill-primary stroke-primary"}/>
                                                 </Button>
-                                                <p className={"text-xl font-medium"}>{selectedIdea?.vote}</p>
+                                                <p className={"text-xl font-normal"}>{selectedIdea?.vote}</p>
                                                 {
                                                     selectedIdea && selectedIdea?.vote_list && selectedIdea?.vote_list.length ?
                                                         <Popover>
@@ -863,7 +863,7 @@ const UpdateIdea = () => {
                                                             <PopoverContent className="p-0" align={"start"}>
                                                                 <div className={""}>
                                                                     <div className={"py-3 px-4"}>
-                                                                        <h4 className="font-medium leading-none text-sm">{`Voters (${selectedIdea?.vote_list.length})`}</h4>
+                                                                        <h4 className="font-normal leading-none text-sm">{`Voters (${selectedIdea?.vote_list.length})`}</h4>
                                                                     </div>
                                                                     <div
                                                                         className="border-t px-4 py-3 space-y-2">
@@ -934,7 +934,7 @@ const UpdateIdea = () => {
                                                         <div className={"flex gap-1 justify-between"}>
                                                             <Button
                                                                 variant={"outline"}
-                                                                className={`hover:bg-muted p-2 h-auto ${theme === "dark" ? "" : "border-muted-foreground text-muted-foreground"} text-xs font-semibold`}
+                                                                className={`hover:bg-muted p-2 h-auto ${theme === "dark" ? "" : "border-muted-foreground text-muted-foreground"} text-xs font-medium`}
                                                                 onClick={() => onChangeStatus(
                                                                     "is_active",
                                                                     selectedIdea?.is_active === 1 ? 0 : 1
@@ -949,7 +949,7 @@ const UpdateIdea = () => {
                                                         <div className={"flex gap-1 justify-between"}>
                                                             <Button
                                                                 variant={"outline"}
-                                                                className={`hover:bg-muted p-2 h-auto ${theme === "dark" ? "" : "border-muted-foreground text-muted-foreground"} text-xs font-semibold`}
+                                                                className={`hover:bg-muted p-2 h-auto ${theme === "dark" ? "" : "border-muted-foreground text-muted-foreground"} text-xs font-medium`}
                                                                 onClick={() => onChangeStatus(
                                                                     "is_archive",
                                                                     selectedIdea?.is_archive === 1 ? 0 : 1
@@ -1013,7 +1013,7 @@ const UpdateIdea = () => {
                                         </div>
                                         <div className={"flex flex-col gap-4"}>
                                             <div className={"flex items-center gap-2"}>
-                                                <h2 className={"text-xl font-medium"}>{selectedIdea?.title}</h2>
+                                                <h2 className={"text-xl font-normal"}>{selectedIdea?.title}</h2>
                                             </div>
                                             <div
                                                 className={`description-container text-sm ${theme === "dark" ? "" : "text-muted-foreground" }`}
@@ -1064,7 +1064,7 @@ const UpdateIdea = () => {
                                                         }
                                                     </Avatar>
                                                     <div className={"flex items-center"}>
-                                                        <h4 className={"text-sm font-medium"}>{selectedIdea?.name}</h4>
+                                                        <h4 className={"text-sm font-normal"}>{selectedIdea?.name}</h4>
                                                         <p className={"text-sm font-normal flex items-center text-muted-foreground"}>
                                                             <Dot size={20}
                                                                  className={"fill-text-card-foreground stroke-text-card-foreground"}/>
@@ -1108,7 +1108,7 @@ const UpdateIdea = () => {
                                         </div>
                                         <div className={"flex flex-col gap-2"}>
                                             <div className="w-full flex flex-col gap-2">
-                                                <Label htmlFor="message">Add comment</Label>
+                                                <Label htmlFor="message" className={"font-normal"}>Add comment</Label>
                                                 {/*{*/}
                                                 {/*    privateNote ?*/}
                                                 {/*        <Card*/}
@@ -1182,7 +1182,7 @@ const UpdateIdea = () => {
                                                     {/*<Switch id="airplane-mode"*/}
                                                     {/*        onCheckedChange={handlePrivateNote}/>*/}
                                                     {/*<Label htmlFor="airplane-mode"*/}
-                                                    {/*       className={"text-sm font-medium"}>Private*/}
+                                                    {/*       className={"text-sm font-normal"}>Private*/}
                                                     {/*    note</Label>*/}
                                                 </div>
                                                 <div className={"flex gap-2 items-center"}>
@@ -1203,7 +1203,7 @@ const UpdateIdea = () => {
 
                                                     </div>
                                                     <Button
-                                                        className={"w-[128px] h-[36px] text-sm font-semibold"}
+                                                        className={"w-[128px] h-[36px] text-sm font-medium"}
                                                         onClick={onCreateComment}
                                                         disabled={commentText.trim() === "" || commentText === ""}
                                                     >
@@ -1259,7 +1259,7 @@ const UpdateIdea = () => {
                                                                                 className={"flex gap-1 flex-wrap justify-between"}>
                                                                                 <div
                                                                                     className={"flex items-start"}>
-                                                                                    <h4 className={"text-sm font-medium"}>{x?.name}</h4>
+                                                                                    <h4 className={"text-sm font-normal"}>{x?.name}</h4>
                                                                                     <p className={"text-sm font-normal flex items-center text-muted-foreground"}>
                                                                                         <Dot size={20}
                                                                                              className={"fill-text-card-foreground stroke-text-card-foreground"}/>
@@ -1343,7 +1343,7 @@ const UpdateIdea = () => {
                                                                                             <div
                                                                                                 className={"flex gap-2"}>
                                                                                                 <Button
-                                                                                                    className={`py-2 px-6 w-[81px] h-[30px] text-sm font-semibold hover:bg-primary`}
+                                                                                                    className={`py-2 px-6 w-[81px] h-[30px] text-sm font-medium hover:bg-primary`}
                                                                                                     onClick={onUpdateComment}
                                                                                                     disabled={selectedComment.comment.trim() === "" || selectedComment.comment === ""}>
                                                                                                     {
@@ -1354,7 +1354,7 @@ const UpdateIdea = () => {
                                                                                                     }
                                                                                                 </Button>
                                                                                                 <Button
-                                                                                                    className={`px-3 py-2 h-[30px] text-sm font-semibold text-primary border border-primary`}
+                                                                                                    className={`px-3 py-2 h-[30px] text-sm font-medium text-primary border border-primary`}
                                                                                                     variant={"outline hover:none"}
                                                                                                     onClick={onCancelComment}>
                                                                                                     Cancel
@@ -1411,7 +1411,7 @@ const UpdateIdea = () => {
                                                                                     <div
                                                                                         className={"flex justify-between"}>
                                                                                         <Button
-                                                                                            className="p-0 text-sm h-auto font-semibold text-primary"
+                                                                                            className="p-0 text-sm h-auto font-medium text-primary"
                                                                                             variant={"ghost hover-none"}
                                                                                             onClick={() => onShowSubComment(i)}
                                                                                             key={`comment-nested-reply-to-${i}`}
@@ -1426,7 +1426,7 @@ const UpdateIdea = () => {
                                                                                                         <MessageCircleMore
                                                                                                             className={"stroke-primary w-[16px] h-[16px]"}/>
                                                                                                     </span>
-                                                                                            <p className={"text-base font-medium"}>
+                                                                                            <p className={"text-base font-normal"}>
                                                                                                 {x.reply.length}
                                                                                             </p>
                                                                                         </div>
@@ -1454,7 +1454,7 @@ const UpdateIdea = () => {
                                                                                                                     className={"flex justify-between"}>
                                                                                                                     <div
                                                                                                                         className={"flex items-start"}>
-                                                                                                                        <h4 className={"text-sm font-medium"}>{x.name}</h4>
+                                                                                                                        <h4 className={"text-sm font-normal"}>{x.name}</h4>
                                                                                                                         <p className={"text-sm font-normal flex items-center text-muted-foreground"}>
                                                                                                                             <Dot
                                                                                                                                 size={20}
@@ -1537,7 +1537,7 @@ const UpdateIdea = () => {
                                                                                                                                 <div
                                                                                                                                     className={"flex gap-2"}>
                                                                                                                                     <Button
-                                                                                                                                        className={`py-2 px-6 w-[81px] h-[30px] text-sm font-semibold hover:bg-primary`}
+                                                                                                                                        className={`py-2 px-6 w-[81px] h-[30px] text-sm font-medium hover:bg-primary`}
                                                                                                                                         onClick={onUpdateSubComment}
                                                                                                                                         disabled={selectedSubComment.comment.trim() === "" || selectedSubComment.comment === ""}>
                                                                                                                                         {
@@ -1548,7 +1548,7 @@ const UpdateIdea = () => {
                                                                                                                                         }
                                                                                                                                     </Button>
                                                                                                                                     <Button
-                                                                                                                                        className={"px-3 py-2 h-[30px] text-sm font-semibold text-primary border border-primary"}
+                                                                                                                                        className={"px-3 py-2 h-[30px] text-sm font-medium text-primary border border-primary"}
                                                                                                                                         variant={"outline hover:none"}
                                                                                                                                         onClick={onCancelSubComment}>Cancel</Button>
                                                                                                                                     <div
@@ -1656,7 +1656,7 @@ const UpdateIdea = () => {
                                                                                             <div
                                                                                                 className={"flex gap-2"}>
                                                                                                 <Button
-                                                                                                    className={`${isSaveSubComment === true ? "py-2 px-6" : "py-2 px-6"} w-[86px] h-[30px] text-sm font-semibold`}
+                                                                                                    className={`${isSaveSubComment === true ? "py-2 px-6" : "py-2 px-6"} w-[86px] h-[30px] text-sm font-medium`}
                                                                                                     disabled={subCommentText.trim() === "" || subCommentText === ""}
                                                                                                     onClick={() => onCreateSubComment(x, i)}
                                                                                                 >

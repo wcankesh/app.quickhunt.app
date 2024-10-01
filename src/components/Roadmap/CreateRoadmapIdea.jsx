@@ -143,7 +143,7 @@ const CreateRoadmapIdea = ({isOpen, onOpen, onClose, closeCreateIdea, selectedRo
                 <SheetContent className={"lg:max-w-[800px] md:max-w-full sm:max-w-full p-0"}>
                     <SheetHeader className={"px-4 py-5 lg:px-8 lg:py-[20px] border-b"}>
                         <div className={"flex justify-between items-center w-full"}>
-                            <h2 className={"text-xl font-medium"}>Tell us your Idea!</h2>
+                            <h2 className={"text-xl font-normal"}>Tell us your Idea!</h2>
                             <X size={18} onClick={onCancel} className={"cursor-pointer"}/>
                         </div>
                     </SheetHeader>
@@ -151,19 +151,19 @@ const CreateRoadmapIdea = ({isOpen, onOpen, onClose, closeCreateIdea, selectedRo
                             <div className={"pb-[60px] sm:p-0"}>
                                 <div className={"px-4 py-3 lg:py-6 lg:px-8 flex flex-col gap-6 border-b"}>
                                     <div className="space-y-2">
-                                        <Label htmlFor="text">Title</Label>
+                                        <Label htmlFor="text" className={"font-normal"}>Title</Label>
                                         <Input type="text" id="text" placeholder="" value={ideaDetail.title} name={"title"} onChange={onChangeText} />
                                         {
                                             formError.title && <span className="text-red-500 text-sm">{formError.title}</span>
                                         }
                                     </div>
                                     <div className="space-y-2">
-                                        <Label htmlFor="message">Description</Label>
+                                        <Label htmlFor="message" className={"font-normal"}>Description</Label>
                                         <ReactQuillEditor value={ideaDetail?.description} name={"description"} onChange={onChangeText}/>
                                         {formError.description && <span className="text-red-500 text-sm">{formError.description}</span>}
                                     </div>
                                     <div className={"space-y-2"}>
-                                        <Label>Choose Board for this Idea</Label>
+                                        <Label className={"font-normal"}>Choose Board for this Idea</Label>
                                         <Select
                                             onValueChange={(value) => onChangeText({target:{name: "board", value}})}
                                             value={ideaDetail.board}>
@@ -190,7 +190,7 @@ const CreateRoadmapIdea = ({isOpen, onOpen, onClose, closeCreateIdea, selectedRo
                                     </div>
                                 </div>
                                 <div className={"px-4 py-3 lg:py-6 lg:px-8 border-b space-y-2"}>
-                                    <Label>Choose Topics for this Idea (optional)</Label>
+                                    <Label className={"font-normal"}>Choose Topics for this Idea (optional)</Label>
                                     <Select onValueChange={handleChange} value={selectedValues}>
                                         <SelectTrigger className="">
                                             <SelectValue className={"text-muted-foreground text-sm"} placeholder="Assign to">
@@ -233,12 +233,12 @@ const CreateRoadmapIdea = ({isOpen, onOpen, onClose, closeCreateIdea, selectedRo
                                     </Select>
                                 </div>
                                 <div className={"p-4 lg:p-8 flex gap-6"}>
-                                    <Button className={`py-2 px-6 w-[126px] text-sm font-semibold hover:bg-primary`} onClick={onCreateIdea}>
+                                    <Button className={`py-2 px-6 w-[126px] text-sm font-medium hover:bg-primary`} onClick={onCreateIdea}>
                                         {
                                             isLoading ? <Loader2 className="h-4 w-4 animate-spin"/> : "Create Idea"
                                         }
                                         </Button>
-                                    <Button variant={"outline hover:bg-transparent"} className={"border border-primary py-2 px-6 text-sm font-semibold"} onClick={onCancel}>Cancel</Button>
+                                    <Button variant={"outline hover:bg-transparent"} className={"border border-primary py-2 px-6 text-sm font-medium"} onClick={onCancel}>Cancel</Button>
                                 </div>
                             </div>
                     </div>

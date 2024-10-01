@@ -41,7 +41,7 @@ const WidgetPreview = ({widgetsSetting, type, toggle,onToggle }) => {
                     </ul>
                 </main>
                 <section className={'py-4'}>
-                    <h6 className="text-sm font-semibold text-center ">Powered by <a className="text-primary underline" href="https://quickhunt.app" target="_blank">quickhunt</a></h6>
+                    <h6 className="text-sm font-medium text-center ">Powered by <a className="text-primary underline" href="https://quickhunt.app" target="_blank">quickhunt</a></h6>
                 </section>
             </div>
         )

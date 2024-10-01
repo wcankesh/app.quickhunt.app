@@ -96,7 +96,7 @@ const RestPassword = () => {
                         theme === "dark" ? Icon.whiteLogo : Icon.blackLogo
                     }
                 </div>
-                <h1 className="scroll-m-20 text-2xl md:text-3xl font-semibold text-center lg:text-3xl mb-3.5 mt-6">
+                <h1 className="scroll-m-20 text-2xl md:text-3xl font-medium text-center lg:text-3xl mb-3.5 mt-6">
                     Reset Password
                 </h1>
                 <div className={"mb-2.5"}>
@@ -151,14 +151,14 @@ const RestPassword = () => {
                             </div>
 
                             <Button
-                                className={"w-full mt-2.5 bg-primary"}
+                                className={"w-full mt-2.5 bg-primary font-normal"}
                                 disabled={(forgotPasswordDetails.password === "" || forgotPasswordDetails.password.trim() === "") || (forgotPasswordDetails.confirm_password === "" || forgotPasswordDetails.confirm_password.trim() === "")}
                                 onClick={onSubmit}
                             >
                                 {
                                     isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : ""
                                 }
-                                <span className={"font-normal"}>Reset Password</span>
+                                Reset Password
                             </Button>
                         </CardContent>
                     </Card>

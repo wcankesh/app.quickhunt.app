@@ -171,11 +171,11 @@ const Widgets = () => {
                             </DialogHeader>
                             <DialogFooter className={"flex-row justify-end space-x-2"}>
                                 <Button variant={"outline hover:none"}
-                                        className={"text-sm font-semibold border"}
+                                        className={"text-sm font-medium border"}
                                         onClick={() => setOpenDelete(false)}>Cancel</Button>
                                 <Button
                                     variant={"hover:bg-destructive"}
-                                    className={`${theme === "dark" ? "text-card-foreground" : "text-card"} ${isDeleteLoading === true ? "py-2 px-6" : "py-2 px-6"} w-[76px] text-sm font-semibold bg-destructive`}
+                                    className={`${theme === "dark" ? "text-card-foreground" : "text-card"} ${isDeleteLoading === true ? "py-2 px-6" : "py-2 px-6"} w-[76px] text-sm font-medium bg-destructive`}
                                     onClick={() => deleteWidget(deleteRecord)}
                                 >
                                     {isDeleteLoading ? <Loader2 size={16} className={"animate-spin"}/> : "Delete"}
@@ -192,7 +192,7 @@ const Widgets = () => {
                         <DialogContent className="max-w-[350px] w-full sm:max-w-[580px] bg-white rounded-lg p-3 md:p-6">
                             <DialogHeader className={"flex flex-row justify-between gap-2"}>
                                 <div className={"flex flex-col gap-2"}>
-                                    <DialogTitle className={`text-left ${theme === "dark" ? "text-card" : ""}`}>Embed
+                                    <DialogTitle className={`text-left font-medium ${theme === "dark" ? "text-card" : ""}`}>Embed
                                         Widget</DialogTitle>
                                     <DialogDescription className={"text-left"}>Choose how you would like to embed your
                                         widget.</DialogDescription>
@@ -202,10 +202,10 @@ const Widgets = () => {
                             </DialogHeader>
                             <Tabs defaultValue="script" className={""}>
                                 <TabsList className="grid grid-cols-4 w-full bg-white mb-2 h-auto sm:h-10">
-                                    <TabsTrigger value="script">Script</TabsTrigger>
-                                    <TabsTrigger className={"whitespace-normal sm:whitespace-nowrap"} value="embedlink">Embed Link</TabsTrigger>
-                                    <TabsTrigger value="iframe">iFrame</TabsTrigger>
-                                    <TabsTrigger className={"whitespace-normal sm:whitespace-nowrap"} value="callback">Callback function</TabsTrigger>
+                                    <TabsTrigger value="script" className={"font-normal"}>Script</TabsTrigger>
+                                    <TabsTrigger className={"whitespace-normal sm:whitespace-nowrap font-normal"} value="embedlink">Embed Link</TabsTrigger>
+                                    <TabsTrigger value="iframe" className={"font-normal"}>iFrame</TabsTrigger>
+                                    <TabsTrigger className={"whitespace-normal sm:whitespace-nowrap font-normal"} value="callback">Callback function</TabsTrigger>
                                 </TabsList>
                                 <TabsContent value="script" className={"flex flex-col gap-2 m-0"}>
                                     <h4 className={`${theme === "dark" ? "text-muted-foreground" : "text-muted-foreground"} text-sm`}>
@@ -235,13 +235,13 @@ const Widgets = () => {
                                         <p className={`${theme === "dark" ? "text-muted-foreground" : "text-muted-foreground"} text-xs`}>Read
                                             the {" "}
                                             <Button variant={"ghost hover:none"}
-                                                    className={"p-0 h-auto text-xs text-primary font-semibold"}>
+                                                    className={"p-0 h-auto text-xs text-primary font-medium"}>
                                                 Setup Guide
                                             </Button>
                                             {" "}for more information or {" "}
                                             <Button
                                                 variant={"ghost hover:none"}
-                                                className={"p-0 h-auto text-xs text-primary font-semibold"}
+                                                className={"p-0 h-auto text-xs text-primary font-medium"}
                                             >
                                                 download the HTML example.
                                             </Button>
@@ -255,7 +255,7 @@ const Widgets = () => {
                                             Follow these simple steps to embed the widget on any {" "}
                                             <Button
                                                 variant={"ghost hover:none"}
-                                                className={"p-0 h-auto text-xs text-primary font-semibold"}
+                                                className={"p-0 h-auto text-xs text-primary font-medium"}
                                             >
                                                 supported website.
                                             </Button>
@@ -293,7 +293,7 @@ const Widgets = () => {
                                             the {" "}
                                             <Button
                                                 variant={"ghost hover:none"}
-                                                className={"p-0 h-auto text-xs text-primary font-semibold"}
+                                                className={"p-0 h-auto text-xs text-primary font-medium"}
                                             >
                                                 Setup Guide
                                             </Button>
@@ -331,7 +331,7 @@ const Widgets = () => {
                                         the {" "}
                                         <Button
                                             variant={"ghost hover:none"}
-                                            className={"p-0 h-auto text-xs text-primary font-semibold"}
+                                            className={"p-0 h-auto text-xs text-primary font-medium"}
                                         >
                                             Setup Guide
                                         </Button>
@@ -365,13 +365,13 @@ const Widgets = () => {
                                         <p className={`${theme === "dark" ? "text-muted-foreground" : "text-muted-foreground"} text-xs`}>Read
                                             the {" "}
                                             <Button variant={"ghost hover:none"}
-                                                    className={"p-0 h-auto text-xs text-primary font-semibold"}>
+                                                    className={"p-0 h-auto text-xs text-primary font-medium"}>
                                                 Setup Guide
                                             </Button>
                                             {" "}for more information or {" "}
                                             <Button
                                                 variant={"ghost hover:none"}
-                                                className={"p-0 h-auto text-xs text-primary font-semibold"}
+                                                className={"p-0 h-auto text-xs text-primary font-medium"}
                                             >
                                                 download the HTML example.
                                             </Button>
@@ -381,7 +381,7 @@ const Widgets = () => {
                             </Tabs>
                             <DialogFooter>
                                 <Button variant={"outline hover:none"}
-                                        className={`text-sm font-semibold border ${theme === "dark" ? "text-card" : "text-card-foreground"}`}
+                                        className={`text-sm font-medium border ${theme === "dark" ? "text-card" : "text-card-foreground"}`}
                                         onClick={() => getCodeCopy("")}>Cancel</Button>
                             </DialogFooter>
                         </DialogContent>
@@ -401,9 +401,9 @@ const Widgets = () => {
                 <div className={"flex flex-col space-y-6"}>
                     <div className={"flex flex-col gap-2"}>
                         <div className={"flex items-center justify-between"}>
-                            <h1 className={"text-2xl font-medium"}>Widgets</h1>
+                            <h1 className={"text-2xl font-normal"}>Widgets</h1>
                             <Button
-                                size="sm" className={"gap-2 font-semibold hover:bg-primary"}
+                                size="sm" className={"gap-2 font-medium hover:bg-primary"}
                                 onClick={() => handleCreateNew("type")}
                             >
                                 <Plus size={20} strokeWidth={3}/>Create New
@@ -423,7 +423,7 @@ const Widgets = () => {
                                             ["Name", "Type", "Last Updated", "", "Analytics", "Actions"].map((x, i) => {
                                                 return (
                                                     <TableHead
-                                                        className={`px-2 py-[10px] md:px-3 font-semibold ${i >= 4 ? 'text-center' : ''}`}>{x}</TableHead>
+                                                        className={`px-2 py-[10px] md:px-3 font-medium ${i >= 4 ? 'text-center' : ''}`}>{x}</TableHead>
                                                 )
                                             })
                                         }
@@ -452,18 +452,18 @@ const Widgets = () => {
                                             {widgetsSetting.map((x, i) => (
                                                 <TableRow key={i}>
                                                     <TableCell
-                                                        className={"font-medium p-2 py-[10px] md:px-3 cursor-pointer capitalize"}
+                                                        className={"font-normal p-2 py-[10px] md:px-3 cursor-pointer capitalize"}
                                                         onClick={() => handleCreateNew(x.id, x.type)}>{x.name}</TableCell>
                                                     <TableCell
-                                                        className={"font-medium p-2 py-[10px] md:px-3 capitalize"}>{x.type}</TableCell>
+                                                        className={"font-normal p-2 py-[10px] md:px-3 capitalize"}>{x.type}</TableCell>
                                                     <TableCell
-                                                        className={"font-medium p-2 py-[10px] md:px-3"}>{moment(x.created_at).format('D MMM, YYYY')}</TableCell>
+                                                        className={"font-normal p-2 py-[10px] md:px-3"}>{moment(x.created_at).format('D MMM, YYYY')}</TableCell>
                                                     <TableCell className={" p-2 py-[10px] md:px-3 text-center"}>
                                                         <Button
-                                                            className={"py-[6px] px-3 h-auto text-xs font-semibold hover:bg-primary"}
+                                                            className={"py-[6px] px-3 h-auto text-xs font-medium hover:bg-primary"}
                                                             onClick={() => getCodeCopy(x.id)}>Get code</Button>
                                                     </TableCell>
-                                                    <TableCell className={"font-medium p-2 py-[10px] md:px-3"}>
+                                                    <TableCell className={"font-normal p-2 py-[10px] md:px-3"}>
                                                         <div className={"flex justify-center"}>
                                                         <BarChart
                                                             onClick={() => openSheet(x.id)} size={16}
@@ -503,7 +503,7 @@ const Widgets = () => {
                                         className={`w-full ${theme === "dark" ? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end p-2 md:px-3 md:py-[10px]`}>
                                         <div className={"w-full flex gap-2 items-center justify-between sm:justify-end"}>
                                             <div>
-                                                <h5 className={"text-sm font-semibold"}>Page {widgetsSetting.length <= 0 ? 0 :pageNo} of {totalPages}</h5>
+                                                <h5 className={"text-sm font-medium"}>Page {widgetsSetting.length <= 0 ? 0 :pageNo} of {totalPages}</h5>
                                             </div>
                                             <div className={"flex flex-row gap-2 items-center"}>
                                                 <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
