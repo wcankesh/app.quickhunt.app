@@ -21,7 +21,7 @@ const initialState = {
     title: "",
     description: "",
     createdAt: moment().fromNow(),
-    images: [],
+    image: "",
 };
 
 const initialStateError = {
@@ -47,6 +47,7 @@ const Category = () => {
     const {theme} = useTheme();
     const {toast} = useToast()
     const [isSheetOpen, setSheetOpen] = useState(false);
+    const [isSheetOpenSub, setSheetOpenSub] = useState(false);
     const [isSave, setIsSave] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [subLoading, setSubLoading] = useState(true);
@@ -60,7 +61,8 @@ const Category = () => {
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
     const [formError, setFormError] = useState(initialStateError);
     const [tables, setTables] = useState(initialStateTable);
-    const [categoryData, setCategoryData] = useState(initialState);
+    const [selectedCategory, setSelectedCategory] = useState(initialState);
+    const [selectedSubCategory, setSelectedSubCategory] = useState(initialState);
     const [categoryList, setCategoryList] = useState([]);
     const [subCategoryList, setSubCategoryList] = useState([]);
     const [idToDelete, setIdToDelete] = useState(null);
@@ -70,7 +72,6 @@ const Category = () => {
         if(projectDetailsReducer.id){
             // setSubCategoryList(allStatusAndTypes?.categories)
             getAllCategory();
-            getAllSubCategory();
         }
     }, [projectDetailsReducer.id])
 
@@ -83,14 +84,6 @@ const Category = () => {
         setIsLoading(false)
     };
 
-    const getAllSubCategory = async () => {
-        setSubLoading(true);
-        const data = await apiService.getAllSubCategory(projectDetailsReducer.id);
-        if (data.status === 200) {
-            setSubCategoryList(data.data);
-        }
-        setSubLoading(false)
-    };
 
     const formValidate = (name, value) => {
         switch (name) {
@@ -115,8 +108,8 @@ const Category = () => {
 
     const addCategory = async () => {
         let validationErrors = {};
-        Object.keys(categoryData).forEach(name => {
-            const error = formValidate(name, categoryData[name]);
+        Object.keys(selectedCategory).forEach(name => {
+            const error = formValidate(name, selectedCategory[name]);
             if (error && error.length > 0) {
                 validationErrors[name] = error;
             }
@@ -128,31 +121,28 @@ const Category = () => {
         setIsSave(true);
         let formData = new FormData();
         formData.append('project_id', projectDetailsReducer.id);
-        formData.append('title', categoryData.title);
-        formData.append('description', categoryData.description);
-        formData.append(`images[0]`, categoryData.images);
+        formData.append('title', selectedCategory.title);
+        formData.append('description', selectedCategory.description);
+        formData.append(`image`, selectedCategory.image);
         const data = await apiService.createCategory(formData)
         if(data.status === 200) {
             setIsSave(false);
-            setCategoryData(initialState);
-            toast({
-                description: data.message,
-            });
-            // getAllCategory()
+            setSelectedCategory(initialState);
             let clone = [...categoryList];
             clone.push(data.data);
             setCategoryList(clone);
+            toast({description: data.message,});
         } else {
             setIsSave(false);
             toast({description: data.message, variant: "destructive",})
         }
-        closeSheet();
+        closeSheetCategory();
     };
 
     const addSubCategory = async () => {
         let validationErrors = {};
-        Object.keys(categoryData).forEach(name => {
-            const error = formValidate(name, categoryData[name]);
+        Object.keys(selectedSubCategory).forEach(name => {
+            const error = formValidate(name, selectedSubCategory[name]);
             if (error && error.length > 0) {
                 validationErrors[name] = error;
             }
@@ -164,64 +154,85 @@ const Category = () => {
         }
         setIsSave(true);
         let formData = new FormData();
-        formData.append(`images[0]`, categoryData.images);
-        formData.append('title', categoryData.title);
-        formData.append('description', categoryData.description);
+        formData.append(`images[0]`, selectedSubCategory.images);
+        formData.append('title', selectedSubCategory.title);
+        formData.append('description', selectedSubCategory.description);
         formData.append('project_id', projectDetailsReducer.id);
-        formData.append('category_id', selectedIndex);
+        formData.append('category_id', selectedSubCategory.category_id);
         const data = await apiService.createSubCategory(formData);
         if (data.status === 200) {
             setIsSave(false);
-            setCategoryData(initialState);
             toast({description: data.message,});
-            const updatedCategoryList = [...subCategoryList];
-            const categoryToUpdate = updatedCategoryList.find(cat => cat.id === selectedIndex);
-            if (categoryToUpdate) {
-                categoryToUpdate.data.push(data.data);
+            let clone = [...categoryList];
+            const index = clone.findIndex((x) => x.id == selectedSubCategory.category_id)
+            if(index !== -1){
+                const cloneSub = [...clone[index].sub_categories];
+                // const subIndex = cloneSub.findIndex((x) => x.id === selectedSubCategory.id);
+                // if(subIndex !== -1){
+                //     cloneSub[subIndex] = data.data
+                // }
+                cloneSub.push(data.data)
+                clone[index].sub_categories = cloneSub;
+                setCategoryList(clone)
             }
-            setSubCategoryList(updatedCategoryList);
-            // getAllSubCategory();
-            setSelectedIndex(null)
+            setSelectedSubCategory(initialState)
+            toast({description: data.message});
+            closeSheetSubCategory()
         } else {
             setIsSave(false);
             toast({description: data.message, variant: "destructive",});
         }
-        closeSheet();
+        closeSheetCategory();
     };
 
     const onEditCategory = async () => {
         let formData = new FormData();
         formData.append('project_id', projectDetailsReducer.id);
-        formData.append('title', categoryData.title);
-        formData.append('description', categoryData.description);
-        formData.append(`images[0]`, categoryData.images);
-        formData.append(`delete_image[0]`, categoryData?.images?.replace('https://code.quickhunt.app/public/storage/category/', ''));
-        const data = await apiService.updateCategory(formData)
+        formData.append('title', selectedCategory.title);
+        formData.append('description', selectedCategory.description);
+        formData.append(`image`, selectedCategory.image);
+        formData.append(`delete_image[0]`, selectedCategory?.images?.replace('https://code.quickhunt.app/public/storage/category/', ''));
+        const data = await apiService.updateCategory(formData, selectedCategory.id)
         if (data.state === 200) {
-            setCategoryList([])
+            let clone = [...categoryList];
+            const index = clone.findIndex((x) => x.id === selectedCategory.id)
+            if(index !== -1){
+               // clone[index] = data.data
+                setCategoryList(clone);
+            }
         }
     }
 
-    const openSheet = (type, id , data ) => {
-        setType(type);
-        setSelectedIndex(id);
-        setEditData(data);
-        setCategoryData(data || initialState);
+    const openSheetCategory = (id, data) => {
+        setSelectedCategory(id ? data : initialState);
         setSheetOpen(true);
     };
 
-    const closeSheet = () => {
+    const openSheetSubCategory = (id, data) => {
+        setSelectedSubCategory(id ? data : initialState);
+        setSheetOpenSub(true);
+    };
+
+    const closeSheetCategory = () => {
         setSheetOpen(false);
-        setCategoryData(initialState);
+        setSelectedCategory(initialState);
+        setFormError(initialStateError);
+    };
+    const closeSheetSubCategory = () => {
+        setSheetOpenSub(false);
+        setSelectedSubCategory(initialState);
         setFormError(initialStateError);
     };
 
     const handleOnChange = (name, value) => {
-        setCategoryData({ ...categoryData, [name]: value });
+        setSelectedCategory({ ...selectedCategory, [name]: value });
+    };
+    const handleOnChangeSub = (name, value) => {
+        setSelectedSubCategory({ ...selectedSubCategory, [name]: value });
     };
 
-    console.log("categoryData", categoryData)
-    console.log("categoryData?.images", categoryData?.images)
+    console.log("categoryData", selectedCategory)
+    console.log("categoryData?.images", selectedCategory?.images)
 
     const handleImageUpload = (file) => {
         const selectedFile = file.target.files[0];
@@ -229,26 +240,47 @@ const Category = () => {
             if (selectedFile.size > 5 * 1024 * 1024) { // 5 MB
                 setFormError(prevErrors => ({
                     ...prevErrors,
-                    images: 'Image size must be less than 5 MB.'
+                    image: 'Image size must be less than 5 MB.'
                 }));
             } else {
                 setFormError(prevErrors => ({
                     ...prevErrors,
-                    images: ''
+                    image: ''
                 }));
-                setCategoryData({
-                    ...categoryData,
-                    images: selectedFile
+                setSelectedCategory({
+                    ...selectedCategory,
+                    image: selectedFile
+                });
+            }
+        }
+    };
+
+    const handleImageUploadSub = (file) => {
+        const selectedFile = file.target.files[0];
+        if (selectedFile) {
+            if (selectedFile.size > 5 * 1024 * 1024) { // 5 MB
+                setFormError(prevErrors => ({
+                    ...prevErrors,
+                    image: 'Image size must be less than 5 MB.'
+                }));
+            } else {
+                setFormError(prevErrors => ({
+                    ...prevErrors,
+                    image: ''
+                }));
+                setSelectedSubCategory({
+                    ...selectedSubCategory,
+                    image: selectedFile
                 });
             }
         }
     };
 
     const onDeleteImg = async (name, value) => {
-        if (categoryData && categoryData?.images && categoryData.images?.name) {
-            setCategoryData({...categoryData, images: ""})
+        if (selectedCategory && selectedCategory?.image && selectedCategory.image?.name) {
+            setSelectedCategory({...selectedCategory, image: ""})
         } else {
-            setCategoryData({...categoryData, [name]: value, images: ""})
+            setSelectedCategory({...selectedCategory, [name]: value, image: ""})
         }
     }
 
@@ -314,23 +346,21 @@ const Category = () => {
     return (
         <Fragment>
             {isSheetOpen && (
-                <Sheet open={isSheetOpen} onOpenChange={isSheetOpen ? closeSheet : openSheet}>
+                <Sheet open={isSheetOpen} onOpenChange={isSheetOpen ? closeSheetCategory : openSheetCategory}>
                     <SheetOverlay className={"inset-0"} />
                     <SheetContent className={"sm:max-w-[662px] p-0"}>
                         <SheetHeader className={"px-3 py-4 lg:px-8 lg:py-[20px] flex flex-row justify-between items-center border-b"}>
                             <h5 className={"text-sm md:text-xl font-normal"}>
-                                {type === "cate"
-                                    ? (editData ? "Update Category" : "Create New Category")
-                                    : (editData ? "Update Subcategory" : "Create New Subcategory")}
+                                { selectedCategory?.id ? "Update Category" : "Create Category"}
                             </h5>
-                            <X onClick={closeSheet} size={18} className={"cursor-pointer m-0"} />
+                            <X onClick={closeSheetCategory} size={18} className={"cursor-pointer m-0"} />
                         </SheetHeader>
                         <div className={"h-[calc(100%_-_69px)] overflow-y-auto"}>
                         <div className={"sm:px-8 sm:py-6 px-3 py-4 border-b space-y-6"}>
                             <div className="grid w-full gap-2">
                                 <Label htmlFor="category-name" className={"font-normal"}>Category name</Label>
                                 <Input
-                                    value={categoryData?.title}
+                                    value={selectedCategory?.title}
                                     onChange={(e) => handleOnChange("title", e.target.value)}
                                     type="text"
                                     id="category-name"
@@ -344,7 +374,7 @@ const Category = () => {
                             <div className="grid w-full gap-2">
                                 <Label className={"font-normal"}>Category description</Label>
                                 <ReactQuillEditor
-                                    value={categoryData?.description}
+                                    value={selectedCategory?.description}
                                     onChange={(e) => handleOnChange("description", e.target.value)}
                                 />
                                 {formError?.description && <span className="text-red-500 text-sm">{formError?.description}</span>}
@@ -352,60 +382,21 @@ const Category = () => {
                             <div className={"flex flex-col gap-2"}>
                                 <Label className={"font-normal"}>Category Icon</Label>
                             <div className="w-[282px] h-[128px] flex gap-1">
-                                {/*{categoryData?.images && categoryData?.images instanceof File ? (*/}
-                                {/*    <div className={"w-[282px] h-[128px] relative border p-[5px]"}>*/}
-                                {/*        <img*/}
-                                {/*            className={"upload-img"}*/}
-                                {/*            src={URL.createObjectURL(categoryData?.images)}*/}
-                                {/*            alt="Uploaded icon"*/}
-                                {/*            // onLoad={() => URL.revokeObjectURL(categoryData.image)}*/}
-                                {/*        />*/}
-                                {/*        <CircleX className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`} size={20} onClick={() => handleOnChange("images", null)} />*/}
-                                {/*    </div>*/}
-                                {/*) : (*/}
-                                {/*    <div>*/}
-                                {/*        <input*/}
-                                {/*            id="imageInput"*/}
-                                {/*            type="file"*/}
-                                {/*            className="hidden"*/}
-                                {/*            onChange={handleImageUpload}*/}
-                                {/*            accept={".jpg,.jpeg"}*/}
-                                {/*        />*/}
-                                {/*        <label*/}
-                                {/*            htmlFor="imageInput"*/}
-                                {/*            className="border-dashed w-[282px] h-[128px] py-[52px] flex items-center justify-center bg-muted border border-muted-foreground rounded cursor-pointer"*/}
-                                {/*        >*/}
-                                {/*            <Upload className="h-4 w-4 text-muted-foreground" />*/}
-                                {/*        </label>*/}
-                                {/*    </div>*/}
-                                {/*)}*/}
-
                                 {
-                                    categoryData?.images ?
+                                    selectedCategory?.image ?
                                         <div>
-                                            {categoryData && categoryData?.images && categoryData?.images?.name ?
-                                                <div className={"w-[282px] h-[128px] relative border p-[5px]"}>
-                                                    <img
-                                                        className={"upload-img"}
-                                                        src={categoryData && categoryData?.images && categoryData?.images?.name ? URL.createObjectURL(categoryData?.images) : categoryData?.images}
-                                                        alt=""
-                                                    />
-                                                    <CircleX
-                                                        size={20}
-                                                        className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
-                                                        onClick={() => onDeleteImg('delete_image', categoryData && categoryData?.images && categoryData?.images?.name ? "" : categoryData?.images.replace("https://code.quickhunt.app/public/storage/help/category/", ""))}
-                                                    />
-                                                </div> :
-                                                <div className={"w-[282px] h-[128px] relative border p-[5px]"}>
-                                                    <img className={"upload-img"} src={categoryData?.images}
-                                                         alt=""/>
-                                                    <CircleX
-                                                        size={20}
-                                                        className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
-                                                        onClick={() => onDeleteImg('delete_image', categoryData && categoryData?.images && categoryData?.images?.name ? "" : categoryData?.images.replace("https://code.quickhunt.app/public/storage/help/category/", ""))}
-                                                    />
-                                                </div>
-                                            }
+                                            <div className={"w-[282px] h-[128px] relative border p-[5px]"}>
+                                                <img
+                                                    className={"upload-img"}
+                                                    src={selectedCategory && selectedCategory?.image && selectedCategory?.image?.name ? URL.createObjectURL(selectedCategory?.image) : selectedCategory?.image}
+                                                    alt=""
+                                                />
+                                                <CircleX
+                                                    size={20}
+                                                    className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
+                                                    onClick={() => onDeleteImg('delete_image', selectedCategory && selectedCategory?.image && selectedCategory?.image?.name ? "" : selectedCategory?.image.replace("https://code.quickhunt.app/public/storage/help/category/", ""))}
+                                                />
+                                            </div>
                                         </div> :
                                         <div>
                                             <input
@@ -429,19 +420,111 @@ const Category = () => {
                         <div className={"flex gap-4 px-3 py-4 sm:py-6 sm:px-8"}>
                             <Button
                                 className={`border w-[132px] font-medium hover:bg-primary ${isSave ? "justify-center items-center" : ""}`}
-                                onClick={type === 'sub' ? addSubCategory : addCategory}
+                                onClick={selectedCategory?.id ? onEditCategory : addCategory}
                             >
                                 {isSave ? <Loader2 className="h-4 w-4 animate-spin" /> : (type === 'sub' ? "Save Subcategory" : "Save Category")}
                             </Button>
 
                             <Button
                                 variant={"ghost hover:bg-none"}
-                                onClick={closeSheet}
+                                onClick={closeSheetCategory}
                                 className={`border border-primary font-medium`}
                             >
                                 Cancel
                             </Button>
                         </div>
+                        </div>
+                    </SheetContent>
+                </Sheet>
+            )}
+            {isSheetOpenSub && (
+                <Sheet open={isSheetOpenSub} onOpenChange={isSheetOpenSub ? closeSheetSubCategory : openSheetSubCategory}>
+                    <SheetOverlay className={"inset-0"} />
+                    <SheetContent className={"sm:max-w-[662px] p-0"}>
+                        <SheetHeader className={"px-3 py-4 lg:px-8 lg:py-[20px] flex flex-row justify-between items-center border-b"}>
+                            <h5 className={"text-sm md:text-xl font-normal"}>
+                                { selectedSubCategory?.id ? "Update Sub Category" : "Create Sub Category"}
+                            </h5>
+                            <X onClick={closeSheetSubCategory} size={18} className={"cursor-pointer m-0"} />
+                        </SheetHeader>
+                        <div className={"h-[calc(100%_-_69px)] overflow-y-auto"}>
+                            <div className={"sm:px-8 sm:py-6 px-3 py-4 border-b space-y-6"}>
+                                <div className="grid w-full gap-2">
+                                    <Label htmlFor="category-name" className={"font-normal"}>Category name</Label>
+                                    <Input
+                                        value={selectedSubCategory?.title}
+                                        onChange={(e) => handleOnChangeSub("title", e.target.value)}
+                                        type="text"
+                                        id="category-name"
+                                        className={"h-9"}
+                                        placeholder={"Enter the category name..."}
+                                    />
+                                    {
+                                        formError?.title && <span className="text-red-500 text-sm">{formError?.title}</span>
+                                    }
+                                </div>
+                                <div className="grid w-full gap-2">
+                                    <Label className={"font-normal"}>Category description</Label>
+                                    <ReactQuillEditor
+                                        value={selectedSubCategory?.description}
+                                        onChange={(e) => handleOnChangeSub("description", e.target.value)}
+                                    />
+                                    {formError?.description && <span className="text-red-500 text-sm">{formError?.description}</span>}
+                                </div>
+                                <div className={"flex flex-col gap-2"}>
+                                    <Label className={"font-normal"}>Category Icon</Label>
+                                    <div className="w-[282px] h-[128px] flex gap-1">
+                                        {
+                                            selectedSubCategory?.image ?
+                                                <div>
+                                                    <div className={"w-[282px] h-[128px] relative border p-[5px]"}>
+                                                        <img
+                                                            className={"upload-img"}
+                                                            src={selectedSubCategory && selectedSubCategory?.image && selectedSubCategory?.image?.name ? URL.createObjectURL(selectedSubCategory?.image) : selectedSubCategory?.image}
+                                                            alt=""
+                                                        />
+                                                        <CircleX
+                                                            size={20}
+                                                            className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
+                                                            onClick={() => onDeleteImg('delete_image', selectedSubCategory && selectedSubCategory?.image && selectedSubCategory?.image?.name ? "" : selectedSubCategory?.image.replace("https://code.quickhunt.app/public/storage/help/category/", ""))}
+                                                        />
+                                                    </div>
+                                                </div> :
+                                                <div>
+                                                    <input
+                                                        id="pictureInput"
+                                                        type="file"
+                                                        className="hidden"
+                                                        accept="image/*"
+                                                        onChange={handleImageUploadSub}
+                                                    />
+                                                    <label
+                                                        htmlFor="pictureInput"
+                                                        className="border-dashed w-[282px] h-[128px] py-[52px] flex items-center justify-center bg-muted border border-muted-foreground rounded cursor-pointer"
+                                                    >
+                                                        <Upload className="h-4 w-4 text-muted-foreground" />
+                                                    </label>
+                                                </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                            <div className={"flex gap-4 px-3 py-4 sm:py-6 sm:px-8"}>
+                                <Button
+                                    className={`border w-[132px] font-medium hover:bg-primary ${isSave ? "justify-center items-center" : ""}`}
+                                    onClick={selectedSubCategory?.id ? onEditCategory : addSubCategory}
+                                >
+                                    {isSave ? <Loader2 className="h-4 w-4 animate-spin" /> : (type === 'sub' ? "Save Subcategory" : "Save Category")}
+                                </Button>
+
+                                <Button
+                                    variant={"ghost hover:bg-none"}
+                                    onClick={closeSheetCategory}
+                                    className={`border border-primary font-medium`}
+                                >
+                                    Cancel
+                                </Button>
+                            </div>
                         </div>
                     </SheetContent>
                 </Sheet>
@@ -487,7 +570,7 @@ const Category = () => {
                         />
                         <Button
                             size="sm"
-                            onClick={() => openSheet("cate")}
+                            onClick={() => openSheetCategory("", "")}
                             className={"gap-2 font-medium hover:bg-primary"}
                         >
                             <Plus size={20} strokeWidth={3} />New Category
@@ -516,7 +599,7 @@ const Category = () => {
                                                                 <Button
                                                                     size={"sm"}
                                                                     variant={"ghost hover:bg-none"}
-                                                                    onClick={() => openSheet('sub',x.id)}
+                                                                    onClick={() => openSheetSubCategory("", {...initialState,category_id: x.id })}
                                                                     className={"mr-3 border border-primary font-normal text-primary py-2 px-3"}
                                                                 >
                                                                     <Plus size={16} className={"mr-2"} /> Add Subcategory
@@ -526,7 +609,7 @@ const Category = () => {
                                                                         <Ellipsis size={16} />
                                                                     </DropdownMenuTrigger>
                                                                     <DropdownMenuContent align={"end"}>
-                                                                        <DropdownMenuItem className={"cursor-pointer"} onClick={() => openSheet('cate', i, x.id)}>Edit</DropdownMenuItem>
+                                                                        <DropdownMenuItem className={"cursor-pointer"} onClick={() => openSheetCategory(x.id, x)}>Edit</DropdownMenuItem>
                                                                         <DropdownMenuItem className={"cursor-pointer"} onClick={() => deleteRow(x.id)}>Delete</DropdownMenuItem>
                                                                     </DropdownMenuContent>
                                                                 </DropdownMenu>
@@ -535,7 +618,7 @@ const Category = () => {
                                                     </TableRow>
                                                 </TableHeader>
                                                 <TableBody>
-                                                    {subCategoryList.map((y, j) => (
+                                                    {(x.sub_categories || []).map((y, j) => (
                                                         <TableRow key={j} className="">
                                                             <TableCell className={`inline-flex gap-2 md:gap-1 flex-wrap items-center px-2 py-[10px] md:px-3 w-[300px]`}>
                                                                 <span className={"cursor-pointer text-ellipsis overflow-hidden whitespace-nowrap"}>{y.title}</span>
@@ -555,7 +638,7 @@ const Category = () => {
                                                                         <Ellipsis className={`font-normal`} size={18} />
                                                                     </DropdownMenuTrigger>
                                                                     <DropdownMenuContent align={"end"}>
-                                                                        <DropdownMenuItem className={"cursor-pointer"} onClick={() => openSheet('sub', i, y)}>Edit</DropdownMenuItem>
+                                                                        <DropdownMenuItem className={"cursor-pointer"} onClick={() => openSheetSubCategory(y.id, {...y,category_id: x.id })}>Edit</DropdownMenuItem>
                                                                         <DropdownMenuItem className={"cursor-pointer"} onClick={() => handleDelete('sub', i, y)}>Delete</DropdownMenuItem>
                                                                     </DropdownMenuContent>
                                                                 </DropdownMenu>
