@@ -223,13 +223,19 @@ export class ApiService{
         return await this.deleteData(`${baseUrlApi}/customers/${id}`)
     }
     async createCategory (payload){
-        return await this.postData(`${baseUrlApi}/category`, payload)
+        return await this.postData(`${baseUrlApi}/help/category`, payload, true)
+    }
+    async createSubCategory (payload){
+        return await this.postData(`${baseUrlApi}/help/sub-category`, payload, true)
     }
     async getAllCategory (id){
-        return await this.getData(`${baseUrlApi}/category?project_id=${id}`,)
+        return await this.getData(`${baseUrlApi}/help/categories?project_id=${id}`,)
+    }
+    async getAllSubCategory (id){
+        return await this.getData(`${baseUrlApi}/help/sub-categories?project_id=${id}`,)
     }
     async updateCategory (payload, id){
-        return await this.putData(`${baseUrlApi}/category/${id}`,payload)
+        return await this.putData(`${baseUrlApi}/category/${id}`,payload, true)
     }
     async deleteCategories (id){
         return await this.deleteData(`${baseUrlApi}/category/${id}`)

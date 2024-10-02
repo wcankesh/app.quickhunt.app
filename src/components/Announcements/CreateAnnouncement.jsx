@@ -519,7 +519,7 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
                                                 id="pictureInput"
                                                 type="file"
                                                 className="hidden"
-                                                accept="image/*"
+                                                accept={".jpg,.jpeg"}
                                                 onChange={handleFileChange}
                                             />
                                             <label

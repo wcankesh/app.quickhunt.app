@@ -22,8 +22,8 @@ const SaidBarDesktop = () => {
         return window.location.pathname === subLink2 || window.location.pathname === subLink || window.location.pathname === link;
     };
 
-    const isHelpCenterActive = isActive(`${baseUrl}/help-center/articles`, `${baseUrl}/help-center/category`) ||
-        isActive(`${baseUrl}/help-center/articles/${id}`, `${baseUrl}/help-center/category/${id}`);
+    const isHelpCenterActive = isActive(`${baseUrl}/help/articles`, `${baseUrl}/help/category`) ||
+        isActive(`${baseUrl}/help/articles/${id}`, `${baseUrl}/help/category/${id}`);
 
     const hasRoadmapPath = location.pathname.includes("/roadmap");
 
@@ -79,20 +79,20 @@ const SaidBarDesktop = () => {
                 },
                 {
                     title: 'Help Center',
-                    link: '/help-center/articles',
+                    link: '/help/articles',
                     icon: Icon.helpCenter,
                     // selected: isActive(`${baseUrl}/help-center/articles`,`${baseUrl}/help-center/category`) || isActive(`${baseUrl}/help-center/articles/${id}`,`${baseUrl}/help-center/category/${id}`),
                     selected: isHelpCenterActive,
                     subItems: [
                         {
                             title: 'Articles',
-                            link: `/help-center/articles`,
-                            selected: isActive(`${baseUrl}/help-center/articles`, `${baseUrl}/help-center/articles/${id}`),
+                            link: `/help/articles`,
+                            selected: isActive(`${baseUrl}/help/articles`, `${baseUrl}/help/articles/${id}`),
                         },
                         {
                             title: 'Category',
-                            link: `/help-center/category`,
-                            selected: isActive(`${baseUrl}/help-center/category`, `${baseUrl}/help-center/category/${id}`),
+                            link: `/help/category`,
+                            selected: isActive(`${baseUrl}/help/category`, `${baseUrl}/help/category/${id}`),
                         }
                     ]
                 },
