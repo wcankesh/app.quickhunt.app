@@ -1,4 +1,4 @@
-import React, { useState, Fragment } from 'react';
+import React, {useState, Fragment, useEffect} from 'react';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "../../ui/breadcrumb";
 import { baseUrl } from "../../../utils/constent";
 import { Button } from "../../ui/button";
@@ -8,41 +8,143 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 import { Label } from "../../ui/label";
 import { Input } from "../../ui/input";
 import { Card, CardContent } from "../../ui/card";
+import {ApiService} from "../../../utils/ApiService";
+import {useSelector} from "react-redux";
+import {useToast} from "../../ui/use-toast";
 
-const statusOptions = [
-    { name: "Publish", value: 1, fillColor: "#389E0D", strokeColor: "#389E0D" },
-    { name: "Draft", value: 2, fillColor: "#CF1322", strokeColor: "#CF1322" },
-];
-const categoryOptions = [
-    { name: "Category 1", value: 1 },
-    { name: "Category 2", value: 2 },
-];
-const subcategoryOptions = [
-    { name: "Subcategory 1", value: 1 },
-    { name: "Subcategory 2", value: 2 },
-];
+    const statusOptions = [
+        { name: "Publish", value: 1, fillColor: "#389E0D", strokeColor: "#389E0D" },
+        { name: "Draft", value: 2, fillColor: "#CF1322", strokeColor: "#CF1322" },
+    ];
+    const categoryOptions = [
+        { name: "Category 1", value: 1 },
+        { name: "Category 2", value: 2 },
+    ];
+    const subcategoryOptions = [
+        { name: "Subcategory 1", value: 1 },
+        { name: "Subcategory 2", value: 2 },
+    ];
 
-const ArticleDetail = () => {
-    const navigate = useNavigate();
-    const { type, id } = useParams();
-    const [loading, setLoading] = useState(false);
-    const [formData, setFormData] = useState({
-        title: 'New Article',
+    const initialState =
+        {
+            title: 'New Article',
+            category: 1,
+            subcategory: 1,
+            status: 1,
+        }
+
+    const initialStateError =
+    {
+        title: '',
         category: 1,
         subcategory: 1,
         status: 1,
-    });
+    }
 
-    const commonHandleChange = (name, value) => {
-        setFormData({...formData, [name]: value});
+const ArticleDetail = () => {
+    const apiService = new ApiService();
+    const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
+    const {toast} = useToast();
+    const navigate = useNavigate();
+    const { id } = useParams();
+
+    const [loading, setLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+    const [articlesDetails, setArticlesDetails] = useState(initialState);
+    const [formError, setFormError] = useState(initialStateError);
+    const [articleList, setArticleList] = useState([]);
+
+    useEffect(() => {
+        if(projectDetailsReducer.id){
+            getAllCategory();
+            getSingleArticle();
+        }
+    }, [projectDetailsReducer.id])
+
+    const getAllCategory = async () => {
+        setIsLoading(true);
+        const data = await apiService.getAllCategory(projectDetailsReducer.id);
+        if (data.status === 200) {
+            setArticleList(data.data);
+        }
+        setIsLoading(false)
     };
 
-    const handlePublish = () => {
+    const getSingleArticle = async () => {
+        setIsLoading(true);
+        const data = await apiService.getSingleArticle(id);
+        if (data.status === 200) {
+            setArticlesDetails({
+                ...initialState,
+                title: data.data.title,
+                category: data.data.category_id,
+                subcategory: data.data.sub_category_id,
+                status: data.data.status,
+            });
+        }
+        setIsLoading(false)
+    };
+
+    const handleOnChange = (name, value) => {
+        setArticlesDetails({ ...articlesDetails, [name]: value });
+        setFormError(formError => ({
+            ...formError,
+            [name]: formValidate(name, value)
+        }));
+    };
+
+    const formValidate = (name, value) => {
+        switch (name) {
+            case "title":
+                if (!value || value.trim() === "") {
+                    return "Title is required";
+                } else {
+                    return "";
+                }
+            default: {
+                return "";
+            }
+        }
+    };
+
+    const selectedCategory = articleList?.find((category) => category.id === Number(articlesDetails?.category));
+    const subcategories = selectedCategory ? selectedCategory?.sub_categories : [];
+
+    const handlePublish = async () => {
+        let validationErrors = {};
+        Object.keys(articlesDetails).forEach(name => {
+            const error = formValidate(name, articlesDetails[name]);
+            if (error && error.length > 0) {
+                validationErrors[name] = error;
+            }
+        });
+        if (Object.keys(validationErrors).length > 0) {
+            setFormError(validationErrors);
+            return;
+        }
         setLoading(true);
-        setTimeout(() => {
-            setLoading(false);
-        }, 1000);
-        navigate(`${baseUrl}/help-center/articles`);
+
+        const selectedCategory = articleList.find(item => item.id === Number(articlesDetails.category));
+        let selectedSubCategory = null;
+        if (selectedCategory && selectedCategory.sub_categories.length > 0) {
+            selectedSubCategory = selectedCategory.sub_categories.find(sub => sub.id === Number(articlesDetails.subcategory));
+        }
+
+        let formData = new FormData();
+        formData.append('project_id', projectDetailsReducer.id);
+        formData.append('category_id', articlesDetails.category);
+        formData.append('sub_category_id', selectedSubCategory ? selectedSubCategory.id : null);
+        formData.append('title', articlesDetails.title);
+        formData.append('description', articlesDetails.description);
+        formData.append(`images`, articlesDetails.image);
+        const data = await apiService.createArticles(formData);
+        if(data.status === 200) {
+            setArticlesDetails(initialState);
+            navigate(`${baseUrl}/help/article`);
+            toast({description: data.message,});
+        } else {
+            toast({description: data.message, variant: "destructive",})
+        }
     };
 
     const renderSidebarItems = () => {
@@ -54,23 +156,26 @@ const ArticleDetail = () => {
                         <Input
                             name="title"
                             placeholder={"The Evolution of Urban Green Spaces: From Parks to Vertical Gardens"}
-                            value={formData.title}
-                            onChange={(e) => commonHandleChange("title", e.target.value)}
+                            value={articlesDetails.title}
+                            onChange={(e) => handleOnChange("title", e.target.value)}
                             className={"text-sm font-normal w-full h-auto"}
                             autoFocus
                         />
+                        {
+                            formError?.title && <span className="text-red-500 text-sm">{formError?.title}</span>
+                        }
                     </div>
                     <div className={"space-y-2"}>
                         <Label className={"text-sm font-normal"}>Select Category</Label>
-                        <Select defaultValue={1} onValueChange={(value) => commonHandleChange('category', value)}>
+                        <Select value={articlesDetails.category} onValueChange={(value) => handleOnChange('category', value)}>
                             <SelectTrigger className="h-auto">
                                 <SelectValue placeholder="" />
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectGroup>
-                                    {categoryOptions.map((item) => (
-                                        <SelectItem key={item.value} value={item.value}>
-                                            {item.name}
+                                    {articleList.map((item) => (
+                                        <SelectItem key={item.id} value={item.id}>
+                                            {item.title}
                                         </SelectItem>
                                     ))}
                                 </SelectGroup>
@@ -79,17 +184,21 @@ const ArticleDetail = () => {
                     </div>
                     <div className={"space-y-2"}>
                         <Label className={"text-sm font-normal"}>Subcategory</Label>
-                        <Select defaultValue={1} onValueChange={(value) => commonHandleChange('subcategory', value)}>
+                        <Select value={articlesDetails.subcategory} onValueChange={(value) => handleOnChange('subcategory', value)}>
                             <SelectTrigger className="h-auto">
                                 <SelectValue placeholder="" />
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectGroup>
-                                    {subcategoryOptions.map((item) => (
-                                        <SelectItem key={item.value} value={item.value}>
-                                            {item.name}
-                                        </SelectItem>
-                                    ))}
+                                    {subcategories.length > 0 ? (
+                                        subcategories.map((subCategory) => (
+                                            <SelectItem key={subCategory.id} value={subCategory.id}>
+                                                {subCategory.title}
+                                            </SelectItem>
+                                        ))
+                                    ) : (
+                                        <SelectItem disabled>No Subcategories</SelectItem>
+                                    )}
                                 </SelectGroup>
                             </SelectContent>
                         </Select>
@@ -105,18 +214,18 @@ const ArticleDetail = () => {
                 <Breadcrumb>
                     <BreadcrumbList>
                         <BreadcrumbItem className={"cursor-pointer"}>
-                            <BreadcrumbLink onClick={() => navigate(`${baseUrl}/help-center/articles`)}>
+                            <BreadcrumbLink onClick={() => navigate(`${baseUrl}/help/article`)}>
                                 Create New Article
                             </BreadcrumbLink>
                         </BreadcrumbItem>
                         <BreadcrumbSeparator />
                         <BreadcrumbItem className={"cursor-pointer"}>
-                            <BreadcrumbPage>{formData.title}</BreadcrumbPage>
+                            <BreadcrumbPage>{articlesDetails.title}</BreadcrumbPage>
                         </BreadcrumbItem>
                     </BreadcrumbList>
                 </Breadcrumb>
                 <div className={"flex gap-4 items-center"}>
-                    <Select defaultValue={1} onValueChange={(value) => commonHandleChange('status', Number(value))}>
+                    <Select defaultValue={1} onValueChange={(value) => handleOnChange('status', Number(value))}>
                         <SelectTrigger className={"w-[106px] h-auto py-[6px]"}>
                             <SelectValue placeholder="Draft" />
                         </SelectTrigger>
@@ -134,7 +243,7 @@ const ArticleDetail = () => {
                         </SelectContent>
                     </Select>
                     <Button variant={"ghost hover:bg-none"} className={"px-3 py-[6px] border font-normal h-auto"}><Play size={16} className={"mr-3"} /> Preview</Button>
-                    <Button className={"py-[7px] font-medium h-auto hover:bg-primary"} onClick={handlePublish}>
+                    <Button className={"w-[81px] py-[7px] font-medium h-8 hover:bg-primary"} onClick={handlePublish}>
                         {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Publish"}
                     </Button>
                     <Button variant={"ghost hover:bg-none"} className={"p-1 h-auto border"}><Trash2 size={16} /></Button>

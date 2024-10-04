@@ -163,7 +163,7 @@ const Widgets = () => {
                         <DialogContent className={"max-w-[350px] w-full sm:max-w-[425px] p-3 md:p-6 rounded-lg"}>
                             <DialogHeader className={"flex flex-row justify-between gap-2"}>
                                 <div className={"flex flex-col gap-2"}>
-                                    <DialogTitle className={"text-left"}>Delete widget?</DialogTitle>
+                                    <DialogTitle className={"text-left font-medium"}>Delete widget?</DialogTitle>
                                     <DialogDescription className={"text-left"}>Are you sure? This cannot be
                                         undone.</DialogDescription>
                                 </div>
@@ -423,7 +423,7 @@ const Widgets = () => {
                                             ["Name", "Type", "Last Updated", "", "Analytics", "Actions"].map((x, i) => {
                                                 return (
                                                     <TableHead
-                                                        className={`px-2 py-[10px] md:px-3 font-medium ${i >= 4 ? 'text-center' : ''}`}>{x}</TableHead>
+                                                        className={`px-2 py-[10px] md:px-3 font-medium text-card-foreground ${i >= 4 ? 'text-center' : ''}`}>{x}</TableHead>
                                                 )
                                             })
                                         }

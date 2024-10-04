@@ -222,7 +222,7 @@ const InAppMessage = () => {
                         <DialogContent className="max-w-[350px] w-full sm:max-w-[525px] p-3 md:p-6 rounded-lg">
                             <DialogHeader className={"flex flex-row justify-between gap-2"}>
                                 <div className={"flex flex-col gap-2"}>
-                                    <DialogTitle className={"text-start"}>You really want delete this label?</DialogTitle>
+                                    <DialogTitle className={"text-start font-medium"}>You really want delete this label?</DialogTitle>
                                     <DialogDescription className={"text-start"}>This action can't be undone.</DialogDescription>
                                 </div>
                                 <X size={16} className={"m-0 cursor-pointer"} onClick={() => setDeleteId(null)}/>
@@ -247,85 +247,87 @@ const InAppMessage = () => {
             <div className={"container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-3 md:px-4"}>
                 <div className={""}>
                     <div className={"flex justify-between items-center"}>
-                        <h4 className={"font-normal text-lg sm:text-2xl leading-8"}>In App Messages</h4>
-                        <Button size="sm" onClick={()=>handleCreateNew("type")} className={"gap-2 font-medium hover:bg-primary"}> <Plus size={20} strokeWidth={3}/>New Content</Button>
-                    </div>
-                    <div className={"flex justify-between pt-7"}>
-                        <div className={"flex gap-4"}>
-                            <Input
-                                type="search"
-                                placeholder="Search..."
-                                className="pl-4 pr-4 text-sm font-normal h-9"
-                                value={formData.search}
-                                onChange={(e)=>setFormData({...formData,search: e.target.value})}
-                            />
+                        <h4 className={"font-normal text-lg sm:text-2xl"}>In App Messages</h4>
+                        <div className={"flex gap-2 flex-wrap items-center"}>
+                            <div className={"flex gap-2"}>
+                                <Input
+                                    type="search"
+                                    placeholder="Search..."
+                                    className="pl-4 pr-4 text-sm font-normal h-9"
+                                    value={formData.search}
+                                    onChange={(e)=>setFormData({...formData,search: e.target.value})}
+                                />
 
-                            <Popover open={openFilter}
-                                     onOpenChange={() => {
-                                         setOpenFilter(!openFilter);
-                                         setOpenFilterType('');
-                                     }}>
-                                <PopoverTrigger asChild>
-                                    <Button className={"h-9 p-0 w-[45px] flex justify-center"} size={"icon"}  variant="outline"><Filter fill="true" className='w-4 h-4' /></Button>
-                                </PopoverTrigger>
-                                <PopoverContent className="w-full p-0" align={"end"}>
-                                    <Command className="w-full">
-                                        <CommandInput placeholder="Search filter..."/>
-                                        <CommandList className="w-full">
-                                            <CommandEmpty>No filter found.</CommandEmpty>
-                                            {
-                                                openFilterType === 'content_type' ?
-                                                    <CommandGroup className={"w-full"}>
-                                                        <CommandItem className={"p-0 flex gap-2 items-center cursor-pointer p-1"} onSelect={() => {setOpenFilterType('');}}>
-                                                            <ChevronLeft className="mr-2 h-4 w-4"  />  <span className={"flex-1 w-full text-sm font-normal cursor-pointer flex gap-2 items-center"}>Back</span>
-                                                        </CommandItem>
-                                                        {
-                                                            (contentType || []).map((x, i) => {
-                                                                return (
-                                                                    <CommandItem key={i} className={"p-0 w-full flex flex-row gap-1 items-center cursor-pointer"}>
-                                                                        <div className={"flex"} onClick={(event)=>filterPosts({name:"content_type",value:x.value == formData.content_type ? "" :x.value })}>
-                                                                            <Checkbox className={'m-2'} checked={x.value === formData.content_type} onClick={(event)=>filterPosts({name:"content_type",value:x.value == formData.content_type ? "" :x.value })} />
-                                                                            <span onClick={(event)=>filterPosts({name:"content_type",value:x.value == formData.content_type ? "" :x.value })} className={`w-full font-normal flex items-center ${theme === "dark" ? "" : "text-muted-foreground"} hover:none`} onSelect={()=>setOpen(false)}>{x.icon} <span className={"ml-2"}>{x.label}</span></span>
-                                                                        </div>
-                                                                    </CommandItem>
-                                                                )
-                                                            })
-                                                        }
-                                                    </CommandGroup>
-                                                    : openFilterType === 'add_filter' ?
-                                                    <CommandGroup className={"w-full"}>
-                                                        <CommandItem className={"p-0 flex gap-2 items-center cursor-pointer p-1"} onSelect={() => {setOpenFilterType('');}}>
-                                                            <ChevronLeft className="mr-2 h-4 w-4"  />  <span className={"flex-1 w-full text-sm font-normal cursor-pointer flex gap-2 items-center"}>Back</span>
-                                                        </CommandItem>
-                                                        {
-                                                            (filterType || []).map((x,i)=>{
-                                                                return (
-                                                                    <CommandItem key={i}  className={"p-0 w-full flex flex-row gap-1 items-center cursor-pointer"}>
-                                                                        <div className={"flex"} onClick={(event)=>filterPosts({name:"add_filter",value:x.value == formData.add_filter ? "" :x.value })}>
-                                                                            <Checkbox className={'m-2'} checked={x.value === formData.add_filter} onClick={(event)=>filterPosts({name:"add_filter",value:x.value == formData.add_filter ? "" :x.value })} />
-                                                                            <span onClick={(event)=>filterPosts({name:"add_filter",value:x.value == formData.add_filter ? "" :x.value })} className={`w-full font-normal flex items-center ${theme === "dark" ? "" : "text-muted-foreground"} hover:none`} onSelect={()=>setOpen(false)}>{x.icon} <span className={"ml-2"}>{x.label}</span></span>
-                                                                        </div>
-                                                                    </CommandItem>
-                                                                )
-                                                            })
-                                                        }
+                                <Popover open={openFilter}
+                                         onOpenChange={() => {
+                                             setOpenFilter(!openFilter);
+                                             setOpenFilterType('');
+                                         }}
+                                >
+                                    <PopoverTrigger asChild>
+                                        <Button className={"h-9 p-0 w-[45px] flex justify-center"} size={"icon"}  variant="outline"><Filter fill="true" className='w-4 h-4' /></Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-full p-0" align={"end"}>
+                                        <Command className="w-full">
+                                            <CommandInput placeholder="Search filter..."/>
+                                            <CommandList className="w-full">
+                                                <CommandEmpty>No filter found.</CommandEmpty>
+                                                {
+                                                    openFilterType === 'content_type' ?
+                                                        <CommandGroup className={"w-full"}>
+                                                            <CommandItem className={"p-0 flex gap-2 items-center cursor-pointer p-1"} onSelect={() => {setOpenFilterType('');}}>
+                                                                <ChevronLeft className="mr-2 h-4 w-4"  />  <span className={"flex-1 w-full text-sm font-normal cursor-pointer flex gap-2 items-center"}>Back</span>
+                                                            </CommandItem>
+                                                            {
+                                                                (contentType || []).map((x, i) => {
+                                                                    return (
+                                                                        <CommandItem key={i} className={"p-0 w-full flex flex-row gap-1 items-center cursor-pointer"}>
+                                                                            <div className={"flex"} onClick={(event)=>filterPosts({name:"content_type",value:x.value == formData.content_type ? "" :x.value })}>
+                                                                                <Checkbox className={'m-2'} checked={x.value === formData.content_type} onClick={(event)=>filterPosts({name:"content_type",value:x.value == formData.content_type ? "" :x.value })} />
+                                                                                <span onClick={(event)=>filterPosts({name:"content_type",value:x.value == formData.content_type ? "" :x.value })} className={`w-full font-normal flex items-center ${theme === "dark" ? "" : "text-muted-foreground"} hover:none`} onSelect={()=>setOpen(false)}>{x.icon} <span className={"ml-2"}>{x.label}</span></span>
+                                                                            </div>
+                                                                        </CommandItem>
+                                                                    )
+                                                                })
+                                                            }
+                                                        </CommandGroup>
+                                                        : openFilterType === 'add_filter' ?
+                                                        <CommandGroup className={"w-full"}>
+                                                            <CommandItem className={"p-0 flex gap-2 items-center cursor-pointer p-1"} onSelect={() => {setOpenFilterType('');}}>
+                                                                <ChevronLeft className="mr-2 h-4 w-4"  />  <span className={"flex-1 w-full text-sm font-normal cursor-pointer flex gap-2 items-center"}>Back</span>
+                                                            </CommandItem>
+                                                            {
+                                                                (filterType || []).map((x,i)=>{
+                                                                    return (
+                                                                        <CommandItem key={i}  className={"p-0 w-full flex flex-row gap-1 items-center cursor-pointer"}>
+                                                                            <div className={"flex"} onClick={(event)=>filterPosts({name:"add_filter",value:x.value == formData.add_filter ? "" :x.value })}>
+                                                                                <Checkbox className={'m-2'} checked={x.value === formData.add_filter} onClick={(event)=>filterPosts({name:"add_filter",value:x.value == formData.add_filter ? "" :x.value })} />
+                                                                                <span onClick={(event)=>filterPosts({name:"add_filter",value:x.value == formData.add_filter ? "" :x.value })} className={`w-full font-normal flex items-center ${theme === "dark" ? "" : "text-muted-foreground"} hover:none`} onSelect={()=>setOpen(false)}>{x.icon} <span className={"ml-2"}>{x.label}</span></span>
+                                                                            </div>
+                                                                        </CommandItem>
+                                                                    )
+                                                                })
+                                                            }
 
-                                                    </CommandGroup>
-                                                    :<CommandGroup>
-                                                        <CommandItem onSelect={() => {setOpenFilterType('content_type');}}>
-                                                            <span className={"text-sm font-normal cursor-pointer"}>Content Type</span>
-                                                        </CommandItem>
-                                                        <CommandItem onSelect={() => {setOpenFilterType('add_filter');}}>
-                                                            <span className={"text-sm font-normal cursor-pointer"}>Add Filter</span>
-                                                        </CommandItem>
-                                                    </CommandGroup>
-                                            }
-                                        </CommandList>
-                                    </Command>
-                                </PopoverContent>
-                            </Popover>
+                                                        </CommandGroup>
+                                                        :<CommandGroup>
+                                                            <CommandItem onSelect={() => {setOpenFilterType('content_type');}}>
+                                                                <span className={"text-sm font-normal cursor-pointer"}>Content Type</span>
+                                                            </CommandItem>
+                                                            <CommandItem onSelect={() => {setOpenFilterType('add_filter');}}>
+                                                                <span className={"text-sm font-normal cursor-pointer"}>Add Filter</span>
+                                                            </CommandItem>
+                                                        </CommandGroup>
+                                                }
+                                            </CommandList>
+                                        </Command>
+                                    </PopoverContent>
+                                </Popover>
+                            </div>
+                            <Button size="sm" onClick={()=>handleCreateNew("type")} className={"gap-2 font-medium hover:bg-primary"}> <Plus size={20} strokeWidth={3}/>New Content</Button>
                         </div>
                     </div>
+
                     {
                         (formData.add_filter || formData.content_type) && <div className={"flex flex-wrap gap-2 mt-6"}>
                             {
@@ -353,7 +355,7 @@ const InAppMessage = () => {
                                         {
                                             ["Title","State","Sender","Content type","Created at","Action"].map((x,i)=>{
                                                 return(
-                                                    <TableHead  className={`px-2 py-[10px] md:px-3 font-medium ${i >= 5 ? 'text-center' : ''}`} key={i}>{x}</TableHead>
+                                                    <TableHead  className={`px-2 py-[10px] md:px-3 font-medium text-card-foreground ${i >= 5 ? 'text-center' : ''}`} key={i}>{x}</TableHead>
                                                 )
                                             })
                                         }
@@ -416,16 +418,6 @@ const InAppMessage = () => {
                                                                             </SelectContent>
                                                                         </Select>
                                                                     </TableCell>
-                                                                    {/*<TableCell className={`flex items-center mt-1 px-2 py-[10px] md:px-3 flex gap-2`}>*/}
-                                                                    {/*    <Avatar className={"w-[20px] h-[20px] "}>*/}
-                                                                    {/*        {*/}
-                                                                    {/*            sender?.user_photo ? <AvatarImage src={sender?.user_photo} alt="@shadcn"/>*/}
-                                                                    {/*                :*/}
-                                                                    {/*                <AvatarFallback>{sender && sender.user_first_name && sender.user_first_name.substring(0, 1)}</AvatarFallback>*/}
-                                                                    {/*        }*/}
-                                                                    {/*    </Avatar>*/}
-                                                                    {/*    <p className={"font-normal"}>{sender && sender?.user_first_name}</p>*/}
-                                                                    {/*</TableCell>*/}
                                                                     <TableCell className={`flex items-center mt-1 px-2 py-[10px] md:px-3 gap-2 ${sender ? sender : "justify-center"}`}>
                                                                         {sender ? (
                                                                             <>

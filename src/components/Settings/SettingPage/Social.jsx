@@ -1,5 +1,5 @@
 import React, {useState,useEffect,} from 'react';
-import {Card, CardContent, CardHeader} from "../../ui/card";
+import {Card, CardContent, CardFooter, CardHeader} from "../../ui/card";
 import {Separator} from "../../ui/separator";
 import {Label} from "../../ui/label";
 import {Input} from "../../ui/input";
@@ -135,11 +135,10 @@ const Social = () => {
     };
 
     return (
-        <Card>
+        <Card className={"divide-y"}>
             <CardHeader className={"p-4 sm:p-6"}>
                 <h2 className={`text-lg sm:text-2xl font-normal`}>Social links</h2>
             </CardHeader>
-            <Separator/>
             <CardContent className={"p-0"}>
                 <div className={"p-4 sm:p-6"}>
                     <div className="grid w-full gap-1.5">
@@ -178,19 +177,13 @@ const Social = () => {
                         {formError.github && <span className="text-destructive text-sm mt-1">{formError.github}</span>}
                     </div>
                 </div>
-
-                <Separator className={""}/>
-
-                <div className={"px-6 py-4 flex flex-row justify-end"}>
-                    <Button
-                        className={`py-2 px-6 w-[142px] text-sm font-medium`}
-                        onClick={onUpdateSocialSetting}>
-                        {isSave ? <Loader2 className="h-4 w-4 animate-spin"/> : "Update Social"}</Button>
-                </div>
-
-
-
             </CardContent>
+            <CardFooter className={"px-6 py-4 justify-end"}>
+                <Button
+                    className={`py-2 px-6 w-[142px] text-sm font-medium hover:bg-primary`}
+                    onClick={onUpdateSocialSetting}>
+                    {isSave ? <Loader2 className="h-4 w-4 animate-spin"/> : "Update Social"}</Button>
+            </CardFooter>
         </Card>
     );
 };

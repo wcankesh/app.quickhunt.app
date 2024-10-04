@@ -22,8 +22,8 @@ const SaidBarDesktop = () => {
         return window.location.pathname === subLink2 || window.location.pathname === subLink || window.location.pathname === link;
     };
 
-    const isHelpCenterActive = isActive(`${baseUrl}/help/articles`, `${baseUrl}/help/category`) ||
-        isActive(`${baseUrl}/help/articles/${id}`, `${baseUrl}/help/category/${id}`);
+    const isHelpCenterActive = isActive(`${baseUrl}/help/article`, `${baseUrl}/help/category`) ||
+        isActive(`${baseUrl}/help/article/${id}`, `${baseUrl}/help/category/${id}`);
 
     const hasRoadmapPath = location.pathname.includes("/roadmap");
 
@@ -79,15 +79,15 @@ const SaidBarDesktop = () => {
                 },
                 {
                     title: 'Help Center',
-                    link: '/help/articles',
+                    link: '/help/article',
                     icon: Icon.helpCenter,
                     // selected: isActive(`${baseUrl}/help-center/articles`,`${baseUrl}/help-center/category`) || isActive(`${baseUrl}/help-center/articles/${id}`,`${baseUrl}/help-center/category/${id}`),
                     selected: isHelpCenterActive,
                     subItems: [
                         {
                             title: 'Articles',
-                            link: `/help/articles`,
-                            selected: isActive(`${baseUrl}/help/articles`, `${baseUrl}/help/articles/${id}`),
+                            link: `/help/article`,
+                            selected: isActive(`${baseUrl}/help/article`, `${baseUrl}/help/article/${id}`),
                         },
                         {
                             title: 'Category',
@@ -214,7 +214,7 @@ const SaidBarDesktop = () => {
                                                         {
                                                             (x.items || []).map((y, i) => {
                                                                 return (
-                                                                    <Fragment>
+                                                                    <Fragment key={i}>
                                                                         {/*// <Button*/}
                                                                         {/*//     key={i}*/}
                                                                         {/*//     variant={"link hover:no-underline"}*/}

@@ -129,7 +129,7 @@ const AnnouncementsTable = ({data, isLoading, setSelectedRecord, handleDelete, s
                         <DialogContent className="max-w-[350px] w-full sm:max-w-[525px] p-3 md:p-6 rounded-lg">
                             <DialogHeader className={"flex flex-row justify-between gap-2"}>
                                 <div className={"flex flex-col gap-2"}>
-                                    <DialogTitle className={"text-start"}>You really want delete this
+                                    <DialogTitle className={"text-start font-medium"}>You really want delete this
                                         announcement?</DialogTitle>
                                     <DialogDescription className={"text-start"}>This action can't be
                                         undone.</DialogDescription>
@@ -161,7 +161,7 @@ const AnnouncementsTable = ({data, isLoading, setSelectedRecord, handleDelete, s
                             {
                                 ["Title", "Last Updated", "Published At", "Status", "", "", ""].map((x, i) => {
                                     return (
-                                        <TableHead className={`font-semibold px-2 py-[10px] md:px-3 `} key={i}
+                                        <TableHead className={`font-medium text-card-foreground px-2 py-[10px] md:px-3 `} key={i}
                                                    onClick={() => x === "Published At" && toggleSort("Published At")}>
                                             {x}
                                             {x === "Published At" && (
@@ -185,7 +185,7 @@ const AnnouncementsTable = ({data, isLoading, setSelectedRecord, handleDelete, s
                                                 [...Array(7)].map((_, i) => {
                                                     return (
                                                         <TableCell className={"max-w-[373px] px-2 py-[10px] md:px-3"}>
-                                                            <Skeleton className={"rounded-md  w-full h-7"}/>
+                                                            <Skeleton className={"rounded-md w-full h-7"}/>
                                                         </TableCell>
                                                     )
                                                 })
@@ -197,9 +197,7 @@ const AnnouncementsTable = ({data, isLoading, setSelectedRecord, handleDelete, s
                                 {(announcementData || []).map((x, index) => {
                                     return (
                                         <TableRow key={x?.id} className={""}>
-                                            <TableCell
-                                                className={`inline-flex gap-2 md:gap-1 flex-wrap items-center px-2 py-[10px] md:px-3 font-medium`}>
-                                                {/*className={`inline-flex gap-2 md:gap-3 flex-wrap items-center px-2 py-[10px] md:px-3 font-medium h-12`}>*/}
+                                            <TableCell className={`inline-flex gap-2 md:gap-1 flex-wrap items-center px-2 py-[10px] md:px-3 font-normal`}>
                                                 <span
                                                     className={"cursor-pointer text-ellipsis overflow-hidden whitespace-nowrap"}
                                                     onClick={() => onEdit(x)}>{x?.post_title}</span>
@@ -225,8 +223,8 @@ const AnnouncementsTable = ({data, isLoading, setSelectedRecord, handleDelete, s
                                                         </div> : ""}
                                             </TableCell>
                                             <TableCell
-                                                className={`font-medium px-2 py-[10px] md:px-3`}>{x?.post_modified_date ? moment.utc(x.post_modified_date).local().startOf('seconds').fromNow() : "-"}</TableCell>
-                                            <TableCell className={`font-medium px-2 py-[10px] md:px-3`}>{x.post_published_at ? moment(x.post_published_at).format('D MMM, YYYY') : moment().format('D MMM, YYYY')}</TableCell>
+                                                className={`font-normal px-2 py-[10px] md:px-3`}>{x?.post_modified_date ? moment.utc(x.post_modified_date).local().startOf('seconds').fromNow() : "-"}</TableCell>
+                                            <TableCell className={`font-normal px-2 py-[10px] md:px-3`}>{x.post_published_at ? moment(x.post_published_at).format('D MMM, YYYY') : moment().format('D MMM, YYYY')}</TableCell>
                                             <TableCell className={"px-2 py-[10px] md:px-3"}>
                                                 <Select value={x.post_status}
                                                         onValueChange={(value) => handleStatusChange(x, value)}>
@@ -246,7 +244,7 @@ const AnnouncementsTable = ({data, isLoading, setSelectedRecord, handleDelete, s
                                                                                     className={"flex items-center gap-2"}>
                                                                                     <Circle fill={x.fillColor}
                                                                                             stroke={x.strokeColor}
-                                                                                            className={`font-medium w-2 h-2`}/>
+                                                                                            className={`font-normal w-2 h-2`}/>
                                                                                     {x.name}
                                                                                 </div>
                                                                             </SelectItem>
@@ -265,7 +263,7 @@ const AnnouncementsTable = ({data, isLoading, setSelectedRecord, handleDelete, s
                                                     onClick={() => shareFeedback(x.domain, x.post_slug_url)}
                                                     className={"p-0 h-auto"}
                                                 >
-                                                    <Eye size={18} className={`font-medium`}/>
+                                                    <Eye size={18} className={`font-normal`}/>
                                                 </Button>
                                             </TableCell>
                                             <TableCell className={"px-2 py-[10px] md:px-3"}>
@@ -276,7 +274,7 @@ const AnnouncementsTable = ({data, isLoading, setSelectedRecord, handleDelete, s
                                                     variant={"ghost"}
                                                     className={"p-0 h-auto"}
                                                 >
-                                                    <BarChart size={18} className={`font-medium`}/>
+                                                    <BarChart size={18}/>
                                                 </Button>
                                             </TableCell>
                                             <TableCell className={"px-2 py-[10px] md:px-3"}>

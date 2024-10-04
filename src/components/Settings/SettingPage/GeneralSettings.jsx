@@ -87,12 +87,12 @@ const GeneralSettings = () => {
     }
 
     return (
-        <Card>
-            <CardHeader className={"gap-1 border-b p-4 md:p-6"}>
+        <Card className={"divide-y"}>
+            <CardHeader className={"gap-1 p-4 md:p-6"}>
                 <h3 className={"font-normal text-lg sm:text-2xl"}>General Settings</h3>
             </CardHeader>
-            <CardContent className={"p-0"}>
-                <div className={"space-y-3 p-4 md:p-6 border-b"}>
+            <CardContent className={"p-0 divide-y"}>
+                <div className={"space-y-3 p-4 md:p-6"}>
                     <div className={"flex justify-between items-center gap-2"}>
                         <h3 className={"font-normal"}>Announcement</h3>
                         <div className="announce-create-switch flex gap-4">
@@ -144,7 +144,7 @@ const GeneralSettings = () => {
                         </Fragment>
                     }
                 </div>
-                <div className={"space-y-3 p-4 md:p-6 border-b"}>
+                <div className={"space-y-3 p-4 md:p-6"}>
                     <div className={"flex justify-between items-center gap-2"}>
                         <h3 className={"font-normal"}>Roadmap</h3>
                         <div className="announce-create-switch flex gap-4">
@@ -170,7 +170,7 @@ const GeneralSettings = () => {
                     }
 
                 </div>
-                <div className={"space-y-3 p-4 md:p-6 border-b"}>
+                <div className={"space-y-3 p-4 md:p-6"}>
                     <div className={"flex justify-between items-center gap-2"}>
                         <h3 className={"font-normal"}>Ideas</h3>
                         <div className="announce-create-switch flex gap-4">
@@ -195,7 +195,7 @@ const GeneralSettings = () => {
                         </Fragment>
                     }
                 </div>
-                <div className={"space-y-3 p-4 md:p-6 border-b"}>
+                <div className={"space-y-3 p-4 md:p-6"}>
                     <h3 className={"font-normal"}>Header Color</h3>
                     <div className={"flex items-center gap-3 flex-wrap md:flex-nowrap"}>
                         <div className={"widget-color-picker space-y-1 w-full md:basis-1/2"}>
@@ -232,7 +232,7 @@ const GeneralSettings = () => {
                         </div>
                     </div>
                 </div>
-                <div className={"space-y-3 p-4 md:p-6 border-b"}>
+                <div className={"space-y-3 p-4 md:p-6"}>
                     <h3 className={"font-normal"}>Global Color</h3>
                     <div className={"flex items-center gap-3 flex-wrap md:flex-nowrap"}>
                         <div className={"widget-color-picker space-y-1 w-full md:basis-1/2"}>
@@ -253,7 +253,7 @@ const GeneralSettings = () => {
                         </div>
                     </div>
                 </div>
-                <div className={"space-y-3 p-4 md:p-6 border-b"}>
+                <div className={"space-y-3 p-4 md:p-6"}>
                     <h3 className={"font-normal"}>Branding</h3>
                     <div className="announce-create-switch flex gap-4">
                         <Switch

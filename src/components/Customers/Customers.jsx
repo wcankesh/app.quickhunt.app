@@ -248,7 +248,7 @@ const Customers = () => {
                             <DialogContent className="w-[310px] md:w-full rounded-lg">
                                 <DialogHeader className={"flex flex-row justify-between gap-2"}>
                                     <div className={"flex flex-col gap-2"}>
-                                        <DialogTitle className={"text-start"}>You really want delete this customer ?</DialogTitle>
+                                        <DialogTitle className={"text-start font-medium"}>You really want delete this customer ?</DialogTitle>
                                         <DialogDescription className={"text-start"}>This action can't be undone.</DialogDescription>
                                     </div>
                                     <X size={16} className={"m-0 cursor-pointer"} onClick={() => setOpenDelete(false)}/>
@@ -288,7 +288,7 @@ const Customers = () => {
                                                         {
                                                             (tableHeadingsArray || []).map((x,i)=>{
                                                                 return(
-                                                                    <TableHead className={`font-medium px-2 py-[10px] md:px-3 ${i >= 2 ? "text-center" : ""}  ${theme === "dark"? "text-[]" : "bg-muted"} `} key={x.label}>{x.label}</TableHead>
+                                                                    <TableHead className={`font-medium text-card-foreground px-2 py-[10px] md:px-3 ${i >= 2 ? "text-center" : ""}  ${theme === "dark"? "text-[]" : "bg-muted"} `} key={x.label}>{x.label}</TableHead>
                                                                 )
                                                             })
                                                         }
@@ -318,12 +318,12 @@ const Customers = () => {
                                                                 (customerList || []).map((x,index)=>{
                                                                     return(
                                                                         <TableRow key={x.id} className={"font-normal"}>
-                                                                            <TableCell className={`px-2 py-[10px] md:px-3 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.customer_name ? x.customer_name : "-"}</TableCell>
-                                                                            <TableCell className={`px-2 py-[10px] md:px-3 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x?.customer_email_id}</TableCell>
-                                                                            <TableCell className={`px-2 py-[10px] md:px-3 ${theme === "dark" ? "" : "text-muted-foreground"} text-center`}>{x.customer_country ? x.customer_country : "-"}</TableCell>
-                                                                            <TableCell className={`px-2 py-[10px] md:px-3 ${theme === "dark" ? "" : "text-muted-foreground"} text-center`}>{x.customer_browser ? x.customer_browser : "-"}</TableCell>
-                                                                            <TableCell className={`px-2 py-[10px] md:px-3 ${theme === "dark" ? "" : "text-muted-foreground"} text-center`}>{x.os ? x.os : "-"}</TableCell>
-                                                                            <TableCell className={`px-2 py-[10px] md:px-3 ${theme === "dark" ? "" : "text-muted-foreground flex justify-center"}`}>
+                                                                            <TableCell className={`px-2 py-[10px] md:px-3`}>{x.customer_name ? x.customer_name : "-"}</TableCell>
+                                                                            <TableCell className={`px-2 py-[10px] md:px-3`}>{x?.customer_email_id}</TableCell>
+                                                                            <TableCell className={`px-2 py-[10px] md:px-3 text-center`}>{x.customer_country ? x.customer_country : "-"}</TableCell>
+                                                                            <TableCell className={`px-2 py-[10px] md:px-3 text-center`}>{x.customer_browser ? x.customer_browser : "-"}</TableCell>
+                                                                            <TableCell className={`px-2 py-[10px] md:px-3 text-center`}>{x.os ? x.os : "-"}</TableCell>
+                                                                            <TableCell className={`px-2 py-[10px] md:px-3 text-center`}>
                                                                                 <Button onClick={() => deleteCustomer(x.id,index)} variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px]`}>
                                                                                     <Trash2 size={16}/>
                                                                                 </Button>

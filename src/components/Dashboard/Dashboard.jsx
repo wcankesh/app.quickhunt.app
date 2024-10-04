@@ -161,10 +161,6 @@ export function Dashboard() {
         },
     ]
 
-    const openReactions = (postId) => {
-        navigate(`${baseUrl}/announcements?postId=${postId}`)
-    }
-
     return (
         <Fragment>
 
@@ -318,8 +314,6 @@ export function Dashboard() {
                                                                     <div className="flex gap-1 items-center">
                                                                         <h4
                                                                             className="text-sm font-medium cursor-pointer"
-                                                                            // onClick={() => openReactions(x.post_id)}
-                                                                            // onClick={() => navigate(`${baseUrl}/announcements?postId=${x.post_id}`)}
                                                                             onClick={() => navigate(`${baseUrl}/announcements/analytic-view?postId=${x.post_id}`)}
                                                                         >{x.customer_name}</h4>
                                                                         <p className="text-xs text-muted-foreground">Reacted

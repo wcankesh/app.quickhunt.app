@@ -1,20 +1,7 @@
 import React, {Fragment, useState, useEffect} from 'react';
 import {Sheet, SheetContent, SheetHeader, SheetOverlay} from "../ui/sheet";
 import {Button} from "../ui/button";
-import {
-    ArrowBigUp,
-    Check,
-    Circle,
-    CircleX,
-    Dot,
-    Loader2,
-    MessageCircleMore,
-    Paperclip,
-    Pencil,
-    Pin,
-    Trash2, Upload,
-    X
-} from "lucide-react";
+import {ArrowBigUp, Check, Circle, CircleX, Dot, Loader2, MessageCircleMore, Paperclip, Pencil, Pin, Trash2, Upload, X} from "lucide-react";
 import {RadioGroup, RadioGroupItem} from "../ui/radio-group";
 import {Label} from "../ui/label";
 import {Input} from "../ui/input";
@@ -27,7 +14,6 @@ import {useTheme} from "../theme-provider";
 import {useToast} from "../ui/use-toast";
 import {ApiService} from "../../utils/ApiService";
 import {useSelector} from "react-redux";
-import ReadMoreText from "../Comman/ReadMoreText";
 import moment from "moment";
 import ReactQuillEditor from "../Comman/ReactQuillEditor";
 
@@ -37,17 +23,7 @@ const initialStateError = {
     board: "",
 }
 
-const UpdateRoadMapIdea = ({
-                               isOpen,
-                               onOpen,
-                               onClose,
-                               selectedIdea,
-                               setSelectedIdea,
-                               setSelectedRoadmap,
-                               selectedRoadmap,
-                               roadmapList,
-                               setRoadmapList,
-                           }) => {
+const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedIdea, setSelectedRoadmap, selectedRoadmap, roadmapList, setRoadmapList,}) => {
     const {theme} = useTheme()
     let apiSerVice = new ApiService();
     const {toast} = useToast()

@@ -87,12 +87,12 @@ const Domain = () => {
     }
 
     return (
-        <Card>
-            <CardHeader className={"p-4 sm:p-6 gap-1 border-b"}>
+        <Card className={"divide-y"}>
+            <CardHeader className={"p-4 sm:p-6 gap-1"}>
                 <CardTitle className={"text-lg sm:text-2xl font-normal"}>Domain Setting</CardTitle>
                 <CardDescription className={"text-sm text-muted-foreground p-0"}>Personalise your Quickhunt page with a custom domain.</CardDescription>
             </CardHeader>
-            <CardContent className={"p-4 sm:p-6 flex flex-col gap-6 border-b"}>
+            <CardContent className={"p-4 sm:p-6 flex flex-col gap-6"}>
                 <div className="space-y-1 relative">
                     <Label htmlFor="domain" className={"text-right font-normal"}>Subdomain</Label>
                     <Input disabled  value={settingData?.domain?.replace('.quickhunt.io', '')} id="domain" placeholder="example.com" className={"pr-[115px] bg-card mt-1"} />

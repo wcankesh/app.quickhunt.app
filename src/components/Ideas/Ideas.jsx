@@ -120,9 +120,7 @@ const Ideas = () => {
     }
 
     const openDetailsSheet = (record) => {
-
         navigate(`${baseUrl}/ideas/${record.id}`)
-
     };
 
     const handleChange = (e) => {
@@ -297,7 +295,7 @@ const Ideas = () => {
                         <DialogContent className={"max-w-[350px] w-full sm:max-w-[425px] p-3 md:p-6 rounded-lg"}>
                             <DialogHeader className={"flex flex-row justify-between gap-2"}>
                                 <div className={"flex flex-col gap-2"}>
-                                    <DialogTitle className={"text-start"}>You really want delete this idea?</DialogTitle>
+                                    <DialogTitle className={"text-start font-medium"}>You really want delete this idea?</DialogTitle>
                                     <DialogDescription className={"text-start"}>This action can't be undone.</DialogDescription>
                                 </div>
                                 <X size={16} className={"m-0 cursor-pointer"} onClick={() => setOpenDelete(false)}/>
