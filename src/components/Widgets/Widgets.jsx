@@ -144,12 +144,12 @@ const Widgets = () => {
     };
     const codeString = selectedType === "embed" ? `
     <div class="quickhunt-widget-embed" Quickhunt_Widget_Key=${selectedId} widget-width="740px" widget-height="460px"></div>
-    <script src="https://quickhunt.app/widgetScript.js"></script>
+    <script src="https://fw.quickhunt.app/widgetScript.js"></script>
     ` : `<script>
     window.Quickhunt_Config = window.Quickhunt_Config || [];
     window.Quickhunt_Config.push({ Quickhunt_Widget_Key:  ${selectedId}});
 </script>
-<script src="https://quickhunt.app/widgetScript.js"></script>`;
+<script src="https://fw.quickhunt.app/widgetScript.js"></script>`;
     const embedLink = `https://${projectDetailsReducer.domain}/ideas?widget=${selectedId}`
     const iFrame = `<iframe src="${embedLink}" style="border: 0px; outline: 0px; width: 450px; height: 400px;"></iframe>`
     const callback = `window.Quickhunt('${selectedId}')`
