@@ -11,34 +11,33 @@ import { Card, CardContent } from "../../ui/card";
 import {ApiService} from "../../../utils/ApiService";
 import {useSelector} from "react-redux";
 import {useToast} from "../../ui/use-toast";
+// import Tiptap from "../../../Tiptap";
 
     const statusOptions = [
         { name: "Publish", value: 1, fillColor: "#389E0D", strokeColor: "#389E0D" },
-        { name: "Draft", value: 2, fillColor: "#CF1322", strokeColor: "#CF1322" },
-    ];
-    const categoryOptions = [
-        { name: "Category 1", value: 1 },
-        { name: "Category 2", value: 2 },
-    ];
-    const subcategoryOptions = [
-        { name: "Subcategory 1", value: 1 },
-        { name: "Subcategory 2", value: 2 },
+        { name: "Draft", value: 0, fillColor: "#CF1322", strokeColor: "#CF1322" },
     ];
 
     const initialState =
         {
             title: 'New Article',
-            category: 1,
-            subcategory: 1,
-            status: 1,
+            category_id: 1,
+            category_title: "",
+            sub_category_id: 1,
+            sub_category_title: "",
+            description: "",
+            is_active: 1,
         }
 
     const initialStateError =
     {
         title: '',
-        category: 1,
-        subcategory: 1,
-        status: 1,
+        category_id: 1,
+        category_title: "",
+        sub_category_id: 1,
+        sub_category_title: "",
+        description: "",
+        is_active: 1,
     }
 
 const ArticleDetail = () => {
@@ -55,15 +54,17 @@ const ArticleDetail = () => {
     const [articleList, setArticleList] = useState([]);
 
     useEffect(() => {
-        if(projectDetailsReducer.id){
-            getAllCategory();
+        if(id !== "new" && projectDetailsReducer.id){
             getSingleArticle();
         }
+            getAllCategory();
     }, [projectDetailsReducer.id])
 
     const getAllCategory = async () => {
         setIsLoading(true);
-        const data = await apiService.getAllCategory(projectDetailsReducer.id);
+        const data = await apiService.getAllCategory({
+            project_id: projectDetailsReducer.id,
+        });
         if (data.status === 200) {
             setArticleList(data.data);
         }
@@ -76,10 +77,12 @@ const ArticleDetail = () => {
         if (data.status === 200) {
             setArticlesDetails({
                 ...initialState,
+                id: data.data.id,
                 title: data.data.title,
-                category: data.data.category_id,
-                subcategory: data.data.sub_category_id,
-                status: data.data.status,
+                category_id: data.data.category_id,
+                sub_category_id: data.data.sub_category_id,
+                description: data.data.description,
+                is_active: data.data.is_active,
             });
         }
         setIsLoading(false)
@@ -92,6 +95,14 @@ const ArticleDetail = () => {
             [name]: formValidate(name, value)
         }));
     };
+
+    const onChangeText = (event) => {
+        setArticlesDetails({...articlesDetails, [event.target.name]: event.target.value})
+        setFormError(formError => ({
+            ...formError,
+            [event.target.name]: formValidate(event.target.name, event.target.value)
+        }));
+    }
 
     const formValidate = (name, value) => {
         switch (name) {
@@ -107,7 +118,7 @@ const ArticleDetail = () => {
         }
     };
 
-    const selectedCategory = articleList?.find((category) => category.id === Number(articlesDetails?.category));
+    const selectedCategory = articleList?.find((category) => category.id === Number(articlesDetails?.category_id));
     const subcategories = selectedCategory ? selectedCategory?.sub_categories : [];
 
     const handlePublish = async () => {
@@ -123,16 +134,15 @@ const ArticleDetail = () => {
             return;
         }
         setLoading(true);
-
-        const selectedCategory = articleList.find(item => item.id === Number(articlesDetails.category));
+        const selectedCategory = articleList.find(item => item.id === articlesDetails.category_id);
         let selectedSubCategory = null;
         if (selectedCategory && selectedCategory.sub_categories.length > 0) {
-            selectedSubCategory = selectedCategory.sub_categories.find(sub => sub.id === Number(articlesDetails.subcategory));
+            selectedSubCategory = selectedCategory.sub_categories.find(sub => sub.id === articlesDetails.sub_category_id);
         }
 
         let formData = new FormData();
         formData.append('project_id', projectDetailsReducer.id);
-        formData.append('category_id', articlesDetails.category);
+        formData.append('category_id', articlesDetails.category_id);
         formData.append('sub_category_id', selectedSubCategory ? selectedSubCategory.id : null);
         formData.append('title', articlesDetails.title);
         formData.append('description', articlesDetails.description);
@@ -145,7 +155,32 @@ const ArticleDetail = () => {
         } else {
             toast({description: data.message, variant: "destructive",})
         }
+        setLoading(false)
     };
+
+    const updateArticle = async () => {
+        setLoading(true);
+        const selectedCategory = articleList.find(item => item.id === Number(articlesDetails.category_id));
+        let selectedSubCategory = null;
+        if (selectedCategory && selectedCategory.sub_categories.length > 0) {
+            selectedSubCategory = selectedCategory.sub_categories.find(sub => sub.id === Number(articlesDetails.sub_category_id));
+        }
+        let formData = new FormData();
+        formData.append('project_id', projectDetailsReducer.id);
+        formData.append('category_id', articlesDetails.category_id);
+        formData.append('sub_category_id', selectedSubCategory ? selectedSubCategory.id : null);
+        formData.append('title', articlesDetails.title);
+        formData.append('description', articlesDetails.description);
+        formData.append('is_active', articlesDetails.is_active);
+        const data = await apiService.updateArticle(formData, articlesDetails.id)
+        if (data.status === 200) {
+            setArticleList(articleList)
+            toast({description: data.message,});
+        } else {
+            toast({description: data.message, variant: "destructive",});
+        }
+        setLoading(false)
+    }
 
     const renderSidebarItems = () => {
         return (
@@ -167,24 +202,28 @@ const ArticleDetail = () => {
                     </div>
                     <div className={"space-y-2"}>
                         <Label className={"text-sm font-normal"}>Select Category</Label>
-                        <Select value={articlesDetails.category} onValueChange={(value) => handleOnChange('category', value)}>
+                        <Select value={articlesDetails.category_id} onValueChange={(value) => handleOnChange('category_id', value)}>
                             <SelectTrigger className="h-auto">
                                 <SelectValue placeholder="" />
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectGroup>
-                                    {articleList.map((item) => (
-                                        <SelectItem key={item.id} value={item.id}>
-                                            {item.title}
-                                        </SelectItem>
-                                    ))}
+                                    {
+                                        articleList.length > 0 ?
+                                            articleList.map((item) => (
+                                                <SelectItem key={item.id} value={item.id}>
+                                                    {item.title}
+                                                </SelectItem>
+                                            )) : (
+                                                <SelectItem disabled>No Categories</SelectItem>
+                                            )}
                                 </SelectGroup>
                             </SelectContent>
                         </Select>
                     </div>
                     <div className={"space-y-2"}>
                         <Label className={"text-sm font-normal"}>Subcategory</Label>
-                        <Select value={articlesDetails.subcategory} onValueChange={(value) => handleOnChange('subcategory', value)}>
+                        <Select value={articlesDetails.sub_category_id} onValueChange={(value) => handleOnChange('sub_category_id', value)}>
                             <SelectTrigger className="h-auto">
                                 <SelectValue placeholder="" />
                             </SelectTrigger>
@@ -225,9 +264,9 @@ const ArticleDetail = () => {
                     </BreadcrumbList>
                 </Breadcrumb>
                 <div className={"flex gap-4 items-center"}>
-                    <Select defaultValue={1} onValueChange={(value) => handleOnChange('status', Number(value))}>
-                        <SelectTrigger className={"w-[106px] h-auto py-[6px]"}>
-                            <SelectValue placeholder="Draft" />
+                    <Select value={articlesDetails.is_active} onValueChange={(value) => handleOnChange('is_active', Number(value))}>
+                        <SelectTrigger className={"w-[120px] h-auto py-[6px]"}>
+                            <SelectValue placeholder={articlesDetails.is_active ? statusOptions.find(s => s.value == articlesDetails.is_active)?.name : "Publish"} />
                         </SelectTrigger>
                         <SelectContent>
                             <SelectGroup>
@@ -243,7 +282,7 @@ const ArticleDetail = () => {
                         </SelectContent>
                     </Select>
                     <Button variant={"ghost hover:bg-none"} className={"px-3 py-[6px] border font-normal h-auto"}><Play size={16} className={"mr-3"} /> Preview</Button>
-                    <Button className={"w-[81px] py-[7px] font-medium h-8 hover:bg-primary"} onClick={handlePublish}>
+                    <Button className={"w-[81px] py-[7px] font-medium h-8 hover:bg-primary"} onClick={articlesDetails.id ? updateArticle : handlePublish}>
                         {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Publish"}
                     </Button>
                     <Button variant={"ghost hover:bg-none"} className={"p-1 h-auto border"}><Trash2 size={16} /></Button>
@@ -255,7 +294,7 @@ const ArticleDetail = () => {
                 </div>
                 <div className={"bg-muted w-full h-full hidden md:block overflow-y-auto"}>
                     <Card className={"m-8 mb-0"}>
-                        <CardContent>abc</CardContent>
+                        {/*<CardContent className={"p-6"}><Tiptap onChange={onChangeText} value={articlesDetails.description} name={"description"} /></CardContent>*/}
                     </Card>
                 </div>
             </div>

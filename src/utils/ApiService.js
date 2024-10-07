@@ -336,8 +336,8 @@ export class ApiService{
     async createSubCategory (payload){
         return await this.postData(`${baseUrlApi}/help/sub-category`, payload, true)
     }
-    async getAllCategory (id){
-        return await this.getData(`${baseUrlApi}/help/categories?project_id=${id}`,)
+    async getAllCategory (payload){
+        return await this.postData(`${baseUrlApi}/help/categories?${qs.stringify(payload)}`,)
     }
     async getAllSubCategory (id){
         return await this.getData(`${baseUrlApi}/help/sub-categories?project_id=${id}`,)
@@ -356,8 +356,8 @@ export class ApiService{
     }
 
     /* ---------- Help Center Articles api ---------- */
-    async getAllArticles (id){
-        return await this.getData(`${baseUrlApi}/help/articles?project_id=${id}`,)
+    async getAllArticles (payload){
+        return await this.postData(`${baseUrlApi}/help/articles?${qs.stringify(payload)}`,)
     }
     async createArticles (payload){
         return await this.postData(`${baseUrlApi}/help/article`, payload, true)
@@ -365,8 +365,14 @@ export class ApiService{
     async getSingleArticle (id){
         return await this.getData(`${baseUrlApi}/help/article/${id}`)
     }
+    async updateArticle (payload, id){
+        return await this.postData(`${baseUrlApi}/help/article/${id}`,payload, true)
+    }
     async deleteArticles (id){
         return await this.deleteData(`${baseUrlApi}/help/article/${id}`)
+    }
+    async articleSearch (payload){
+        return await this.postData(`${baseUrlApi}/help/article`, payload)
     }
 
     /* ---------- Widget api ---------- */

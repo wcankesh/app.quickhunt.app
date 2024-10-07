@@ -2,10 +2,21 @@ import React, {Fragment, useEffect, useState} from 'react';
 import {Input} from "../../ui/input";
 import {Button} from "../../ui/button";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "../../ui/table";
-import {Card, CardContent} from "../../ui/card";
+import {Card, CardContent, CardFooter} from "../../ui/card";
 import {DropdownMenu, DropdownMenuTrigger} from "@radix-ui/react-dropdown-menu";
 import {DropdownMenuContent, DropdownMenuItem} from "../../ui/dropdown-menu";
-import {CircleX, Ellipsis, Loader2, Plus, Upload, X} from "lucide-react";
+import {
+    ChevronLeft,
+    ChevronRight,
+    ChevronsLeft,
+    ChevronsRight,
+    CircleX,
+    Ellipsis,
+    Loader2,
+    Plus,
+    Upload,
+    X
+} from "lucide-react";
 import {Sheet, SheetContent, SheetHeader, SheetOverlay} from "../../ui/sheet";
 import {Label} from "../../ui/label";
 import moment from 'moment';
@@ -18,6 +29,8 @@ import {useSelector} from "react-redux";
 import {ApiService} from "../../../utils/ApiService";
 import {Skeleton} from "../../ui/skeleton";
 import EmptyData from "../../Comman/EmptyData";
+import {baseUrl} from "../../../utils/constent";
+import {useNavigate} from "react-router";
 
 const initialState = {
     title: "",
@@ -31,11 +44,16 @@ const initialStateError = {
     description: "",
 }
 
+const perPageLimit = 10
+
 const Category = () => {
     const apiService = new ApiService();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const {theme} = useTheme();
     const {toast} = useToast();
+    const navigate = useNavigate();
+    const UrlParams = new URLSearchParams(location.search);
+    const getPageNo = UrlParams.get("pageNo") || 1;
 
     const [formError, setFormError] = useState(initialStateError);
     const [selectedCategory, setSelectedCategory] = useState(initialState);
@@ -52,20 +70,29 @@ const Category = () => {
     const [subIdToDelete, setSubIdToDelete] = useState(null);
     const [subCategoryId,setSubCategoryId] = useState("")
     const [isLoadingDelete, setIsLoadingDelete] = useState(false);
+    const [pageNo, setPageNo] = useState(Number(getPageNo));
+    const [totalRecord, setTotalRecord] = useState(0);
 
     useEffect(() => {
         if(projectDetailsReducer.id){
             getAllCategory();
         }
-    }, [projectDetailsReducer.id])
+        navigate(`${baseUrl}/help/category?pageNo=${pageNo}`);
+    }, [projectDetailsReducer.id, pageNo])
 
     const getAllCategory = async () => {
-        setIsLoading(true);
-        const data = await apiService.getAllCategory(projectDetailsReducer.id);
+        const data = await apiService.getAllCategory({
+            project_id: projectDetailsReducer.id,
+            page: pageNo,
+            limit: perPageLimit
+        });
         if (data.status === 200) {
             setCategoryList(data.data);
+            setTotalRecord(data.total);
+            setIsLoading(false)
+        } else {
+            setIsLoading(false)
         }
-        setIsLoading(false)
     };
 
     const handleOnChange = (name, value) => {
@@ -126,7 +153,7 @@ const Category = () => {
         if(data.status === 200) {
             setSelectedCategory(initialState);
             let clone = [...categoryList];
-            clone.push(data.data);
+            clone.unshift(data.data);
             setCategoryList(clone);
             toast({description: data.message,});
         } else {
@@ -357,6 +384,17 @@ const Category = () => {
         setIsLoadingDelete(false)
         setOpenSubDelete(false);
     }
+
+    const totalPages = Math.ceil(totalRecord / perPageLimit);
+
+    const handlePaginationClick = async (newPage) => {
+        if (newPage >= 1 && newPage <= totalPages) {
+            setIsLoading(true);
+            setPageNo(newPage);
+        } else {
+            setIsLoading(false);
+        }
+    };
 
     return (
         <Fragment>
@@ -720,7 +758,7 @@ const Category = () => {
                                                                     <span className={"cursor-pointer text-ellipsis overflow-hidden whitespace-nowrap"}>{y.title}</span>
                                                                 </TableCell>
                                                                 <TableCell className={"px-2 py-[10px] md:px-3 w-[300px] text-end"}>
-                                                                    {y.articles ? y.articles : "00"}
+                                                                    {y.article_count ? y.article_count : "0"}
                                                                 </TableCell>
                                                                 <TableCell className={"px-2 py-[10px] md:px-3 w-[300px] text-end"}>
                                                                     {y.updated_at ? moment.utc(y.updated_at).local().startOf('seconds').fromNow() : "-"}
@@ -758,6 +796,48 @@ const Category = () => {
                         </Card>
                     )
                 )}
+                <div className={`mt-6 ${isLoading ? "hidden" : ""}`}>
+                    <Card>
+                        {
+                            categoryList.length > 0 ?
+                                <CardContent className={`p-0`}>
+                                    <div className={`w-full ${theme === "dark" ? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end p-2 md:px-3 md:py-[10px]`}>
+                                        <div className={"w-full flex gap-2 items-center justify-between sm:justify-end"}>
+                                            <div>
+                                                <h5 className={"text-sm font-medium"}>Page {categoryList.length <= 0 ? 0 :pageNo} of {totalPages}</h5>
+                                            </div>
+                                            <div className={"flex flex-row gap-2 items-center"}>
+                                                <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
+                                                        onClick={() => handlePaginationClick(1)}
+                                                        disabled={pageNo === 1 || isLoading}>
+                                                    <ChevronsLeft
+                                                        className={pageNo === 1 || isLoading ? "stroke-muted-foreground" : "stroke-primary"} />
+                                                </Button>
+                                                <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
+                                                        onClick={() => handlePaginationClick(pageNo - 1)}
+                                                        disabled={pageNo === 1 || isLoading}>
+                                                    <ChevronLeft
+                                                        className={pageNo === 1 || isLoading ? "stroke-muted-foreground" : "stroke-primary"} />
+                                                </Button>
+                                                <Button variant={"outline"} className={" h-[30px] w-[30px] p-1.5"}
+                                                        onClick={() => handlePaginationClick(pageNo + 1)}
+                                                        disabled={pageNo === totalPages || isLoading || categoryList.length <= 0}>
+                                                    <ChevronRight
+                                                        className={pageNo === totalPages || isLoading || categoryList.length <= 0 ? "stroke-muted-foreground" : "stroke-primary"} />
+                                                </Button>
+                                                <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
+                                                        onClick={() => handlePaginationClick(totalPages)}
+                                                        disabled={pageNo === totalPages || isLoading || categoryList.length <= 0}>
+                                                    <ChevronsRight
+                                                        className={pageNo === totalPages || isLoading || categoryList.length <= 0 ? "stroke-muted-foreground" : "stroke-primary"} />
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </CardContent> : ""
+                        }
+                    </Card>
+                </div>
             </div>
         </Fragment>
     );
