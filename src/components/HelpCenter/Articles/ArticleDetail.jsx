@@ -11,7 +11,7 @@ import { Card, CardContent } from "../../ui/card";
 import {ApiService} from "../../../utils/ApiService";
 import {useSelector} from "react-redux";
 import {useToast} from "../../ui/use-toast";
-// import Tiptap from "../../../Tiptap";
+import Tiptap from "../../../Tiptap";
 
     const statusOptions = [
         { name: "Publish", value: 1, fillColor: "#389E0D", strokeColor: "#389E0D" },
@@ -294,7 +294,7 @@ const ArticleDetail = () => {
                 </div>
                 <div className={"bg-muted w-full h-full hidden md:block overflow-y-auto"}>
                     <Card className={"m-8 mb-0"}>
-                        {/*<CardContent className={"p-6"}><Tiptap onChange={onChangeText} value={articlesDetails.description} name={"description"} /></CardContent>*/}
+                        <CardContent className={"p-6"}><Tiptap onChange={onChangeText} value={articlesDetails.description} name={"description"} /></CardContent>
                     </Card>
                 </div>
             </div>

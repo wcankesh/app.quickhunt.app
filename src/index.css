@@ -135,6 +135,9 @@ button.inline-flex.items-center.justify-center.whitespace-nowrap.rounded-md.text
 /*Dialog Close Button*/
 button.absolute.right-4.top-4.rounded-sm.opacity-70.ring-offset-background.transition-opacity.hover\:opacity-100.focus\:outline-none.focus\:ring-2.focus\:ring-ring.focus\:ring-offset-2.disabled\:pointer-events-none.data-\[state\=open\]\:bg-accent.data-\[state\=open\]\:text-muted-foreground{top: 12px; right: 12px; display: none}
 
+/*Tiptap editor color picker*/
+.tiptap-color-picker .sketch-picker {position: relative; top: 0}
+
 /*Widget Color Picker*/
 .widget-color-picker .color_picker{ width: 100%; gap: 8px}
 .widget-accordion button[data-state="closed"]{border-bottom-color: transparent;}
@@ -191,6 +194,12 @@ em {color: var(--muted-foreground) !important;}
 .remove-button {background: none;border: none;cursor: pointer;}
 .column-header {width: 100%;display: flex;justify-content: space-between;padding: 0px 8px;}
 .column-header > svg {cursor: pointer;}
+
+/* Article Editor css */
+.tiptap-editor .tiptap {
+  outline: none;
+  box-shadow: none;
+}
 
 /*Ideas Tab BgCol*/
 .ideas-tab-comm-bgCol.data-\[state\=active\]\:bg-background[data-state="active"] {background-color: transparent}
@@ -493,4 +502,33 @@ h5.ce-header {
 h6.ce-header {
   font-size: 14px;
   font-weight: bold;
+}
+
+
+.bubble-menu {
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 5px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.nested-menu {
+  position: relative; /* To position the nested menu */
+}
+
+.color-options {
+  display: none; /* Hide color options initially */
+  position: absolute; /* Position it absolutely */
+  top: 100%; /* Position below the button */
+  left: 0; /* Align left */
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 5px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.nested-menu:hover .color-options {
+  display: block; /* Show color options on hover */
 }

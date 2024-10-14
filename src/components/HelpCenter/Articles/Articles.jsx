@@ -76,8 +76,6 @@ const Articles = () => {
     const [openFilter, setOpenFilter] = useState('');
     const [openFilterType, setOpenFilterType] = useState('');
 
-    console.log("articles", articles)
-
     useEffect(() => {
         if(filter.sub_category_id || filter.category_id || filter.title || filter.all) {
             let payload = {...filter, project_id: projectDetailsReducer.id, page: pageNo, limit: perPageLimit}
@@ -334,8 +332,8 @@ const Articles = () => {
                                         {
                                             articles.map((x, index) => (
                                                 <TableRow key={index}>
-                                                    <TableCell
-                                                        className={"px-2 py-[10px] md:px-3 font-normal"}>{x.title}</TableCell>
+                                                    <TableCell onClick={() => onEdit(x.id)}
+                                                        className={"px-2 py-[10px] md:px-3 font-normal cursor-pointer"}>{x.title}</TableCell>
                                                     <TableCell
                                                         className={"px-2 py-[10px] md:px-3 font-normal"}>{x?.category_title} / {x?.sub_category_title}</TableCell>
                                                     <TableCell className={"px-2 py-[10px] md:px-3 font-normal"}>
