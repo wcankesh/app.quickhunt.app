@@ -25,6 +25,7 @@ const checklists = ({inAppMsgSetting, setInAppMsgSetting, isLoading, selectedSte
         setSelectedStep(obj)
         setSelectedStepIndex(i)
     }
+
     const updateStepRecord = (record) => {
         let clone =[...inAppMsgSetting.checklists];
         clone[selectedStepIndex] = record;
@@ -75,6 +76,23 @@ const checklists = ({inAppMsgSetting, setInAppMsgSetting, isLoading, selectedSte
         setSelectedStep({...newRecord[index]});
         setSelectedStepIndex(index);
     }
+
+    const handleEditorChange = (id, newData) => {
+        setInAppMsgSetting((prev) => ({
+            ...prev,
+            checklists: prev.checklists.map((x, i) => {
+                if (i === id) {
+                    return { ...x, description: newData.blocks }; // Return the updated object
+                }
+                return { ...x }; // Return the unchanged object
+            }),
+        }));
+        // setEditorsData((prev) =>
+        //     prev.map((editor) =>
+        //         editor.id === id ? { ...editor, content: newData } : editor
+        //     )
+        // );
+    };
 
     return (
         <div className={`py-16 bg-muted overflow-y-auto h-[calc(100%_-_94px)]`}>
@@ -135,6 +153,7 @@ const checklists = ({inAppMsgSetting, setInAppMsgSetting, isLoading, selectedSte
                                                     <Checkbox className={"w-6 h-6"}/>
                                                     <Input placeholder={"Step title"}
                                                            value={x.title}
+                                                           onClick={() => onSelectChecklists(i,x)}
                                                            onChange={(e) => {
                                                                e.stopPropagation()
                                                                onChangeChecklists("title", e.target.value, x);
@@ -142,13 +161,17 @@ const checklists = ({inAppMsgSetting, setInAppMsgSetting, isLoading, selectedSte
                                                            className={"w-full  text-sm border-none py-[10px] h-auto focus-visible:ring-offset-0 focus-visible:ring-0 font-normal"}
                                                     />
                                                     {
-                                                        i == selectedStepIndex ? <Trash2 className={"cursor-pointer"} onClick={() => onDeleteStep(i)}/> : <ChevronDown onClick={() => onSelectChecklists(i, x)} className={"cursor-pointer"}/>
+                                                        i == selectedStepIndex ? <Trash2 className={"cursor-pointer"} onClick={() => onDeleteStep(x, i)}/> : <ChevronDown onClick={() => onSelectChecklists(i, x)} className={"cursor-pointer"}/>
                                                     }
                                                 </div>
                                             </CollapsibleTrigger>
                                             <CollapsibleContent>
                                                 <div className={"ml-8"}>
-                                                    <Editor id={`checklists-${i}`} blocks={x.description} onChange={(e) => onChangeChecklists("description", e, x)} />
+                                                    <Editor
+                                                        blocks={x.description}
+                                                        onChange={(newData) => handleEditorChange(i, newData)}
+                                                    />
+                                                    {/*<Editor id={`checklists-${i}`} blocks={x.description} onChange={(e) => onChangeChecklists("description", e, x)} />*/}
                                                     {selectedStep?.action_type === 1 && <Button style={{backgroundColor:inAppMsgSetting.btn_color,  color: inAppMsgSetting.text_color}} className={"mt-2"}>{selectedStep?.action_text}</Button>}
                                                 </div>
                                             </CollapsibleContent>

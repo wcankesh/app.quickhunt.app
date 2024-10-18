@@ -59,9 +59,7 @@ const Post = ({inAppMsgSetting, setInAppMsgSetting, isLoading}) => {
         linkTool: LinkTool,
         image: {
             class: Image,
-
             inlineToolbar : true,
-
             config: {
                 endpoints: {
                     byFile: 'https://code.quickhunt.app/public/api/upload', // Your file upload endpoint
@@ -69,7 +67,6 @@ const Post = ({inAppMsgSetting, setInAppMsgSetting, isLoading}) => {
                 },
                 field: 'image',
                 types: 'image/*',
-
             },
             // actions: [
             //     {

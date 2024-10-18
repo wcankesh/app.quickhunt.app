@@ -3,13 +3,9 @@ import EditorJS from "@editorjs/editorjs";
 import Embed from "@editorjs/embed";
 import Image from "@editorjs/image";
 
-const Editor = ({blocks, id, onChange}) => {
-    const editorCore = useRef(null);
-
-    const handleSave = React.useCallback(async () => {
-        const savedData = await editorCore.current.save();
-        onChange(savedData.blocks)
-    }, []);
+const Editor = ({blocks, onChange}) => {
+    const editorRef = useRef(null);
+    const editorInstance = useRef(null);
 
     const editorConstants = {
         embed: Embed,
@@ -44,33 +40,34 @@ const Editor = ({blocks, id, onChange}) => {
         },
 
     }
+
     useEffect(() => {
-        const editor = new EditorJS({
-            holder: id,
+        editorInstance.current = new EditorJS({
+            holder: editorRef.current,
             autofocus: false,
             tools:editorConstants,
-            enableReInitialize:true,
+            enableReInitialize:false,
             placeholder: "Step description",
-            onChange:handleSave,
             data:{
                 time: new Date().getTime(),
                 blocks: blocks,
                 version: "2.12.4"
-            }
+            },
+            onChange: () => {
+                editorInstance.current.save().then((outputData) => {
+                    onChange(outputData);
+                }).catch((err) => {
+                    console.error('Saving failed: ', err);
+                });
+            },
         });
-        editorCore.current = editor;
+
         return () => {
-            if (editorCore.current && typeof editorCore.current.destroy === 'function') {
-                editorCore.current.destroy(); // Destroy the editor instance
-            }
+            editorInstance.current.destroy();
+            editorInstance.current = null;
         };
-
     }, []);
-    return (
-        <div id={id}>
-
-        </div>
-    );
+    return <div ref={editorRef} />
 };
 
 export default Editor;

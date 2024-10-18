@@ -151,6 +151,17 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
         updateStepRecord(obj)
     }
 
+    const onChangeChecklist = (name, value) => {
+        const obj = {...selectedStep, [name]: value, }
+        setSelectedStep(obj);
+        let clone = [...inAppMsgSetting.checklists];
+        clone[selectedStepIndex] = obj;
+        setInAppMsgSetting(prevState => ({
+            ...prevState,
+            checklists: clone
+        }));
+    }
+
     const handleCancel = () => {
         setInAppMsgSetting(inAppMsgSetting);
         if (id === "new") {
@@ -248,7 +259,7 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                                 <div className="grid w-full max-w-sm items-center gap-1.5">
                                     <Label className={"font-normal"}>Action</Label>
                                     <Select value={selectedStep?.action_type}
-                                            onValueChange={(value) => onChangeQuestion("action_type",value)}>
+                                            onValueChange={(value) => onChangeChecklist("action_type",value)}>
                                         <SelectTrigger className="w-full h-9">
                                             <SelectValue placeholder=""/>
                                         </SelectTrigger>
@@ -265,18 +276,18 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                                         <div className="grid w-full max-w-sm items-center gap-1.5">
                                             <Label htmlFor="action_text" className={"font-normal"}>Action Text</Label>
                                             <Input className={"h-9"} id="action_text" placeholder="Enter action text" value={selectedStep?.action_text}
-                                                   onChange={(e) => onChangeQuestion("action_text", e.target.value)}/>
+                                                   onChange={(e) => onChangeChecklist("action_text", e.target.value)}/>
                                         </div>
                                         <div className="grid w-full max-w-sm items-center gap-1.5">
                                             <Label htmlFor="action_url" className={"font-normal"}>Action URL</Label>
                                             <Input className={"h-9"} id="action_url" placeholder="Enter URL address" value={selectedStep?.action_url}
-                                                   onChange={(e) => onChangeQuestion("action_url", e.target.value)}/>
+                                                   onChange={(e) => onChangeChecklist("action_url", e.target.value)}/>
                                         </div>
                                         <div className="grid w-full max-w-sm items-center gap-1.5">
                                             <div className="flex items-center gap-2">
                                                 <Checkbox id="is_redirect"
                                                           checked={selectedStep.is_redirect === 1}
-                                                          onCheckedChange={(checked) => onChangeQuestion("is_redirect", checked ? 1 : 0)}
+                                                          onCheckedChange={(checked) => onChangeChecklist("is_redirect", checked ? 1 : 0)}
                                                 />
                                                 <Label htmlFor="is_redirect" className={"font-normal cursor-pointer"}>Open URL in a new tab</Label>
                                             </div>
