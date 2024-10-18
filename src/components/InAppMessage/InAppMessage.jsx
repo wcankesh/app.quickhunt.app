@@ -1,6 +1,26 @@
 import React, {useState, useEffect, Fragment} from 'react';
 import {Button} from "../ui/button";
-import {BarChart, BookCheck, Calendar, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Circle, ClipboardList, Ellipsis, Filter, Loader2, Plus, ScrollText, SquareMousePointer, User, Users, X} from "lucide-react";
+import {
+    BarChart,
+    BookCheck,
+    Calendar,
+    ChevronLeft,
+    ChevronRight,
+    ChevronsLeft,
+    ChevronsRight,
+    Circle,
+    ClipboardList,
+    Copy,
+    Ellipsis,
+    Filter,
+    Loader2,
+    Plus,
+    ScrollText,
+    SquareMousePointer,
+    User,
+    Users,
+    X
+} from "lucide-react";
 import {Input} from "../ui/input";
 import {Popover, PopoverContent, PopoverTrigger} from "../ui/popover";
 import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList} from "../ui/command";
@@ -24,6 +44,7 @@ import moment from "moment";
 import {DropdownMenu, DropdownMenuTrigger} from "@radix-ui/react-dropdown-menu";
 import {DropdownMenuContent, DropdownMenuItem} from "../ui/dropdown-menu";
 import {toast} from "../ui/use-toast";
+import {Tabs, TabsContent, TabsList, TabsTrigger} from "../ui/tabs";
 
 const perPageLimit = 10;
 
@@ -123,6 +144,11 @@ const typeIcon = {
 
 const InAppMessage = () => {
     const {theme} = useTheme();
+    const navigate = useNavigate();
+    const apiService = new ApiService();
+    const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
+    const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
+
     const [isLoading,setIsLoading]=useState(false);
     const [messageList,setMessageList]=useState([]);
     const [pageNo, setPageNo] = useState(1);
@@ -133,10 +159,10 @@ const InAppMessage = () => {
     const [formData,setFormData]=useState(initialState);
     const [deleteId,setDeleteId] = useState(null);
     const [isLoadingDelete,setIsLoadingDelete] = useState(false);
-    const navigate = useNavigate();
-    const apiService = new ApiService();
-    const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
-    const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
+    const [openCopyCode, setOpenCopyCode] = useState(false);
+    const [selectedId, setSelectedId] = useState("");
+    const [selectedType, setSelectedType] = useState("");
+    const [isCopyLoading, setCopyIsLoading] = useState(false);
 
     useEffect(()=>{
         if(projectDetailsReducer.id){
@@ -212,6 +238,40 @@ const InAppMessage = () => {
         }
     }
 
+    const getCodeCopy = (id, type) => {
+        setOpenCopyCode(!openCopyCode)
+        setSelectedId(id)
+        setSelectedType(type)
+    }
+
+    const handleCopyCode = (id) => {
+        setCopyIsLoading(true)
+        navigator.clipboard.writeText(id).then(() => {
+            setCopyIsLoading(false)
+            toast({description: "Copied to clipboard"})
+        }).catch(err => {
+            console.error('Failed to copy text: ', err);
+        });
+    };
+
+    const codeString = selectedType === "embed" ? `
+    <div class="quickhunt-widget-embed" Quickhunt_Widget_Key=${selectedId} widget-width="740px" widget-height="460px"></div>
+    <script src="https://fw.quickhunt.app/widgetScript.js"></script>
+    ` : `<script>
+    window.quickhuntSettings = {
+      name: "",
+      email: "",
+    };
+</script>
+<script>
+    window.Quickhunt_In_App_Message_Config = window.Quickhunt_In_App_Message_Config || [];
+    window.Quickhunt_Config.push({ Quickhunt_Widget_Key:  ${selectedId}});
+</script>
+<script src="https://fw.quickhunt.app/widgetScript.js"></script>`;
+    const embedLink = `https://${projectDetailsReducer.domain}/ideas?widget=${selectedId}`
+    const iFrame = `<iframe src="${embedLink}" style="border: 0px; outline: 0px; width: 450px; height: 400px;"></iframe>`
+    const callback = `window.Quickhunt('${selectedId}')`
+
     return (
         <Fragment>
             {
@@ -237,6 +297,71 @@ const InAppMessage = () => {
                                 >
                                     {isLoadingDelete ? <Loader2 size={16} className={"animate-spin"}/> : "Delete"}
                                 </Button>
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
+                </Fragment>
+            }
+
+            {
+                openCopyCode &&
+                <Fragment>
+                    <Dialog open onOpenChange={() => getCodeCopy("")}>
+                        <DialogContent className="max-w-[350px] w-full sm:max-w-[580px] bg-white rounded-lg p-3 md:p-6">
+                            <DialogHeader className={"flex flex-row justify-between gap-2"}>
+                                <div className={"flex flex-col gap-2"}>
+                                    <DialogTitle className={`text-left font-medium ${theme === "dark" ? "text-card" : ""}`}>In App Message</DialogTitle>
+                                    <DialogDescription className={"text-left"}>Choose how you would like to embed your
+                                        message.</DialogDescription>
+                                </div>
+                                <X size={16} className={`${theme === "dark" ? "text-card" : ""} m-0 cursor-pointer`}
+                                   onClick={() => getCodeCopy("")}/>
+                            </DialogHeader>
+                            <div className={"space-y-2"}>
+                                <h4 className={`${theme === "dark" ? "text-muted-foreground" : "text-muted-foreground"} text-sm`}>
+                                    Place the code below before the closing body tag on your site.
+                                </h4>
+                                <div>
+                                    <div className={"relative px-6 rounded-md bg-black mb-2"}>
+                                        <div className={"relative"}>
+                                                <pre id="text"
+                                                     className={"py-4 whitespace-pre overflow-x-auto scrollbars-none text-[10px] text-text-invert text-white max-w-[230px] w-full md:max-w-[450px]"}>
+                                                      {codeString}
+                                                  </pre>
+
+                                            <Button
+                                                variant={"ghost hover:none"}
+                                                className={`${isCopyLoading === true ? "absolute top-0 right-0 px-0" : "absolute top-0 right-0 px-0"}`}
+                                                onClick={() => handleCopyCode(codeString)}
+                                            >
+                                                {isCopyLoading ? <Loader2 size={16} className={"animate-spin"}
+                                                                          color={"white"}/> :
+                                                    <Copy size={16} color={"white"}/>}
+                                            </Button>
+
+                                        </div>
+                                    </div>
+
+                                    <p className={`${theme === "dark" ? "text-muted-foreground" : "text-muted-foreground"} text-xs`}>Read
+                                        the {" "}
+                                        <Button variant={"ghost hover:none"}
+                                                className={"p-0 h-auto text-xs text-primary font-medium"}>
+                                            Setup Guide
+                                        </Button>
+                                        {" "}for more information or {" "}
+                                        <Button
+                                            variant={"ghost hover:none"}
+                                            className={"p-0 h-auto text-xs text-primary font-medium"}
+                                        >
+                                            download the HTML example.
+                                        </Button>
+                                    </p>
+                                </div>
+                            </div>
+                            <DialogFooter>
+                                <Button variant={"outline hover:none"}
+                                        className={`text-sm font-medium border ${theme === "dark" ? "text-card" : "text-card-foreground"}`}
+                                        onClick={() => getCodeCopy("")}>Cancel</Button>
                             </DialogFooter>
                         </DialogContent>
                     </Dialog>
@@ -352,7 +477,7 @@ const InAppMessage = () => {
                                 <TableHeader className={`${theme === "dark" ? "" : "bg-muted"}`}>
                                     <TableRow>
                                         {
-                                            ["Title","State","Sender","Content type","Created at","Action",""].map((x,i)=>{
+                                            ["Title","State","Sender","Content type","Created at","", "Action"].map((x,i)=>{
                                                 return(
                                                     <TableHead  className={`px-2 py-[10px] md:px-3 font-medium text-card-foreground ${i >= 5 ? 'text-center' : ''}`} key={i}>{x}</TableHead>
                                                 )
@@ -438,7 +563,15 @@ const InAppMessage = () => {
                                                                     <TableCell className={`px-2 py-[10px] md:px-3 font-normal`}>
                                                                         {x?.created_at ? moment.utc(x.created_at).local().startOf('seconds').fromNow() : "-"}
                                                                     </TableCell>
-                                                                    <TableCell className={`px-2 py-[10px] md:px-3 text-center`}>
+                                                                    <TableCell className={"px-2 py-[10px] md:px-3"}>
+                                                                        <Button
+                                                                            className={"py-[6px] px-3 h-auto text-xs font-medium hover:bg-primary"}
+                                                                            onClick={() => getCodeCopy(x.id)}>Get code</Button>
+                                                                    </TableCell>
+                                                                    <TableCell className={`px-2 py-[10px] md:px-3 text-center flex justify-between`}>
+                                                                        <div className={"cursor-pointer"} onClick={() => navigate(`${baseUrl}/in-app-message/${x.type}/analytic/${x.id}`)}>
+                                                                            <BarChart size={18}/>
+                                                                        </div>
                                                                         <DropdownMenu>
                                                                             <DropdownMenuTrigger>
                                                                                 <Ellipsis className={`font-normal`} size={18}/>
@@ -448,12 +581,6 @@ const InAppMessage = () => {
                                                                                 <DropdownMenuItem onClick={()=>setDeleteId(x.id)}>Delete</DropdownMenuItem>
                                                                             </DropdownMenuContent>
                                                                         </DropdownMenu>
-                                                                    </TableCell>
-                                                                    <TableCell
-                                                                        className={`px-2 py-[10px] md:px-3 text-center cursor-pointer`}
-                                                                        onClick={() => navigate(`${baseUrl}/in-app-message/${x.type}/analytic/${x.id}`)}
-                                                                    >
-                                                                        <BarChart size={18}/>
                                                                     </TableCell>
                                                                 </TableRow>
                                                             )
