@@ -369,7 +369,7 @@ const Project = () => {
             <CardFooter className={"pt-4 flex flex-wrap justify-end sm:justify-end gap-4 sm:p-5 p-4"}>
                 <Button
                     variant={"outline hover:bg-transparent"} onClick={deleteAlert}
-                    className={`text-sm font-medium border w-[130px] ${theme === "dark" ? "text-card-foreground" : "text-primary border-primary"}`}
+                    className={`text-sm font-medium border w-[130px] text-destructive border-destructive`}
                 >{isDel ? <Loader2 className="h-4 w-4 animate-spin" /> : "Delete project"}</Button>
                 <Button
                     className={`w-[132px] text-sm font-medium hover:bg-primary`}

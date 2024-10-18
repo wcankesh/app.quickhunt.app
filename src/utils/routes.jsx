@@ -24,6 +24,7 @@ import Reactions from "../components/Dashboard/Reactions";
 import UpdateIdea from "../components/Ideas/UpdateIdea";
 import UpdateAnnouncement from "../components/Announcements/UpdateAnnouncement";
 import AnnouncementAnalyticsViews from "../components/Announcements/AnnouncementAnalyticsViews";
+import InAppMessageAnalyticsView from "../components/InAppMessage/InAppMessageAnalyticsView";
 
 export const routes = [
      {path: `${baseUrl}/dashboard`, component: <Dashboard/>},
@@ -49,6 +50,7 @@ export const routes = [
      {path: `${baseUrl}/in-app-message`, component: <InAppMessage/>},
      {path: `${baseUrl}/in-app-message/type`, component: <MessageTypes/>},
      {path: `${baseUrl}/in-app-message/:type/:id`, component: <UpdateInAppMessage/>},
+     {path: `${baseUrl}/in-app-message/:type/analytic/:id`, component: <InAppMessageAnalyticsView/>},
      {path: `${baseUrl}/import-export`, component: <ImportExport/>},
      {path: `${baseUrl}/settings/import-export/import`, component: <ImportIdea/>},
 ]

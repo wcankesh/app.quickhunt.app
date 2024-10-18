@@ -5,18 +5,7 @@ import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "../
 import {Card, CardContent, CardFooter} from "../../ui/card";
 import {DropdownMenu, DropdownMenuTrigger} from "@radix-ui/react-dropdown-menu";
 import {DropdownMenuContent, DropdownMenuItem} from "../../ui/dropdown-menu";
-import {
-    ChevronLeft,
-    ChevronRight,
-    ChevronsLeft,
-    ChevronsRight,
-    CircleX,
-    Ellipsis,
-    Loader2,
-    Plus,
-    Upload,
-    X
-} from "lucide-react";
+import {ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, CircleX, Ellipsis, Loader2, Plus, Upload, X} from "lucide-react";
 import {Sheet, SheetContent, SheetHeader, SheetOverlay} from "../../ui/sheet";
 import {Label} from "../../ui/label";
 import moment from 'moment';
@@ -482,7 +471,7 @@ const Category = () => {
                             <Button
                                 variant={"ghost hover:bg-none"}
                                 onClick={closeSheetCategory}
-                                className={`border border-primary font-medium`}
+                                className={`border border-primary font-medium text-primary`}
                             >
                                 Cancel
                             </Button>
@@ -575,7 +564,7 @@ const Category = () => {
                                 <Button
                                     variant={"ghost hover:bg-none"}
                                     onClick={closeSheetSubCategory}
-                                    className={`border border-primary font-medium`}
+                                    className={`border border-primary font-medium text-primary`}
                                 >
                                     Cancel
                                 </Button>
@@ -722,7 +711,7 @@ const Category = () => {
                                             <Table>
                                                 <TableHeader className={`${theme === "dark" ? "" : "bg-muted"} py-8 px-5`}>
                                                     <TableRow>
-                                                        <TableHead className={`px-2 py-[10px] md:px-3 text-primary font-medium max-w-[300px] overflow-hidden text-ellipsis`}>
+                                                        <TableHead className={`px-2 py-[10px] md:px-3 text-primary font-medium max-w-[270px] cursor-pointer truncate text-ellipsis overflow-hidden whitespace-nowrap`}>
                                                             {x.title}
                                                         </TableHead>
                                                         <TableHead className={`font-medium px-2 py-[10px] md:px-3 w-[300px] text-end`}>Articles</TableHead>
@@ -754,8 +743,9 @@ const Category = () => {
                                                     {x.sub_categories?.length > 0 ? (
                                                         x.sub_categories.map((y, j) => (
                                                             <TableRow key={j}>
-                                                                <TableCell className={`inline-flex gap-2 md:gap-1 flex-wrap items-center px-2 py-[10px] md:px-3 w-[300px]`}>
-                                                                    <span className={"cursor-pointer text-ellipsis overflow-hidden whitespace-nowrap"}>{y.title}</span>
+                                                                {/*<TableCell className={`cursor-pointer inline-flex gap-2 md:gap-1 flex-wrap items-center px-2 py-[10px] md:px-3 max-w-[270px] cursor-pointer truncate text-ellipsis overflow-hidden whitespace-nowrap`}>*/}
+                                                                <TableCell className={`px-2 py-[10px] md:px-3 max-w-[270px] cursor-pointer truncate text-ellipsis overflow-hidden whitespace-nowrap`}>
+                                                                    {y.title}
                                                                 </TableCell>
                                                                 <TableCell className={"px-2 py-[10px] md:px-3 w-[300px] text-end"}>
                                                                     {y.article_count ? y.article_count : "0"}
@@ -796,48 +786,52 @@ const Category = () => {
                         </Card>
                     )
                 )}
-                <div className={`mt-6 ${isLoading ? "hidden" : ""}`}>
-                    <Card>
-                        {
-                            categoryList.length > 0 ?
-                                <CardContent className={`p-0`}>
-                                    <div className={`w-full ${theme === "dark" ? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end p-2 md:px-3 md:py-[10px]`}>
-                                        <div className={"w-full flex gap-2 items-center justify-between sm:justify-end"}>
-                                            <div>
-                                                <h5 className={"text-sm font-medium"}>Page {categoryList.length <= 0 ? 0 :pageNo} of {totalPages}</h5>
+                {
+                    categoryList.length > 0 ?
+                        <div className={`mt-6 ${isLoading ? "hidden" : ""}`}>
+                            <Card>
+                                {
+                                    categoryList.length > 0 ?
+                                        <CardContent className={`p-0`}>
+                                            <div className={`w-full ${theme === "dark" ? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end p-2 md:px-3 md:py-[10px]`}>
+                                                <div className={"w-full flex gap-2 items-center justify-between sm:justify-end"}>
+                                                    <div>
+                                                        <h5 className={"text-sm font-medium"}>Page {categoryList.length <= 0 ? 0 :pageNo} of {totalPages}</h5>
+                                                    </div>
+                                                    <div className={"flex flex-row gap-2 items-center"}>
+                                                        <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
+                                                                onClick={() => handlePaginationClick(1)}
+                                                                disabled={pageNo === 1 || isLoading}>
+                                                            <ChevronsLeft
+                                                                className={pageNo === 1 || isLoading ? "stroke-muted-foreground" : "stroke-primary"} />
+                                                        </Button>
+                                                        <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
+                                                                onClick={() => handlePaginationClick(pageNo - 1)}
+                                                                disabled={pageNo === 1 || isLoading}>
+                                                            <ChevronLeft
+                                                                className={pageNo === 1 || isLoading ? "stroke-muted-foreground" : "stroke-primary"} />
+                                                        </Button>
+                                                        <Button variant={"outline"} className={" h-[30px] w-[30px] p-1.5"}
+                                                                onClick={() => handlePaginationClick(pageNo + 1)}
+                                                                disabled={pageNo === totalPages || isLoading || categoryList.length <= 0}>
+                                                            <ChevronRight
+                                                                className={pageNo === totalPages || isLoading || categoryList.length <= 0 ? "stroke-muted-foreground" : "stroke-primary"} />
+                                                        </Button>
+                                                        <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
+                                                                onClick={() => handlePaginationClick(totalPages)}
+                                                                disabled={pageNo === totalPages || isLoading || categoryList.length <= 0}>
+                                                            <ChevronsRight
+                                                                className={pageNo === totalPages || isLoading || categoryList.length <= 0 ? "stroke-muted-foreground" : "stroke-primary"} />
+                                                        </Button>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div className={"flex flex-row gap-2 items-center"}>
-                                                <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
-                                                        onClick={() => handlePaginationClick(1)}
-                                                        disabled={pageNo === 1 || isLoading}>
-                                                    <ChevronsLeft
-                                                        className={pageNo === 1 || isLoading ? "stroke-muted-foreground" : "stroke-primary"} />
-                                                </Button>
-                                                <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
-                                                        onClick={() => handlePaginationClick(pageNo - 1)}
-                                                        disabled={pageNo === 1 || isLoading}>
-                                                    <ChevronLeft
-                                                        className={pageNo === 1 || isLoading ? "stroke-muted-foreground" : "stroke-primary"} />
-                                                </Button>
-                                                <Button variant={"outline"} className={" h-[30px] w-[30px] p-1.5"}
-                                                        onClick={() => handlePaginationClick(pageNo + 1)}
-                                                        disabled={pageNo === totalPages || isLoading || categoryList.length <= 0}>
-                                                    <ChevronRight
-                                                        className={pageNo === totalPages || isLoading || categoryList.length <= 0 ? "stroke-muted-foreground" : "stroke-primary"} />
-                                                </Button>
-                                                <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
-                                                        onClick={() => handlePaginationClick(totalPages)}
-                                                        disabled={pageNo === totalPages || isLoading || categoryList.length <= 0}>
-                                                    <ChevronsRight
-                                                        className={pageNo === totalPages || isLoading || categoryList.length <= 0 ? "stroke-muted-foreground" : "stroke-primary"} />
-                                                </Button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </CardContent> : ""
-                        }
-                    </Card>
-                </div>
+                                        </CardContent> : ""
+                                }
+                            </Card>
+                        </div>
+                        : ""
+                }
             </div>
         </Fragment>
     );

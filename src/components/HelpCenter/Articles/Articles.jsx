@@ -1,18 +1,7 @@
 import React, {Fragment, useEffect, useState} from 'react';
 import { Input } from "../../ui/input";
 import { Select, SelectGroup, SelectValue, SelectLabel, SelectItem, SelectTrigger, SelectContent } from "../../ui/select";
-import {
-    ChevronLeft,
-    ChevronRight,
-    ChevronsLeft,
-    ChevronsRight,
-    Circle,
-    Ellipsis,
-    Filter,
-    Loader2,
-    Plus,
-    X
-} from "lucide-react";
+import {ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Circle, Ellipsis, Filter, Loader2, Plus, X} from "lucide-react";
 import { Button } from "../../ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../ui/table";
 import {Card, CardContent, CardFooter} from "../../ui/card";
@@ -20,11 +9,11 @@ import { useTheme } from "../../theme-provider";
 import { DropdownMenu, DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
 import { DropdownMenuContent, DropdownMenuItem } from "../../ui/dropdown-menu";
 import {useNavigate, useParams} from "react-router-dom";
-import { baseUrl } from "../../../utils/constent";
+import {apiService, baseUrl} from "../../../utils/constent";
 import moment from "moment";
 import {ApiService} from "../../../utils/ApiService";
 import {useSelector} from "react-redux";
-import {useToast} from "../../ui/use-toast";
+import {toast, useToast} from "../../ui/use-toast";
 import {Skeleton} from "../../ui/skeleton";
 import EmptyData from "../../Comman/EmptyData";
 import {Dialog} from "@radix-ui/react-dialog";
@@ -174,6 +163,47 @@ const Articles = () => {
             setPageNo(newPage);
         } else {
             setIsLoading(false);
+        }
+    };
+
+    console.log("articles.is_active", articles.is_active)
+
+    // const handleStatus = async (name, value) => {
+    //     debugger
+    //     const articleToUpdate = articles.find(article => article.id === name);
+    //     let formData = new FormData();
+    //     formData.append('is_active', value);
+    //     const data = await apiService.updateArticle(formData, name);
+    //     if (data.status === 200) {
+    //         const updatedArticles = articles.map(article =>
+    //             article.id === name ? { ...article, is_active: value } : article
+    //         );
+    //         setArticles(updatedArticles);
+    //         toast({ description: data.message });
+    //     } else {
+    //         toast({ description: data.message, variant: "destructive" });
+    //     }
+    // };
+
+    const handleStatus = async (object, value) => {
+        setArticles(articles.map(x => x.id === object.id ? {
+            ...x,
+            is_active: value,
+        } : x));
+        const payload = {
+            ...object,
+            is_active: value,
+        }
+        const data = await apiService.updateArticle(payload, object.id);
+        if (data.status === 200) {
+            toast({
+                description: data.message,
+            });
+        } else {
+            toast({
+                description: data.message,
+                variant: "destructive",
+            });
         }
     };
 
@@ -337,10 +367,10 @@ const Articles = () => {
                                                     <TableCell
                                                         className={"px-2 py-[10px] md:px-3 font-normal"}>{x?.category_title} / {x?.sub_category_title}</TableCell>
                                                     <TableCell className={"px-2 py-[10px] md:px-3 font-normal"}>
-                                                        <Select value={x.is_active}>
+                                                        <Select value={x.is_active}  onValueChange={(value) => handleStatus(x, value)}>
                                                             <SelectTrigger className="w-[137px] h-7">
                                                                 <SelectValue
-                                                                    placeholder={"Publish"}/>
+                                                                    placeholder={x.is_active ? status.find(s => s.value == x.is_active)?.name : "Publish"}/>
                                                             </SelectTrigger>
                                                             <SelectContent>
                                                                 <SelectGroup>

@@ -238,7 +238,7 @@ const CreateRoadmapIdea = ({isOpen, onOpen, onClose, closeCreateIdea, selectedRo
                                             isLoading ? <Loader2 className="h-4 w-4 animate-spin"/> : "Create Idea"
                                         }
                                         </Button>
-                                    <Button variant={"outline hover:bg-transparent"} className={"border border-primary py-2 px-6 text-sm font-medium"} onClick={onCancel}>Cancel</Button>
+                                    <Button variant={"outline hover:bg-transparent"} className={"border border-primary py-2 px-6 text-sm font-medium text-primary"} onClick={onCancel}>Cancel</Button>
                                 </div>
                             </div>
                     </div>

@@ -22,7 +22,13 @@ const ColorInput = ({ value, name, onChange, style, hideInput  }) => {
 
     const handleColorChange = (color) => {
         const newColor = color.hex;
-        onChange(name, newColor);
+        // onChange(name, newColor);
+        onChange({ clr: newColor });
+    };
+
+    const handleInputChange = (e) => {
+        const newColor = e.target.value;
+        onChange({ clr: newColor });  // Update the color state based on input value
     };
 
     return (
@@ -46,7 +52,8 @@ const ColorInput = ({ value, name, onChange, style, hideInput  }) => {
                             className={"text-sm border-none p-0 h-auto focus-visible:ring-offset-0 focus-visible:ring-0"}
                             id={name}
                             value={value}
-                            onChange={(e) => handleColorChange({hex: e.target.value})}
+                            // onChange={(e) => handleColorChange({hex: e.target.value})}
+                            onChange={handleInputChange}
                         />
                         {/*<span className="text-sm" id={name}>{inputValue}</span>*/}
                     </div>

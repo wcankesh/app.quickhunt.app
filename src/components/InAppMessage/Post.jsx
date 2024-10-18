@@ -34,9 +34,6 @@ const Post = ({inAppMsgSetting, setInAppMsgSetting, isLoading}) => {
 
     const handleSave = React.useCallback(async () => {
         const savedData = await editorCore.current.save();
-        console.log(
-            savedData.blocks
-        )
         setInAppMsgSetting(prevState => ({
             ...prevState,
             body_text: JSON.stringify({blocks: savedData.blocks})
@@ -123,8 +120,6 @@ const Post = ({inAppMsgSetting, setInAppMsgSetting, isLoading}) => {
         }));
 
     }
-
-    console.log("inAppMsgSetting?.body_text?.blocks", inAppMsgSetting?.body_text?.blocks, isLoading)
 
     useEffect(() => {
        if(!isLoading){

@@ -631,7 +631,7 @@ return (
                             className="h-4 w-4 animate-spin"/> : (id === "new" ? "Create Widget" : "Save Changes")
                 }
             </Button>
-                <Button size={"sm"} variant={"ghost hover-none"} className={"font-medium border border-primary"} onClick={handleCancel}>Cancel</Button>
+                <Button size={"sm"} variant={"ghost hover-none"} className={"font-medium border border-primary text-primary"} onClick={handleCancel}>Cancel</Button>
             </div>
         </div>
         <div className={"flex h-[calc(100%_-_85px)] overflow-y-auto"}>
@@ -646,7 +646,7 @@ return (
                                     className="h-4 w-4 animate-spin"/> : (id === "new" ? "Create Widget" : "Save Changes")
                         }
                     </Button>
-                    <Button variant={"ghost hover-none"} className={"font-medium border border-primary"} onClick={handleCancel}>Cancel</Button>
+                    <Button variant={"ghost hover-none"} className={"font-medium border border-primary text-primary"} onClick={handleCancel}>Cancel</Button>
                 </div>
             </div>
             <div className={"bg-muted w-full h-full hidden md:block overflow-y-auto"}>

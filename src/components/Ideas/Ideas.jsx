@@ -21,6 +21,7 @@ import {DropdownMenuContent, DropdownMenuItem,} from "../ui/dropdown-menu";
 import {Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "../ui/dialog";
 import {Badge} from "../ui/badge";
 import {Popover, PopoverContent, PopoverTrigger} from "../ui/popover";
+import {Avatar, AvatarFallback, AvatarImage} from "../ui/avatar";
 
 const filterByStatus = [
     {name: "Archived", value: "archive",},
@@ -465,7 +466,7 @@ const Ideas = () => {
                                     </Command>
                                 </PopoverContent>
                             </Popover>
-                            <Button size="sm" className={"gap-2 font-medium hover:bg-primary"} onClick={openCreateIdea}><Plus size={20} strokeWidth={3}/>Create Idea</Button>
+                            <Button className={"gap-2 font-medium hover:bg-primary"} onClick={openCreateIdea}><Plus size={20} strokeWidth={3}/>Create Idea</Button>
                         </div>
                     </div>
                     {
@@ -527,7 +528,7 @@ const Ideas = () => {
                                     (ideasList || []).map((x, i) => {
                                         return (
                                             <Fragment key={x.id || i}>
-                                                <div className={"flex gap-[5px] md:gap-8 p-2 sm:p-3 lg:py-6 lg:px-16"}>
+                                                <div className={"flex gap-[5px] md:gap-8 p-2 sm:p-3 lg:py-4 lg:px-5"}>
                                                     <div className={"flex gap-1 md:gap-2"}>
                                                         <Button
                                                             className={"p-0 bg-white shadow border hover:bg-white w-[20px] h-[20px] md:w-[30px] md:h-[30px]"}
@@ -538,14 +539,14 @@ const Ideas = () => {
                                                         </Button>
                                                         <p className={"text-base md:text-xl font-normal"}>{x.vote}</p>
                                                     </div>
-                                                    <div className={"flex flex-col w-full gap-6"}>
-                                                        <div className={"flex flex-col gap-[11px]"}>
+                                                    <div className={"flex flex-col w-full gap-3"}>
+                                                        <div className={"flex flex-col gap-3"}>
                                                             <div className={"flex items-center justify-between gap-3"}>
                                                                 <div
                                                                     className={"flex flex-wrap items-center gap-1 cursor-pointer xl:gap-3"}
                                                                     onClick={() => openDetailsSheet(x)}
                                                                 >
-                                                                    <h3 className={"text-base font-normal"}>{x.title}</h3>
+                                                                    <h3 className={"text-base font-normal max-w-[278px] truncate text-ellipsis overflow-hidden whitespace-nowrap"}>{x.title}</h3>
                                                                     <div className={"flex gap-2 items-center"}>
                                                                         <h4 className={"text-xs font-normal text-muted-foreground"}>{x.name}</h4>
                                                                         <p className={"text-xs font-normal flex items-center text-muted-foreground"}>
@@ -553,8 +554,97 @@ const Ideas = () => {
                                                                             {moment(x.created_at).format('D MMM')}
                                                                         </p>
                                                                     </div>
+                                                                    <div
+                                                                        className={"flex items-center gap-1 sm:gap-2 cursor-pointer"}
+                                                                        onClick={() => openDetailsSheet(x)}
+                                                                    >
+                                                                        <span><MessageCircleMore size={16} className={"stroke-primary"}/></span>
+                                                                        <p className={"text-base font-normal"}>
+                                                                            {x && x.comments && x.comments.length ? x.comments.length : 0}
+                                                                        </p>
+                                                                    </div>
                                                                 </div>
                                                                 <div className={"flex gap-2 items-center"}>
+                                                                    {
+                                                                        (x && x?.topic && x?.topic?.length) ? (
+                                                                            <Popover>
+                                                                                <PopoverTrigger asChild>
+                                                                                    <Button variant={"ghost hove:none"} className={"p-0 h-[24px]"}>
+                                                                                        <div className={"flex justify-between items-center"}>
+                                                                                                <div className={"text-sm text-center"}>
+                                                                                                    <div className={`flex flex-wrap gap-2`}>
+                                                                                                        {
+                                                                                                            x?.topic?.slice(0, 1).map((topic, i) => (
+                                                                                                                <div className={"text-sm font-normal"} key={i}>
+                                                                                                                    {topic?.title}
+                                                                                                                </div>
+                                                                                                            ))
+                                                                                                        }
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            <div className={"update-idea text-sm rounded-full border text-center"}>
+                                                                                                <Avatar>
+                                                                                                    <AvatarFallback>+{x?.topic?.length}</AvatarFallback>
+                                                                                                </Avatar>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </Button>
+                                                                                </PopoverTrigger>
+                                                                                <PopoverContent className="p-0" align={"start"}>
+                                                                                    <div className={""}>
+                                                                                        <div className={"py-3 px-4"}>
+                                                                                            <h4 className="font-normal leading-none text-sm">{`Topics (${x?.topic?.length})`}</h4>
+                                                                                        </div>
+                                                                                        <div className="border-t px-4 py-3 space-y-2">
+                                                                                            {x.topic && x.topic.length > 0 && (
+                                                                                                <div className="space-y-2">
+                                                                                                    {x.topic.map((y, i) => (
+                                                                                                        <div className="text-sm font-normal" key={i}>
+                                                                                                            {y?.title}
+                                                                                                        </div>
+                                                                                                    ))}
+                                                                                                </div>
+                                                                                            )}
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </PopoverContent>
+                                                                            </Popover>
+                                                                        ) : ""
+                                                                    }
+                                                                    <Select
+                                                                        onValueChange={(value) => handleStatusUpdate("roadmap_id", value, i, x)}
+                                                                        value={x.roadmap_id}>
+                                                                        <SelectTrigger
+                                                                            className="md:w-[200px] w-[170px] h-8 bg-card"
+                                                                            // className="md:w-[291px] w-[170px] h-[24px] px-3 py-1 bg-card"
+                                                                        >
+                                                                            <SelectValue/>
+                                                                        </SelectTrigger>
+                                                                        <SelectContent>
+                                                                            <SelectGroup>
+                                                                                <SelectItem value={null}>
+                                                                                    <div className={"flex items-center gap-2"}>No status</div>
+                                                                                </SelectItem>
+                                                                                {
+                                                                                    (allStatusAndTypes.roadmap_status || []).map((x, i) => {
+                                                                                        return (
+                                                                                            <SelectItem key={i}
+                                                                                                        value={x.id}>
+                                                                                                <div
+                                                                                                    className={"flex items-center gap-2 truncate text-ellipsis overflow-hidden whitespace-nowrap"}>
+                                                                                                    <Circle
+                                                                                                        fill={x.color_code}
+                                                                                                        stroke={x.color_code}
+                                                                                                        className={` w-[10px] h-[10px]`}/>
+                                                                                                    {x.title || "No status"}
+                                                                                                </div>
+                                                                                            </SelectItem>
+                                                                                        )
+                                                                                    })
+                                                                                }
+                                                                            </SelectGroup>
+                                                                        </SelectContent>
+                                                                    </Select>
                                                                     {
                                                                         x.is_active == 0 &&
                                                                         <Badge
@@ -604,69 +694,65 @@ const Ideas = () => {
                                                                 <ReadMoreText html={x.description}/>
                                                             </div>
                                                         </div>
-                                                        <div className={`flex ${x.topic && x.topic.length > 0 ? "justify-between gap-2" : "sm:justify-between gap-0 justify-start"} items-center flex-wrap`}>
-                                                            <div className={`flex flex-wrap gap-2`}>
-                                                                {
-                                                                    (x.topic && x.topic.length > 0) &&
-                                                                    <div className={`flex flex-wrap gap-2`}>
-                                                                        {
-                                                                            x.topic.map((y, i) => (
-                                                                                <div className={"text-sm font-normal"} key={i}> {y?.title}</div>
-                                                                            ))
-                                                                        }
-                                                                    </div>
-                                                                }
-                                                            </div>
-                                                            <div className={"flex items-center md:gap-8 gap-1"}>
-                                                                <Select
-                                                                    onValueChange={(value) => handleStatusUpdate("roadmap_id", value, i, x)}
-                                                                    value={x.roadmap_id}>
-                                                                    <SelectTrigger
-                                                                        className="md:w-[291px] w-[170px] bg-card">
-                                                                        <SelectValue/>
-                                                                    </SelectTrigger>
-                                                                    <SelectContent>
-                                                                        <SelectGroup>
-                                                                            <SelectItem value={null}>
-                                                                                <div
-                                                                                    className={"flex items-center gap-2"}>
-                                                                                    No status
-                                                                                </div>
-                                                                            </SelectItem>
-                                                                            {
-                                                                                (allStatusAndTypes.roadmap_status || []).map((x, i) => {
-                                                                                    return (
-                                                                                        <SelectItem key={i}
-                                                                                                    value={x.id}>
-                                                                                            <div
-                                                                                                className={"flex items-center gap-2"}>
-                                                                                                <Circle
-                                                                                                    fill={x.color_code}
-                                                                                                    stroke={x.color_code}
-                                                                                                    className={` w-[10px] h-[10px]`}/>
-                                                                                                {x.title || "No status"}
-                                                                                            </div>
-                                                                                        </SelectItem>
-                                                                                    )
-                                                                                })
-                                                                            }
-                                                                        </SelectGroup>
-                                                                    </SelectContent>
-                                                                </Select>
-                                                                <div
-                                                                    className={"flex items-center gap-1 sm:gap-2 cursor-pointer"}
-                                                                    onClick={() => openDetailsSheet(x)}
-                                                                >
-                                                                            <span>
-                                                                                <MessageCircleMore size={16}
-                                                                                                   className={"stroke-primary"}/>
-                                                                            </span>
-                                                                    <p className={"text-base font-normal"}>
-                                                                        {x && x.comments && x.comments.length ? x.comments.length : 0}
-                                                                    </p>
-                                                                </div>
-                                                            </div>
-                                                        </div>
+                                                        {/*<div className={`flex ${x.topic && x.topic.length > 0 ? "justify-between gap-2" : "sm:justify-between gap-0 justify-start"} items-center flex-wrap`}>*/}
+                                                        {/*    /!*<div className={`flex flex-wrap gap-2`}>*!/*/}
+                                                        {/*    /!*    {*!/*/}
+                                                        {/*    /!*        (x.topic && x.topic.length > 0) &&*!/*/}
+                                                        {/*    /!*        <div className={`flex flex-wrap gap-2`}>*!/*/}
+                                                        {/*    /!*            {*!/*/}
+                                                        {/*    /!*                x.topic.map((y, i) => (*!/*/}
+                                                        {/*    /!*                    <div className={"text-sm font-normal"} key={i}> {y?.title}</div>*!/*/}
+                                                        {/*    /!*                ))*!/*/}
+                                                        {/*    /!*            }*!/*/}
+                                                        {/*    /!*        </div>*!/*/}
+                                                        {/*    /!*    }*!/*/}
+                                                        {/*    /!*</div>*!/*/}
+                                                        {/*    /!*<div className={"flex items-center md:gap-8 gap-1"}>*!/*/}
+                                                        {/*    /!*    <Select*!/*/}
+                                                        {/*    /!*        onValueChange={(value) => handleStatusUpdate("roadmap_id", value, i, x)}*!/*/}
+                                                        {/*    /!*        value={x.roadmap_id}>*!/*/}
+                                                        {/*    /!*        <SelectTrigger*!/*/}
+                                                        {/*    /!*            className="md:w-[224px] w-[170px] h-8 bg-card"*!/*/}
+                                                        {/*    /!*            // className="md:w-[291px] w-[170px] h-[24px] px-3 py-1 bg-card"*!/*/}
+                                                        {/*    /!*        >*!/*/}
+                                                        {/*    /!*            <SelectValue/>*!/*/}
+                                                        {/*    /!*        </SelectTrigger>*!/*/}
+                                                        {/*    /!*        <SelectContent>*!/*/}
+                                                        {/*    /!*            <SelectGroup>*!/*/}
+                                                        {/*    /!*                <SelectItem value={null}>*!/*/}
+                                                        {/*    /!*                    <div className={"flex items-center gap-2"}>No status</div>*!/*/}
+                                                        {/*    /!*                </SelectItem>*!/*/}
+                                                        {/*    /!*                {*!/*/}
+                                                        {/*    /!*                    (allStatusAndTypes.roadmap_status || []).map((x, i) => {*!/*/}
+                                                        {/*    /!*                        return (*!/*/}
+                                                        {/*    /!*                            <SelectItem key={i}*!/*/}
+                                                        {/*    /!*                                        value={x.id}>*!/*/}
+                                                        {/*    /!*                                <div*!/*/}
+                                                        {/*    /!*                                    className={"flex items-center gap-2"}>*!/*/}
+                                                        {/*    /!*                                    <Circle*!/*/}
+                                                        {/*    /!*                                        fill={x.color_code}*!/*/}
+                                                        {/*    /!*                                        stroke={x.color_code}*!/*/}
+                                                        {/*    /!*                                        className={` w-[10px] h-[10px]`}/>*!/*/}
+                                                        {/*    /!*                                    {x.title || "No status"}*!/*/}
+                                                        {/*    /!*                                </div>*!/*/}
+                                                        {/*    /!*                            </SelectItem>*!/*/}
+                                                        {/*    /!*                        )*!/*/}
+                                                        {/*    /!*                    })*!/*/}
+                                                        {/*    /!*                }*!/*/}
+                                                        {/*    /!*            </SelectGroup>*!/*/}
+                                                        {/*    /!*        </SelectContent>*!/*/}
+                                                        {/*    /!*    </Select>*!/*/}
+                                                        {/*    /!*    <div*!/*/}
+                                                        {/*    /!*        className={"flex items-center gap-1 sm:gap-2 cursor-pointer"}*!/*/}
+                                                        {/*    /!*        onClick={() => openDetailsSheet(x)}*!/*/}
+                                                        {/*    /!*    >*!/*/}
+                                                        {/*    /!*        <span><MessageCircleMore size={16} className={"stroke-primary"}/></span>*!/*/}
+                                                        {/*    /!*        <p className={"text-base font-normal"}>*!/*/}
+                                                        {/*    /!*            {x && x.comments && x.comments.length ? x.comments.length : 0}*!/*/}
+                                                        {/*    /!*        </p>*!/*/}
+                                                        {/*    /!*    </div>*!/*/}
+                                                        {/*    /!*</div>*!/*/}
+                                                        {/*</div>*/}
                                                     </div>
                                                 </div>
                                                 <div className={"border-b"}/>

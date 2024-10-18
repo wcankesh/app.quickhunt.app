@@ -171,7 +171,7 @@ export function Dashboard() {
                 </div>
             </div>
             <div
-                className="container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pb-5 px-3 md:px-4">
+                className="container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pb-5 px-3 md:px-4 m-auto">
                 <div className={"flex items-center flex-wrap pb-6 pt-9 gap-2 md:justify-between md:flex-nowrap"}>
                     <h3 className="text-base font-medium">Here's what has happened to your program</h3>
                     <DateRangePicker

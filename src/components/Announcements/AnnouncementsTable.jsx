@@ -199,7 +199,7 @@ const AnnouncementsTable = ({data, isLoading, setSelectedRecord, handleDelete, s
                                         <TableRow key={x?.id} className={""}>
                                             <TableCell className={`inline-flex gap-2 md:gap-1 flex-wrap items-center px-2 py-[10px] md:px-3 font-normal`}>
                                                 <span
-                                                    className={"cursor-pointer text-ellipsis overflow-hidden whitespace-nowrap"}
+                                                    className={"cursor-pointer max-w-[270px] truncate text-ellipsis overflow-hidden whitespace-nowrap"}
                                                     onClick={() => onEdit(x)}>{x?.post_title}</span>
                                                 {x.post_pin_to_top === 1 && <Pin size={14} className={`${theme === "dark" ? "fill-card-foreground" : "fill-card-foreground"}`}/>}
                                                 {

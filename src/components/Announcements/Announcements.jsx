@@ -243,11 +243,11 @@ const Announcements = () => {
             {/*    setAnalyticsObj={setAnalyticsObj}*/}
             {/*/>}*/}
 
-            <div className={"flex items-center justify-between flex-wrap gap-6"}>
+            <div className={"flex items-center justify-between flex-wrap gap-2"}>
                 <div className={"flex justify-between items-center w-full md:w-auto"}>
                     <h3 className={"text-2xl font-normal"}>Announcement ({totalRecord})</h3>
                 </div>
-                <div className={"flex gap-2 flex-wrap items-center"}>
+                <div className={"w-full lg:w-auto flex sm:flex-nowrap flex-wrap gap-2 items-center"}>
                     <div className={"flex gap-2 items-center w-full md:w-auto"}>
                         <div className={"w-full"}>
                             <Input
@@ -327,7 +327,7 @@ const Announcements = () => {
                             </Popover>
                         </div>
                     </div>
-                    <div className={"flex flex-grow gap-2 items-center"}>
+                    {/*<div className={"flex flex-grow gap-2 items-center"}>*/}
                         <Button
                             size={"sm"}
                             onClick={openSheet}
@@ -336,8 +336,7 @@ const Announcements = () => {
                             <Plus size={20} strokeWidth={3} />
                             <span className={"text-xs md:text-sm font-medium"}>New Announcement</span>
                         </Button>
-
-                    </div>
+                    {/*</div>*/}
                 </div>
             </div>
 

@@ -14,11 +14,16 @@ const DefaultLayout = () => {
                 <HeaderBar />
                 <SaidBarDesktop />
                 <Fragment>
-                    <div className={`ltr:xl:ml-[282px] rtl:xl:mr-[282px]`}>
-                        <main className={`flex flex-1 flex-col gap-4 lg:gap-6 pr-3 lg:pr-4 xl:pl-0 pl-3 ${location.pathname.includes(`/ideas/${id}`) ? "pb-3 md:pb-0" : ""}`}>
-                            <Card className={`shadow bodyScreenHeight ${location.pathname.includes("/roadmap") ? "overflow-hidden" : "overflow-auto"}`}>
+                    {/*<div className={`ltr:xl:ml-[282px] rtl:xl:mr-[282px]`}>*/}
+                    <div className={`ltr:xl:ml-[250px] rtl:xl:mr-[250px]`}>
+                        {/*<main className={`flex flex-1 flex-col gap-4 lg:gap-6 pr-3 lg:pr-4 xl:pl-0 pl-3 ${location.pathname.includes(`/ideas/${id}`) ? "pb-3 md:pb-0" : ""}`}>*/}
+                        <main className={`${location.pathname.includes(`/ideas/${id}`) ? "pb-3 md:pb-0" : ""}`}>
+                            {/*<Card className={`shadow bodyScreenHeight ${location.pathname.includes("/roadmap") ? "overflow-hidden" : "overflow-auto"}`}>*/}
+                            {/*    <Outlet />*/}
+                            {/*</Card>*/}
+                            <div className={`bodyScreenHeight ${location.pathname.includes("/roadmap") ? "overflow-hidden" : "overflow-auto"}`}>
                                 <Outlet />
-                            </Card>
+                            </div>
                         </main>
                     </div>
                 </Fragment>

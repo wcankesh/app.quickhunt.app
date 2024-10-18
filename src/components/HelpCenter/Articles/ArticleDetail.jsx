@@ -1,17 +1,29 @@
-import React, {useState, Fragment, useEffect} from 'react';
+import React, {useState, Fragment, useEffect, useRef} from 'react';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "../../ui/breadcrumb";
 import { baseUrl } from "../../../utils/constent";
 import { Button } from "../../ui/button";
-import { Circle, Loader2, Play, Trash2 } from "lucide-react";
+import {Circle, Loader2, Play} from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "../../ui/select";
 import { Label } from "../../ui/label";
 import { Input } from "../../ui/input";
-import { Card, CardContent } from "../../ui/card";
+import {Card, CardContent, CardHeader} from "../../ui/card";
 import {ApiService} from "../../../utils/ApiService";
 import {useSelector} from "react-redux";
 import {useToast} from "../../ui/use-toast";
-import Tiptap from "../../../Tiptap";
+import Embed from "@editorjs/embed";
+import Header from "@editorjs/header";
+import Table from "@editorjs/table";
+import Marker from "@editorjs/marker";
+import List from "@editorjs/list";
+import Warning from "@editorjs/warning";
+import Code from "@editorjs/code";
+import LinkTool from "@editorjs/link";
+import Image from "@editorjs/image";
+import Quote from "@editorjs/quote";
+import InlineCode from "@editorjs/inline-code";
+import EditorJS from "@editorjs/editorjs";
+import {useTheme} from "../../theme-provider";
 
     const statusOptions = [
         { name: "Publish", value: 1, fillColor: "#389E0D", strokeColor: "#389E0D" },
@@ -52,6 +64,8 @@ const ArticleDetail = () => {
     const [articlesDetails, setArticlesDetails] = useState(initialState);
     const [formError, setFormError] = useState(initialStateError);
     const [articleList, setArticleList] = useState([]);
+    const {theme} = useTheme();
+    const editorCore = useRef(null);
 
     useEffect(() => {
         if(id !== "new" && projectDetailsReducer.id){
@@ -96,14 +110,6 @@ const ArticleDetail = () => {
         }));
     };
 
-    const onChangeText = (event) => {
-        setArticlesDetails({...articlesDetails, [event.target.name]: event.target.value})
-        setFormError(formError => ({
-            ...formError,
-            [event.target.name]: formValidate(event.target.name, event.target.value)
-        }));
-    }
-
     const formValidate = (name, value) => {
         switch (name) {
             case "title":
@@ -134,6 +140,7 @@ const ArticleDetail = () => {
             return;
         }
         setLoading(true);
+        debugger
         const selectedCategory = articleList.find(item => item.id === articlesDetails.category_id);
         let selectedSubCategory = null;
         if (selectedCategory && selectedCategory.sub_categories.length > 0) {
@@ -147,6 +154,7 @@ const ArticleDetail = () => {
         formData.append('title', articlesDetails.title);
         formData.append('description', articlesDetails.description);
         formData.append(`images`, articlesDetails.image);
+        formData.append('is_active', articlesDetails.is_active);
         const data = await apiService.createArticles(formData);
         if(data.status === 200) {
             setArticlesDetails(initialState);
@@ -160,6 +168,7 @@ const ArticleDetail = () => {
 
     const updateArticle = async () => {
         setLoading(true);
+        debugger
         const selectedCategory = articleList.find(item => item.id === Number(articlesDetails.category_id));
         let selectedSubCategory = null;
         if (selectedCategory && selectedCategory.sub_categories.length > 0) {
@@ -171,6 +180,7 @@ const ArticleDetail = () => {
         formData.append('sub_category_id', selectedSubCategory ? selectedSubCategory.id : null);
         formData.append('title', articlesDetails.title);
         formData.append('description', articlesDetails.description);
+        formData.append(`images`, articlesDetails.image);
         formData.append('is_active', articlesDetails.is_active);
         const data = await apiService.updateArticle(formData, articlesDetails.id)
         if (data.status === 200) {
@@ -180,6 +190,102 @@ const ArticleDetail = () => {
             toast({description: data.message, variant: "destructive",});
         }
         setLoading(false)
+    }
+
+    const handleSave = React.useCallback(async () => {
+        const savedData = await editorCore.current.save();
+        console.log(
+            savedData.blocks
+        )
+        setArticlesDetails(prevState => ({
+            ...prevState,
+            description: JSON.stringify({blocks: savedData.blocks})
+        }));
+    }, []);
+
+    useEffect(() => {
+        if(!isLoading){
+            let editorData = { blocks: [{ type: "paragraph", data: { text: "Hey" } }] };
+            if (articlesDetails?.description) {
+                if (typeof articlesDetails.description === 'string' && articlesDetails.description.trim().startsWith('{')) {
+                    const parsedDescription = JSON.parse(articlesDetails.description);
+                    if (parsedDescription.blocks) {
+                        editorData = {blocks: parsedDescription.blocks};
+                    }
+                }
+            }
+            editorCore.current = new EditorJS({
+                holder: 'editorjs',
+                autofocus: true,
+                tools:editorConstants,
+                enableReInitialize:true,
+                onChange:handleSave,
+                data:{
+                    time: new Date().getTime(),
+                    // blocks: articlesDetails?.description?.blocks || [{type: "paragraph", data: {text: "Hey"}}],
+                    blocks: editorData.blocks,
+                    version: "2.12.4"
+                }
+            });
+
+            return () => {
+                if (editorCore.current && typeof editorCore.current.destroy === 'function') {
+                    editorCore.current.destroy(); // Destroy the editor instance
+                }
+            };
+        }
+
+    }, [isLoading]);
+
+    const editorConstants = {
+        embed: Embed,
+        header: {
+            class: Header,
+            inlineToolbar: true,
+            config: {
+                placeholder: 'Enter a header',
+                levels: [2, 3, 4], // Available header levels
+                defaultLevel: 2,   // Default level
+            },
+        },
+        table: Table,
+        marker: Marker,
+        list: List,
+        warning: Warning,
+        code: Code,
+        linkTool: LinkTool,
+        image: {
+            class: Image,
+
+            inlineToolbar : true,
+
+            config: {
+                endpoints: {
+                    byFile: 'https://code.quickhunt.app/public/api/upload', // Your file upload endpoint
+                    byUrl: 'https://code.quickhunt.app/public/storage/post', // Your endpoint that provides image by URL
+                },
+                field: 'image',
+                types: 'image/*',
+
+            },
+            // actions: [
+            //     {
+            //         icon: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-trash-2">
+            //             <path d="M3 6h18"/>
+            //             <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
+            //             <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+            //             <line x1="10" x2="10" y1="11" y2="17"/>
+            //             <line x1="14" x2="14" y1="11" y2="17"/>
+            //         </svg>,
+            //         title: 'Delete',
+            //         action: (block) => {
+            //             handleImageDelete(editorCore, block.id);
+            //         },
+            //     },
+            // ],
+        },
+        quote: Quote,
+        inlineCode: InlineCode,
     }
 
     const renderSidebarItems = () => {
@@ -283,19 +389,20 @@ const ArticleDetail = () => {
                     </Select>
                     <Button variant={"ghost hover:bg-none"} className={"px-3 py-[6px] border font-normal h-auto"}><Play size={16} className={"mr-3"} /> Preview</Button>
                     <Button className={"w-[81px] py-[7px] font-medium h-8 hover:bg-primary"} onClick={articlesDetails.id ? updateArticle : handlePublish}>
-                        {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Publish"}
+                        {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : (articlesDetails.id ? "Update" : "Create")}
                     </Button>
-                    <Button variant={"ghost hover:bg-none"} className={"p-1 h-auto border"}><Trash2 size={16} /></Button>
                 </div>
             </div>
             <div className={"flex h-[calc(100%_-_83px)] overflow-y-auto"}>
                 <div className={"max-w-[407px] w-full border-r h-full overflow-y-auto"}>
                     {renderSidebarItems()}
                 </div>
-                <div className={"bg-muted w-full h-full hidden md:block overflow-y-auto"}>
-                    <Card className={"m-8 mb-0"}>
-                        <CardContent className={"p-6"}><Tiptap onChange={onChangeText} value={articlesDetails.description} name={"description"} /></CardContent>
-                    </Card>
+                <div className={"bg-muted w-full h-full px-16 flex flex-col gap-4 py-8 justify-start overflow-y-auto h-[calc(100%_-_94px)]"}>
+                        <Card className={`rounded-[10px] p-0 h-full overflow-auto`} >
+                            <CardHeader className={"pt-0"}>
+                                <div className={"pl-14 pt-6 m-0 w-full"}>{isLoading ? "" : <div id="editorjs"/>}</div>
+                            </CardHeader>
+                        </Card>
                 </div>
             </div>
         </Fragment>

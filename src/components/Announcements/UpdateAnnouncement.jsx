@@ -309,10 +309,15 @@ const UpdateAnnouncement = () => {
                     </BreadcrumbList>
                 </Breadcrumb>
                 <div className={"flex items-center gap-4"}>
-                    <Button className={"p-0 h-auto"}
+                    <Button variant={"outline"}
+                            className={`w-9 h-9 p-1`}
                             onClick={() => commonToggle("post_pin_to_top", selectedRecord.post_pin_to_top === 1 ? 0 : 1)}
-                            variant={"ghost hover:bg-none"}>{selectedRecord.post_pin_to_top === 1 ?
-                        <Pin size={18} className={`${theme === "dark" ? "fill-card-foreground" : "fill-card-foreground"}`}/> : <Pin size={18}/>}
+                    >
+                        {
+                            selectedRecord.post_pin_to_top === 1 ?
+                                <Pin size={18} className={`${theme === "dark" ? "fill-card-foreground" : "fill-card-foreground"}`}/> :
+                                <Pin size={18}/>
+                        }
                     </Button>
                     <Button
                         size={"sm"}

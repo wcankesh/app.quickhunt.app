@@ -1,21 +1,6 @@
 import React, {Fragment, useState, useEffect} from 'react';
 import {Button} from "../ui/button";
-import {
-    ArrowBigUp,
-    Check,
-    Circle,
-    CircleX,
-    Dot,
-    Ellipsis,
-    Loader2,
-    MessageCircleMore,
-    Paperclip,
-    Pencil,
-    Pin,
-    Trash2,
-    Upload,
-    X
-} from "lucide-react";
+import {ArrowBigUp, Check, Circle, CircleX, Dot, Ellipsis, Loader2, MessageCircleMore, Paperclip, Pencil, Pin, Trash2, Upload, X} from "lucide-react";
 import {RadioGroup, RadioGroupItem} from "../ui/radio-group";
 import {Label} from "../ui/label";
 import {Input} from "../ui/input";
@@ -33,15 +18,9 @@ import {DropdownMenu, DropdownMenuTrigger} from "@radix-ui/react-dropdown-menu";
 import {DropdownMenuContent, DropdownMenuItem} from "../ui/dropdown-menu";
 import ReactQuillEditor from "../Comman/ReactQuillEditor";
 import {useNavigate, useParams} from "react-router-dom";
-import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbPage,
-    BreadcrumbSeparator
-} from "../ui/breadcrumb";
+import {Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator} from "../ui/breadcrumb";
 import {baseUrl} from "../../utils/constent";
+import {Skeleton} from "../ui/skeleton";
 
 const initialStateError = {
     title: "",
@@ -93,8 +72,10 @@ const UpdateIdea = () => {
     }, [projectDetailsReducer.id, allStatusAndTypes]);
 
     const getSingleIdea = async () => {
+        setIsLoading(true)
         const data = await apiSerVice.getSingleIdea(id);
         if (data.status === 200) {
+            setIsLoading(false)
             setSelectedIdea(data.data)
             setOldSelectedIdea(data.data)
         }
@@ -691,7 +672,7 @@ const UpdateIdea = () => {
                         </div>
                     </div>
                 </div>
-                <div className={"www w-full h-full overflow-y-auto"}>
+                <div className={"update-idea-right-side w-full h-full overflow-y-auto"}>
                     {
                         isEditIdea ?
                             <Fragment>
@@ -801,7 +782,7 @@ const UpdateIdea = () => {
                                     </Button>
                                     <Button
                                         variant={"outline hover:bg-transparent"}
-                                        className={"border border-primary py-2 px-6 text-sm font-medium"}
+                                        className={"border border-primary py-2 px-6 text-sm font-medium text-primary"}
                                         onClick={handleOnCreateCancel}
                                     >
                                         Cancel
@@ -812,93 +793,100 @@ const UpdateIdea = () => {
                             <Fragment>
                                 <div className={"px-4 py-3 lg:py-6 lg:px-8"}>
                                     <div className={"flex flex-col gap-6"}>
-                                        <div
-                                            className={"flex justify-between items-center gap-4 md:flex-nowrap flex-wrap"}>
-                                            <div className={"flex gap-2 items-center"}>
-                                                <Button
-                                                    className={"p-[7px] bg-white shadow border hover:bg-white w-[30px] h-[30px]"}
-                                                    variant={"outline"}
-                                                    onClick={() => giveVote(1)}
-                                                >
-                                                    <ArrowBigUp
-                                                        className={"fill-primary stroke-primary"}/>
-                                                </Button>
-                                                <p className={"text-xl font-normal"}>{selectedIdea?.vote}</p>
-                                                {
-                                                    selectedIdea && selectedIdea?.vote_list && selectedIdea?.vote_list.length ?
-                                                        <Popover>
-                                                            <PopoverTrigger asChild>
-                                                                <Button variant={"ghost hover-none"}
-                                                                        className={"rounded-full p-0 h-[24px]"}>
-                                                                    {
-                                                                        (selectedIdea?.vote_list.slice(0, 1) || []).map((x, i) => {
-                                                                            return (
-                                                                                <div className={"flex"}
-                                                                                     key={i}>
-                                                                                    <div
-                                                                                        className={"relative"}>
-                                                                                        <div
-                                                                                            className={"update-idea text-sm rounded-full border text-center"}>
-                                                                                            <Avatar>
-                                                                                                {
-                                                                                                    x.user_photo ?
-                                                                                                        <AvatarImage
-                                                                                                            src={x.user_photo}
-                                                                                                            alt={x && x.name && x.name.substring(0, 1)}/> :
-                                                                                                        <AvatarFallback>{x && x.name && x.name.substring(0, 1).toUpperCase()}</AvatarFallback>
-                                                                                                }
-                                                                                            </Avatar>
+                                        <div className={"flex justify-between items-center gap-4 md:flex-nowrap flex-wrap"}>
+                                            {
+                                                isLoading ?
+                                                    <div className={"flex gap-2 items-center"}>
+                                                        <Skeleton className="w-[30px] h-[30px] rounded-full" />
+                                                        <Skeleton className="w-[30px] h-[30px] rounded-full" />
+                                                    </div>
+                                                        :
+                                                    <div className={"flex gap-2 items-center"}>
+                                                        <Button
+                                                            className={"p-[7px] bg-white shadow border hover:bg-white w-[30px] h-[30px]"}
+                                                            variant={"outline"}
+                                                            onClick={() => giveVote(1)}
+                                                        >
+                                                            <ArrowBigUp
+                                                                className={"fill-primary stroke-primary"}/>
+                                                        </Button>
+                                                        <p className={"text-xl font-normal"}>{selectedIdea?.vote}</p>
+                                                        {
+                                                            selectedIdea && selectedIdea?.vote_list && selectedIdea?.vote_list.length ?
+                                                                <Popover>
+                                                                    <PopoverTrigger asChild>
+                                                                        <Button variant={"ghost hover-none"}
+                                                                                className={"rounded-full p-0 h-[24px]"}>
+                                                                            {
+                                                                                (selectedIdea?.vote_list.slice(0, 1) || []).map((x, i) => {
+                                                                                    return (
+                                                                                        <div className={"flex"}
+                                                                                             key={i}>
+                                                                                            <div
+                                                                                                className={"relative"}>
+                                                                                                <div
+                                                                                                    className={"update-idea text-sm rounded-full border text-center"}>
+                                                                                                    <Avatar>
+                                                                                                        {
+                                                                                                            x.user_photo ?
+                                                                                                                <AvatarImage
+                                                                                                                    src={x.user_photo}
+                                                                                                                    alt={x && x.name && x.name.substring(0, 1)}/> :
+                                                                                                                <AvatarFallback>{x && x.name && x.name.substring(0, 1).toUpperCase()}</AvatarFallback>
+                                                                                                        }
+                                                                                                    </Avatar>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                            <div
+                                                                                                className={"update-idea text-sm rounded-full border text-center ml-[-5px]"}>
+                                                                                                <Avatar><AvatarFallback>+{selectedIdea?.vote_list.length}</AvatarFallback></Avatar>
+                                                                                            </div>
                                                                                         </div>
-                                                                                    </div>
-                                                                                    <div
-                                                                                        className={"update-idea text-sm rounded-full border text-center ml-[-5px]"}>
-                                                                                        <Avatar><AvatarFallback>+{selectedIdea?.vote_list.length}</AvatarFallback></Avatar>
-                                                                                    </div>
-                                                                                </div>
-                                                                            )
-                                                                        })
-                                                                    }
-                                                                </Button>
-                                                            </PopoverTrigger>
-                                                            <PopoverContent className="p-0" align={"start"}>
-                                                                <div className={""}>
-                                                                    <div className={"py-3 px-4"}>
-                                                                        <h4 className="font-normal leading-none text-sm">{`Voters (${selectedIdea?.vote_list.length})`}</h4>
-                                                                    </div>
-                                                                    <div
-                                                                        className="border-t px-4 py-3 space-y-2">
-                                                                        {
-                                                                            (selectedIdea?.vote_list || []).map((x, i) => {
-                                                                                return (
-                                                                                    <div
-                                                                                        className={"flex gap-2"}
-                                                                                        key={i}>
-                                                                                        <div
-                                                                                            className={"update-idea text-sm rounded-full border text-center"}>
-                                                                                            <Avatar
-                                                                                                className={"w-[20px] h-[20px]"}>
-                                                                                                {
-                                                                                                    x.user_photo ?
-                                                                                                        <AvatarImage
-                                                                                                            src={x.user_photo}
-                                                                                                            alt=""/>
-                                                                                                        :
-                                                                                                        <AvatarFallback>{x && x.name && x.name.substring(0, 1).toUpperCase()}</AvatarFallback>
-                                                                                                }
-                                                                                            </Avatar>
-                                                                                        </div>
-                                                                                        <h4 className={"text-sm font-normal"}>{x.name}</h4>
-                                                                                    </div>
-                                                                                )
-                                                                            })
-                                                                        }
-                                                                    </div>
-                                                                </div>
-                                                            </PopoverContent>
-                                                        </Popover>
-                                                        : ""
-                                                }
-                                            </div>
+                                                                                    )
+                                                                                })
+                                                                            }
+                                                                        </Button>
+                                                                    </PopoverTrigger>
+                                                                    <PopoverContent className="p-0" align={"start"}>
+                                                                        <div className={""}>
+                                                                            <div className={"py-3 px-4"}>
+                                                                                <h4 className="font-normal leading-none text-sm">{`Voters (${selectedIdea?.vote_list.length})`}</h4>
+                                                                            </div>
+                                                                            <div
+                                                                                className="border-t px-4 py-3 space-y-2">
+                                                                                {
+                                                                                    (selectedIdea?.vote_list || []).map((x, i) => {
+                                                                                        return (
+                                                                                            <div
+                                                                                                className={"flex gap-2"}
+                                                                                                key={i}>
+                                                                                                <div
+                                                                                                    className={"update-idea text-sm rounded-full border text-center"}>
+                                                                                                    <Avatar
+                                                                                                        className={"w-[20px] h-[20px]"}>
+                                                                                                        {
+                                                                                                            x.user_photo ?
+                                                                                                                <AvatarImage
+                                                                                                                    src={x.user_photo}
+                                                                                                                    alt=""/>
+                                                                                                                :
+                                                                                                                <AvatarFallback>{x && x.name && x.name.substring(0, 1).toUpperCase()}</AvatarFallback>
+                                                                                                        }
+                                                                                                    </Avatar>
+                                                                                                </div>
+                                                                                                <h4 className={"text-sm font-normal"}>{x.name}</h4>
+                                                                                            </div>
+                                                                                        )
+                                                                                    })
+                                                                                }
+                                                                            </div>
+                                                                        </div>
+                                                                    </PopoverContent>
+                                                                </Popover>
+                                                                : ""
+                                                        }
+                                                    </div>
+                                            }
                                             <div className={"md:hidden"}>
                                                 <DropdownMenu>
                                                     <DropdownMenuTrigger>
@@ -934,14 +922,14 @@ const UpdateIdea = () => {
                                                         <div className={"flex gap-1 justify-between"}>
                                                             <Button
                                                                 variant={"outline"}
-                                                                className={`hover:bg-muted p-2 h-auto ${theme === "dark" ? "" : "border-muted-foreground text-muted-foreground"} text-xs font-medium`}
+                                                                className={`hover:bg-muted p-2 h-auto w-[102px] ${theme === "dark" ? "" : "border-muted-foreground text-muted-foreground"} text-xs font-medium`}
                                                                 onClick={() => onChangeStatus(
                                                                     "is_active",
                                                                     selectedIdea?.is_active === 1 ? 0 : 1
                                                                 )}
                                                             >
                                                                 {
-                                                                    isLoading ? <Loader2
+                                                                    isLoadingCreateIdea ? <Loader2
                                                                         className="h-4 w-4 animate-spin"/> : (selectedIdea?.is_active === 0 ? "Convert to Idea" : "Mark as bug")
                                                                 }
                                                             </Button>
@@ -949,7 +937,7 @@ const UpdateIdea = () => {
                                                         <div className={"flex gap-1 justify-between"}>
                                                             <Button
                                                                 variant={"outline"}
-                                                                className={`hover:bg-muted p-2 h-auto ${theme === "dark" ? "" : "border-muted-foreground text-muted-foreground"} text-xs font-medium`}
+                                                                className={`hover:bg-muted p-2 h-auto w-[58px] ${theme === "dark" ? "" : "border-muted-foreground text-muted-foreground"} text-xs font-medium`}
                                                                 onClick={() => onChangeStatus(
                                                                     "is_archive",
                                                                     selectedIdea?.is_archive === 1 ? 0 : 1
@@ -989,259 +977,319 @@ const UpdateIdea = () => {
                                             <div className={"hidden lg:block"}>
                                                 <div className={"flex gap-2"}>
                                                     {
-                                                        selectedIdea?.is_edit === 1 ?
-                                                            <Button
-                                                                variant={"outline"}
-                                                                className={"w-[30px] h-[30px] p-1"}
-                                                                onClick={() => setIsEditIdea(true)}
-                                                            >
-                                                                <Pencil className={"w-[16px] h-[16px]"}/>
-                                                            </Button> : ""
+                                                        isLoading ?
+                                                            <div className={"flex gap-2"}>
+                                                                {
+                                                                    selectedIdea?.is_edit === 1 ?
+                                                                        <Skeleton className="w-[30px] h-[30px] rounded-full"/>
+                                                                        : ""
+                                                                }
+                                                                <Skeleton className="w-[30px] h-[30px] rounded-full" />
+                                                            </div>
+                                                                :
+                                                            <Fragment>
+                                                                {
+                                                                    selectedIdea?.is_edit === 1 ?
+                                                                        <Button
+                                                                            variant={"outline"}
+                                                                            className={"w-[30px] h-[30px] p-1"}
+                                                                            onClick={() => setIsEditIdea(true)}
+                                                                        >
+                                                                            <Pencil className={"w-[16px] h-[16px]"}/>
+                                                                        </Button> : ""
+                                                                }
+                                                                <Button
+                                                                    variant={"outline"}
+                                                                    className={`w-[30px] h-[30px] p-1`}
+                                                                    onClick={() => onChangeStatus("pin_to_top", selectedIdea?.pin_to_top === 0 ? 1 : 0)}
+                                                                >
+                                                                    {selectedIdea?.pin_to_top == 0 ?
+                                                                        <Pin size={16}/> :
+                                                                        <Pin size={16} className={`${theme === "dark" ? "fill-card-foreground" : "fill-card-foreground"}`}/>}
+                                                                </Button>
+                                                            </Fragment>
                                                     }
-
-                                                    <Button
-                                                        variant={"outline"}
-                                                        className={`w-[30px] h-[30px] p-1`}
-                                                        onClick={() => onChangeStatus("pin_to_top", selectedIdea?.pin_to_top === 0 ? 1 : 0)}
-                                                    >
-                                                        {selectedIdea?.pin_to_top == 0 ?
-                                                            <Pin size={16}/> :
-                                                            <Pin size={16} className={`${theme === "dark" ? "fill-card-foreground" : "fill-card-foreground"}`}/>}
-                                                    </Button>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className={"flex flex-col gap-4"}>
-                                            <div className={"flex items-center gap-2"}>
-                                                <h2 className={"text-xl font-normal"}>{selectedIdea?.title}</h2>
-                                            </div>
-                                            <div
-                                                className={`description-container text-sm ${theme === "dark" ? "" : "text-muted-foreground" }`}
-                                                dangerouslySetInnerHTML={{ __html: selectedIdea?.description }}
-                                            />
-                                        </div>
                                         {
-                                            selectedIdea && selectedIdea?.images && selectedIdea?.images?.length > 0 ?
+                                            isLoading ?
+                                                <div className={"flex flex-col gap-4"}>
+                                                    <Skeleton className="h-4 " />
+                                                    <div className={"space-y-1"}>
+                                                        <Skeleton className="h-4 " />
+                                                        <Skeleton className="h-4 " />
+                                                    </div>
+                                                </div> :
+                                                <div className={"flex flex-col gap-4"}>
+                                                    <div className={"flex items-center gap-2"}>
+                                                        <h2 className={"text-xl font-normal"}>{selectedIdea?.title}</h2>
+                                                    </div>
+                                                    <div
+                                                        className={`description-container text-sm ${theme === "dark" ? "" : "text-muted-foreground" }`}
+                                                        dangerouslySetInnerHTML={{ __html: selectedIdea?.description }}
+                                                    />
+                                                </div>
+                                        }
+                                        {
+                                            isLoading ?
                                                 <div className={"flex gap-2 flex-wrap"}>
+                                                    <Skeleton className="w-[50px] h-[50px] md:w-[100px] md:h-[100px] border p-[3px] relative" />
+                                                </div>
+                                                :
+                                                <Fragment>
                                                     {
-                                                        (selectedIdea?.images || []).map((x, i) => {
-                                                                return (
-                                                                    <Fragment>
-                                                                        {
-                                                                            x && x.name ?
-                                                                                <div
-                                                                                    className="w-[50px] h-[50px] md:w-[100px] md:h-[100px] border p-[3px] relative"
-                                                                                    onClick={() => handleImageClick(URL.createObjectURL(x))}
-                                                                                >
-                                                                                    <img className={"upload-img cursor-pointer"}
-                                                                                         src={x && x.name ? URL.createObjectURL(x) : x}
-                                                                                         alt=""/>
-                                                                                </div> : x ?
-                                                                                <div
-                                                                                    className="w-[50px] h-[50px] md:w-[100px] md:h-[100px] border p-[3px] relative"
-                                                                                    onClick={() => handleImageClick(x)}
-                                                                                >
-                                                                                    <img className={"upload-img cursor-pointer"}
-                                                                                         src={x} alt=""/>
-                                                                                </div> : ""
-                                                                        }
-                                                                    </Fragment>
-                                                                )
-                                                            }
-                                                        )}
-                                                </div> : ""
+                                                        selectedIdea && selectedIdea?.images && selectedIdea?.images?.length > 0 ?
+                                                            <div className={"flex gap-2 flex-wrap"}>
+                                                                <Fragment>
+                                                                    {
+                                                                        (selectedIdea?.images || []).map((x, i) => {
+                                                                                return (
+                                                                                    <Fragment>
+                                                                                        {
+                                                                                            x && x.name ?
+                                                                                                <div
+                                                                                                    className="w-[50px] h-[50px] md:w-[100px] md:h-[100px] border p-[3px] relative"
+                                                                                                    onClick={() => handleImageClick(URL.createObjectURL(x))}
+                                                                                                >
+                                                                                                    <img className={"upload-img cursor-pointer"}
+                                                                                                         src={x && x.name ? URL.createObjectURL(x) : x}
+                                                                                                         alt=""/>
+                                                                                                </div> : x ?
+                                                                                                <div
+                                                                                                    className="w-[50px] h-[50px] md:w-[100px] md:h-[100px] border p-[3px] relative"
+                                                                                                    onClick={() => handleImageClick(x)}
+                                                                                                >
+                                                                                                    <img className={"upload-img cursor-pointer"}
+                                                                                                         src={x} alt=""/>
+                                                                                                </div> : ""
+                                                                                        }
+                                                                                    </Fragment>
+                                                                                )
+                                                                            }
+                                                                        )}
+                                                                </Fragment>
+                                                            </div> : ""
+                                                    }
+                                                </Fragment>
                                         }
                                         <div className={"flex items-center"}>
                                             <div className={"flex items-center gap-4 md:flex-nowrap flex-wrap"}>
                                                 <div className={"flex items-center gap-2"}>
                                                     <Avatar className={"w-[20px] h-[20px]"}>
                                                         {
-                                                            selectedIdea?.user_photo ?
-                                                                <AvatarImage src={selectedIdea?.user_photo}
-                                                                             alt="@shadcn"/>
-                                                                :
-                                                                <AvatarFallback>{selectedIdea && selectedIdea?.name && selectedIdea?.name.substring(0, 1)}</AvatarFallback>
+                                                            isLoading ?
+                                                                <Skeleton className="w-[20px] h-[20px] rounded-full" /> :
+                                                                <Fragment>
+                                                                    {
+                                                                        selectedIdea?.user_photo ?
+                                                                            <AvatarImage src={selectedIdea?.user_photo}
+                                                                                         alt="@shadcn"/>
+                                                                            :
+                                                                            <AvatarFallback>{selectedIdea && selectedIdea?.name && selectedIdea?.name.substring(0, 1)}</AvatarFallback>
+                                                                    }
+                                                                </Fragment>
                                                         }
                                                     </Avatar>
                                                     <div className={"flex items-center"}>
-                                                        <h4 className={"text-sm font-normal"}>{selectedIdea?.name}</h4>
-                                                        <p className={"text-sm font-normal flex items-center text-muted-foreground"}>
-                                                            <Dot size={20}
-                                                                 className={"fill-text-card-foreground stroke-text-card-foreground"}/>
-                                                            {moment(selectedIdea?.created_at).format('D MMM')}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                                <Select
-                                                    onValueChange={(value) => onChangeStatus('roadmap_id', value)}
-                                                    value={selectedIdea?.roadmap_id}
-                                                >
-                                                    <SelectTrigger className="w-[234px] h-[24px] px-3 py-1">
-                                                        <SelectValue/>
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        <SelectGroup>
-                                                            <SelectItem value={null}>
-                                                                <div className={"flex items-center gap-2"}>
-                                                                    No status
-                                                                </div>
-                                                            </SelectItem>
-                                                            {
-                                                                (roadmapStatus || []).map((x, i) => {
-                                                                    return (
-                                                                        <SelectItem key={i} value={x.id}>
-                                                                            <div
-                                                                                className={"flex items-center gap-2"}>
-                                                                                <Circle fill={x.color_code}
-                                                                                        stroke={x.color_code}
-                                                                                        className={` w-[10px] h-[10px]`}/>
-                                                                                {x.title ? x.title : "No status"}
-                                                                            </div>
-                                                                        </SelectItem>
-                                                                    )
-                                                                })
-                                                            }
-                                                        </SelectGroup>
-                                                    </SelectContent>
-                                                </Select>
-                                            </div>
-                                        </div>
-                                        <div className={"flex flex-col gap-2"}>
-                                            <div className="w-full flex flex-col gap-2">
-                                                <Label htmlFor="message" className={"font-normal"}>Add comment</Label>
-                                                {/*{*/}
-                                                {/*    privateNote ?*/}
-                                                {/*        <Card*/}
-                                                {/*            className={`shadow-none ${theme === "dark" ? "" : "border-amber-300"}`}>*/}
-                                                {/*            <div*/}
-                                                {/*                className={`text-xs text-card-foreground font-normal py-1 px-3 ${theme === "dark" ? "" : "bg-orange-100"} rounded-tl-md rounded-tr-md`}>Add*/}
-                                                {/*                a private note for your team*/}
-                                                {/*            </div>*/}
-                                                {/*            <Textarea*/}
-                                                {/*                className={"rounded-tl-none rounded-tr-none"}*/}
-                                                {/*                placeholder="Private Start writing..."*/}
-                                                {/*                id="message"*/}
-                                                {/*                value={commentText}*/}
-                                                {/*                onChange={(e) => setCommentText(e.target.value)}*/}
-                                                {/*            />*/}
-                                                {/*        </Card>*/}
-                                                {/*        :*/}
-                                                <>
-                                                    <Textarea
-                                                        placeholder="Start writing..."
-                                                        id="message"
-                                                        value={commentText}
-                                                        onChange={(e) => setCommentText(e.target.value)}
-                                                    />
-                                                    {
-                                                        commentFiles && commentFiles.length ?
-                                                            <div className={"flex flex-wrap gap-3 mt-1"}>
-                                                                {
-                                                                    (commentFiles || []).map((x, i) => {
-                                                                        return (
-                                                                            <Fragment>
-                                                                                {
-                                                                                    x && x.name ?
-                                                                                        <div
-                                                                                            className={"w-[50px] h-[50px] md:w-[100px] md:h-[100px] relative border p-[3px]"}>
-                                                                                            <img
-                                                                                                className={"upload-img"}
-                                                                                                src={x && x.name ? URL.createObjectURL(x) : x}
-                                                                                                alt=""/>
-                                                                                            <CircleX
-                                                                                                size={20}
-                                                                                                className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
-                                                                                                onClick={() => onDeleteImageComment(i, false)}
-                                                                                            />
-                                                                                        </div> : x ?
-                                                                                        <div
-                                                                                            className={"w-[50px] h-[50px] md:w-[100px] md:h-[100px] relative border p-[3px]"}>
-                                                                                            <img
-                                                                                                className={"upload-img"}
-                                                                                                src={x}
-                                                                                                alt={x}/>
-                                                                                            <CircleX
-                                                                                                size={20}
-                                                                                                className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
-                                                                                                onClick={() => onDeleteImageComment(i, false)}
-                                                                                            />
-                                                                                        </div> : ''
-                                                                                }
-                                                                            </Fragment>
-                                                                        )
-                                                                    })
-                                                                }
-                                                            </div>
-                                                            : ""
-                                                    }
-                                                </>
-                                                {/*}*/}
-                                            </div>
-                                            <div className={"flex justify-between gap-1"}>
-                                                <div className="flex items-center space-x-2">
-                                                    {/*<Switch id="airplane-mode"*/}
-                                                    {/*        onCheckedChange={handlePrivateNote}/>*/}
-                                                    {/*<Label htmlFor="airplane-mode"*/}
-                                                    {/*       className={"text-sm font-normal"}>Private*/}
-                                                    {/*    note</Label>*/}
-                                                </div>
-                                                <div className={"flex gap-2 items-center"}>
-                                                    <div className="p-2 max-w-sm relative w-[36px] h-[36px]">
-
-                                                        <input
-                                                            id="commentFile"
-                                                            type="file"
-                                                            className="hidden"
-                                                            onChange={handleAddCommentImg}
-                                                            accept={".jpg,.jpeg"}
-                                                        />
-                                                        <label htmlFor="commentFile"
-                                                               className="absolute inset-0 flex items-center justify-center bg-white border border-primary rounded cursor-pointer"
-                                                        >
-                                                            <Paperclip size={16} className={"stroke-primary"}/>
-                                                        </label>
-
-                                                    </div>
-                                                    <Button
-                                                        className={"w-[128px] h-[36px] text-sm font-medium"}
-                                                        onClick={onCreateComment}
-                                                        disabled={commentText.trim() === "" || commentText === ""}
-                                                    >
                                                         {
-                                                            isSaveComment ? <Loader2
-                                                                className="h-4 w-4 animate-spin"/> : "Add Comment"
+                                                            isLoading ?
+                                                                <Skeleton className="w-[50px] h-[20px]" />
+                                                                :
+                                                                <Fragment>
+                                                                    <h4 className={"text-sm font-normal"}>{selectedIdea?.name}</h4>
+                                                                    <p className={"text-sm font-normal flex items-center text-muted-foreground"}>
+                                                                        <Dot size={20}
+                                                                             className={"fill-text-card-foreground stroke-text-card-foreground"}/>
+                                                                        {moment(selectedIdea?.created_at).format('D MMM')}
+                                                                    </p>
+                                                                </Fragment>
                                                         }
-                                                    </Button>
+
+                                                    </div>
                                                 </div>
+                                                {
+                                                    isLoading ? <Skeleton className={"w-[224px] h-[24px] px-3 py-1"} /> :
+                                                        <Select
+                                                            onValueChange={(value) => onChangeStatus('roadmap_id', value)}
+                                                            value={selectedIdea?.roadmap_id}
+                                                        >
+                                                            <SelectTrigger className="w-[224px] h-[24px] px-3 py-1">
+                                                                <SelectValue/>
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                <SelectGroup>
+                                                                    <SelectItem value={null}>
+                                                                        <div className={"flex items-center gap-2"}>
+                                                                            No status
+                                                                        </div>
+                                                                    </SelectItem>
+                                                                    {
+                                                                        (roadmapStatus || []).map((x, i) => {
+                                                                            return (
+                                                                                <SelectItem key={i} value={x.id}>
+                                                                                    <div
+                                                                                        className={"flex items-center gap-2"}>
+                                                                                        <Circle fill={x.color_code}
+                                                                                                stroke={x.color_code}
+                                                                                                className={` w-[10px] h-[10px]`}/>
+                                                                                        {x.title ? x.title : "No status"}
+                                                                                    </div>
+                                                                                </SelectItem>
+                                                                            )
+                                                                        })
+                                                                    }
+                                                                </SelectGroup>
+                                                            </SelectContent>
+                                                        </Select>
+                                                }
                                             </div>
                                         </div>
+                                        {
+                                            isLoading ?
+                                                <div className={"flex flex-col gap-2"}>
+                                                    <div className="w-full flex flex-col gap-2">
+                                                        <Skeleton className={"w-[100px] h-[20px]"} />
+                                                        <Skeleton className={"w-full h-[80px]"} />
+                                                    </div>
+                                                    <div className={"flex justify-end gap-2 items-center"}>
+                                                        <Skeleton className={"w-[36px] h-[36px]"} />
+                                                        <Skeleton className={"w-[128px] h-[36px]"} />
+                                                    </div>
+                                                </div>
+                                                :
+                                                <div className={"flex flex-col gap-2"}>
+                                                    <div className="w-full flex flex-col gap-2">
+                                                        <Label htmlFor="message" className={"font-normal"}>Add comment</Label>
+                                                        {/*{*/}
+                                                        {/*    privateNote ?*/}
+                                                        {/*        <Card*/}
+                                                        {/*            className={`shadow-none ${theme === "dark" ? "" : "border-amber-300"}`}>*/}
+                                                        {/*            <div*/}
+                                                        {/*                className={`text-xs text-card-foreground font-normal py-1 px-3 ${theme === "dark" ? "" : "bg-orange-100"} rounded-tl-md rounded-tr-md`}>Add*/}
+                                                        {/*                a private note for your team*/}
+                                                        {/*            </div>*/}
+                                                        {/*            <Textarea*/}
+                                                        {/*                className={"rounded-tl-none rounded-tr-none"}*/}
+                                                        {/*                placeholder="Private Start writing..."*/}
+                                                        {/*                id="message"*/}
+                                                        {/*                value={commentText}*/}
+                                                        {/*                onChange={(e) => setCommentText(e.target.value)}*/}
+                                                        {/*            />*/}
+                                                        {/*        </Card>*/}
+                                                        {/*        :*/}
+                                                        <>
+                                                            <Textarea
+                                                                placeholder="Start writing..."
+                                                                id="message"
+                                                                value={commentText}
+                                                                onChange={(e) => setCommentText(e.target.value)}
+                                                            />
+                                                            {
+                                                                commentFiles && commentFiles.length ?
+                                                                    <div className={"flex flex-wrap gap-3 mt-1"}>
+                                                                        {
+                                                                            (commentFiles || []).map((x, i) => {
+                                                                                return (
+                                                                                    <Fragment>
+                                                                                        {
+                                                                                            x && x.name ?
+                                                                                                <div
+                                                                                                    className={"w-[50px] h-[50px] md:w-[100px] md:h-[100px] relative border p-[3px]"}>
+                                                                                                    <img
+                                                                                                        className={"upload-img"}
+                                                                                                        src={x && x.name ? URL.createObjectURL(x) : x}
+                                                                                                        alt=""/>
+                                                                                                    <CircleX
+                                                                                                        size={20}
+                                                                                                        className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
+                                                                                                        onClick={() => onDeleteImageComment(i, false)}
+                                                                                                    />
+                                                                                                </div> : x ?
+                                                                                                <div
+                                                                                                    className={"w-[50px] h-[50px] md:w-[100px] md:h-[100px] relative border p-[3px]"}>
+                                                                                                    <img
+                                                                                                        className={"upload-img"}
+                                                                                                        src={x}
+                                                                                                        alt={x}/>
+                                                                                                    <CircleX
+                                                                                                        size={20}
+                                                                                                        className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
+                                                                                                        onClick={() => onDeleteImageComment(i, false)}
+                                                                                                    />
+                                                                                                </div> : ''
+                                                                                        }
+                                                                                    </Fragment>
+                                                                                )
+                                                                            })
+                                                                        }
+                                                                    </div>
+                                                                    : ""
+                                                            }
+                                                        </>
+                                                        {/*}*/}
+                                                    </div>
+                                                    <div className={"flex justify-between gap-1"}>
+                                                        <div className="flex items-center space-x-2">
+                                                            {/*<Switch id="airplane-mode"*/}
+                                                            {/*        onCheckedChange={handlePrivateNote}/>*/}
+                                                            {/*<Label htmlFor="airplane-mode"*/}
+                                                            {/*       className={"text-sm font-normal"}>Private*/}
+                                                            {/*    note</Label>*/}
+                                                        </div>
+                                                        <div className={"flex gap-2 items-center"}>
+                                                            <div className="p-2 max-w-sm relative w-[36px] h-[36px]">
+
+                                                                <input
+                                                                    id="commentFile"
+                                                                    type="file"
+                                                                    className="hidden"
+                                                                    onChange={handleAddCommentImg}
+                                                                    accept={".jpg,.jpeg"}
+                                                                />
+                                                                <label htmlFor="commentFile"
+                                                                       className="absolute inset-0 flex items-center justify-center bg-white border border-primary rounded cursor-pointer"
+                                                                >
+                                                                    <Paperclip size={16} className={"stroke-primary"}/>
+                                                                </label>
+
+                                                            </div>
+                                                            <Button
+                                                                className={"w-[128px] h-[36px] text-sm font-medium"}
+                                                                onClick={onCreateComment}
+                                                                disabled={commentText.trim() === "" || commentText === ""}
+                                                            >
+                                                                {
+                                                                    isSaveComment ? <Loader2
+                                                                        className="h-4 w-4 animate-spin"/> : "Add Comment"
+                                                                }
+                                                            </Button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                        }
                                     </div>
                                 </div>
                                 <div className={"tabs"}>
                                     <Tabs defaultValue="comment">
                                         <div className={"px-4 lg:px-8"}>
-                                            <TabsList
-                                                className={"bg-transparent border-b-2 border-b-primary rounded-none"}>
+                                            <TabsList className={"bg-transparent border-b-2 border-b-primary rounded-none"}>
                                                 <TabsTrigger className={"ideas-tab-comm-bgCol"} value="comment">Comment</TabsTrigger>
                                             </TabsList>
                                         </div>
 
                                         {
                                             selectedIdea?.comments?.length > 0 &&
-                                            <TabsContent value="comment"
-                                                         className={`${theme === "dark" ? "" : "bg-muted"} pb-5`}>
+                                            <TabsContent value="comment" className={`${theme === "dark" ? "" : "bg-muted"} pb-5`}>
                                                 {
                                                     selectedIdea && selectedIdea?.comments && selectedIdea?.comments.length > 0 ?
                                                         (selectedIdea?.comments || []).map((x, i) => {
                                                             return (
                                                                 <Fragment>
-                                                                    <div
-                                                                        className={"flex gap-2 p-4 lg:p-8 lg:pb-0 pt-3 pb-0"}>
+                                                                    <div className={"flex gap-2 p-4 lg:p-8 lg:pb-0 pt-3 pb-0"}>
                                                                         <div>
-                                                                            <div
-                                                                                className={"update-idea text-sm rounded-full border text-center"}>
-                                                                                <Avatar
-                                                                                    className={"w-[20px] h-[20px]"}>
+                                                                            <div className={"update-idea text-sm rounded-full border text-center"}>
+                                                                                <Avatar className={"w-[20px] h-[20px]"}>
                                                                                     {
                                                                                         x?.user_photo ?
                                                                                             <AvatarImage
@@ -1253,12 +1301,9 @@ const UpdateIdea = () => {
                                                                                 </Avatar>
                                                                             </div>
                                                                         </div>
-                                                                        <div
-                                                                            className={"w-full flex flex-col space-y-3"}>
-                                                                            <div
-                                                                                className={"flex gap-1 flex-wrap justify-between"}>
-                                                                                <div
-                                                                                    className={"flex items-start"}>
+                                                                        <div className={"w-full flex flex-col space-y-3"}>
+                                                                            <div className={"flex gap-1 flex-wrap justify-between"}>
+                                                                                <div className={"flex items-start"}>
                                                                                     <h4 className={"text-sm font-normal"}>{x?.name}</h4>
                                                                                     <p className={"text-sm font-normal flex items-center text-muted-foreground"}>
                                                                                         <Dot size={20}
@@ -1290,120 +1335,115 @@ const UpdateIdea = () => {
                                                                                 </div>
                                                                             </div>
                                                                             <div>
-                                                                                {
-                                                                                    selectedCommentIndex === i && isEditComment ?
-                                                                                        <div
-                                                                                            className={"space-y-2"}>
-                                                                                            <Textarea
-                                                                                                value={selectedComment.comment}
-                                                                                                onChange={(e) => setSelectedComment({
-                                                                                                    ...selectedComment,
-                                                                                                    comment: e.target.value
-                                                                                                })}
-                                                                                            />
-                                                                                            {
-                                                                                                selectedComment && selectedComment?.images && selectedComment?.images?.length ?
-                                                                                                    <div
-                                                                                                        className={"flex gap-3 flex-wrap"}>
+                                                                                <Fragment>
+                                                                                    {
+                                                                                        selectedCommentIndex === i && isEditComment ?
+                                                                                            <div className={"space-y-2"}>
+                                                                                                <Textarea
+                                                                                                    value={selectedComment.comment}
+                                                                                                    onChange={(e) => setSelectedComment({
+                                                                                                        ...selectedComment,
+                                                                                                        comment: e.target.value
+                                                                                                    })}
+                                                                                                />
+                                                                                                {
+                                                                                                    selectedComment && selectedComment?.images && selectedComment?.images?.length ?
+                                                                                                        <div className={"flex gap-3 flex-wrap"}>
+                                                                                                            {
+                                                                                                                (selectedComment?.images || []).map((x, i) => {
+                                                                                                                    return (
+                                                                                                                        <Fragment>
+                                                                                                                            {
+                                                                                                                                x && x.name ?
+                                                                                                                                    <div
+                                                                                                                                        className={"w-[50px] h-[50px] md:w-[100px] md:h-[100px] relative border p-[3px]"}>
+                                                                                                                                        <img
+                                                                                                                                            className={"upload-img"}
+                                                                                                                                            src={x && x.name ? URL.createObjectURL(x) : x}
+                                                                                                                                            alt=""/>
+                                                                                                                                        <CircleX
+                                                                                                                                            size={20}
+                                                                                                                                            className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
+                                                                                                                                            onClick={() => onDeleteCommentImage(i, true)}/>
+                                                                                                                                    </div> : x ?
+                                                                                                                                    <div
+                                                                                                                                        className={"w-[50px] h-[50px] md:w-[100px] md:h-[100px] relative border p-[3px]"}>
+                                                                                                                                        <img
+                                                                                                                                            className={"upload-img"}
+                                                                                                                                            src={x}
+                                                                                                                                            alt={x}/>
+                                                                                                                                        <CircleX
+                                                                                                                                            size={20}
+                                                                                                                                            className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
+                                                                                                                                            onClick={() => onDeleteCommentImage(i, false)}/>
+                                                                                                                                    </div> : ''
+                                                                                                                            }
+                                                                                                                        </Fragment>
+                                                                                                                    )
+                                                                                                                })
+                                                                                                            }
+                                                                                                        </div> : ""
+                                                                                                }
+                                                                                                <div className={"flex gap-2"}>
+                                                                                                    <Button
+                                                                                                        className={`py-2 px-6 w-[81px] h-[30px] text-sm font-medium hover:bg-primary`}
+                                                                                                        onClick={onUpdateComment}
+                                                                                                        disabled={selectedComment.comment.trim() === "" || selectedComment.comment === ""}>
                                                                                                         {
-                                                                                                            (selectedComment?.images || []).map((x, i) => {
-                                                                                                                return (
-                                                                                                                    <Fragment>
-                                                                                                                        {
-                                                                                                                            x && x.name ?
-                                                                                                                                <div
-                                                                                                                                    className={"w-[50px] h-[50px] md:w-[100px] md:h-[100px] relative border p-[3px]"}>
-                                                                                                                                    <img
-                                                                                                                                        className={"upload-img"}
-                                                                                                                                        src={x && x.name ? URL.createObjectURL(x) : x}
-                                                                                                                                        alt=""/>
-                                                                                                                                    <CircleX
-                                                                                                                                        size={20}
-                                                                                                                                        className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
-                                                                                                                                        onClick={() => onDeleteCommentImage(i, true)}/>
-                                                                                                                                </div> : x ?
-                                                                                                                                <div
-                                                                                                                                    className={"w-[50px] h-[50px] md:w-[100px] md:h-[100px] relative border p-[3px]"}>
-                                                                                                                                    <img
-                                                                                                                                        className={"upload-img"}
-                                                                                                                                        src={x}
-                                                                                                                                        alt={x}/>
-                                                                                                                                    <CircleX
-                                                                                                                                        size={20}
-                                                                                                                                        className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
-                                                                                                                                        onClick={() => onDeleteCommentImage(i, false)}/>
-                                                                                                                                </div> : ''
-                                                                                                                        }
-                                                                                                                    </Fragment>
-                                                                                                                )
-                                                                                                            })
+                                                                                                            isSaveUpdateComment ?
+                                                                                                                <Loader2
+                                                                                                                    size={16}
+                                                                                                                    className="animate-spin"/> : "Save"
                                                                                                         }
-                                                                                                    </div> : ""
-                                                                                            }
-                                                                                            <div
-                                                                                                className={"flex gap-2"}>
-                                                                                                <Button
-                                                                                                    className={`py-2 px-6 w-[81px] h-[30px] text-sm font-medium hover:bg-primary`}
-                                                                                                    onClick={onUpdateComment}
-                                                                                                    disabled={selectedComment.comment.trim() === "" || selectedComment.comment === ""}>
-                                                                                                    {
-                                                                                                        isSaveUpdateComment ?
-                                                                                                            <Loader2
+                                                                                                    </Button>
+                                                                                                    <Button
+                                                                                                        className={`px-3 py-2 h-[30px] text-sm font-medium text-primary border border-primary`}
+                                                                                                        variant={"outline hover:none"}
+                                                                                                        onClick={onCancelComment}>
+                                                                                                        Cancel
+                                                                                                    </Button>
+                                                                                                    <div
+                                                                                                        className="p-2 max-w-sm relative w-[36px]">
+                                                                                                        <Input
+                                                                                                            id="selectedCommentImg"
+                                                                                                            type="file"
+                                                                                                            className="hidden"
+                                                                                                            onChange={handleAddCommentImg}
+                                                                                                            accept={".jpg,.jpeg"}
+                                                                                                        />
+                                                                                                        <label
+                                                                                                            htmlFor="selectedCommentImg"
+                                                                                                            className="absolute inset-0 flex items-center justify-center bg-white border border-primary rounded cursor-pointer">
+                                                                                                            <Paperclip
                                                                                                                 size={16}
-                                                                                                                className="animate-spin"/> : "Save"
-                                                                                                    }
-                                                                                                </Button>
-                                                                                                <Button
-                                                                                                    className={`px-3 py-2 h-[30px] text-sm font-medium text-primary border border-primary`}
-                                                                                                    variant={"outline hover:none"}
-                                                                                                    onClick={onCancelComment}>
-                                                                                                    Cancel
-                                                                                                </Button>
-                                                                                                <div
-                                                                                                    className="p-2 max-w-sm relative w-[36px]">
-                                                                                                    <Input
-                                                                                                        id="selectedCommentImg"
-                                                                                                        type="file"
-                                                                                                        className="hidden"
-                                                                                                        onChange={handleAddCommentImg}
-                                                                                                        accept={".jpg,.jpeg"}
-                                                                                                    />
-                                                                                                    <label
-                                                                                                        htmlFor="selectedCommentImg"
-                                                                                                        className="absolute inset-0 flex items-center justify-center bg-white border border-primary rounded cursor-pointer">
-                                                                                                        <Paperclip
-                                                                                                            size={16}
-                                                                                                            className={"stroke-primary"}/>
-                                                                                                    </label>
+                                                                                                                className={"stroke-primary"}/>
+                                                                                                        </label>
+                                                                                                    </div>
                                                                                                 </div>
                                                                                             </div>
-                                                                                        </div>
-                                                                                        : <div
-                                                                                            className={"space-y-2"}>
-                                                                                            <p className={"text-xs"}>
-                                                                                                {x.comment}
-                                                                                            </p>
-                                                                                            <div
-                                                                                                className={"flex gap-2 flex-wrap"}>
-                                                                                                {
-                                                                                                    (Array.isArray(x?.images) ? x.images : []).map((img, ind) => (
-                                                                                                        <div
-                                                                                                            key={ind}
-                                                                                                            className={"w-[50px] h-[50px] md:w-[100px] md:h-[100px] border p-[3px]"}
-                                                                                                            onClick={() => handleImageClick(img)}
-                                                                                                        >
-                                                                                                            <img
-                                                                                                                className={"upload-img cursor-pointer"}
-                                                                                                                src={img}
-                                                                                                                alt={img}
-                                                                                                            />
-                                                                                                        </div>
-                                                                                                    ))
-                                                                                                }
+                                                                                            : <div className={"space-y-2"}>
+                                                                                                <p className={"text-xs"}>{x.comment}</p>
+                                                                                                <div className={"flex gap-2 flex-wrap"}>
+                                                                                                    {
+                                                                                                        (Array.isArray(x?.images) ? x.images : []).map((img, ind) => (
+                                                                                                            <div
+                                                                                                                key={ind}
+                                                                                                                className={"w-[50px] h-[50px] md:w-[100px] md:h-[100px] border p-[3px]"}
+                                                                                                                onClick={() => handleImageClick(img)}
+                                                                                                            >
+                                                                                                                <img
+                                                                                                                    className={"upload-img cursor-pointer"}
+                                                                                                                    src={img}
+                                                                                                                    alt={img}
+                                                                                                                />
+                                                                                                            </div>
+                                                                                                        ))
+                                                                                                    }
 
+                                                                                                </div>
                                                                                             </div>
-                                                                                        </div>
-                                                                                }
+                                                                                    }
+                                                                                </Fragment>
                                                                             </div>
 
                                                                             {

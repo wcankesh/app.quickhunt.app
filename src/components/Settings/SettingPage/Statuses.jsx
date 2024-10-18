@@ -56,7 +56,7 @@ const Statuses = () => {
 
     const onChangeColorColor = (newColor, index) => {
         const updatedColors = [...statusList];
-        updatedColors[index] = { ...updatedColors[index], color_code: newColor.color_code };
+        updatedColors[index] = { ...updatedColors[index], color_code: newColor.clr };
         setStatusList(updatedColors);
     };
 
@@ -382,7 +382,17 @@ const Statuses = () => {
                             {
                                 statusList.length > 0 ? <>
                                 {(statusList || []).map((x, i) => (
-                                    <TableRow id={i} key={i} position={i} data-position={i} draggable={"true"} onDragStart={onDragStart} onDragOver={onDragOver} onDrop={onDrop} onDragLeave={onDragLeave}>
+                                    <TableRow
+                                        id={i}
+                                        key={i}
+                                        position={i}
+                                        data-position={i}
+                                        draggable={isEdit ? "false" : "true"}
+                                        onDragStart={onDragStart}
+                                        onDragOver={onDragOver}
+                                        onDrop={onDrop}
+                                        onDragLeave={onDragLeave}
+                                    >
                                         <TableCell><Menu className={"cursor-grab"} size={16}/></TableCell>
                                         {
                                             isEdit === i ?
@@ -407,7 +417,7 @@ const Statuses = () => {
                                                     <TableCell
                                                         className={`font-normal text-xs ${theme === "dark" ? "" : "text-muted-foreground"}`}>
                                                         <div className={"flex justify-center items-center"}>
-                                                            <ColorInput name={"color_code"} value={x.color_code} onChange={(color) => onChangeColorColor(color, i)}/>
+                                                            <ColorInput name={"clr"} value={x.color_code} onChange={(color) => onChangeColorColor(color, i)}/>
                                                         </div>
                                                     </TableCell>
                                                     <TableCell className={`pr-4 ${theme === "dark" ? "" : "text-muted-foreground"}`}>

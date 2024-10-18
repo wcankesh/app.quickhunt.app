@@ -1,6 +1,6 @@
 import React, {useState, useEffect, Fragment} from 'react';
 import {Button} from "../ui/button";
-import {BookCheck, Calendar, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Circle, ClipboardList, Ellipsis, Filter, Loader2, Plus, ScrollText, SquareMousePointer, User, Users, X} from "lucide-react";
+import {BarChart, BookCheck, Calendar, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Circle, ClipboardList, Ellipsis, Filter, Loader2, Plus, ScrollText, SquareMousePointer, User, Users, X} from "lucide-react";
 import {Input} from "../ui/input";
 import {Popover, PopoverContent, PopoverTrigger} from "../ui/popover";
 import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList} from "../ui/command";
@@ -166,7 +166,6 @@ const InAppMessage = () => {
     }
 
     const totalPages = Math.ceil(totalRecord / perPageLimit);
-    console.log(totalRecord)
 
     const handlePaginationClick = async (newPage) => {
         if (newPage >= 1 && newPage <= totalPages) {
@@ -353,7 +352,7 @@ const InAppMessage = () => {
                                 <TableHeader className={`${theme === "dark" ? "" : "bg-muted"}`}>
                                     <TableRow>
                                         {
-                                            ["Title","State","Sender","Content type","Created at","Action"].map((x,i)=>{
+                                            ["Title","State","Sender","Content type","Created at","Action",""].map((x,i)=>{
                                                 return(
                                                     <TableHead  className={`px-2 py-[10px] md:px-3 font-medium text-card-foreground ${i >= 5 ? 'text-center' : ''}`} key={i}>{x}</TableHead>
                                                 )
@@ -368,7 +367,7 @@ const InAppMessage = () => {
                                                     return(
                                                         <TableRow key={index}>
                                                             {
-                                                                [...Array(6)].map((_, i) => {
+                                                                [...Array(7)].map((_, i) => {
                                                                     return (
                                                                         <TableCell key={i} className={"max-w-[373px] px-2 py-[10px] md:px-3"}>
                                                                             <Skeleton className={"rounded-md w-full h-7"}/>
@@ -388,10 +387,9 @@ const InAppMessage = () => {
                                                             const sender = allStatusAndTypes?.members.find((y)=> y.user_id == x.from);
                                                             return(
                                                                 <TableRow key={x.id}>
-                                                                    <TableCell className={"px-2 py-[10px] md:px-3 font-normal cursor-pointer"} onClick={()=>handleCreateNew(x.id, x.type)}>{x.title}</TableCell>
+                                                                    <TableCell className={"px-2 py-[10px] md:px-3 font-normal max-w-[270px] cursor-pointer truncate text-ellipsis overflow-hidden whitespace-nowrap"} onClick={()=>handleCreateNew(x.id, x.type)}>{x.title}</TableCell>
                                                                     <TableCell className={"px-2 py-[10px] md:px-3"}>
-                                                                        <Select value={x.status}
-                                                                                onValueChange={(value) => handleStatusChange(x, value)}>
+                                                                        <Select value={x.status} onValueChange={(value) => handleStatusChange(x, value)}>
                                                                             <SelectTrigger className="w-[135px] h-7">
                                                                                 <SelectValue placeholder="Publish"/>
                                                                             </SelectTrigger>
@@ -451,6 +449,12 @@ const InAppMessage = () => {
                                                                             </DropdownMenuContent>
                                                                         </DropdownMenu>
                                                                     </TableCell>
+                                                                    <TableCell
+                                                                        className={`px-2 py-[10px] md:px-3 text-center cursor-pointer`}
+                                                                        onClick={() => navigate(`${baseUrl}/in-app-message/${x.type}/analytic/${x.id}`)}
+                                                                    >
+                                                                        <BarChart size={18}/>
+                                                                    </TableCell>
                                                                 </TableRow>
                                                             )
                                                         })
@@ -458,7 +462,7 @@ const InAppMessage = () => {
                                                 </Fragment>
                                                 :
                                                 <TableRow>
-                                                    <TableCell colSpan={6}>
+                                                    <TableCell colSpan={7}>
                                                         <EmptyData/>
                                                     </TableCell>
                                                 </TableRow>

@@ -288,6 +288,7 @@ const Labels = () => {
                 </Button>
             </CardHeader>
             <CardContent className="p-0">
+                {/*<div className={"grid grid-cols-1 overflow-auto sm:overflow-visible whitespace-nowrap"}>*/}
                 <div className={"grid grid-cols-1 overflow-auto sm:overflow-visible whitespace-nowrap"}>
                     <Table>
                     <TableHeader className="p-0">

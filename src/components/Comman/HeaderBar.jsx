@@ -1,7 +1,7 @@
 import React, {Fragment, useEffect, useState} from 'react';
 import {Sheet, SheetContent, SheetHeader, SheetOverlay, SheetTitle, SheetTrigger} from "../ui/sheet";
 import {Button} from "../ui/button";
-import {Bell, ChevronsUpDown, Eye, Loader2, Menu, Moon, Plus, Sun, Trash2, X} from "lucide-react";
+import {Activity, Bell, ChevronsUpDown, CircleHelp, DatabaseBackup, Eye, FileSliders, House, LayoutTemplate, Lightbulb, Loader2, Megaphone, Menu, Moon, NotebookPen, Plus, Settings, Sun, Tag, Trash2, Users, UsersRound, X} from "lucide-react";
 import {Input} from "../ui/input";
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger} from "../ui/dropdown-menu";
 import {useTheme} from "../theme-provider";
@@ -185,10 +185,6 @@ const HeaderBar = () => {
         setTheme(theme === 'light' ? 'dark' : 'light');
     };
 
-    const isActive = (link, subLink ="", subLink2 = "") => {
-        return  window.location.pathname === subLink2 || window.location.pathname === subLink || window.location.pathname === link ;
-    };
-
     const onChangeText = (event) => {
         const { name, value } = event.target;
         if(name === "project_name" || name === 'domain'){
@@ -327,14 +323,21 @@ const HeaderBar = () => {
         }
     }
 
+    const isActive = (link, subLink ="", subLink2 = "") => {
+        return  window.location.pathname === subLink2 || window.location.pathname === subLink || window.location.pathname === link ;
+    };
+
+    const isHelpCenterActive = isActive(`${baseUrl}/help/article`, `${baseUrl}/help/category`) ||
+        isActive(`${baseUrl}/help/article/${id}`, `${baseUrl}/help/category/${id}`);
+
     const menuComponent = [
         {
             dashBtn: [
                 {
                     title: 'Dashboard',
                     link: '/dashboard',
-                    icon: Icon.homeIcon,
-                    selected: isActive(`${baseUrl}/dashboard`),
+                    icon: <House size={15} />,
+                    selected: isActive(`${baseUrl}/dashboard`, `${baseUrl}/dashboard/comments`, `${baseUrl}/dashboard/reactions`,),
                 }
             ]
         },
@@ -344,38 +347,57 @@ const HeaderBar = () => {
                 {
                     title: 'Ideas',
                     link: '/ideas',
-                    icon: Icon.ideasIcon,
-                    selected: isActive(`${baseUrl}/ideas`),
+                    icon: <Lightbulb size={15} />,
+                    selected: isActive(`${baseUrl}/ideas`, `${baseUrl}/ideas/${id}`),
                 },
                 {
                     title: 'Roadmap',
                     link: '/roadmap',
-                    icon: Icon.roadmapIcon,
+                    icon: <Activity size={15} />,
                     selected: isActive(`${baseUrl}/roadmap`),
                 },
                 {
                     title: 'Announcements',
                     link: '/announcements',
-                    icon: Icon.announcement,
-                    selected: isActive(`${baseUrl}/announcements`),
+                    icon: <Megaphone size={15} />,
+                    selected: isActive(`${baseUrl}/announcements`, `${baseUrl}/announcements/${id}`, `${baseUrl}/announcements/analytic-view`),
                 },
                 {
                     title: 'Customers',
                     link: '/customers',
-                    icon: Icon.userIcon,
+                    icon: <Users size={15} />,
                     selected: isActive(`${baseUrl}/customers`),
                 },
                 {
                     title: 'In App Message',
                     link: '/in-app-message',
-                    icon: Icon.inAppMessage,
+                    icon: <NotebookPen size={15} />,
                     selected: isActive(`${baseUrl}/in-app-message`, `${baseUrl}/in-app-message/type`, `${baseUrl}/in-app-message/${type}/${id}`),
                 },
                 {
                     title: 'Widget',
                     link: '/widget',
-                    icon: Icon.widgetsIcon,
+                    icon: <LayoutTemplate size={15} />,
                     selected: isActive(`${baseUrl}/widget`, `${baseUrl}/widget/type`, `${baseUrl}/widget/${type}/${id}`),
+                },
+                {
+                    title: 'Help Center',
+                    link: '/help/article',
+                    icon: <FileSliders size={15} />,
+                    // selected: isActive(`${baseUrl}/help-center/articles`,`${baseUrl}/help-center/category`) || isActive(`${baseUrl}/help-center/articles/${id}`,`${baseUrl}/help-center/category/${id}`),
+                    selected: isHelpCenterActive,
+                    subItems: [
+                        {
+                            title: 'Articles',
+                            link: `/help/article`,
+                            selected: isActive(`${baseUrl}/help/article`, `${baseUrl}/help/article/${id}`),
+                        },
+                        {
+                            title: 'Category',
+                            link: `/help/category`,
+                            selected: isActive(`${baseUrl}/help/category`, `${baseUrl}/help/category/${id}`),
+                        }
+                    ]
                 },
             ]
         },
@@ -386,55 +408,56 @@ const HeaderBar = () => {
         //     title: 'Import / Export',
         //     link: '/import-export',
         //     icon: Icon.importExport,
-        //     selected: isActive(`${baseUrl}/import-export` , `${baseUrl}/import`),
+        //     selected: isActive(`${baseUrl}/import-export`, `${baseUrl}/import`),
         //     isDisplay: true,
         // },
         {
             title: `${userDetailsReducer.trial_days} days trial left`,
             link: '/pricing-plan',
-            icon: Icon.trialPlanIcon,
+            icon: <DatabaseBackup size={15} />,
             selected: false,
             isDisplay: userDetailsReducer?.trial_days > 0 && userDetailsReducer.plan === 1,
         },
         {
             title: 'What’s New',
             link: '/notification',
-            icon: Icon.notificationIcon,
+            icon: <Bell size={15} />,
             selected: isActive(`${baseUrl}/notification`),
             isDisplay: true,
         },
         {
             title: 'Invite Team',
             link: '/settings/team',
-            icon: Icon.userIcon,
+            icon: <UsersRound size={15} />,
             selected: isActive(`${baseUrl}/settings/team`),
             isDisplay: true,
         },
         {
             title: 'Help & Support',
             link: '/help-support',
-            icon: Icon.helpSupportIcon,
+            icon: <CircleHelp size={15} />,
             selected: isActive(`${baseUrl}/help-support`),
             isDisplay: true,
         },
         {
             title: "Pricing & Plan",
             link: '/pricing-plan',
-            icon: Icon.pricingIcon,
+            icon: <Tag size={15} className={"rotate-90"} />,
             selected: isActive(`${baseUrl}/pricing-plan`),
             isDisplay: true,
         },
         {
             title: 'Settings',
             link: '/settings/profile',
-            icon: Icon.settingIcon,
-            selected: window.location.pathname === `${baseUrl}/settings/team` ? false :isActive(`${baseUrl}/settings/profile`, `${baseUrl}/settings/${type}`),
+            icon: <Settings size={15} />,
+            selected: window.location.pathname === `${baseUrl}/settings/team` ? false : isActive(`${baseUrl}/settings/profile`, `${baseUrl}/settings/${type}`),
             isDisplay: true,
         }
     ];
 
     return (
-        <header className={`z-50 ltr:xl:ml-[282px] rtl:xl:mr-[282px] sticky top-0 pr-3 lg:pr-4 ${scrollingDown ? 'bg-background' : ''}`}>
+        // <header className={`z-50 ltr:xl:ml-[282px] rtl:xl:mr-[282px] sticky top-0 pr-3 lg:pr-4 ${scrollingDown ? 'bg-background' : ''}`}>
+        <header className={`z-50 ltr:xl:ml-[250px] rtl:xl:mr-[250px] sticky top-0 bg-primary ${scrollingDown ? 'bg-background' : ''}`}>
 
             {
                 isOpenDeleteAlert &&
@@ -465,8 +488,9 @@ const HeaderBar = () => {
                 </Fragment>
             }
 
-            <div className={"w-full p-3 pr-0 lg:py-3"}>
-                <div className={"flex justify-between items-center h-full gap-2"}>
+            {/*<div className={"w-full p-3 pr-0 lg:py-3"}>*/}
+            <div className={"w-full flex justify-between xl:justify-end items-center h-[56px] px-3"}>
+                <div className={"flex justify-between items-center w-full h-full gap-2"}>
                     <div className={"flex gap-3 items-center"}>
 
                         {/*Mobile said bar start */}
@@ -477,30 +501,31 @@ const HeaderBar = () => {
                                     </Button>
                                 </SheetTrigger>
                                 <SheetOverlay className={"inset-0"} />
-                                <SheetContent side="left" className="flex flex-col w-[280px] md:w-[340px] p-0">
-                                    <SheetHeader className={"flex flex-row justify-between items-center p-3 pb-0 md:p-6 md:pb-0"}>
-                                        <div className={"app-logo cursor-pointer"}  onClick={() => onRedirect("/dashboard")}>
+                                <SheetContent side="left" className="flex gap-0 flex-col w-[280px] md:w-[340px] p-0">
+                                    <SheetHeader className={"flex gap-2 flex-row justify-between items-center p-3 py-2.5"}>
+                                        <div className={"flex w-full items-center h-[56px] cursor-pointer"}  onClick={() => onRedirect("/dashboard")}>
                                             {theme === "dark" ? Icon.whiteLogo : Icon.blackLogo}
                                         </div>
                                         <X size={18} className={"fill-card-foreground stroke-card-foreground m-0"} onClick={closeMobileSheet}/>
                                     </SheetHeader>
-                                    <div className={"sidebar-mobile-menu flex flex-col gap-3 overflow-y-auto p-3 pt-0 md:p-6 md:pt-0"}>
-                                        <nav className="grid items-start gap-3">
+                                    {/*<div className={"h-[calc(100vh_-_64px)] flex flex-col gap-3 overflow-y-auto p-3 pt-0 md:p-6 md:pt-0"}>*/}
+                                    <div className={" px-3 flex flex-col overflow-y-auto h-full bg-primary/5"}>
+                                        <nav className="grid items-start">
                                             {
                                                 (menuComponent || []).map((x, i) => {
                                                     return (
-                                                        <div key={i} className={`flex flex-col ${x.dashBtn ? "" : "gap-1"}`}>
+                                                        <div key={i} className={`flex flex-col py-4 ${x.dashBtn ? "" : "gap-1"}`}>
                                                             {
                                                                 (x.dashBtn || []).map((z, i) => {
                                                                     return (
                                                                         <Button
                                                                             key={i}
                                                                             variant={"link hover:no-underline"}
-                                                                            className={`${z.selected ? "rounded-md bg-primary/15 transition-none" : 'items-center transition-none'} flex justify-start gap-4 h-9`}
+                                                                            className={`flex justify-start gap-2 py-0 px-2 pr-1 h-[28px] ${z.selected ? "rounded-md bg-primary/15 transition-none" : 'items-center hover:bg-primary/10 hover:text-primary transition-none'}`}
                                                                             onClick={() => onRedirect(z.link)}
                                                                         >
-                                                                            <div className={`${z.selected ? "active-menu" : "menu-icon"}`}>{z.icon}</div>
-                                                                            <div className={`${z.selected ? "text-primary" : ""}`}>{z.title}</div>
+                                                                            <div className={`${z.selected ? "active-menu" : ""}`}>{z.icon}</div>
+                                                                            <div className={`font-normal text-left flex-1 text-sm ${z.selected ? "text-primary" : ""}`}>{z.title}</div>
                                                                         </Button>
                                                                     )
                                                                 })
@@ -508,7 +533,7 @@ const HeaderBar = () => {
                                                             {
                                                                 x.dashBtn ? "" :
                                                                     <Fragment>
-                                                                        <h3 className={"text-sm font-bold py-2 px-4"}>{x.mainTitle}</h3>
+                                                                        <h3 className={"text-sm font-bold px-2 pr-1"}>{x.mainTitle}</h3>
                                                                         <div className={"flex flex-col gap-1"}>
                                                                             {
                                                                                 (x.items || []).map((y, i) => {
@@ -516,11 +541,11 @@ const HeaderBar = () => {
                                                                                         <Button
                                                                                             key={i}
                                                                                             variant={"link hover:no-underline"}
-                                                                                            className={`flex justify-start gap-4 h-9 ${y.selected ? "rounded-md bg-primary/15 transition-none" : 'items-center transition-none'} ${y.title === 'Announcements' ? 'gap-[10px]' : ''}`}
+                                                                                            className={`flex justify-start gap-2 py-0 px-2 pr-1 h-[28px] ${y.selected ? "rounded-md bg-primary/15 transition-none" : 'items-center transition-none hover:bg-primary/10 hover:text-primary'} ${y.title === 'Announcements' ? 'gap-[10px]' : ''}`}
                                                                                             onClick={() => onRedirect(y.link)}
                                                                                         >
-                                                                                            <div className={`${y.selected ? "active-menu" : "menu-icon"}`}>{y.icon}</div>
-                                                                                            <div className={`${y.selected ? "text-primary" : ""}`}>{y.title}</div>
+                                                                                            <div className={`${y.selected ? "active-menu" : ""}`}>{y.icon}</div>
+                                                                                            <div className={`font-normal text-left flex-1 text-sm ${y.selected ? "text-primary" : ""}`}>{y.title}</div>
                                                                                         </Button>
                                                                                     )
                                                                                 })
@@ -533,7 +558,7 @@ const HeaderBar = () => {
                                                 })
                                             }
                                         </nav>
-                                        <div className="mt-auto ">
+                                        <div className="mt-auto pb-4">
                                             <nav className="grid gap-1">
                                                 {
                                                     (footerMenuComponent || []).map((x, i) => {
@@ -542,11 +567,11 @@ const HeaderBar = () => {
                                                                 <Button
                                                                     key={i}
                                                                     variant={"link hover:no-underline"}
-                                                                    className={`flex justify-start gap-4 h-9 ${x.selected  ? "rounded-md bg-primary/15 transition-none" : 'items-center transition-none'}`}
+                                                                    className={`flex justify-start gap-2 py-0 px-2 pr-1 h-[28px] ${x.selected  ? "rounded-md bg-primary/15 transition-none" : 'items-center hover:bg-primary/10 hover:text-primary transition-none'}`}
                                                                     onClick={() => onRedirect(x.link)}
                                                                 >
-                                                                    <div className={`${x.selected ? "active-menu" : "menu-icon"}`}>{x.icon}</div>
-                                                                    <div className={`${x.selected ? "text-primary" : ""}`}>{x.title}</div>
+                                                                    <div className={`${x.selected ? "active-menu" : ""}`}>{x.icon}</div>
+                                                                    <div className={`font-normal text-left flex-1 text-sm ${x.selected ? "text-primary" : ""}`}>{x.title}</div>
                                                                 </Button> : ''
                                                         )
                                                     })
@@ -559,8 +584,9 @@ const HeaderBar = () => {
                         {/*Mobile said bar End */}
 
                         <div className="flex h-11 items-center xl:hidden md:block hidden">
-                            <div className={"app-logo cursor-pointer"}  onClick={() => onRedirect("/dashboard")}>
-                                {theme === "dark" ? Icon.whiteLogo : Icon.blackLogo}
+                            <div className={"app-logo cursor-pointer h-[45px]"}  onClick={() => onRedirect("/dashboard")}>
+                                {/*{theme === "dark" ? Icon.whiteLogo : Icon.blackLogo}*/}
+                                {Icon.whiteLogo}
                             </div>
                         </div>
                     </div>
@@ -616,14 +642,13 @@ const HeaderBar = () => {
                         </div>
                         <div className={"flex gap-2 md:gap-4 items-center"}>
                             <Button variant="ghost hover:none" size="icon" className={"h-8 w-8"} onClick={viewLink}>
-                                <Eye size={20} />
+                                <Eye size={20} className={theme === 'light' ? 'stroke-white' : ''} />
                             </Button>
                             <Button variant="ghost hover:none" size="icon" className={"h-8 w-8"}>
-                                <Bell size={20} />
+                                <Bell size={20} className={theme === 'light' ? 'stroke-white' : ''} />
                             </Button>
-                            <Button variant="ghost hover:none" size="icon" className="h-8 w-8" onClick={toggleTheme}>
-                                {theme === 'light' ? <Moon size={20} className="fill-black stroke-black"/> :
-                                    <Sun size={20} className="fill-black "/>}
+                            <Button variant="ghost hover:none" size="icon" className={"h-8 w-8"} onClick={toggleTheme}>
+                                {theme === 'light' ? <Moon size={20} className="stroke-white"/> : <Sun size={20} />}
                             </Button>
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
@@ -686,7 +711,7 @@ const HeaderBar = () => {
                                     </SheetTitle>
                                     <X className={"cursor-pointer m-0"} onClick={closeSheet}/>
                                 </SheetHeader>
-                                <div className="overflow-auto comm-sheet-height">
+                                <div className="overflow-auto h-[calc(100vh_-_69px)]">
                                 <div className="space-y-6 px-4 py-3 md:py-5 lg:px-8 lg:py-[20px]">
                                     <div className="space-y-1">
                                         <Label htmlFor="name" className="text-right font-normal">Project Name</Label>

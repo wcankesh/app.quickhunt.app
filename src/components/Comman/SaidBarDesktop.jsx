@@ -6,6 +6,17 @@ import {useNavigate, useLocation, useParams} from "react-router-dom";
 import {useTheme} from "../theme-provider";
 import {useSelector} from "react-redux";
 import Articles from "../HelpCenter/Articles/Articles";
+import {
+    Activity, Bell, CircleHelp, DatabaseBackup,
+    FileSliders,
+    Grid2x2,
+    House, LayoutTemplate,
+    Lightbulb,
+    Megaphone,
+    NotebookPen, Settings, Tag,
+    Users,
+    UsersRound
+} from "lucide-react";
 
 const SaidBarDesktop = () => {
     const {theme} = useTheme()
@@ -18,8 +29,8 @@ const SaidBarDesktop = () => {
         navigate(`${baseUrl}${link}`);
     };
 
-    const isActive = (link, subLink = "", subLink2 = "") => {
-        return window.location.pathname === subLink2 || window.location.pathname === subLink || window.location.pathname === link;
+    const isActive = (link, subLink = "", subLink2 = "", subLink3 = "") => {
+        return window.location.pathname === subLink3 || window.location.pathname === subLink2 || window.location.pathname === subLink || window.location.pathname === link;
     };
 
     const isHelpCenterActive = isActive(`${baseUrl}/help/article`, `${baseUrl}/help/category`) ||
@@ -33,7 +44,7 @@ const SaidBarDesktop = () => {
                 {
                     title: 'Dashboard',
                     link: '/dashboard',
-                    icon: Icon.homeIcon,
+                    icon: <House size={15} />,
                     selected: isActive(`${baseUrl}/dashboard`, `${baseUrl}/dashboard/comments`, `${baseUrl}/dashboard/reactions`,),
                 }
             ]
@@ -44,43 +55,44 @@ const SaidBarDesktop = () => {
                 {
                     title: 'Ideas',
                     link: '/ideas',
-                    icon: Icon.ideasIcon,
+                    // icon: Icon.ideasIcon,
+                    icon: <Lightbulb size={15} />,
                     selected: isActive(`${baseUrl}/ideas`, `${baseUrl}/ideas/${id}`),
                 },
                 {
                     title: 'Roadmap',
                     link: '/roadmap',
-                    icon: Icon.roadmapIcon,
+                    icon: <Activity size={15} />,
                     selected: isActive(`${baseUrl}/roadmap`),
                 },
                 {
                     title: 'Announcements',
                     link: '/announcements',
-                    icon: Icon.announcement,
+                    icon: <Megaphone size={15} />,
                     selected: isActive(`${baseUrl}/announcements`, `${baseUrl}/announcements/${id}`, `${baseUrl}/announcements/analytic-view`),
                 },
                 {
                     title: 'Customers',
                     link: '/customers',
-                    icon: Icon.userIcon,
+                    icon: <Users size={15} />,
                     selected: isActive(`${baseUrl}/customers`),
                 },
                 {
                     title: 'In App Message',
                     link: '/in-app-message',
-                    icon: Icon.inAppMessage,
-                    selected: isActive(`${baseUrl}/in-app-message`, `${baseUrl}/in-app-message/type`, `${baseUrl}/in-app-message/${type}/${id}`),
+                    icon: <NotebookPen size={15} />,
+                    selected: isActive(`${baseUrl}/in-app-message`, `${baseUrl}/in-app-message/type`, `${baseUrl}/in-app-message/${type}/${id}`, `${baseUrl}/in-app-message/${type}/analytic/${id}`),
                 },
                 {
                     title: 'Widget',
                     link: '/widget',
-                    icon: Icon.widgetsIcon,
+                    icon: <LayoutTemplate size={15} />,
                     selected: isActive(`${baseUrl}/widget`, `${baseUrl}/widget/type`, `${baseUrl}/widget/${type}/${id}`),
                 },
                 {
                     title: 'Help Center',
                     link: '/help/article',
-                    icon: Icon.helpCenter,
+                    icon: <FileSliders size={15} />,
                     // selected: isActive(`${baseUrl}/help-center/articles`,`${baseUrl}/help-center/category`) || isActive(`${baseUrl}/help-center/articles/${id}`,`${baseUrl}/help-center/category/${id}`),
                     selected: isHelpCenterActive,
                     subItems: [
@@ -111,42 +123,42 @@ const SaidBarDesktop = () => {
         {
             title: `${userDetailsReducer.trial_days} days trial left`,
             link: '/pricing-plan',
-            icon: Icon.trialPlanIcon,
+            icon: <DatabaseBackup size={15} />,
             selected: false,
             isDisplay: userDetailsReducer?.trial_days > 0 && userDetailsReducer.plan === 1,
         },
         {
             title: 'What’s New',
             link: '/notification',
-            icon: Icon.notificationIcon,
+            icon: <Bell size={15} />,
             selected: isActive(`${baseUrl}/notification`),
             isDisplay: true,
         },
         {
             title: 'Invite Team',
             link: '/settings/team',
-            icon: Icon.userIcon,
+            icon: <UsersRound size={15} />,
             selected: isActive(`${baseUrl}/settings/team`),
             isDisplay: true,
         },
         {
             title: 'Help & Support',
             link: '/help-support',
-            icon: Icon.helpSupportIcon,
+            icon: <CircleHelp size={15} />,
             selected: isActive(`${baseUrl}/help-support`),
             isDisplay: true,
         },
         {
             title: "Pricing & Plan",
             link: '/pricing-plan',
-            icon: Icon.pricingIcon,
+            icon: <Tag size={15} className={"rotate-90"} />,
             selected: isActive(`${baseUrl}/pricing-plan`),
             isDisplay: true,
         },
         {
             title: 'Settings',
             link: '/settings/profile',
-            icon: Icon.settingIcon,
+            icon: <Settings size={15} />,
             selected: window.location.pathname === `${baseUrl}/settings/team` ? false : isActive(`${baseUrl}/settings/profile`, `${baseUrl}/settings/${type}`),
             isDisplay: true,
         }
@@ -172,36 +184,39 @@ const SaidBarDesktop = () => {
     };
 
     return (
-        <div
-            className={`main-sidebar pointer-events-none fixed start-0 top-0 z-[60] flex h-full xl:z-10 hidden md:block ${location.pathname.includes("widget/") ? "overflow-hidden" : "overflow-auto"}`}>
-            <div
-                className="pointer-events-auto relative z-30 flex h-full w-[282px] flex-col ltr:-translate-x-full rtl:translate-x-full ltr:xl:translate-x-0 rtl:xl:translate-x-0">
-                <div className={"flex gap-3 items-center px-4"}>
-                    <div className="flex h-14 items-center lg:h-[60px]">
+        // <div className={`main-sidebar pointer-events-none fixed start-0 top-0 z-[60] flex h-full xl:z-10 hidden md:block ${location.pathname.includes("widget/") ? "overflow-hidden" : "overflow-auto"}`}>
+        <div className={`main-sidebar pointer-events-none fixed start-0 top-0 z-[60] h-full xl:z-10 hidden md:block ${location.pathname.includes("widget/") ? "overflow-hidden" : "overflow-auto"}`}>
+            {/*<div className="pointer-events-auto relative z-30 flex h-full w-[282px] flex-col ltr:-translate-x-full rtl:translate-x-full ltr:xl:translate-x-0 rtl:xl:translate-x-0">*/}
+            <div className="pointer-events-auto relative z-30 flex h-full w-[250px] flex-col ltr:-translate-x-full rtl:translate-x-full ltr:xl:translate-x-0 rtl:xl:translate-x-0">
+                <div className={"flex gap-3 items-center px-4 bg-primary"}>
+                    {/*<div className="flex h-14 items-center lg:h-[60px]">*/}
+                    <div className="flex w-full items-center h-[56px]">
                         <div className={"app-logo cursor-pointer"} onClick={() => onRedirect("/dashboard")}>
-                            {theme === "dark" ? Icon.whiteLogo : Icon.blackLogo}
+                            {/*{theme === "dark" ? Icon.blackLogo : Icon.whiteLogo}*/}
+                            {Icon.whiteLogo}
                         </div>
                     </div>
                 </div>
-                <div className={"sidebar-dek-menu flex flex-col gap-3 overflow-y-auto"}>
-                    <nav className="grid items-start px-4 gap-3 pt-[10px]">
+                {/*<div className={"sidebar-dek-menu flex flex-col gap-3 overflow-y-auto"}>*/}
+                <div className={`h-[calc(100vh_-_56px)] px-3 flex flex-col overflow-y-auto h-full bg-primary/5 ${theme === "dark" ? "border border-r" : ""}`}>
+                    {/*<nav className="grid items-start px-4 gap-3 pt-[10px]">*/}
+                    <nav className="grid items-start">
                         {
                             (menuComponent || []).map((x, i) => {
                                 return (
-                                    <div key={i} className={`flex flex-col ${x.dashBtn ? "" : "gap-1"}`}>
+                                    // <div key={i} className={`flex flex-col ${x.dashBtn ? "" : "gap-1"}`}>
+                                    <div key={i} className={`flex flex-col py-4 ${x.dashBtn ? "" : "gap-1"}`}>
                                         {
                                             (x.dashBtn || []).map((z, i) => {
                                                 return (
                                                     <Button
                                                         key={i}
                                                         variant={"link hover:no-underline"}
-                                                        className={`flex justify-start gap-4 h-9 ${z.selected ? "rounded-md bg-primary/15 transition-none" : 'items-center transition-none'}`}
+                                                        className={`flex justify-start gap-2 py-0 px-2 pr-1 h-[28px] ${z.selected ? "rounded-md bg-primary/15 transition-none" : 'items-center hover:bg-primary/10 hover:text-primary transition-none'}`}
                                                         onClick={() => onRedirect(z.link)}
                                                     >
-                                                        <div
-                                                            className={`${z.selected ? "active-menu" : "menu-icon"}`}>{z.icon}</div>
-                                                        <div
-                                                            className={`${z.selected ? "text-primary" : ""}`}>{z.title}</div>
+                                                        <div className={`${z.selected ? "active-menu" : ""}`}>{z.icon}</div>
+                                                        <div className={`font-normal text-left flex-1 text-sm ${z.selected ? "text-primary" : ""}`}>{z.title}</div>
                                                     </Button>
                                                 )
                                             })
@@ -209,7 +224,7 @@ const SaidBarDesktop = () => {
                                         {
                                             x.dashBtn ? "" :
                                                 <Fragment>
-                                                    <h3 className={"text-sm font-medium py-2 px-4"}>{x.mainTitle}</h3>
+                                                    <h3 className={"text-sm font-medium px-2 pr-1"}>{x.mainTitle}</h3>
                                                     <div className={"flex flex-col gap-1"}>
                                                         {
                                                             (x.items || []).map((y, i) => {
@@ -227,13 +242,12 @@ const SaidBarDesktop = () => {
                                                                         <Button
                                                                             key={i}
                                                                             variant={"link hover:no-underline"}
-                                                                            className={`flex justify-start gap-4 h-9 ${y.selected ? "rounded-md bg-primary/15 transition-none" : 'items-center transition-none'} ${y.title === 'Announcements' ? 'gap-[10px]' : ''}`}
+                                                                            className={`flex justify-start gap-2 py-0 px-2 pr-1 h-[28px] ${y.selected ? "rounded-md bg-primary/15 transition-none" : 'items-center transition-none hover:bg-primary/10 hover:text-primary'} ${y.title === 'Announcements' ? 'gap-[10px]' : ''}`}
                                                                             onClick={() => onRedirect(y.link)}
                                                                         >
+                                                                            <div className={`${y.selected ? "active-menu" : ""}`}>{y.icon}</div>
                                                                             <div
-                                                                                className={`${y.selected ? "active-menu" : "menu-icon"}`}>{y.icon}</div>
-                                                                            <div
-                                                                                className={`${y.selected ? "text-primary" : ""}`}>{y.title}</div>
+                                                                                className={`font-normal text-left flex-1 text-sm ${y.selected ? "text-primary" : ""}`}>{y.title}</div>
                                                                         </Button>
                                                                         {y.title === 'Help Center' && isHelpCenterActive && y.subItems && renderSubItems(y.subItems)}
                                                                     </Fragment>
@@ -248,7 +262,7 @@ const SaidBarDesktop = () => {
                             })
                         }
                     </nav>
-                    <div className="mt-auto px-4 pb-4">
+                    <div className="mt-auto pb-4">
                         <nav className="grid gap-1">
                             {
                                 (footerMenuComponent || []).map((x, i) => {
@@ -257,13 +271,11 @@ const SaidBarDesktop = () => {
                                             <Button
                                                 key={i}
                                                 variant={"link hover:no-underline"}
-                                                className={`flex justify-start gap-4 h-9 ${x.selected ? "rounded-md bg-primary/15 transition-none" : 'items-center transition-none'}`}
+                                                className={`flex justify-start gap-2 py-0 px-2 pr-1 h-[28px] ${x.selected ? "rounded-md bg-primary/15 transition-none" : 'items-center hover:bg-primary/10 hover:text-primary transition-none'}`}
                                                 onClick={() => onRedirect(x.link)}
                                             >
-                                                <div
-                                                    className={`${x.selected ? "active-menu" : "menu-icon"}`}>{x.icon}</div>
-                                                <div
-                                                    className={`${x.selected ? "text-primary" : ""}`}>{x.title}</div>
+                                                <div className={`${x.selected ? "active-menu" : ""}`}>{x.icon}</div>
+                                                <div className={`font-normal text-left flex-1 text-sm ${x.selected ? "text-primary" : ""}`}>{x.title}</div>
                                             </Button> : ''
                                     )
                                 })
@@ -273,8 +285,7 @@ const SaidBarDesktop = () => {
                 </div>
             </div>
         </div>
-    )
-        ;
+    );
 };
 
 export default SaidBarDesktop;

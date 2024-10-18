@@ -68,8 +68,8 @@
       @apply border-border;
     }
     body {
-      font-family: "Inter", sans-serif;
-      @apply bg-background text-foreground;
+      /*font-family: sans-serif;*/
+      @apply bg-background bg-card text-foreground;
     }
   }
 
@@ -85,13 +85,7 @@ p {margin: 0 !important;}
 .p-r{padding-right: 0 !important;}
 
 /*.bodyScreenHeight{height: calc(100vh - 60px);}*/
-.bodyScreenHeight{height: calc(100vh - 64px);}
-.comm-sheet-height{height: calc(100vh - 69px);}
-
-.idea-sheet-height{height: calc(100vh - 65px);}
-
-.sidebar-dek-menu{height: calc(100vh - 60px);}
-.sidebar-mobile-menu{height: calc(100vh - 64px);}
+.bodyScreenHeight{height: calc(100vh - 56px);}
 
 .hov-primary.data-\[selected\=true\]\:bg-accent[data-selected=true]{background-color: hsl(var(--primary));color: hsl(var(--card))}
 .hov-primary-dark.data-\[selected\=true\]\:bg-accent[data-selected=true]{background-color: hsl(var(--primary));color: hsl(var(--card-foreground))}
@@ -99,11 +93,8 @@ p {margin: 0 !important;}
 .announce-create-switch .data-\[state\=checked\]\:translate-x-5[data-state=checked]{width: 14px;height: 14px;--tw-translate-x: 20px}
 .announce-create-switch .data-\[state\=unchecked\]\:translate-x-0[data-state=unchecked]{width: 14px;height: 14px;}
 
-.active-menu svg {fill: hsl(var(--primary));}
-.active-menu svg path {fill: hsl(var(--primary));}
-
-.setting-active-menu svg {stroke: hsl(var(--primary));}
-.setting-active-menu svg path {stroke: hsl(var(--primary));}
+.active-menu svg {stroke: hsl(var(--primary));}
+.active-menu svg path {stroke: hsl(var(--primary));}
 
 .menu-icon svg {fill: hsl(var(--muted-foreground));}
 .menu-icon svg path {fill: hsl(var(--muted-foreground));}
@@ -111,11 +102,13 @@ p {margin: 0 !important;}
 .profile-menu-icon svg {stroke: hsl(var(--muted-foreground));}
 .profile-menu-icon svg path {stroke: hsl(var(--muted-foreground));}
 
-.focus-visible\:ring-ring:focus-visible {--tw-ring-color: hsl(240, 5%, 65%) !important;}
-.focus-visible\:ring-ring:focus-visible {--tw-ring-color: hsl(240, 5%, 84%) !important;}
+.focus-visible\:ring-ring:focus-visible {outline: none !important;box-shadow: none !important;}
+/*.focus-visible\:ring-ring:focus-visible {--tw-ring-color: hsl(240, 5%, 65%) !important;}*/
+/*.focus-visible\:ring-ring:focus-visible {--tw-ring-color: hsl(240, 5%, 84%) !important;}*/
 
-.focus\:ring-ring:focus {--tw-ring-color: hsl(240, 5%, 65%) !important;}
-.focus\:ring-ring:focus {--tw-ring-color: hsl(240, 5%, 84%) !important;}
+.focus\:ring-ring:focus {outline: none !important;box-shadow: none !important;}
+/*.focus\:ring-ring:focus {--tw-ring-color: hsl(240, 5%, 65%) !important;}*/
+/*.focus\:ring-ring:focus {--tw-ring-color: hsl(240, 5%, 84%) !important;}*/
 
 .team-tab-active.data-\[state\=active\]\:bg-background[data-state=active] {background-color: hsl(var(--primary)/15%);}
 .team-tab-text-active.data-\[state\=active\]\:text-foreground[data-state=active] {color: hsl(var(--primary));}
@@ -205,25 +198,19 @@ em {color: var(--muted-foreground) !important;}
 .ideas-tab-comm-bgCol.data-\[state\=active\]\:bg-background[data-state="active"] {background-color: transparent}
 
 @media (max-width: 993px) {
-  .idea-sheet-height{height: calc(100vh - 65px);}
 }
 
 @media (max-width: 767px) {
-  .idea-sheet-height{height: calc(100vh - 65px);}
   .container-secondary{padding-left: 12px; padding-right: 12px}
 }
 
 @media (max-width: 640px) {
-  /*.bodyScreenHeight {height: auto;}*/
-  .bodyScreenHeight:not(:has(.www)){height: auto;}
-  .idea-sheet-height{height: calc(100vh - 95px);}
+  .bodyScreenHeight:not(:has(.update-idea-right-side)){height: auto;}
 }
 
 @media (max-width: 329px) {
   .bodyScreenHeight {height: auto;}
-  .idea-sheet-height{height: calc(100vh - 14px);}
 }
-
 
 .QH-popover{
   width: 410px;

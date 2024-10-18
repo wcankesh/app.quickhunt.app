@@ -997,7 +997,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                             </Button>
                                             <Button
                                                 variant={"outline hover:bg-transparent"}
-                                                className={"border border-primary py-2 px-6 text-sm font-medium"}
+                                                className={"border border-primary py-2 px-6 text-sm font-medium text-primary"}
                                                 onClick={handleOnCreateCancel}
                                             >
                                                 Cancel

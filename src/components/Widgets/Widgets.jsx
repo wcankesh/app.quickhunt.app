@@ -452,7 +452,7 @@ const Widgets = () => {
                                             {widgetsSetting.map((x, i) => (
                                                 <TableRow key={i}>
                                                     <TableCell
-                                                        className={"font-normal p-2 py-[10px] md:px-3 cursor-pointer capitalize"}
+                                                        className={"font-normal p-2 py-[10px] md:px-3 cursor-pointer capitalize max-w-[120px] cursor-pointer truncate text-ellipsis overflow-hidden whitespace-nowrap"}
                                                         onClick={() => handleCreateNew(x.id, x.type)}>{x.name}</TableCell>
                                                     <TableCell
                                                         className={"font-normal p-2 py-[10px] md:px-3 capitalize"}>{x.type}</TableCell>

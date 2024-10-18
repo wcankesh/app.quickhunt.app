@@ -488,7 +488,7 @@ const Team = () => {
                                 <Button
                                     variant={"ghost hover:bg-none"}
                                     onClick={closeSheet}
-                                    className={`text-sm font-medium border border-primary`}
+                                    className={`text-sm font-medium border border-primary text-primary`}
                                 >Cancel</Button>
 
                         </div>

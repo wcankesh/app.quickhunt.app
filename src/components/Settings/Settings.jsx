@@ -14,7 +14,18 @@ import Tags from "./SettingPage/Tags";
 import Statuses from "./SettingPage/Statuses";
 import Social from "./SettingPage/Social";
 import Emoji from "./SettingPage/Emoji";
-import {Kanban, Menu, SmilePlus} from "lucide-react";
+import {
+    FileText,
+    Globe,
+    Kanban,
+    Menu,
+    SmilePlus,
+    UserRound,
+    UsersRound,
+    Settings2,
+    Tag,
+    Layers3, NotepadText, CircleDashed, CircleFadingPlus, FolderKey
+} from "lucide-react";
 import {  Popover, PopoverContent, PopoverTrigger} from "../ui/popover";
 import Board from "./SettingPage/Board";
 import GeneralSettings from "./SettingPage/GeneralSettings";
@@ -52,44 +63,44 @@ const Settings = () => {
         {
             title: 'Profile',
             link: 'profile',
-            icon: Icon.setProfileIcon,
+            icon: <UserRound size={16} />,
             selected: `${baseUrl}/profile`,
         },
         {
             title: 'Team',
             link: 'team',
-            icon: Icon.setTeamIcon,
+            icon: <UsersRound size={16}/>,
             selected: `${baseUrl}/team`,
         },
         {
             title: 'Project',
             link: 'project',
-            icon: Icon.setProjectIcon,
+            icon: <FileText size={16} />,
             selected: `${baseUrl}/project`,
         },
         {
             title: 'Domain',
             link: 'domain',
-            icon: Icon.setDomainIcon,
+            icon: <Globe size={16} />,
             selected: `${baseUrl}/domain`,
         },
         {
             title: 'General Settings',
             link: 'general-settings',
-            icon: Icon.settingIcon,
+            icon: <Settings2 size={16} />,
             selected: `${baseUrl}/general-settings`,
         },
         {
             title: 'Labels',
             link: 'labels',
-            icon: Icon.setLabelIcon,
+            icon: <Tag size={16} className={"rotate-90"} />,
             selected: `${baseUrl}/labels`,
             useFor: "(Announcements)",
         },
         {
             title: 'Categories',
             link: 'categories',
-            icon: Icon.setCategoriesIcon,
+            icon: <Layers3 size={16} />,
             selected: `${baseUrl}/categories`,
             useFor: "(Announcements)",
         },
@@ -103,7 +114,7 @@ const Settings = () => {
         {
             title: 'Tags',
             link: 'tags',
-            icon: Icon.setTopicsIcon,
+            icon: <NotepadText size={16} />,
             selected: `${baseUrl}/tags`,
             useFor: "(Ideas)",
         },
@@ -117,14 +128,14 @@ const Settings = () => {
         {
             title: 'Statuses',
             link: 'statuses',
-            icon: Icon.setStatusesIcon,
+            icon: <CircleDashed size={16} />,
             selected: `${baseUrl}/statuses`,
             useFor: "(Roadmap)",
         },
         {
             title: 'Social',
             link: 'social',
-            icon: Icon.setSocialIcon,
+            icon: <CircleFadingPlus size={16} />,
             selected: `${baseUrl}/social`,
         },
         // {
@@ -144,7 +155,7 @@ const Settings = () => {
         {
             title: 'Import / Export',
             link: 'import-export',
-            icon: Icon.importExport,
+            icon: <FolderKey size={16} />,
             subLinks: [
                 {
                     title: 'Import',
@@ -203,11 +214,10 @@ const Settings = () => {
                                 <Button
                                     key={i}
                                     variant={"link hover:no-underline"}
-                                    className={`flex justify-start gap-4 h-9 ${isActive(x.link) ? "rounded-md bg-primary/15 transition-none" : 'items-center transition-none'}`}
+                                    className={`flex justify-start gap-4 h-9 ${isActive(x.link) ? "rounded-md bg-primary/15 transition-none" : 'items-center hover:bg-primary/10 transition-none'}`}
                                     onClick={() => onRedirect(x.link)}
                                 >
-                                    <div
-                                        className={`${isActive(x.link) ? "setting-active-menu" : "profile-menu-icon"}`}>{x.icon}</div>
+                                    <div className={`${isActive(x.link) ? "active-menu" : ""}`}>{x.icon}</div>
                                     <div
                                         className={`flex justify-between w-full ${isActive(x.link) ? "text-primary" : ""}`}>
                                         {x.title}
@@ -226,18 +236,17 @@ const Settings = () => {
                         <CardHeader className={"p-4 pb-0"}>
                             <CardTitle className={"text-base font-normal"}>General Settings</CardTitle>
                         </CardHeader>
-                        <CardContent className={"flex flex-col gap-1 p-4"}>
+                        <CardContent className={"flex flex-col gap-1.5 p-4"}>
                             {
                                 (settingsLinksList || []).map((x, i) => {
                                     return (
                                         <Button
                                             key={i}
                                             variant={"link hover:no-underline"}
-                                            className={`flex justify-start gap-4 h-9 ${isActive(x.link) ? "rounded-md bg-primary/15 transition-none" : 'items-center transition-none'}`}
+                                            className={`flex justify-start gap-2 py-0 px-2 pr-1 h-[28px] ${isActive(x.link) ? "rounded-md bg-primary/15 transition-none" : 'items-center hover:bg-primary/10 hover:text-primary transition-none'}`}
                                             onClick={() => onRedirect(x.link)}
                                         >
-                                            <div
-                                                className={`${isActive(x.link) ? "setting-active-menu" : "profile-menu-icon"}`}>{x.icon}</div>
+                                            <div className={`${isActive(x.link) ? "active-menu" : ""}`}>{x.icon}</div>
                                             <div
                                                 className={`flex justify-between w-full ${isActive(x.link) ? "text-primary" : ""}`}>
                                                 {x.title}
