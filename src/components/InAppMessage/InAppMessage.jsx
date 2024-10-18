@@ -254,10 +254,8 @@ const InAppMessage = () => {
         });
     };
 
-    const codeString = selectedType === "embed" ? `
-    <div class="quickhunt-widget-embed" Quickhunt_Widget_Key=${selectedId} widget-width="740px" widget-height="460px"></div>
-    <script src="https://fw.quickhunt.app/widgetScript.js"></script>
-    ` : `<script>
+    const codeString = `
+<script>
     window.quickhuntSettings = {
       name: "",
       email: "",
@@ -265,12 +263,9 @@ const InAppMessage = () => {
 </script>
 <script>
     window.Quickhunt_In_App_Message_Config = window.Quickhunt_In_App_Message_Config || [];
-    window.Quickhunt_Config.push({ Quickhunt_Widget_Key:  ${selectedId}});
+    window.Quickhunt_In_App_Message_Config.push({ Quickhunt_In_App_Message_Key:  "${selectedId}"});
 </script>
 <script src="https://fw.quickhunt.app/widgetScript.js"></script>`;
-    const embedLink = `https://${projectDetailsReducer.domain}/ideas?widget=${selectedId}`
-    const iFrame = `<iframe src="${embedLink}" style="border: 0px; outline: 0px; width: 450px; height: 400px;"></iframe>`
-    const callback = `window.Quickhunt('${selectedId}')`
 
     return (
         <Fragment>
@@ -566,7 +561,7 @@ const InAppMessage = () => {
                                                                     <TableCell className={"px-2 py-[10px] md:px-3"}>
                                                                         <Button
                                                                             className={"py-[6px] px-3 h-auto text-xs font-medium hover:bg-primary"}
-                                                                            onClick={() => getCodeCopy(x.id)}>Get code</Button>
+                                                                            onClick={() => getCodeCopy(x.uuid)}>Get code</Button>
                                                                     </TableCell>
                                                                     <TableCell className={`px-2 py-[10px] md:px-3 text-center flex justify-between`}>
                                                                         <div className={"cursor-pointer"} onClick={() => navigate(`${baseUrl}/in-app-message/${x.type}/analytic/${x.id}`)}>
