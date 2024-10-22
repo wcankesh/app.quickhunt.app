@@ -131,8 +131,8 @@ const BannerAnalyticsView = () => {
                         </CardContent>
                     </Card>
                     <Card>
-                        <CardHeader className={"p-4"}>How did that change over time?</CardHeader>
-                        <CardContent className={"p-4 pt-0 pl-0"}>
+                        <CardHeader className={"p-4 border-b text-base font-medium"}>How did that change over time?</CardHeader>
+                        <CardContent className={"p-4 pl-0"}>
                             <ChartContainer config={chartConfig} className="aspect-auto h-[250px] w-full">
                                 <ResponsiveContainer width="100%" height="100%">
                                     <LineChart
@@ -177,7 +177,7 @@ const BannerAnalyticsView = () => {
                         </CardContent>
                     </Card>
                     <Card>
-                        <CardHeader className={"p-4"}>Customers who opened</CardHeader>
+                        <CardHeader className={"p-4 border-b text-base font-medium"}>Customers who opened</CardHeader>
                         <CardContent className={"p-0"}>
                             <Table>
                                 <TableHeader className={`${theme === "dark" ? "" : "bg-muted"}`}>
@@ -237,7 +237,7 @@ const BannerAnalyticsView = () => {
                         </CardContent>
                     </Card>
                     <Card>
-                        <CardHeader className={"p-4"}>Customers who replied</CardHeader>
+                        <CardHeader className={"p-4 border-b text-base font-medium"}>Customers who replied</CardHeader>
                         <CardContent className={"p-0"}>
                             <Table>
                                 <TableHeader className={`${theme === "dark" ? "" : "bg-muted"}`}>
