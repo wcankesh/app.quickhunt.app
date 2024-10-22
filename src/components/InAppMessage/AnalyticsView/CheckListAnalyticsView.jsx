@@ -1,11 +1,10 @@
 import React, {Fragment, useEffect, useState} from 'react';
 import {Card, CardContent, CardHeader} from "../../ui/card";
-import {TooltipContent, TooltipTrigger,  TooltipProvider} from "../../ui/tooltip";
 import {Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator} from "../../ui/breadcrumb";
 import {baseUrl} from "../../../utils/constent";
 import {CommSkel} from "../../Comman/CommSkel";
 import {Skeleton} from "../../ui/skeleton";
-import {useLocation, useNavigate} from "react-router";
+import {useNavigate} from "react-router";
 import {ApiService} from "../../../utils/ApiService";
 import {useSelector} from "react-redux";
 import moment from "moment";
@@ -14,78 +13,30 @@ import {LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContain
 import {ChartContainer, ChartTooltipContent} from "../../ui/chart";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "../../ui/table";
 import {useTheme} from "../../theme-provider";
-import {Avatar, AvatarFallback, AvatarImage} from "../../ui/avatar";
-import {Info} from "lucide-react";
-import {Button} from "../../ui/button";
-import EmptyData from "../../Comman/EmptyData";
-
-const initialState = {
-    project_id: "2",
-    title: "In app message",
-    type: 1,
-    body_text: "",
-    from: "",
-    reply_to: "",
-    bg_color: "#EEE4FF",
-    text_color: "#000000",
-    icon_color: "#FD6B65",
-    btn_color: "#7c3aed",
-    delay: 1,
-    start_at: moment().toISOString(),
-    end_at: moment().add(1, 'hour').toISOString(),
-    position: "top",
-    alignment: "center",
-    is_close_button: true,
-    reply_type: 1,
-    show_sender: true,
-    action_type: 0,
-    action_text: "",
-    action_url: "",
-    is_redirect: "",
-    is_banner_close_button: false,
-    banner_style: "",
-    reactions: [],
-    status: 1,
-    steps:[],
-    checklist_title: "",
-    checklist_description : "",
-    checklists: []
-}
+import {Avatar, AvatarFallback} from "../../ui/avatar";
 
 const chartConfig = {
-    desktop: {
-        label: "Desktop",
-        color: "hsl(var(--chart-1))",
+    view: {
+        label: "View",
+        color: "#7c3bed80",
+    },
+    response: {
+        label: "Response",
+        color: "#7c3aed",
     },
 }
 
-const chartData = [
-    { month: "January", desktop: 186 },
-    { month: "February", desktop: 305 },
-    { month: "March", desktop: 237 },
-    { month: "April", desktop: 73 },
-    { month: "May", desktop: 209 },
-    { month: "June", desktop: 214 },
-]
+
 
 const CheckListAnalyticsView = () => {
     const {theme} = useTheme();
     const {id, type} = useParams();
-    const location = useLocation();
-    const urlParams = new URLSearchParams(location.search);
-    const postId = urlParams.get("postId");
-    const getPageNo = urlParams.get("pageNo") || 1;
-
     const navigate = useNavigate();
     const apiService = new ApiService();
-
-    const allEmoji = useSelector(state => state.allStatusAndTypes.emoji);
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
-    const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
-    const [inAppMsgSetting, setInAppMsgSetting] = useState(initialState);
+    const [inAppMsgSetting, setInAppMsgSetting] = useState({});
     const [isLoading, setIsLoading] = useState(false);
-    const [selectedStep, setSelectedStep] = useState(null);
-    const [isSave, setIsSave] = useState(false);
+    const [analytics, setAnalytics] = useState({})
 
     useEffect(() => {
         if (id !== "new" && projectDetailsReducer.id) {
@@ -101,149 +52,140 @@ const CheckListAnalyticsView = () => {
                 ...data.data,
                 body_text: type === "1" ? JSON.parse(data.data.body_text) : data.data.body_text,
             }
+            const combinedData = {};
+            data.analytics.charts.forEach(({ x, y }) => {
+                if (!combinedData[x]) {
+                    combinedData[x] = { view: 0, response: 0, x }; // Initialize object
+                }
+                combinedData[x].view = parseFloat(y); // Add 'view' from charts
+            });
+            data.analytics.response_charts.forEach(({ x, y }) => {
+                if (!combinedData[x]) {
+                    combinedData[x] = { view: 0, response: 0, x }; // Initialize object
+                }
+                combinedData[x].response = parseFloat(y); // Add 'response' from response_charts
+            });
+            const result = Object.values(combinedData).sort((a, b) => new Date(a.x) - new Date(b.x))
+            setAnalytics({chart:result, analytics: data.analytics.analytics, open_count: data.analytics.open_count, response_count: data.analytics.response_count, responses: data.analytics.responses, response_percentage: data.analytics.response_percentage})
             setInAppMsgSetting(payload);
-            if(type === "3"){
-                setSelectedStep(payload.steps[0])
-            } else if(type === "4"){
-                setSelectedStep(payload.checklists[0])
-            }
             setIsLoading(false);
         } else {
             setIsLoading(false);
         }
     }
 
-    const getEmoji = inAppMsgSetting.reactions.map((x) => x.emoji)
-
     const analyticsViews = [
         {
-            title: "Sent",
-            // count: views && views[0] && views[0].totalView ? views[0].totalView : 0,
+            title: "Total View",
+            show: true,
+            count: analytics?.open_count || 0,
         },
         {
-            title: "Viewed",
-            // count: views && views[0] && views[0].uniqueView ? views[0].uniqueView : 0,
+            title: "Total Response",
+            show: inAppMsgSetting?.reply_type === 1,
+            count: analytics?.response_count || 0,
         },
         {
-            title: "Completed",
-            // count: views && views[0] && views[0].uniqueView ? views[0].uniqueView : 0,
-        },
-        {
-            title: "Analysis",
-            // count: views && views[0] && views[0].uniqueView ? views[0].uniqueView : 0,
+            title: "Completion Rate",
+            count: `${analytics?.response_percentage?.toFixed(2) || 0}%`,
+            show: inAppMsgSetting?.reply_type === 1,
         },
     ]
-
-    const columnTitles = [
-        "Name",
-        inAppMsgSetting.action_type === 1
-            ? "Linked"
-            : inAppMsgSetting.action_type === 2
-            ? "Reaction"
-            : inAppMsgSetting.action_type === 3
-                ? "Collected Email"
-                : "Action",
-        inAppMsgSetting.action_type === 1
-            ? "When it was clicked"
-            : inAppMsgSetting.action_type === 2
-            ? "When they reacted"
-            : inAppMsgSetting.action_type === 3
-                ? "When it was collected"
-                : "Timestamp"
-    ];
-
-    const tableTitles = [
-        { title: "Step" },
-        { title: "Title" },
-        { title: "Viewed", tooltip: "This column shows the number of views." },
-        { title: "Action clicked", tooltip: "This column shows how many times actions were clicked." },
-        { title: "Completed", tooltip: "This column shows the number of completed actions." },
-        { title: "How it was completed", tooltip: "This column shows how the action was completed." },
-    ];
 
     return (
         <Fragment>
             <div className={"container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-3 md:px-4"}>
-                <Card>
-                    <CardHeader className={"p-3 lg:p-6 border-b"}>
-                        <Breadcrumb>
-                            <BreadcrumbList>
-                                <BreadcrumbItem className={"cursor-pointer"}>
-                                    {/*<BreadcrumbLink onClick={() => navigate(`${baseUrl}/in-app-message?pageNo=${getPageNo}`)}>*/}
-                                    <BreadcrumbLink onClick={() => navigate(`${baseUrl}/in-app-message`)}>
-                                        In App Message
-                                    </BreadcrumbLink>
-                                </BreadcrumbItem>
-                                <BreadcrumbSeparator />
-                                <BreadcrumbItem className={"cursor-pointer"}>
-                                    <BreadcrumbPage>{inAppMsgSetting?.title}</BreadcrumbPage>
-                                </BreadcrumbItem>
-                            </BreadcrumbList>
-                        </Breadcrumb>
-                    </CardHeader>
-                    <CardContent className={"p-3 md:p-6 flex flex-col gap-6"}>
-                        <div className={"flex flex-col gap-8"}>
-                            <div className={"grid lg:grid-cols-4 md:grid-cols-2 md:gap-4 gap-3"}>
-                                {analyticsViews
-                                    .map((x, i) => (
-                                        <Fragment key={i}>
-                                            {isLoading ? (
-                                                <Card>
-                                                    <CardContent className={"p-0"}>{CommSkel.commonParagraphThree}</CardContent>
-                                                </Card>
-                                            ) : (
-                                                <Card>
-                                                    <CardContent className={"text-2xl font-medium p-3 md:p-6"}>
-                                                        {x.emoji}
-                                                        <div className={"text-base font-medium"}>{x.title}</div>
-                                                    </CardContent>
-                                                </Card>
-                                            )}
-                                        </Fragment>
-                                    ))}
+                <div className={"pb-6"}>
+                    <Breadcrumb>
+                        <BreadcrumbList>
+                            <BreadcrumbItem className={"cursor-pointer"}>
+                                {/*<BreadcrumbLink onClick={() => navigate(`${baseUrl}/in-app-message?pageNo=${getPageNo}`)}>*/}
+                                <BreadcrumbLink onClick={() => navigate(`${baseUrl}/in-app-message`)}>
+                                    In App Message
+                                </BreadcrumbLink>
+                            </BreadcrumbItem>
+                            <BreadcrumbSeparator />
+                            <BreadcrumbItem className={"cursor-pointer"}>
+                                <BreadcrumbPage>{inAppMsgSetting?.title}</BreadcrumbPage>
+                            </BreadcrumbItem>
+                        </BreadcrumbList>
+                    </Breadcrumb>
+                </div>
+                <div className={"flex flex-col gap-4"}>
+                    <Card>
+                        <CardContent className={"p-0"}>
+                            <div className={"grid md:grid-cols-3 sm:grid-cols-1"}>
+                                {analyticsViews.map((x, i) => (
+                                    <Fragment key={i}>
+                                        {isLoading ? <div className={"space-y-[14px] w-full p-4 border-b md:border-r md:border-0 last:border-b-0 last:border-r-0"}>
+                                            <Skeleton className="h-4"/>
+                                            <Skeleton className="h-4"/></div> : (
+                                            <div className={`p-4 border-b md:border-r md:border-0 last:border-b-0 last:border-r-0`}>
+                                                <h3 className={"text-base font-medium"}>{x.title}</h3>
+                                                <div className={"flex gap-1"}>
+                                                    <h3 className={`text-2xl font-medium`}>{x.count}</h3>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </Fragment>
+                                ))}
                             </div>
-                        </div>
-                        <div>
+                        </CardContent>
+                    </Card>
+                    <Card>
+                        <CardHeader className={"p-4"}>How did that change over time?</CardHeader>
+                        <CardContent className={"p-4 pt-0 pl-0"}>
                             <ChartContainer config={chartConfig} className="aspect-auto h-[250px] w-full">
                                 <ResponsiveContainer width="100%" height="100%">
                                     <LineChart
                                         accessibilityLayer
-                                        data={chartData}
-                                        margin={{
-                                            left: 12,
-                                            right: 12,
-                                        }}
+                                        data={analytics.chart}
+
                                     >
                                         <CartesianGrid vertical={false} />
                                         <XAxis
-                                            dataKey="month"
+                                            dataKey="x"
                                             tickLine={false}
                                             axisLine={false}
                                             tickMargin={8}
-                                            tickFormatter={(value) => value.slice(0, 3)}
+                                            tickFormatter={(value) => {
+                                                const date = new Date(value)
+                                                return date.toLocaleDateString("en-US", {
+                                                    month: "short",
+                                                    day: "numeric",
+                                                })
+                                            }}
                                         />
                                         <Tooltip
                                             cursor={false}
                                             content={<ChartTooltipContent hideLabel />}
                                         />
+                                        <YAxis tickLine={false} axisLine={false}/>
                                         <Line
-                                            dataKey="desktop"
-                                            type="linear"
-                                            stroke="var(--color-desktop)"
+                                            dataKey="view"
+                                            type="monotone"
+                                            stroke="var(--color-view)"
                                             strokeWidth={2}
-                                            dot={false}
+                                        />
+                                        <Line
+                                            dataKey="response"
+                                            type="monotone"
+                                            stroke="var(--color-response)"
+                                            strokeWidth={2}
                                         />
                                     </LineChart>
                                 </ResponsiveContainer>
                             </ChartContainer>
-
-                        </div>
-                        <div>
+                        </CardContent>
+                    </Card>
+                    <Card>
+                        <CardHeader className={"p-4"}>Customers who opened</CardHeader>
+                        <CardContent className={"p-0"}>
                             <Table>
                                 <TableHeader className={`${theme === "dark" ? "" : "bg-muted"}`}>
                                     <TableRow>
                                         {
-                                            columnTitles.map((x, i) => {
+                                            ["Name", "When it was opened"].map((x, i) => {
                                                 return (
                                                     <TableHead className={`px-2 py-[10px] md:px-3 font-medium text-card-foreground`} key={i}>
                                                         {x}
@@ -260,10 +202,9 @@ const CheckListAnalyticsView = () => {
                                                     return (
                                                         <TableRow key={index}>
                                                             {
-                                                                [...Array(3)].map((_, i) => {
+                                                                [...Array(2)].map((_, i) => {
                                                                     return (
-                                                                        <TableCell key={i}
-                                                                                   className={"max-w-[373px] px-2 py-[10px] md:px-3"}>
+                                                                        <TableCell key={i} className={"max-w-[373px] px-2 py-[10px] md:px-3"}>
                                                                             <Skeleton className={"rounded-md w-full h-7"}/>
                                                                         </TableCell>
                                                                     )
@@ -271,69 +212,46 @@ const CheckListAnalyticsView = () => {
                                                             }
                                                         </TableRow>
                                                     )
-                                                })
-                                            )
-                                            :
-                                            inAppMsgSetting.length >  0 ?
+                                                })) :
+                                            (analytics?.analytics || []).length >  0 ?
                                                 <Fragment>
                                                     {
-                                                        inAppMsgSetting.map((x,i)=> {
-                                                            const sender = allStatusAndTypes?.members.find((y) => y.user_id == x.from);
+                                                        (analytics?.analytics || []).map((x,i)=> {
                                                             return (
                                                                 <TableRow key={x.id}>
-                                                                    <TableCell className={`flex items-center mt-1 px-2 py-[10px] md:px-3 gap-2 ${sender ? sender : "justify-center"}`}>
-                                                                        {sender ? (
-                                                                            <>
-                                                                                <Avatar className={"w-[20px] h-[20px]"}>
-                                                                                    {sender.user_photo ? (
-                                                                                        <AvatarImage src={sender.user_photo} alt="@shadcn" />
-                                                                                    ) : (
-                                                                                        <AvatarFallback>{sender.user_first_name.substring(0, 1)}</AvatarFallback>
-                                                                                    )}
-                                                                                </Avatar>
-                                                                                <p className={"font-normal"}>{sender.user_first_name}</p>
-                                                                            </>
-                                                                        ) : (
-                                                                            <p className={"font-normal"}>-</p>
-                                                                        )}
+                                                                    <TableCell className={`flex items-center px-2 py-[10px] md:px-3 gap-2`}>
+                                                                        <>
+                                                                            <Avatar className={"w-[20px] h-[20px]"}>
+                                                                                <AvatarFallback>{x?.name? x?.name?.substring(0, 1) : x?.email?.substring(0, 1)}</AvatarFallback>
+                                                                            </Avatar>
+                                                                            <p className={"font-normal"}>{x?.name? x?.name : x.email}</p>
+                                                                        </>
                                                                     </TableCell>
-                                                                    <TableCell className={`px-2 py-[10px] md:px-3 font-normal`}></TableCell>
-                                                                    <TableCell className={`px-2 py-[10px] md:px-3 font-normal`}></TableCell>
+                                                                    <TableCell className={`px-2 py-[10px] md:px-3 font-normal`}>{moment(x.created_at).format("ll")}</TableCell>
                                                                 </TableRow>
                                                             )
                                                         })
                                                     }
-                                                </Fragment> : <TableRow>
-                                                    <TableCell colSpan={3}>
-                                                        <EmptyData/>
-                                                    </TableCell>
-                                                </TableRow>
+                                                </Fragment> : ""
                                     }
                                 </TableBody>
                             </Table>
-                        </div>
-                        <div>
+                        </CardContent>
+                    </Card>
+                    <Card>
+                        <CardHeader className={"p-4"}>Customers who replied</CardHeader>
+                        <CardContent className={"p-0"}>
                             <Table>
                                 <TableHeader className={`${theme === "dark" ? "" : "bg-muted"}`}>
                                     <TableRow>
                                         {
-                                            tableTitles.map((item, i) => (
-                                                <TableHead className={`px-2 py-[10px] md:px-3 font-medium text-card-foreground ${i >= 4 ? 'text-center' : ''}`} key={i}>
-                                                    {item.title}
-                                                    {item.tooltip && (
-                                                        <TooltipProvider>
-                                                            <Tooltip>
-                                                                <TooltipTrigger asChild>
-                                                                    <Button variant="outline" className="ml-2"><Info size={14} /></Button>
-                                                                </TooltipTrigger>
-                                                                <TooltipContent side="top">
-                                                                    <p>{item.tooltip}</p>
-                                                                </TooltipContent>
-                                                            </Tooltip>
-                                                        </TooltipProvider>
-                                                    )}
-                                                </TableHead>
-                                            ))
+                                            ["Name", "Linked", "Reaction", "Collected Email", "When they replied"].map((x, i) => {
+                                                return (
+                                                    <TableHead className={`px-2 py-[10px] md:px-3 font-medium text-card-foreground`} key={i}>
+                                                        {x}
+                                                    </TableHead>
+                                                );
+                                            })
                                         }
                                     </TableRow>
                                 </TableHeader>
@@ -344,7 +262,7 @@ const CheckListAnalyticsView = () => {
                                                     return (
                                                         <TableRow key={index}>
                                                             {
-                                                                [...Array(6)].map((_, i) => {
+                                                                [...Array(5)].map((_, i) => {
                                                                     return (
                                                                         <TableCell key={i}
                                                                                    className={"max-w-[373px] px-2 py-[10px] md:px-3"}>
@@ -355,49 +273,36 @@ const CheckListAnalyticsView = () => {
                                                             }
                                                         </TableRow>
                                                     )
-                                                })
-                                            )
-                                            :
-                                            inAppMsgSetting.length >  0 ?
+                                                })) :
+                                            (analytics?.responses || []).length >  0 ?
                                                 <Fragment>
                                                     {
-                                                        inAppMsgSetting.map((x,i)=> {
-                                                            const sender = allStatusAndTypes?.members.find((y) => y.user_id == x.from);
+                                                        (analytics?.responses || []).map((x,i)=> {
                                                             return (
                                                                 <TableRow key={x.id}>
-                                                                    <TableCell className={`flex items-center mt-1 px-2 py-[10px] md:px-3 gap-2 ${sender ? sender : "justify-center"}`}>
-                                                                        {sender ? (
-                                                                            <>
-                                                                                <Avatar className={"w-[20px] h-[20px]"}>
-                                                                                    {sender.user_photo ? (
-                                                                                        <AvatarImage src={sender.user_photo} alt="@shadcn" />
-                                                                                    ) : (
-                                                                                        <AvatarFallback>{sender.user_first_name.substring(0, 1)}</AvatarFallback>
-                                                                                    )}
-                                                                                </Avatar>
-                                                                                <p className={"font-normal"}>{sender.user_first_name}</p>
-                                                                            </>
-                                                                        ) : (
-                                                                            <p className={"font-normal"}>-</p>
-                                                                        )}
+                                                                    <TableCell className={`flex items-center px-2 py-[10px] md:px-3 gap-2`}>
+                                                                        <>
+                                                                            <Avatar className={"w-[20px] h-[20px]"}>
+                                                                                <AvatarFallback>{x?.name? x?.name?.substring(0, 1) : x?.email?.substring(0, 1)}</AvatarFallback>
+                                                                            </Avatar>
+                                                                            <p className={"font-normal"}>{x?.name? x?.name : x.email}</p>
+                                                                        </>
                                                                     </TableCell>
-                                                                    <TableCell className={`px-2 py-[10px] md:px-3 font-normal`}></TableCell>
-                                                                    <TableCell className={`px-2 py-[10px] md:px-3 font-normal`}></TableCell>
+                                                                    <TableCell className={`px-2 py-[10px] md:px-3 font-normal`}>{"-"}</TableCell>
+                                                                    <TableCell className={`px-2 py-[10px] md:px-3 font-normal`}>{x.emoji_url ? <img key={i} className={"h-6 w-6 cursor-pointer"} src={x.emoji_url}/> : "-"}</TableCell>
+                                                                    <TableCell className={`px-2 py-[10px] md:px-3 font-normal`}>{x.submit_mail || "-"}</TableCell>
+                                                                    <TableCell className={`px-2 py-[10px] md:px-3 font-normal`}>{moment(x.created_at).format("ll")}</TableCell>
                                                                 </TableRow>
                                                             )
                                                         })
                                                     }
-                                                </Fragment> : <TableRow>
-                                                    <TableCell colSpan={6}>
-                                                        <EmptyData/>
-                                                    </TableCell>
-                                                </TableRow>
+                                                </Fragment> : ""
                                     }
                                 </TableBody>
                             </Table>
-                        </div>
-                    </CardContent>
-                </Card>
+                        </CardContent>
+                    </Card>
+                </div>
             </div>
         </Fragment>
     );
