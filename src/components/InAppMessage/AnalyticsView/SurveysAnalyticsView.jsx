@@ -23,6 +23,21 @@ const chartConfig = {
     },
 }
 
+const chartConfigNPS ={
+    detractor: {
+        label: "Detractor",
+        color: "#e87e6d",
+    },
+    passives: {
+        label: "Passives",
+        color: "#f0ca00",
+    },
+    promoter: {
+        label: "Promoter",
+        color: "#55c99b",
+    },
+}
+
 
 const SurveysAnalyticsView = () => {
     const {theme} = useTheme();
@@ -381,16 +396,7 @@ const SurveysAnalyticsView = () => {
                                                     <div className={"text-base font-medium mb-2"}>{x.text}</div>
                                                     {
                                                         x.question_type === 1 ? <div>
-                                                            <ChartContainer config={{
-                                                                desktop: {
-                                                                    label: "Desktop",
-                                                                    color: "hsl(var(--chart-1))",
-                                                                },
-                                                                mobile: {
-                                                                    label: "Mobile",
-                                                                    color: "hsl(var(--chart-2))",
-                                                                },
-                                                            }}>
+                                                            <ChartContainer config={chartConfigNPS}>
                                                                 <BarChart accessibilityLayer data={x.report}>
                                                                     <CartesianGrid vertical={false} />
                                                                     <XAxis
@@ -398,20 +404,58 @@ const SurveysAnalyticsView = () => {
                                                                         tickLine={false}
                                                                         tickMargin={10}
                                                                         axisLine={false}
-                                                                        tickFormatter={(value) => value.slice(0, 3)}
+                                                                        tickFormatter={(value) => {
+                                                                            const date = new Date(value)
+                                                                            return date.toLocaleDateString("en-US", {
+                                                                                month: "short",
+                                                                                day: "numeric",
+                                                                            })
+                                                                        }}
                                                                     />
-                                                                    <ChartTooltip content={<ChartTooltipContent hideLabel />} />
-                                                                    <ChartLegend content={<ChartLegendContent />} />
+                                                                    <YAxis tickLine={false} axisLine={false} tickFormatter={(value) => `${value}%`}/>
+                                                                    <ChartTooltip
+                                                                        cursor={true}
+                                                                        content={<ChartTooltipContent formatter={(value, name) => {
+                                                                            return(
+                                                                                <Fragment>
+                                                                                    <div
+                                                                                        className="h-2.5 w-2.5 shrink-0 rounded-[2px] bg-[--color-bg]"
+                                                                                        style={
+                                                                                            {
+                                                                                                backgroundColor: `var(--color-${name.toLowerCase()})`,
+                                                                                            }
+                                                                                        }
+                                                                                    />
+                                                                                    {chartConfigNPS?.label || name}
+                                                                                    <div className="ml-auto flex items-baseline gap-0.5 font-mono font-medium tabular-nums text-foreground">
+                                                                                        {value}
+                                                                                        <span className="font-normal text-muted-foreground">%</span>
+                                                                                    </div>
+                                                                                </Fragment>
+                                                                            )
+                                                                        }}
+                                                                        />}
+                                                                    />
+
                                                                     <Bar
-                                                                        dataKey="desktop"
+                                                                        dataKey="detractor_percentage"
                                                                         stackId="a"
-                                                                        fill="var(--color-desktop)"
+                                                                        fill="var(--color-detractor)"
                                                                         radius={[0, 0, 4, 4]}
+                                                                        name={"Detractor"}
                                                                     />
                                                                     <Bar
-                                                                        dataKey="mobile"
+                                                                        dataKey="passives_percentage"
                                                                         stackId="a"
-                                                                        fill="var(--color-mobile)"
+                                                                        fill="var(--color-passives)"
+                                                                        radius={[0, 0, 0, 0]}
+                                                                        name={"Passives"}
+                                                                    />
+                                                                    <Bar
+                                                                        dataKey="promoter_percentage"
+                                                                        stackId="a"
+                                                                        fill="var(--color-promoter)"
+                                                                        name={"Promoter"}
                                                                         radius={[4, 4, 0, 0]}
                                                                     />
                                                                 </BarChart>
@@ -422,7 +466,7 @@ const SurveysAnalyticsView = () => {
                                                                     label: 'Total',
                                                                     color: "#7c3aed26",
                                                                 }
-                                                            }} className="aspect-auto h-[250px] w-full">
+                                                            }} >
                                                                 <BarChart accessibilityLayer data={x.question_type === 2 || x.question_type === 3 ? questionType2 : x.question_type === 4 ? questionType4 : x.question_type === 5 ? questionType5 : []}>
                                                                     <CartesianGrid vertical={false}/>
                                                                     <XAxis
