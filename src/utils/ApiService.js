@@ -325,6 +325,9 @@ export class ApiService{
     async getSingleInAppMessage (id){
         return await this.getData(`${baseUrlApi}/app-message/${id}`)
     }
+    async getResponseInAppMessage (payload){
+        return await this.postData(`${baseUrlApi}/response/report`, payload)
+    }
     async updateInAppMessage (payload, id){
         return await this.postData(`${baseUrlApi}/app-message/${id}?_method=PUT`, payload)
     }

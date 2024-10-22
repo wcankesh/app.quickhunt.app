@@ -15,73 +15,30 @@ import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "../
 import {useTheme} from "../../theme-provider";
 import {Avatar, AvatarFallback, AvatarImage} from "../../ui/avatar";
 
-const initialState = {
-    project_id: "2",
-    title: "In app message",
-    type: 1,
-    body_text: "",
-    from: "",
-    reply_to: "",
-    bg_color: "#EEE4FF",
-    text_color: "#000000",
-    icon_color: "#FD6B65",
-    btn_color: "#7c3aed",
-    delay: 1,
-    start_at: moment().toISOString(),
-    end_at: moment().add(1, 'hour').toISOString(),
-    position: "top",
-    alignment: "center",
-    is_close_button: true,
-    reply_type: 1,
-    show_sender: true,
-    action_type: 0,
-    action_text: "",
-    action_url: "",
-    is_redirect: "",
-    is_banner_close_button: false,
-    banner_style: "",
-    reactions: [],
-    status: 1,
-    steps:[],
-    checklist_title: "",
-    checklist_description : "",
-    checklists: []
-}
+
 
 const chartConfig = {
-    desktop: {
-        label: "Desktop",
-        color: "hsl(var(--chart-1))",
+    view: {
+        label: "View",
+        color: "#7c3bed80",
+    },
+    response: {
+        label: "Response",
+        color: "#7c3aed",
     },
 }
 
-const chartData = [
-    { month: "January", desktop: 186 },
-    { month: "February", desktop: 305 },
-    { month: "March", desktop: 237 },
-    { month: "April", desktop: 73 },
-    { month: "May", desktop: 209 },
-    { month: "June", desktop: 214 },
-]
-
 const PostAnalyticsView = () => {
     const {theme} = useTheme();
-    const {id, type} = useParams();
-    const location = useLocation();
-    const urlParams = new URLSearchParams(location.search);
-    const postId = urlParams.get("postId");
-    const getPageNo = urlParams.get("pageNo") || 1;
+    const {id} = useParams();
 
     const navigate = useNavigate();
     const apiService = new ApiService();
 
-    const allEmoji = useSelector(state => state.allStatusAndTypes.emoji);
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
-    const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
-    const [inAppMsgSetting, setInAppMsgSetting] = useState(initialState);
+    const [inAppMsgSetting, setInAppMsgSetting] = useState({});
+    const [analytics, setAnalytics] = useState({})
     const [isLoading, setIsLoading] = useState(false);
-    const [selectedStep, setSelectedStep] = useState(null);
-    const [isSave, setIsSave] = useState(false);
 
     useEffect(() => {
         if (id !== "new" && projectDetailsReducer.id) {
@@ -95,58 +52,48 @@ const PostAnalyticsView = () => {
         if (data.status === 200) {
             const payload = {
                 ...data.data,
-                body_text: type === "1" ? JSON.parse(data.data.body_text) : data.data.body_text,
             }
-            setInAppMsgSetting(payload);
-            if(type === "3"){
-                setSelectedStep(payload.steps[0])
-            } else if(type === "4"){
-                setSelectedStep(payload.checklists[0])
-            }
+            const combinedData = {};
+            data.analytics.charts.forEach(({ x, y }) => {
+                if (!combinedData[x]) {
+                    combinedData[x] = { view: 0, response: 0, x }; // Initialize object
+                }
+                combinedData[x].view = parseFloat(y); // Add 'view' from charts
+            });
+            data.analytics.response_charts.forEach(({ x, y }) => {
+                if (!combinedData[x]) {
+                    combinedData[x] = { view: 0, response: 0, x }; // Initialize object
+                }
+                combinedData[x].response = parseFloat(y); // Add 'response' from response_charts
+            });
+            const result = Object.values(combinedData).sort((a, b) => new Date(a.x) - new Date(b.x))
+            setAnalytics({chart:result, analytics: data.analytics.analytics, open_count: data.analytics.open_count, response_count: data.analytics.response_count, responses: data.analytics.responses, response_percentage: data.analytics.response_percentage})
+            setInAppMsgSetting(payload)
             setIsLoading(false);
         } else {
             setIsLoading(false);
         }
     }
 
-    const getEmoji = inAppMsgSetting.reactions.map((x) => x.emoji)
 
     const analyticsViews = [
         {
-            title: "Sent",
+            title: "Total View",
             show: true,
-            // count: views && views[0] && views[0].totalView ? views[0].totalView : 0,
+            count: analytics?.open_count || 0,
         },
         {
-            title: "Opened",
-            show: inAppMsgSetting.reply_type === 1,
-            // count: views && views[0] && views[0].uniqueView ? views[0].uniqueView : 0,
+            title: "Total Response",
+            show: inAppMsgSetting?.reply_type === 1,
+            count: analytics?.response_count || 0,
         },
         {
-            title: "Replied",
-            emoji: <div>{getEmoji}</div>,
-            show: inAppMsgSetting.reply_type === 2,
-            // count: views && views[0] && views[0].uniqueView ? views[0].uniqueView : 0,
+            title: "Completion Rate",
+            count: `${analytics?.response_percentage?.toFixed(2) || 0}%`,
+            show: inAppMsgSetting?.reply_type === 1,
         },
     ]
 
-    const columnTitles = [
-        "Name",
-        inAppMsgSetting.action_type === 1
-            ? "Linked"
-            : inAppMsgSetting.action_type === 2
-            ? "Reaction"
-            : inAppMsgSetting.action_type === 3
-                ? "Collected Email"
-                : "Action",
-        inAppMsgSetting.action_type === 1
-            ? "When it was clicked"
-            : inAppMsgSetting.action_type === 2
-            ? "When they reacted"
-            : inAppMsgSetting.action_type === 3
-                ? "When it was collected"
-                : "Timestamp"
-    ];
 
     return (
         <Fragment>
@@ -156,7 +103,6 @@ const PostAnalyticsView = () => {
                         <Breadcrumb>
                             <BreadcrumbList>
                                 <BreadcrumbItem className={"cursor-pointer"}>
-                                    {/*<BreadcrumbLink onClick={() => navigate(`${baseUrl}/in-app-message?pageNo=${getPageNo}`)}>*/}
                                     <BreadcrumbLink onClick={() => navigate(`${baseUrl}/in-app-message`)}>
                                         In App Message
                                     </BreadcrumbLink>
@@ -171,9 +117,7 @@ const PostAnalyticsView = () => {
                     <CardContent className={"p-3 md:p-6 flex flex-col gap-6"}>
                         <div className={"flex flex-col gap-8"}>
                             <div className={"grid lg:grid-cols-3 md:grid-cols-2 md:gap-4 gap-3"}>
-                                {analyticsViews
-                                    .filter(view => view.show)
-                                    .map((x, i) => (
+                                {analyticsViews.map((x, i) => (
                                         <Fragment key={i}>
                                             {isLoading ? (
                                                 <Card>
@@ -182,8 +126,8 @@ const PostAnalyticsView = () => {
                                             ) : (
                                                 <Card>
                                                     <CardContent className={"text-2xl font-medium p-3 md:p-6"}>
-                                                        {x.emoji}
                                                         <div className={"text-base font-medium"}>{x.title}</div>
+                                                        <div className={"text-base font-medium"}>{x.count}</div>
                                                     </CardContent>
                                                 </Card>
                                             )}
@@ -192,34 +136,46 @@ const PostAnalyticsView = () => {
                             </div>
                         </div>
                         <div>
+                            How did that change over time?
+                        </div>
+                        <div>
                             <ChartContainer config={chartConfig} className="aspect-auto h-[250px] w-full">
                                 <ResponsiveContainer width="100%" height="100%">
                                     <LineChart
                                         accessibilityLayer
-                                        data={chartData}
-                                        margin={{
-                                            left: 12,
-                                            right: 12,
-                                        }}
+                                        data={analytics.chart}
+
                                     >
                                         <CartesianGrid vertical={false} />
                                         <XAxis
-                                            dataKey="month"
+                                            dataKey="x"
                                             tickLine={false}
                                             axisLine={false}
                                             tickMargin={8}
-                                            tickFormatter={(value) => value.slice(0, 3)}
+                                            tickFormatter={(value) => {
+                                                const date = new Date(value)
+                                                return date.toLocaleDateString("en-US", {
+                                                    month: "short",
+                                                    day: "numeric",
+                                                })
+                                            }}
                                         />
                                         <Tooltip
                                             cursor={false}
                                             content={<ChartTooltipContent hideLabel />}
                                         />
+                                        <YAxis tickLine={false} axisLine={false}/>
                                         <Line
-                                            dataKey="desktop"
-                                            type="linear"
-                                            stroke="var(--color-desktop)"
+                                            dataKey="view"
+                                            type="monotone"
+                                            stroke="var(--color-view)"
                                             strokeWidth={2}
-                                            dot={false}
+                                        />
+                                        <Line
+                                            dataKey="response"
+                                            type="monotone"
+                                            stroke="var(--color-response)"
+                                            strokeWidth={2}
                                         />
                                     </LineChart>
                                 </ResponsiveContainer>
@@ -227,11 +183,14 @@ const PostAnalyticsView = () => {
 
                         </div>
                         <div>
+                            Customers who opened
+                        </div>
+                        <div className={"border"}>
                             <Table>
                                 <TableHeader className={`${theme === "dark" ? "" : "bg-muted"}`}>
                                     <TableRow>
                                         {
-                                            columnTitles.map((x, i) => {
+                                            ["Name", "When it was opened"].map((x, i) => {
                                                 return (
                                                     <TableHead className={`px-2 py-[10px] md:px-3 font-medium text-card-foreground`} key={i}>
                                                         {x}
@@ -248,7 +207,69 @@ const PostAnalyticsView = () => {
                                                     return (
                                                         <TableRow key={index}>
                                                             {
-                                                                [...Array(3)].map((_, i) => {
+                                                                [...Array(2)].map((_, i) => {
+                                                                    return (
+                                                                        <TableCell key={i} className={"max-w-[373px] px-2 py-[10px] md:px-3"}>
+                                                                            <Skeleton className={"rounded-md w-full h-7"}/>
+                                                                        </TableCell>
+                                                                    )
+                                                                })
+                                                            }
+                                                        </TableRow>
+                                                    )
+                                                })
+                                            )
+                                            :
+                                            (analytics?.analytics || []).length >  0 ?
+                                                <Fragment>
+                                                    {
+                                                        (analytics?.analytics || []).map((x,i)=> {
+                                                            return (
+                                                                <TableRow key={x.id}>
+                                                                    <TableCell className={`flex items-center px-2 py-[10px] md:px-3 gap-2`}>
+                                                                        <>
+                                                                            <Avatar className={"w-[20px] h-[20px]"}>
+                                                                                <AvatarFallback>{x?.name? x?.name?.substring(0, 1) : x?.email?.substring(0, 1)}</AvatarFallback>
+                                                                            </Avatar>
+                                                                            <p className={"font-normal"}>{x?.name? x?.name : x.email}</p>
+                                                                        </>
+                                                                    </TableCell>
+                                                                    <TableCell className={`px-2 py-[10px] md:px-3 font-normal`}>{moment(x.created_at).format("ll")}</TableCell>
+                                                                </TableRow>
+                                                            )
+                                                        })
+                                                    }
+                                                </Fragment> : ""
+                                    }
+                                </TableBody>
+                            </Table>
+                        </div>
+                        <div>
+                            Customers who replied
+                        </div>
+                        <div className={"border"}>
+                            <Table>
+                                <TableHeader className={`${theme === "dark" ? "" : "bg-muted"}`}>
+                                    <TableRow>
+                                        {
+                                            ["Name", "Replay", "Reaction", "When they replied"].map((x, i) => {
+                                                return (
+                                                    <TableHead className={`px-2 py-[10px] md:px-3 font-medium text-card-foreground`} key={i}>
+                                                        {x}
+                                                    </TableHead>
+                                                );
+                                            })
+                                        }
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {
+                                        isLoading ? (
+                                                [...Array(10)].map((x, index) => {
+                                                    return (
+                                                        <TableRow key={index}>
+                                                            {
+                                                                [...Array(4)].map((_, i) => {
                                                                     return (
                                                                         <TableCell key={i}
                                                                                    className={"max-w-[373px] px-2 py-[10px] md:px-3"}>
@@ -262,31 +283,23 @@ const PostAnalyticsView = () => {
                                                 })
                                             )
                                             :
-                                            inAppMsgSetting.length >  0 ?
+                                            (analytics?.responses || []).length >  0 ?
                                                 <Fragment>
                                                     {
-                                                        inAppMsgSetting.map((x,i)=> {
-                                                            const sender = allStatusAndTypes?.members.find((y) => y.user_id == x.from);
+                                                        (analytics?.responses || []).map((x,i)=> {
                                                             return (
                                                                 <TableRow key={x.id}>
-                                                                    <TableCell className={`flex items-center mt-1 px-2 py-[10px] md:px-3 gap-2 ${sender ? sender : "justify-center"}`}>
-                                                                        {sender ? (
-                                                                            <>
-                                                                                <Avatar className={"w-[20px] h-[20px]"}>
-                                                                                    {sender.user_photo ? (
-                                                                                        <AvatarImage src={sender.user_photo} alt="@shadcn" />
-                                                                                    ) : (
-                                                                                        <AvatarFallback>{sender.user_first_name.substring(0, 1)}</AvatarFallback>
-                                                                                    )}
-                                                                                </Avatar>
-                                                                                <p className={"font-normal"}>{sender.user_first_name}</p>
-                                                                            </>
-                                                                        ) : (
-                                                                            <p className={"font-normal"}>-</p>
-                                                                        )}
+                                                                    <TableCell className={`flex items-center px-2 py-[10px] md:px-3 gap-2`}>
+                                                                        <>
+                                                                            <Avatar className={"w-[20px] h-[20px]"}>
+                                                                                <AvatarFallback>{x?.name? x?.name?.substring(0, 1) : x?.email?.substring(0, 1)}</AvatarFallback>
+                                                                            </Avatar>
+                                                                            <p className={"font-normal"}>{x?.name? x?.name : x.email}</p>
+                                                                        </>
                                                                     </TableCell>
-                                                                    <TableCell className={`px-2 py-[10px] md:px-3 font-normal`}></TableCell>
-                                                                    <TableCell className={`px-2 py-[10px] md:px-3 font-normal`}></TableCell>
+                                                                    <TableCell className={`px-2 py-[10px] md:px-3 font-normal`}>{x?.response ||  "-" }</TableCell>
+                                                                    <TableCell className={`px-2 py-[10px] md:px-3 font-normal`}>{x.emoji_url ? <img key={i} className={"h-6 w-6 cursor-pointer"} src={x.emoji_url}/> : "-" }</TableCell>
+                                                                    <TableCell className={`px-2 py-[10px] md:px-3 font-normal`}>{moment(x.created_at).format("ll")}</TableCell>
                                                                 </TableRow>
                                                             )
                                                         })

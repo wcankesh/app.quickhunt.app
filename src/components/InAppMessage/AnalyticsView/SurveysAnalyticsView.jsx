@@ -1,95 +1,44 @@
 import React, {Fragment, useEffect, useState} from 'react';
 import {Card, CardContent, CardHeader} from "../../ui/card";
-import {TooltipContent, TooltipTrigger,  TooltipProvider} from "../../ui/tooltip";
 import {Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator} from "../../ui/breadcrumb";
 import {baseUrl} from "../../../utils/constent";
 import {CommSkel} from "../../Comman/CommSkel";
 import {Skeleton} from "../../ui/skeleton";
-import {useLocation, useNavigate} from "react-router";
+import {useNavigate} from "react-router";
 import {ApiService} from "../../../utils/ApiService";
 import {useSelector} from "react-redux";
 import moment from "moment";
 import {useParams} from "react-router-dom";
-import {LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer} from 'recharts';
-import {ChartContainer, ChartTooltipContent} from "../../ui/chart";
+import {LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart, Bar, } from 'recharts';
+import {ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent} from "../../ui/chart";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "../../ui/table";
 import {useTheme} from "../../theme-provider";
-import {Avatar, AvatarFallback, AvatarImage} from "../../ui/avatar";
-import {Info} from "lucide-react";
-import {Button} from "../../ui/button";
-import EmptyData from "../../Comman/EmptyData";
+import {Avatar, AvatarFallback} from "../../ui/avatar";
 
-const initialState = {
-    project_id: "2",
-    title: "In app message",
-    type: 1,
-    body_text: "",
-    from: "",
-    reply_to: "",
-    bg_color: "#EEE4FF",
-    text_color: "#000000",
-    icon_color: "#FD6B65",
-    btn_color: "#7c3aed",
-    delay: 1,
-    start_at: moment().toISOString(),
-    end_at: moment().add(1, 'hour').toISOString(),
-    position: "top",
-    alignment: "center",
-    is_close_button: true,
-    reply_type: 1,
-    show_sender: true,
-    action_type: 0,
-    action_text: "",
-    action_url: "",
-    is_redirect: "",
-    is_banner_close_button: false,
-    banner_style: "",
-    reactions: [],
-    status: 1,
-    steps:[],
-    checklist_title: "",
-    checklist_description : "",
-    checklists: []
-}
 
 const chartConfig = {
-    desktop: {
-        label: "Desktop",
-        color: "hsl(var(--chart-1))",
+    y: {
+        label: "View",
+        color: "#7c3aed",
     },
 }
 
-const chartData = [
-    { month: "January", desktop: 186 },
-    { month: "February", desktop: 305 },
-    { month: "March", desktop: 237 },
-    { month: "April", desktop: 73 },
-    { month: "May", desktop: 209 },
-    { month: "June", desktop: 214 },
-]
 
 const SurveysAnalyticsView = () => {
     const {theme} = useTheme();
-    const {id, type} = useParams();
-    const location = useLocation();
-    const urlParams = new URLSearchParams(location.search);
-    const postId = urlParams.get("postId");
-    const getPageNo = urlParams.get("pageNo") || 1;
-
+    const {id} = useParams();
     const navigate = useNavigate();
     const apiService = new ApiService();
-
-    const allEmoji = useSelector(state => state.allStatusAndTypes.emoji);
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
-    const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
-    const [inAppMsgSetting, setInAppMsgSetting] = useState(initialState);
+    const [inAppMsgSetting, setInAppMsgSetting] = useState({});
     const [isLoading, setIsLoading] = useState(false);
-    const [selectedStep, setSelectedStep] = useState(null);
-    const [isSave, setIsSave] = useState(false);
+    const [analytics, setAnalytics] = useState({})
+    const [analyticsResponse, setAnalyticsResponse] = useState([])
 
     useEffect(() => {
-        if (id !== "new" && projectDetailsReducer.id) {
+        if (projectDetailsReducer.id) {
             getSingleInAppMessages();
+            getResponseInAppMessage();
         }
     }, [projectDetailsReducer.id]);
 
@@ -99,14 +48,20 @@ const SurveysAnalyticsView = () => {
         if (data.status === 200) {
             const payload = {
                 ...data.data,
-                body_text: type === "1" ? JSON.parse(data.data.body_text) : data.data.body_text,
             }
+            setAnalytics(data.analytics)
             setInAppMsgSetting(payload);
-            if(type === "3"){
-                setSelectedStep(payload.steps[0])
-            } else if(type === "4"){
-                setSelectedStep(payload.checklists[0])
-            }
+            setIsLoading(false);
+        } else {
+            setIsLoading(false);
+        }
+    }
+
+    const getResponseInAppMessage = async () => {
+        setIsLoading(true)
+        const data = await apiService.getResponseInAppMessage({in_app_message_id :id})
+        if (data.status === 200) {
+            setAnalyticsResponse(data.data)
             setIsLoading(false);
         } else {
             setIsLoading(false);
@@ -151,7 +106,6 @@ const SurveysAnalyticsView = () => {
                         <Breadcrumb>
                             <BreadcrumbList>
                                 <BreadcrumbItem className={"cursor-pointer"}>
-                                    {/*<BreadcrumbLink onClick={() => navigate(`${baseUrl}/in-app-message?pageNo=${getPageNo}`)}>*/}
                                     <BreadcrumbLink onClick={() => navigate(`${baseUrl}/in-app-message`)}>
                                         In App Message
                                     </BreadcrumbLink>
@@ -176,7 +130,6 @@ const SurveysAnalyticsView = () => {
                                             ) : (
                                                 <Card>
                                                     <CardContent className={"text-2xl font-medium p-3 md:p-6"}>
-                                                        {x.emoji}
                                                         <div className={"text-base font-medium"}>{x.title}</div>
                                                     </CardContent>
                                                 </Card>
@@ -186,46 +139,54 @@ const SurveysAnalyticsView = () => {
                             </div>
                         </div>
                         <div>
+                            How did that change over time?
+                        </div>
+                        <div>
                             <ChartContainer config={chartConfig} className="aspect-auto h-[250px] w-full">
                                 <ResponsiveContainer width="100%" height="100%">
                                     <LineChart
                                         accessibilityLayer
-                                        data={chartData}
-                                        margin={{
-                                            left: 12,
-                                            right: 12,
-                                        }}
+                                        data={analytics?.charts || []}
+
                                     >
                                         <CartesianGrid vertical={false} />
                                         <XAxis
-                                            dataKey="month"
+                                            dataKey="x"
                                             tickLine={false}
                                             axisLine={false}
                                             tickMargin={8}
-                                            tickFormatter={(value) => value.slice(0, 3)}
+                                            tickFormatter={(value) => {
+                                                const date = new Date(value)
+                                                return date.toLocaleDateString("en-US", {
+                                                    month: "short",
+                                                    day: "numeric",
+                                                })
+                                            }}
                                         />
                                         <Tooltip
                                             cursor={false}
                                             content={<ChartTooltipContent hideLabel />}
                                         />
+                                        <YAxis tickLine={false} axisLine={false}/>
                                         <Line
-                                            dataKey="desktop"
-                                            type="linear"
-                                            stroke="var(--color-desktop)"
+                                            dataKey="y"
+                                            type="monotone"
+                                            stroke="var(--color-y)"
                                             strokeWidth={2}
-                                            dot={false}
                                         />
                                     </LineChart>
                                 </ResponsiveContainer>
                             </ChartContainer>
-
                         </div>
                         <div>
+                            Customers who opened
+                        </div>
+                        <div className={"border"}>
                             <Table>
                                 <TableHeader className={`${theme === "dark" ? "" : "bg-muted"}`}>
                                     <TableRow>
                                         {
-                                            ["Name", "When it was received", "How it was received"].map((x, i) => {
+                                            ["Name", "When it was opened"].map((x, i) => {
                                                 return (
                                                     <TableHead className={`px-2 py-[10px] md:px-3 font-medium text-card-foreground`} key={i}>
                                                         {x}
@@ -242,10 +203,9 @@ const SurveysAnalyticsView = () => {
                                                     return (
                                                         <TableRow key={index}>
                                                             {
-                                                                [...Array(3)].map((_, i) => {
+                                                                [...Array(2)].map((_, i) => {
                                                                     return (
-                                                                        <TableCell key={i}
-                                                                                   className={"max-w-[373px] px-2 py-[10px] md:px-3"}>
+                                                                        <TableCell key={i} className={"max-w-[373px] px-2 py-[10px] md:px-3"}>
                                                                             <Skeleton className={"rounded-md w-full h-7"}/>
                                                                         </TableCell>
                                                                     )
@@ -256,121 +216,296 @@ const SurveysAnalyticsView = () => {
                                                 })
                                             )
                                             :
-                                            inAppMsgSetting.length >  0 ?
+                                            (analytics?.analytics || []).length >  0 ?
                                                 <Fragment>
                                                     {
-                                                        inAppMsgSetting.map((x,i)=> {
-                                                            const sender = allStatusAndTypes?.members.find((y) => y.user_id == x.from);
+                                                        (analytics?.analytics || []).map((x,i)=> {
                                                             return (
                                                                 <TableRow key={x.id}>
-                                                                    <TableCell className={`flex items-center mt-1 px-2 py-[10px] md:px-3 gap-2 ${sender ? sender : "justify-center"}`}>
-                                                                        {sender ? (
-                                                                            <>
-                                                                                <Avatar className={"w-[20px] h-[20px]"}>
-                                                                                    {sender.user_photo ? (
-                                                                                        <AvatarImage src={sender.user_photo} alt="@shadcn" />
-                                                                                    ) : (
-                                                                                        <AvatarFallback>{sender.user_first_name.substring(0, 1)}</AvatarFallback>
-                                                                                    )}
-                                                                                </Avatar>
-                                                                                <p className={"font-normal"}>{sender.user_first_name}</p>
-                                                                            </>
-                                                                        ) : (
-                                                                            <p className={"font-normal"}>-</p>
-                                                                        )}
+                                                                    <TableCell className={`flex items-center px-2 py-[10px] md:px-3 gap-2`}>
+                                                                        <>
+                                                                            <Avatar className={"w-[20px] h-[20px]"}>
+                                                                                <AvatarFallback>{x?.name? x?.name?.substring(0, 1) : x?.email?.substring(0, 1)}</AvatarFallback>
+                                                                            </Avatar>
+                                                                            <p className={"font-normal"}>{x?.name? x?.name : x.email}</p>
+                                                                        </>
                                                                     </TableCell>
-                                                                    <TableCell className={`px-2 py-[10px] md:px-3 font-normal`}></TableCell>
-                                                                    <TableCell className={`px-2 py-[10px] md:px-3 font-normal`}></TableCell>
+                                                                    <TableCell className={`px-2 py-[10px] md:px-3 font-normal`}>{moment(x.created_at).format("ll")}</TableCell>
                                                                 </TableRow>
                                                             )
                                                         })
                                                     }
-                                                </Fragment> : <TableRow>
-                                                    <TableCell colSpan={3}>
-                                                        <EmptyData/>
-                                                    </TableCell>
-                                                </TableRow>
+                                                </Fragment> : ""
                                     }
                                 </TableBody>
                             </Table>
                         </div>
                         <div>
+                            Customers who responded
+                        </div>
+                        <div className={"border"}>
                             <Table>
                                 <TableHeader className={`${theme === "dark" ? "" : "bg-muted"}`}>
                                     <TableRow>
-                                        <TableHead className={`px-2 py-[10px] md:px-3 font-medium text-card-foreground`}>
+                                        <TableHead className={`px-2 py-[10px] md:px-3 font-medium text-card-foreground`} >
                                             Name
                                         </TableHead>
-                                        {inAppMsgSetting.steps.map((step, i) => (
-                                            <TableHead className={`px-2 py-[10px] md:px-3 font-medium text-card-foreground`} key={i}>
-                                                {step.text || `Step ${step.step}`}
-                                            </TableHead>
-                                        ))}
+                                        {
+                                            (inAppMsgSetting?.steps || []).map((x, i) => {
+                                                return (
+                                                    <TableHead className={`px-2 py-[10px] md:px-3 font-medium text-card-foreground`} key={i}>
+                                                        {x.text}
+                                                    </TableHead>
+                                                );
+                                            })
+                                        }
+                                        <TableHead className={`px-2 py-[10px] md:px-3 font-medium text-card-foreground`} >
+                                            Date Responded
+                                        </TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {isLoading ? (
-                                        [...Array(10)].map((_, index) => (
-                                            <TableRow key={index}>
-                                                <TableCell className={"max-w-[373px] px-2 py-[10px] md:px-3"}>
-                                                    <Skeleton className={"rounded-md w-full h-7"} />
-                                                </TableCell>
-                                                {[...Array(inAppMsgSetting.steps.length)].map((_, i) => (
-                                                    <TableCell key={i} className={"max-w-[373px] px-2 py-[10px] md:px-3"}>
-                                                        <Skeleton className={"rounded-md w-full h-7"} />
-                                                    </TableCell>
-                                                ))}
-                                            </TableRow>
-                                        ))
-                                    ) : inAppMsgSetting.steps.length > 0 ? (
-                                        <Fragment>
-                                            {inAppMsgSetting.steps.map((step, i) => {
-                                                const sender = allStatusAndTypes?.members.find((y) => y.user_id == step.from); // Replace with appropriate data source for sender info
-                                                return (
-                                                    <TableRow key={step.step_id}>
-                                                        <TableCell className={`px-2 py-[10px] md:px-3 font-normal`}>
-                                                            {sender ? sender.user_first_name : "-"}
-                                                        </TableCell>
-                                                        {/* Display step information */}
-                                                        <TableCell className={`px-2 py-[10px] md:px-3 font-normal`}>
-                                                            {step.text}
-                                                        </TableCell>
-                                                    </TableRow>
-                                                );
-                                            })}
-                                        </Fragment>
-                                    ) : (
-                                        <TableRow>
-                                            <TableCell colSpan={inAppMsgSetting.steps.length + 1}>
-                                                <EmptyData />
-                                            </TableCell>
-                                        </TableRow>
-                                    )}
+                                    {
+                                        isLoading ? (
+                                                [...Array(10)].map((x, index) => {
+                                                    return (
+                                                        <TableRow key={index}>
+                                                            {
+                                                                [...Array(2)].map((_, i) => {
+                                                                    return (
+                                                                        <TableCell key={i} className={"max-w-[373px] px-2 py-[10px] md:px-3"}>
+                                                                            <Skeleton className={"rounded-md w-full h-7"}/>
+                                                                        </TableCell>
+                                                                    )
+                                                                })
+                                                            }
+                                                        </TableRow>
+                                                    )
+                                                })
+                                            )
+                                            :
+                                            (analytics?.analytics || []).length >  0 ?
+                                                <Fragment>
+                                                    {
+                                                        (analytics?.analytics || []).map((x,i)=> {
+                                                            return (
+                                                                <TableRow key={x.id}>
+                                                                    <TableCell className={`flex items-center px-2 py-[10px] md:px-3 gap-2`}>
+                                                                        <>
+                                                                            <Avatar className={"w-[20px] h-[20px]"}>
+                                                                                <AvatarFallback>{x?.name? x?.name?.substring(0, 1) : x?.email?.substring(0, 1)}</AvatarFallback>
+                                                                            </Avatar>
+                                                                            <p className={"font-normal"}>{x?.name? x?.name : x.email}</p>
+                                                                        </>
+                                                                    </TableCell>
+                                                                    {
+                                                                        (inAppMsgSetting?.steps || []).map((s, i) => {
+                                                                            const findResponse = x.response.find((f) => s.step_id === f.step_id) || {response: "-"}
+                                                                            return (
+                                                                                <TableCell className={`px-2 py-[10px] md:px-3 font-normal`}>
+                                                                                    {findResponse?.response}
+                                                                                </TableCell>
+                                                                            );
+                                                                        })
+                                                                    }
+                                                                    <TableCell className={`px-2 py-[10px] md:px-3 font-normal`}>{moment(x.created_at).format("ll")}</TableCell>
+                                                                </TableRow>
+                                                            )
+                                                        })
+                                                    }
+                                                </Fragment> : ""
+                                    }
                                 </TableBody>
                             </Table>
                         </div>
-                        <div>
-                            <div className={"grid lg:grid-cols-3 md:grid-cols-2 md:gap-4 gap-3"}>
-                                {reportAnalysis
-                                    .map((x, i) => (
-                                        <Fragment key={i}>
-                                            {isLoading ? (
-                                                <Card>
-                                                    <CardContent className={"p-0"}>{CommSkel.commonParagraphThree}</CardContent>
-                                                </Card>
-                                            ) : (
-                                                <Card>
-                                                    <CardContent className={"text-2xl font-medium p-3 md:p-6"}>
-                                                        {x.emoji}
-                                                        <div className={"text-base font-medium"}>{x.title}</div>
-                                                    </CardContent>
-                                                </Card>
-                                            )}
-                                        </Fragment>
-                                    ))}
+                        <div className={"flex flex-col gap-8"}>
+                            <div className={"grid lg:grid-cols-2 md:grid-cols-2 md:gap-4 gap-3"}>
+                                {
+                                    analyticsResponse.map((x) => {
+                                        let questionType2 = [];
+                                        let questionType4 = [];
+                                        let questionType5 = [];
+                                        if(x.question_type === 2 || x.question_type === 3){
+                                            for (let i = x.start_number; i <= x.end_number; i++) {
+                                                const foundReport = x.report.find(item => item.response === i.toString());
+                                                if (foundReport) {
+                                                    questionType2.push({
+                                                        total: foundReport.total,
+                                                        response: x.question_type === 3 ? `(${foundReport.response} stars)` :`(${foundReport.response})`
+                                                    });
+                                                } else {
+                                                    questionType2.push({
+                                                        total: 0,
+                                                        response: x.question_type === 3 ? `(${i} stars)` :`(${i})`
+                                                    });
+                                                }
+                                            }
+                                        }
+                                        if(x.question_type === 4){
+                                          x.reactions.map((r) => {
+                                              const foundReport = x.report.find(item => item.reaction_id === r.id);
+                                              if (foundReport) {
+                                                  questionType4.push({
+                                                      total: foundReport.total,
+                                                      response: foundReport.emoji
+                                                  });
+                                              } else {
+                                                  questionType4.push({
+                                                      total: 0,
+                                                      response: r.emoji
+                                                  });
+                                              }
+                                          })
+                                        }
+
+                                        if(x.question_type === 5){
+                                            x.options.map((r) => {
+                                                const foundReport = x.report.find(item => item.step_option_id === r.id);
+                                                if (foundReport) {
+                                                    questionType5.push({
+                                                        total: foundReport.total,
+                                                        response: r.title
+                                                    });
+                                                } else {
+                                                    questionType5.push({
+                                                        total: 0,
+                                                        response: r.title
+                                                    });
+                                                }
+                                            })
+                                        }
+                                        return(
+                                            x.question_type === 6 || x.question_type === 7 || x.question_type === 8 ? "" :
+                                            <Card>
+                                                <CardContent className={"text-2xl font-medium p-2 md:p-4"}>
+                                                    <div className={"text-base font-medium mb-2"}>{x.text}</div>
+                                                    {
+                                                        x.question_type === 1 ? <div>
+                                                            <ChartContainer config={{
+                                                                desktop: {
+                                                                    label: "Desktop",
+                                                                    color: "hsl(var(--chart-1))",
+                                                                },
+                                                                mobile: {
+                                                                    label: "Mobile",
+                                                                    color: "hsl(var(--chart-2))",
+                                                                },
+                                                            }}>
+                                                                <BarChart accessibilityLayer data={x.report}>
+                                                                    <CartesianGrid vertical={false} />
+                                                                    <XAxis
+                                                                        dataKey="created_at"
+                                                                        tickLine={false}
+                                                                        tickMargin={10}
+                                                                        axisLine={false}
+                                                                        tickFormatter={(value) => value.slice(0, 3)}
+                                                                    />
+                                                                    <ChartTooltip content={<ChartTooltipContent hideLabel />} />
+                                                                    <ChartLegend content={<ChartLegendContent />} />
+                                                                    <Bar
+                                                                        dataKey="desktop"
+                                                                        stackId="a"
+                                                                        fill="var(--color-desktop)"
+                                                                        radius={[0, 0, 4, 4]}
+                                                                    />
+                                                                    <Bar
+                                                                        dataKey="mobile"
+                                                                        stackId="a"
+                                                                        fill="var(--color-mobile)"
+                                                                        radius={[4, 4, 0, 0]}
+                                                                    />
+                                                                </BarChart>
+                                                            </ChartContainer>
+                                                        </div> : <div>
+                                                            <ChartContainer config={{
+                                                                total: {
+                                                                    label: 'Total',
+                                                                    color: "#7c3aed26",
+                                                                }
+                                                            }} className="aspect-auto h-[250px] w-full">
+                                                                <BarChart accessibilityLayer data={x.question_type === 2 || x.question_type === 3 ? questionType2 : x.question_type === 4 ? questionType4 : x.question_type === 5 ? questionType5 : []}>
+                                                                    <CartesianGrid vertical={false}/>
+                                                                    <XAxis
+                                                                        dataKey="response"
+                                                                        tickLine={false}
+                                                                        tickMargin={10}
+                                                                        axisLine={false}
+                                                                    />
+                                                                    <YAxis tickLine={false} axisLine={false}/>
+
+                                                                    <ChartTooltip
+                                                                        cursor={false}
+                                                                        content={<ChartTooltipContent indicator="line" />}
+                                                                    />
+                                                                    <Bar dataKey="total" fill="var(--color-total)"
+                                                                         className={"cursor-pointer"} radius={4}/>
+
+                                                                </BarChart>
+                                                            </ChartContainer>
+                                                        </div>
+                                                    }
+
+                                                </CardContent>
+                                            </Card>
+                                        )
+                                    })
+                                }
                             </div>
                         </div>
-                        <div className={"grid lg:grid-cols-2 md:grid-cols-2 md:gap-4 gap-3"}></div>
+                        <div className={"flex flex-col gap-8"}>
+                            <div className={"grid lg:grid-cols-1 md:grid-cols-1 md:gap-4 gap-3"}>
+                                {
+                                    analyticsResponse.map((x) => {
+                                        return(
+                                            x.question_type === 6 || x.question_type === 7 ?  <Card>
+                                                <CardContent className={"text-2xl font-medium p-2 md:p-4"}>
+                                                    <div className={"text-base font-medium mb-2"}>{x.text}</div>
+                                                    <div className={"border"}>
+                                                        <Table>
+                                                            <TableHeader className={`${theme === "dark" ? "" : "bg-muted"}`}>
+                                                                <TableRow>
+                                                                    <TableHead className={`px-2 py-[10px] md:px-3 font-medium text-card-foreground`} >
+                                                                        Name
+                                                                    </TableHead>
+                                                                    <TableHead className={`px-2 py-[10px] md:px-3 font-medium text-card-foreground`} >
+                                                                        Response
+                                                                    </TableHead>
+                                                                    <TableHead className={`px-2 py-[10px] md:px-3 font-medium text-card-foreground`} >
+                                                                        Date Responded
+                                                                    </TableHead>
+                                                                </TableRow>
+                                                            </TableHeader>
+                                                            <TableBody>
+                                                                {
+                                                                    (x?.report || []).map((x,i)=> {
+                                                                        return (
+                                                                            <TableRow key={x.id}>
+                                                                                <TableCell className={`flex items-center px-2 py-[10px] md:px-3 gap-2`}>
+                                                                                    <>
+                                                                                        <Avatar className={"w-[20px] h-[20px]"}>
+                                                                                            <AvatarFallback>{x?.name? x?.name?.substring(0, 1) : x?.email?.substring(0, 1)}</AvatarFallback>
+                                                                                        </Avatar>
+                                                                                        <p className={"font-normal"}>{x?.name? x?.name : x.email}</p>
+                                                                                    </>
+                                                                                </TableCell>
+                                                                                <TableCell className={`px-2 py-[10px] md:px-3 font-normal`}>
+                                                                                    {x?.response}
+                                                                                </TableCell>
+                                                                                <TableCell className={`px-2 py-[10px] md:px-3 font-normal`}>{moment(x.created_at).format("ll")}</TableCell>
+                                                                            </TableRow>
+                                                                        )
+                                                                    })
+                                                                }
+                                                            </TableBody>
+                                                        </Table>
+                                                    </div>
+                                                </CardContent>
+                                            </Card>: ""
+                                        )
+                                    })
+                                }
+                            </div>
+                        </div>
                     </CardContent>
                 </Card>
             </div>
