@@ -18,6 +18,7 @@ import {DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitl
 import EmptyData from "../Comman/EmptyData";
 import {useNavigate} from "react-router";
 import {useLocation} from "react-router-dom";
+import DeleteDialog from "../Comman/DeleteDialog";
 
 const status = [
     {name: "Publish", value: 1, fillColor: "#389E0D", strokeColor: "#389E0D",},
@@ -124,35 +125,15 @@ const AnnouncementsTable = ({data, isLoading, setSelectedRecord, handleDelete, s
 
             {
                 openDelete &&
-                <Fragment>
-                    <Dialog open onOpenChange={() => setOpenDelete(false)}>
-                        <DialogContent className="max-w-[350px] w-full sm:max-w-[525px] p-3 md:p-6 rounded-lg">
-                            <DialogHeader className={"flex flex-row justify-between gap-2"}>
-                                <div className={"flex flex-col gap-2"}>
-                                    <DialogTitle className={"text-start font-medium"}>You really want delete this
-                                        announcement?</DialogTitle>
-                                    <DialogDescription className={"text-start"}>This action can't be
-                                        undone.</DialogDescription>
-                                </div>
-                                <X size={16} className={"m-0 cursor-pointer"} onClick={() => setOpenDelete(false)}/>
-                            </DialogHeader>
-                            <DialogFooter className={"flex-row justify-end space-x-2"}>
-                                <Button variant={"outline hover:none"}
-                                        className={"text-sm font-semibold border"}
-                                        onClick={() => setOpenDelete(false)}>Cancel</Button>
-                                <Button
-                                    variant={"hover:bg-destructive"}
-                                    className={` ${theme === "dark" ? "text-card-foreground" : "text-card"} ${isLoadingDelete ? "py-2 px-6" : "py-2 px-6"} w-[76px] text-sm font-semibold bg-destructive`}
-                                    onClick={deleteParticularRow}
-                                >
-                                    {isLoadingDelete ? <Loader2 size={16} className={"animate-spin"}/> : "Delete"}
-                                </Button>
-                            </DialogFooter>
-                        </DialogContent>
-                    </Dialog>
-                </Fragment>
+                <DeleteDialog
+                    title={"You really want to delete this Announcement?"}
+                    isOpen={openDelete}
+                    onOpenChange={() => setOpenDelete(false)}
+                    onDelete={deleteParticularRow}
+                    isDeleteLoading={isLoadingDelete}
+                    deleteRecord={idToDelete}
+                />
             }
-
 
             <CardContent className={"p-0 overflow-auto"}>
                 <Table>
@@ -161,7 +142,7 @@ const AnnouncementsTable = ({data, isLoading, setSelectedRecord, handleDelete, s
                             {
                                 ["Title", "Last Updated", "Published At", "Status", "", "", ""].map((x, i) => {
                                     return (
-                                        <TableHead className={`font-medium text-card-foreground px-2 py-[10px] md:px-3 `} key={i}
+                                        <TableHead className={`font-medium text-card-foreground px-2 py-[10px] md:px-3 ${i > 0 ? "max-w-[140px] truncate text-ellipsis overflow-hidden whitespace-nowrap" : ""}`} key={i}
                                                    onClick={() => x === "Published At" && toggleSort("Published At")}>
                                             {x}
                                             {x === "Published At" && (
@@ -268,8 +249,6 @@ const AnnouncementsTable = ({data, isLoading, setSelectedRecord, handleDelete, s
                                             </TableCell>
                                             <TableCell className={"px-2 py-[10px] md:px-3"}>
                                                 <Button
-                                                    // onClick={() => openSheet(x)}
-                                                    // onClick={() => navigate(`${baseUrl}/announcements/analytic-view?postId=${x.id}`)}
                                                     onClick={() => navigate(`${baseUrl}/announcements/analytic-view?postId=${x.id}?pageNo=${getPageNo}`)}
                                                     variant={"ghost"}
                                                     className={"p-0 h-auto"}

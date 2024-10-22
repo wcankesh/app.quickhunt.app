@@ -320,16 +320,15 @@ const UpdateAnnouncement = () => {
                         }
                     </Button>
                     <Button
-                        size={"sm"}
                         variant={"outline "}
                         disabled={isLoad === 'head'}
                         onClick={() => updatePost('head')}
-                        className={`bg-primary w-[115px] font-medium hidden md:flex justify-center items-center ${theme === "dark" ? "text-card-foreground" : "text-card"}`}
+                        className={`bg-primary w-[101px] font-medium hidden md:flex justify-center items-center ${theme === "dark" ? "text-card-foreground" : "text-card"}`}
                     >
-                        {isLoad === 'head' ? <Loader2
+                        {isLoad == 'head' ? <Loader2
                             className="h-4 w-4 animate-spin"/> : "Update Post"}
                     </Button>
-                    <Button size={"sm"} onClick={() => navigate(`${baseUrl}/announcements?pageNo=${getPageNo}`)} variant={"outline "}
+                    <Button onClick={() => navigate(`${baseUrl}/announcements?pageNo=${getPageNo}`)} variant={"outline "}
                             className={`text-sm font-medium border border-primary hidden md:block ${theme === "dark" ? "" : "text-primary"}`}>Cancel</Button>
 
                 </div>
@@ -612,7 +611,7 @@ const UpdateAnnouncement = () => {
                         variant={"outline "}
                         disabled={isLoad === 'bottom'}
                         onClick={() => updatePost("bottom")}
-                        className={` bg-primary ${theme === "dark" ? "text-card-foreground" : "text-card"} w-[115px] font-medium`}
+                        className={` bg-primary ${theme === "dark" ? "text-card-foreground" : "text-card"} w-[101px] font-medium`}
                     >
                         {isLoad === 'bottom' ? <Loader2
                             className="h-4 w-4 animate-spin"/> : "Update Post"}

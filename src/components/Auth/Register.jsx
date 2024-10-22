@@ -209,7 +209,7 @@ const Register = () => {
                                             <div className={"w-full flex flex-col gap-8"}>
                                         <div className="gap-2 flex flex-col items-start">
                                             {/*{theme === "dark" ? Icon.whiteLogo : Icon.blackLogo}*/}
-                                            <h1 className="text-2xl md:text-3xl">Create Your Account</h1>
+                                            <h1 className="text-2xl md:text-3xl font-normal flex-initial w-auto">Create Your Account</h1>
                                             {/*<h6 className="font-normal text-sm text-muted-foreground">*/}
                                             {/*    Enhance customer experience now.*/}
                                             {/*</h6>*/}

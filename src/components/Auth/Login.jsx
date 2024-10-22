@@ -175,7 +175,7 @@ const Login = () => {
                                         <div className={"w-full flex flex-col gap-8"}>
                                         <div className="gap-2 flex flex-col items-start">
                                             {/*{theme === "dark" ? Icon.whiteLogo : Icon.blackLogo}*/}
-                                            <h1 className="text-2xl md:text-3xl">Login</h1>
+                                            <h1 className="text-2xl md:text-3xl font-normal flex-initial w-auto">Login</h1>
                                             {/*<h6 className="text-center font-normal text-sm text-muted-foreground">*/}
                                             {/*    Enter your email below to create your account*/}
                                             {/*</h6>*/}

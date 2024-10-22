@@ -53,7 +53,7 @@ const IdeaWidgetPreview = ({widgetsSetting}) => {
                     <Button variant="outline" size="icon" className={`w-9 h-9 flex ${btnClass}`}><Filter fill="true" className='w-4 h-4'/></Button>
                     <Button size="icon" variant="outline" className={`w-9 h-9 flex ${btnClass}`}><GalleryVerticalEnd fill="true" className='w-4 -h4'/></Button>
                 </div>
-                <Button size="sm" className="gap-2 inset-0 shadow-none outline-none" style={{
+                <Button className="gap-2 inset-0 shadow-none outline-none" style={{
                     backgroundColor: widgetsSetting?.btn_background_color,
                     color: widgetsSetting?.btn_text_color
                 }}><Plus className="w-5 h-5"/> Create Idea</Button>
@@ -162,7 +162,7 @@ const IdeaWidgetPreview = ({widgetsSetting}) => {
                                 <p className="mt-2 text-sm text-gray-500">It looks like you haven't added any items yet.
                                     Start by adding new items to see them here.</p>
                                 <div className="mt-6">
-                                    <Button size="sm" className="gap-2 inset-0 shadow-none outline-none" style={{
+                                    <Button className="gap-2 inset-0 shadow-none outline-none" style={{
                                         backgroundColor: widgetsSetting?.btn_background_color,
                                         color: widgetsSetting?.btn_text_color
                                     }}><Plus className="w-5 h-5"/> Add New Idea</Button>

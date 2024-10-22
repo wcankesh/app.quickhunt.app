@@ -53,8 +53,8 @@ const WidgetHeader = ({widgetsSetting, selected, setSelected}) => {
                             </div>
                             <div className="flex flex-wrap gap-2">
                                 <div className={`gap-2 flex`}>
-                                    <Button size={'sm'} variant={"outline"} style={{ borderColor:widgetsSetting?.header_btn_background_color,color:widgetsSetting?.header_btn_background_color, }} className="hover:bg-inherit text-primary border-primary bg-transparent">Sign in</Button>
-                                    <Button size={'sm'} style={{ backgroundColor:widgetsSetting?.header_btn_background_color,color:widgetsSetting?.header_btn_text_color}}>Sign up</Button>
+                                    <Button variant={"outline"} style={{ borderColor:widgetsSetting?.header_btn_background_color,color:widgetsSetting?.header_btn_background_color, }} className="hover:bg-inherit text-primary border-primary bg-transparent">Sign in</Button>
+                                    <Button style={{ backgroundColor:widgetsSetting?.header_btn_background_color,color:widgetsSetting?.header_btn_text_color}}>Sign up</Button>
                                 </div>
 
 

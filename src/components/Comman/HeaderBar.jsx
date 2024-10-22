@@ -1,7 +1,7 @@
 import React, {Fragment, useEffect, useState} from 'react';
 import {Sheet, SheetContent, SheetHeader, SheetOverlay, SheetTitle, SheetTrigger} from "../ui/sheet";
 import {Button} from "../ui/button";
-import {Activity, Bell, ChevronsUpDown, CircleHelp, DatabaseBackup, Eye, FileSliders, House, LayoutTemplate, Lightbulb, Loader2, Megaphone, Menu, Moon, NotebookPen, Plus, Settings, Sun, Tag, Trash2, Users, UsersRound, X} from "lucide-react";
+import {Activity, Bell, ChevronsUpDown, CircleHelp, CreditCard, DatabaseBackup, Eye, FileSliders, FileText, House, LayoutTemplate, Lightbulb, Loader2, LogOut, Megaphone, Menu, Moon, NotebookPen, Plus, Settings, Sun, Tag, Trash2, User, Users, UsersRound, X} from "lucide-react";
 import {Input} from "../ui/input";
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger} from "../ui/dropdown-menu";
 import {useTheme} from "../theme-provider";
@@ -676,24 +676,24 @@ const HeaderBar = () => {
                                         className={"text-sm font-normal flex gap-2 cursor-pointer"}
                                         onClick={() => navigate(`${baseUrl}/settings/profile`)}
                                     >
-                                        <span className={`${theme === "dark" ? "profile-menu-icon" : ""}`}>{Icon.accountUserIcon}</span>
+                                        <span className={`${theme === "dark" ? "profile-menu-icon" : ""}`}><User size={16} /></span>
                                         Profile
                                     </DropdownMenuItem>
                                     <DropdownMenuItem
                                         className={"text-sm font-normal flex gap-2 cursor-pointer"}
                                         onClick={() => navigate(`${baseUrl}/pricing-plan`)}
                                     >
-                                        <span className={`${theme === "dark" ? "profile-menu-icon" : ""}`}>{Icon.bilingIcon}</span>
+                                        <span className={`${theme === "dark" ? "profile-menu-icon" : ""}`}><CreditCard size={16} /></span>
                                         Billing
                                     </DropdownMenuItem>
                                     <DropdownMenuSeparator/>
                                     <DropdownMenuItem className={"text-sm font-normal flex gap-2 cursor-pointer"} onClick={openSheet}>
-                                        <span className={`${theme === "dark" ? "profile-menu-icon" : ""}`}>{Icon.projectsIcon}</span>
+                                        <span className={`${theme === "dark" ? "profile-menu-icon" : ""}`}><FileText size={16} /></span>
                                         Projects
                                     </DropdownMenuItem>
                                     <DropdownMenuSeparator/>
                                     <DropdownMenuItem onClick={onLogout} className={"text-sm font-normal flex gap-2 cursor-pointer"}>
-                                        <span className={`${theme === "dark" ? "profile-menu-icon" : ""}`}>{Icon.logoutIcon}</span>
+                                        <span className={`${theme === "dark" ? "profile-menu-icon" : ""}`}><LogOut size={16} /></span>
                                         Logout
                                     </DropdownMenuItem>
                                 </DropdownMenuContent>

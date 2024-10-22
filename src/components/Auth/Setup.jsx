@@ -82,8 +82,8 @@ const Setup = () => {
                                 </div>
                             </div>
                             <div className={"flex gap-2"}>
-                                <Button size={"sm"} onClick={() =>joinInvite(2)}>Accept</Button>
-                                <Button size={"sm"} variant={"outline"} onClick={() =>joinInvite(3)}>Reject</Button>
+                                <Button onClick={() =>joinInvite(2)}>Accept</Button>
+                                <Button variant={"outline"} onClick={() =>joinInvite(3)}>Reject</Button>
                             </div>
                         </CardContent>
                     </Card>

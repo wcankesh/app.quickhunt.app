@@ -136,11 +136,11 @@ const Social = () => {
 
     return (
         <Card className={"divide-y"}>
-            <CardHeader className={"p-4 sm:p-6"}>
+            <CardHeader className={"p-4 sm:px-5 sm:py-4"}>
                 <h2 className={`text-lg sm:text-2xl font-normal`}>Social links</h2>
             </CardHeader>
             <CardContent className={"p-0"}>
-                <div className={"p-4 sm:p-6"}>
+                <div className={"p-4 sm:px-5 sm:py-4"}>
                     <div className="grid w-full gap-1.5">
                         <Label htmlFor="facebook" className={" font-normal"}>Facebook</Label>
                         <Input value={socialLink?.facebook} onBlur={onBlur} onChange={onChange} name="facebook" placeholder={"https://facebook.com/"} type="text" id="facebook" className={"h-9"}/>
@@ -178,9 +178,9 @@ const Social = () => {
                     </div>
                 </div>
             </CardContent>
-            <CardFooter className={"px-6 py-4 justify-end"}>
+            <CardFooter className={"p-4 sm:px-5 sm:py-4 justify-end"}>
                 <Button
-                    className={`py-2 px-6 w-[142px] text-sm font-medium hover:bg-primary`}
+                    className={`w-[111px] text-sm font-medium hover:bg-primary`}
                     onClick={onUpdateSocialSetting}>
                     {isSave ? <Loader2 className="h-4 w-4 animate-spin"/> : "Update Social"}</Button>
             </CardFooter>

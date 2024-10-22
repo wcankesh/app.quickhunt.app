@@ -509,7 +509,6 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
     }
 
     const deleteComment = async (id, indexs) => {
-        debugger
         const data = await apiSerVice.deleteComment({id: id})
         if (data.status === 200) {
             let cloneRoadmap = [...roadmapList.columns];
@@ -649,7 +648,6 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
     }
 
     const onCreateIdea = async () => {
-        debugger
         setIsLoadingCreateIdea(true)
         let validationErrors = {};
         Object.keys(selectedIdea).forEach(name => {
@@ -718,7 +716,6 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
     //     setIsLoadingSidebar("delete")
     //     const data = await apiSerVice.onDeleteIdea(selectedIdea?.id)
     //     if (data.status === 200) {
-    //         debugger
     //         let cloneRoadmap = [...roadmapList.columns];
     //         const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap?.id);
     //         if(roadmapIndex !== -1) {
@@ -987,7 +984,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                         </div>
                                         <div className={"p-4 lg:p-8 flex gap-3"}>
                                             <Button
-                                                className={`py-2 px-6 w-[81px] text-sm font-medium hover:bg-primary`}
+                                                className={`w-[53px] text-sm font-medium hover:bg-primary`}
                                                 onClick={onCreateIdea}
                                             >
                                                 {
@@ -997,7 +994,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                             </Button>
                                             <Button
                                                 variant={"outline hover:bg-transparent"}
-                                                className={"border border-primary py-2 px-6 text-sm font-medium text-primary"}
+                                                className={"border border-primary text-sm font-medium text-primary"}
                                                 onClick={handleOnCreateCancel}
                                             >
                                                 Cancel
@@ -1454,7 +1451,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                                                                     <div
                                                                                                         className={"flex gap-2"}>
                                                                                                         <Button
-                                                                                                            className={`py-2 px-6 w-[81px] h-[30px] text-sm font-medium hover:bg-primary`}
+                                                                                                            className={`w-[81px] h-[30px] text-sm font-medium hover:bg-primary`}
                                                                                                             onClick={onUpdateComment}
                                                                                                             disabled={selectedComment.comment.trim() === "" || selectedComment.comment === ""}>
                                                                                                             {
@@ -1465,7 +1462,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                                                                             }
                                                                                                         </Button>
                                                                                                         <Button
-                                                                                                            className={"px-3 py-2 h-[30px] text-sm font-medium text-primary border border-primary"}
+                                                                                                            className={"h-[30px] text-sm font-medium text-primary border border-primary"}
                                                                                                             variant={"outline hover:none"}
                                                                                                             onClick={onCancelComment}>
                                                                                                             Cancel
@@ -1641,7 +1638,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                                                                                                     <div
                                                                                                                                         className={"flex gap-2"}>
                                                                                                                                         <Button
-                                                                                                                                            className={`py-2 px-6 w-[81px] h-[30px] text-sm font-medium hover:bg-primary`}
+                                                                                                                                            className={`w-[81px] h-[30px] text-sm font-medium hover:bg-primary`}
                                                                                                                                             onClick={onUpdateSubComment}
                                                                                                                                             disabled={selectedSubComment.comment.trim() === "" || selectedSubComment.comment === ""}>
                                                                                                                                             {
@@ -1652,7 +1649,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                                                                                                             }
                                                                                                                                         </Button>
                                                                                                                                         <Button
-                                                                                                                                            className={"px-3 py-2 h-[30px] text-sm font-medium text-primary border border-primary"}
+                                                                                                                                            className={"h-[30px] text-sm font-medium text-primary border border-primary"}
                                                                                                                                             variant={"outline hover:none"}
                                                                                                                                             onClick={onCancelSubComment}>Cancel</Button>
                                                                                                                                         <div
@@ -1753,7 +1750,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                                                                     <div
                                                                                                         className={"flex gap-2"}>
                                                                                                         <Button
-                                                                                                            className={`py-2 px-6 w-[86px] h-[30px] text-sm font-medium`}
+                                                                                                            className={`w-[86px] h-[30px] text-sm font-medium`}
                                                                                                             disabled={subCommentText.trim() === "" || subCommentText === ""}
                                                                                                             onClick={() => onCreateSubComment(x, i)}
                                                                                                         >

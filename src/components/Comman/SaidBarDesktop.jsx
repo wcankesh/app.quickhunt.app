@@ -1,4 +1,4 @@
-import React, {Fragment, useState, useEffect} from 'react';
+import React, {Fragment} from 'react';
 import {Button} from "../ui/button";
 import {Icon} from "../../utils/Icon";
 import {baseUrl} from "../../utils/constent";
@@ -6,17 +6,7 @@ import {useNavigate, useLocation, useParams} from "react-router-dom";
 import {useTheme} from "../theme-provider";
 import {useSelector} from "react-redux";
 import Articles from "../HelpCenter/Articles/Articles";
-import {
-    Activity, Bell, CircleHelp, DatabaseBackup,
-    FileSliders,
-    Grid2x2,
-    House, LayoutTemplate,
-    Lightbulb,
-    Megaphone,
-    NotebookPen, Settings, Tag,
-    Users,
-    UsersRound
-} from "lucide-react";
+import {Activity, Bell, CircleHelp, DatabaseBackup, FileSliders, House, LayoutTemplate, Lightbulb, Megaphone, NotebookPen, Settings, Tag, Users, UsersRound} from "lucide-react";
 
 const SaidBarDesktop = () => {
     const {theme} = useTheme()
@@ -36,8 +26,6 @@ const SaidBarDesktop = () => {
     const isHelpCenterActive = isActive(`${baseUrl}/help/article`, `${baseUrl}/help/category`) ||
         isActive(`${baseUrl}/help/article/${id}`, `${baseUrl}/help/category/${id}`);
 
-    const hasRoadmapPath = location.pathname.includes("/roadmap");
-
     const menuComponent = [
         {
             dashBtn: [
@@ -55,7 +43,6 @@ const SaidBarDesktop = () => {
                 {
                     title: 'Ideas',
                     link: '/ideas',
-                    // icon: Icon.ideasIcon,
                     icon: <Lightbulb size={15} />,
                     selected: isActive(`${baseUrl}/ideas`, `${baseUrl}/ideas/${id}`),
                 },
@@ -184,12 +171,9 @@ const SaidBarDesktop = () => {
     };
 
     return (
-        // <div className={`main-sidebar pointer-events-none fixed start-0 top-0 z-[60] flex h-full xl:z-10 hidden md:block ${location.pathname.includes("widget/") ? "overflow-hidden" : "overflow-auto"}`}>
         <div className={`main-sidebar pointer-events-none fixed start-0 top-0 z-[60] h-full xl:z-10 hidden md:block ${location.pathname.includes("widget/") ? "overflow-hidden" : "overflow-auto"}`}>
-            {/*<div className="pointer-events-auto relative z-30 flex h-full w-[282px] flex-col ltr:-translate-x-full rtl:translate-x-full ltr:xl:translate-x-0 rtl:xl:translate-x-0">*/}
             <div className="pointer-events-auto relative z-30 flex h-full w-[250px] flex-col ltr:-translate-x-full rtl:translate-x-full ltr:xl:translate-x-0 rtl:xl:translate-x-0">
                 <div className={"flex gap-3 items-center px-4 bg-primary"}>
-                    {/*<div className="flex h-14 items-center lg:h-[60px]">*/}
                     <div className="flex w-full items-center h-[56px]">
                         <div className={"app-logo cursor-pointer"} onClick={() => onRedirect("/dashboard")}>
                             {/*{theme === "dark" ? Icon.blackLogo : Icon.whiteLogo}*/}
@@ -197,14 +181,11 @@ const SaidBarDesktop = () => {
                         </div>
                     </div>
                 </div>
-                {/*<div className={"sidebar-dek-menu flex flex-col gap-3 overflow-y-auto"}>*/}
                 <div className={`h-[calc(100vh_-_56px)] px-3 flex flex-col overflow-y-auto h-full bg-primary/5 ${theme === "dark" ? "border border-r" : ""}`}>
-                    {/*<nav className="grid items-start px-4 gap-3 pt-[10px]">*/}
                     <nav className="grid items-start">
                         {
                             (menuComponent || []).map((x, i) => {
                                 return (
-                                    // <div key={i} className={`flex flex-col ${x.dashBtn ? "" : "gap-1"}`}>
                                     <div key={i} className={`flex flex-col py-4 ${x.dashBtn ? "" : "gap-1"}`}>
                                         {
                                             (x.dashBtn || []).map((z, i) => {
@@ -230,15 +211,6 @@ const SaidBarDesktop = () => {
                                                             (x.items || []).map((y, i) => {
                                                                 return (
                                                                     <Fragment key={i}>
-                                                                        {/*// <Button*/}
-                                                                        {/*//     key={i}*/}
-                                                                        {/*//     variant={"link hover:no-underline"}*/}
-                                                                        {/*//     className={`${y.selected ? "flex justify-start gap-4 h-9 rounded-md bg-primary/15 transition-none" : 'flex items-center gap-4 h-9 justify-start transition-none'}`}*/}
-                                                                        {/*//     onClick={() => onRedirect(y.link)}*/}
-                                                                        {/*// >*/}
-                                                                        {/*//     <div className={`${y.selected ? "active-menu" : "menu-icon"}`}>{y.icon}</div>*/}
-                                                                        {/*//     <div className={`${y.selected ? "text-primary text-sm font-medium" : "text-sm font-medium"}`}>{y.title}</div>*/}
-                                                                        {/*// </Button>*/}
                                                                         <Button
                                                                             key={i}
                                                                             variant={"link hover:no-underline"}
@@ -246,8 +218,7 @@ const SaidBarDesktop = () => {
                                                                             onClick={() => onRedirect(y.link)}
                                                                         >
                                                                             <div className={`${y.selected ? "active-menu" : ""}`}>{y.icon}</div>
-                                                                            <div
-                                                                                className={`font-normal text-left flex-1 text-sm ${y.selected ? "text-primary" : ""}`}>{y.title}</div>
+                                                                            <div className={`font-normal text-left flex-1 text-sm ${y.selected ? "text-primary" : ""}`}>{y.title}</div>
                                                                         </Button>
                                                                         {y.title === 'Help Center' && isHelpCenterActive && y.subItems && renderSubItems(y.subItems)}
                                                                     </Fragment>

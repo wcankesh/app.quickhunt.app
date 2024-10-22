@@ -1,8 +1,7 @@
 import React, {useEffect, useState, Fragment} from 'react';
 import {useNavigate, useParams} from "react-router-dom";
 import {Button} from "../ui/button";
-import {DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger,} from "../ui/dropdown-menu";
-import {ArrowLeft, ArrowRight, Loader2, Plus, RotateCcw} from "lucide-react";
+import {ArrowLeft, ArrowRight, BarChart, Loader2, Plus, RotateCcw} from "lucide-react";
 import {useTheme} from "../theme-provider";
 import {baseUrl} from "../../utils/constent";
 import {Card} from "../ui/card";
@@ -280,10 +279,22 @@ const UpdateInAppMessage = () => {
                     </Breadcrumb>
                 </Breadcrumb>
                 <div className={"flex items-center gap-2"}>
-                    <Button size={"sm"} className={`w-[125px] font-medium hover:bg-primary`} onClick={id === "new" ? createMessage : onUpdateMessage}>
+                    {
+                        (id !== "new") ?
+                            <Button
+                                variant={"outline"}
+                                size={"icon"}
+                                className={"h-9"}
+                                onClick={() => navigate(`${baseUrl}/in-app-message/${inAppMsgSetting.type}/analytic/${inAppMsgSetting.id}`)}
+                            >
+                                <BarChart size={16}/>
+                            </Button>
+                            : ""
+                    }
+                    <Button className={`w-[111px] font-medium hover:bg-primary`} onClick={id === "new" ? createMessage : onUpdateMessage}>
                         {isSave ? <Loader2 size={16} className={"animate-spin"}/> : "Save Changes"}
                     </Button>
-                    <Button size={"sm"} variant={"ghost hover-none"} className={"font-medium border border-primary text-primary"} onClick={handleCancel}>Cancel</Button>
+                    <Button variant={"ghost hover-none"} className={"font-medium border border-primary text-primary"} onClick={handleCancel}>Cancel</Button>
                 </div>
             </div>
             <div className={"flex h-[calc(100%_-_85px)] overflow-y-auto"}>

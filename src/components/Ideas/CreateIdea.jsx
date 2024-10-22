@@ -31,10 +31,11 @@ const CreateIdea = ({isOpen, onOpen, onClose, closeCreateIdea, setIdeasList, ide
     let apiSerVice = new ApiService();
     const { toast } = useToast()
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
+    const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
+
     const [ideaDetail, setIdeaDetail] = useState(initialState);
     const [topicLists, setTopicLists] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
-    const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const [formError, setFormError] = useState(initialStateError);
 
     useEffect(() => {
@@ -235,12 +236,12 @@ const CreateIdea = ({isOpen, onOpen, onClose, closeCreateIdea, setIdeasList, ide
                                         </Select>
                                 </div>
                                 <div className={"p-4 lg:p-8 flex gap-6"}>
-                                    <Button className={`py-2 px-6 w-[126px] text-sm font-medium hover:bg-primary`} onClick={onCreateIdea}>
+                                    <Button className={`w-[96px] text-sm font-medium hover:bg-primary`} onClick={onCreateIdea}>
                                         {
                                             isLoading ? <Loader2 className="h-4 w-4 animate-spin"/> : "Create Idea"
                                         }
                                         </Button>
-                                    <Button variant={"outline hover:bg-transparent"} className={"border border-primary py-2 px-6 text-sm font-medium text-primary"} onClick={onCancel}>Cancel</Button>
+                                    <Button variant={"outline hover:bg-transparent"} className={"border border-primary text-sm font-medium text-primary"} onClick={onCancel}>Cancel</Button>
                                 </div>
                             </div>
                     </div>

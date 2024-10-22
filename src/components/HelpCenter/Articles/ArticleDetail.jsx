@@ -7,7 +7,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "../../ui/select";
 import { Label } from "../../ui/label";
 import { Input } from "../../ui/input";
-import {Card, CardContent, CardHeader} from "../../ui/card";
+import {Card, CardHeader} from "../../ui/card";
 import {ApiService} from "../../../utils/ApiService";
 import {useSelector} from "react-redux";
 import {useToast} from "../../ui/use-toast";
@@ -23,7 +23,6 @@ import Image from "@editorjs/image";
 import Quote from "@editorjs/quote";
 import InlineCode from "@editorjs/inline-code";
 import EditorJS from "@editorjs/editorjs";
-import {useTheme} from "../../theme-provider";
 
     const statusOptions = [
         { name: "Publish", value: 1, fillColor: "#389E0D", strokeColor: "#389E0D" },
@@ -64,7 +63,6 @@ const ArticleDetail = () => {
     const [articlesDetails, setArticlesDetails] = useState(initialState);
     const [formError, setFormError] = useState(initialStateError);
     const [articleList, setArticleList] = useState([]);
-    const {theme} = useTheme();
     const editorCore = useRef(null);
 
     useEffect(() => {
@@ -140,7 +138,6 @@ const ArticleDetail = () => {
             return;
         }
         setLoading(true);
-        debugger
         const selectedCategory = articleList.find(item => item.id === articlesDetails.category_id);
         let selectedSubCategory = null;
         if (selectedCategory && selectedCategory.sub_categories.length > 0) {
@@ -168,7 +165,6 @@ const ArticleDetail = () => {
 
     const updateArticle = async () => {
         setLoading(true);
-        debugger
         const selectedCategory = articleList.find(item => item.id === Number(articlesDetails.category_id));
         let selectedSubCategory = null;
         if (selectedCategory && selectedCategory.sub_categories.length > 0) {
@@ -302,9 +298,7 @@ const ArticleDetail = () => {
                             className={"text-sm font-normal w-full h-auto"}
                             autoFocus
                         />
-                        {
-                            formError?.title && <span className="text-red-500 text-sm">{formError?.title}</span>
-                        }
+                        {formError?.title && <span className="text-red-500 text-sm">{formError?.title}</span>}
                     </div>
                     <div className={"space-y-2"}>
                         <Label className={"text-sm font-normal"}>Select Category</Label>
@@ -355,12 +349,12 @@ const ArticleDetail = () => {
 
     return (
         <Fragment>
-            <div className={"py-6 px-4 border-b flex items-center justify-between"}>
+            <div className={"p-4 md:py-6 md:px-4 border-b flex items-center justify-between flex-wrap gap-2"}>
                 <Breadcrumb>
                     <BreadcrumbList>
                         <BreadcrumbItem className={"cursor-pointer"}>
                             <BreadcrumbLink onClick={() => navigate(`${baseUrl}/help/article`)}>
-                                Create New Article
+                                Article
                             </BreadcrumbLink>
                         </BreadcrumbItem>
                         <BreadcrumbSeparator />
@@ -397,7 +391,7 @@ const ArticleDetail = () => {
                 <div className={"max-w-[407px] w-full border-r h-full overflow-y-auto"}>
                     {renderSidebarItems()}
                 </div>
-                <div className={"bg-muted w-full h-full px-16 flex flex-col gap-4 py-8 justify-start overflow-y-auto h-[calc(100%_-_94px)]"}>
+                <div className={"hidden md:block bg-muted w-full h-full px-16 flex flex-col gap-4 py-8 justify-start overflow-y-auto h-[calc(100%_-_94px)]"}>
                         <Card className={`rounded-[10px] p-0 h-full overflow-auto`} >
                             <CardHeader className={"pt-0"}>
                                 <div className={"pl-14 pt-6 m-0 w-full"}>{isLoading ? "" : <div id="editorjs"/>}</div>

@@ -615,7 +615,7 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                 </div>
             </div>
             <div className={"px-4 py-6 flex justify-between gap-2"}>
-                <Button className={`w-[125px] font-medium hover:bg-primary`} onClick={id === "new" ? createMessage : onUpdateMessage}>
+                <Button className={`w-[111px] font-medium hover:bg-primary`} onClick={id === "new" ? createMessage : onUpdateMessage}>
                     {isLoading ? <Loader2 className={"h-4 w-4 animate-spin"}/> : "Save Changes"}
                 </Button>
                 <Button variant={"ghost hover-none"} className={"font-medium border border-primary text-primary"} onClick={handleCancel}>Cancel</Button>

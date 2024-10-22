@@ -1,7 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import { Button } from "../ui/button";
 import {Card, CardContent, CardHeader, CardTitle,} from "../ui/card";
-import {Icon} from "../../utils/Icon";
 import {baseUrl, } from "../../utils/constent";
 import {useNavigate, useParams} from "react-router-dom";
 import Profile from "./SettingPage/Profile";
@@ -51,7 +50,7 @@ const Settings = () => {
     }, []);
 
     const isActive = (link) => {
-        return type === link || `${type}/${subType}` === link;;
+        return type === link || `${type}/${subType}` === link;
     };
 
     const onRedirect = (link) => {
@@ -201,7 +200,7 @@ const Settings = () => {
     return (
         <div className='container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-3 md:px-4'>
             <div className={"flex flex-row justify-between items-center px-1 relative"}>
-                <h1 className="text-lg sm:text-2xl font-normal">Settings</h1>
+                <h1 className="text-2xl font-normal flex-initial w-auto">Settings</h1>
                 {windowSize.width <= 768 && <Popover open={open} onOpenChange={setOpen}>
                     <PopoverTrigger>
                         <Button variant="outline" className={"w-[30px] h-[30px]"} size="icon">

@@ -13,6 +13,7 @@ import {toast} from "../../ui/use-toast";
 import {Dialog} from "@radix-ui/react-dialog";
 import {DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "../../ui/dialog";
 import EmptyData from "../../Comman/EmptyData";
+import DeleteDialog from "../../Comman/DeleteDialog";
 
 const initialState = {
     name: "",
@@ -93,7 +94,7 @@ const Categories = () => {
         }
 
         const clone = [...categoriesList];
-        const data = await apiService.createCategory(payload)
+        const data = await apiService.createCategorySettings(payload)
 
         if(data.status === 200){
             clone.push(data.data);
@@ -115,13 +116,12 @@ const Categories = () => {
 
     const onDelete = async () => {
         setIsLoadingDelete(true)
-        const data = await apiService.deleteCategories(deleteId);
+        const data = await apiService.deleteCategorySettings(deleteId);
         const clone = [...categoriesList];
         const deleteToIndex = clone.findIndex((x)=> x.id == deleteId);
         if(data.status === 200) {
-
-            setCategoriesList(clone);
             clone.splice(deleteToIndex,1);
+            // setCategoriesList(clone);
             dispatch(allStatusAndTypesAction({...allStatusAndTypes, categories: clone}));
             setCategoriesList(clone);
             toast({
@@ -191,7 +191,7 @@ const Categories = () => {
             description:topicToSave.description,
             project_id: projectDetailsReducer.id,
         }
-        const data = await apiService.updateCategory(payload, topicToSave.id);
+        const data = await apiService.updateCategorySettings(payload, topicToSave.id);
         if(data.status === 200){
             const clone = [...categoriesList];
             const index = clone.findIndex((x) => x.id === topicToSave.id)
@@ -223,40 +223,23 @@ const Categories = () => {
         <Fragment>
             {
                 openDelete &&
-                <Fragment>
-                    <Dialog open onOpenChange={()=> setOpenDelete(false)}>
-                        <DialogContent className="max-w-[350px] w-full sm:max-w-[525px] p-3 md:p-6 rounded-lg">
-                            <DialogHeader className={"flex flex-row justify-between gap-2"}>
-                                <div className={"flex flex-col gap-2"}>
-                                    <DialogTitle className={"text-start font-medium"}>You really want delete this Category?</DialogTitle>
-                                    <DialogDescription className={"text-start"}>This action can't be undone.</DialogDescription>
-                                </div>
-                                <X size={16} className={"m-0 cursor-pointer"} onClick={() => setOpenDelete(false)}/>
-                            </DialogHeader>
-                            <DialogFooter className={"flex-row justify-end space-x-2"}>
-                                <Button variant={"outline hover:none"}
-                                        className={"text-sm font-medium border"}
-                                        onClick={() => setOpenDelete(false)}>Cancel</Button>
-                                <Button
-                                    variant={"hover:bg-destructive"}
-                                    className={` ${theme === "dark" ? "text-card-foreground" : "text-card"} py-2 px-6 w-[76px] text-sm font-medium bg-destructive`}
-                                    onClick={onDelete}
-                                >
-                                    {isLoadingDelete ? <Loader2 size={16} className={"animate-spin"}/> : "Delete"}
-                                </Button>
-                            </DialogFooter>
-                        </DialogContent>
-                    </Dialog>
-                </Fragment>
+                <DeleteDialog
+                    title={"You really want to delete this Category ?"}
+                    isOpen={openDelete}
+                    onOpenChange={() => setOpenDelete(false)}
+                    onDelete={onDelete}
+                    isDeleteLoading={isLoadingDelete}
+                    deleteRecord={deleteId}
+                />
             }
 
             <Card>
-                <CardHeader className={"p-6 gap-1 border-b flex flex-row flex-wrap justify-between items-center p-4 sm:p-6 gap-y-2"}>
+                <CardHeader className={"p-6 gap-1 border-b flex flex-row flex-wrap justify-between items-center p-4 sm:px-5 sm:py-4 gap-y-2"}>
                     <div>
                         <CardTitle className={"text-lg sm:text-2xl font-normal"}>Categories</CardTitle>
                         <CardDescription className={"text-sm text-muted-foreground p-0 mt-1"}>Use Categories to organise your Changelog</CardDescription>
                     </div>
-                    <Button size="sm" disabled={isEdit != null} onClick={addNewTopic} className={"gap-2 font-medium hover:bg-primary m-0"}>
+                    <Button disabled={isEdit != null} onClick={addNewTopic} className={"gap-2 font-medium hover:bg-primary m-0"}>
                         <Plus size={18} strokeWidth={3}/>New Categories
                     </Button>
                 </CardHeader>
@@ -311,7 +294,6 @@ const Categories = () => {
                                                                                             >
                                                                                                 {isSave ? <Loader2 className="h-4 w-4 animate-spin"/> : <Check size={16}/>}
                                                                                             </Button> : <Button
-                                                                                                variant=""
                                                                                                 className="text-sm font-medium h-[30px] w-[126px] hover:bg-primary"
                                                                                                 onClick={() => addCategory(x, i)}
                                                                                             >

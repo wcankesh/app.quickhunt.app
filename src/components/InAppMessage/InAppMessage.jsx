@@ -45,6 +45,8 @@ import {DropdownMenu, DropdownMenuTrigger} from "@radix-ui/react-dropdown-menu";
 import {DropdownMenuContent, DropdownMenuItem} from "../ui/dropdown-menu";
 import {toast} from "../ui/use-toast";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "../ui/tabs";
+import Pagination from "../Comman/Pagination";
+import DeleteDialog from "../Comman/DeleteDialog";
 
 const perPageLimit = 10;
 
@@ -163,6 +165,7 @@ const InAppMessage = () => {
     const [selectedId, setSelectedId] = useState("");
     const [selectedType, setSelectedType] = useState("");
     const [isCopyLoading, setCopyIsLoading] = useState(false);
+    const [openDelete,setOpenDelete]=useState(false);
 
     useEffect(()=>{
         if(projectDetailsReducer.id){
@@ -217,13 +220,19 @@ const InAppMessage = () => {
         }
     }
 
+    const openDeleteWidget = (id) => {
+        setDeleteId(id)
+        setOpenDelete(true)
+    }
+
     const onDelete = async () => {
         setIsLoadingDelete(true);
-        const clone = [...messageList];
-        const deleteIndex = clone.findIndex((x)=> x.id === deleteId);
+        debugger
         const data = await apiService.deleteInAppMessage(deleteId);
+        const clone = [...messageList];
+        const deleteIndex = clone.findIndex((x)=> x.id == deleteId);
         if (data.status === 200) {
-            setDeleteId(null);
+            // setDeleteId(null);
             clone.splice(deleteIndex,1);
             setMessageList(clone);
             setIsLoadingDelete(false);
@@ -233,9 +242,12 @@ const InAppMessage = () => {
         } else {
             setIsLoadingDelete(false);
             toast({
-                description:data.message
+                description:data.message,
+                variant: "destructive",
             })
         }
+        setOpenDelete(false);
+        setDeleteId(null);
     }
 
     const getCodeCopy = (id, type) => {
@@ -269,33 +281,45 @@ const InAppMessage = () => {
 
     return (
         <Fragment>
+            {/*{*/}
+            {/*    openDelete &&*/}
+            {/*    <Fragment>*/}
+            {/*        <Dialog open onOpenChange={() => setOpenDelete(!openDelete)}>*/}
+            {/*            <DialogContent className="max-w-[350px] w-full sm:max-w-[525px] p-3 md:p-6 rounded-lg">*/}
+            {/*                <DialogHeader className={"flex flex-row justify-between gap-2"}>*/}
+            {/*                    <div className={"flex flex-col gap-2"}>*/}
+            {/*                        <DialogTitle className={"text-start font-medium"}>You really want delete this label?</DialogTitle>*/}
+            {/*                        <DialogDescription className={"text-start"}>This action can't be undone.</DialogDescription>*/}
+            {/*                    </div>*/}
+            {/*                    <X size={16} className={"m-0 cursor-pointer"} onClick={() => setOpenDelete(false)}/>*/}
+            {/*                </DialogHeader>*/}
+            {/*                <DialogFooter className={"flex-row justify-end space-x-2"}>*/}
+            {/*                    <Button variant={"outline hover:none"}*/}
+            {/*                            className={"text-sm font-medium border"}*/}
+            {/*                            onClick={() => setOpenDelete(false)}>Cancel</Button>*/}
+            {/*                    <Button*/}
+            {/*                        variant={"hover:bg-destructive"}*/}
+            {/*                        className={` ${theme === "dark" ? "text-card-foreground" : "text-card"} w-[65px] text-sm font-medium bg-destructive`}*/}
+            {/*                        onClick={() => onDelete(deleteId)}*/}
+            {/*                    >*/}
+            {/*                        {isLoadingDelete ? <Loader2 size={16} className={"animate-spin"}/> : "Delete"}*/}
+            {/*                    </Button>*/}
+            {/*                </DialogFooter>*/}
+            {/*            </DialogContent>*/}
+            {/*        </Dialog>*/}
+            {/*    </Fragment>*/}
+            {/*}*/}
+
             {
                 deleteId &&
-                <Fragment>
-                    <Dialog open onOpenChange={()=> setDeleteId(null)}>
-                        <DialogContent className="max-w-[350px] w-full sm:max-w-[525px] p-3 md:p-6 rounded-lg">
-                            <DialogHeader className={"flex flex-row justify-between gap-2"}>
-                                <div className={"flex flex-col gap-2"}>
-                                    <DialogTitle className={"text-start font-medium"}>You really want delete this label?</DialogTitle>
-                                    <DialogDescription className={"text-start"}>This action can't be undone.</DialogDescription>
-                                </div>
-                                <X size={16} className={"m-0 cursor-pointer"} onClick={() => setDeleteId(null)}/>
-                            </DialogHeader>
-                            <DialogFooter className={"flex-row justify-end space-x-2"}>
-                                <Button variant={"outline hover:none"}
-                                        className={"text-sm font-medium border"}
-                                        onClick={() => setDeleteId(null)}>Cancel</Button>
-                                <Button
-                                    variant={"hover:bg-destructive"}
-                                    className={` ${theme === "dark" ? "text-card-foreground" : "text-card"} ${isLoadingDelete === true ? "py-2 px-6" : "py-2 px-6"} w-[76px] text-sm font-medium bg-destructive`}
-                                    onClick={onDelete}
-                                >
-                                    {isLoadingDelete ? <Loader2 size={16} className={"animate-spin"}/> : "Delete"}
-                                </Button>
-                            </DialogFooter>
-                        </DialogContent>
-                    </Dialog>
-                </Fragment>
+                <DeleteDialog
+                    title={"You really want to delete this Message?"}
+                    isOpen={openDelete}
+                    onOpenChange={() => setOpenDelete(false)}
+                    onDelete={onDelete}
+                    isDeleteLoading={isLoadingDelete}
+                    deleteRecord={deleteId}
+                />
             }
 
             {
@@ -365,18 +389,22 @@ const InAppMessage = () => {
 
             <div className={"container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-3 md:px-4"}>
                 <div className={""}>
-                    <div className={"flex justify-between items-center"}>
-                        <h4 className={"font-normal text-lg sm:text-2xl"}>In App Messages</h4>
-                        <div className={"flex gap-2 flex-wrap items-center"}>
-                            <div className={"flex gap-2"}>
+                    <div className={"flex items-center justify-between flex-wrap gap-2"}>
+                        <div className={"flex justify-between items-center w-full md:w-auto"}>
+                            <h1 className="text-2xl font-normal flex-initial w-auto">In App Messages</h1>
+                        </div>
+                        <div className={"w-full lg:w-auto flex sm:flex-nowrap flex-wrap gap-2 items-center"}>
+                            <div className={"flex gap-2 items-center w-full md:w-auto"}>
+                                <div className={"w-full"}>
                                 <Input
                                     type="search"
                                     placeholder="Search..."
-                                    className="pl-4 pr-4 text-sm font-normal h-9"
+                                    className="w-full pl-4 pr-14 text-sm font-normal h-9"
                                     value={formData.search}
                                     onChange={(e)=>setFormData({...formData,search: e.target.value})}
                                 />
-
+                                </div>
+                                <div className={"flex items-center"}>
                                 <Popover open={openFilter}
                                          onOpenChange={() => {
                                              setOpenFilter(!openFilter);
@@ -384,7 +412,7 @@ const InAppMessage = () => {
                                          }}
                                 >
                                     <PopoverTrigger asChild>
-                                        <Button className={"h-9 p-0 w-[45px] flex justify-center"} size={"icon"}  variant="outline"><Filter fill="true" className='w-4 h-4' /></Button>
+                                        <Button className={"h-9 w-9"} size={"icon"} variant="outline"><Filter fill="true" className='w-4 -h4' /></Button>
                                     </PopoverTrigger>
                                     <PopoverContent className="w-full p-0" align={"end"}>
                                         <Command className="w-full">
@@ -442,8 +470,9 @@ const InAppMessage = () => {
                                         </Command>
                                     </PopoverContent>
                                 </Popover>
+                                </div>
                             </div>
-                            <Button size="sm" onClick={()=>handleCreateNew("type")} className={"gap-2 font-medium hover:bg-primary"}> <Plus size={20} strokeWidth={3}/>New Content</Button>
+                            <Button onClick={()=>handleCreateNew("type")} className={"gap-2 font-medium hover:bg-primary"}><Plus size={20} strokeWidth={3}/><span className={"text-xs md:text-sm font-medium"}>New Content</span></Button>
                         </div>
                     </div>
 
@@ -573,7 +602,7 @@ const InAppMessage = () => {
                                                                             </DropdownMenuTrigger>
                                                                             <DropdownMenuContent align={"end"}>
                                                                                 <DropdownMenuItem onClick={()=>handleCreateNew(x.id, x.type)}>Edit</DropdownMenuItem>
-                                                                                <DropdownMenuItem onClick={()=>setDeleteId(x.id)}>Delete</DropdownMenuItem>
+                                                                                <DropdownMenuItem onClick={()=>openDeleteWidget(x.id)}>Delete</DropdownMenuItem>
                                                                             </DropdownMenuContent>
                                                                         </DropdownMenu>
                                                                     </TableCell>
@@ -594,42 +623,13 @@ const InAppMessage = () => {
                         </div>
                         {
                             messageList.length > 0 ?
-                                <CardFooter className={`p-0 ${theme === "dark" ? "border-t" : ""}`}>
-                                    <div
-                                        className={`w-full ${theme === "dark" ? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end p-2 md:px-3 md:py-[10px]`}>
-                                        <div className={"w-full flex gap-2 items-center justify-between sm:justify-end"}>
-                                            <div>
-                                                <h5 className={"text-sm font-medium"}>Page {messageList.length <= 0 ? 0 :pageNo} of {totalPages}</h5>
-                                            </div>
-                                            <div className={"flex flex-row gap-2 items-center"}>
-                                                <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
-                                                        onClick={() => handlePaginationClick(1)}
-                                                        disabled={pageNo === 1 || isLoading}>
-                                                    <ChevronsLeft
-                                                        className={pageNo === 1 || isLoading ? "stroke-muted-foreground" : "stroke-primary"} />
-                                                </Button>
-                                                <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
-                                                        onClick={() => handlePaginationClick(pageNo - 1)}
-                                                        disabled={pageNo === 1 || isLoading}>
-                                                    <ChevronLeft
-                                                        className={pageNo === 1 || isLoading ? "stroke-muted-foreground" : "stroke-primary"} />
-                                                </Button>
-                                                <Button variant={"outline"} className={" h-[30px] w-[30px] p-1.5"}
-                                                        onClick={() => handlePaginationClick(pageNo + 1)}
-                                                        disabled={pageNo === totalPages || isLoading || messageList.length <= 0}>
-                                                    <ChevronRight
-                                                        className={pageNo === totalPages || isLoading || messageList.length <= 0 ? "stroke-muted-foreground" : "stroke-primary"} />
-                                                </Button>
-                                                <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
-                                                        onClick={() => handlePaginationClick(totalPages)}
-                                                        disabled={pageNo === totalPages || isLoading || messageList.length <= 0}>
-                                                    <ChevronsRight
-                                                        className={pageNo === totalPages || isLoading || messageList.length <= 0 ? "stroke-muted-foreground" : "stroke-primary"} />
-                                                </Button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </CardFooter> : ""
+                                <Pagination
+                                    pageNo={pageNo}
+                                    totalPages={totalPages}
+                                    isLoading={isLoading}
+                                    handlePaginationClick={handlePaginationClick}
+                                    stateLength={messageList.length}
+                                /> : ""
                         }
                     </Card>
                 </div>

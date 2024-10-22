@@ -5,7 +5,7 @@ import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "../
 import {Card, CardContent, CardFooter} from "../../ui/card";
 import {DropdownMenu, DropdownMenuTrigger} from "@radix-ui/react-dropdown-menu";
 import {DropdownMenuContent, DropdownMenuItem} from "../../ui/dropdown-menu";
-import {ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, CircleX, Ellipsis, Loader2, Plus, Upload, X} from "lucide-react";
+import {CircleX, Ellipsis, Loader2, Plus, Upload, X} from "lucide-react";
 import {Sheet, SheetContent, SheetHeader, SheetOverlay} from "../../ui/sheet";
 import {Label} from "../../ui/label";
 import moment from 'moment';
@@ -20,6 +20,8 @@ import {Skeleton} from "../../ui/skeleton";
 import EmptyData from "../../Comman/EmptyData";
 import {baseUrl} from "../../../utils/constent";
 import {useNavigate} from "react-router";
+import Pagination from "../../Comman/Pagination";
+import DeleteDialog from "../../Comman/DeleteDialog";
 
 const initialState = {
     title: "",
@@ -539,7 +541,7 @@ const Category = () => {
                                                         id="pictureInput"
                                                         type="file"
                                                         className="hidden"
-                                                        accept="image/*"
+                                                        accept={".jpg,.jpeg"}
                                                         onChange={handleImageUploadSub}
                                                     />
                                                     <label
@@ -578,60 +580,26 @@ const Category = () => {
 
                 {
                     openDelete &&
-                    <Fragment>
-                        <Dialog open onOpenChange={()=> setOpenDelete(false)}>
-                            <DialogContent className="w-[310px] md:w-full rounded-lg">
-                                <DialogHeader className={"flex flex-row justify-between gap-2"}>
-                                    <div className={"flex flex-col gap-2"}>
-                                        <DialogTitle className={"text-start font-medium"}>You really want delete this category ?</DialogTitle>
-                                        <DialogDescription className={"text-start"}>This action can't be undone.</DialogDescription>
-                                    </div>
-                                    <X size={16} className={"m-0 cursor-pointer"} onClick={() => setOpenDelete(false)}/>
-                                </DialogHeader>
-                                <div className={"flex justify-end gap-2"}>
-                                    <Button variant={"outline hover:none"}
-                                            className={"text-sm font-medium border"}
-                                            onClick={() => setOpenDelete(false)}>Cancel</Button>
-                                    <Button
-                                        variant={"hover:bg-destructive"}
-                                        className={`${theme === "dark" ? "text-card-foreground" : "text-card"} w-[76px] text-sm font-medium bg-destructive`}
-                                        onClick={deleteCategory}
-                                    >
-                                        {isLoadingDelete ? <Loader2 size={16} className={"animate-spin"}/> : "Delete"}
-                                    </Button>
-                                </div>
-                            </DialogContent>
-                        </Dialog>
-                    </Fragment>
+                    <DeleteDialog
+                        title={"You really want to delete this Category?"}
+                        isOpen={openDelete}
+                        onOpenChange={() => setOpenDelete(false)}
+                        onDelete={deleteCategory}
+                        isDeleteLoading={isLoadingDelete}
+                        deleteRecord={idToDelete}
+                    />
                 }
 
                 {
                     openSubDelete &&
-                    <Fragment>
-                        <Dialog open onOpenChange={()=> setOpenSubDelete(false)}>
-                            <DialogContent className="w-[310px] md:w-full rounded-lg">
-                                <DialogHeader className={"flex flex-row justify-between gap-2"}>
-                                    <div className={"flex flex-col gap-2"}>
-                                        <DialogTitle className={"text-start font-medium"}>You really want delete this sub category ?</DialogTitle>
-                                        <DialogDescription className={"text-start"}>This action can't be undone.</DialogDescription>
-                                    </div>
-                                    <X size={16} className={"m-0 cursor-pointer"} onClick={() => setOpenSubDelete(false)}/>
-                                </DialogHeader>
-                                <div className={"flex justify-end gap-2"}>
-                                    <Button variant={"outline hover:none"}
-                                            className={"text-sm font-medium border"}
-                                            onClick={() => setOpenSubDelete(false)}>Cancel</Button>
-                                    <Button
-                                        variant={"hover:bg-destructive"}
-                                        className={`${theme === "dark" ? "text-card-foreground" : "text-card"} w-[76px] text-sm font-medium bg-destructive`}
-                                        onClick={deleteSubCategory}
-                                    >
-                                        {isLoadingDelete ? <Loader2 size={16} className={"animate-spin"}/> : "Delete"}
-                                    </Button>
-                                </div>
-                            </DialogContent>
-                        </Dialog>
-                    </Fragment>
+                    <DeleteDialog
+                        title={"You really want to delete this Sub Category ?"}
+                        isOpen={openSubDelete}
+                        onOpenChange={() => setOpenSubDelete(false)}
+                        onDelete={deleteSubCategory}
+                        isDeleteLoading={isLoadingDelete}
+                        deleteRecord={subIdToDelete}
+                    />
                 }
 
                 <div className={"flex justify-between gap-3"}>
@@ -643,7 +611,6 @@ const Category = () => {
                             className={"pl-4 pr-4 text-sm font-normal h-9 w-full"}
                         />
                         <Button
-                            size="sm"
                             onClick={() => openSheetCategory("", "")}
                             className={"gap-2 font-medium hover:bg-primary"}
                         >
@@ -717,12 +684,11 @@ const Category = () => {
                                                         <TableHead className={`font-medium px-2 py-[10px] md:px-3 w-[300px] text-end`}>Articles</TableHead>
                                                         <TableHead className={`font-medium px-2 py-[10px] md:px-3 w-[300px] text-end`}>Created at</TableHead>
                                                         <TableHead className={`font-medium px-2 py-[10px] md:px-3 w-[300px] text-center`}>
-                                                            <div className={"space-x-2"}>
+                                                            <div className={"space-x-4"}>
                                                                 <Button
-                                                                    size={"sm"}
                                                                     variant={"ghost hover:bg-none"}
                                                                     onClick={() => openSheetSubCategory("", { ...initialState, category_id: x.id })}
-                                                                    className={"mr-3 border border-primary font-normal text-primary py-2 px-3"}
+                                                                    className={"border border-primary font-normal text-primary"}
                                                                 >
                                                                     <Plus size={16} className={"mr-2"} /> Add Subcategory
                                                                 </Button>
@@ -792,41 +758,13 @@ const Category = () => {
                             <Card>
                                 {
                                     categoryList.length > 0 ?
-                                        <CardContent className={`p-0`}>
-                                            <div className={`w-full ${theme === "dark" ? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end p-2 md:px-3 md:py-[10px]`}>
-                                                <div className={"w-full flex gap-2 items-center justify-between sm:justify-end"}>
-                                                    <div>
-                                                        <h5 className={"text-sm font-medium"}>Page {categoryList.length <= 0 ? 0 :pageNo} of {totalPages}</h5>
-                                                    </div>
-                                                    <div className={"flex flex-row gap-2 items-center"}>
-                                                        <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
-                                                                onClick={() => handlePaginationClick(1)}
-                                                                disabled={pageNo === 1 || isLoading}>
-                                                            <ChevronsLeft
-                                                                className={pageNo === 1 || isLoading ? "stroke-muted-foreground" : "stroke-primary"} />
-                                                        </Button>
-                                                        <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
-                                                                onClick={() => handlePaginationClick(pageNo - 1)}
-                                                                disabled={pageNo === 1 || isLoading}>
-                                                            <ChevronLeft
-                                                                className={pageNo === 1 || isLoading ? "stroke-muted-foreground" : "stroke-primary"} />
-                                                        </Button>
-                                                        <Button variant={"outline"} className={" h-[30px] w-[30px] p-1.5"}
-                                                                onClick={() => handlePaginationClick(pageNo + 1)}
-                                                                disabled={pageNo === totalPages || isLoading || categoryList.length <= 0}>
-                                                            <ChevronRight
-                                                                className={pageNo === totalPages || isLoading || categoryList.length <= 0 ? "stroke-muted-foreground" : "stroke-primary"} />
-                                                        </Button>
-                                                        <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
-                                                                onClick={() => handlePaginationClick(totalPages)}
-                                                                disabled={pageNo === totalPages || isLoading || categoryList.length <= 0}>
-                                                            <ChevronsRight
-                                                                className={pageNo === totalPages || isLoading || categoryList.length <= 0 ? "stroke-muted-foreground" : "stroke-primary"} />
-                                                        </Button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </CardContent> : ""
+                                        <Pagination
+                                            pageNo={pageNo}
+                                            totalPages={totalPages}
+                                            isLoading={isLoading}
+                                            handlePaginationClick={handlePaginationClick}
+                                            stateLength={categoryList.length}
+                                        /> : ""
                                 }
                             </Card>
                         </div>

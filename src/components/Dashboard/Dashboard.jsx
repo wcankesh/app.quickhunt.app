@@ -1,5 +1,5 @@
 import React, {Fragment, useEffect, useState} from "react"
-import {Card, CardContent, CardFooter, CardHeader, CardTitle} from "../ui/card"
+import {Card, CardContent, CardHeader, CardTitle} from "../ui/card"
 import moment from "moment";
 import {ApiService} from "../../utils/ApiService";
 import {useSelector} from "react-redux";
@@ -15,7 +15,6 @@ import {useLocation, useNavigate} from "react-router-dom";
 import {baseUrl} from "../../utils/constent";
 import {Badge} from "../ui/badge";
 
-
 const chartConfig = {
     totalView: {
         label: "Total View",
@@ -28,14 +27,11 @@ const chartConfig = {
 }
 
 export function Dashboard() {
-    const location = useLocation();
-    const UrlParams = new URLSearchParams(location.search);
-    const getPageNo = UrlParams.get("pageNo");
-
     let apiSerVice = new ApiService();
     const navigate = useNavigate();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
+
     const [isLoading, setIsLoading] = useState(true);
     const [dataAvailable, setDataAvailable] = useState(true);
     const [state, setState] = useState({

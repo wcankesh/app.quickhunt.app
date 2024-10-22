@@ -16,6 +16,7 @@ import {allStatusAndTypesAction} from "../../../redux/action/AllStatusAndTypesAc
 import EmptyData from "../../Comman/EmptyData";
 import {Dialog} from "@radix-ui/react-dialog";
 import {DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "../../ui/dialog";
+import DeleteDialog from "../../Comman/DeleteDialog";
 
 const Emoji = () => {
     const [selectedEmoji, setSelectedEmoji] = useState({});
@@ -194,39 +195,22 @@ const Emoji = () => {
         <Fragment>
             {
                 openDelete &&
-                <Fragment>
-                    <Dialog open onOpenChange={()=> setOpenDelete(false)}>
-                        <DialogContent className="max-w-[350px] w-full sm:max-w-[525px] p-3 md:p-6 rounded-lg">
-                            <DialogHeader className={"flex flex-row justify-between gap-2"}>
-                                <div className={"flex flex-col gap-2"}>
-                                    <DialogTitle className={"text-start"}>You really want delete this emoji?</DialogTitle>
-                                    <DialogDescription className={"text-start"}>This action can't be undone.</DialogDescription>
-                                </div>
-                                <X size={16} className={"m-0 cursor-pointer"} onClick={() => setOpenDelete(false)}/>
-                            </DialogHeader>
-                            <DialogFooter className={"flex-row justify-end space-x-2"}>
-                                <Button variant={"outline hover:none"}
-                                        className={"text-sm font-medium border"}
-                                        onClick={() => setOpenDelete(false)}>Cancel</Button>
-                                <Button
-                                    variant={"hover:bg-destructive"}
-                                    className={` ${theme === "dark" ? "text-card-foreground" : "text-card"} ${isDeleteLoading === true ? "py-2 px-6" : "py-2 px-6"} w-[76px] text-sm font-medium bg-destructive`}
-                                    onClick={handleDelete}
-                                >
-                                    {isDeleteLoading ? <Loader2 size={16} className={"animate-spin"}/> : "Delete"}
-                                </Button>
-                            </DialogFooter>
-                        </DialogContent>
-                    </Dialog>
-                </Fragment>
+                <DeleteDialog
+                    title={"You really want to delete this Emoji ?"}
+                    isOpen={openDelete}
+                    onOpenChange={() => setOpenDelete(false)}
+                    onDelete={handleDelete}
+                    isDeleteLoading={isDeleteLoading}
+                    deleteRecord={deleteId}
+                />
             }
             <Card>
-                <CardHeader className={"p-4 sm:p-6 gap-1 border-b flex flex-row justify-between items-center flex-wrap gap-y-2"}>
+                <CardHeader className={"p-4 sm:px-5 sm:py-4 gap-1 border-b flex flex-row justify-between items-center flex-wrap gap-y-2"}>
                     <div>
                         <CardTitle className={"text-lg sm:text-2xl font-normal"}>Emoji</CardTitle>
                         <CardDescription className={"text-sm text-muted-foreground p-0"}>Use Emoji to organise your Changelog</CardDescription>
                     </div>
-                    <Button size="sm" onClick={newEmoji} disabled={editIndex != null} className={"gap-2 font-medium hover:bg-primary m-0"}><Plus strokeWidth={3} size={18}/> New Emoji</Button>
+                    <Button onClick={newEmoji} disabled={editIndex != null} className={"gap-2 font-medium hover:bg-primary m-0"}><Plus strokeWidth={3} size={18}/> New Emoji</Button>
                 </CardHeader>
                 <CardContent className={"p-0"}>
                     <Table>
@@ -287,7 +271,6 @@ const Emoji = () => {
                                                                                 >
                                                                                     {isSave ? <Loader2 className="h-4 w-4 animate-spin"/> : <Check size={16}/>}
                                                                                 </Button> : <Button
-                                                                                    variant=""
                                                                                     className="text-sm font-medium h-[30px] w-[99px] hover:bg-primary"
                                                                                     onClick={()=>addEmoji(i)}
                                                                                 >

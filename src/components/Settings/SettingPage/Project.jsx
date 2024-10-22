@@ -14,6 +14,7 @@ import {toast} from "../../ui/use-toast";
 import {CircleX, Loader2, X} from "lucide-react";
 import {Dialog} from "@radix-ui/react-dialog";
 import {DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "../../ui/dialog";
+import DeleteDialog from "../../Comman/DeleteDialog";
 
 const initialState = {
     project_name: '',
@@ -169,6 +170,7 @@ const Project = () => {
 
     const onDelete = async () => {
         setIsLoadingDelete(true);
+        debugger
         const data = await apiService.deleteProjects(projectDetailsReducer.id)
         if(data.status === 200){
             const cloneProject = [...allProjectReducer.projectList]
@@ -196,38 +198,20 @@ const Project = () => {
         <Card>
             {
                 openDelete &&
-                <Fragment>
-                    <Dialog open onOpenChange={()=> setOpenDelete(false)}>
-                        <DialogContent className="max-w-[350px] w-full sm:max-w-[525px] p-3 md:p-6 rounded-lg">
-                            <DialogHeader className={"flex flex-row justify-between gap-2"}>
-                                <div className={"flex flex-col gap-2"}>
-                                    <DialogTitle className={"text-start font-medium"}>You really want delete this project?</DialogTitle>
-                                    <DialogDescription className={"text-start"}>This action can't be undone.</DialogDescription>
-                                </div>
-                                <X size={16} className={"m-0 cursor-pointer"} onClick={() => setOpenDelete(false)}/>
-                            </DialogHeader>
-                            <DialogFooter className={"flex-row justify-end space-x-2"}>
-                                <Button variant={"outline hover:none"}
-                                        className={"text-sm font-medium border"}
-                                        onClick={closeDialog}>Cancel</Button>
-                                <Button
-                                    variant={"hover:bg-destructive"}
-                                    className={` ${theme === "dark" ? "text-card-foreground" : "text-card"} py-2 px-6 w-[76px] text-sm font-medium bg-destructive`}
-                                    onClick={onDelete}
-                                >
-                                    {isLoadingDelete ? <Loader2 size={16} className={"animate-spin"}/> : "Delete"}
-                                </Button>
-                            </DialogFooter>
-                        </DialogContent>
-                    </Dialog>
-                </Fragment>
+                <DeleteDialog
+                    title={"You really want to delete this Project ?"}
+                    isOpen={openDelete}
+                    onOpenChange={closeDialog}
+                    onDelete={onDelete}
+                    isDeleteLoading={isLoadingDelete}
+                />
             }
 
-            <CardHeader className={"p-6 gap-1 border-b p-4 sm:p-6"}>
+            <CardHeader className={"p-6 gap-1 border-b p-4 sm:px-5 sm:py-4"}>
                 <CardTitle className={"text-lg sm:text-2xl font-normal"}>Project Setting</CardTitle>
                 <CardDescription className={"text-sm text-muted-foreground p-0"}>Manage your project settings.</CardDescription>
             </CardHeader>
-            <CardContent className={"px-3 py-4 md:p-6 border-b space-y-4"}>
+            <CardContent className={"p-4 sm:px-5 sm:py-4 border-b space-y-4"}>
                 <h3 className={"text-base font-normal"}>Edit Images</h3>
                 <div className="w-full items-center ">
                     <div className={"flex flex-wrap sm:flex-nowrap gap-4 gap-x-[94px]"}>
@@ -348,7 +332,7 @@ const Project = () => {
                     </div>
                 </div>
             </CardContent>
-            <CardContent className={"p-4 sm:p-6 border-b"}>
+            <CardContent className={"p-4 sm:px-5 sm:py-4 border-b"}>
                 <div className={"flex flex-wrap sm:flex-nowrap gap-4 w-full"}>
                     <div className="basis-full sm:basis-1/2 space-y-1">
                         <Label htmlFor="project_name" className={"font-normal"}>Project Name</Label>
@@ -366,13 +350,13 @@ const Project = () => {
                     </div>
                 </div>
             </CardContent>
-            <CardFooter className={"pt-4 flex flex-wrap justify-end sm:justify-end gap-4 sm:p-5 p-4"}>
+            <CardFooter className={"p-4 sm:px-5 sm:py-4 flex flex-wrap justify-end sm:justify-end gap-4"}>
                 <Button
                     variant={"outline hover:bg-transparent"} onClick={deleteAlert}
-                    className={`text-sm font-medium border w-[130px] text-destructive border-destructive`}
+                    className={`text-sm font-medium border w-[115px] text-destructive border-destructive`}
                 >{isDel ? <Loader2 className="h-4 w-4 animate-spin" /> : "Delete project"}</Button>
                 <Button
-                    className={`w-[132px] text-sm font-medium hover:bg-primary`}
+                    className={`w-[119px] text-sm font-medium hover:bg-primary`}
                     onClick={() => updateProjects('')}>{isSave ? <Loader2 className="h-4 w-4 animate-spin" /> : "Update project"}</Button>
             </CardFooter>
         </Card>

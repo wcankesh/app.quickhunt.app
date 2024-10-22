@@ -1,19 +1,19 @@
 import React, {Fragment, useEffect, useState} from 'react';
 import { Input } from "../../ui/input";
-import { Select, SelectGroup, SelectValue, SelectLabel, SelectItem, SelectTrigger, SelectContent } from "../../ui/select";
-import {ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Circle, Ellipsis, Filter, Loader2, Plus, X} from "lucide-react";
+import { Select, SelectGroup, SelectValue, SelectItem, SelectTrigger, SelectContent } from "../../ui/select";
+import {ChevronLeft, Circle, Ellipsis, Filter, Loader2, Plus, X} from "lucide-react";
 import { Button } from "../../ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../ui/table";
 import {Card, CardContent, CardFooter} from "../../ui/card";
 import { useTheme } from "../../theme-provider";
 import { DropdownMenu, DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
 import { DropdownMenuContent, DropdownMenuItem } from "../../ui/dropdown-menu";
-import {useNavigate, useParams} from "react-router-dom";
-import {apiService, baseUrl} from "../../../utils/constent";
+import {useNavigate} from "react-router-dom";
+import {baseUrl} from "../../../utils/constent";
 import moment from "moment";
 import {ApiService} from "../../../utils/ApiService";
 import {useSelector} from "react-redux";
-import {toast, useToast} from "../../ui/use-toast";
+import {useToast} from "../../ui/use-toast";
 import {Skeleton} from "../../ui/skeleton";
 import EmptyData from "../../Comman/EmptyData";
 import {Dialog} from "@radix-ui/react-dialog";
@@ -22,6 +22,8 @@ import {Popover, PopoverContent, PopoverTrigger} from "../../ui/popover";
 import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList} from "../../ui/command";
 import {Checkbox} from "../../ui/checkbox";
 import {Badge} from "../../ui/badge";
+import Pagination from "../../Comman/Pagination";
+import DeleteDialog from "../../Comman/DeleteDialog";
 
 const status = [
     {name: "Publish", value: 1, fillColor: "#389E0D", strokeColor: "#389E0D",},
@@ -55,7 +57,6 @@ const Articles = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [articles, setArticles] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
-    const [categoryFilter, setCategoryFilter] = useState('');
     const [idToDelete, setIdToDelete] = useState(null);
     const [openDelete,setOpenDelete]=useState(false);
     const [isLoadingDelete, setIsLoadingDelete] = useState(false);
@@ -166,25 +167,6 @@ const Articles = () => {
         }
     };
 
-    console.log("articles.is_active", articles.is_active)
-
-    // const handleStatus = async (name, value) => {
-    //     debugger
-    //     const articleToUpdate = articles.find(article => article.id === name);
-    //     let formData = new FormData();
-    //     formData.append('is_active', value);
-    //     const data = await apiService.updateArticle(formData, name);
-    //     if (data.status === 200) {
-    //         const updatedArticles = articles.map(article =>
-    //             article.id === name ? { ...article, is_active: value } : article
-    //         );
-    //         setArticles(updatedArticles);
-    //         toast({ description: data.message });
-    //     } else {
-    //         toast({ description: data.message, variant: "destructive" });
-    //     }
-    // };
-
     const handleStatus = async (object, value) => {
         setArticles(articles.map(x => x.id === object.id ? {
             ...x,
@@ -212,44 +194,32 @@ const Articles = () => {
 
             {
                 openDelete &&
-                <Fragment>
-                    <Dialog open onOpenChange={()=> setOpenDelete(false)}>
-                        <DialogContent className="w-[310px] md:w-full rounded-lg">
-                            <DialogHeader className={"flex flex-row justify-between gap-2"}>
-                                <div className={"flex flex-col gap-2"}>
-                                    <DialogTitle className={"text-start font-medium"}>You really want delete this article ?</DialogTitle>
-                                    <DialogDescription className={"text-start"}>This action can't be undone.</DialogDescription>
-                                </div>
-                                <X size={16} className={"m-0 cursor-pointer"} onClick={() => setOpenDelete(false)}/>
-                            </DialogHeader>
-                            <div className={"flex justify-end gap-2"}>
-                                <Button variant={"outline hover:none"}
-                                        className={"text-sm font-medium border"}
-                                        onClick={() => setOpenDelete(false)}>Cancel</Button>
-                                <Button
-                                    variant={"hover:bg-destructive"}
-                                    className={`${theme === "dark" ? "text-card-foreground" : "text-card"} w-[76px] text-sm font-medium bg-destructive`}
-                                    onClick={handleDelete}
-                                >
-                                    {isLoadingDelete ? <Loader2 size={16} className={"animate-spin"}/> : "Delete"}
-                                </Button>
-                            </div>
-                        </DialogContent>
-                    </Dialog>
-                </Fragment>
+                <DeleteDialog
+                    title={"You really want to delete this Article?"}
+                    isOpen={openDelete}
+                    onOpenChange={() => setOpenDelete(false)}
+                    onDelete={handleDelete}
+                    isDeleteLoading={isLoadingDelete}
+                    deleteRecord={idToDelete}
+                />
             }
 
-            <div className={"flex justify-between items-center flex-wrap gap-3"}>
-                <h4 className={"font-normal text-lg sm:text-2xl"}>All Articles</h4>
-                <div className={"flex flex-wrap gap-3"}>
-                    <div className={"flex flex-wrap md:flex-nowrap gap-3"}>
+            <div className={"flex items-center justify-between flex-wrap gap-2"}>
+                <div className={"flex justify-between items-center w-full md:w-auto"}>
+                    <h1 className="text-2xl font-normal flex-initial w-auto">All Articles ({totalRecord})</h1>
+                </div>
+                <div className={"w-full lg:w-auto flex sm:flex-nowrap flex-wrap gap-2 items-center"}>
+                    <div className={"flex gap-2 items-center w-full md:w-auto"}>
+                        <div className={"w-full"}>
                         <Input
                             type="search"
                             placeholder="Search..."
-                            className={"pl-4 pr-4 text-sm font-normal h-9 min-w-[352px] w-full"}
+                            className={"w-full pl-4 pr-14 text-sm font-normal h-9"}
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
+                        </div>
+                        <div className={"flex items-center"}>
                         <Popover
                             open={openFilter}
                             onOpenChange={() => {
@@ -259,7 +229,7 @@ const Articles = () => {
                             className="w-full p-0"
                         >
                             <PopoverTrigger asChild>
-                                <Button variant="outline" size="icon" className={"w-9 h-9 "}><Filter fill="true" className='w-4 -h4' /></Button>
+                                <Button className={"h-9 w-9"} size={"icon"} variant="outline"><Filter fill="true" className='w-4 -h4' /></Button>
                             </PopoverTrigger>
                             <PopoverContent className="w-full p-0" align='end'>
                                 <Command className="w-full">
@@ -310,10 +280,11 @@ const Articles = () => {
                                 </Command>
                             </PopoverContent>
                         </Popover>
-
-                    </div>
-                    <Button size="sm" onClick={handleCreateClick} className={"gap-2 font-medium hover:bg-primary"}>
-                        <Plus size={20} strokeWidth={3} /> New Article
+                        </div>
+                        </div>
+                    <Button onClick={handleCreateClick} className={"gap-2 font-medium hover:bg-primary"}>
+                        <Plus size={20} strokeWidth={3} />
+                        <span className={"text-xs md:text-sm font-medium"}>New Article</span>
                     </Button>
                 </div>
             </div>
@@ -324,18 +295,18 @@ const Articles = () => {
                     <span className="w-7 h-7 flex items-center justify-center cursor-pointer"
                         // onClick={() =>  handleChange({name: "status" , value: "archive"})}
                     >
-                                        <X className='w-4 h-4'/>
-                                    </span>
+                        <X className='w-4 h-4'/>
+                    </span>
                 </Badge>
             }
             <div className={"mt-6"}>
                 <Card className={""}>
-                    <CardContent className={"p-0"}>
+                    <CardContent className={"p-0 overflow-auto"}>
                         <Table>
                             <TableHeader className={`${theme === "dark" ? "" : "bg-muted"} py-8 px-5`}>
                                 <TableRow>
                                     {["Title", "Category / Subcategory", "Status", "Seen", "Created At", ""].map((x, i) => (
-                                        <TableHead className={`font-medium text-card-foreground px-2 py-[10px] md:px-3`} key={i}>{x}</TableHead>
+                                        <TableHead className={`font-medium text-card-foreground px-2 py-[10px] md:px-3 ${i === 4 ? "max-w-[140px] truncate text-ellipsis overflow-hidden whitespace-nowrap" : ""}`} key={i}>{x}</TableHead>
                                     ))}
                                 </TableRow>
                             </TableHeader>
@@ -363,9 +334,9 @@ const Articles = () => {
                                             articles.map((x, index) => (
                                                 <TableRow key={index}>
                                                     <TableCell onClick={() => onEdit(x.id)}
-                                                        className={"px-2 py-[10px] md:px-3 font-normal cursor-pointer"}>{x.title}</TableCell>
+                                                        className={"px-2 py-[10px] md:px-3 font-normal cursor-pointer max-w-[270px] truncate text-ellipsis overflow-hidden whitespace-nowrap"}>{x.title}</TableCell>
                                                     <TableCell
-                                                        className={"px-2 py-[10px] md:px-3 font-normal"}>{x?.category_title} / {x?.sub_category_title}</TableCell>
+                                                        className={"px-2 py-[10px] md:px-3 font-normal max-w-[270px] truncate text-ellipsis overflow-hidden whitespace-nowrap"}>{x?.category_title} / {x?.sub_category_title}</TableCell>
                                                     <TableCell className={"px-2 py-[10px] md:px-3 font-normal"}>
                                                         <Select value={x.is_active}  onValueChange={(value) => handleStatus(x, value)}>
                                                             <SelectTrigger className="w-[137px] h-7">
@@ -396,9 +367,8 @@ const Articles = () => {
                                                             </SelectContent>
                                                         </Select>
                                                     </TableCell>
-                                                    <TableCell
-                                                        className={"px-2 py-[10px] md:px-3 font-normal"}>{x.view}</TableCell>
-                                                    <TableCell className={"px-2 py-[10px] md:px-3 font-normal"}>
+                                                    <TableCell className={"px-2 py-[10px] md:px-3 font-normal"}>{x.view}</TableCell>
+                                                    <TableCell className={"px-2 py-[10px] md:px-3 font-normal max-w-[140px] truncate text-ellipsis overflow-hidden whitespace-nowrap"}>
                                                         {x?.updated_at ? moment.utc(x?.updated_at).local().startOf('seconds').fromNow() : "-"}
                                                     </TableCell>
                                                     <TableCell className={"px-2 py-[10px] md:px-3 font-normal"}>
@@ -427,41 +397,13 @@ const Articles = () => {
                     </CardContent>
                     {
                         articles.length > 0 ?
-                            <CardFooter className={`p-0`}>
-                                <div className={`w-full ${theme === "dark" ? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end p-2 md:px-3 md:py-[10px]`}>
-                                    <div className={"w-full flex gap-2 items-center justify-between sm:justify-end"}>
-                                        <div>
-                                            <h5 className={"text-sm font-medium"}>Page {articles.length <= 0 ? 0 :pageNo} of {totalPages}</h5>
-                                        </div>
-                                        <div className={"flex flex-row gap-2 items-center"}>
-                                            <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
-                                                    onClick={() => handlePaginationClick(1)}
-                                                    disabled={pageNo === 1 || isLoading}>
-                                                <ChevronsLeft
-                                                    className={pageNo === 1 || isLoading ? "stroke-muted-foreground" : "stroke-primary"} />
-                                            </Button>
-                                            <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
-                                                    onClick={() => handlePaginationClick(pageNo - 1)}
-                                                    disabled={pageNo === 1 || isLoading}>
-                                                <ChevronLeft
-                                                    className={pageNo === 1 || isLoading ? "stroke-muted-foreground" : "stroke-primary"} />
-                                            </Button>
-                                            <Button variant={"outline"} className={" h-[30px] w-[30px] p-1.5"}
-                                                    onClick={() => handlePaginationClick(pageNo + 1)}
-                                                    disabled={pageNo === totalPages || isLoading || articles.length <= 0}>
-                                                <ChevronRight
-                                                    className={pageNo === totalPages || isLoading || articles.length <= 0 ? "stroke-muted-foreground" : "stroke-primary"} />
-                                            </Button>
-                                            <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
-                                                    onClick={() => handlePaginationClick(totalPages)}
-                                                    disabled={pageNo === totalPages || isLoading || articles.length <= 0}>
-                                                <ChevronsRight
-                                                    className={pageNo === totalPages || isLoading || articles.length <= 0 ? "stroke-muted-foreground" : "stroke-primary"} />
-                                            </Button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </CardFooter> : ""
+                            <Pagination
+                                pageNo={pageNo}
+                                totalPages={totalPages}
+                                isLoading={isLoading}
+                                handlePaginationClick={handlePaginationClick}
+                                stateLength={articles.length}
+                            /> : ""
                     }
                 </Card>
             </div>

@@ -14,6 +14,7 @@ import {Separator} from "../../ui/separator";
 import EmptyData from "../../Comman/EmptyData";
 import {Dialog} from "@radix-ui/react-dialog";
 import {DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "../../ui/dialog";
+import DeleteDialog from "../../Comman/DeleteDialog";
 
 const initialState ={
     title:""
@@ -232,41 +233,23 @@ const Board = () => {
         <Fragment>
             {
                 openDelete &&
-                <Fragment>
-                    <Dialog open onOpenChange={()=> setOpenDelete(false)}>
-                        <DialogContent className="max-w-[350px] w-full sm:max-w-[525px] p-3 md:p-6 rounded-lg">
-                            <DialogHeader className={"flex flex-row justify-between gap-2"}>
-                                <div className={"flex flex-col gap-2"}>
-                                    <DialogTitle className={"text-start font-medium"}>You really want delete this board?</DialogTitle>
-                                    <DialogDescription className={"text-start"}>This action can't be undone.</DialogDescription>
-                                </div>
-                                <X size={16} className={"m-0 cursor-pointer"} onClick={() => setOpenDelete(false)}/>
-                            </DialogHeader>
-                            <DialogFooter className={"flex-row justify-end space-x-2"}>
-                                <Button variant={"outline hover:none"}
-                                        className={"text-sm font-medium border"}
-                                        onClick={() => setOpenDelete(false)}>Cancel</Button>
-                                <Button
-                                    variant={"hover:bg-destructive"}
-                                    className={` ${theme === "dark" ? "text-card-foreground" : "text-card"} py-2 px-6 w-[76px] text-sm font-medium bg-destructive`}
-                                    onClick={onDelete}
-                                >
-                                    {isLoadingDelete ? <Loader2 size={16} className={"animate-spin"}/> : "Delete"}
-                                </Button>
-                            </DialogFooter>
-                        </DialogContent>
-                    </Dialog>
-                </Fragment>
+                <DeleteDialog
+                    title={"You really want to delete this Board ?"}
+                    isOpen={openDelete}
+                    onOpenChange={() => setOpenDelete(false)}
+                    onDelete={onDelete}
+                    isDeleteLoading={isLoadingDelete}
+                    deleteRecord={deleteId}
+                />
             }
 
             <Card>
-                <CardHeader className={"flex flex-row flex-wrap md:flex-nowrap justify-between gap-x-6 items-center p-4 sm:p-6 gap-y-2"}>
+                <CardHeader className={"flex flex-row flex-wrap md:flex-nowrap justify-between gap-x-6 items-center p-4 sm:px-5 sm:py-4 gap-y-2"}>
                     <div>
                         <CardTitle className={"text-lg sm:text-2xl font-normal	"}>Board</CardTitle>
                         <CardDescription className={"text-sm text-muted-foreground p-0"}>Use Boards to track Ideas on your Roadmap.</CardDescription>
                     </div>
                     <Button
-                        size={"sm"}
                         disabled={isEdit != null}
                         className={"gap-2 font-medium hover:bg-primary m-0"}
                         onClick={createNewBoard}
@@ -330,7 +313,6 @@ const Board = () => {
                                                                                     >
                                                                                         {isSave ? <Loader2 className="h-4 w-4 animate-spin justify-center"/> : <Check size={16}/>}
                                                                                     </Button> : <Button
-                                                                                        variant=""
                                                                                         className="text-sm font-medium h-[30px] w-[126px] hover:bg-primary"
                                                                                         onClick={() => addBoard(x, i)}
                                                                                     >

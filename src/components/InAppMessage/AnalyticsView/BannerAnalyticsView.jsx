@@ -4,7 +4,7 @@ import {Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPa
 import {baseUrl} from "../../../utils/constent";
 import {CommSkel} from "../../Comman/CommSkel";
 import {Skeleton} from "../../ui/skeleton";
-import {useLocation, useNavigate} from "react-router";
+import {useNavigate} from "react-router";
 import {ApiService} from "../../../utils/ApiService";
 import {useSelector} from "react-redux";
 import moment from "moment";
@@ -13,9 +13,7 @@ import {LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContain
 import {ChartContainer, ChartTooltipContent} from "../../ui/chart";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "../../ui/table";
 import {useTheme} from "../../theme-provider";
-import {Avatar, AvatarFallback, AvatarImage} from "../../ui/avatar";
-import EmptyData from "../../Comman/EmptyData";
-
+import {Avatar, AvatarFallback} from "../../ui/avatar";
 
 const chartConfig = {
     view: {
@@ -74,7 +72,6 @@ const BannerAnalyticsView = () => {
         }
     }
 
-
     const analyticsViews = [
         {
             title: "Total View",
@@ -93,52 +90,49 @@ const BannerAnalyticsView = () => {
         },
     ]
 
-
     return (
         <Fragment>
             <div className={"container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-3 md:px-4"}>
-                <Card>
-                    <CardHeader className={"p-3 lg:p-6 border-b"}>
-                        <Breadcrumb>
-                            <BreadcrumbList>
-                                <BreadcrumbItem className={"cursor-pointer"}>
-                                    {/*<BreadcrumbLink onClick={() => navigate(`${baseUrl}/in-app-message?pageNo=${getPageNo}`)}>*/}
-                                    <BreadcrumbLink onClick={() => navigate(`${baseUrl}/in-app-message`)}>
-                                        In App Message
-                                    </BreadcrumbLink>
-                                </BreadcrumbItem>
-                                <BreadcrumbSeparator />
-                                <BreadcrumbItem className={"cursor-pointer"}>
-                                    <BreadcrumbPage>{inAppMsgSetting?.title}</BreadcrumbPage>
-                                </BreadcrumbItem>
-                            </BreadcrumbList>
-                        </Breadcrumb>
-                    </CardHeader>
-                    <CardContent className={"p-3 md:p-6 flex flex-col gap-6"}>
-                        <div className={"flex flex-col gap-8"}>
-                            <div className={"grid lg:grid-cols-3 md:grid-cols-2 md:gap-4 gap-3"}>
+                <div className={"pb-6"}>
+                    <Breadcrumb>
+                        <BreadcrumbList>
+                            <BreadcrumbItem className={"cursor-pointer"}>
+                                {/*<BreadcrumbLink onClick={() => navigate(`${baseUrl}/in-app-message?pageNo=${getPageNo}`)}>*/}
+                                <BreadcrumbLink onClick={() => navigate(`${baseUrl}/in-app-message`)}>
+                                    In App Message
+                                </BreadcrumbLink>
+                            </BreadcrumbItem>
+                            <BreadcrumbSeparator />
+                            <BreadcrumbItem className={"cursor-pointer"}>
+                                <BreadcrumbPage>{inAppMsgSetting?.title}</BreadcrumbPage>
+                            </BreadcrumbItem>
+                        </BreadcrumbList>
+                    </Breadcrumb>
+                </div>
+                <div className={"flex flex-col gap-4"}>
+                    <Card>
+                        <CardContent className={"p-0"}>
+                            <div className={"grid md:grid-cols-3 sm:grid-cols-1"}>
                                 {analyticsViews.map((x, i) => (
                                     <Fragment key={i}>
-                                        {isLoading ? (
-                                            <Card>
-                                                <CardContent className={"p-0"}>{CommSkel.commonParagraphThree}</CardContent>
-                                            </Card>
-                                        ) : (
-                                            <Card>
-                                                <CardContent className={"text-2xl font-medium p-3 md:p-6"}>
-                                                    <div className={"text-base font-medium"}>{x.title}</div>
-                                                    <div className={"text-base font-medium"}>{x.count}</div>
-                                                </CardContent>
-                                            </Card>
+                                        {isLoading ? <div className={"space-y-[14px] w-full p-4 border-b md:border-r md:border-0 last:border-b-0 last:border-r-0"}>
+                                            <Skeleton className="h-4"/>
+                                            <Skeleton className="h-4"/></div> : (
+                                            <div className={`p-4 border-b md:border-r md:border-0 last:border-b-0 last:border-r-0`}>
+                                                <h3 className={"text-base font-medium"}>{x.title}</h3>
+                                                <div className={"flex gap-1"}>
+                                                    <h3 className={`text-2xl font-medium`}>{x.count}</h3>
+                                                </div>
+                                            </div>
                                         )}
                                     </Fragment>
                                 ))}
                             </div>
-                        </div>
-                        <div>
-                            How did that change over time?
-                        </div>
-                        <div>
+                        </CardContent>
+                    </Card>
+                    <Card>
+                        <CardHeader className={"p-4"}>How did that change over time?</CardHeader>
+                        <CardContent className={"p-4 pt-0 pl-0"}>
                             <ChartContainer config={chartConfig} className="aspect-auto h-[250px] w-full">
                                 <ResponsiveContainer width="100%" height="100%">
                                     <LineChart
@@ -180,12 +174,11 @@ const BannerAnalyticsView = () => {
                                     </LineChart>
                                 </ResponsiveContainer>
                             </ChartContainer>
-
-                        </div>
-                        <div>
-                            Customers who opened
-                        </div>
-                        <div className={"border"}>
+                        </CardContent>
+                    </Card>
+                    <Card>
+                        <CardHeader className={"p-4"}>Customers who opened</CardHeader>
+                        <CardContent className={"p-0"}>
                             <Table>
                                 <TableHeader className={`${theme === "dark" ? "" : "bg-muted"}`}>
                                     <TableRow>
@@ -203,23 +196,21 @@ const BannerAnalyticsView = () => {
                                 <TableBody>
                                     {
                                         isLoading ? (
-                                                [...Array(10)].map((x, index) => {
-                                                    return (
-                                                        <TableRow key={index}>
-                                                            {
-                                                                [...Array(2)].map((_, i) => {
-                                                                    return (
-                                                                        <TableCell key={i} className={"max-w-[373px] px-2 py-[10px] md:px-3"}>
-                                                                            <Skeleton className={"rounded-md w-full h-7"}/>
-                                                                        </TableCell>
-                                                                    )
-                                                                })
-                                                            }
-                                                        </TableRow>
-                                                    )
-                                                })
-                                            )
-                                            :
+                                            [...Array(10)].map((x, index) => {
+                                                return (
+                                                    <TableRow key={index}>
+                                                        {
+                                                            [...Array(2)].map((_, i) => {
+                                                                return (
+                                                                    <TableCell key={i} className={"max-w-[373px] px-2 py-[10px] md:px-3"}>
+                                                                        <Skeleton className={"rounded-md w-full h-7"}/>
+                                                                    </TableCell>
+                                                                )
+                                                            })
+                                                        }
+                                                    </TableRow>
+                                                )
+                                            })) :
                                             (analytics?.analytics || []).length >  0 ?
                                                 <Fragment>
                                                     {
@@ -243,11 +234,11 @@ const BannerAnalyticsView = () => {
                                     }
                                 </TableBody>
                             </Table>
-                        </div>
-                        <div>
-                            Customers who replied
-                        </div>
-                        <div className={"border"}>
+                        </CardContent>
+                    </Card>
+                    <Card>
+                        <CardHeader className={"p-4"}>Customers who replied</CardHeader>
+                        <CardContent className={"p-0"}>
                             <Table>
                                 <TableHeader className={`${theme === "dark" ? "" : "bg-muted"}`}>
                                     <TableRow>
@@ -265,24 +256,22 @@ const BannerAnalyticsView = () => {
                                 <TableBody>
                                     {
                                         isLoading ? (
-                                                [...Array(10)].map((x, index) => {
-                                                    return (
-                                                        <TableRow key={index}>
-                                                            {
-                                                                [...Array(5)].map((_, i) => {
-                                                                    return (
-                                                                        <TableCell key={i}
-                                                                                   className={"max-w-[373px] px-2 py-[10px] md:px-3"}>
-                                                                            <Skeleton className={"rounded-md w-full h-7"}/>
-                                                                        </TableCell>
-                                                                    )
-                                                                })
-                                                            }
-                                                        </TableRow>
-                                                    )
-                                                })
-                                            )
-                                            :
+                                            [...Array(10)].map((x, index) => {
+                                                return (
+                                                    <TableRow key={index}>
+                                                        {
+                                                            [...Array(5)].map((_, i) => {
+                                                                return (
+                                                                    <TableCell key={i}
+                                                                               className={"max-w-[373px] px-2 py-[10px] md:px-3"}>
+                                                                        <Skeleton className={"rounded-md w-full h-7"}/>
+                                                                    </TableCell>
+                                                                )
+                                                            })
+                                                        }
+                                                    </TableRow>
+                                                )
+                                            })) :
                                             (analytics?.responses || []).length >  0 ?
                                                 <Fragment>
                                                     {
@@ -309,9 +298,9 @@ const BannerAnalyticsView = () => {
                                     }
                                 </TableBody>
                             </Table>
-                        </div>
-                    </CardContent>
-                </Card>
+                        </CardContent>
+                    </Card>
+                </div>
             </div>
         </Fragment>
     );

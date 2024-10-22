@@ -540,7 +540,7 @@ const UpdateIdea = () => {
                         </BreadcrumbItem>
                         <BreadcrumbSeparator />
                         <BreadcrumbItem className={"cursor-pointer"}>
-                            <BreadcrumbPage>{selectedIdea?.title}</BreadcrumbPage>
+                            <BreadcrumbPage className={`w-full ${selectedIdea?.title?.length > 30 ? "max-w-[200px] truncate" : ""}`}>{selectedIdea?.title}</BreadcrumbPage>
                         </BreadcrumbItem>
                     </BreadcrumbList>
                 </Breadcrumb>
@@ -629,7 +629,7 @@ const UpdateIdea = () => {
                         </div>
                     </div>
                     <div className={"py-4 px-6 flex flex-col gap-[26px]"}>
-                        <div className={"flex gap-1 justify-between"}>
+                        <div className={"flex gap-1 justify-between items-center"}>
                             <div className={"flex flex-col gap-1"}>
                                 <h4 className={"text-sm font-normal"}>Mark as bug</h4>
                                 <p className={"text-muted-foreground text-xs font-normal"}>Hides Idea from your
@@ -637,19 +637,19 @@ const UpdateIdea = () => {
                             </div>
                             <Button
                                 variant={"outline"}
-                                className={`hover:bg-muted w-[132px] ${theme === "dark" ? "" : "border-muted-foreground text-muted-foreground"} text-sm font-medium`}
+                                className={`hover:bg-muted w-[105px] ${theme === "dark" ? "" : "border-muted-foreground text-muted-foreground"} text-sm font-medium`}
                                 onClick={() => onChangeStatus(
                                     "is_active",
                                     selectedIdea?.is_active === 1 ? 0 : 1
                                 )}
                             >
                                 {
-                                    isLoading ? <Loader2
+                                    isLoadingCreateIdea ? <Loader2
                                         className="h-4 w-4 animate-spin"/> : (selectedIdea?.is_active === 0 ? "Convert to Idea" : "Mark as bug")
                                 }
                             </Button>
                         </div>
-                        <div className={"flex gap-1 justify-between"}>
+                        <div className={"flex gap-1 justify-between items-center"}>
                             <div className={"flex flex-col gap-1"}>
                                 <h4 className={"text-sm font-normal"}>Archive</h4>
                                 <p className={"text-muted-foreground text-xs font-normal"}>Remove Idea from
@@ -658,7 +658,7 @@ const UpdateIdea = () => {
                             </div>
                             <Button
                                 variant={"outline"}
-                                className={`w-[100px] hover:bg-muted ${theme === "dark" ? "" : "border-muted-foreground text-muted-foreground"} text-sm font-medium`}
+                                className={`w-[73px] hover:bg-muted ${theme === "dark" ? "" : "border-muted-foreground text-muted-foreground"} text-sm font-medium`}
                                 onClick={() => onChangeStatus(
                                     "is_archive",
                                     selectedIdea?.is_archive === 1 ? 0 : 1
@@ -772,7 +772,7 @@ const UpdateIdea = () => {
                                 </div>
                                 <div className={"p-4 lg:p-8 flex gap-3"}>
                                     <Button
-                                        className={`py-2 px-6 w-[81px] text-sm font-medium hover:bg-primary`}
+                                        className={`w-[54px] text-sm font-medium hover:bg-primary`}
                                         onClick={onCreateIdea}
                                     >
                                         {
@@ -782,7 +782,7 @@ const UpdateIdea = () => {
                                     </Button>
                                     <Button
                                         variant={"outline hover:bg-transparent"}
-                                        className={"border border-primary py-2 px-6 text-sm font-medium text-primary"}
+                                        className={"border border-primary text-sm font-medium text-primary"}
                                         onClick={handleOnCreateCancel}
                                     >
                                         Cancel
@@ -922,7 +922,7 @@ const UpdateIdea = () => {
                                                         <div className={"flex gap-1 justify-between"}>
                                                             <Button
                                                                 variant={"outline"}
-                                                                className={`hover:bg-muted p-2 h-auto w-[102px] ${theme === "dark" ? "" : "border-muted-foreground text-muted-foreground"} text-xs font-medium`}
+                                                                className={`hover:bg-muted w-[95px] h-[30px] ${theme === "dark" ? "" : "border-muted-foreground text-muted-foreground"} text-xs font-medium`}
                                                                 onClick={() => onChangeStatus(
                                                                     "is_active",
                                                                     selectedIdea?.is_active === 1 ? 0 : 1
@@ -937,7 +937,7 @@ const UpdateIdea = () => {
                                                         <div className={"flex gap-1 justify-between"}>
                                                             <Button
                                                                 variant={"outline"}
-                                                                className={`hover:bg-muted p-2 h-auto w-[58px] ${theme === "dark" ? "" : "border-muted-foreground text-muted-foreground"} text-xs font-medium`}
+                                                                className={`hover:bg-muted w-[80px] h-[30px] ${theme === "dark" ? "" : "border-muted-foreground text-muted-foreground"} text-xs font-medium`}
                                                                 onClick={() => onChangeStatus(
                                                                     "is_archive",
                                                                     selectedIdea?.is_archive === 1 ? 0 : 1
@@ -1255,7 +1255,7 @@ const UpdateIdea = () => {
 
                                                             </div>
                                                             <Button
-                                                                className={"w-[128px] h-[36px] text-sm font-medium"}
+                                                                className={"w-[117px] text-sm font-medium"}
                                                                 onClick={onCreateComment}
                                                                 disabled={commentText.trim() === "" || commentText === ""}
                                                             >
@@ -1386,7 +1386,7 @@ const UpdateIdea = () => {
                                                                                                 }
                                                                                                 <div className={"flex gap-2"}>
                                                                                                     <Button
-                                                                                                        className={`py-2 px-6 w-[81px] h-[30px] text-sm font-medium hover:bg-primary`}
+                                                                                                        className={`w-[81px] h-[30px] text-sm font-medium hover:bg-primary`}
                                                                                                         onClick={onUpdateComment}
                                                                                                         disabled={selectedComment.comment.trim() === "" || selectedComment.comment === ""}>
                                                                                                         {
@@ -1397,7 +1397,7 @@ const UpdateIdea = () => {
                                                                                                         }
                                                                                                     </Button>
                                                                                                     <Button
-                                                                                                        className={`px-3 py-2 h-[30px] text-sm font-medium text-primary border border-primary`}
+                                                                                                        className={`h-[30px] text-sm font-medium text-primary border border-primary`}
                                                                                                         variant={"outline hover:none"}
                                                                                                         onClick={onCancelComment}>
                                                                                                         Cancel
@@ -1577,7 +1577,7 @@ const UpdateIdea = () => {
                                                                                                                                 <div
                                                                                                                                     className={"flex gap-2"}>
                                                                                                                                     <Button
-                                                                                                                                        className={`py-2 px-6 w-[81px] h-[30px] text-sm font-medium hover:bg-primary`}
+                                                                                                                                        className={`w-[81px] h-[30px] text-sm font-medium hover:bg-primary`}
                                                                                                                                         onClick={onUpdateSubComment}
                                                                                                                                         disabled={selectedSubComment.comment.trim() === "" || selectedSubComment.comment === ""}>
                                                                                                                                         {
@@ -1610,13 +1610,9 @@ const UpdateIdea = () => {
                                                                                                                                     </div>
                                                                                                                                 </div>
                                                                                                                             </div> :
-                                                                                                                            <div
-                                                                                                                                className={"space-y-2"}>
-                                                                                                                                <p className={"text-xs"}>
-                                                                                                                                    {y.comment}
-                                                                                                                                </p>
-                                                                                                                                <div
-                                                                                                                                    className={"flex gap-2 flex-wrap"}>
+                                                                                                                            <div className={"space-y-2"}>
+                                                                                                                                <p className={"text-xs"}>{y.comment}</p>
+                                                                                                                                <div className={"flex gap-2 flex-wrap"}>
                                                                                                                                     {
                                                                                                                                         y && y.images && y.images.length ?
                                                                                                                                             <Fragment>

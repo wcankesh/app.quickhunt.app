@@ -1,7 +1,7 @@
 import React, {Fragment, useEffect, useState} from 'react';
 import {Button} from "../ui/button";
-import {ArrowBigUp, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Circle, Dot, Ellipsis, Filter, Loader2, MessageCircleMore, Pin, Plus, X,} from "lucide-react";
-import {Card, CardContent, CardFooter} from "../ui/card";
+import {ArrowBigUp, ChevronLeft, Circle, Dot, Ellipsis, Filter, Loader2, MessageCircleMore, Pin, Plus, X,} from "lucide-react";
+import {Card, CardContent} from "../ui/card";
 import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "../ui/select";
 import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList} from "../ui/command";
 import {Checkbox} from "../ui/checkbox";
@@ -22,6 +22,8 @@ import {Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, Di
 import {Badge} from "../ui/badge";
 import {Popover, PopoverContent, PopoverTrigger} from "../ui/popover";
 import {Avatar, AvatarFallback, AvatarImage} from "../ui/avatar";
+import Pagination from "../Comman/Pagination";
+import DeleteDialog from "../Comman/DeleteDialog";
 
 const filterByStatus = [
     {name: "Archived", value: "archive",},
@@ -47,8 +49,10 @@ const Ideas = () => {
     const getPageNo = UrlParams.get("pageNo") || 1;
     let apiSerVice = new ApiService();
     const {toast} = useToast()
-    const [isSheetOpenCreate, setSheetOpenCreate] = useState(false);
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
+    const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
+
+    const [isSheetOpenCreate, setSheetOpenCreate] = useState(false);
     const [ideasList, setIdeasList] = useState([]);
     const [isDeleteLoading, setDeleteIsLoading] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
@@ -58,21 +62,17 @@ const Ideas = () => {
     const [totalRecord, setTotalRecord] = useState(0);
     const [roadmapStatus, setRoadmapStatus] = useState([]);
     const [filter, setFilter] = useState(initialStateFilter);
-    const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const [openDelete, setOpenDelete] = useState(false);
     const [deleteRecord, setDeleteRecord] = useState(null);
-
     const [openFilter, setOpenFilter] = useState('');
     const [openFilterType, setOpenFilterType] = useState('');
 
     const openCreateIdea = () => {
         setSheetOpenCreate(true)
-
     };
 
     const closeCreateIdea = () => {
         setSheetOpenCreate(false)
-
     };
 
     useEffect(() => {
@@ -291,31 +291,14 @@ const Ideas = () => {
         <Fragment>
             {
                 openDelete &&
-                <Fragment>
-                    <Dialog open onOpenChange={deleteIdea}>
-                        <DialogContent className={"max-w-[350px] w-full sm:max-w-[425px] p-3 md:p-6 rounded-lg"}>
-                            <DialogHeader className={"flex flex-row justify-between gap-2"}>
-                                <div className={"flex flex-col gap-2"}>
-                                    <DialogTitle className={"text-start font-medium"}>You really want delete this idea?</DialogTitle>
-                                    <DialogDescription className={"text-start"}>This action can't be undone.</DialogDescription>
-                                </div>
-                                <X size={16} className={"m-0 cursor-pointer"} onClick={() => setOpenDelete(false)}/>
-                            </DialogHeader>
-                            <DialogFooter className={"flex-row justify-end space-x-2"}>
-                                <Button variant={"outline hover:none"}
-                                        className={"text-sm font-medium border"}
-                                        onClick={() => setOpenDelete(false)}>Cancel</Button>
-                                <Button
-                                    variant={"hover:bg-destructive"}
-                                    className={`${theme === "dark" ? "text-card-foreground" : "text-card"} py-2 px-6 w-[76px] text-sm font-medium bg-destructive`}
-                                    onClick={() => onDeleteIdea(deleteRecord)}
-                                >
-                                    {isDeleteLoading ? <Loader2 size={16} className={"animate-spin"}/> : "Delete"}
-                                </Button>
-                            </DialogFooter>
-                        </DialogContent>
-                    </Dialog>
-                </Fragment>
+                <DeleteDialog
+                    title={"You really want to delete this Idea ?"}
+                    isOpen={openDelete}
+                    onOpenChange={deleteIdea}
+                    onDelete={onDeleteIdea}
+                    isDeleteLoading={isDeleteLoading}
+                    deleteRecord={deleteRecord}
+                />
             }
             <div className={"container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-3 md:px-4"}>
 
@@ -330,7 +313,7 @@ const Ideas = () => {
                 />
 
                     <div className="flex items-center gap-4 mb-6 justify-between">
-                        <h1 className="text-2xl font-normal flex-initial w-auto">Ideas (<span>{totalRecord}</span>)</h1>
+                        <h1 className="text-2xl font-normal flex-initial w-auto">Ideas ({totalRecord})</h1>
                         <div className="flex gap-2 flex-1 w-full justify-end">
                             <Popover
                                 open={openFilter}
@@ -541,7 +524,7 @@ const Ideas = () => {
                                                     </div>
                                                     <div className={"flex flex-col w-full gap-3"}>
                                                         <div className={"flex flex-col gap-3"}>
-                                                            <div className={"flex items-center justify-between gap-3"}>
+                                                            <div className={"flex flex-wrap items-center justify-between gap-3"}>
                                                                 <div
                                                                     className={"flex flex-wrap items-center gap-1 cursor-pointer xl:gap-3"}
                                                                     onClick={() => openDetailsSheet(x)}
@@ -564,7 +547,7 @@ const Ideas = () => {
                                                                         </p>
                                                                     </div>
                                                                 </div>
-                                                                <div className={"flex gap-2 items-center"}>
+                                                                <div className={"flex flex-wrap gap-2 items-center"}>
                                                                     {
                                                                         (x && x?.topic && x?.topic?.length) ? (
                                                                             <Popover>
@@ -765,41 +748,13 @@ const Ideas = () => {
 
                     {
                         ideasList.length > 0 ?
-                            <CardFooter className={`p-0`}>
-                                <div className={`w-full ${theme === "dark" ? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end p-2 md:px-3 md:py-[10px]`}>
-                                    <div className={"w-full flex gap-2 items-center justify-between sm:justify-end"}>
-                                        <div>
-                                            <h5 className={"text-sm font-medium"}>Page {ideasList.length <= 0 ? 0 :pageNo} of {totalPages}</h5>
-                                        </div>
-                                        <div className={"flex flex-row gap-2 items-center"}>
-                                            <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
-                                                    onClick={() => handlePaginationClick(1)}
-                                                    disabled={pageNo === 1 || isLoading}>
-                                                <ChevronsLeft
-                                                    className={pageNo === 1 || isLoading ? "stroke-muted-foreground" : "stroke-primary"} />
-                                            </Button>
-                                            <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
-                                                    onClick={() => handlePaginationClick(pageNo - 1)}
-                                                    disabled={pageNo === 1 || isLoading}>
-                                                <ChevronLeft
-                                                    className={pageNo === 1 || isLoading ? "stroke-muted-foreground" : "stroke-primary"} />
-                                            </Button>
-                                            <Button variant={"outline"} className={" h-[30px] w-[30px] p-1.5"}
-                                                    onClick={() => handlePaginationClick(pageNo + 1)}
-                                                    disabled={pageNo === totalPages || isLoading || ideasList.length <= 0}>
-                                                <ChevronRight
-                                                    className={pageNo === totalPages || isLoading || ideasList.length <= 0 ? "stroke-muted-foreground" : "stroke-primary"} />
-                                            </Button>
-                                            <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
-                                                    onClick={() => handlePaginationClick(totalPages)}
-                                                    disabled={pageNo === totalPages || isLoading || ideasList.length <= 0}>
-                                                <ChevronsRight
-                                                    className={pageNo === totalPages || isLoading || ideasList.length <= 0 ? "stroke-muted-foreground" : "stroke-primary"} />
-                                            </Button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </CardFooter> : ""
+                            <Pagination
+                                pageNo={pageNo}
+                                totalPages={totalPages}
+                                isLoading={isLoading}
+                                handlePaginationClick={handlePaginationClick}
+                                stateLength={ideasList.length}
+                            /> : ""
                     }
 
                 </Card>

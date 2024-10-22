@@ -600,7 +600,7 @@ const UpdateWidget = () => {
 
 return (
     <Fragment>
-        <div className={"py-6 px-4 border-b flex items-center justify-between flex-wrap gap-2"}>
+        <div className={"p-4 md:py-6 md:px-4 border-b flex items-center justify-between flex-wrap gap-2"}>
             <Breadcrumb>
                 <Breadcrumb>
                     <BreadcrumbList>
@@ -623,7 +623,7 @@ return (
                 </Breadcrumb>
             </Breadcrumb>
             <div className={"flex justify-between gap-2 items-center"}>
-            <Button size={"sm"} className={"font-medium w-[128px] hover:bg-primary"}
+            <Button className={"font-medium w-[115px] hover:bg-primary"}
                     onClick={() => id === "new" ? createWidget('head') : onUpdateWidgets('head')}>
                 {
                     loading === 'head' ?
@@ -631,14 +631,14 @@ return (
                             className="h-4 w-4 animate-spin"/> : (id === "new" ? "Create Widget" : "Save Changes")
                 }
             </Button>
-                <Button size={"sm"} variant={"ghost hover-none"} className={"font-medium border border-primary text-primary"} onClick={handleCancel}>Cancel</Button>
+                <Button variant={"ghost hover-none"} className={"font-medium border border-primary text-primary"} onClick={handleCancel}>Cancel</Button>
             </div>
         </div>
         <div className={"flex h-[calc(100%_-_85px)] overflow-y-auto"}>
             <div className={"max-w-[407px] w-full border-r h-full overflow-y-auto"}>
                 {renderSidebarItems()}
                 <div className={"px-4 py-6 border-t flex justify-between gap-2"}>
-                    <Button className={"font-medium w-[128px] hover:bg-primary"}
+                    <Button className={"font-medium w-[115px] hover:bg-primary"}
                             onClick={() => id === "new" ? createWidget('side') : onUpdateWidgets('side')}>
                         {
                             loading === 'side' ?

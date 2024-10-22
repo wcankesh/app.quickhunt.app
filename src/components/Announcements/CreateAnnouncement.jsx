@@ -582,7 +582,7 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
                             variant={"outline "}
                             disabled={isSave}
                             onClick={createPosts}
-                            className={` bg-primary ${theme === "dark" ? "text-card-foreground" : "text-card"} w-[115px] font-medium`}
+                            className={` bg-primary ${theme === "dark" ? "text-card-foreground" : "text-card"} w-[101px] font-medium`}
                         >
                             {isSave ? <Loader2 className=" h-4 w-4 animate-spin"/> : "Publish Post"}
                         </Button>

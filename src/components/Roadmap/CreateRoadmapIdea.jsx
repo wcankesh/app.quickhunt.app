@@ -147,7 +147,7 @@ const CreateRoadmapIdea = ({isOpen, onOpen, onClose, closeCreateIdea, selectedRo
                             <X size={18} onClick={onCancel} className={"cursor-pointer"}/>
                         </div>
                     </SheetHeader>
-                    <div className={"w-full overflow-y-auto comm-sheet-height"}>
+                    <div className={"w-full overflow-y-auto h-[calc(100vh_-_69px)]"}>
                             <div className={"pb-[60px] sm:p-0"}>
                                 <div className={"px-4 py-3 lg:py-6 lg:px-8 flex flex-col gap-6 border-b"}>
                                     <div className="space-y-2">
@@ -233,12 +233,12 @@ const CreateRoadmapIdea = ({isOpen, onOpen, onClose, closeCreateIdea, selectedRo
                                     </Select>
                                 </div>
                                 <div className={"p-4 lg:p-8 flex gap-6"}>
-                                    <Button className={`py-2 px-6 w-[126px] text-sm font-medium hover:bg-primary`} onClick={onCreateIdea}>
+                                    <Button className={`w-[96px] text-sm font-medium hover:bg-primary`} onClick={onCreateIdea}>
                                         {
                                             isLoading ? <Loader2 className="h-4 w-4 animate-spin"/> : "Create Idea"
                                         }
                                         </Button>
-                                    <Button variant={"outline hover:bg-transparent"} className={"border border-primary py-2 px-6 text-sm font-medium text-primary"} onClick={onCancel}>Cancel</Button>
+                                    <Button variant={"outline hover:bg-transparent"} className={"border border-primary text-sm font-medium text-primary"} onClick={onCancel}>Cancel</Button>
                                 </div>
                             </div>
                     </div>

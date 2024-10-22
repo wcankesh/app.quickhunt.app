@@ -1,7 +1,7 @@
 import React, {Fragment, useEffect, useState} from 'react';
 import {Button} from "../ui/button";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow,} from "../ui/table";
-import {BarChart, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Copy, Ellipsis, Loader2, Plus, X} from "lucide-react";
+import {BarChart, Copy, Ellipsis, Loader2, Plus, X} from "lucide-react";
 import {useTheme} from "../theme-provider";
 import {useSelector} from "react-redux";
 import {Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "../ui/dialog";
@@ -17,6 +17,8 @@ import WidgetAnalytics from "./WidgetAnalytics";
 import {Skeleton} from "../ui/skeleton";
 import EmptyData from "../Comman/EmptyData";
 import moment from "moment";
+import Pagination from "../Comman/Pagination";
+import DeleteDialog from "../Comman/DeleteDialog";
 
 const perPageLimit = 10;
 
@@ -25,9 +27,10 @@ const Widgets = () => {
     const navigate = useNavigate();
     let apiSerVice = new ApiService();
     const {toast} = useToast()
-    const [widgetsSetting, setWidgetsSetting] = useState([])
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const userDetailsReducer = useSelector(state => state.userDetailsReducer);
+
+    const [widgetsSetting, setWidgetsSetting] = useState([])
     const [isDeleteLoading, setDeleteIsLoading] = useState(false);
     const [isCopyLoading, setCopyIsLoading] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -158,32 +161,14 @@ const Widgets = () => {
         <Fragment>
             {
                 openDelete &&
-                <Fragment>
-                    <Dialog open onOpenChange={() => setOpenDelete(!openDelete)}>
-                        <DialogContent className={"max-w-[350px] w-full sm:max-w-[425px] p-3 md:p-6 rounded-lg"}>
-                            <DialogHeader className={"flex flex-row justify-between gap-2"}>
-                                <div className={"flex flex-col gap-2"}>
-                                    <DialogTitle className={"text-left font-medium"}>Delete widget?</DialogTitle>
-                                    <DialogDescription className={"text-left"}>Are you sure? This cannot be
-                                        undone.</DialogDescription>
-                                </div>
-                                <X size={16} className={"m-0 cursor-pointer"} onClick={() => setOpenDelete(false)}/>
-                            </DialogHeader>
-                            <DialogFooter className={"flex-row justify-end space-x-2"}>
-                                <Button variant={"outline hover:none"}
-                                        className={"text-sm font-medium border"}
-                                        onClick={() => setOpenDelete(false)}>Cancel</Button>
-                                <Button
-                                    variant={"hover:bg-destructive"}
-                                    className={`${theme === "dark" ? "text-card-foreground" : "text-card"} ${isDeleteLoading === true ? "py-2 px-6" : "py-2 px-6"} w-[76px] text-sm font-medium bg-destructive`}
-                                    onClick={() => deleteWidget(deleteRecord)}
-                                >
-                                    {isDeleteLoading ? <Loader2 size={16} className={"animate-spin"}/> : "Delete"}
-                                </Button>
-                            </DialogFooter>
-                        </DialogContent>
-                    </Dialog>
-                </Fragment>
+                <DeleteDialog
+                    title={"You really want to delete this Widget?"}
+                    isOpen={openDelete}
+                    onOpenChange={() => setOpenDelete(false)}
+                    onDelete={deleteWidget}
+                    isDeleteLoading={isDeleteLoading}
+                    deleteRecord={deleteRecord}
+                />
             }
             {
                 openCopyCode &&
@@ -388,8 +373,7 @@ const Widgets = () => {
                     </Dialog>
                 </Fragment>
             }
-            <div
-                className={"container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-3 md:px-4"}>
+            <div className={"container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-3 md:px-4"}>
 
                 <WidgetAnalytics
                     isOpen={isSheetOpen}
@@ -401,12 +385,12 @@ const Widgets = () => {
                 <div className={"flex flex-col space-y-6"}>
                     <div className={"flex flex-col gap-2"}>
                         <div className={"flex items-center justify-between"}>
-                            <h1 className={"text-2xl font-normal"}>Widgets</h1>
+                            <h1 className="text-2xl font-normal flex-initial w-auto">Widgets ({totalRecord})</h1>
                             <Button
-                                size="sm" className={"gap-2 font-medium hover:bg-primary"}
+                                className={"gap-2 font-medium hover:bg-primary"}
                                 onClick={() => handleCreateNew("type")}
                             >
-                                <Plus size={20} strokeWidth={3}/>Create New
+                                <Plus size={20} strokeWidth={3}/><span className={"text-xs md:text-sm font-medium"}>Create New</span>
                             </Button>
                         </div>
                         <div className={"flex flex-col space-y-4"}>
@@ -423,7 +407,7 @@ const Widgets = () => {
                                             ["Name", "Type", "Last Updated", "", "Analytics", "Actions"].map((x, i) => {
                                                 return (
                                                     <TableHead
-                                                        className={`px-2 py-[10px] md:px-3 font-medium text-card-foreground ${i >= 4 ? 'text-center' : ''}`}>{x}</TableHead>
+                                                        className={`px-2 py-[10px] md:px-3 font-medium text-card-foreground ${i > 1 ? "max-w-[140px] truncate text-ellipsis overflow-hidden whitespace-nowrap" : ""} ${i >= 4 ? 'text-center' : ''}`}>{x}</TableHead>
                                                 )
                                             })
                                         }
@@ -498,42 +482,13 @@ const Widgets = () => {
                         </CardContent>
                         {
                             widgetsSetting.length > 0 ?
-                                <CardFooter className={`p-0 ${theme === "dark" ? "border-t" : ""}`}>
-                                    <div
-                                        className={`w-full ${theme === "dark" ? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end p-2 md:px-3 md:py-[10px]`}>
-                                        <div className={"w-full flex gap-2 items-center justify-between sm:justify-end"}>
-                                            <div>
-                                                <h5 className={"text-sm font-medium"}>Page {widgetsSetting.length <= 0 ? 0 :pageNo} of {totalPages}</h5>
-                                            </div>
-                                            <div className={"flex flex-row gap-2 items-center"}>
-                                                <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
-                                                        onClick={() => handlePaginationClick(1)}
-                                                        disabled={pageNo === 1 || isLoading}>
-                                                    <ChevronsLeft
-                                                        className={pageNo === 1 || isLoading ? "stroke-muted-foreground" : "stroke-primary"}/>
-                                                </Button>
-                                                <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
-                                                        onClick={() => handlePaginationClick(pageNo - 1)}
-                                                        disabled={pageNo === 1 || isLoading}>
-                                                    <ChevronLeft
-                                                        className={pageNo === 1 || isLoading ? "stroke-muted-foreground" : "stroke-primary"}/>
-                                                </Button>
-                                                <Button variant={"outline"} className={" h-[30px] w-[30px] p-1.5"}
-                                                        onClick={() => handlePaginationClick(pageNo + 1)}
-                                                        disabled={pageNo === totalPages || isLoading || widgetsSetting.length <= 0}>
-                                                    <ChevronRight
-                                                        className={pageNo === totalPages || isLoading || widgetsSetting.length <= 0 ? "stroke-muted-foreground" : "stroke-primary"}/>
-                                                </Button>
-                                                <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
-                                                        onClick={() => handlePaginationClick(totalPages)}
-                                                        disabled={pageNo === totalPages || isLoading || widgetsSetting.length <= 0}>
-                                                    <ChevronsRight
-                                                        className={pageNo === totalPages || isLoading || widgetsSetting.length <= 0 ? "stroke-muted-foreground" : "stroke-primary"}/>
-                                                </Button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </CardFooter> : ""
+                                <Pagination
+                                    pageNo={pageNo}
+                                    totalPages={totalPages}
+                                    isLoading={isLoading}
+                                    handlePaginationClick={handlePaginationClick}
+                                    stateLength={widgetsSetting.length}
+                                /> : ""
                         }
                     </Card>
                 </div>

@@ -124,153 +124,160 @@ const AnnouncementAnalyticsViews = () => {
     return (
         <Fragment>
             <div className={"container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-3 md:px-4"}>
-                <Card>
-                    <CardHeader className={"p-3 lg:p-6 border-b"}>
-                        <Breadcrumb>
-                            <BreadcrumbList>
-                                <BreadcrumbItem className={"cursor-pointer"}>
-                                    <BreadcrumbLink onClick={() => navigate(`${baseUrl}/announcements?pageNo=${getPageNo}`)}>
-                                        Announcement
-                                    </BreadcrumbLink>
-                                </BreadcrumbItem>
-                                <BreadcrumbSeparator />
-                                <BreadcrumbItem className={"cursor-pointer"}>
-                                    <BreadcrumbPage>{analyticsObj?.post_title}</BreadcrumbPage>
-                                </BreadcrumbItem>
-                            </BreadcrumbList>
-                        </Breadcrumb>
-                    </CardHeader>
-                    <CardContent className={"p-3 md:p-6 flex flex-col gap-6"}>
-                        <div className={"flex flex-col gap-8"}>
-                            <div className={"grid lg:grid-cols-3 md:grid-cols-2 md:gap-4 gap-3"}>
+                <div className={"pb-6"}>
+                    <Breadcrumb>
+                        <BreadcrumbList>
+                            <BreadcrumbItem className={"cursor-pointer"}>
+                                <BreadcrumbLink onClick={() => navigate(`${baseUrl}/announcements?pageNo=${getPageNo}`)}>
+                                    Announcement
+                                </BreadcrumbLink>
+                            </BreadcrumbItem>
+                            <BreadcrumbSeparator />
+                            <BreadcrumbItem className={"cursor-pointer"}>
+                                <BreadcrumbPage>{analyticsObj?.post_title}</BreadcrumbPage>
+                            </BreadcrumbItem>
+                        </BreadcrumbList>
+                    </Breadcrumb>
+                </div>
+                <div className={"flex flex-col gap-4"}>
+                    <Card>
+                        <CardContent className={"p-0"}>
+                            <div className={"grid md:grid-cols-3 sm:grid-cols-1"}>
                                 {
                                     (analyticsViews || []).map((x, i) => {
                                         return (
                                             <Fragment key={i}>
                                                 {
                                                     isLoadingReaction ?
-                                                        <Card><CardContent
-                                                            className={"p-0"}>{CommSkel.commonParagraphThree}</CardContent></Card> :
-                                                        <Card>
-                                                            <CardHeader
-                                                                className={"text-base font-medium p-3 md:p-6"}>{x.title}</CardHeader>
-                                                            <CardContent
-                                                                className={"text-2xl font-medium p-3 pt-0 md:p-6 md:pt-0"}>{x.count}</CardContent>
-                                                        </Card>
+                                                        <div className={"space-y-[14px] w-full p-4 border-b md:border-r md:border-0 last:border-b-0 last:border-r-0"}>
+                                                            <Skeleton className="h-4"/>
+                                                            <Skeleton className="h-4"/></div> :
+                                                        <div className={`p-4 border-b md:border-r md:border-0 last:border-b-0 last:border-r-0`}>
+                                                            <h3 className={"text-base font-medium"}>{x.title}</h3>
+                                                            <div className={"flex gap-1"}>
+                                                                <h3 className={`text-2xl font-medium`}>{x.count}</h3>
+                                                            </div>
+                                                        </div>
                                                 }
                                             </Fragment>
                                         )
                                     })
                                 }
                             </div>
-                        </div>
-                        <div className={"flex flex-col gap-3"}>
-                            <h5 className={"text-base font-medium leading-5"}>Reaction</h5>
-                            {isLoadingReaction ? <div className="flex gap-4 items-center">
-                                    {[...Array(4)].map((_, i) => {
-                                        return (<Skeleton key={i} className="h-12 w-12 rounded-full"/>)
-                                    })}
-                                </div>
-                                : <div className={"flex flex-row flex-wrap gap-4"}>
-                                    {
-                                        reactionList.length == 0 ?
-                                            <p className={"text-muted-foreground text-xs font-normal"}>No reaction received
-                                                for this announcement yet</p> : <Fragment>
-                                                {
-                                                    (reactionList || []).map((x, index) => {
-                                                        const matchedEmojiObject = (allEmoji || []).find((y) => y.id === x.reaction_id);
-                                                        return (
-                                                            <div className={""} key={index}>
-                                                                <div className={"flex flex-row gap-2 items-center"}>
-                                                                    {matchedEmojiObject ? <img className={"h-10 w-10"}
-                                                                                               src={matchedEmojiObject?.emoji_url}/> : Icon?.smileEmoji2}
-                                                                    <h5 className={"text-2xl font-medium"}>{x.total}</h5>
-                                                                </div>
-                                                            </div>
-                                                        )
-                                                    })
-                                                }
-                                            </Fragment>
-                                    }
-                                </div>}
-
-                        </div>
-                        <div className={"flex flex-col gap-4"}>
-                            <h5 className={"text-base font-medium leading-5"}>Feedback</h5>
-                            {
-                                isLoadingFeedBack ?
-                                    <div>
-                                        {
-                                            [...Array(3)].map((_, i) => {
-                                                return (
-                                                    <div key={i} className="space-y-2 mt-3">
-                                                        <Skeleton className="h-4 w-full"/>
-                                                        <Skeleton className="h-4 w-full"/>
-                                                        <Separator/>
-                                                    </div>
-                                                )
-                                            })
-                                        }
+                        </CardContent>
+                    </Card>
+                    <Card>
+                        <CardContent className={"p-4"}>
+                            <div className={"flex flex-col gap-3"}>
+                                <h5 className={"text-base font-medium leading-5"}>Reaction</h5>
+                                {isLoadingReaction ? <div className="flex gap-4 items-center">
+                                        {[...Array(4)].map((_, i) => {
+                                            return (<Skeleton key={i} className="h-12 w-12 rounded-full"/>)
+                                        })}
                                     </div>
-                                    :
-                                    <Fragment>
+                                    : <div className={"flex flex-row flex-wrap gap-4"}>
                                         {
-                                            feedbackList.length == 0 ?
-                                                <p className={"text-muted-foreground text-xs font-normal"}>No feedback
-                                                    received for this announcement yet</p> :
-                                                <div>
+                                            reactionList.length == 0 ?
+                                                <p className={"text-muted-foreground text-xs font-normal"}>No reaction received
+                                                    for this announcement yet</p> : <Fragment>
                                                     {
-                                                        (feedbackList || []).map((x) => {
+                                                        (reactionList || []).map((x, index) => {
+                                                            const matchedEmojiObject = (allEmoji || []).find((y) => y.id === x.reaction_id);
                                                             return (
-                                                                <div key={x.id}
-                                                                     className={"flex flex-col py-4 first:pt-0 border-b"}>
-                                                                    <div className={"flex flex-row gap-4 ml-4 mr-[10px]"}>
-                                                                        <div className={"flex flex-col gap-1"}>
-                                                                            <div
-                                                                                className={"flex flex-row gap-4 items-center"}>
-                                                                                <h5 className={"text-sm font-medium"}>{x?.customer_name}</h5>
-                                                                                <p className={"text-muted-foreground text-[10px] font-normal"}>{x?.customer_email_id}</p>
-                                                                            </div>
-                                                                            <p className={"text-muted-foreground text-xs font-normal"}>
-                                                                                <ReadMoreText className={"text-xs"}
-                                                                                              html={x.feedback}/>
-                                                                            </p>
-                                                                        </div>
+                                                                <div className={""} key={index}>
+                                                                    <div className={"flex flex-row gap-2 items-center"}>
+                                                                        {matchedEmojiObject ? <img className={"h-10 w-10"}
+                                                                                                   src={matchedEmojiObject?.emoji_url}/> : Icon?.smileEmoji2}
+                                                                        <h5 className={"text-2xl font-medium"}>{x.total}</h5>
                                                                     </div>
                                                                 </div>
                                                             )
                                                         })
                                                     }
-                                                    <div className={"flex flex-row justify-end items-center gap-3 pt-4"}>
-                                                        <Button
-                                                            disabled={pageNo === 1 || isLoading}
-                                                            variant={"outline"}
-                                                            className={"h-[30px] w-[30px] p-1.5"}
-                                                            onClick={() => handlePaginationClick(pageNo - 1)}
-                                                        >
-                                                            <ChevronLeft
-                                                                className={pageNo === 1 || isLoading ? "stroke-muted-foreground" : "stroke-primary"}/>
-                                                        </Button>
-                                                        <h5 className={"text-[14px] font-medium"}>{pageNo}</h5>
-                                                        <Button
-                                                            disabled={pageNo === totalPages || isLoading}
-                                                            variant={"outline"}
-                                                            className={"h-[30px] w-[30px] p-1.5"}
-                                                            onClick={() => handlePaginationClick(pageNo + 1)}
-                                                        >
-                                                            <ChevronRight
-                                                                className={pageNo === totalPages || isLoading ? "stroke-muted-foreground" : "stroke-primary"}/>
-                                                        </Button>
-                                                    </div>
-                                                </div>
+                                                </Fragment>
                                         }
-                                    </Fragment>
-                            }
+                                    </div>}
 
-
-                        </div>
-                    </CardContent>
-                </Card>
+                            </div>
+                        </CardContent>
+                    </Card>
+                    <Card>
+                        <CardContent className={"p-4"}>
+                            <div className={"flex flex-col gap-4"}>
+                                <h5 className={"text-base font-medium leading-5"}>Feedback</h5>
+                                {
+                                    isLoadingFeedBack ?
+                                        <div>
+                                            {
+                                                [...Array(3)].map((_, i) => {
+                                                    return (
+                                                        <div key={i} className="space-y-2 mt-3">
+                                                            <Skeleton className="h-4 w-full"/>
+                                                            <Skeleton className="h-4 w-full"/>
+                                                            <Separator/>
+                                                        </div>
+                                                    )
+                                                })
+                                            }
+                                        </div>
+                                        :
+                                        <Fragment>
+                                            {
+                                                feedbackList.length == 0 ?
+                                                    <p className={"text-muted-foreground text-xs font-normal"}>No feedback
+                                                        received for this announcement yet</p> :
+                                                    <div>
+                                                        {
+                                                            (feedbackList || []).map((x) => {
+                                                                return (
+                                                                    <div key={x.id}
+                                                                         className={"flex flex-col py-4 first:pt-0 border-b"}>
+                                                                        <div className={"flex flex-row gap-4"}>
+                                                                            <div className={"flex flex-col gap-1"}>
+                                                                                <div
+                                                                                    className={"flex flex-row gap-4 items-center"}>
+                                                                                    <h5 className={"text-sm font-medium"}>{x?.customer_name}</h5>
+                                                                                    <p className={"text-muted-foreground text-[10px] font-normal"}>{x?.customer_email_id}</p>
+                                                                                </div>
+                                                                                <p className={"text-muted-foreground text-xs font-normal"}>
+                                                                                    <ReadMoreText className={"text-xs"}
+                                                                                                  html={x.feedback}/>
+                                                                                </p>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                )
+                                                            })
+                                                        }
+                                                        <div className={"flex flex-row justify-end items-center gap-3 pt-4"}>
+                                                            <Button
+                                                                disabled={pageNo === 1 || isLoading}
+                                                                variant={"outline"}
+                                                                className={"h-[30px] w-[30px] p-1.5"}
+                                                                onClick={() => handlePaginationClick(pageNo - 1)}
+                                                            >
+                                                                <ChevronLeft
+                                                                    className={pageNo === 1 || isLoading ? "stroke-muted-foreground" : "stroke-primary"}/>
+                                                            </Button>
+                                                            <h5 className={"text-[14px] font-medium"}>{pageNo}</h5>
+                                                            <Button
+                                                                disabled={pageNo === totalPages || isLoading}
+                                                                variant={"outline"}
+                                                                className={"h-[30px] w-[30px] p-1.5"}
+                                                                onClick={() => handlePaginationClick(pageNo + 1)}
+                                                            >
+                                                                <ChevronRight
+                                                                    className={pageNo === totalPages || isLoading ? "stroke-muted-foreground" : "stroke-primary"}/>
+                                                            </Button>
+                                                        </div>
+                                                    </div>
+                                            }
+                                        </Fragment>
+                                }
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
             </div>
         </Fragment>
     );

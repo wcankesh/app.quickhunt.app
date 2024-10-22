@@ -15,6 +15,8 @@ import {Sheet, SheetContent, SheetHeader, SheetOverlay} from "../ui/sheet";
 import {Label} from "../ui/label";
 import {Input} from "../ui/input";
 import {Switch} from "../ui/switch";
+import Pagination from "../Comman/Pagination";
+import DeleteDialog from "../Comman/DeleteDialog";
 
 const tableHeadingsArray = [
     {label:"Name"},
@@ -43,6 +45,10 @@ const initialStateError = {
 }
 
 const Customers = () => {
+    const {theme} =useTheme();
+    const apiService = new ApiService();
+    const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
+
     const [isSheetOpen, setSheetOpen] = useState(false);
     const [customerList, setCustomerList] = useState([])
     const [isLoading, setIsLoading] = useState(true);
@@ -52,12 +58,9 @@ const Customers = () => {
     const [deleteId,setDeleteId]=useState(null);
     const [openDelete,setOpenDelete]=useState(false);
     const [isSave,setIsSave]=useState(false);
-
     const [formError, setFormError] = useState(initialStateError);
     const [customerDetails, setCustomerDetails] = useState(initialState);
-    const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
-    const {theme} =useTheme();
-    const apiService = new ApiService();
+
 
     useEffect(() => {
         if(projectDetailsReducer.id){
@@ -211,7 +214,7 @@ const Customers = () => {
                 <SheetOverlay className={"inset-0"}/>
                 <SheetContent className={"sm:max-w-[662px] p-0"}>
                     <SheetHeader className={"px-3 py-4 lg:px-8 lg:py-[20px] flex flex-row justify-between items-center border-b"}>
-                        <h5 className={"text-sm md:text-xl font-normal"}>Add New Customer</h5>
+                        <h2 className={"text-sm md:text-xl font-normal"}>Add New Customer</h2>
                         <X onClick={closeSheet} size={18} className={"cursor-pointer m-0"}/>
                     </SheetHeader>
                     <div className={"sm:px-8 sm:py-6 px-3 py-4 border-b"}>
@@ -233,7 +236,7 @@ const Customers = () => {
                         </div>
                     </div>
                     <div className={"px-3 py-4 sm:p-8"}>
-                        <Button onClick={addCustomer} className={`border w-[127px] font-medium hover:bg-primary`}>{isSave ? <Loader2 className="h-4 w-4 animate-spin" /> : "Add Customer"}</Button>
+                        <Button onClick={addCustomer} className={`border w-[117px] font-medium hover:bg-primary`}>{isSave ? <Loader2 className="h-4 w-4 animate-spin" /> : "Add Customer"}</Button>
                     </div>
                 </SheetContent>
             </Sheet>}
@@ -243,146 +246,99 @@ const Customers = () => {
 
                 {
                     openDelete &&
-                    <Fragment>
-                        <Dialog open onOpenChange={()=> setOpenDelete(false)}>
-                            <DialogContent className="w-[310px] md:w-full rounded-lg">
-                                <DialogHeader className={"flex flex-row justify-between gap-2"}>
-                                    <div className={"flex flex-col gap-2"}>
-                                        <DialogTitle className={"text-start font-medium"}>You really want delete this customer ?</DialogTitle>
-                                        <DialogDescription className={"text-start"}>This action can't be undone.</DialogDescription>
-                                    </div>
-                                    <X size={16} className={"m-0 cursor-pointer"} onClick={() => setOpenDelete(false)}/>
-                                </DialogHeader>
-                                <div className={"flex justify-end gap-2"}>
-                                    <Button variant={"outline hover:none"}
-                                            className={"text-sm font-medium border"}
-                                            onClick={() => setOpenDelete(false)}>Cancel</Button>
-                                    <Button
-                                        variant={"hover:bg-destructive"}
-                                        className={`${theme === "dark" ? "text-card-foreground" : "text-card"} py-2 px-6 w-[76px] text-sm font-medium bg-destructive`}
-                                        onClick={handleDelete}
-                                    >
-                                        {isLoadingDelete ? <Loader2 size={16} className={"animate-spin"}/> : "Delete"}
-                                    </Button>
-                                </div>
-                            </DialogContent>
-                        </Dialog>
-                    </Fragment>
+                    <DeleteDialog
+                        title={"You really want to delete this Customer?"}
+                        isOpen={openDelete}
+                        onOpenChange={() => setOpenDelete(false)}
+                        onDelete={handleDelete}
+                        isDeleteLoading={isLoadingDelete}
+                        deleteRecord={deleteId}
+                    />
                 }
 
-                <div className={""}>
+                <div>
                     <div className={"flex flex-row gap-x-4 flex-wrap justify-between gap-y-2 items-center"}>
                         <div>
-                            <h4 className={"font-normal text-lg sm:text-2xl"}>Customers ({totalRecord})</h4>
+                            <h1 className="text-2xl font-normal flex-initial w-auto">Customers ({totalRecord})</h1>
                             <h5 className={"text-muted-foreground text-base"}>Last updates</h5>
                         </div>
-                        <Button size="sm" onClick={openSheet} className={"gap-2 font-medium hover:bg-primary"}> <Plus size={20} strokeWidth={3} />New Customer</Button>
+                        <Button onClick={openSheet} className={"gap-2 font-medium hover:bg-primary"}><Plus size={20} strokeWidth={3} /><span className={"text-xs md:text-sm font-medium"}>New Customer</span></Button>
                     </div>
                     <div className={"mt-4 sm:mt-6"}>
-                                <Card className={""}>
-                                    <CardContent className={"p-0"}>
-                                        <div className={"rounded-md grid grid-cols-1 overflow-auto whitespace-nowrap"}>
-                                            <Table>
-                                                <TableHeader className={"py-8 px-5"}>
-                                                    <TableRow className={""}>
-                                                        {
-                                                            (tableHeadingsArray || []).map((x,i)=>{
-                                                                return(
-                                                                    <TableHead className={`font-medium text-card-foreground px-2 py-[10px] md:px-3 ${i >= 2 ? "text-center" : ""}  ${theme === "dark"? "text-[]" : "bg-muted"} `} key={x.label}>{x.label}</TableHead>
-                                                                )
-                                                            })
-                                                        }
-                                                    </TableRow>
-                                                </TableHeader>
-                                                <TableBody>
+                        <Card>
+                            <CardContent className={"p-0"}>
+                                <div className={"rounded-md grid grid-cols-1 overflow-auto whitespace-nowrap"}>
+                                    <Table>
+                                        <TableHeader className={"py-8 px-5"}>
+                                            <TableRow className={""}>
                                                 {
-                                                    isLoading ? (
-                                                                [...Array(10)].map((_, index) => {
-                                                                    return (
-                                                                        <TableRow key={index}>
-                                                                            {
-                                                                                [...Array(6)].map((_, i) => {
-                                                                                    return (
-                                                                                        <TableCell key={i} className={"px-2 py-[9px] md:px-3"}>
-                                                                                            <Skeleton className={"rounded-md  w-full h-8"}/>
-                                                                                        </TableCell>
-                                                                                    )
-                                                                                })
-                                                                            }
-                                                                        </TableRow>
-                                                                    )
-                                                                })
+                                                    (tableHeadingsArray || []).map((x,i)=>{
+                                                        return(
+                                                            <TableHead className={`font-medium text-card-foreground px-2 py-[10px] md:px-3 ${i >= 2 ? "text-center" : ""}  ${theme === "dark"? "text-[]" : "bg-muted"} `} key={x.label}>{x.label}</TableHead>
                                                         )
-                                                         : customerList.length > 0 ? <>
+                                                    })
+                                                }
+                                            </TableRow>
+                                        </TableHeader>
+                                        <TableBody>
+                                        {
+                                            isLoading ? (
+                                                [...Array(10)].map((_, index) => {
+                                                    return (
+                                                        <TableRow key={index}>
                                                             {
-                                                                (customerList || []).map((x,index)=>{
-                                                                    return(
-                                                                        <TableRow key={x.id} className={"font-normal"}>
-                                                                            <TableCell className={`px-2 py-[10px] md:px-3`}>{x.customer_name ? x.customer_name : "-"}</TableCell>
-                                                                            <TableCell className={`px-2 py-[10px] md:px-3`}>{x?.customer_email_id}</TableCell>
-                                                                            <TableCell className={`px-2 py-[10px] md:px-3 text-center`}>{x.customer_country ? x.customer_country : "-"}</TableCell>
-                                                                            <TableCell className={`px-2 py-[10px] md:px-3 text-center`}>{x.customer_browser ? x.customer_browser : "-"}</TableCell>
-                                                                            <TableCell className={`px-2 py-[10px] md:px-3 text-center`}>{x.os ? x.os : "-"}</TableCell>
-                                                                            <TableCell className={`px-2 py-[10px] md:px-3 text-center`}>
-                                                                                <Button onClick={() => deleteCustomer(x.id,index)} variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px]`}>
-                                                                                    <Trash2 size={16}/>
-                                                                                </Button>
-                                                                            </TableCell>
-                                                                        </TableRow>
+                                                                [...Array(6)].map((_, i) => {
+                                                                    return (
+                                                                        <TableCell key={i} className={"px-2 py-[9px] md:px-3"}>
+                                                                            <Skeleton className={"rounded-md  w-full h-8"}/>
+                                                                        </TableCell>
                                                                     )
                                                                 })
                                                             }
-                                                            </> : <TableRow>
-                                                            <TableCell colSpan={6}>
-                                                                <EmptyData/>
-                                                            </TableCell>
                                                         </TableRow>
-                                                }
-                                                </TableBody>
-                                        </Table>
-
-                                        </div>
-                                    </CardContent>
-                                    {
-                                        customerList.length > 0 ?
-                                            <CardFooter className={`p-0 ${theme === "dark" ? "border-t" : ""}`}>
-                                                <div
-                                                    className={`w-full ${theme === "dark" ? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end p-2 md:px-3 md:py-[10px]`}>
-                                                    <div className={"w-full flex gap-2 items-center justify-between sm:justify-end"}>
-                                                        <div>
-                                                            <h5 className={"text-sm font-medium"}>Page {customerList.length <= 0 ? 0 : pageNo} of {totalPages}</h5>
-                                                        </div>
-                                                        <div className={"flex flex-row gap-2 items-center"}>
-                                                            <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
-                                                                    onClick={() => handlePaginationClick(1)}
-                                                                    disabled={pageNo === 1 || isLoading}>
-                                                                <ChevronsLeft
-                                                                    className={pageNo === 1 || isLoading ? "stroke-muted-foreground" : "stroke-primary"} />
-                                                            </Button>
-                                                            <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
-                                                                    onClick={() => handlePaginationClick(pageNo - 1)}
-                                                                    disabled={pageNo === 1 || isLoading}>
-                                                                <ChevronLeft
-                                                                    className={pageNo === 1 || isLoading ? "stroke-muted-foreground" : "stroke-primary"} />
-                                                            </Button>
-                                                            <Button variant={"outline"} className={" h-[30px] w-[30px] p-1.5"}
-                                                                    onClick={() => handlePaginationClick(pageNo + 1)}
-                                                                    disabled={pageNo === totalPages || isLoading || customerList.length <= 0}>
-                                                                <ChevronRight
-                                                                    className={pageNo === totalPages || isLoading || customerList.length <= 0 ? "stroke-muted-foreground" : "stroke-primary"} />
-                                                            </Button>
-                                                            <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
-                                                                    onClick={() => handlePaginationClick(totalPages)}
-                                                                    disabled={pageNo === totalPages || isLoading || customerList.length <= 0}>
-                                                                <ChevronsRight
-                                                                    className={pageNo === totalPages || isLoading || customerList.length <= 0 ? "stroke-muted-foreground" : "stroke-primary"} />
-                                                            </Button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </CardFooter> : ""
-                                    }
-                                </Card>
+                                                    )
+                                                })
+                                                )
+                                                 : customerList.length > 0 ? <>
+                                                    {
+                                                        (customerList || []).map((x,index)=>{
+                                                            return(
+                                                                <TableRow key={x.id} className={"font-normal"}>
+                                                                    <TableCell className={`px-2 py-[10px] md:px-3`}>{x.customer_name ? x.customer_name : "-"}</TableCell>
+                                                                    <TableCell className={`px-2 py-[10px] md:px-3`}>{x?.customer_email_id}</TableCell>
+                                                                    <TableCell className={`px-2 py-[10px] md:px-3 text-center`}>{x.customer_country ? x.customer_country : "-"}</TableCell>
+                                                                    <TableCell className={`px-2 py-[10px] md:px-3 text-center`}>{x.customer_browser ? x.customer_browser : "-"}</TableCell>
+                                                                    <TableCell className={`px-2 py-[10px] md:px-3 text-center`}>{x.os ? x.os : "-"}</TableCell>
+                                                                    <TableCell className={`px-2 py-[10px] md:px-3 text-center`}>
+                                                                        <Button onClick={() => deleteCustomer(x.id,index)} variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px]`}>
+                                                                            <Trash2 size={16}/>
+                                                                        </Button>
+                                                                    </TableCell>
+                                                                </TableRow>
+                                                            )
+                                                        })
+                                                    }
+                                                    </> : <TableRow>
+                                                    <TableCell colSpan={6}>
+                                                        <EmptyData/>
+                                                    </TableCell>
+                                                </TableRow>
+                                        }
+                                        </TableBody>
+                                    </Table>
+                                </div>
+                            </CardContent>
+                            {
+                                customerList.length > 0 ?
+                                    <Pagination
+                                        pageNo={pageNo}
+                                        totalPages={totalPages}
+                                        isLoading={isLoading}
+                                        handlePaginationClick={handlePaginationClick}
+                                        stateLength={customerList.length}
+                                    /> : ""
+                            }
+                        </Card>
                     </div>
                 </div>
             </div>

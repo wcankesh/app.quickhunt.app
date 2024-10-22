@@ -98,7 +98,7 @@ const AnnouncementsView = ({data,isLoading,setSelectedRecord,handleDelete,setAna
                                         onClick={() => setOpenDelete(false)}>Cancel</Button>
                                 <Button
                                     variant={"hover:bg-destructive"}
-                                    className={`${theme === "dark" ? "text-card-foreground" : "text-card"} ${isLoading === true ? "py-2 px-6" : "py-2 px-6"} w-[76px] text-sm font-semibold bg-destructive`}
+                                    className={`${theme === "dark" ? "text-card-foreground" : "text-card"} w-[65px] text-sm font-semibold bg-destructive`}
                                     onClick={deleteParticularRow}
                                 >
                                     {isLoading ? <Loader2 size={16} className={"animate-spin"}/> : "Delete"}

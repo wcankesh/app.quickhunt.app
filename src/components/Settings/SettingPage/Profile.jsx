@@ -236,11 +236,11 @@ const Profile = () => {
     return (
         <div className={"flex flex-col gap-6"}>
             <Card>
-                <CardHeader className={"gap-1 border-b p-4 sm:p-6"}>
+                <CardHeader className={"gap-1 border-b p-4 sm:px-5 sm:py-4"}>
                        <h3 className={"font-normal text-lg sm:text-2xl"}>Edit Profile</h3>
                     <CardDescription className={" text-sm text-muted-foreground p-0"}>Manage your personal account settings.</CardDescription>
                 </CardHeader>
-                <CardContent className={"py-4 px-4 sm:py-6 border-b"}>
+                <CardContent className={"py-4 px-4 sm:px-5 sm:py-4 border-b"}>
                     <div className={"flex gap-4 flex-wrap lg:flex-nowrap md:flex-nowrap sm:flex-wrap"}>
                         <div className="flex justify-center mt-2 relative">
                             {
@@ -277,7 +277,7 @@ const Profile = () => {
                                             id="pictureInput"
                                             type="file"
                                             className="hidden"
-                                            accept="image/*"
+                                            accept={".jpg,.jpeg"}
                                             onChange={handleFileChange}
                                         />
                                         <label
@@ -368,18 +368,19 @@ const Profile = () => {
                         </div>
                     </div>
                 </CardContent>
-                <CardFooter className={"flex items-center p-4 sm:p-6 justify-end"}>
+                <CardFooter className={"flex items-center p-4 sm:px-5 sm:py-4 justify-end"}>
                     <Button onClick={onUpdateUser}
-                            className={`py-2 px-4 w-[128px] text-sm font-medium hover:bg-primary`}
+                            className={`w-[111px] text-sm font-medium hover:bg-primary`}
                     >
                         {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save Changes"}</Button>
                 </CardFooter>
             </Card>
+
             <Card>
-                <CardHeader className={"gap-1 border-b p-4 sm:p-6"}>
+                <CardHeader className={"gap-1 border-b p-4 sm:px-5 sm:py-4"}>
                     <CardTitle className={"text-base font-normal"}>Change a password for your account</CardTitle>
                 </CardHeader>
-                <CardContent className={"py-4 px-4 sm:p-6"}>
+                <CardContent className={"py-4 px-4 sm:px-5 sm:py-4"}>
                     <div className={"flex flex-col gap-4"}>
                         <div className={"space-y-1"}>
                         <Label htmlFor="current_password" className={"font-normal"}>Current password</Label>
@@ -456,7 +457,7 @@ const Profile = () => {
                     </div>
                 </CardContent>
                 <CardFooter className={"justify-end p-4 pt-0 sm:px-6"}>
-                    <Button className={`py-2 px-4 w-[150px] text-sm font-medium hover:bg-primary`}
+                    <Button className={`w-[134px] text-sm font-medium hover:bg-primary`}
                             onClick={changePassword}>{isLoadingPass ? <Loader2 className="h-4 w-4 animate-spin" /> : "Update Password"}</Button>
                 </CardFooter>
             </Card>

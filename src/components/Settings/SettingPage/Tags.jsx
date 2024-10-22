@@ -13,6 +13,7 @@ import {toast} from "../../ui/use-toast";
 import {Dialog} from "@radix-ui/react-dialog";
 import {DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "../../ui/dialog";
 import EmptyData from "../../Comman/EmptyData";
+import DeleteDialog from "../../Comman/DeleteDialog";
 
 const initialState ={title:""}
 
@@ -217,40 +218,23 @@ const Tags = () => {
         <Fragment>
             {
                 openDelete &&
-                <Fragment>
-                    <Dialog open onOpenChange={()=> setOpenDelete(false)}>
-                        <DialogContent className="max-w-[350px] w-full sm:max-w-[525px] p-3 md:p-6 rounded-lg">
-                            <DialogHeader className={"flex flex-row justify-between gap-2"}>
-                                <div className={"flex flex-col gap-2"}>
-                                    <DialogTitle className={"text-start font-medium"}>You really want delete this tag?</DialogTitle>
-                                    <DialogDescription className={"text-start"}>This action can't be undone.</DialogDescription>
-                                </div>
-                                <X size={16} className={"m-0 cursor-pointer"} onClick={() => setOpenDelete(false)}/>
-                            </DialogHeader>
-                            <DialogFooter className={"flex-row justify-end space-x-2"}>
-                                <Button variant={"outline hover:none"}
-                                        className={"text-sm font-medium border"}
-                                        onClick={() => setOpenDelete(false)}>Cancel</Button>
-                                <Button
-                                    variant={"hover:bg-destructive"}
-                                    className={` ${theme === "dark" ? "text-card-foreground" : "text-card"} py-2 px-6 w-[76px] text-sm font-medium bg-destructive`}
-                                    onClick={onDelete}
-                                >
-                                    {isLoadingDelete ? <Loader2 size={16} className={"animate-spin"}/> : "Delete"}
-                                </Button>
-                            </DialogFooter>
-                        </DialogContent>
-                    </Dialog>
-                </Fragment>
+                <DeleteDialog
+                    title={"You really want to delete this Tag ?"}
+                    isOpen={openDelete}
+                    onOpenChange={() => setOpenDelete(false)}
+                    onDelete={onDelete}
+                    isDeleteLoading={isLoadingDelete}
+                    deleteRecord={deleteId}
+                />
             }
 
             <Card>
-                <CardHeader className={"p-4 sm:p-6 gap-1 border-b flex flex-row flex-wrap justify-between items-center gap-y-2"}>
+                <CardHeader className={"p-4 sm:px-5 sm:py-4 gap-1 border-b flex flex-row flex-wrap justify-between items-center gap-y-2"}>
                     <div>
                         <CardTitle className={"text-lg sm:text-2xl font-normal"}>Tags</CardTitle>
                         <CardDescription className={"text-sm text-muted-foreground p-0"}>Add Tags so that users can tag them when creating Ideas.</CardDescription>
                     </div>
-                    <Button size={"sm"} onClick={handleNewTopics} disabled={isEdit != null} className={"gap-2 font-medium hover:bg-primary m-0"}><Plus size={18} strokeWidth={3}/>New Tag</Button>
+                    <Button onClick={handleNewTopics} disabled={isEdit != null} className={"gap-2 font-medium hover:bg-primary m-0"}><Plus size={18} strokeWidth={3}/>New Tag</Button>
                 </CardHeader>
                 <CardContent className={"p-0"}>
                     <div className={"grid grid-cols-1 overflow-auto whitespace-nowrap"}>
@@ -304,7 +288,6 @@ const Tags = () => {
                                                                                         >
                                                                                             {isSave ? <Loader2 className="mr-1 h-4 w-4 animate-spin justify-center"/> : <Check size={16}/>}
                                                                                         </Button> : <Button
-                                                                                            variant=""
                                                                                             className="text-sm font-medium h-[30px] w-[89px] hover:bg-primary"
                                                                                             onClick={() => addTag(x, i)}
                                                                                         >

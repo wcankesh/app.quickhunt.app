@@ -18,6 +18,7 @@ import {Badge} from "../ui/badge";
 import {useLocation, useNavigate} from "react-router-dom";
 import {baseUrl} from "../../utils/constent";
 import AnnouncementAnalyticsViews from "./AnnouncementAnalyticsViews";
+import Pagination from "../Comman/Pagination";
 
 
 const initialStateFilter = {
@@ -245,7 +246,7 @@ const Announcements = () => {
 
             <div className={"flex items-center justify-between flex-wrap gap-2"}>
                 <div className={"flex justify-between items-center w-full md:w-auto"}>
-                    <h3 className={"text-2xl font-normal"}>Announcement ({totalRecord})</h3>
+                    <h1 className="text-2xl font-normal flex-initial w-auto">Announcement ({totalRecord})</h1>
                 </div>
                 <div className={"w-full lg:w-auto flex sm:flex-nowrap flex-wrap gap-2 items-center"}>
                     <div className={"flex gap-2 items-center w-full md:w-auto"}>
@@ -329,7 +330,6 @@ const Announcements = () => {
                     </div>
                     {/*<div className={"flex flex-grow gap-2 items-center"}>*/}
                         <Button
-                            size={"sm"}
                             onClick={openSheet}
                             className={"gap-2 font-medium hover:bg-primary"}
                         >
@@ -374,42 +374,14 @@ const Announcements = () => {
                 />
                 {
                     announcementList.length > 0 ?
-                        <CardFooter className={`p-0 ${theme === "dark" ? "border-t" : ""}`}>
-                            <div
-                                className={`w-full ${theme === "dark" ? "" : "bg-muted"} rounded-b-lg rounded-t-none flex justify-end p-2 md:px-3 md:py-[10px]`}>
-                                <div className={"w-full flex gap-2 items-center justify-between sm:justify-end"}>
-                                    <div>
-                                        <h5 className={"text-sm font-medium"}>Page {announcementList.length <= 0 ? 0 :pageNo} of {totalPages}</h5>
-                                    </div>
-                                    <div className={"flex flex-row gap-2 items-center"}>
-                                        <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
-                                                onClick={() => handlePaginationClick(1)}
-                                                disabled={pageNo === 1 || isLoading}>
-                                            <ChevronsLeft
-                                                className={pageNo === 1 || isLoading ? "stroke-muted-foreground" : "stroke-primary"} />
-                                        </Button>
-                                        <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
-                                                onClick={() => handlePaginationClick(pageNo - 1)}
-                                                disabled={pageNo === 1 || isLoading}>
-                                            <ChevronLeft
-                                                className={pageNo === 1 || isLoading ? "stroke-muted-foreground" : "stroke-primary"} />
-                                        </Button>
-                                        <Button variant={"outline"} className={" h-[30px] w-[30px] p-1.5"}
-                                                onClick={() => handlePaginationClick(pageNo + 1)}
-                                                disabled={pageNo === totalPages || isLoading || announcementList.length <= 0}>
-                                            <ChevronRight
-                                                className={pageNo === totalPages || isLoading || announcementList.length <= 0 ? "stroke-muted-foreground" : "stroke-primary"} />
-                                        </Button>
-                                        <Button variant={"outline"} className={"h-[30px] w-[30px] p-1.5"}
-                                                onClick={() => handlePaginationClick(totalPages)}
-                                                disabled={pageNo === totalPages || isLoading || announcementList.length <= 0}>
-                                            <ChevronsRight
-                                                className={pageNo === totalPages || isLoading || announcementList.length <= 0 ? "stroke-muted-foreground" : "stroke-primary"} />
-                                        </Button>
-                                    </div>
-                                </div>
-                            </div>
-                        </CardFooter> : ""
+                        <Pagination
+                            pageNo={pageNo}
+                            totalPages={totalPages}
+                            isLoading={isLoading}
+                            handlePaginationClick={handlePaginationClick}
+                            theme={"light"} // or "dark"
+                            stateLength={announcementList.length}
+                        /> : ""
                 }
             </Card>
 

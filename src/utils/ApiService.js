@@ -396,6 +396,17 @@ export class ApiService{
     }
 
     /* ---------- Settings Board api ---------- */
+    async createCategorySettings (payload){
+        return await this.postData(`${baseUrlApi}/category`, payload)
+    }
+    async deleteCategorySettings (id){
+        return await this.deleteData(`${baseUrlApi}/category/${id}`)
+    }
+    async updateCategorySettings (payload, id){
+        return await this.putData(`${baseUrlApi}/category/${id}`,payload)
+    }
+
+    /* ---------- Settings Board api ---------- */
     async getAllBoards (payload){
         return await this.getData(`${baseUrlApi}/board?${qs.stringify(payload)}`)
     }

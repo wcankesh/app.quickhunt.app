@@ -13,17 +13,17 @@ const ImportExport = () => {
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     return (
         <Card className={"divide-y"}>
-            <CardHeader className={"p-4 sm:p-6"}>
+            <CardHeader className={"p-4 sm:px-5 sm:py-4"}>
                 <h2 className={`text-lg sm:text-2xl font-normal`}>Import / Export</h2>
             </CardHeader>
-            <CardContent className={"p-6 space-y-3"}>
+            <CardContent className={"p-4 sm:px-5 sm:py-4 space-y-3"}>
                 <div>
                     <h5 className={"text-base font-normal"}>Import Data</h5>
                     <p className={"text-muted-foreground text-sm"}>We've made it easy to import your data from other tools and spreadsheets.</p>
                 </div>
                 <Button className={"font-medium hover:bg-primary"} onClick={onRedirect}>Import Data</Button>
             </CardContent>
-            <CardContent className={"p-6 space-y-3"}>
+            <CardContent className={"p-4 sm:px-5 sm:py-4 space-y-3"}>
                 <div>
                     <h5 className={"text-base font-normal"}>Export Data</h5>
                     <p className={"text-muted-foreground text-sm"}>You can export all your data in CSV format. (This can take up to 30 sec.)</p>

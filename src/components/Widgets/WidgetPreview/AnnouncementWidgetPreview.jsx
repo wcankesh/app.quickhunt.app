@@ -176,7 +176,7 @@ const AnnouncementWidgetPreview = ({widgetsSetting}) => {
                                                                         <div className="relative overflow-hidden  border-t mt-2 border-[#e2e8f0]">
                                                                             <Textarea on id="message" placeholder="Type your message here..." className={`${cardClass} min-h-12 resize-none border-0 p-3 shadow-none focus-visible:ring-0 ring-offset-color-0`}/>
                                                                             <div className="flex items-center p-3 pt-0">
-                                                                                <Button size="sm" className="ml-auto gap-1.5"  style={{backgroundColor: widgetsSetting?.btn_background_color, color: widgetsSetting?.btn_text_color}}>Send</Button>
+                                                                                <Button className="ml-auto gap-1.5"  style={{backgroundColor: widgetsSetting?.btn_background_color, color: widgetsSetting?.btn_text_color}}>Send</Button>
                                                                             </div>
                                                                         </div>
                                                                     </AccordionContent> : ''

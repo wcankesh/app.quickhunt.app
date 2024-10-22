@@ -120,7 +120,9 @@ const Roadmap = () => {
                 setRoadmapList={setRoadmapList}
 
             />
-            <div className={"p-4 px-2.5"}><h1 className={"text-2xl font-normal"}>Roadmap</h1></div>
+            <div className={"p-4 px-2.5"}>
+                <h1 className="text-2xl font-normal flex-initial w-auto">Roadmap</h1>
+            </div>
             <div className={"py-[11px] pt-[3px]"}>
                 {
                     isLoading ?

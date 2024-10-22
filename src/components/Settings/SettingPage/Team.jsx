@@ -262,7 +262,7 @@ const Team = () => {
                                         onClick={() => setOpenDelete(false)}>Cancel</Button>
                                 <Button
                                     variant={"hover:bg-destructive"}
-                                    className={` ${theme === "dark" ? "text-card-foreground" : "text-card"} py-2 px-6 w-[76px] text-sm font-medium bg-destructive`}
+                                    className={` ${theme === "dark" ? "text-card-foreground" : "text-card"} w-[76px] text-sm font-medium bg-destructive`}
                                     onClick={onDelete}
                                 >
                                     {isLoadingDelete ? <Loader2 size={16} className={"animate-spin"}/> : "Delete"}
@@ -274,7 +274,7 @@ const Team = () => {
             }
 
             <Card>
-                <CardHeader className={"flex flex-row flex-wrap md:flex-nowrap justify-between gap-2 items-center p-4 sm:p-6"}>
+                <CardHeader className={"flex flex-row flex-wrap md:flex-nowrap justify-between gap-2 items-center p-4 sm:px-5 sm:py-4"}>
                     <div>
                         <CardTitle className={"text-lg sm:text-2xl font-normal"}>Invite Team</CardTitle>
                         <CardDescription className={"text-sm text-muted-foreground p-0"}>Add members to your company to
@@ -283,8 +283,8 @@ const Team = () => {
                     <Button className={"text-sm font-medium hover:bg-primary m-0"} onClick={openSheet}>Invite Team</Button>
                 </CardHeader>
                 <CardContent className={"p-0"}>
-                    <Tabs defaultValue="users" className="space-y-6">
-                        <div className={"px-4 sm:px-6"}>
+                    <Tabs defaultValue="users" className="space-y-3">
+                        <div className={"px-4 sm:px-5"}>
                             <TabsList className="grid w-[141px] grid-cols-2 bg-card border">
                                 <TabsTrigger value="users"
                                              className={`text-sm font-normal team-tab-active team-tab-text-active ${theme === "dark" ? "text-card-foreground" : ""}`}>Users</TabsTrigger>
@@ -296,7 +296,7 @@ const Team = () => {
                             <div className={"grid grid-cols-1 overflow-auto whitespace-nowrap"}>
                                     <Table>
                                         <TableHeader className={"p-0"}>
-                                            <TableRow className={""}>
+                                            <TableRow>
                                                 {
                                                     ["Team", "Role" ,isAdmin === true ? "Action" : ""].map((x, i) => {
                                                         return (
@@ -480,7 +480,7 @@ const Team = () => {
                         </div>
                         <div className={"flex px-3 py-4 sm:px-[32px] gap-[16px] sm:justify-start"}>
                             <Button
-                                className={`py-2 px-4 w-[69px] text-sm font-medium hover:bg-primary`}
+                                className={`w-[69px] text-sm font-medium hover:bg-primary`}
                                 onClick={onInviteUser}
                             >
                                 {isSave ? <Loader2 className="h-4 w-4 animate-spin"/> : "Invite"}
