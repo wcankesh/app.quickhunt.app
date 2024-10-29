@@ -284,6 +284,7 @@ export function Dashboard() {
                             </div>
                             <div className={"p-6 py-3 text-end"}>
                                 <Button variant={"ghost hover:none"} className={"p-0 h-auto text-primary font-medium"}
+                                        // onClick={() => navigate(`${baseUrl}/dashboard/comments?pageNo=2`)}>
                                         onClick={() => navigate(`${baseUrl}/dashboard/comments`)}>
                                     See All
                                 </Button>

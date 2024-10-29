@@ -239,9 +239,8 @@ const ImportIdea = () => {
                                 </Card>
                                 <Card>
                                     <CardHeader className={" border-b p-3"}>
-                                        <h3 className={"font-normal text-lg"}>Migrating from another tool?</h3>
-                                        <CardDescription className={" text-sm text-muted-foreground p-0"}>Check out helpful
-                                            articles from our help center that help you do that.</CardDescription>
+                                        <h3 className={"font-normal text-lg"}>Switching from another tool?</h3>
+                                        <CardDescription className={"text-sm text-muted-foreground p-0"}>Easily migrate your ideas to Quickhunt in just a few minutes!</CardDescription>
                                     </CardHeader>
                                     <CardContent className={"p-3"}>
                                         <div

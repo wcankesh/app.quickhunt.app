@@ -85,11 +85,10 @@ const Forgot = () => {
         const data = await apiSerVice.forgotPassword({email: forgotPasswordDetails.email})
         if (data.status === 200) {
             setForgotPasswordDetails({email: ""})
-            toast({
-                description: data.message,
-            })
+            toast({description: data.message,})
             setIsLoading(false)
         } else {
+            toast({variant: "destructive", description: data.message})
             setIsLoading(false)
         }
     }

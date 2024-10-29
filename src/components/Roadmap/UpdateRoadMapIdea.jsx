@@ -16,6 +16,7 @@ import {ApiService} from "../../utils/ApiService";
 import {useSelector} from "react-redux";
 import moment from "moment";
 import ReactQuillEditor from "../Comman/ReactQuillEditor";
+import ImageUploader from "../Comman/ImageUploader";
 
 const initialStateError = {
     title: "",
@@ -808,51 +809,63 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                     <Label htmlFor="picture" className={"font-normal capitalize"}>Featured image</Label>
                                     <div className="w-[282px] h-[128px] flex gap-1">
 
-                                        {
-                                            selectedIdea?.cover_image ?
-                                                <div>
-                                                    {selectedIdea && selectedIdea?.cover_image && selectedIdea?.cover_image?.name ?
-                                                        <div className={"w-[282px] h-[128px] relative border p-[5px]"}>
-                                                            <img
-                                                                className={"upload-img"}
-                                                                src={selectedIdea && selectedIdea?.cover_image && selectedIdea?.cover_image?.name ? URL.createObjectURL(selectedIdea?.cover_image) : selectedIdea?.cover_image}
-                                                                alt=""/>
-                                                            <CircleX
-                                                                size={20}
-                                                                className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
-                                                                onClick={() => onChangeStatus('delete_cover_image', selectedIdea && selectedIdea?.cover_image && selectedIdea?.cover_image?.name ? "" : [selectedIdea?.cover_image.replace("https://code.quickhunt.app/public/storage/feature_idea/", "")])}
-                                                            />
-                                                        </div> : selectedIdea?.cover_image ?
-                                                            <div
-                                                                className={"w-[282px] h-[128px] relative border p-[5px]"}>
-                                                                <img className={"upload-img"}
-                                                                     src={selectedIdea?.cover_image} alt=""/>
-                                                                <CircleX
-                                                                    size={20}
-                                                                    className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
-                                                                    onClick={() => onChangeStatus('delete_cover_image', selectedIdea && selectedIdea?.cover_image && selectedIdea?.cover_image?.name ? "" : selectedIdea?.cover_image.replace("https://code.quickhunt.app/public/storage/feature_idea/", ""))}
-                                                                />
-                                                            </div>
-                                                            : ''}
-                                                </div> :
-                                                <div>
+                                        <ImageUploader
+                                            // selectedImage={selectedIdea}
+                                            // onChangeStatus={onChangeStatus}
+                                            // handleUpload={handleFeatureImgUpload}
 
-                                                    <input
-                                                        id="pictureInput"
-                                                        type="file"
-                                                        className="hidden"
-                                                        multiple
-                                                        onChange={handleFeatureImgUpload}
-                                                        accept={".jpg,.jpeg"}
-                                                    />
-                                                    <label
-                                                        htmlFor="pictureInput"
-                                                        className="border-dashed w-[282px] h-[128px] py-[52px] flex items-center justify-center bg-muted border border-muted-foreground rounded cursor-pointer"
-                                                    >
-                                                        <Upload className="h-4 w-4 text-muted-foreground" />
-                                                    </label>
-                                                </div>
-                                        }
+                                            image={selectedIdea?.cover_image}
+                                            onDelete={() => onChangeStatus('delete_cover_image', selectedIdea && selectedIdea?.cover_image && selectedIdea?.cover_image?.name ? "" : [selectedIdea?.cover_image.replace("https://code.quickhunt.app/public/storage/feature_idea/", "")])}
+                                            onUpload={handleFeatureImgUpload}
+                                            altText="Cover Image"
+
+                                        />
+
+                                        {/*{*/}
+                                        {/*    selectedIdea?.cover_image ?*/}
+                                        {/*        <div>*/}
+                                        {/*            {selectedIdea && selectedIdea?.cover_image && selectedIdea?.cover_image?.name ?*/}
+                                        {/*                <div className={"w-[282px] h-[128px] relative border p-[5px]"}>*/}
+                                        {/*                    <img*/}
+                                        {/*                        className={"upload-img"}*/}
+                                        {/*                        src={selectedIdea && selectedIdea?.cover_image && selectedIdea?.cover_image?.name ? URL.createObjectURL(selectedIdea?.cover_image) : selectedIdea?.cover_image}*/}
+                                        {/*                        alt=""/>*/}
+                                        {/*                    <CircleX*/}
+                                        {/*                        size={20}*/}
+                                        {/*                        className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}*/}
+                                        {/*                        onClick={() => onChangeStatus('delete_cover_image', selectedIdea && selectedIdea?.cover_image && selectedIdea?.cover_image?.name ? "" : [selectedIdea?.cover_image.replace("https://code.quickhunt.app/public/storage/feature_idea/", "")])}*/}
+                                        {/*                    />*/}
+                                        {/*                </div> : selectedIdea?.cover_image ?*/}
+                                        {/*                    <div*/}
+                                        {/*                        className={"w-[282px] h-[128px] relative border p-[5px]"}>*/}
+                                        {/*                        <img className={"upload-img"}*/}
+                                        {/*                             src={selectedIdea?.cover_image} alt=""/>*/}
+                                        {/*                        <CircleX*/}
+                                        {/*                            size={20}*/}
+                                        {/*                            className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}*/}
+                                        {/*                            onClick={() => onChangeStatus('delete_cover_image', selectedIdea && selectedIdea?.cover_image && selectedIdea?.cover_image?.name ? "" : selectedIdea?.cover_image.replace("https://code.quickhunt.app/public/storage/feature_idea/", ""))}*/}
+                                        {/*                        />*/}
+                                        {/*                    </div>*/}
+                                        {/*                    : ''}*/}
+                                        {/*        </div> :*/}
+                                        {/*        <div>*/}
+
+                                        {/*            <input*/}
+                                        {/*                id="pictureInput"*/}
+                                        {/*                type="file"*/}
+                                        {/*                className="hidden"*/}
+                                        {/*                multiple*/}
+                                        {/*                onChange={handleFeatureImgUpload}*/}
+                                        {/*                accept={".jpg,.jpeg"}*/}
+                                        {/*            />*/}
+                                        {/*            <label*/}
+                                        {/*                htmlFor="pictureInput"*/}
+                                        {/*                className="border-dashed w-[282px] h-[128px] py-[52px] flex items-center justify-center bg-muted border border-muted-foreground rounded cursor-pointer"*/}
+                                        {/*            >*/}
+                                        {/*                <Upload className="h-4 w-4 text-muted-foreground" />*/}
+                                        {/*            </label>*/}
+                                        {/*        </div>*/}
+                                        {/*}*/}
                                     </div>
                                 </div>
                             </div>

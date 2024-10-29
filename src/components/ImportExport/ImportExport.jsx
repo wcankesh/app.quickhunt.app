@@ -22,14 +22,14 @@ const ImportExport = () => {
             <CardContent className={"p-4 sm:px-5 sm:py-4 space-y-3"}>
                 <div>
                     <h5 className={"text-base font-normal capitalize"}>Import Data</h5>
-                    <p className={"text-muted-foreground text-sm"}>We've made it easy to import your data from other tools and spreadsheets.</p>
+                    <p className={"text-muted-foreground text-sm"}>Seamlessly Import Ideas from any tool effortlessly in just a few minutes.</p>
                 </div>
                 <Button className={"font-medium hover:bg-primary"} onClick={onRedirect}>Import Data</Button>
             </CardContent>
             <CardContent className={"p-4 sm:px-5 sm:py-4 space-y-3"}>
                 <div>
                     <h5 className={"text-base font-normal capitalize"}>Export Data</h5>
-                    <p className={"text-muted-foreground text-sm"}>You can export all your data in CSV format. (This can take up to 30 sec.)</p>
+                    <p className={"text-muted-foreground text-sm"}>Export your ideas in CSV format! The process may take up to 30 seconds.</p>
                 </div>
                 <Button className={"font-medium hover:bg-primary"} onClick={() => window.open(`https://code.quickhunt.app/public/api/idea/export?project_id=${projectDetailsReducer.id}`, "_blank")}>Export Data</Button>
             </CardContent>
