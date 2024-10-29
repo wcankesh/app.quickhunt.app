@@ -10,8 +10,6 @@ import {useSelector, useDispatch} from "react-redux";
 import moment from "moment";
 import {allStatusAndTypesAction} from "../../../redux/action/AllStatusAndTypesAction";
 import {toast} from "../../ui/use-toast";
-import {Dialog} from "@radix-ui/react-dialog";
-import {DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "../../ui/dialog";
 import EmptyData from "../../Comman/EmptyData";
 import DeleteDialog from "../../Comman/DeleteDialog";
 
@@ -22,18 +20,19 @@ const initialState = {
 
 const Categories = () => {
     const {theme} = useTheme();
+    const apiService = new ApiService();
+    const dispatch = useDispatch();
+    const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
+    const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
+
     const [formError, setFormError] = useState(initialState);
-    const [isLoading, setIsLoading] = useState(true);
     const [categoriesList, setCategoriesList] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
     const [isSave, setIsSave] = useState(false);
     const [deleteId, setDeleteId] = useState(null);
     const [openDelete, setOpenDelete] = useState(false);
     const [isLoadingDelete, setIsLoadingDelete] = useState(false);
     const [isEdit,setIsEdit] =useState(null);
-    const apiService = new ApiService();
-    const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
-    const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
-    const dispatch = useDispatch();
 
     useEffect(() => {
         if (allStatusAndTypes.categories) {
@@ -237,7 +236,7 @@ const Categories = () => {
                 <CardHeader className={"p-6 gap-1 border-b flex flex-row flex-wrap justify-between items-center p-4 sm:px-5 sm:py-4 gap-y-2"}>
                     <div>
                         <CardTitle className={"text-lg sm:text-2xl font-normal"}>Categories</CardTitle>
-                        <CardDescription className={"text-sm text-muted-foreground p-0 mt-1"}>Use Categories to organise your Changelog</CardDescription>
+                        <CardDescription className={"text-sm text-muted-foreground p-0 mt-1"}>Organize your changelog with categories.</CardDescription>
                     </div>
                     <Button disabled={isEdit != null} onClick={addNewTopic} className={"gap-2 font-medium hover:bg-primary m-0"}>
                         <Plus size={18} strokeWidth={3}/>New Categories
@@ -246,12 +245,12 @@ const Categories = () => {
                 <CardContent className={"p-0"}>
                     <div className={"grid grid-cols-1 overflow-auto whitespace-nowrap"}>
                         <Table>
-                            <TableHeader className={""}>
+                            <TableHeader className={`dark:bg-transparent bg-muted`}>
                                 <TableRow>
                                     {
                                         ["Category Name","Last Update","Action"].map((x,i)=>{
                                             return(
-                                                <TableHead className={`${i == 0 ? "w-2/5" : i == 1 ? "text-center" : i == 2 ? "text-end" : ""}  px-2 py-[10px] md:px-3 ${theme === "dark" ? "" : "text-card-foreground"}`}>{x}</TableHead>
+                                                <TableHead className={`${i == 0 ? "w-2/5" : i == 1 ? "text-center" : i == 2 ? "text-end" : ""} text-sm font-normal px-2 py-[10px] md:px-3 text-card-foreground dark:text-muted-foreground`}>{x}</TableHead>
                                             )
                                         })
                                     }

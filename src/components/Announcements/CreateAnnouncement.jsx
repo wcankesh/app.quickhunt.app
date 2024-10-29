@@ -3,7 +3,6 @@ import {Sheet, SheetContent, SheetHeader, SheetOverlay,} from "../ui/sheet";
 import {CalendarIcon, Check, Circle, Pin, X, Loader2, CircleX, Upload} from "lucide-react";
 import {Label} from "../ui/label";
 import {Input} from "../ui/input";
-import {Switch} from "../ui/switch";
 import {Button} from "../ui/button";
 import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue,} from "../ui/select";
 import moment from "moment";
@@ -40,21 +39,20 @@ const initialStateError = {
 }
 
 const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPosts, announcementList}) => {
-
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
     const userDetailsReducer = useSelector(state => state.userDetailsReducer);
+    const {theme} = useTheme();
+    let apiService = new ApiService();
+
     const [changeLogDetails, setChangeLogDetails] = useState(initialState);
+    const [formError, setFormError] = useState(initialStateError);
     const [labelList, setLabelList] = useState([]);
     const [memberList, setMemberList] = useState([])
     const [categoriesList, setCategoriesList] = useState([])
     const [isSave, setIsSave] = useState(false)
-    const [formError, setFormError] = useState(initialStateError);
     const [popoverOpen, setPopoverOpen] = useState(false);
     const [popoverOpenExpired, setPopoverOpenExpired] = useState(false);
-
-    const {theme} = useTheme();
-    let apiService = new ApiService();
 
     useEffect(() => {
         if (projectDetailsReducer.id) {
@@ -328,8 +326,7 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
                                 <Label htmlFor="description" className={"font-normal"}>Description</Label>
                                 <ReactQuillEditor className={"min-h-[145px] h-full"} value={changeLogDetails.post_description} onChange={onChangeText}
                                                   name={"post_description"}/>
-                                {formError.post_description &&
-                                <span className="text-sm text-destructive">{formError.post_description}</span>}
+                                {formError.post_description && <span className="text-sm text-destructive">{formError.post_description}</span>}
                             </div>
                         </div>
                     </div>
@@ -534,11 +531,7 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
                             {formError.image && <div className={"text-xs text-destructive"}>{formError.image}</div>}
                         </div>
                         <div className={"flex flex-col gap-[18px] w-full"}>
-                            {/*<div className={"announce-create-switch flex gap-3"}>*/}
                             <div className={"flex items-center gap-3"}>
-                                {/*<Switch id={"expire_date"} className={"w-[38px] h-[20px]"}*/}
-                                {/*        checked={changeLogDetails.post_expired_boolean === 1}*/}
-                                {/*        onCheckedChange={(checked) => commonToggle("post_expired_boolean",checked === true ? 1 : 0)}/>*/}
                                 <Checkbox id={"expire_date"}
                                         checked={changeLogDetails.post_expired_boolean === 1}
                                         onCheckedChange={(checked) => commonToggle("post_expired_boolean",checked === true ? 1 : 0)}/>
@@ -574,7 +567,6 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
                                         </Popover>
                                     </div> : ""
                             }
-
                         </div>
                     </div>
                     <div className={"p-3 lg:p-8 sm:pb-0 flex flex-row gap-4"}>
@@ -582,12 +574,12 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
                             variant={"outline "}
                             disabled={isSave}
                             onClick={createPosts}
-                            className={` bg-primary ${theme === "dark" ? "text-card-foreground" : "text-card"} w-[101px] font-medium`}
+                            className={`bg-primary w-[101px] font-medium ${theme === "dark" ? "text-card-foreground" : "text-card"}`}
                         >
                             {isSave ? <Loader2 className=" h-4 w-4 animate-spin"/> : "Publish Post"}
                         </Button>
-                        <Button onClick={onClose} variant={"outline "}
-                                className={`border border-primary ${theme === "dark" ? "" : "text-primary"} text-sm font-medium`}>Cancel</Button>
+                        <Button onClick={onClose} variant={"outline"}
+                                className={`border border-primary text-sm font-medium ${theme === "dark" ? "" : "text-primary"}`}>Cancel</Button>
                     </div>
                 </div>
             </SheetContent>

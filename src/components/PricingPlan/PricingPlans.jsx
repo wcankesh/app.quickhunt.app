@@ -17,7 +17,6 @@ const PricingPlans = () => {
     const [tab, setTab] = useState(userDetailsReducer.subscr_type || 1);
     const [isLoading, setLoading] = useState('');
 
-
     const plans = [
         {
             name: "Free",
@@ -101,9 +100,8 @@ const PricingPlans = () => {
             window.open(data.url, "top");
         }
     }
-    const onChangeTab = (type) => {
-        setTab(type)
-    }
+
+    const onChangeTab = (type) => {setTab(type)}
 
     return (
         <div className={"container xl:max-w-[1130px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-3 md:px-4 space-y-8"}>

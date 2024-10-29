@@ -14,11 +14,15 @@ import {toast} from "../../ui/use-toast";
 import {useDispatch} from "react-redux";
 import {allStatusAndTypesAction} from "../../../redux/action/AllStatusAndTypesAction";
 import EmptyData from "../../Comman/EmptyData";
-import {Dialog} from "@radix-ui/react-dialog";
-import {DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "../../ui/dialog";
 import DeleteDialog from "../../Comman/DeleteDialog";
 
 const Emoji = () => {
+    const apiService = new ApiService();
+    const dispatch = useDispatch();
+    const theme = useTheme();
+    const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
+    const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
+
     const [selectedEmoji, setSelectedEmoji] = useState({});
     const [emojiList, setEmojiList] = useState([]);
     const [deleteId, setDeleteId] = useState(null);
@@ -30,12 +34,6 @@ const Emoji = () => {
     const [validationError, setValidationError] = useState('');
     const [openDelete,setOpenDelete] = useState(false);
     const [isDeleteLoading,setIsDeleteLoading] = useState(false);
-
-    const apiService = new ApiService();
-    const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
-    const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
-    const dispatch = useDispatch();
-    const theme = useTheme();
 
     useEffect(()=>{
         if(allStatusAndTypes.emoji){
@@ -208,18 +206,18 @@ const Emoji = () => {
                 <CardHeader className={"p-4 sm:px-5 sm:py-4 gap-1 border-b flex flex-row justify-between items-center flex-wrap gap-y-2"}>
                     <div>
                         <CardTitle className={"text-lg sm:text-2xl font-normal"}>Emoji</CardTitle>
-                        <CardDescription className={"text-sm text-muted-foreground p-0"}>Use Emoji to organise your Changelog</CardDescription>
+                        <CardDescription className={"text-sm text-muted-foreground p-0"}>Enhance and organize your changelog with emojis.</CardDescription>
                     </div>
                     <Button onClick={newEmoji} disabled={editIndex != null} className={"gap-2 font-medium hover:bg-primary m-0"}><Plus strokeWidth={3} size={18}/> New Emoji</Button>
                 </CardHeader>
                 <CardContent className={"p-0"}>
                     <Table>
-                        <TableHeader>
+                        <TableHeader className={`dark:bg-transparent bg-muted`}>
                             <TableRow>
                                 {
                                     ["Emoji","Action"].map((x,i)=>{
                                         return(
-                                            <TableHead className={`px-2 py-[10px] md:px-3 ${i === 0 ? "w-1/2" : "text-end"} w-1/2 ${theme === "dark" ? "" : "text-card-foreground"}`} key={x}>{x}</TableHead>
+                                            <TableHead className={`px-2 py-[10px] md:px-3 text-sm font-normal text-card-foreground dark:text-muted-foreground w-1/2 ${i === 0 ? "w-1/2" : "text-end"}`} key={x}>{x}</TableHead>
                                         )
                                     })
                                 }

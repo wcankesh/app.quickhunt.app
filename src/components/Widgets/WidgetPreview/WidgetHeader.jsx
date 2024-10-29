@@ -5,6 +5,7 @@ import {Button} from "../../ui/button";
 
 const WidgetHeader = ({widgetsSetting, selected, setSelected}) => {
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
+
     const navList = [
         {
             title: widgetsSetting.idea_title || 'Ideas',
@@ -39,6 +40,7 @@ const WidgetHeader = ({widgetsSetting, selected, setSelected}) => {
             window.open(`https://${projectDetailsReducer.domain}/${link}`, "_blank")
         }
     };
+
     return (
         <header className="border-b border-slate-200" style={{backgroundColor:widgetsSetting.header_bg_color}}>
             <div className={"px-3"}>

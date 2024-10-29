@@ -13,13 +13,14 @@ import {baseUrl} from "../../utils/constent";
 const RestPassword = () => {
     const {theme} = useTheme();
     let apiSerVice = new ApiService();
+    let navigate = useNavigate();
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token');
+
     const [formError, setFormError] = useState({password:"", confirm_password: ''});
     const [forgotPasswordDetails, setForgotPasswordDetails] = useState({password:"", confirm_password: ''});
     const [isLoading, setIsLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
-    let navigate = useNavigate();
-    const urlParams = new URLSearchParams(window.location.search);
-    const token = urlParams.get('token');
 
     const onChange = (event) => {
         setForgotPasswordDetails({...forgotPasswordDetails,[event.target.name]: event.target.value})
@@ -92,9 +93,7 @@ const RestPassword = () => {
         <div className={"w-full flex flex-col items-center justify-center p-4 md:px-4 md:py-0"}>
             <div className={"max-w-2xl m-auto"}>
                 <div className={"flex items-center justify-center mt-20"}>
-                    {
-                        theme === "dark" ? Icon.whiteLogo : Icon.blackLogo
-                    }
+                    {theme === "dark" ? Icon.whiteLogo : Icon.blackLogo}
                 </div>
                 <h1 className="scroll-m-20 text-2xl md:text-3xl font-medium text-center lg:text-3xl mb-3.5 mt-6">
                     Reset Password
@@ -163,7 +162,6 @@ const RestPassword = () => {
                         </CardContent>
                     </Card>
                 </div>
-
             </div>
         </div>
     );

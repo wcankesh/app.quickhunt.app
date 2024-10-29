@@ -1,22 +1,9 @@
 import React, {Fragment, useEffect, useState} from 'react';
 import {Button} from "../ui/button";
 import {Badge} from "../ui/badge";
-import {
-    ArrowBigDown,
-    ArrowBigUp,
-    ChevronLeft,
-    ChevronRight,
-    ChevronsLeft,
-    ChevronsRight, Circle, Dot, Ellipsis, Loader2,
-    MessageCircleMore, X
-} from "lucide-react";
+import {ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Circle, Dot, Ellipsis, Loader2, X} from "lucide-react";
 import {Card, CardContent, CardFooter} from "../ui/card";
-import { DropdownMenu,
-    DropdownMenuTrigger,
-    DropdownMenuContent,
-    DropdownMenuItem,
-} from "../ui/dropdown-menu"
-import {Separator} from "../ui/separator";
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem,} from "../ui/dropdown-menu";
 import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "../ui/select";
 import {useTheme} from "../theme-provider";
 import {apiService, getProjectDetails} from "../../utils/constent";
@@ -25,12 +12,11 @@ import {toast} from "../ui/use-toast";
 import ReadMoreText from "../Comman/ReadMoreText";
 import {Toaster} from "../ui/toaster";
 import {CommSkel} from "../Comman/CommSkel";
-// import {Dialog} from "@radix-ui/react-dialog";
 import {Dialog,DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "../ui/dialog";
 
 const status = [
-    {name: "Publish", value: 0, fillColor: "#389E0D", strokeColor: "#389E0D",},
-    {name: "Draft", value: 1, fillColor: "#CF1322", strokeColor: "#CF1322",},
+    {name: "Publish", value: 1, fillColor: "#389E0D", strokeColor: "#389E0D",},
+    {name: "Draft", value: 4, fillColor: "#CF1322", strokeColor: "#CF1322",},
 ]
 
 const AnnouncementsView = ({data,isLoading,setSelectedRecord,handleDelete,setAnalyticsObj}) => {

@@ -20,10 +20,11 @@ const Forgot = () => {
     const {theme} = useTheme();
     let apiSerVice = new ApiService();
     let navigate = useNavigate();
+    const {toast} = useToast()
+
     const [formError, setFormError] = useState({email: ""});
     const [forgotPasswordDetails, setForgotPasswordDetails] = useState({email: ""});
     const [isLoading, setIsLoading] = useState(false);
-    const {toast} = useToast()
 
     const getForgetDetail = async () => {
         const getDetail = await apiSerVice.forgotPassword();
@@ -86,7 +87,6 @@ const Forgot = () => {
             setForgotPasswordDetails({email: ""})
             toast({
                 description: data.message,
-                // description: "Your password reset request has been received successfully, please check your email for the reset link",
             })
             setIsLoading(false)
         } else {
@@ -107,7 +107,20 @@ const Forgot = () => {
 
     const plugin = React.useRef(Autoplay({delay: 2000, stopOnInteraction: true}))
 
-    const imageSources = [carousel_1, carousel_2, carousel_3];
+    const imageSources = [
+        {
+            img: carousel_1,
+            description: 'Empower your SaaS business with Quickhunt’s feedback and roadmap tools to engage users and drive product growth.',
+        },
+        {
+            img: carousel_2,
+            description: 'Streamline feedback, track progress with roadmaps, and keep users updated through announcements—all in one platform.',
+        },
+        {
+            img: carousel_3,
+            description: 'Get started for free and keep your users engaged with timely updates. Join Quickhunt today to shape your product’s future!',
+        }
+    ];
 
     return (
         <div className="h-full">
@@ -132,26 +145,20 @@ const Forgot = () => {
                                             {/*))}*/}
                                             {imageSources.map((src, index) => (
                                             <CarouselItem key={index} className={"max-w-[706px] w-full shrink-0 grow pl-4"}>
-                                                <img className={"w-[706px]"} src={src} alt={`Carousel image ${index + 1}`} />
+                                                <img className={"w-[706px] mb-6"} src={src.img} alt={`Carousel image ${index + 1}`} />
+                                                <p className={"text-white text-center mt-4 text-lg"}>{src.description}</p>
                                             </CarouselItem>
                                         ))}
                                         </CarouselContent>
                                         {/*<CarouselPrevious/>*/}
                                         {/*<CarouselNext/>*/}
                                     </Carousel>
-                                    <div className={"description"}>
-                                        <p className={"text-white text-center text-[20px]"}>“This library has saved me
-                                            countless hours of work and
-                                            helped me deliver stunning designs to my clients faster than ever
-                                            before.”</p>
-                                    </div>
                                 </div>
                             </div>
                         </div>
                         <div className=" min-h-screen md:basis-1/2 md:p-16 flex justify-center items-center">
                             <div className={"lg:w-[641px] h-full"}>
                                 <div className={"w-full h-full pt-5"}>
-                                    {/*<div className="mx-auto flex items-center w-[320px] md:w-[384px] px-3 h-full">*/}
                                     <div className="mx-auto flex items-center w-[320px] md:w-[640px] px-3 h-full">
                                         <div className={"w-full flex flex-col gap-8"}>
                                             <h1 className="scroll-m-20 text-2xl md:text-3xl font-medium text-center lg:text-3xl">
@@ -159,8 +166,7 @@ const Forgot = () => {
                                             </h1>
                                             <div className={"mb-2.5"}>
                                                 <p className="text-sm text-center text-muted-foreground">
-                                                    Enter the email associated to your quickhunt account and we'll send
-                                                    an email with instrcutions to reset your password.
+                                                    Provide the email associated with your Quickhunt account, and we'll send a password reset link.
                                                 </p>
                                             </div>
                                             <div className={"mt-2.5"}>
@@ -207,7 +213,6 @@ const Forgot = () => {
                                                         </Button>
                                                     </p>
                                                 </div>
-
                                         </div>
                                     </div>
                                 </div>

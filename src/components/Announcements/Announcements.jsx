@@ -2,12 +2,12 @@ import React, {useState, useEffect, useRef,} from 'react';
 import {Button} from "../ui/button";
 import {Input} from "../ui/input";
 import AnnouncementsTable from "./AnnouncementsTable";
-import {ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Circle, Filter, Plus, X} from "lucide-react";
+import {ChevronLeft, Circle, Filter, Plus, X} from "lucide-react";
 import CreateAnnouncement from "./CreateAnnouncement";
 import {useTheme} from "../theme-provider";
 import {useSelector} from "react-redux";
 import {ApiService} from "../../utils/ApiService";
-import {Card, CardFooter} from "../ui/card";
+import {Card} from "../ui/card";
 import AnalyticsView from "./AnalyticsView";
 import {toast} from "../ui/use-toast";
 import {Popover, PopoverTrigger} from "@radix-ui/react-popover";
@@ -17,15 +17,9 @@ import {Checkbox} from "../ui/checkbox";
 import {Badge} from "../ui/badge";
 import {useLocation, useNavigate} from "react-router-dom";
 import {baseUrl} from "../../utils/constent";
-import AnnouncementAnalyticsViews from "./AnnouncementAnalyticsViews";
 import Pagination from "../Comman/Pagination";
 
-
-const initialStateFilter = {
-    l: "",
-    s: "",
-    q:""
-}
+const initialStateFilter = {l: "", s: "", q:""}
 
 const perPageLimit = 10;
 
@@ -50,20 +44,21 @@ const Announcements = () => {
     const {theme} = useTheme();
     const UrlParams = new URLSearchParams(location.search);
     const getPageNo = UrlParams.get("pageNo") || 1;
+    const apiService = new ApiService();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
+    const timeoutHandler = useRef(null);
+
     const [announcementList, setAnnouncementList] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [isLoadingDelete, setIsLoadingDelete] = useState(false);
-    const [filter, setFilter] = useState(initialStateFilter);
-    const [pageNo, setPageNo] = useState(Number(getPageNo));
-    const [totalRecord, setTotalRecord] = useState(0);
     const [selectedRecord, setSelectedRecord] = useState({})
     const [analyticsObj, setAnalyticsObj] = useState({})
-    const apiService = new ApiService();
+    const [filter, setFilter] = useState(initialStateFilter);
+    const [pageNo, setPageNo] = useState(Number(getPageNo));
     const [openFilterType, setOpenFilterType] = useState('');
-    const timeoutHandler = useRef(null);
     const [openFilter, setOpenFilter] = useState('');
+    const [totalRecord, setTotalRecord] = useState(0);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isLoadingDelete, setIsLoadingDelete] = useState(false);
     const [isFilter, setIsFilter] = useState(false);
 
     useEffect(() => {
@@ -181,7 +176,7 @@ const Announcements = () => {
         }, 2000);
     }
 
-    const filterPosts = async  (event) => {
+    const filterPosts = async (event) => {
         setIsLoading(true)
         setFilter({...filter, [event.name]: event.value,});
         const payload = {
@@ -219,6 +214,7 @@ const Announcements = () => {
 
     return (
         <div className={"container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-3 md:px-4"}>
+
             {selectedRecord.id &&
             <CreateAnnouncement
                 isOpen={selectedRecord.id}
@@ -230,6 +226,7 @@ const Announcements = () => {
                 announcementList={announcementList}
                 setAnnouncementList={setAnnouncementList}
             />}
+
             {analyticsObj?.id &&
             <AnalyticsView
                 onClose={onCloseAnalyticsSheet}
@@ -237,19 +234,13 @@ const Announcements = () => {
                 setAnalyticsObj={setAnalyticsObj}
             />}
 
-            {/*{analyticsObj?.id &&*/}
-            {/*<AnnouncementAnalyticsViews*/}
-            {/*    onClose={onCloseAnalyticsSheet}*/}
-            {/*    analyticsObj={analyticsObj}*/}
-            {/*    setAnalyticsObj={setAnalyticsObj}*/}
-            {/*/>}*/}
-
             <div className={"flex items-center justify-between flex-wrap gap-2"}>
-                <div className={"flex justify-between items-center w-full md:w-auto"}>
+                <div className={"flex flex-col flex-1 gap-y-0.5"}>
                     <h1 className="text-2xl font-normal flex-initial w-auto">Announcement ({totalRecord})</h1>
+                    <p className={"text-sm text-muted-foreground"}>Use announcements to keep your users informed about the latest updates, bug fixes, enhancements, and other important changes.</p>
                 </div>
                 <div className={"w-full lg:w-auto flex sm:flex-nowrap flex-wrap gap-2 items-center"}>
-                    <div className={"flex gap-2 items-center w-full md:w-auto"}>
+                    <div className={"flex gap-2 items-center w-full lg:w-auto"}>
                         <div className={"w-full"}>
                             <Input
                                 type="search"
@@ -298,7 +289,7 @@ const Announcements = () => {
                                                         {
                                                             (allStatusAndTypes.labels || []).map((x, i) => {
                                                                 return (
-                                                                    <CommandItem key={x.id}>
+                                                                    <CommandItem key={x.id} className={"p-0"}>
                                                                         <div className={"w-full flex items-center gap-1"}  key={x.label}>
                                                                             <Checkbox className={'m-2'} checked={x.id == filter.l} onClick={(event) => filterPosts({name: "l", value: x.id == filter.l ? "" : x.id })} />
                                                                             <div className={"flex items-center gap-2 w-full"} onClick={(event) => filterPosts({name: "l", value: x.id == filter.l ? "" : x.id })}>
@@ -328,15 +319,13 @@ const Announcements = () => {
                             </Popover>
                         </div>
                     </div>
-                    {/*<div className={"flex flex-grow gap-2 items-center"}>*/}
-                        <Button
-                            onClick={openSheet}
-                            className={"gap-2 font-medium hover:bg-primary"}
-                        >
-                            <Plus size={20} strokeWidth={3} />
-                            <span className={"text-xs md:text-sm font-medium"}>New Announcement</span>
-                        </Button>
-                    {/*</div>*/}
+                    <Button
+                        onClick={openSheet}
+                        className={"gap-2 font-medium hover:bg-primary"}
+                    >
+                        <Plus size={20} strokeWidth={3} />
+                        <span className={"text-xs md:text-sm font-medium"}>New Announcement</span>
+                    </Button>
                 </div>
             </div>
 
@@ -348,7 +337,7 @@ const Announcements = () => {
                             className="px-3 py-1.5 border-r">{filter.s == 1 ? "Published" : filter.s === 2 ? "Scheduled" : filter.s == 4 ? "Draft" : ""}</span>
                         <span className="w-7 h-7 flex items-center justify-center cursor-pointer"
                               onClick={() => handleBadge({name: "status", value: "s"})}>
-                                            <X className='w-4 h-4'/>
+                            <X className='w-4 h-4'/>
                         </span>
                     </Badge>
                 }
@@ -364,7 +353,6 @@ const Announcements = () => {
 
             <Card className={"mt-6"}>
                 <AnnouncementsTable
-                    pageNo={pageNo}
                     setAnalyticsObj={setAnalyticsObj}
                     handleDelete={handleDelete}
                     data={announcementList}

@@ -7,35 +7,30 @@ import {ApiService} from "../../utils/ApiService";
 import {Skeleton} from "../ui/skeleton";
 import {useSelector} from "react-redux";
 import ReadMoreText from "../Comman/ReadMoreText";
-import {useNavigate, useLocation} from "react-router";
+import {useLocation} from "react-router";
 import moment from "moment";
-import {Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator} from "../ui/breadcrumb";
-import {baseUrl} from "../../utils/constent";
-import {Card, CardContent, CardHeader} from "../ui/card";
-import {CommSkel} from "../Comman/CommSkel";
+import {Card, CardContent} from "../ui/card";
+import CommonBreadCrumb from "../Comman/CommonBreadCrumb";
 
 const perPageLimit = 10;
 
 const AnnouncementAnalyticsViews = () => {
-
     const location = useLocation();
     const urlParams = new URLSearchParams(location.search);
     const postId = urlParams.get("postId");
     const getPageNo = urlParams.get("pageNo") || 1;
-
-    const navigate = useNavigate();
     const apiService = new ApiService();
-
     const allEmoji = useSelector(state => state.allStatusAndTypes.emoji);
+
     const [analyticsObj, setAnalyticsObj] = useState({})
     const [feedbackList, setFeedbackList] = useState([])
     const [reactionList, setReactionList] = useState([])
     const [views, setViews] = useState([])
-    const [isLoadingReaction, setIsLoadingReaction] = useState(false)
-    const [isLoadingFeedBack, setIsLoadingFeedBack] = useState(false)
     const [totalFeedback, setTotalFeedback] = useState(0)
     const [pageNo, setPageNo] = useState(1);
     const [totalRecord, setTotalRecord] = useState(0);
+    const [isLoadingReaction, setIsLoadingReaction] = useState(false)
+    const [isLoadingFeedBack, setIsLoadingFeedBack] = useState(false)
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
@@ -121,23 +116,19 @@ const AnnouncementAnalyticsViews = () => {
         },
     ]
 
+    const links = [
+        { label: 'Announcement', path: `/announcements?pageNo=${getPageNo}` }
+    ];
+
     return (
         <Fragment>
             <div className={"container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-3 md:px-4"}>
                 <div className={"pb-6"}>
-                    <Breadcrumb>
-                        <BreadcrumbList>
-                            <BreadcrumbItem className={"cursor-pointer"}>
-                                <BreadcrumbLink onClick={() => navigate(`${baseUrl}/announcements?pageNo=${getPageNo}`)}>
-                                    Announcement
-                                </BreadcrumbLink>
-                            </BreadcrumbItem>
-                            <BreadcrumbSeparator />
-                            <BreadcrumbItem className={"cursor-pointer"}>
-                                <BreadcrumbPage>{analyticsObj?.post_title}</BreadcrumbPage>
-                            </BreadcrumbItem>
-                        </BreadcrumbList>
-                    </Breadcrumb>
+                    <CommonBreadCrumb
+                        links={links}
+                        currentPage={analyticsObj?.post_title}
+                        truncateLimit={30}
+                    />
                 </div>
                 <div className={"flex flex-col gap-4"}>
                     <Card>

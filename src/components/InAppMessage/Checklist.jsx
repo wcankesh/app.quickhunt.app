@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {ArrowLeft, ChevronDown, Trash2} from "lucide-react";
 import {Progress} from "../ui/progress";
 import {Card} from "../ui/card";
@@ -8,7 +8,7 @@ import {useTheme} from "../theme-provider";
 import {Input} from "../ui/input";
 import {Avatar, AvatarFallback, AvatarImage} from "../ui/avatar";
 import {useSelector} from "react-redux";
-import Editor from "./Editor";
+import Editor from "../Comman/Editor";
 import {Collapsible, CollapsibleContent, CollapsibleTrigger,} from "../ui/collapsible"
 
 const checklists = ({inAppMsgSetting, setInAppMsgSetting, isLoading, selectedStep, setSelectedStep, setSelectedStepIndex, selectedStepIndex}) => {
@@ -36,7 +36,6 @@ const checklists = ({inAppMsgSetting, setInAppMsgSetting, isLoading, selectedSte
         const obj = {...record, [name]: value};
         setSelectedStep(obj)
         updateStepRecord(obj)
-
     };
 
     const handleAddStep = () => {

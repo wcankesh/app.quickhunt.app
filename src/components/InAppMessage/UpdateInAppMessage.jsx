@@ -1,5 +1,5 @@
 import React, {useEffect, useState, Fragment} from 'react';
-import {useNavigate, useParams} from "react-router-dom";
+import {useLocation, useNavigate, useParams} from "react-router-dom";
 import {Button} from "../ui/button";
 import {ArrowLeft, ArrowRight, BarChart, Loader2, Plus, RotateCcw} from "lucide-react";
 import {useTheme} from "../theme-provider";
@@ -29,7 +29,8 @@ const initialState = {
     btn_color: "#7c3aed",
     delay: 1,
     start_at: moment().toISOString(),
-    end_at: moment().add(1, 'hour').toISOString(),
+    // end_at: moment().add(1, 'hour').toISOString(),
+    end_at: '',
     position: "top",
     alignment: "center",
     is_close_button: true,
@@ -127,13 +128,17 @@ const checkListObj =  {
 const UpdateInAppMessage = () => {
     const {toast} = useToast()
     const navigate = useNavigate();
+    const location = useLocation();
+    const UrlParams = new URLSearchParams(location.search);
+    const getPageNo = UrlParams.get("pageNo") || 1;
     let apiSerVice = new ApiService();
     const {id, type} = useParams()
     const {theme} = useTheme();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
+
     const [inAppMsgSetting, setInAppMsgSetting] = useState(initialState);
-    const [isLoading, setIsLoading] = useState(false);
     const [selectedStepIndex, setSelectedStepIndex] = useState(0);
+    const [isLoading, setIsLoading] = useState(false);
     const [selectedStep, setSelectedStep] = useState(null);
     const [isSave, setIsSave] = useState(false);
 
@@ -175,7 +180,7 @@ const UpdateInAppMessage = () => {
         if (id !== "new" && projectDetailsReducer.id) {
             getSingleInAppMessages();
         }
-    }, [projectDetailsReducer.id]);
+    }, [projectDetailsReducer.id, getPageNo]);
 
     const getSingleInAppMessages = async () => {
         setIsLoading(true)
@@ -218,7 +223,7 @@ const UpdateInAppMessage = () => {
         if (data.status === 200) {
             toast({description: data.message})
             if (id === "new") {
-                navigate(`${baseUrl}/in-app-message`)
+                navigate(`${baseUrl}/app-message`)
             }
         } else {
             toast({variant: "destructive", description: data.message})
@@ -236,7 +241,6 @@ const UpdateInAppMessage = () => {
             type: type
         }
         const data = await apiSerVice.updateInAppMessage(payload, inAppMsgSetting.id)
-
         if (data.status === 200) {
             toast({description: data.message})
         } else {
@@ -249,21 +253,21 @@ const UpdateInAppMessage = () => {
     const handleCancel = () => {
         setInAppMsgSetting(inAppMsgSetting);
         if (id === "new") {
-            navigate(`${baseUrl}/in-app-message/type`)
+            navigate(`${baseUrl}/app-message/type`)
         } else {
-            navigate(`${baseUrl}/in-app-message`)
+            navigate(`${baseUrl}/app-message`)
         }
     }
 
     return (
         <Fragment>
-            <div className={"py-6 px-4 border-b flex items-center justify-between flex-wrap"}>
+            <div className={"p-4 md:py-6 md:px-4 border-b flex items-center justify-between flex-wrap gap-2"}>
                 <Breadcrumb>
                     <Breadcrumb>
                         <BreadcrumbList>
                             <BreadcrumbItem className={"cursor-pointer"}>
                                 <BreadcrumbLink>
-                                    <span onClick={id === 'new' ? () => navigate(`${baseUrl}/in-app-message/type`) : () => navigate(`${baseUrl}/in-app-message`)}>
+                                    <span onClick={id === 'new' ? () => navigate(`${baseUrl}/app-message/type`) : () => navigate(`${baseUrl}/app-message?pageNo=${getPageNo}`)}>
                                         {type === '1' && 'Post'}
                                         {type === '2' && 'Banners'}
                                         {type === '3' && 'Surveys'}
@@ -273,7 +277,7 @@ const UpdateInAppMessage = () => {
                             </BreadcrumbItem>
                             <BreadcrumbSeparator/>
                             <BreadcrumbItem className={"cursor-pointer"}>
-                                <BreadcrumbPage>{inAppMsgSetting.title}</BreadcrumbPage>
+                                <BreadcrumbPage className={`w-full ${inAppMsgSetting?.title?.length > 30 ? "max-w-[200px] truncate" : ""}`}>{inAppMsgSetting?.title}</BreadcrumbPage>
                             </BreadcrumbItem>
                         </BreadcrumbList>
                     </Breadcrumb>
@@ -282,10 +286,8 @@ const UpdateInAppMessage = () => {
                     {
                         (id !== "new") ?
                             <Button
-                                variant={"outline"}
-                                size={"icon"}
-                                className={"h-9"}
-                                onClick={() => navigate(`${baseUrl}/in-app-message/${inAppMsgSetting.type}/analytic/${inAppMsgSetting.id}`)}
+                                variant="outline" className={"w-9 h-9"} size="icon"
+                                onClick={() => navigate(`${baseUrl}/app-message/${inAppMsgSetting.type}/analytic/${inAppMsgSetting.id}`)}
                             >
                                 <BarChart size={16}/>
                             </Button>
@@ -301,7 +303,7 @@ const UpdateInAppMessage = () => {
                 <div className={"max-w-[407px] w-full border-r h-full overflow-y-auto"}>
                     <SidebarInAppMessage id={id} type={type} inAppMsgSetting={inAppMsgSetting} setInAppMsgSetting={setInAppMsgSetting} selectedStepIndex={selectedStepIndex} setSelectedStepIndex={setSelectedStepIndex} selectedStep={selectedStep} setSelectedStep={setSelectedStep}/>
                 </div>
-                <div className={"bg-muted w-full h-full"}>
+                <div className={"bg-muted w-full h-full hidden md:block overflow-y-auto"}>
                     <Card className={"my-6 mx-4 rounded-md px-4 pt-6 pb-8 h-[calc(100%_-_48px)]"}>
                         <Card className={"rounded-md border-b h-full"}>
                             <div className={"p-4 flex gap-2 border-b"}>

@@ -8,8 +8,8 @@ import AnnouncementWidgetPreview from "./AnnouncementWidgetPreview";
 
 const WidgetPreview = ({widgetsSetting, type, toggle,onToggle }) => {
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
-    const [selected, setSelected] = useState("ideas")
 
+    const [selected, setSelected] = useState("ideas")
 
     const renderContent = () => {
         return(

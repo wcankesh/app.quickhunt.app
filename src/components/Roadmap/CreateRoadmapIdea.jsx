@@ -32,12 +32,13 @@ const CreateRoadmapIdea = ({isOpen, onOpen, onClose, closeCreateIdea, selectedRo
     let apiSerVice = new ApiService();
     const { toast } = useToast()
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
-    const [ideaDetail, setIdeaDetail] = useState(initialState);
-    const [topicLists, setTopicLists] = useState([]);
-    const [isLoading, setIsLoading] = useState(false);
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
+
+    const [ideaDetail, setIdeaDetail] = useState(initialState);
     const [formError, setFormError] = useState(initialStateError);
+    const [topicLists, setTopicLists] = useState([]);
     const [selectedValues, setSelectedValues] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         if(projectDetailsReducer.id){
@@ -45,7 +46,6 @@ const CreateRoadmapIdea = ({isOpen, onOpen, onClose, closeCreateIdea, selectedRo
             setIdeaDetail({...initialState, board: allStatusAndTypes?.boards[0]?.id})
         }
     }, [projectDetailsReducer.id, allStatusAndTypes]);
-
 
     const handleChange = (id) => {
         const clone = [...ideaDetail.topic];
@@ -57,7 +57,6 @@ const CreateRoadmapIdea = ({isOpen, onOpen, onClose, closeCreateIdea, selectedRo
         }
         setIdeaDetail({ ...ideaDetail, topic: clone });
     };
-
 
     const onChangeText = (event) => {
         setIdeaDetail(ideaDetail => ({...ideaDetail, [event.target.name]:event.target.value}))
@@ -143,7 +142,7 @@ const CreateRoadmapIdea = ({isOpen, onOpen, onClose, closeCreateIdea, selectedRo
                 <SheetContent className={"lg:max-w-[800px] md:max-w-full sm:max-w-full p-0"}>
                     <SheetHeader className={"px-4 py-5 lg:px-8 lg:py-[20px] border-b"}>
                         <div className={"flex justify-between items-center w-full"}>
-                            <h2 className={"text-xl font-normal"}>Tell us your Idea!</h2>
+                            <h2 className={"text-xl font-normal capitalize"}>Tell us your Idea!</h2>
                             <X size={18} onClick={onCancel} className={"cursor-pointer"}/>
                         </div>
                     </SheetHeader>
@@ -160,10 +159,10 @@ const CreateRoadmapIdea = ({isOpen, onOpen, onClose, closeCreateIdea, selectedRo
                                     <div className="space-y-2">
                                         <Label htmlFor="message" className={"font-normal"}>Description</Label>
                                         <ReactQuillEditor value={ideaDetail?.description} name={"description"} onChange={onChangeText}/>
-                                        {formError.description && <span className="text-red-500 text-sm">{formError.description}</span>}
+                                        {/*{formError.description && <span className="text-red-500 text-sm">{formError.description}</span>}*/}
                                     </div>
                                     <div className={"space-y-2"}>
-                                        <Label className={"font-normal"}>Choose Board for this Idea</Label>
+                                        <Label className={"font-normal capitalize"}>Choose Board for this Idea</Label>
                                         <Select
                                             onValueChange={(value) => onChangeText({target:{name: "board", value}})}
                                             value={ideaDetail.board}>
@@ -190,7 +189,7 @@ const CreateRoadmapIdea = ({isOpen, onOpen, onClose, closeCreateIdea, selectedRo
                                     </div>
                                 </div>
                                 <div className={"px-4 py-3 lg:py-6 lg:px-8 border-b space-y-2"}>
-                                    <Label className={"font-normal"}>Choose Topics for this Idea (optional)</Label>
+                                    <Label className={"font-normal capitalize"}>Choose Topics for this Idea (optional)</Label>
                                     <Select onValueChange={handleChange} value={selectedValues}>
                                         <SelectTrigger className="">
                                             <SelectValue className={"text-muted-foreground text-sm"} placeholder="Assign to">

@@ -1,4 +1,4 @@
-import React, {useEffect, useRef,Fragment} from 'react';
+import React, {useEffect, useRef} from 'react';
 import {useTheme} from "../theme-provider";
 import {Plus, Trash2, X, ChevronRight} from "lucide-react";
 import {Input} from "../ui/input";
@@ -12,7 +12,6 @@ import EmojiPicker from "emoji-picker-react";
 const Banners = ({inAppMsgSetting, setInAppMsgSetting, isLoading}) => {
     const {theme} = useTheme();
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
-    const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const userDetailsReducer = allStatusAndTypes.members.find((x) => x.user_id == inAppMsgSetting.from);
     const inputRef = useRef(null);
     const spanRef = useRef(null);
@@ -67,7 +66,6 @@ const Banners = ({inAppMsgSetting, setInAppMsgSetting, isLoading}) => {
     }
 
     return (
-
         <div className={"relative bg-muted px-16 flex flex-col gap-4 py-8 bg-muted justify-start overflow-y-auto h-[calc(100%_-_94px)]"}>
             <div className={`absolute w-full flex flex-row items-center justify-between gap-3 px-6 py-[18px] ${inAppMsgSetting.position === "bottom" ? "bottom-0" : "top-0"} left-0`}
                  style={{backgroundColor: inAppMsgSetting.bg_color}}>
@@ -76,15 +74,16 @@ const Banners = ({inAppMsgSetting, setInAppMsgSetting, isLoading}) => {
                         (inAppMsgSetting.show_sender === 1 && inAppMsgSetting.from) && <Avatar className={"w-[32px] h-[32px]"}>
                             {
                                 userDetailsReducer?.user_photo ?
-                                    <AvatarImage src={userDetailsReducer?.user_photo} alt="@shadcn"/>
+                                    <AvatarImage src={userDetailsReducer?.user_photo}
+                                                 alt={userDetailsReducer && userDetailsReducer?.user_first_name?.substring(0, 1)?.toUpperCase() && userDetailsReducer?.user_last_name?.substring(0, 1)?.toUpperCase()}/>
                                     :
-                                    <AvatarFallback>{userDetailsReducer && userDetailsReducer?.name && userDetailsReducer?.name.substring(0, 1)}</AvatarFallback>
+                                    <AvatarFallback>{userDetailsReducer?.user_first_name?.substring(0, 1)?.toUpperCase()}{userDetailsReducer?.user_last_name?.substring(0, 1)?.toUpperCase()}</AvatarFallback>
                             }
                         </Avatar>
                     }
                     <div>
-                            <span ref={spanRef}
-                                  className="absolute invisible whitespace-pre p-2">{inAppMsgSetting?.body_text}</span>
+                        <span ref={spanRef}
+                              className="absolute invisible whitespace-pre p-2">{inAppMsgSetting?.body_text}</span>
                         <Input ref={inputRef} placeholder={"Your message..."} autofocus
                                value={inAppMsgSetting.body_text}
                                onChange={(event) => onChange("body_text", event.target.value)}

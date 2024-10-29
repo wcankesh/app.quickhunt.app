@@ -1,6 +1,6 @@
 import React, {Fragment, useState, useEffect} from 'react';
 import {Button} from "../ui/button";
-import {ArrowBigUp, Check, Circle, CircleX, Dot, Ellipsis, Loader2, MessageCircleMore, Paperclip, Pencil, Pin, Trash2, Upload, X} from "lucide-react";
+import {ArrowBigUp, Check, Circle, CircleX, Dot, Ellipsis, Loader2, MessageCircleMore, Paperclip, Pencil, Pin, Trash2, Upload} from "lucide-react";
 import {RadioGroup, RadioGroupItem} from "../ui/radio-group";
 import {Label} from "../ui/label";
 import {Input} from "../ui/input";
@@ -17,10 +17,11 @@ import moment from "moment";
 import {DropdownMenu, DropdownMenuTrigger} from "@radix-ui/react-dropdown-menu";
 import {DropdownMenuContent, DropdownMenuItem} from "../ui/dropdown-menu";
 import ReactQuillEditor from "../Comman/ReactQuillEditor";
-import {useNavigate, useParams} from "react-router-dom";
+import {useLocation, useNavigate, useParams} from "react-router-dom";
 import {Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator} from "../ui/breadcrumb";
-import {baseUrl} from "../../utils/constent";
+import {baseUrl, cleanQuillHtml} from "../../utils/constent";
 import {Skeleton} from "../ui/skeleton";
+import CommonBreadCrumb from "../Comman/CommonBreadCrumb";
 
 const initialStateError = {
     title: "",
@@ -29,25 +30,32 @@ const initialStateError = {
 }
 
 const UpdateIdea = () => {
-
+    const location = useLocation();
+    const UrlParams = new URLSearchParams(location.search);
+    const getPageNo = UrlParams.get("pageNo") || 1;
     const {theme} = useTheme()
     let apiSerVice = new ApiService();
     const {toast} = useToast();
     const { id } = useParams();
     const navigate = useNavigate();
-
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
-    const [isLoading, setIsLoading] = useState(false);
-    const [isLoadingCreateIdea, setIsLoadingCreateIdea] = useState(false);
-    const [isLoadingArchive, setIsLoadingArchive] = useState(false);
+
+    const [formError, setFormError] = useState(initialStateError);
     const [topicLists, setTopicLists] = useState([]);
     const [commentFiles, setCommentFiles] = useState([])
     const [subCommentFiles, setSubCommentFiles] = useState([])
     const [deletedCommentImage, setDeletedCommentImage] = useState([])
     const [deletedSubCommentImage, setDeletedSubCommentImage] = useState([])
+    const [roadmapStatus, setRoadmapStatus] = useState([]);
+    const [selectedIdea, setSelectedIdea] = useState({}); // update idea
+    const [oldSelectedIdea, setOldSelectedIdea] = useState({});
     const [commentText, setCommentText] = useState("")
     const [subCommentText, setSubCommentText] = useState("")
+    const [isLoading, setIsLoading] = useState(false);
+    const [isLoadingCreateIdea, setIsLoadingCreateIdea] = useState(false);
+    const [isLoadingArchive, setIsLoadingArchive] = useState(false);
+    const [isLoadingBug, setIsLoadingBug] = useState(false);
     const [selectedComment, setSelectedComment] = useState(null);
     const [selectedSubComment, setSelectedSubComment] = useState(null);
     const [selectedCommentIndex, setSelectedCommentIndex] = useState(null);
@@ -58,10 +66,6 @@ const UpdateIdea = () => {
     const [isSaveUpdateComment, setIsSaveUpdateComment] = useState(false);
     const [isSaveUpdateSubComment, setIsSaveUpdateSubComment] = useState(false);
     const [isSaveSubComment, setIsSaveSubComment] = useState(false);
-    const [roadmapStatus, setRoadmapStatus] = useState([]);
-    const [formError, setFormError] = useState(initialStateError);
-    const [selectedIdea, setSelectedIdea] = useState({}); // update idea
-    const [oldSelectedIdea, setOldSelectedIdea] = useState({});
 
     useEffect(() => {
         if (projectDetailsReducer.id) {
@@ -69,7 +73,7 @@ const UpdateIdea = () => {
             setRoadmapStatus(allStatusAndTypes.roadmap_status)
             getSingleIdea()
         }
-    }, [projectDetailsReducer.id, allStatusAndTypes]);
+    }, [projectDetailsReducer.id, allStatusAndTypes, getPageNo]);
 
     const getSingleIdea = async () => {
         setIsLoading(true)
@@ -250,7 +254,7 @@ const UpdateIdea = () => {
 
     const onChangeStatus = async (name, value) => {
         if (name === "is_active") {
-            setIsLoading(true)
+            setIsLoadingBug(true)
         } else if (name === "is_archive") {
             setIsLoadingArchive(true)
         }
@@ -270,11 +274,13 @@ const UpdateIdea = () => {
                 roadmap_title: data.data.roadmap_title
             })
             setIsLoading(false)
+            setIsLoadingBug(false)
             setIsLoadingArchive(false)
             setIsEditIdea(false)
             toast({description: data.message})
         } else {
             setIsLoading(false)
+            setIsLoadingBug(false)
             setIsLoadingArchive(false)
             toast({variant: "destructive", description: data.message})
         }
@@ -528,22 +534,31 @@ const UpdateIdea = () => {
         window.open(imageSrc, '_blank');
     };
 
+    const links = [
+        { label: 'Ideas', path: `/ideas?pageNo=${getPageNo}` }
+    ];
+
     return (
         <Fragment>
             <div className={"px-4 py-3 lg:py-6 lg:px-8 border-b"}>
-                <Breadcrumb>
-                    <BreadcrumbList>
-                        <BreadcrumbItem className={"cursor-pointer"}>
-                            <BreadcrumbLink onClick={() => navigate(`${baseUrl}/ideas`)}>
-                                Ideas
-                            </BreadcrumbLink>
-                        </BreadcrumbItem>
-                        <BreadcrumbSeparator />
-                        <BreadcrumbItem className={"cursor-pointer"}>
-                            <BreadcrumbPage className={`w-full ${selectedIdea?.title?.length > 30 ? "max-w-[200px] truncate" : ""}`}>{selectedIdea?.title}</BreadcrumbPage>
-                        </BreadcrumbItem>
-                    </BreadcrumbList>
-                </Breadcrumb>
+                {/*<Breadcrumb>*/}
+                {/*    <BreadcrumbList>*/}
+                {/*        <BreadcrumbItem className={"cursor-pointer"}>*/}
+                {/*            <BreadcrumbLink onClick={() => navigate(`${baseUrl}/ideas?pageNo=${getPageNo}`)}>*/}
+                {/*                Ideas*/}
+                {/*            </BreadcrumbLink>*/}
+                {/*        </BreadcrumbItem>*/}
+                {/*        <BreadcrumbSeparator />*/}
+                {/*        <BreadcrumbItem className={"cursor-pointer"}>*/}
+                {/*            <BreadcrumbPage className={`w-full ${selectedIdea?.title?.length > 30 ? "max-w-[200px] truncate" : ""}`}>{selectedIdea?.title}</BreadcrumbPage>*/}
+                {/*        </BreadcrumbItem>*/}
+                {/*    </BreadcrumbList>*/}
+                {/*</Breadcrumb>*/}
+                <CommonBreadCrumb
+                    links={links}
+                    currentPage={selectedIdea?.title}
+                    truncateLimit={30}
+                />
             </div>
             <div className={`flex h-[calc(100%_-_45px)] lg:h-[calc(100%_-_69px)] overflow-y-auto`}>
                 <div className={`max-w-[407px] w-full h-full border-r lg:block hidden lg:overflow-auto`}>
@@ -576,7 +591,7 @@ const UpdateIdea = () => {
                     </div>
                     <div className={"border-b"}>
                         <div className="py-4 px-6 w-full space-y-1.5">
-                            <Label htmlFor="picture" className={"font-normal"}>Featured image</Label>
+                            <Label htmlFor="picture" className={"font-normal capitalize"}>Featured image</Label>
                             <div className="w-[282px] h-[128px] flex gap-1">
 
                                 {
@@ -591,7 +606,7 @@ const UpdateIdea = () => {
                                                     />
                                                     <CircleX
                                                         size={20}
-                                                        className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
+                                                        className={`text-muted-foreground dark:text-card-foreground cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
                                                         onClick={() => onChangeStatus('delete_cover_image', selectedIdea && selectedIdea?.cover_image && selectedIdea.cover_image?.name ? "" : [selectedIdea.cover_image.replace("https://code.quickhunt.app/public/storage/feature_idea/", "")])}
                                                     />
                                                 </div> : selectedIdea.cover_image ?
@@ -601,14 +616,13 @@ const UpdateIdea = () => {
                                                              src={selectedIdea.cover_image} alt=""/>
                                                         <CircleX
                                                             size={20}
-                                                            className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
+                                                            className={`text-muted-foreground dark:text-card-foreground cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
                                                             onClick={() => onChangeStatus('delete_cover_image', selectedIdea && selectedIdea?.cover_image && selectedIdea.cover_image?.name ? "" : selectedIdea.cover_image.replace("https://code.quickhunt.app/public/storage/feature_idea/", ""))}
                                                         />
                                                     </div>
                                                     : ''}
                                         </div> :
                                         <div>
-
                                             <input
                                                 id="pictureInput"
                                                 type="file"
@@ -631,20 +645,20 @@ const UpdateIdea = () => {
                     <div className={"py-4 px-6 flex flex-col gap-[26px]"}>
                         <div className={"flex gap-1 justify-between items-center"}>
                             <div className={"flex flex-col gap-1"}>
-                                <h4 className={"text-sm font-normal"}>Mark as bug</h4>
+                                <h4 className={"text-sm font-normal capitalize"}>Mark as bug</h4>
                                 <p className={"text-muted-foreground text-xs font-normal"}>Hides Idea from your
                                     users</p>
                             </div>
                             <Button
                                 variant={"outline"}
-                                className={`hover:bg-muted w-[105px] ${theme === "dark" ? "" : "border-muted-foreground text-muted-foreground"} text-sm font-medium`}
+                                className={`hover:bg-muted w-[125px] ${theme === "dark" ? "" : "border-muted-foreground text-muted-foreground"} capitalize text-sm font-medium`}
                                 onClick={() => onChangeStatus(
                                     "is_active",
                                     selectedIdea?.is_active === 1 ? 0 : 1
                                 )}
                             >
                                 {
-                                    isLoadingCreateIdea ? <Loader2
+                                    isLoadingBug ? <Loader2
                                         className="h-4 w-4 animate-spin"/> : (selectedIdea?.is_active === 0 ? "Convert to Idea" : "Mark as bug")
                                 }
                             </Button>
@@ -658,7 +672,7 @@ const UpdateIdea = () => {
                             </div>
                             <Button
                                 variant={"outline"}
-                                className={`w-[73px] hover:bg-muted ${theme === "dark" ? "" : "border-muted-foreground text-muted-foreground"} text-sm font-medium`}
+                                className={`w-[89px] hover:bg-muted ${theme === "dark" ? "" : "border-muted-foreground text-muted-foreground"} text-sm font-medium`}
                                 onClick={() => onChangeStatus(
                                     "is_archive",
                                     selectedIdea?.is_archive === 1 ? 0 : 1
@@ -922,14 +936,14 @@ const UpdateIdea = () => {
                                                         <div className={"flex gap-1 justify-between"}>
                                                             <Button
                                                                 variant={"outline"}
-                                                                className={`hover:bg-muted w-[95px] h-[30px] ${theme === "dark" ? "" : "border-muted-foreground text-muted-foreground"} text-xs font-medium`}
+                                                                className={`hover:bg-muted w-[110px] h-[30px] ${theme === "dark" ? "" : "border-muted-foreground text-muted-foreground"} text-xs font-medium`}
                                                                 onClick={() => onChangeStatus(
                                                                     "is_active",
                                                                     selectedIdea?.is_active === 1 ? 0 : 1
                                                                 )}
                                                             >
                                                                 {
-                                                                    isLoadingCreateIdea ? <Loader2
+                                                                    isLoadingBug ? <Loader2
                                                                         className="h-4 w-4 animate-spin"/> : (selectedIdea?.is_active === 0 ? "Convert to Idea" : "Mark as bug")
                                                                 }
                                                             </Button>
@@ -969,7 +983,7 @@ const UpdateIdea = () => {
                                                         >
                                                             {selectedIdea?.pin_to_top == 0 ?
                                                                 <Pin size={16}/> :
-                                                                <Pin size={16} className={`${theme === "dark" ? "fill-card-foreground" : "fill-card-foreground"}`}/>}
+                                                                <Pin size={16} className={`fill-card-foreground`}/>}
                                                         </Button>
                                                     </div>
                                                 </div>
@@ -1005,7 +1019,7 @@ const UpdateIdea = () => {
                                                                 >
                                                                     {selectedIdea?.pin_to_top == 0 ?
                                                                         <Pin size={16}/> :
-                                                                        <Pin size={16} className={`${theme === "dark" ? "fill-card-foreground" : "fill-card-foreground"}`}/>}
+                                                                        <Pin size={16} className={`fill-card-foreground`}/>}
                                                                 </Button>
                                                             </Fragment>
                                                     }
@@ -1025,10 +1039,13 @@ const UpdateIdea = () => {
                                                     <div className={"flex items-center gap-2"}>
                                                         <h2 className={"text-xl font-normal"}>{selectedIdea?.title}</h2>
                                                     </div>
-                                                    <div
-                                                        className={`description-container text-sm ${theme === "dark" ? "" : "text-muted-foreground" }`}
-                                                        dangerouslySetInnerHTML={{ __html: selectedIdea?.description }}
-                                                    />
+                                                    {
+                                                        cleanQuillHtml(selectedIdea?.description) ?
+                                                            <div
+                                                                className={`description-container text-sm ${theme === "dark" ? "" : "text-muted-foreground" }`}
+                                                                dangerouslySetInnerHTML={{ __html: selectedIdea?.description }}
+                                                            /> : null
+                                                    }
                                                 </div>
                                         }
                                         {
@@ -1160,7 +1177,7 @@ const UpdateIdea = () => {
                                                 :
                                                 <div className={"flex flex-col gap-2"}>
                                                     <div className="w-full flex flex-col gap-2">
-                                                        <Label htmlFor="message" className={"font-normal"}>Add comment</Label>
+                                                        <Label htmlFor="message" className={"font-normal capitalize"}>Add comment</Label>
                                                         {/*{*/}
                                                         {/*    privateNote ?*/}
                                                         {/*        <Card*/}

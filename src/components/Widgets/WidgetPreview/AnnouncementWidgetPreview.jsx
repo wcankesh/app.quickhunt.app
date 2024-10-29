@@ -17,16 +17,19 @@ import {Icon} from "../../../utils/Icon";
 import ReadMoreText from "../../Comman/ReadMoreText";
 
 const AnnouncementWidgetPreview = ({widgetsSetting}) => {
-    const [isLoading, setIsLoading] = useState(true);
-    const [announcementsList, setAnnouncementsList] = useState([]);
-    const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
     const apiService = new ApiService();
+    const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
+
+    const [announcementsList, setAnnouncementsList] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+
     useEffect(() => {
         if(projectDetailsReducer.id){
             getAllPosts()
         }
     }, [projectDetailsReducer.id])
+
     const getAllPosts = async () => {
         const data = await apiService.getAllPosts({
             project_id: projectDetailsReducer.id,

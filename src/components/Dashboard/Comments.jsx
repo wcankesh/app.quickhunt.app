@@ -1,8 +1,8 @@
 import React, {useEffect, useState} from 'react';
-import {ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, MoveLeft} from "lucide-react";
+import {MoveLeft} from "lucide-react";
 import {useNavigate} from "react-router-dom";
 import {baseUrl} from "../../utils/constent";
-import {Card, CardContent, CardFooter} from "../ui/card";
+import {Card, CardContent} from "../ui/card";
 import {CommSkel} from "../Comman/CommSkel";
 import {Avatar, AvatarFallback, AvatarImage} from "../ui/avatar";
 import {Badge} from "../ui/badge";
@@ -10,20 +10,18 @@ import ReadMoreText from "../Comman/ReadMoreText";
 import EmptyData from "../Comman/EmptyData";
 import {ApiService} from "../../utils/ApiService";
 import {useSelector} from "react-redux";
-import {Button} from "../ui/button";
-import {useTheme} from "../theme-provider";
 import Pagination from "../Comman/Pagination";
 
 const perPageLimit = 10
 
 const Comments = () => {
-    const {theme} = useTheme()
     let apiSerVice = new ApiService();
     const navigate = useNavigate();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
-    const [isLoading, setIsLoading] = useState(false);
+
     const [pageNo, setPageNo] = useState(1);
     const [totalRecord, setTotalRecord] = useState(0);
+    const [isLoading, setIsLoading] = useState(false);
     const [chartList, setChartList] = useState({
         reactionAnalytic: [],
         guest: [],
@@ -63,7 +61,6 @@ const Comments = () => {
         if(projectDetailsReducer.id){
             getComments();
         }
-
     },[projectDetailsReducer.id, pageNo])
 
     const getComments = async () => {
@@ -95,7 +92,7 @@ const Comments = () => {
         <div className={"container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-3 md:px-4"}>
             <div className={"flex gap-4 items-center mb-6"}>
                 <MoveLeft size={20} onClick={() => navigate(`${baseUrl}/dashboard`)} className={"cursor-pointer"}/>
-                <h1 className="text-2xl font-normal flex-initial w-auto">Comments (<span>{totalRecord}</span>)</h1>
+                <h1 className="text-2xl font-normal flex-initial w-auto">Comments ({totalRecord})</h1>
             </div>
             <Card>
                 {

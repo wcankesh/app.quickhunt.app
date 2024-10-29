@@ -1,15 +1,14 @@
 import React, {Fragment, useEffect, useState} from 'react';
 import {Button} from "../ui/button";
-import {ArrowBigUp, ChevronLeft, Circle, Dot, Ellipsis, Filter, Loader2, MessageCircleMore, Pin, Plus, X,} from "lucide-react";
+import {ArrowBigUp, ChevronLeft, Circle, Dot, Ellipsis, Filter, MessageCircleMore, Pin, Plus, X,} from "lucide-react";
 import {Card, CardContent} from "../ui/card";
 import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "../ui/select";
 import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList} from "../ui/command";
 import {Checkbox} from "../ui/checkbox";
-import {useTheme} from "../theme-provider";
 import {ApiService} from "../../utils/ApiService";
 import {useNavigate} from "react-router";
 import {useSelector} from "react-redux";
-import {baseUrl} from "../../utils/constent";
+import {baseUrl, cleanQuillHtml} from "../../utils/constent";
 import moment from "moment";
 import {useToast} from "../ui/use-toast";
 import ReadMoreText from "../Comman/ReadMoreText";
@@ -18,7 +17,6 @@ import EmptyData from "../Comman/EmptyData";
 import CreateIdea from "./CreateIdea";
 import {DropdownMenu, DropdownMenuTrigger} from "@radix-ui/react-dropdown-menu";
 import {DropdownMenuContent, DropdownMenuItem,} from "../ui/dropdown-menu";
-import {Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "../ui/dialog";
 import {Badge} from "../ui/badge";
 import {Popover, PopoverContent, PopoverTrigger} from "../ui/popover";
 import {Avatar, AvatarFallback, AvatarImage} from "../ui/avatar";
@@ -43,7 +41,6 @@ const initialStateFilter = {
 };
 
 const Ideas = () => {
-    const {theme} = useTheme()
     const navigate = useNavigate();
     const UrlParams = new URLSearchParams(location.search);
     const getPageNo = UrlParams.get("pageNo") || 1;
@@ -52,28 +49,23 @@ const Ideas = () => {
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
 
-    const [isSheetOpenCreate, setSheetOpenCreate] = useState(false);
     const [ideasList, setIdeasList] = useState([]);
-    const [isDeleteLoading, setDeleteIsLoading] = useState(false);
-    const [isLoading, setIsLoading] = useState(true);
-    const [isLoadingSearch, setIsLoadingSearch] = useState(false);
     const [topicLists, setTopicLists] = useState([]);
-    const [pageNo, setPageNo] = useState(Number(getPageNo));
-    const [totalRecord, setTotalRecord] = useState(0);
     const [roadmapStatus, setRoadmapStatus] = useState([]);
     const [filter, setFilter] = useState(initialStateFilter);
-    const [openDelete, setOpenDelete] = useState(false);
-    const [deleteRecord, setDeleteRecord] = useState(null);
     const [openFilter, setOpenFilter] = useState('');
     const [openFilterType, setOpenFilterType] = useState('');
+    const [pageNo, setPageNo] = useState(Number(getPageNo));
+    const [totalRecord, setTotalRecord] = useState(0);
+    const [isSheetOpenCreate, setSheetOpenCreate] = useState(false);
+    const [isDeleteLoading, setDeleteIsLoading] = useState(false);
+    const [load, setLoad] = useState('');
+    const [openDelete, setOpenDelete] = useState(false);
+    const [deleteRecord, setDeleteRecord] = useState(null);
 
-    const openCreateIdea = () => {
-        setSheetOpenCreate(true)
-    };
+    const openCreateIdea = () => {setSheetOpenCreate(true)};
 
-    const closeCreateIdea = () => {
-        setSheetOpenCreate(false)
-    };
+    const closeCreateIdea = () => {setSheetOpenCreate(false)};
 
     useEffect(() => {
         if (filter.topic.length || filter.roadmap.length || filter.bug || filter.archive /*|| filter.no_status*/ || filter.all) {
@@ -89,8 +81,8 @@ const Ideas = () => {
         navigate(`${baseUrl}/ideas?pageNo=${pageNo}`);
     }, [projectDetailsReducer.id, pageNo, allStatusAndTypes])
 
-
     const getAllIdea = async () => {
+        setLoad('list');
         const data = await apiSerVice.getAllIdea({
             project_id: projectDetailsReducer.id,
             page: pageNo,
@@ -99,29 +91,27 @@ const Ideas = () => {
         if (data.status === 200) {
             setIdeasList(data.data)
             setTotalRecord(data.total)
-            setIsLoading(false)
+            setLoad('')
         } else {
-            setIsLoading(false)
+            setLoad('')
         }
     }
 
-
-
     const ideaSearch = async (payload) => {
-        setIsLoadingSearch(true)
+        setLoad('search')
         const data = await apiSerVice.ideaSearch(payload)
         if (data.status === 200) {
             setIdeasList(data.data)
             setTotalRecord(data.total)
-            setIsLoadingSearch(false)
             setPageNo(payload.page)
+            setLoad('')
         } else {
-            setIsLoadingSearch(false)
+            setLoad('')
         }
     }
 
     const openDetailsSheet = (record) => {
-        navigate(`${baseUrl}/ideas/${record.id}`)
+        navigate(`${baseUrl}/ideas/${record.id}?pageNo=${getPageNo}`)
     };
 
     const handleChange = (e) => {
@@ -220,10 +210,10 @@ const Ideas = () => {
 
     const handlePaginationClick = async (newPage) => {
         if (newPage >= 1 && newPage <= totalPages) {
-            setIsLoading(true);
+            setLoad('search');
+            setLoad('list');
             setPageNo(newPage);
         } else {
-            setIsLoading(false);
         }
     };
 
@@ -292,7 +282,7 @@ const Ideas = () => {
             {
                 openDelete &&
                 <DeleteDialog
-                    title={"You really want to delete this Idea ?"}
+                    title={"You really want to delete this Idea?"}
                     isOpen={openDelete}
                     onOpenChange={deleteIdea}
                     onDelete={onDeleteIdea}
@@ -302,19 +292,25 @@ const Ideas = () => {
             }
             <div className={"container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-3 md:px-4"}>
 
-                <CreateIdea
-                    isOpen={isSheetOpenCreate}
-                    onOpen={openCreateIdea}
-                    onClose={closeCreateIdea}
-                    closeCreateIdea={closeCreateIdea}
-                    setIdeasList={setIdeasList}
-                    ideasList={ideasList}
-                    getAllIdea={getAllIdea}
-                />
+                {
+                    isSheetOpenCreate &&
+                    <CreateIdea
+                        isOpen={isSheetOpenCreate}
+                        onOpen={openCreateIdea}
+                        onClose={closeCreateIdea}
+                        closeCreateIdea={closeCreateIdea}
+                        setIdeasList={setIdeasList}
+                        ideasList={ideasList}
+                        getAllIdea={getAllIdea}
+                    />
+                }
 
-                    <div className="flex items-center gap-4 mb-6 justify-between">
-                        <h1 className="text-2xl font-normal flex-initial w-auto">Ideas ({totalRecord})</h1>
-                        <div className="flex gap-2 flex-1 w-full justify-end">
+                    <div className="flex flex-wrap items-center gap-2 justify-between">
+                        <div className={"flex flex-col gap-y-0.5"}>
+                            <h1 className="text-2xl font-normal flex-initial w-auto">Ideas ({totalRecord})</h1>
+                            <p className={"text-sm text-muted-foreground"}>Create and display your ideas on your website and encourage users to upvote and comment with their feedback.</p>
+                        </div>
+                        <div className="flex gap-2">
                             <Popover
                                 open={openFilter}
                                 onOpenChange={() => {
@@ -396,7 +392,7 @@ const Ideas = () => {
                                                                         setOpenFilter(true);
                                                                         setOpenFilterType('roadmap');
                                                                     }}
-                                                                    className={"flex-1 w-full text-sm font-normal cursor-pointer flex gap-2 items-center"}
+                                                                    className={"flex-1 w-full text-sm font-normal cursor-pointer flex gap-2 items-center capitalize"}
                                                                 >
                                                                     <span className={"w-2.5 h-2.5 rounded-full"} style={{backgroundColor: x.color_code}}/>
                                                                     {x.title}
@@ -453,7 +449,7 @@ const Ideas = () => {
                         </div>
                     </div>
                     {
-                        (filter.topic.length > 0 || filter.roadmap.length > 0 || filter.archive === 1 || filter.bug === 1) && <div className="flex flex-wrap gap-2 mb-6">
+                        (filter.topic.length > 0 || filter.roadmap.length > 0 || filter.archive === 1 || filter.bug === 1) && <div className="flex flex-wrap gap-2 my-6">
                             {
                                 (filter.topic || []).map((data,index) =>{
                                     const findTopic = (topicLists || []).find((topic) => topic.id === data);
@@ -503,10 +499,10 @@ const Ideas = () => {
                         </div>
                     }
 
-                <Card>
+                <Card className={"mt-6"}>
                     {
-                        (isLoading || isLoadingSearch) ? CommSkel.commonParagraphFourIdea : ideasList.length > 0 ?
-                            <CardContent className={"p-0"}>
+                        (load === 'search' || load === 'list') ? CommSkel.commonParagraphFourIdea : ideasList.length > 0 ?
+                            <CardContent className={"p-0 divide-y"}>
                                 {
                                     (ideasList || []).map((x, i) => {
                                         return (
@@ -614,7 +610,7 @@ const Ideas = () => {
                                                                                             <SelectItem key={i}
                                                                                                         value={x.id}>
                                                                                                 <div
-                                                                                                    className={"flex items-center gap-2 truncate text-ellipsis overflow-hidden whitespace-nowrap"}>
+                                                                                                    className={"flex capitalize items-center gap-2 truncate text-ellipsis overflow-hidden whitespace-nowrap"}>
                                                                                                     <Circle
                                                                                                         fill={x.color_code}
                                                                                                         stroke={x.color_code}
@@ -647,7 +643,7 @@ const Ideas = () => {
                                                                             Archive
                                                                         </Badge>
                                                                     }
-                                                                    {x.pin_to_top === 1 && <Pin size={16} className={`${theme === "dark" ? "fill-card-foreground" : "fill-card-foreground"}`}/>}
+                                                                    {x.pin_to_top === 1 && <Pin size={16} className={`fill-card-foreground`}/>}
                                                                     <DropdownMenu>
                                                                         <DropdownMenuTrigger>
                                                                             <Ellipsis size={16}/>
@@ -662,7 +658,7 @@ const Ideas = () => {
                                                                                 {x?.is_archive === 1 ? "Unarchive" : "Archive"}
                                                                             </DropdownMenuItem>
                                                                             <DropdownMenuItem
-                                                                                className={"cursor-pointer"}
+                                                                                className={"cursor-pointer capitalize"}
                                                                                 onClick={() => handleStatusUpdate("is_active", x.is_active === 1 ? 0 : 1, i, x)}>
                                                                                 {x.is_active === 0 ? "Convert to Idea" : "Mark as bug"}
                                                                             </DropdownMenuItem>
@@ -674,7 +670,9 @@ const Ideas = () => {
                                                                 </div>
                                                             </div>
                                                             <div className={"description-container text-sm text-muted-foreground"}>
-                                                                <ReadMoreText html={x.description}/>
+                                                                {
+                                                                    cleanQuillHtml(x?.description) ? <ReadMoreText html={x.description}/> : null
+                                                                }
                                                             </div>
                                                         </div>
                                                         {/*<div className={`flex ${x.topic && x.topic.length > 0 ? "justify-between gap-2" : "sm:justify-between gap-0 justify-start"} items-center flex-wrap`}>*/}
@@ -738,7 +736,6 @@ const Ideas = () => {
                                                         {/*</div>*/}
                                                     </div>
                                                 </div>
-                                                <div className={"border-b"}/>
                                             </Fragment>
                                         )
                                     })
@@ -751,7 +748,7 @@ const Ideas = () => {
                             <Pagination
                                 pageNo={pageNo}
                                 totalPages={totalPages}
-                                isLoading={isLoading}
+                                isLoading={load === 'search' || load === 'list'}
                                 handlePaginationClick={handlePaginationClick}
                                 stateLength={ideasList.length}
                             /> : ""

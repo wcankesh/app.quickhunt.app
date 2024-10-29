@@ -1,8 +1,7 @@
-import React, {Fragment, useState} from 'react';
+import React, {useState} from 'react';
 import { Sheet, SheetContent, SheetHeader, SheetOverlay } from "../ui/sheet";
 import { X } from "lucide-react";
 import {Card, CardContent, CardHeader, CardTitle} from "../ui/card";
-import {CommSkel} from "../Comman/CommSkel";
 
 const WidgetAnalytics = ({ isOpen, onOpen, onClose, widgetsSetting, selectedRecordAnalytics }) => {
 

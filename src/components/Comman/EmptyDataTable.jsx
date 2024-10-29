@@ -1,5 +1,5 @@
 import React from 'react';
-import {Card, CardHeader} from "../ui/card";
+import {Card} from "../ui/card";
 import {Table, TableHead, TableHeader, TableRow} from "../ui/table"
 import NoDataThumbnail from "../../img/Frame.png";
 import {useTheme} from "../theme-provider";

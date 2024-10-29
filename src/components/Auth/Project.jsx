@@ -13,7 +13,7 @@ import {Carousel, CarouselContent, CarouselItem} from "../ui/carousel";
 import {Label} from "../ui/label";
 import {Input} from "../ui/input";
 import {Button} from "../ui/button";
-import {Eye, EyeOff, Loader2} from "lucide-react";
+import {Loader2} from "lucide-react";
 import {projectDetailsAction} from "../../redux/action/ProjectDetailsAction";
 import {useDispatch} from "react-redux";
 
@@ -38,11 +38,11 @@ const Project = () => {
     let apiSerVice = new ApiService()
     let navigate = useNavigate();
     const dispatch = useDispatch();
+    const {toast} = useToast();
 
     const [isCreateLoading, setIsCreateLoading] = useState(false);
     const [createProjectDetails, setCreateProjectDetails] = useState(initialStateProject);
     const [formError, setFormError] = useState(initialStateErrorProject);
-    const {toast} = useToast()
 
     const plugin = React.useRef(Autoplay({delay: 2000, stopOnInteraction: true}))
     const imageSources = [carousel_1, carousel_2, carousel_3];

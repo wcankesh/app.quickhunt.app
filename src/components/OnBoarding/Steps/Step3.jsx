@@ -22,7 +22,7 @@ const Step3 = ({setStep}) => {
                 </div>
                 <div className={`space-y-3`}>
                     <div className="space-y-1">
-                        <Label htmlFor="name" className="text-right">Project Name</Label>
+                        <Label htmlFor="name" className="text-right font-normal">Project Name</Label>
                         <Input
                             id="project_name"
                             placeholder="Project Name"
@@ -38,7 +38,7 @@ const Step3 = ({setStep}) => {
                         {/*}*/}
                     </div>
                     <div className="space-y-1">
-                        <Label htmlFor="website" className="text-right">Project URL</Label>
+                        <Label htmlFor="website" className="text-right font-normal">Project URL</Label>
                         <Input
                             id="project_website"
                             placeholder="https://yourcompany.com"
@@ -49,11 +49,11 @@ const Step3 = ({setStep}) => {
                         />
                     </div>
                     <div className="space-y-1">
-                        <Label htmlFor="domain" className="text-right">Project Domain</Label>
+                        <Label htmlFor="domain" className="text-right font-normal">Project Domain</Label>
                         <div className={"relative"}>
                             <Input
                                 id="domain"
-                                placeholder="projectname"
+                                placeholder="Project Domain"
                                 // className={`${theme === "dark" ? "placeholder:text-muted-foreground/75 pr-[115px]" : "placeholder:text-muted-foreground/75 pr-[115px]"}`}
                                 // value={createProjectDetails.domain}
                                 name="domain"
@@ -62,8 +62,8 @@ const Step3 = ({setStep}) => {
                         </div>
                     </div>
                     <div className="space-y-1">
-                        <Label htmlFor="domain" className="text-right">Send invites to your team.</Label>
-                        <div className={"flex gap-3"}>
+                        <Label htmlFor="domain" className="text-right font-normal">Send invites to your team.</Label>
+                        <div className={"flex items-center gap-3"}>
                         <div className={"relative w-full"}>
                             <Input
                                 type={"email"}
@@ -80,7 +80,7 @@ const Step3 = ({setStep}) => {
                     </div>
                 </div>
             </div>
-            <div className={"flex justify-between items-end"}>
+            <div className={"flex justify-between gap-2"}>
                 <Button variant={"ghost hover:none"} className={"h-auto p-0 text-primary text-sm font-bold"}>Need help?</Button>
                 <Button className={"font-semibold px-[29px] hover:bg-primary"} onClick={() => onStep(4)}>Finish Signing up</Button>
             </div>

@@ -27,20 +27,21 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
     const {theme} = useTheme()
     let apiSerVice = new ApiService();
     const {toast} = useToast()
-
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
-    const [isLoading, setIsLoading] = useState(false);
-    const [isLoadingCreateIdea, setIsLoadingCreateIdea] = useState(false);
+
     const [isLoadingSidebar, setIsLoadingSidebar] = useState('');
-    const [topicLists, setTopicLists] = useState([]);
+    const [commentText, setCommentText] = useState("")
+    const [subCommentText, setSubCommentText] = useState("")
     const [description, setDescription] = useState("");
+    const [topicLists, setTopicLists] = useState([]);
     const [commentFiles, setCommentFiles] = useState([])
     const [subCommentFiles, setSubCommentFiles] = useState([])
     const [deletedCommentImage, setDeletedCommentImage] = useState([])
     const [deletedSubCommentImage, setDeletedSubCommentImage] = useState([])
-    const [commentText, setCommentText] = useState("")
-    const [subCommentText, setSubCommentText] = useState("")
+    const [roadmapStatus, setRoadmapStatus] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [isLoadingCreateIdea, setIsLoadingCreateIdea] = useState(false);
     const [selectedComment, setSelectedComment] = useState(null);
     const [selectedSubComment, setSelectedSubComment] = useState(null);
     const [selectedCommentIndex, setSelectedCommentIndex] = useState(null);
@@ -51,7 +52,6 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
     const [isSaveUpdateComment, setIsSaveUpdateComment] = useState(false);
     const [isSaveUpdateSubComment, setIsSaveUpdateSubComment] = useState(false);
     const [isSaveSubComment, setIsSaveSubComment] = useState(false);
-    const [roadmapStatus, setRoadmapStatus] = useState([]);
     const [formError, setFormError] = useState(initialStateError);
     const [openDelete, setOpenDelete] = useState(false);
     const [deleteRecord, setDeleteRecord] = useState(null);
@@ -533,31 +533,6 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
         }
     }
 
-    // const deleteComment = async (id, index) => {
-    //     const data = await apiSerVice.deleteComment({ id: id });
-    //     if (data.status === 200) {
-    //         let cloneRoadmap = [...roadmapList.columns];
-    //         const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap?.id);
-    //         if (roadmapIndex !== -1) {
-    //             const ideaIndex = cloneRoadmap[roadmapIndex].ideas.findIndex((x) => x.id === selectedIdea?.id);
-    //             if (ideaIndex !== -1) {
-    //                 let cloneIdeas = [...cloneRoadmap[roadmapIndex].ideas];
-    //                 let cloneIdea = { ...cloneIdeas[ideaIndex] };
-    //                 const cloneComments = cloneIdea.comments ? [...cloneIdea.comments] : [];
-    //                 cloneComments.splice(index, 1);
-    //                 cloneIdea = { ...cloneIdea, comments: cloneComments };
-    //                 cloneIdeas[ideaIndex] = cloneIdea;
-    //                 cloneRoadmap[roadmapIndex] = { ...cloneRoadmap[roadmapIndex], ideas: cloneIdeas };
-    //                 setRoadmapList({ columns: cloneRoadmap });
-    //                 setSelectedIdea(cloneIdea);
-    //             }
-    //         }
-    //         toast({ description: data.message });
-    //     } else {
-    //         toast({ variant: "destructive", description: data.message });
-    //     }
-    // }
-
     const deleteSubComment = async (id, record, index, subIndex) => {
         const data = await apiSerVice.deleteComment({id: id})
         if (data.status === 200) {
@@ -630,10 +605,10 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
         const {value} = event.target;
         setDescription(value);
         setSelectedIdea(selectedIdea => ({...selectedIdea, description: value}));
-        setFormError(formError => ({
-            ...formError,
-            description: formValidate("description", value)
-        }));
+        // setFormError(formError => ({
+        //     ...formError,
+        //     description: formValidate("description", value)
+        // }));
     };
 
     const handleChange = (tag) => {
@@ -830,7 +805,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                             </div>
                             <div className={"border-b"}>
                                 <div className="py-4 pl-8 pr-6 w-full space-y-1.5">
-                                    <Label htmlFor="picture" className={"font-normal"}>Featured image</Label>
+                                    <Label htmlFor="picture" className={"font-normal capitalize"}>Featured image</Label>
                                     <div className="w-[282px] h-[128px] flex gap-1">
 
                                         {
@@ -902,8 +877,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                 <Label htmlFor="message" className={"font-normal"}>Description</Label>
                                                 <ReactQuillEditor value={selectedIdea?.description} name={"description"}
                                                                   onChange={handleUpdate}/>
-                                                {formError.description &&
-                                                <span className="text-red-500 text-sm">{formError.description}</span>}
+                                                {/*{formError.description && <span className="text-red-500 text-sm">{formError.description}</span>}*/}
                                             </div>
                                             <div className={"space-y-2"}>
                                                 <Label className={"font-normal"}>Choose Board for this Idea</Label>
@@ -1219,7 +1193,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                 </div>
                                                 <div className={"flex flex-col gap-2"}>
                                                     <div className="w-full flex flex-col gap-2">
-                                                        <Label htmlFor="message" className={"font-normal"}>Add comment</Label>
+                                                        <Label htmlFor="message" className={"font-normal capitalize"}>Add comment</Label>
                                                         {/*{*/}
                                                         {/*    privateNote ?*/}
                                                         {/*        <Card*/}

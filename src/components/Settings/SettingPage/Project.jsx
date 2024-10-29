@@ -1,4 +1,4 @@
-import React, {useState, useEffect, Fragment,} from 'react';
+import React, {useState, useEffect} from 'react';
 import {Card, CardContent, CardHeader, CardTitle, CardFooter, CardDescription} from "../../ui/card";
 import {Label} from "../../ui/label";
 import {Button} from "../../ui/button";
@@ -12,8 +12,6 @@ import {allProjectAction} from "../../../redux/action/AllProjectAction";
 import {setProjectDetails} from "../../../utils/constent";
 import {toast} from "../../ui/use-toast";
 import {CircleX, Loader2, X} from "lucide-react";
-import {Dialog} from "@radix-ui/react-dialog";
-import {DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "../../ui/dialog";
 import DeleteDialog from "../../Comman/DeleteDialog";
 
 const initialState = {
@@ -35,16 +33,17 @@ const initialStateError = {
 
 const Project = () => {
     const {theme} = useTheme();
+    const dispatch = useDispatch();
+    const apiService = new ApiService();
+    const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
+    const allProjectReducer = useSelector(state => state.allProjectReducer);
+
     const [createProjectDetails, setCreateProjectDetails] = useState(initialState);
     const [formError, setFormError] = useState(initialStateError);
     const [isSave, setIsSave] = useState(false);
     const [isDel, setIsDel] = useState(false);
-    const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
-    const allProjectReducer = useSelector(state => state.allProjectReducer);
     const [openDelete,setOpenDelete] = useState(false);
     const [isLoadingDelete,setIsLoadingDelete]= useState(false);
-    const dispatch = useDispatch();
-    const apiService = new ApiService();
 
     useEffect(() => {
         if(projectDetailsReducer.id){
@@ -208,8 +207,8 @@ const Project = () => {
             }
 
             <CardHeader className={"p-6 gap-1 border-b p-4 sm:px-5 sm:py-4"}>
-                <CardTitle className={"text-lg sm:text-2xl font-normal"}>Project Setting</CardTitle>
-                <CardDescription className={"text-sm text-muted-foreground p-0"}>Manage your project settings.</CardDescription>
+                <CardTitle className={"text-lg sm:text-2xl font-normal capitalize"}>Project Setting</CardTitle>
+                <CardDescription className={"text-sm text-muted-foreground p-0"}>Configure and manage your project settings.</CardDescription>
             </CardHeader>
             <CardContent className={"p-4 sm:px-5 sm:py-4 border-b space-y-4"}>
                 <h3 className={"text-base font-normal"}>Edit Images</h3>
@@ -335,14 +334,14 @@ const Project = () => {
             <CardContent className={"p-4 sm:px-5 sm:py-4 border-b"}>
                 <div className={"flex flex-wrap sm:flex-nowrap gap-4 w-full"}>
                     <div className="basis-full sm:basis-1/2 space-y-1">
-                        <Label htmlFor="project_name" className={"font-normal"}>Project Name</Label>
+                        <Label htmlFor="project_name" className={"font-normal capitalize"}>Project Name</Label>
                         <Input type="text" onChange={onChangeText} name={"project_name"} value={createProjectDetails.project_name} id="project_name" placeholder="Project Name" />
                         {
                             formError.project_name &&  <p className="text-red-500 text-xs mt-1" >{formError.project_name}</p>
                         }
                     </div>
                     <div className="basis-full sm:basis-1/2 space-y-1">
-                        <Label htmlFor="project_website" className={"font-normal"}>Project website</Label>
+                        <Label htmlFor="project_website" className={"font-normal capitalize"}>Project website</Label>
                         <Input type="text" name={"project_website"} onChange={onChangeText} value={createProjectDetails.project_website} id="project_website" placeholder="https://yourcompany.com" />
                         {
                             formError.project_website &&  <p className="text-destructive text-xs mt-1" >{formError.project_website}</p>
@@ -353,10 +352,10 @@ const Project = () => {
             <CardFooter className={"p-4 sm:px-5 sm:py-4 flex flex-wrap justify-end sm:justify-end gap-4"}>
                 <Button
                     variant={"outline hover:bg-transparent"} onClick={deleteAlert}
-                    className={`text-sm font-medium border w-[115px] text-destructive border-destructive`}
+                    className={`text-sm font-medium border w-[115px] text-destructive border-destructive capitalize`}
                 >{isDel ? <Loader2 className="h-4 w-4 animate-spin" /> : "Delete project"}</Button>
                 <Button
-                    className={`w-[119px] text-sm font-medium hover:bg-primary`}
+                    className={`w-[119px] text-sm font-medium hover:bg-primary capitalize`}
                     onClick={() => updateProjects('')}>{isSave ? <Loader2 className="h-4 w-4 animate-spin" /> : "Update project"}</Button>
             </CardFooter>
         </Card>

@@ -11,8 +11,6 @@ import {ApiService} from "../../../utils/ApiService";
 import {toast} from "../../ui/use-toast";
 import {allStatusAndTypesAction} from "../../../redux/action/AllStatusAndTypesAction";
 import EmptyData from "../../Comman/EmptyData";
-import {Dialog} from "@radix-ui/react-dialog";
-import {DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "../../ui/dialog";
 import randomColor from 'randomcolor';
 import DeleteDialog from "../../Comman/DeleteDialog";
 
@@ -31,19 +29,20 @@ const initialDnDState = {
 
 const Statuses = () => {
     const {theme} = useTheme();
+    const dispatch = useDispatch();
+    let apiService = new ApiService();
+    const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
+    const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
+
     const [labelError, setLabelError] = useState(initialStatus);
-    const [isEdit,setIsEdit]= useState(null);
+    const [dragAndDrop, setDragAndDrop] = useState(initialDnDState);
     const [statusList,setStatusList]=useState([]);
+    const [isEdit,setIsEdit]= useState(null);
     const [isSave,setIsSave]= useState(false);
     const [deleteId,setDeleteId]=useState(null);
     const [deleteIndex,setDeleteIndex] =useState(null);
     const [openDelete,setOpenDelete]=useState(false);
     const [isDeleteLoading,setIsDeleteLoading]=useState(false);
-    const [dragAndDrop, setDragAndDrop] = useState(initialDnDState);
-    const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
-    const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
-    const dispatch = useDispatch();
-    let apiService = new ApiService();
 
     useEffect(() => {
         if(allStatusAndTypes.roadmap_status){
@@ -338,7 +337,7 @@ const Statuses = () => {
                     <div>
                         <CardTitle className="text-lg sm:text-2xl font-normal">Statuses</CardTitle>
                         <CardDescription className="text-sm text-muted-foreground p-0">
-                            Use Statuses to track Ideas on your Roadmap.
+                            Track ideas on your roadmap with statuses.
                         </CardDescription>
                     </div>
                     <Button
@@ -352,12 +351,12 @@ const Statuses = () => {
                 <CardContent className="p-0">
                     <div className={"grid grid-cols-1 overflow-auto sm:overflow-visible whitespace-nowrap"}>
                         <Table>
-                        <TableHeader className={"p-0"}>
+                        <TableHeader className={"dark:bg-transparent bg-muted"}>
                             <TableRow>
                                 {
                                     ["","Status Name","Status Color","Action"].map((x,i)=>{
                                         return(
-                                            <TableHead className={`p-0 ${theme === "dark" ? "" : "text-card-foreground"} ${i === 0 ? "w-[48px]" : i === 1 ? "w-2/5" : i === 2 ? "text-center" : i === 3 ? "text-end pr-4" : ""}`}>{x}</TableHead>
+                                            <TableHead className={`px-2 py-[10px] md:px-3 font-normal text-card-foreground dark:text-muted-foreground ${i === 0 ? "w-[48px]" : i === 1 ? "w-2/5" : i === 2 ? "text-center" : i === 3 ? "text-end pr-4" : ""}`}>{x}</TableHead>
                                         )
                                     })
                                 }

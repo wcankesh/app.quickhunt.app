@@ -13,7 +13,9 @@ const DeleteDialog = ({
                           title = "",
                           description = "This action can't be undone."
                       }) => {
+
     const {theme} =useTheme();
+
     return (
         <Fragment>
             <Dialog open={isOpen} onOpenChange={onOpenChange}>

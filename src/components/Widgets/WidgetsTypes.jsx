@@ -18,26 +18,26 @@ const WidgetsTypes = () => {
 
     const widgetsList = [
         {
-            title: "Embed widget",
-            description : "Embed Ideas, Roadmap & Announcements inside your site.",
+            title: "Embed Widget",
+            description : "Integrate content directly into your website for seamless user interaction.",
             img: embed_img,
             type: "embed"
         },
         {
-            title: "Popover widget",
-            description : "Embed Ideas, Roadmap & Announcements inside your site.",
+            title: "Popover Widget",
+            description : "Display interactive content in a small overlay for quick access without leaving the page.",
             img: popover_img,
             type: "popover"
         },
         {
-            title: "Modal widget",
-            description : "Embed Ideas, Roadmap & Announcements inside your site.",
+            title: "Modal Widget",
+            description : "Present focused content in a popup window, requiring user action before returning to the main page.",
             img: modal_img,
             type: "modal"
         },
         {
-            title: "Sidebar widget",
-            description : "Embed Ideas, Roadmap & Announcements inside your site.",
+            title: "Sidebar Widget",
+            description : "Add a persistent sidebar for easy access to additional features or information on your website.",
             img: sidebar_img,
             type: "sidebar"
         }
@@ -57,8 +57,8 @@ const WidgetsTypes = () => {
                         {
                             widgetsList.map((x, i) => {
                                 return(
-                                    <Card key={i} className={"cursor-pointer"} onClick={() => handleCreateClick(x.type)}>
-                                        <div className={"border-b p-3 md:p-6"}>
+                                    <Card key={i} className={"cursor-pointer flex flex-col h-full"} onClick={() => handleCreateClick(x.type)}>
+                                        <div className={"border-b p-3 md:p-4 flex flex-col flex-1"}>
                                             <h2 className={"text-base font-normal mb-2"}>{x.title}</h2>
                                             <p className={"text-sm font-normal text-muted-foreground"}>{x.description}</p>
                                         </div>

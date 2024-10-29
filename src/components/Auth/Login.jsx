@@ -25,11 +25,12 @@ const Login = () => {
     const {theme} = useTheme();
     let apiSerVice = new ApiService();
     let navigate = useNavigate();
-    const [isLoading, setIsLoading] = useState(false);
+    const {toast} = useToast();
+
     const [companyDetails, setCompanyDetails] = useState(initialState);
     const [formError, setFormError] = useState(initialState);
+    const [isLoading, setIsLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
-    const {toast} = useToast()
 
     const onChange = (event) => {
         setCompanyDetails({...companyDetails, [event.target.name]: event.target.value});
@@ -130,7 +131,20 @@ const Login = () => {
 
     const togglePasswordVisibility = () => {setShowPassword(!showPassword);};
 
-    const imageSources = [carousel_1, carousel_2, carousel_3];
+    const imageSources = [
+        {
+            img: carousel_1,
+            description: 'Empower your SaaS business with Quickhunt’s feedback and roadmap tools to engage users and drive product growth.',
+        },
+        {
+            img: carousel_2,
+            description: 'Streamline feedback, track progress with roadmaps, and keep users updated through announcements—all in one platform.',
+        },
+        {
+            img: carousel_3,
+            description: 'Get started for free and keep your users engaged with timely updates. Join Quickhunt today to shape your product’s future!',
+        }
+    ];
 
     return (
         <div className="h-full">
@@ -151,34 +165,25 @@ const Login = () => {
                                         {/*))}*/}
                                         {imageSources.map((src, index) => (
                                             <CarouselItem key={index} className={"max-w-[706px] w-full shrink-0 grow pl-4"}>
-                                                <img className={"w-[706px]"} src={src} alt={`Carousel image ${index + 1}`} />
+                                                <img className={"w-[706px] mb-6"} src={src.img} alt={`Carousel image ${index + 1}`} />
+                                                <p className={"text-white text-center mt-4 text-lg"}>{src.description}</p>
                                             </CarouselItem>
                                         ))}
                                     </CarouselContent>
                                     {/*<CarouselPrevious/>*/}
                                     {/*<CarouselNext/>*/}
                                 </Carousel>
-                                <div className={"description"}>
-                                    <p className={"text-white text-center text-[20px]"}>“This library has saved me
-                                        countless hours of work and
-                                        helped me deliver stunning designs to my clients faster than ever
-                                        before.”</p>
-                                </div>
                             </div>
                             </div>
                         </div>
                         <div className=" min-h-screen md:basis-1/2 md:p-16 flex justify-center items-center">
                             <div className={"lg:w-[641px] h-full"}>
                                 <div className={"w-full h-full pt-5"}>
-                                    {/*<div className="mx-auto grid w-[320px] md:w-[384px] gap-8 lg:pt-[47px] pt-[50px] px-3">*/}
                                     <div className="mx-auto flex items-center w-[320px] md:w-[384px] px-3 h-full">
                                         <div className={"w-full flex flex-col gap-8"}>
                                         <div className="gap-2 flex flex-col items-start">
                                             {/*{theme === "dark" ? Icon.whiteLogo : Icon.blackLogo}*/}
                                             <h1 className="text-2xl md:text-3xl font-normal flex-initial w-auto">Login</h1>
-                                            {/*<h6 className="text-center font-normal text-sm text-muted-foreground">*/}
-                                            {/*    Enter your email below to create your account*/}
-                                            {/*</h6>*/}
                                         </div>
                                         <div className="grid gap-6">
                                             <div className="grid gap-2">

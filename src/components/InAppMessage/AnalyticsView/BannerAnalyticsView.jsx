@@ -2,7 +2,6 @@ import React, {Fragment, useEffect, useState} from 'react';
 import {Card, CardContent, CardHeader} from "../../ui/card";
 import {Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator} from "../../ui/breadcrumb";
 import {baseUrl} from "../../../utils/constent";
-import {CommSkel} from "../../Comman/CommSkel";
 import {Skeleton} from "../../ui/skeleton";
 import {useNavigate} from "react-router";
 import {ApiService} from "../../../utils/ApiService";
@@ -14,6 +13,8 @@ import {ChartContainer, ChartTooltipContent} from "../../ui/chart";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "../../ui/table";
 import {useTheme} from "../../theme-provider";
 import {Avatar, AvatarFallback} from "../../ui/avatar";
+import EmptyData from "../../Comman/EmptyData";
+import CommonBreadCrumb from "../../Comman/CommonBreadCrumb";
 
 const chartConfig = {
     view: {
@@ -32,9 +33,10 @@ const BannerAnalyticsView = () => {
     const navigate = useNavigate();
     const apiService = new ApiService();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
+
     const [inAppMsgSetting, setInAppMsgSetting] = useState({});
-    const [isLoading, setIsLoading] = useState(false);
     const [analytics, setAnalytics] = useState({})
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         if (id !== "new" && projectDetailsReducer.id) {
@@ -90,24 +92,19 @@ const BannerAnalyticsView = () => {
         },
     ]
 
+    const links = [
+        { label: 'In App Message', path: `/app-message` }
+    ];
+
     return (
         <Fragment>
             <div className={"container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-3 md:px-4"}>
                 <div className={"pb-6"}>
-                    <Breadcrumb>
-                        <BreadcrumbList>
-                            <BreadcrumbItem className={"cursor-pointer"}>
-                                {/*<BreadcrumbLink onClick={() => navigate(`${baseUrl}/in-app-message?pageNo=${getPageNo}`)}>*/}
-                                <BreadcrumbLink onClick={() => navigate(`${baseUrl}/in-app-message`)}>
-                                    In App Message
-                                </BreadcrumbLink>
-                            </BreadcrumbItem>
-                            <BreadcrumbSeparator />
-                            <BreadcrumbItem className={"cursor-pointer"}>
-                                <BreadcrumbPage>{inAppMsgSetting?.title}</BreadcrumbPage>
-                            </BreadcrumbItem>
-                        </BreadcrumbList>
-                    </Breadcrumb>
+                    <CommonBreadCrumb
+                        links={links}
+                        currentPage={inAppMsgSetting?.title}
+                        truncateLimit={30}
+                    />
                 </div>
                 <div className={"flex flex-col gap-4"}>
                     <Card>
@@ -133,52 +130,56 @@ const BannerAnalyticsView = () => {
                     <Card>
                         <CardHeader className={"p-4 border-b text-base font-medium"}>How did that change over time?</CardHeader>
                         <CardContent className={"p-4 pl-0"}>
-                            <ChartContainer config={chartConfig} className="aspect-auto h-[250px] w-full">
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <LineChart
-                                        accessibilityLayer
-                                        data={analytics.chart}
+                            {
+                                analytics?.chart?.length > 0 ?
+                                    <ChartContainer config={chartConfig} className="aspect-auto h-[250px] w-full">
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <LineChart
+                                                accessibilityLayer
+                                                data={analytics.chart}
 
-                                    >
-                                        <CartesianGrid vertical={false} />
-                                        <XAxis
-                                            dataKey="x"
-                                            tickLine={false}
-                                            axisLine={false}
-                                            tickMargin={8}
-                                            tickFormatter={(value) => {
-                                                const date = new Date(value)
-                                                return date.toLocaleDateString("en-US", {
-                                                    month: "short",
-                                                    day: "numeric",
-                                                })
-                                            }}
-                                        />
-                                        <Tooltip
-                                            cursor={false}
-                                            content={<ChartTooltipContent hideLabel />}
-                                        />
-                                        <YAxis tickLine={false} axisLine={false}/>
-                                        <Line
-                                            dataKey="view"
-                                            type="monotone"
-                                            stroke="var(--color-view)"
-                                            strokeWidth={2}
-                                        />
-                                        <Line
-                                            dataKey="response"
-                                            type="monotone"
-                                            stroke="var(--color-response)"
-                                            strokeWidth={2}
-                                        />
-                                    </LineChart>
-                                </ResponsiveContainer>
-                            </ChartContainer>
+                                            >
+                                                <CartesianGrid vertical={false} />
+                                                <XAxis
+                                                    dataKey="x"
+                                                    tickLine={false}
+                                                    axisLine={false}
+                                                    tickMargin={8}
+                                                    tickFormatter={(value) => {
+                                                        const date = new Date(value)
+                                                        return date.toLocaleDateString("en-US", {
+                                                            month: "short",
+                                                            day: "numeric",
+                                                        })
+                                                    }}
+                                                />
+                                                <Tooltip
+                                                    cursor={false}
+                                                    content={<ChartTooltipContent hideLabel />}
+                                                />
+                                                <YAxis tickLine={false} axisLine={false}/>
+                                                <Line
+                                                    dataKey="view"
+                                                    type="monotone"
+                                                    stroke="var(--color-view)"
+                                                    strokeWidth={2}
+                                                />
+                                                <Line
+                                                    dataKey="response"
+                                                    type="monotone"
+                                                    stroke="var(--color-response)"
+                                                    strokeWidth={2}
+                                                />
+                                            </LineChart>
+                                        </ResponsiveContainer>
+                                    </ChartContainer>
+                                    : <EmptyData />
+                            }
                         </CardContent>
                     </Card>
                     <Card>
                         <CardHeader className={"p-4 border-b text-base font-medium"}>Customers who opened</CardHeader>
-                        <CardContent className={"p-0"}>
+                        <CardContent className={"p-0 overflow-auto"}>
                             <Table>
                                 <TableHeader className={`${theme === "dark" ? "" : "bg-muted"}`}>
                                     <TableRow>
@@ -230,7 +231,11 @@ const BannerAnalyticsView = () => {
                                                             )
                                                         })
                                                     }
-                                                </Fragment> : ""
+                                                </Fragment> : <TableRow>
+                                                    <TableCell colSpan={2}>
+                                                        <EmptyData/>
+                                                    </TableCell>
+                                                </TableRow>
                                     }
                                 </TableBody>
                             </Table>
@@ -238,7 +243,7 @@ const BannerAnalyticsView = () => {
                     </Card>
                     <Card>
                         <CardHeader className={"p-4 border-b text-base font-medium"}>Customers who replied</CardHeader>
-                        <CardContent className={"p-0"}>
+                        <CardContent className={"p-0 overflow-auto"}>
                             <Table>
                                 <TableHeader className={`${theme === "dark" ? "" : "bg-muted"}`}>
                                     <TableRow>
@@ -294,7 +299,11 @@ const BannerAnalyticsView = () => {
                                                             )
                                                         })
                                                     }
-                                                </Fragment> : ""
+                                                </Fragment> : <TableRow>
+                                                    <TableCell colSpan={5}>
+                                                        <EmptyData/>
+                                                    </TableCell>
+                                                </TableRow>
                                     }
                                 </TableBody>
                             </Table>

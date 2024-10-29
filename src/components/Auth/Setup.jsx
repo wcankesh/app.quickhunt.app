@@ -19,21 +19,22 @@ const initialState= {
 
 const Setup = () => {
     let apiSerVice = new ApiService();
-    const [invitationDetail, setInvitationDetail] = useState(initialState)
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get('token');
     let navigate = useNavigate();
     const {toast} = useToast();
 
+    const [invitationDetail, setInvitationDetail] = useState(initialState)
+
     useEffect(() => {
         getInvitationDetail()
     }, [])
+
     const getInvitationDetail = async () => {
         const data = await apiSerVice.getInvitationDetail(token)
         if(data.status === 200){
             setInvitationDetail({...data.data[0]})
         } else {
-
         }
     }
 
@@ -55,9 +56,7 @@ const Setup = () => {
     return (
         <div className={"w-full flex flex-col items-center justify-center p-4 md:px-4 md:py-0 h-[100vh]"}>
             <div className={"max-w-[575px] w-full m-auto"}>
-                <div className={"flex items-center justify-center"}>
-                    {Icon.blackLogo}
-                </div>
+                <div className={"flex items-center justify-center"}>{Icon.blackLogo}</div>
                 <h1 className="scroll-m-20 text-2xl md:text-3xl font-medium text-center lg:text-3xl mb-3.5 mt-6">
                     You have 1 invite
                 </h1>

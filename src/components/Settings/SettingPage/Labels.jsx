@@ -11,8 +11,6 @@ import {useDispatch, useSelector} from "react-redux";
 import {allStatusAndTypesAction} from "../../../redux/action/AllStatusAndTypesAction";
 import {toast} from "../../ui/use-toast";
 import EmptyData from "../../Comman/EmptyData";
-import {Dialog} from "@radix-ui/react-dialog";
-import {DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "../../ui/dialog";
 import randomColor from 'randomcolor';
 import DeleteDialog from "../../Comman/DeleteDialog";
 
@@ -23,19 +21,19 @@ const initialNewLabel = {
 
 const Labels = () => {
     const {theme} = useTheme();
+    const apiService = new ApiService();
+    const dispatch = useDispatch();
+    const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
+    const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
+
     const [labelError, setLabelError] = useState(initialNewLabel);
+    const [labelList, setLabelList] = useState([]);
     const [isEdit,setIsEdit]= useState(null);
     const [isLoading,setIsLoading]=useState(true);
-    const [labelList, setLabelList] = useState([]);
     const [deleteId,setDeleteId]=useState(null);
     const [isSave,setIsSave]=useState(false);
     const [openDelete,setOpenDelete] = useState(false);
     const [isLoadingDelete,setIsLoadingDelete] = useState(false);
-
-    const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
-    const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
-    const apiService = new ApiService();
-    const dispatch = useDispatch();
 
     useEffect(() => {
         if(allStatusAndTypes.labels){
@@ -259,7 +257,7 @@ const Labels = () => {
                 <div>
                     <CardTitle className="text-lg sm:text-2xl font-normal">Labels</CardTitle>
                     <CardDescription className="text-sm text-muted-foreground p-0">
-                        Use Labels to organise your Changelog
+                        Organize your changelog efficiently with labels.
                     </CardDescription>
                 </div>
                 <Button
@@ -273,12 +271,12 @@ const Labels = () => {
             <CardContent className="p-0">
                 <div className={"grid grid-cols-1 overflow-auto sm:overflow-visible whitespace-nowrap"}>
                     <Table>
-                    <TableHeader className="p-0">
+                    <TableHeader className={`dark:bg-transparent bg-muted`}>
                         <TableRow>
                             {
                                 ["Label Name","Label Color","Action"].map((x,i)=>{
                                     return(
-                                        <TableHead key={i} className={`px-2 py-[10px] md:px-3 ${i === 0 ? "w-2/5" : i === 1 ? "w-1/5 text-center" : "pr-[39px] text-end"} pl-4 ${theme === "dark" ? "" : "text-card-foreground"}`}>{x}</TableHead>
+                                        <TableHead key={i} className={`px-2 py-[10px] text-sm font-normal md:px-3 text-card-foreground dark:text-muted-foreground ${i === 0 ? "w-2/5" : i === 1 ? "w-1/5 text-center" : "pr-[39px] text-end"}`}>{x}</TableHead>
                                     )
                                 })
                             }

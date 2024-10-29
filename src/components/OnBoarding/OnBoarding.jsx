@@ -12,7 +12,7 @@ const OnBoarding = () => {
     const [progress, setProgress] = useState(33.33);
 
     useEffect(() => {
-        setProgress(step == 1 ? 33.33 : step == 2 ? 66.67 : step == 3 ? 100 : 0);
+        setProgress(step == 1 ? 0 : step == 2 ? 50 : step == 3 ? 100 : 0);
     }, [step]);
 
     return (
@@ -21,10 +21,10 @@ const OnBoarding = () => {
                 <div className="ltr">
                     <div>
                         <div className={"min-h-screen bg-background overflow-hidden w-full"}>
-                            <div className={"min-h-screen basis-full flex w-full justify-center items-center overflow-y-auto"}>
-                                <div className={"flex flex-col items-center gap-16 max-w-[414px] w-full "}>
+                            <div className={"min-h-screen flex w-full justify-center items-center overflow-y-auto px-5"}>
+                                <div className={"flex flex-col items-center gap-8 max-w-[414px] w-full "}>
                                     <div>{Icon.blackLogo}</div>
-                                    <div className={"w-full space-y-10"}>
+                                    <div className={"w-full space-y-8"}>
                                         {(step === 1 || step === 2 || step === 3) && (
                                             <div className="flex flex-col gap-3 items-center">
                                                 <Label>Step {step} of 3</Label>

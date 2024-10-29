@@ -17,7 +17,6 @@ import {DropdownMenu, DropdownMenuTrigger} from "@radix-ui/react-dropdown-menu";
 import {DropdownMenuContent, DropdownMenuItem} from "../../ui/dropdown-menu";
 import {toast} from "../../ui/use-toast";
 import {Skeleton} from "../../ui/skeleton";
-import NoDataThumbnail from "../../../img/Frame.png";
 import EmptyData from "../../Comman/EmptyData";
 import {Dialog} from "@radix-ui/react-dialog";
 import {DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "../../ui/dialog";
@@ -30,21 +29,22 @@ const initialStateError = {
 }
 
 const Team = () => {
-    const {theme,onProModal} = useTheme();
-    const [isSheetOpen, setSheetOpen] = useState(false);
+    const {theme, onProModal} = useTheme();
+    const apiService = new ApiService();
+    const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
+    const userDetailsReducer = useSelector(state => state.userDetailsReducer);
+
     const [inviteTeamDetails, setInviteTeamDetails] = useState(initialState)
     const [formError, setFormError] = useState(initialStateError);
     const [memberList, setMemberList] = useState([])
     const [invitationList, setInvitationList] = useState([])
+    const [isSheetOpen, setSheetOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false)
     const [isSave, setIsSave] = useState(false);
     const [deleteObj, setDeleteObj] = useState({});
     const [isAdmin, setIsAdmin] = useState(false);
     const [openDelete,setOpenDelete] =useState(false);
     const [isLoadingDelete,setIsLoadingDelete] = useState(false);
-    const apiService = new ApiService();
-    const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
-    const userDetailsReducer = useSelector(state => state.userDetailsReducer);
 
     useEffect(() => {
         if(projectDetailsReducer.id){
@@ -217,6 +217,7 @@ const Team = () => {
         }
         setOpenDelete(false);
     }
+
     const removeMember = async (id) => {
         const data = await apiService.removeMember({id: id})
         if (data.status === 200) {
@@ -237,6 +238,7 @@ const Team = () => {
             });
         }
     }
+
     const revokePopup = (record,id) => {
         setDeleteObj(record);
         setOpenDelete(true);
@@ -276,9 +278,8 @@ const Team = () => {
             <Card>
                 <CardHeader className={"flex flex-row flex-wrap md:flex-nowrap justify-between gap-2 items-center p-4 sm:px-5 sm:py-4"}>
                     <div>
-                        <CardTitle className={"text-lg sm:text-2xl font-normal"}>Invite Team</CardTitle>
-                        <CardDescription className={"text-sm text-muted-foreground p-0"}>Add members to your company to
-                            help manage ideas.</CardDescription>
+                        <CardTitle className={"text-lg sm:text-2xl font-normal capitalize"}>Invite Team</CardTitle>
+                        <CardDescription className={"text-sm text-muted-foreground p-0"}>Add members to your project to collaborate on managing ideas.</CardDescription>
                     </div>
                     <Button className={"text-sm font-medium hover:bg-primary m-0"} onClick={openSheet}>Invite Team</Button>
                 </CardHeader>
@@ -295,101 +296,109 @@ const Team = () => {
                         <TabsContent value="users">
                             <div className={"grid grid-cols-1 overflow-auto whitespace-nowrap"}>
                                     <Table>
-                                        <TableHeader className={"p-0"}>
+                                        <TableHeader className={`${theme === "dark" ? "" : "bg-muted"}`}>
                                             <TableRow>
                                                 {
                                                     ["Team", "Role" ,isAdmin === true ? "Action" : ""].map((x, i) => {
                                                         return (
-                                                           x?  <TableHead key={x} className={`h-[22px] sm:pl-6 pb-2 text-sm font-normal ${ isAdmin === true && i === 2 ? "text-end" : isAdmin === false && i === 1 ? "text-end" : ""} ${theme === "dark" ? "" : "text-card-foreground"}`}>{x}</TableHead> :""
+                                                           <TableHead key={x} className={`h-[22px] px-2 py-[10px] md:px-3 text-sm font-normal ${ isAdmin === true && i === 2 ? "text-end" : isAdmin === false && i === 1 ? "text-end" : ""} ${theme === "dark" ? "border-t" : "text-card-foreground"}`}>{x}</TableHead>
+                                                           // x ? <TableHead key={x} className={`h-[22px] sm:pl-6 pb-2 text-sm font-normal ${ isAdmin === true && i === 2 ? "text-end" : isAdmin === false && i === 1 ? "text-end" : ""} ${theme === "dark" ? "" : "text-card-foreground"}`}>{x}</TableHead> :""
                                                         )
                                                     })
                                                 }
                                             </TableRow>
                                         </TableHeader>
-                                        {isLoading ? <TableBody>
-                                            {
-                                                [...Array(4)].map((_, index) => {
-                                                    return (
-                                                        <TableRow key={index}>
-                                                            {
-                                                                [...Array(2)].map((_, i) => {
-                                                                    return (
-                                                                        <TableCell key={i} className={""}>
-                                                                            <Skeleton className={"rounded-md  w-full h-[24px]"}/>
-                                                                        </TableCell>
-                                                                    )
-                                                                })
-                                                            }
-                                                        </TableRow>
-                                                    )
-                                                })
-                                            }
-                                        </TableBody>:<TableBody>
-                                            {
-                                                (memberList || []).map((x) => {
-                                                    return (
-                                                        <TableRow key={x.id}>
-                                                            <TableCell className={"py-[10px]"}>
-                                                                <div className={"flex gap-2 items-center"}>
-                                                                    <Avatar className={"w-[30px] h-[30px]"}>
-                                                                        {
-                                                                            x.user_photo ?
-                                                                                <AvatarImage src={x.user_photo}
-                                                                                             alt={x && x?.user_first_name?.substring(0, 1)?.toUpperCase() && x?.user_last_name?.substring(0, 1)?.toUpperCase()}
-                                                                                />
-                                                                                :
-                                                                                <AvatarFallback className={"bg-primary/10 border-primary border text-sm text-primary font-medium"}>{x?.user_first_name?.substring(0, 1)?.toUpperCase()}{x?.user_last_name?.substring(0, 1)?.toUpperCase()}</AvatarFallback>
-                                                                        }
-                                                                    </Avatar>
-                                                                    <div>
-                                                                        <h3 className={"text-sm font-normal"}>{x.user_first_name} {x.user_last_name}</h3>
-                                                                        <p className={"text-xs font-normal text-muted-foreground"}>{x.user_email_id}</p>
-                                                                    </div>
-                                                                </div>
-                                                            </TableCell>
-                                                            <TableCell className={`${isAdmin === true ? "" : "flex justify-end"} py-[10px] py-[17px]`}>
-                                                                <Badge variant={"outline"} className={`h-[20px] py-0 px-2 text-xs rounded-[5px] ${x.role === 1 ? "text-[#63c8d9] border-[#63c8d9]" : "text-[#694949] border-[#694949]"}`}>{x?.role === 1 ? "Admin" : "Member"}</Badge>
-
-                                                            </TableCell>
-
+                                        <TableBody>
+                                            {isLoading ?
+                                                (
+                                                    [...Array(4)].map((_, index) => {
+                                                        return (
+                                                            <TableRow key={index}>
                                                                 {
-                                                                   isAdmin === true ? <TableCell className={"flex justify-end py-[10px] py-[17px]"}>
-                                                                       {
-                                                                           x.role === 2 ? <Button
-                                                                               variant="outline hover:bg-transparent"
-                                                                               className="p-1 border w-[30px] h-[30px]"
-                                                                               onClick={() => removeMember(x.id)}
-                                                                           >
-                                                                               <Trash2 size={16}/>
-                                                                           </Button> : ""
-                                                                       }
-                                                                   </TableCell> : ""
+                                                                    [...Array(3)].map((_, i) => {
+                                                                        return (
+                                                                            <TableCell key={i} className={""}>
+                                                                                <Skeleton
+                                                                                    className={"rounded-md  w-full h-[24px]"}/>
+                                                                            </TableCell>
+                                                                        )
+                                                                    })
                                                                 }
+                                                            </TableRow>
+                                                        )
+                                                    })
+                                                )
+                                                : memberList?.length > 0 ? <>
+                                                    {
+                                                        (memberList || []).map((x) => {
+                                                            return (
+                                                                <TableRow key={x.id}>
+                                                                    <TableCell className={"py-[10px]"}>
+                                                                        <div className={"flex gap-2 items-center"}>
+                                                                            <Avatar className={"w-[30px] h-[30px]"}>
+                                                                                {
+                                                                                    x.user_photo ?
+                                                                                        <AvatarImage src={x.user_photo}
+                                                                                                     alt={x && x?.user_first_name?.substring(0, 1)?.toUpperCase() && x?.user_last_name?.substring(0, 1)?.toUpperCase()}
+                                                                                        />
+                                                                                        :
+                                                                                        <AvatarFallback
+                                                                                            className={"bg-primary/10 border-primary border text-sm text-primary font-medium"}>{x?.user_first_name?.substring(0, 1)?.toUpperCase()}{x?.user_last_name?.substring(0, 1)?.toUpperCase()}</AvatarFallback>
+                                                                                }
+                                                                            </Avatar>
+                                                                            <div>
+                                                                                <h3 className={"text-sm font-normal"}>{x.user_first_name} {x.user_last_name}</h3>
+                                                                                <p className={"text-xs font-normal text-muted-foreground"}>{x.user_email_id}</p>
+                                                                            </div>
+                                                                        </div>
+                                                                    </TableCell>
+                                                                    <TableCell
+                                                                        className={`${isAdmin === true ? "" : "flex justify-end"} py-[10px] py-[17px]`}>
+                                                                        <Badge variant={"outline"}
+                                                                               className={`h-[20px] py-0 px-2 text-xs rounded-[5px] ${x.role === 1 ? "text-[#63c8d9] border-[#63c8d9]" : "text-[#694949] border-[#694949]"}`}>{x?.role === 1 ? "Admin" : "Member"}</Badge>
 
+                                                                    </TableCell>
 
-                                                        </TableRow>
-                                                    )
-                                                })
-                                            }
-                                        </TableBody>}
+                                                                    {
+                                                                        isAdmin === true ? <TableCell
+                                                                            className={"flex justify-end py-[10px] py-[17px]"}>
+                                                                            {
+                                                                                x.role === 2 ? <Button
+                                                                                    variant="outline hover:bg-transparent"
+                                                                                    className="p-1 border w-[30px] h-[30px]"
+                                                                                    onClick={() => removeMember(x.id)}
+                                                                                >
+                                                                                    <Trash2 size={16}/>
+                                                                                </Button> : ""
+                                                                            }
+                                                                        </TableCell> : <TableRow>
+                                                                            <TableCell colSpan={3}>
+                                                                                <EmptyData/>
+                                                                            </TableCell>
+                                                                        </TableRow>
+                                                                    }
+                                                                </TableRow>
+                                                            )
+                                                        })
+                                                    }
+                                                </> : <TableRow>
+                                                    <TableCell colSpan={3}>
+                                                        <EmptyData/>
+                                                    </TableCell>
+                                                </TableRow>
+                                            }</TableBody>
                                     </Table>
-                                {isLoading === false && memberList.length === 0 && <div className={"flex flex-row justify-center py-[45px]"}>
-                                    <div className={"flex flex-col items-center gap-2"}>
-                                        <img src={NoDataThumbnail} className={"flex items-center"}/>
-                                        <h5 className={`text-center text-2xl font-normal ${theme === "dark" ? "" : "text-[#A4BBDB]"}`}>No Data</h5>
-                                    </div>
-                                </div>}
                             </div>
                         </TabsContent>
                         <TabsContent value="invites" className={""}>
                             <div className={"grid grid-cols-1 overflow-auto whitespace-nowrap"}>
-                                <Table className={""}>
-                                    <TableHeader className={"p-0"}>
-                                        <TableRow className={""}>
+                                <Table>
+                                    <TableHeader className={`${theme === "dark" ? "" : "bg-muted"}`}>
+                                        <TableRow>
                                             {
                                                 ["Email", "Status", "Invited", "Action"].map((x, i) => {
                                                     return (
-                                                        <TableHead key={i} className={`h-[22px] pb-2 text-sm font-normal ${i === 0 ? "sm:pl-6" : i === 3 ? "pr-3" : ""} ${theme === "dark" ? "" : "text-card-foreground"}`}>{x}</TableHead>
+                                                        <TableHead key={i} className={`h-[22px] px-2 py-[10px] text-sm font-normal ${i === 0 ? "sm:pl-6" : i === 3 ? "pr-3" : ""} ${theme === "dark" ? "border-t" : "text-card-foreground"}`}>{x}</TableHead>
                                                     )
                                                 })
                                             }
@@ -397,8 +406,8 @@ const Team = () => {
                                     </TableHeader>
                                     <TableBody>
                                     {
-                                        isLoading ? <Fragment>
-                                            {
+                                        isLoading ? (
+
                                                 [...Array(4)].map((_, index) => {
                                                     return (
                                                         <TableRow key={index}>
@@ -414,35 +423,35 @@ const Team = () => {
                                                         </TableRow>
                                                     )
                                                 })
-                                            }
-                                        </Fragment>
-                                        :
-                                        <Fragment>
-                                            {(invitationList || []).map((x, i) => (
-                                                <TableRow key={i}>
-                                                    <TableCell className="font-normal sm:pl-6">{x?.member_email}</TableCell>
-                                                    <TableCell>Expires in {moment(x?.expire_at).diff(moment(new Date()), 'days')} days</TableCell>
-                                                    <TableCell>Invited about {moment.utc(x.created_at).local().startOf('seconds').fromNow()}</TableCell>
-                                                    <TableCell className="pr-6 text-right">
-                                                        <DropdownMenu className={"relative"} >
-                                                            <DropdownMenuTrigger>
-                                                                <Ellipsis className={`${theme === "dark" ? "" : "text-muted-foreground"}`} size={18}/>
-                                                            </DropdownMenuTrigger>
-                                                            <DropdownMenuContent className={"hover:none absolute right-[-20px]"}>
-                                                                <DropdownMenuItem className={"w-[130px]"} onClick={() => onResendUser(x)}>Resend Invitation</DropdownMenuItem>
-                                                                <DropdownMenuItem className={"w-[130px]"} onClick={() => revokePopup(x,x.id)}>Revoke Invitation</DropdownMenuItem>
-                                                            </DropdownMenuContent>
-                                                        </DropdownMenu>
-                                                    </TableCell>
-                                                </TableRow>
-                                            ))}
-                                        </Fragment>
+
+                                        )
+                                        : invitationList?.length > 0 ? <>
+                                                {(invitationList || []).map((x, i) => (
+                                                    <TableRow key={i}>
+                                                        <TableCell className="font-normal sm:pl-6">{x?.member_email}</TableCell>
+                                                        <TableCell>Expires in {moment(x?.expire_at).diff(moment(new Date()), 'days')} days</TableCell>
+                                                        <TableCell>Invited about {moment.utc(x.created_at).local().startOf('seconds').fromNow()}</TableCell>
+                                                        <TableCell className="pr-6 text-right">
+                                                            <DropdownMenu className={"relative"} >
+                                                                <DropdownMenuTrigger>
+                                                                    <Ellipsis className={`${theme === "dark" ? "" : "text-muted-foreground"}`} size={18}/>
+                                                                </DropdownMenuTrigger>
+                                                                <DropdownMenuContent className={"hover:none absolute right-[-20px]"}>
+                                                                    <DropdownMenuItem className={"w-[130px]"} onClick={() => onResendUser(x)}>Resend Invitation</DropdownMenuItem>
+                                                                    <DropdownMenuItem className={"w-[130px]"} onClick={() => revokePopup(x,x.id)}>Revoke Invitation</DropdownMenuItem>
+                                                                </DropdownMenuContent>
+                                                            </DropdownMenu>
+                                                        </TableCell>
+                                                    </TableRow>
+                                                ))}
+                                            </> : <TableRow>
+                                                <TableCell colSpan={4}>
+                                                    <EmptyData/>
+                                                </TableCell>
+                                            </TableRow>
                                     }
                                     </TableBody>
                                 </Table>
-                                {isLoading ? null : (isLoading === false && invitationList?.length > 0 ? "" :
-                                        <EmptyData/>
-                                )}
                             </div>
                         </TabsContent>
                     </Tabs>

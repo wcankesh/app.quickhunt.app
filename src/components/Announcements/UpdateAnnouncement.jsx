@@ -1,10 +1,10 @@
-import React, {useEffect, useState, Fragment} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Label} from "../ui/label";
 import {Input} from "../ui/input";
 import ReactQuillEditor from "../Comman/ReactQuillEditor";
 import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "../ui/select";
 import {Badge} from "../ui/badge";
-import {CalendarIcon, Check, Circle, CircleX, Loader2, Pin, Upload, X} from "lucide-react";
+import {BarChart, CalendarIcon, Check, Circle, CircleX, Loader2, Pin, Upload} from "lucide-react";
 import {Popover, PopoverContent, PopoverTrigger} from "../ui/popover";
 import {Button} from "../ui/button";
 import {cn} from "../../lib/utils";
@@ -15,10 +15,10 @@ import {useSelector} from "react-redux";
 import {useTheme} from "../theme-provider";
 import {ApiService} from "../../utils/ApiService";
 import {toast} from "../ui/use-toast";
-import {Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator} from "../ui/breadcrumb";
 import {baseUrl} from "../../utils/constent";
 import {Checkbox} from "../ui/checkbox";
 import {Card, CardContent, CardFooter} from "../ui/card";
+import CommonBreadCrumb from "../Comman/CommonBreadCrumb";
 
 const initialStateError = {
     post_title: "",
@@ -30,7 +30,6 @@ const UpdateAnnouncement = () => {
     const location = useLocation();
     const UrlParams = new URLSearchParams(location.search);
     const getPageNo = UrlParams.get("pageNo") || 1;
-
     const { id } = useParams();
     const {theme} = useTheme();
     let apiService = new ApiService();
@@ -38,12 +37,13 @@ const UpdateAnnouncement = () => {
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
     const userDetailsReducer = useSelector(state => state.userDetailsReducer);
+
+    const [formError, setFormError] = useState(initialStateError);
     const [selectedRecord, setSelectedRecord] = useState({});
     const [labelList, setLabelList] = useState([]);
     const [memberList, setMemberList] = useState([])
     const [categoriesList, setCategoriesList] = useState([])
     const [isLoad, setIsLoad] = useState('')
-    const [formError, setFormError] = useState(initialStateError);
     const [popoverOpen, setPopoverOpen] = useState(false);
     const [popoverOpenExpired, setPopoverOpenExpired] = useState(false);
 
@@ -108,7 +108,6 @@ const UpdateAnnouncement = () => {
         } else {
             setSelectedRecord({...selectedRecord, [name]: value, image: ""})
         }
-
     }
 
     const formValidate = (name, value) => {
@@ -292,32 +291,33 @@ const UpdateAnnouncement = () => {
 
     const deleteAssignTo = (e, index) => {e.stopPropagation();}
 
+    const links = [
+        { label: 'Announcement', path: `/announcements?pageNo=${getPageNo}` }
+    ];
+
     return (
         <div className={"container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-3 md:px-4"}>
             <div className={"flex justify-between items-center gap-2"}>
-                <Breadcrumb>
-                    <BreadcrumbList>
-                        <BreadcrumbItem className={"cursor-pointer"}>
-                            <BreadcrumbLink onClick={() => navigate(`${baseUrl}/announcements?pageNo=${getPageNo}`)}>
-                                Announcement
-                            </BreadcrumbLink>
-                        </BreadcrumbItem>
-                        <BreadcrumbSeparator />
-                        <BreadcrumbItem className={"cursor-pointer"}>
-                            <BreadcrumbPage>{selectedRecord.post_title}</BreadcrumbPage>
-                        </BreadcrumbItem>
-                    </BreadcrumbList>
-                </Breadcrumb>
+                <CommonBreadCrumb
+                    links={links}
+                    currentPage={selectedRecord?.post_title}
+                    truncateLimit={30}
+                />
                 <div className={"flex items-center gap-4"}>
-                    <Button variant={"outline"}
-                            className={`w-9 h-9 p-1`}
+                    <Button variant="outline" className={"w-9 h-9"} size="icon"
                             onClick={() => commonToggle("post_pin_to_top", selectedRecord.post_pin_to_top === 1 ? 0 : 1)}
                     >
                         {
                             selectedRecord.post_pin_to_top === 1 ?
-                                <Pin size={18} className={`${theme === "dark" ? "fill-card-foreground" : "fill-card-foreground"}`}/> :
-                                <Pin size={18}/>
+                                <Pin size={15} className={`${theme === "dark" ? "fill-card-foreground" : "fill-card-foreground"}`}/> :
+                                <Pin size={15}/>
                         }
+                    </Button>
+                    <Button
+                        onClick={() => navigate(`${baseUrl}/announcements/analytic-view?postId=${selectedRecord.id}?pageNo=${getPageNo}`)}
+                        variant="outline" className={"w-9 h-9"} size="icon"
+                    >
+                        <BarChart size={15}/>
                     </Button>
                     <Button
                         variant={"outline "}
@@ -330,7 +330,6 @@ const UpdateAnnouncement = () => {
                     </Button>
                     <Button onClick={() => navigate(`${baseUrl}/announcements?pageNo=${getPageNo}`)} variant={"outline "}
                             className={`text-sm font-medium border border-primary hidden md:block ${theme === "dark" ? "" : "text-primary"}`}>Cancel</Button>
-
                 </div>
             </div>
             <Card className={"mt-4"}>
@@ -379,12 +378,15 @@ const UpdateAnnouncement = () => {
                                                         (selectedRecord.labels || []).map((x) => {
                                                             const findObj = labelList.find((y) => y.id == x);
                                                             return (
-                                                                <Badge variant={"outline"} style={{
-                                                                    color: findObj?.label_color_code,
-                                                                    borderColor: findObj?.label_color_code,
-                                                                    textTransform: "capitalize"
-                                                                }}
-                                                                       className={`h-[20px] py-0 px-2 text-xs rounded-[5px]  font-normal text-[${findObj?.label_color_code}] border-[${findObj?.label_color_code}] capitalize`}>{findObj?.label_name}</Badge>
+                                                                <Badge
+                                                                    variant={"outline"}
+                                                                    style={{
+                                                                        color: findObj?.label_color_code,
+                                                                        borderColor: findObj?.label_color_code,
+                                                                        textTransform: "capitalize"
+                                                                    }}
+                                                                    className={`h-[20px] py-0 px-2 text-xs rounded-[5px]  font-normal text-[${findObj?.label_color_code}] border-[${findObj?.label_color_code}] capitalize`}
+                                                                >{findObj?.label_name}</Badge>
                                                             )
                                                         })
                                                     }
@@ -602,7 +604,6 @@ const UpdateAnnouncement = () => {
                                     </div>
                                 </div>
                             </div>
-
                         </div>
                     </div>
                 </CardContent>
@@ -611,13 +612,12 @@ const UpdateAnnouncement = () => {
                         variant={"outline "}
                         disabled={isLoad === 'bottom'}
                         onClick={() => updatePost("bottom")}
-                        className={` bg-primary ${theme === "dark" ? "text-card-foreground" : "text-card"} w-[101px] font-medium`}
+                        className={`bg-primary w-[101px] font-medium ${theme === "dark" ? "text-card-foreground" : "text-card"}`}
                     >
-                        {isLoad === 'bottom' ? <Loader2
-                            className="h-4 w-4 animate-spin"/> : "Update Post"}
+                        {isLoad === 'bottom' ? <Loader2 className="h-4 w-4 animate-spin"/> : "Update Post"}
                     </Button>
                     <Button onClick={() => navigate(`${baseUrl}/announcements?pageNo=${getPageNo}`)} variant={"outline "}
-                            className={`border border-primary ${theme === "dark" ? "" : "text-primary"} text-sm font-medium`}>Cancel</Button>
+                            className={`border border-primary text-sm font-medium ${theme === "dark" ? "" : "text-primary"}`}>Cancel</Button>
                 </CardFooter>
             </Card>
         </div>

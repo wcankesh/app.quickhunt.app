@@ -2,7 +2,7 @@ import React, {Fragment, useEffect, useState} from 'react';
 import {Input} from "../../ui/input";
 import {Button} from "../../ui/button";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "../../ui/table";
-import {Card, CardContent, CardFooter} from "../../ui/card";
+import {Card, CardContent} from "../../ui/card";
 import {DropdownMenu, DropdownMenuTrigger} from "@radix-ui/react-dropdown-menu";
 import {DropdownMenuContent, DropdownMenuItem} from "../../ui/dropdown-menu";
 import {CircleX, Ellipsis, Loader2, Plus, Upload, X} from "lucide-react";
@@ -11,8 +11,6 @@ import {Label} from "../../ui/label";
 import moment from 'moment';
 import {useToast} from "../../ui/use-toast";
 import {useTheme} from "../../theme-provider";
-import {Dialog} from "@radix-ui/react-dialog";
-import {DialogContent, DialogDescription, DialogHeader, DialogTitle} from "../../ui/dialog";
 import ReactQuillEditor from "../../Comman/ReactQuillEditor";
 import {useSelector} from "react-redux";
 import {ApiService} from "../../../utils/ApiService";
@@ -39,16 +37,20 @@ const perPageLimit = 10
 
 const Category = () => {
     const apiService = new ApiService();
-    const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const {theme} = useTheme();
     const {toast} = useToast();
     const navigate = useNavigate();
     const UrlParams = new URLSearchParams(location.search);
     const getPageNo = UrlParams.get("pageNo") || 1;
+    const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
 
     const [formError, setFormError] = useState(initialStateError);
     const [selectedCategory, setSelectedCategory] = useState(initialState);
     const [selectedSubCategory, setSelectedSubCategory] = useState(initialState);
+    const [categoryList, setCategoryList] = useState([]);
+    const [subCategoryId,setSubCategoryId] = useState("")
+    const [pageNo, setPageNo] = useState(Number(getPageNo));
+    const [totalRecord, setTotalRecord] = useState(0);
     const [isSheetOpen, setSheetOpen] = useState(false);
     const [isSheetOpenSub, setSheetOpenSub] = useState(false);
     const [categoryEdit, setCategoryEdit] = useState(false);
@@ -56,13 +58,9 @@ const Category = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [openDelete,setOpenDelete]=useState(false);
     const [openSubDelete,setOpenSubDelete]=useState(false);
-    const [categoryList, setCategoryList] = useState([]);
     const [idToDelete, setIdToDelete] = useState(null);
     const [subIdToDelete, setSubIdToDelete] = useState(null);
-    const [subCategoryId,setSubCategoryId] = useState("")
     const [isLoadingDelete, setIsLoadingDelete] = useState(false);
-    const [pageNo, setPageNo] = useState(Number(getPageNo));
-    const [totalRecord, setTotalRecord] = useState(0);
 
     useEffect(() => {
         if(projectDetailsReducer.id){
@@ -140,6 +138,7 @@ const Category = () => {
         formData.append('title', selectedCategory.title);
         formData.append('description', selectedCategory.description);
         formData.append(`image`, selectedCategory.image);
+        
         const data = await apiService.createCategory(formData);
         if(data.status === 200) {
             setSelectedCategory(initialState);
@@ -173,12 +172,13 @@ const Category = () => {
         formData.append('title', selectedSubCategory.title);
         formData.append('description', selectedSubCategory.description);
         formData.append(`image`, selectedSubCategory.image);
+        
         const data = await apiService.createSubCategory(formData);
         if (data.status === 200) {
             let clone = [...categoryList];
             const index = clone.findIndex((x) => x.id == subCategoryId)
             if(index !== -1){
-                const cloneSub = [...clone[index].sub_categories];
+                let cloneSub = clone[index].sub_categories || [];
                 const subIndex = cloneSub.findIndex((x) => x.id === subCategoryId);
                 if(subIndex !== -1){
                     cloneSub[subIndex] = data.data
@@ -204,6 +204,7 @@ const Category = () => {
         formData.append('title', selectedCategory.title);
         formData.append('description', selectedCategory.description);
         formData.append(`image`, selectedCategory.image);
+        
         const data = await apiService.updateCategory(formData, selectedCategory.id)
         if (data.status === 200) {
             let clone = [...categoryList];
@@ -228,6 +229,7 @@ const Category = () => {
         formData.append('title', selectedSubCategory.title);
         formData.append('description', selectedSubCategory.description);
         formData.append(`image`, selectedSubCategory.image);
+        
         const data = await apiService.updateSubCategory(formData, selectedSubCategory.id)
         if (data.status === 200) {
             let clone = [...categoryList];
@@ -249,11 +251,13 @@ const Category = () => {
 
     const openSheetCategory = (id, data) => {
         setSelectedCategory(id ? data : initialState);
+        navigate(`${baseUrl}/help/category`)
         setSheetOpen(true);
     };
 
     const openSheetSubCategory = (id, data) => {
         setSelectedSubCategory(id ? data : initialState);
+        navigate(`${baseUrl}/help/category`)
         setSheetOpenSub(true);
         setSubCategoryId(data.category_id)
     };
@@ -261,12 +265,14 @@ const Category = () => {
     const closeSheetCategory = () => {
         setSheetOpen(false);
         setSelectedCategory(initialState);
+        navigate(`${baseUrl}/help/category?pageNo=${pageNo}`);
         setFormError(initialStateError);
     };
 
     const closeSheetSubCategory = () => {
         setSheetOpenSub(false);
         setSelectedSubCategory(initialState);
+        navigate(`${baseUrl}/help/category?pageNo=${pageNo}`);
         setFormError(initialStateError);
     };
 
@@ -340,6 +346,7 @@ const Category = () => {
 
     const deleteCategory = async () => {
         setIsLoadingDelete(true)
+        
         const data = await apiService.deleteCategories(idToDelete)
         const clone = [...categoryList];
         const index = clone.findIndex((x) => x.id == idToDelete)
@@ -358,6 +365,7 @@ const Category = () => {
 
     const deleteSubCategory = async () => {
         setIsLoadingDelete(true)
+        
         const data = await apiService.deleteSubCategories(subIdToDelete)
         if (data.status === 200) {
             const clone = [...categoryList];
@@ -403,7 +411,7 @@ const Category = () => {
                         <div className={"h-[calc(100%_-_69px)] overflow-y-auto"}>
                         <div className={"sm:px-8 sm:py-6 px-3 py-4 border-b space-y-6"}>
                             <div className="grid w-full gap-2">
-                                <Label htmlFor="category-name" className={"font-normal"}>Category name</Label>
+                                <Label htmlFor="category-name" className={"font-normal"}>Category Name</Label>
                                 <Input
                                     value={selectedCategory?.title}
                                     onChange={(e) => handleOnChange("title", e.target.value)}
@@ -417,7 +425,7 @@ const Category = () => {
                                 }
                             </div>
                             <div className="grid w-full gap-2">
-                                <Label className={"font-normal"}>Category description</Label>
+                                <Label className={"font-normal"}>Category Description</Label>
                                 <ReactQuillEditor
                                     value={selectedCategory?.description}
                                     onChange={(e) => handleOnChange("description", e.target.value)}
@@ -464,7 +472,7 @@ const Category = () => {
                         </div>
                         <div className={"flex gap-4 px-3 py-4 sm:py-6 sm:px-8"}>
                             <Button
-                                className={`border w-[132px] font-medium hover:bg-primary`}
+                                className={`border w-[115px] font-medium hover:bg-primary`}
                                 onClick={selectedCategory?.id ? onEditCategory : addCategory}
                             >
                                 {categoryEdit ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save Category"}
@@ -496,7 +504,7 @@ const Category = () => {
                         <div className={"h-[calc(100%_-_69px)] overflow-y-auto"}>
                             <div className={"sm:px-8 sm:py-6 px-3 py-4 border-b space-y-6"}>
                                 <div className="grid w-full gap-2">
-                                    <Label htmlFor="category-name" className={"font-normal"}>Category name</Label>
+                                    <Label htmlFor="category-name" className={"font-normal"}>Category Name</Label>
                                     <Input
                                         value={selectedSubCategory?.title}
                                         onChange={(e) => handleOnChangeSub("title", e.target.value)}
@@ -510,7 +518,7 @@ const Category = () => {
                                     }
                                 </div>
                                 <div className="grid w-full gap-2">
-                                    <Label className={"font-normal"}>Category description</Label>
+                                    <Label className={"font-normal"}>Category Description</Label>
                                     <ReactQuillEditor
                                         value={selectedSubCategory?.description}
                                         onChange={(e) => handleOnChangeSub("description", e.target.value)}
@@ -557,7 +565,7 @@ const Category = () => {
                             </div>
                             <div className={"flex gap-4 px-3 py-4 sm:py-6 sm:px-8"}>
                                 <Button
-                                    className={`border w-[156px] font-medium hover:bg-primary`}
+                                    className={`border w-[139px] font-medium hover:bg-primary`}
                                     onClick={selectedSubCategory?.id ? onEditSubCategory : addSubCategory}
                                 >
                                     {subCategoryEdit ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save Subcategory"}
@@ -593,7 +601,7 @@ const Category = () => {
                 {
                     openSubDelete &&
                     <DeleteDialog
-                        title={"You really want to delete this Sub Category ?"}
+                        title={"You really want to delete this Sub Category?"}
                         isOpen={openSubDelete}
                         onOpenChange={() => setOpenSubDelete(false)}
                         onDelete={deleteSubCategory}
@@ -602,20 +610,28 @@ const Category = () => {
                     />
                 }
 
-                <div className={"flex justify-between gap-3"}>
-                    <h4 className={"font-normal text-lg sm:text-2xl"}>All Category</h4>
-                    <div className={"flex gap-4"}>
-                        <Input
-                            type="search"
-                            placeholder="Search..."
-                            className={"pl-4 pr-4 text-sm font-normal h-9 w-full"}
-                        />
+
+                <div className={"flex items-center justify-between flex-wrap gap-2"}>
+                    <div className={"flex flex-col flex-1 gap-y-0.5"}>
+                        <h1 className={"text-2xl font-normal flex-initial w-auto"}>All Category ({totalRecord})</h1>
+                        <p className={"text-sm text-muted-foreground"}>Organize your articles into categories and sub-categories to improve navigation and help users quickly find relevant information.</p>
+                    </div>
+                    <div className={"w-full lg:w-auto flex flex-wrap sm:flex-nowrap gap-2 items-center"}>
+                        <div className={"flex gap-2 items-center w-full lg:w-auto"}>
+                            <div className={"w-full"}>
+                                <Input
+                                    type="search"
+                                    placeholder="Search..."
+                                    className={"pl-4 pr-4 text-sm font-normal h-9 w-full"}
+                                />
+                            </div>
                         <Button
                             onClick={() => openSheetCategory("", "")}
                             className={"gap-2 font-medium hover:bg-primary"}
                         >
-                            <Plus size={20} strokeWidth={3} />New Category
+                            <Plus size={20} strokeWidth={3} /><span className={"text-xs md:text-sm font-medium"}>New Category</span>
                         </Button>
+                        </div>
                     </div>
                 </div>
 
@@ -627,29 +643,21 @@ const Category = () => {
                                     <Table>
                                         <TableHeader className={`${theme === "dark" ? "" : "bg-muted"} py-8 px-5`}>
                                             <TableRow>
-                                                <TableHead className={`px-2 py-[10px] md:px-3 font-medium max-w-[300px]`}>
-                                                    Title
-                                                </TableHead>
-                                                <TableHead className={`font-medium px-2 py-[10px] md:px-3 w-[300px] text-end`}>
-                                                    Articles
-                                                </TableHead>
-                                                <TableHead className={`font-medium px-2 py-[10px] md:px-3 w-[300px] text-end`}>
-                                                    Created at
-                                                </TableHead>
-                                                <TableHead className={`font-medium px-2 py-[10px] md:px-3 w-[300px] text-center`}>
-                                                    Actions
-                                                </TableHead>
-                                                <TableHead className={`font-medium px-2 py-[10px] md:px-3 w-[300px] text-center`}>
-                                                    Status
-                                                </TableHead>
+                                                {
+                                                    ["Title", "Articles", "Created At", "Actions"].map((x, i) => {
+                                                        return (
+                                                            <TableHead className={`font-medium text-card-foreground px-2 py-[10px] md:px-3 max-w-[300px]`}>{x}</TableHead>
+                                                        )
+                                                    })
+                                                }
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>
                                             {
                                                 isLoading ? <Fragment>
-                                                    {[...Array(5)].map((_, index) => (
+                                                    {[...Array(10)].map((_, index) => (
                                                         <TableRow key={index}>
-                                                            {[...Array(5)].map((_, i) => (
+                                                            {[...Array(4)].map((_, i) => (
                                                                 <TableCell key={i} className={"max-w-[373px] px-2 py-[10px] md:px-3"}>
                                                                     <Skeleton className={"rounded-md w-full h-7"} />
                                                                 </TableCell>
@@ -678,12 +686,12 @@ const Category = () => {
                                             <Table>
                                                 <TableHeader className={`${theme === "dark" ? "" : "bg-muted"} py-8 px-5`}>
                                                     <TableRow>
-                                                        <TableHead className={`px-2 py-[10px] md:px-3 text-primary font-medium max-w-[270px] cursor-pointer truncate text-ellipsis overflow-hidden whitespace-nowrap`}>
+                                                        <TableHead className={`capitalize px-2 py-[10px] md:px-3 text-primary font-medium max-w-[270px] cursor-pointer truncate text-ellipsis overflow-hidden whitespace-nowrap`} onClick={() => openSheetCategory(x.id, x)}>
                                                             {x.title}
                                                         </TableHead>
-                                                        <TableHead className={`font-medium px-2 py-[10px] md:px-3 w-[300px] text-end`}>Articles</TableHead>
-                                                        <TableHead className={`font-medium px-2 py-[10px] md:px-3 w-[300px] text-end`}>Created at</TableHead>
-                                                        <TableHead className={`font-medium px-2 py-[10px] md:px-3 w-[300px] text-center`}>
+                                                        <TableHead className={`capitalize font-medium text-card-foreground px-2 py-[10px] md:px-3 w-[300px] text-end`}>Articles</TableHead>
+                                                        <TableHead className={`capitalize font-medium text-card-foreground px-2 py-[10px] md:px-3 w-[300px] text-end`}>Created At</TableHead>
+                                                        <TableHead className={`capitalize font-medium px-2 py-[10px] md:px-3 w-[300px] text-center`}>
                                                             <div className={"space-x-4"}>
                                                                 <Button
                                                                     variant={"ghost hover:bg-none"}
@@ -710,7 +718,7 @@ const Category = () => {
                                                         x.sub_categories.map((y, j) => (
                                                             <TableRow key={j}>
                                                                 {/*<TableCell className={`cursor-pointer inline-flex gap-2 md:gap-1 flex-wrap items-center px-2 py-[10px] md:px-3 max-w-[270px] cursor-pointer truncate text-ellipsis overflow-hidden whitespace-nowrap`}>*/}
-                                                                <TableCell className={`px-2 py-[10px] md:px-3 max-w-[270px] cursor-pointer truncate text-ellipsis overflow-hidden whitespace-nowrap`}>
+                                                                <TableCell className={`px-2 py-[10px] md:px-3 max-w-[270px] cursor-pointer truncate text-ellipsis overflow-hidden whitespace-nowrap`} onClick={() => openSheetSubCategory(y.id, { ...y, category_id: x.id })}>
                                                                     {y.title}
                                                                 </TableCell>
                                                                 <TableCell className={"px-2 py-[10px] md:px-3 w-[300px] text-end"}>

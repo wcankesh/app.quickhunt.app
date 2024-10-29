@@ -5,7 +5,7 @@ import {Input} from "../ui/input";
 import {Checkbox} from "../ui/checkbox";
 import {Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator} from "../ui/breadcrumb";
 import {SelectTrigger, SelectContent, SelectItem, Select, SelectValue} from "../ui/select";
-import {useNavigate, useParams} from "react-router-dom";
+import {useLocation, useNavigate, useParams} from "react-router-dom";
 import {baseUrl} from "../../utils/constent";
 import ColorInput from "../Comman/ColorPicker";
 import {Button} from "../ui/button";
@@ -13,7 +13,6 @@ import {ApiService} from "../../utils/ApiService";
 import {useToast} from "../ui/use-toast";
 import {useSelector} from "react-redux";
 import {ToggleGroup, ToggleGroupItem} from "../ui/toggle-group";
-import qs from 'qs';
 import WidgetPreview from "./WidgetPreview/WidgetPreview";
 
 const initialState = {
@@ -60,21 +59,23 @@ const initialState = {
 }
 
 const UpdateWidget = () => {
+    const location = useLocation();
+    const UrlParams = new URLSearchParams(location.search);
+    const getPageNo = UrlParams.get("pageNo") || 1;
     const navigate = useNavigate();
     let apiSerVice = new ApiService();
     const {toast} = useToast()
     const {id, type} = useParams()
     const [widgetsSetting, setWidgetsSetting] = useState(initialState);
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
+
     const [loading, setLoading] = useState('');
+    const [selectedToggle, setSelectedToggle] = useState('ideas');
     const [index, setIndex] = useState(0);
     const [editWidgetName, setEditWidgetName] = useState(false);
     const [toggle, setToggle] = useState(true);
-    const [selectedToggle, setSelectedToggle] = useState('ideas');
 
-    const handleToggle = (value) => {
-        setSelectedToggle(value);
-    };
+    const handleToggle = (value) => {setSelectedToggle(value);};
 
     useEffect(() => {
         setTimeout(() => {
@@ -86,7 +87,7 @@ const UpdateWidget = () => {
         if (id !== "new") {
             getWidgetsSetting()
         }
-    }, [])
+    }, [getPageNo])
 
     const getWidgetsSetting = async () => {
         const data = await apiSerVice.getWidgets(id)
@@ -170,7 +171,6 @@ const UpdateWidget = () => {
     const renderSidebarItems = () => {
         return (
             <div>
-
                 <div className={"border-b px-4 py-6 space-y-6"}>
                     <div className={"space-y-4"}>
                         <div className={"space-y-2"}>
@@ -300,16 +300,16 @@ const UpdateWidget = () => {
                                 </div>
                                 <div className={"widget-color-picker space-y-2"}>
                                     <Label className={"font-normal"}>Background Color</Label>
-                                    <ColorInput name="launcher_icon_bg_color"
-                                                value={widgetsSetting.launcher_icon_bg_color}
-                                                onChange={onChange}
+                                    <ColorInput
+                                        value={widgetsSetting.launcher_icon_bg_color}
+                                        onChange={(value) => onChange("launcher_icon_bg_color", value.clr)}
                                     />
                                 </div>
                                 <div className={"widget-color-picker space-y-2"}>
                                     <Label className={"font-normal"}>Icon Color</Label>
-                                    <ColorInput name="launcher_icon_color"
-                                                value={widgetsSetting.launcher_icon_color}
-                                                onChange={onChange}
+                                    <ColorInput
+                                        value={widgetsSetting.launcher_icon_color}
+                                        onChange={(value) => onChange("launcher_icon_color", value.clr)}
                                     />
                                 </div>
                             </div>
@@ -518,46 +518,46 @@ const UpdateWidget = () => {
                     <div className={"px-4 py-3 space-y-4 border-b"}>
                             <div className={"widget-color-picker space-y-2"}>
                                 <Label className={"font-normal"}>Header Background Color</Label>
-                                <ColorInput name="header_bg_color"
-                                            onChange={onChange}
-                                            value={widgetsSetting.header_bg_color}
+                                <ColorInput
+                                    onChange={(value) => onChange("header_bg_color", value.clr)}
+                                    value={widgetsSetting.header_bg_color}
                                 />
                             </div>
                             <div className={"widget-color-picker space-y-2"}>
                                 <Label className={"font-normal"}>Header Text Color</Label>
-                                <ColorInput type="color" name="header_text_color"
-                                            onChange={onChange}
-                                            value={widgetsSetting.header_text_color}
+                                <ColorInput
+                                    onChange={(value) => onChange("header_text_color", value.clr)}
+                                    value={widgetsSetting.header_text_color}
                                 />
                             </div>
                             <div className={"widget-color-picker space-y-2"}>
                                 <Label className={"font-normal"}>Header Button Background Color</Label>
-                                <ColorInput name="header_btn_background_color"
-                                            onChange={onChange}
-                                            value={widgetsSetting.header_btn_background_color}
+                                <ColorInput
+                                    onChange={(value) => onChange("header_btn_background_color", value.clr)}
+                                    value={widgetsSetting.header_btn_background_color}
                                 />
                             </div>
                             <div className={"widget-color-picker space-y-2"}>
                                 <Label className={"font-normal"}>Header Button Text Color</Label>
-                                <ColorInput type="color" name="header_btn_text_color"
-                                            onChange={onChange}
-                                            value={widgetsSetting.header_btn_text_color}
+                                <ColorInput
+                                    onChange={(value) => onChange("header_btn_text_color", value.clr)}
+                                    value={widgetsSetting.header_btn_text_color}
                                 />
                             </div>
                         </div>
                     <div className={"px-4 py-3 space-y-4"}>
                         <div className={"widget-color-picker space-y-2"}>
                             <Label className={"font-normal"}>Button Background Color</Label>
-                            <ColorInput name="btn_background_color"
-                                        onChange={onChange}
-                                        value={widgetsSetting.btn_background_color}
+                            <ColorInput
+                                onChange={(value) => onChange("btn_background_color", value.clr)}
+                                value={widgetsSetting.btn_background_color}
                             />
                         </div>
                         <div className={"widget-color-picker space-y-2"}>
                             <Label className={"font-normal"}>Button Text Color</Label>
-                            <ColorInput type="color" name="btn_text_color"
-                                        onChange={onChange}
-                                        value={widgetsSetting.btn_text_color}
+                            <ColorInput
+                                onChange={(value) => onChange("btn_text_color", value.clr)}
+                                value={widgetsSetting.btn_text_color}
                             />
                         </div>
                     </div>

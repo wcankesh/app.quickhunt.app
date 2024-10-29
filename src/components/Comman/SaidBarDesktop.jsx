@@ -66,9 +66,9 @@ const SaidBarDesktop = () => {
                 },
                 {
                     title: 'In App Message',
-                    link: '/in-app-message',
+                    link: '/app-message',
                     icon: <NotebookPen size={15} />,
-                    selected: isActive(`${baseUrl}/in-app-message`, `${baseUrl}/in-app-message/type`, `${baseUrl}/in-app-message/${type}/${id}`, `${baseUrl}/in-app-message/${type}/analytic/${id}`),
+                    selected: isActive(`${baseUrl}/app-message`, `${baseUrl}/app-message/type`, `${baseUrl}/app-message/${type}/${id}`, `${baseUrl}/app-message/${type}/analytic/${id}`),
                 },
                 {
                     title: 'Widget',

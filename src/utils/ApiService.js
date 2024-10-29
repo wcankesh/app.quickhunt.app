@@ -331,6 +331,9 @@ export class ApiService{
     async updateInAppMessage (payload, id){
         return await this.postData(`${baseUrlApi}/app-message/${id}?_method=PUT`, payload)
     }
+    async updateInAppMessageStatus (payload, id){
+        return await this.postData(`${baseUrlApi}/app-message/status/${id}`, payload)
+    }
 
     /* ---------- Help Center Category api ans Settings Categories api ---------- */
     async createCategory (payload){

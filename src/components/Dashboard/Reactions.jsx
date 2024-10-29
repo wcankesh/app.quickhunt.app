@@ -1,7 +1,6 @@
 import React, {Fragment, useEffect, useState} from 'react';
 import {MoveLeft} from "lucide-react";
 import {baseUrl} from "../../utils/constent";
-import {useTheme} from "../theme-provider";
 import {ApiService} from "../../utils/ApiService";
 import {useNavigate} from "react-router-dom";
 import {useSelector} from "react-redux";
@@ -61,7 +60,6 @@ const Reactions = () => {
         if(projectDetailsReducer.id){
             getReactions()
         }
-
     },[projectDetailsReducer.id, pageNo])
 
     const getReactions = async () => {

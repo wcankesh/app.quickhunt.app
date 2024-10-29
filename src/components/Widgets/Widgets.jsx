@@ -8,7 +8,7 @@ import {Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, Di
 import {DropdownMenu, DropdownMenuTrigger} from "@radix-ui/react-dropdown-menu";
 import {DropdownMenuContent, DropdownMenuItem} from "../ui/dropdown-menu";
 import {Tabs, TabsContent, TabsList, TabsTrigger,} from "../ui/tabs";
-import {Card, CardContent, CardFooter} from "../ui/card";
+import {Card, CardContent} from "../ui/card";
 import {useNavigate} from "react-router-dom";
 import {baseUrl} from "../../utils/constent";
 import {ApiService} from "../../utils/ApiService";
@@ -25,25 +25,27 @@ const perPageLimit = 10;
 const Widgets = () => {
     const {theme, onProModal} = useTheme()
     const navigate = useNavigate();
+    const UrlParams = new URLSearchParams(location.search);
+    const getPageNo = UrlParams.get("pageNo") || 1;
     let apiSerVice = new ApiService();
     const {toast} = useToast()
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const userDetailsReducer = useSelector(state => state.userDetailsReducer);
 
     const [widgetsSetting, setWidgetsSetting] = useState([])
+    const [analyticsObj, setAnalyticsObj] = useState({});
+    const [selectedRecordAnalytics, setSelectedRecordAnalytics] = useState({})
     const [isDeleteLoading, setDeleteIsLoading] = useState(false);
     const [isCopyLoading, setCopyIsLoading] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [isSheetOpen, setSheetOpen] = useState(false);
-    const [pageNo, setPageNo] = useState(1);
-    const [totalRecord, setTotalRecord] = useState(0);
     const [openDelete, setOpenDelete] = useState(false);
     const [openCopyCode, setOpenCopyCode] = useState(false);
     const [selectedId, setSelectedId] = useState("");
     const [selectedType, setSelectedType] = useState("");
     const [deleteRecord, setDeleteRecord] = useState(null);
-    const [analyticsObj, setAnalyticsObj] = useState({});
-    const [selectedRecordAnalytics, setSelectedRecordAnalytics] = useState({})
+    const [pageNo, setPageNo] = useState(1);
+    const [totalRecord, setTotalRecord] = useState(0);
 
     const openSheet = (id) => {
         setSheetOpen(true);
@@ -58,6 +60,7 @@ const Widgets = () => {
         if (projectDetailsReducer?.id !== "") {
             getWidgetsSetting(pageNo, perPageLimit);
         }
+        navigate(`${baseUrl}/widget?pageNo=${pageNo}`)
     }, [projectDetailsReducer.id, pageNo, perPageLimit]);
 
     const getWidgetsSetting = async () => {
@@ -90,12 +93,11 @@ const Widgets = () => {
             if(id === "type"){
                 navigate(`${baseUrl}/widget/${id}`);
             } else {
-                navigate(`${baseUrl}/widget/${type}/${id}`);
+                navigate(`${baseUrl}/widget/${type}/${id}?pageNo=${getPageNo}`);
             }
 
             onProModal(false)
         }
-
     };
 
     const deleteWidget = async (id) => {
@@ -382,10 +384,13 @@ const Widgets = () => {
                     widgetsSetting={widgetsSetting}
                     selectedRecordAnalytics={selectedRecordAnalytics}
                 />
-                <div className={"flex flex-col space-y-6"}>
-                    <div className={"flex flex-col gap-2"}>
-                        <div className={"flex items-center justify-between"}>
+                <div className={"flex flex-col"}>
+                    <div className={"flex items-center justify-between flex-wrap gap-2"}>
+                        <div className={"flex flex-col gap-y-0.5"}>
                             <h1 className="text-2xl font-normal flex-initial w-auto">Widgets ({totalRecord})</h1>
+                            <p className={"text-sm text-muted-foreground"}>Enhance your site with different widgets: Embed, Popover, Modal, and Sidebar, for improved interactivity and access.</p>
+                        </div>
+                        <div className={"w-full lg:w-auto flex sm:flex-nowrap flex-wrap gap-2 items-center"}>
                             <Button
                                 className={"gap-2 font-medium hover:bg-primary"}
                                 onClick={() => handleCreateNew("type")}
@@ -393,12 +398,8 @@ const Widgets = () => {
                                 <Plus size={20} strokeWidth={3}/><span className={"text-xs md:text-sm font-medium"}>Create New</span>
                             </Button>
                         </div>
-                        <div className={"flex flex-col space-y-4"}>
-                            <p className={"text-base text-muted-foreground"}>Embed Ideas, Roadmap & Announcements inside
-                                your site.</p>
-                        </div>
                     </div>
-                    <Card>
+                    <Card className={"mt-6"}>
                         <CardContent className={"p-0 overflow-auto"}>
                             <Table>
                                 <TableHeader className={`p-2 lg:py-5 lg:px-8 ${theme === "dark" ? "" : "bg-muted"}`}>

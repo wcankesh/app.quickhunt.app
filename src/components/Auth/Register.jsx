@@ -5,7 +5,6 @@ import {Label} from "../ui/label"
 import {useNavigate} from "react-router-dom"
 import {Carousel, CarouselContent, CarouselItem} from "../ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
-import widget_01 from "../../img/widget.png";
 import carousel_1 from "../../img/carousel1.png";
 import carousel_2 from "../../img/carousel2.png";
 import carousel_3 from "../../img/carousel3.png";
@@ -30,14 +29,15 @@ const Register = () => {
     const {theme} = useTheme();
     let apiSerVice = new ApiService()
     let navigate = useNavigate();
-    const [isLoading, setIsLoading] = useState(false);
+    const {toast} = useToast();
+
     const [companyDetails, setCompanyDetails] = useState(initialState);
     const [formError, setFormError] = useState(initialState);
     const [passwordVisibility, setPasswordVisibility] = useState({
         user_password: false,
         user_confirm_password: false
     });
-    const {toast} = useToast()
+    const [isLoading, setIsLoading] = useState(false);
 
     const onChange = (event) => {
         setCompanyDetails({...companyDetails, [event.target.name]: event.target.value});
@@ -158,7 +158,20 @@ const Register = () => {
         }
     };
 
-    const imageSources = [carousel_1, carousel_2, carousel_3];
+    const imageSources = [
+        {
+            img: carousel_1,
+            description: 'Empower your SaaS business with Quickhunt’s feedback and roadmap tools to engage users and drive product growth.',
+        },
+        {
+            img: carousel_2,
+            description: 'Streamline feedback, track progress with roadmaps, and keep users updated through announcements—all in one platform.',
+        },
+        {
+            img: carousel_3,
+            description: 'Get started for free and keep your users engaged with timely updates. Join Quickhunt today to shape your product’s future!',
+        }
+    ];
 
     return (
         <div className="h-full">
@@ -185,19 +198,14 @@ const Register = () => {
                                             {/*))}*/}
                                             {imageSources.map((src, index) => (
                                                 <CarouselItem key={index} className={"max-w-[706px] w-full shrink-0 grow pl-4"}>
-                                                    <img className={"w-[706px]"} src={src} alt={`Carousel image ${index + 1}`} />
+                                                    <img className={"w-[706px] mb-6"} src={src.img} alt={`Carousel image ${index + 1}`} />
+                                                    <p className={"text-white text-center mt-4 text-lg"}>{src.description}</p>
                                                 </CarouselItem>
                                             ))}
                                         </CarouselContent>
                                         {/*<CarouselPrevious/>*/}
                                         {/*<CarouselNext/>*/}
                                     </Carousel>
-                                    <div className={"description"}>
-                                        <p className={"text-white text-center text-[20px]"}>“This library has saved me
-                                            countless hours of work and
-                                            helped me deliver stunning designs to my clients faster than ever
-                                            before.”</p>
-                                    </div>
                                 </div>
                                 </div>
                             </div>
@@ -210,9 +218,6 @@ const Register = () => {
                                         <div className="gap-2 flex flex-col items-start">
                                             {/*{theme === "dark" ? Icon.whiteLogo : Icon.blackLogo}*/}
                                             <h1 className="text-2xl md:text-3xl font-normal flex-initial w-auto">Create Your Account</h1>
-                                            {/*<h6 className="font-normal text-sm text-muted-foreground">*/}
-                                            {/*    Enhance customer experience now.*/}
-                                            {/*</h6>*/}
                                         </div>
                                         <div className="grid gap-6">
                                             <div className="grid md:grid-flow-col gap-4">
@@ -351,22 +356,6 @@ const Register = () => {
                                                         </Button>
                                                     </p>
                                                 </div>
-
-                                                {/*<p className='text-xs text-center'>*/}
-                                                {/*    By registering you agree to our{" "}*/}
-                                                {/*    <Button*/}
-                                                {/*        variant={"link"}*/}
-                                                {/*        className="p-0 h-auto hover:no-underline"*/}
-                                                {/*    >*/}
-                                                {/*        <span className={"font-medium text-primary"}>Terms of Service</span>*/}
-                                                {/*    </Button> and {""}*/}
-                                                {/*    <Button*/}
-                                                {/*        variant={"link"}*/}
-                                                {/*        className="p-0 h-auto hover:no-underline"*/}
-                                                {/*    >*/}
-                                                {/*        <span className={"font-medium text-primary"}>Privacy Policy</span>*/}
-                                                {/*    </Button>.*/}
-                                                {/*</p>*/}
                                             </div>
                                         </div>
                                         </div>

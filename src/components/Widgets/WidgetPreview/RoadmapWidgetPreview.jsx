@@ -6,10 +6,12 @@ import {useSelector} from "react-redux";
 import {ApiService} from "../../../utils/ApiService";
 
 const RoadmapWidgetPreview = ({widgetsSetting}) => {
-    const [isLoading, setIsLoading] = useState(true);
-    const [roadmapList, setRoadmapList] = useState([]);
     const apiService = new ApiService();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
+
+    const [roadmapList, setRoadmapList] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+
     useEffect(() => {
         if(projectDetailsReducer.id){
             getRoadmapIdea()

@@ -1,5 +1,5 @@
 import React, {useState, useEffect, Fragment} from 'react';
-import {Card, CardContent, CardFooter, CardHeader} from "../../ui/card";
+import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "../../ui/card";
 import {Label} from "../../ui/label";
 import {Input} from "../../ui/input";
 import {Switch} from "../../ui/switch";
@@ -181,7 +181,8 @@ const GeneralSettings = () => {
     return (
         <Card className={"divide-y"}>
             <CardHeader className={"gap-1 p-4 sm:px-5 sm:py-4"}>
-                <h3 className={"font-normal text-lg sm:text-2xl"}>General Settings</h3>
+                <CardTitle className={"text-lg sm:text-2xl font-normal capitalize"}>General Setting</CardTitle>
+                <CardDescription className={"text-sm text-muted-foreground p-0"}>Give title to your Announcement, Roadmap, Ideas. Set header and global color.</CardDescription>
             </CardHeader>
             <CardContent className={"p-0 divide-y"}>
                 {
@@ -268,7 +269,7 @@ const GeneralSettings = () => {
             </CardContent>
             <CardFooter className={"p-4 sm:px-5 sm:py-4 justify-end"}>
                 <Button
-                    className={`w-[179px] text-sm font-semibold hover:bg-primary`}
+                    className={`w-[179px] text-sm font-semibold hover:bg-primary capitalize`}
                     onClick={onUpdatePortal}
                 >
                     {isSave ? <Loader2 className="h-4 w-4 animate-spin"/> : "Update General Settings"}

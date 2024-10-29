@@ -1,10 +1,10 @@
 import React, {Fragment, useEffect, useState} from 'react';
 import { Input } from "../../ui/input";
 import { Select, SelectGroup, SelectValue, SelectItem, SelectTrigger, SelectContent } from "../../ui/select";
-import {ChevronLeft, Circle, Ellipsis, Filter, Loader2, Plus, X} from "lucide-react";
+import {ChevronLeft, Circle, Ellipsis, Filter, Plus, X} from "lucide-react";
 import { Button } from "../../ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../ui/table";
-import {Card, CardContent, CardFooter} from "../../ui/card";
+import {Card, CardContent} from "../../ui/card";
 import { useTheme } from "../../theme-provider";
 import { DropdownMenu, DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
 import { DropdownMenuContent, DropdownMenuItem } from "../../ui/dropdown-menu";
@@ -16,8 +16,6 @@ import {useSelector} from "react-redux";
 import {useToast} from "../../ui/use-toast";
 import {Skeleton} from "../../ui/skeleton";
 import EmptyData from "../../Comman/EmptyData";
-import {Dialog} from "@radix-ui/react-dialog";
-import {DialogContent, DialogDescription, DialogHeader, DialogTitle} from "../../ui/dialog";
 import {Popover, PopoverContent, PopoverTrigger} from "../../ui/popover";
 import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList} from "../../ui/command";
 import {Checkbox} from "../../ui/checkbox";
@@ -47,24 +45,24 @@ const perPageLimit = 10
 
 const Articles = () => {
     const apiService = new ApiService();
-    const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const {theme} = useTheme();
     const {toast} = useToast();
     const navigate = useNavigate();
     const UrlParams = new URLSearchParams(location.search);
     const getPageNo = UrlParams.get("pageNo") || 1;
+    const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
 
-    const [isLoading, setIsLoading] = useState(true);
+    const [filter, setFilter] = useState(initialFilter);
     const [articles, setArticles] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
+    const [openFilter, setOpenFilter] = useState('');
+    const [openFilterType, setOpenFilterType] = useState('');
+    const [totalRecord, setTotalRecord] = useState(0);
+    const [pageNo, setPageNo] = useState(Number(getPageNo));
     const [idToDelete, setIdToDelete] = useState(null);
     const [openDelete,setOpenDelete]=useState(false);
     const [isLoadingDelete, setIsLoadingDelete] = useState(false);
-    const [pageNo, setPageNo] = useState(Number(getPageNo));
-    const [totalRecord, setTotalRecord] = useState(0);
-    const [filter, setFilter] = useState(initialFilter);
-    const [openFilter, setOpenFilter] = useState('');
-    const [openFilterType, setOpenFilterType] = useState('');
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         if(filter.sub_category_id || filter.category_id || filter.title || filter.all) {
@@ -130,7 +128,7 @@ const Articles = () => {
     };
 
     const onEdit = (record) => {
-        navigate(`${baseUrl}/help/article/${record}`)
+        navigate(`${baseUrl}/help/article/${record}?pageNo=${getPageNo}`)
     }
 
     const deleteRow = (id) => {
@@ -205,11 +203,12 @@ const Articles = () => {
             }
 
             <div className={"flex items-center justify-between flex-wrap gap-2"}>
-                <div className={"flex justify-between items-center w-full md:w-auto"}>
+                <div className={"flex flex-col flex-1 gap-y-0.5"}>
                     <h1 className="text-2xl font-normal flex-initial w-auto">All Articles ({totalRecord})</h1>
+                    <p className={"text-sm text-muted-foreground"}>Create a self-service help center to save your team time and provide customers with the support they've been seeking.</p>
                 </div>
                 <div className={"w-full lg:w-auto flex sm:flex-nowrap flex-wrap gap-2 items-center"}>
-                    <div className={"flex gap-2 items-center w-full md:w-auto"}>
+                    <div className={"flex gap-2 items-center w-full lg:w-auto"}>
                         <div className={"w-full"}>
                         <Input
                             type="search"

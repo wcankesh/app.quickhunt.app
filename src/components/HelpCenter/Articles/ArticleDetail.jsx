@@ -1,5 +1,4 @@
 import React, {useState, Fragment, useEffect, useRef} from 'react';
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "../../ui/breadcrumb";
 import { baseUrl } from "../../../utils/constent";
 import { Button } from "../../ui/button";
 import {Circle, Loader2, Play} from "lucide-react";
@@ -23,6 +22,7 @@ import Image from "@editorjs/image";
 import Quote from "@editorjs/quote";
 import InlineCode from "@editorjs/inline-code";
 import EditorJS from "@editorjs/editorjs";
+import CommonBreadCrumb from "../../Comman/CommonBreadCrumb";
 
     const statusOptions = [
         { name: "Publish", value: 1, fillColor: "#389E0D", strokeColor: "#389E0D" },
@@ -57,13 +57,13 @@ const ArticleDetail = () => {
     const {toast} = useToast();
     const navigate = useNavigate();
     const { id } = useParams();
+    const editorCore = useRef(null);
 
-    const [loading, setLoading] = useState(false);
-    const [isLoading, setIsLoading] = useState(true);
     const [articlesDetails, setArticlesDetails] = useState(initialState);
     const [formError, setFormError] = useState(initialStateError);
     const [articleList, setArticleList] = useState([]);
-    const editorCore = useRef(null);
+    const [loading, setLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         if(id !== "new" && projectDetailsReducer.id){
@@ -200,37 +200,37 @@ const ArticleDetail = () => {
     }, []);
 
     useEffect(() => {
-        if(!isLoading){
+        if (!isLoading) {
             let editorData = { blocks: [{ type: "paragraph", data: { text: "Hey" } }] };
-            if (articlesDetails?.description) {
-                if (typeof articlesDetails.description === 'string' && articlesDetails.description.trim().startsWith('{')) {
-                    const parsedDescription = JSON.parse(articlesDetails.description);
-                    if (parsedDescription.blocks) {
-                        editorData = {blocks: parsedDescription.blocks};
-                    }
+
+            if (articlesDetails.description) {
+                const parsedData = JSON.parse(articlesDetails.description);
+                if (parsedData && parsedData.blocks) {
+                    editorData = parsedData;
                 }
             }
+
             editorCore.current = new EditorJS({
                 holder: 'editorjs',
                 autofocus: true,
-                tools:editorConstants,
-                enableReInitialize:true,
-                onChange:handleSave,
-                data:{
+                tools: editorConstants,
+                onChange: handleSave,
+                // data: editorData,
+                data: {
                     time: new Date().getTime(),
                     // blocks: articlesDetails?.description?.blocks || [{type: "paragraph", data: {text: "Hey"}}],
                     blocks: editorData.blocks,
-                    version: "2.12.4"
-                }
+                    version: "2.12.4",
+                },
+                version: "2.12.4",
             });
 
             return () => {
                 if (editorCore.current && typeof editorCore.current.destroy === 'function') {
-                    editorCore.current.destroy(); // Destroy the editor instance
+                    editorCore.current.destroy();
                 }
             };
         }
-
     }, [isLoading]);
 
     const editorConstants = {
@@ -347,22 +347,18 @@ const ArticleDetail = () => {
         );
     };
 
+    const links = [
+        { label: 'Ideas', path: `/help/article` }
+    ];
+
     return (
         <Fragment>
             <div className={"p-4 md:py-6 md:px-4 border-b flex items-center justify-between flex-wrap gap-2"}>
-                <Breadcrumb>
-                    <BreadcrumbList>
-                        <BreadcrumbItem className={"cursor-pointer"}>
-                            <BreadcrumbLink onClick={() => navigate(`${baseUrl}/help/article`)}>
-                                Article
-                            </BreadcrumbLink>
-                        </BreadcrumbItem>
-                        <BreadcrumbSeparator />
-                        <BreadcrumbItem className={"cursor-pointer"}>
-                            <BreadcrumbPage>{articlesDetails.title}</BreadcrumbPage>
-                        </BreadcrumbItem>
-                    </BreadcrumbList>
-                </Breadcrumb>
+                <CommonBreadCrumb
+                    links={links}
+                    currentPage={articlesDetails?.title}
+                    truncateLimit={30}
+                />
                 <div className={"flex gap-4 items-center"}>
                     <Select value={articlesDetails.is_active} onValueChange={(value) => handleOnChange('is_active', Number(value))}>
                         <SelectTrigger className={"w-[120px] h-auto py-[6px]"}>

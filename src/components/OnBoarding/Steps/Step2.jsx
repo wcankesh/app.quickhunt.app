@@ -1,9 +1,10 @@
-import React, { Fragment, useState } from 'react';
+import React, { Fragment, useState, useEffect } from 'react';
 import { Label } from "../../ui/label";
 import { Button } from "../../ui/button";
 import { baseUrl } from "../../../utils/constent";
 import { useNavigate } from "react-router-dom";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "../../ui/select";
+import {Input} from "../../ui/input";
 
 const create = [
     { name: "Ideas", value: "ideas" },
@@ -58,7 +59,7 @@ const Step2 = ({setStep}) => {
                 </div>
                 <div className={`space-y-3`}>
                     <div className={"space-y-2"}>
-                        <Label className={"text-sm font-medium mb-2"}>Hey Darshan jiyani, What can we help you create today?</Label>
+                        <Label className={"text-sm font-normal mb-2"}>Hey Darshan jiyani, What can we help you create today?</Label>
                         <Select onValueChange={handleCreateChange}>
                             <SelectTrigger className="h-auto placeholder:text-muted">
                                 <SelectValue placeholder="Ex. Announcement(changelog)"/>
@@ -76,22 +77,13 @@ const Step2 = ({setStep}) => {
                     </div>
                     {showAdditionalSelect && (
                         <div>
-                            <Select>
-                                <SelectTrigger className="h-auto">
-                                    <SelectValue placeholder="How We can help you?" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectGroup>
-                                        <SelectItem value="help">How We can help you?</SelectItem>
-                                    </SelectGroup>
-                                </SelectContent>
-                            </Select>
+                            <Input placeholder={"Write here..."} />
                         </div>
                     )}
                 </div>
                 <div className={"space-y-3"}>
                     <div className={"space-y-2"}>
-                        <Label className={"text-sm font-medium mb-2"}>How did you get to know about Quickhunt?</Label>
+                        <Label className={"text-sm font-normal mb-2"}>How did you get to know about Quickhunt?</Label>
                         <Select onValueChange={handleKnowAboutChange}>
                             <SelectTrigger className="h-auto">
                                 <SelectValue placeholder="Ex. Blog article" />
@@ -109,21 +101,13 @@ const Step2 = ({setStep}) => {
                     </div>
                     {showAdditionalKnowAboutSelect && (
                         <div>
-                            <Select>
-                                <SelectTrigger className="h-auto">
-                                    <SelectValue placeholder="How We can help you?" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectGroup>
-                                        <SelectItem value="help">How We can help you?</SelectItem>
-                                    </SelectGroup>
-                                </SelectContent>
-                            </Select>
+                            <Input placeholder={"Write here..."} />
                         </div>
                     )}
                 </div>
             </div>
-            <div className={"flex justify-end"}>
+            <div className={"flex gap-2 justify-end"}>
+                <Button variant={"outline hover:bg-none"} className={"border border-primary text-primary font-semibold px-[29px]"} onClick={() => onStep(1)}>Back</Button>
                 <Button className={"font-semibold px-[29px] hover:bg-primary"} onClick={() => onStep(3)}>Continue</Button>
             </div>
         </Fragment>

@@ -1,6 +1,5 @@
 import React, {useState,useEffect,} from 'react';
-import {Card, CardContent, CardFooter, CardHeader} from "../../ui/card";
-import {Separator} from "../../ui/separator";
+import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "../../ui/card";
 import {Label} from "../../ui/label";
 import {Input} from "../../ui/input";
 import {Button} from "../../ui/button";
@@ -20,13 +19,14 @@ const initialState = {
 }
 
 const Social = () => {
-    const [socialLink, setSocialLink] = useState(initialState);
-    const [formError,setFormError] = useState(initialState);
-    const [isSave,setIsSave]=useState(false);
     let apiService = new ApiService();
     const dispatch = useDispatch();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
+
+    const [socialLink, setSocialLink] = useState(initialState);
+    const [formError,setFormError] = useState(initialState);
+    const [isSave,setIsSave]=useState(false);
 
     useEffect(() => {
        setSocialLink(allStatusAndTypes.social)
@@ -137,7 +137,8 @@ const Social = () => {
     return (
         <Card className={"divide-y"}>
             <CardHeader className={"p-4 sm:px-5 sm:py-4"}>
-                <h2 className={`text-lg sm:text-2xl font-normal`}>Social links</h2>
+                <CardTitle className={"text-lg sm:text-2xl font-normal capitalize"}>Social links</CardTitle>
+                <CardDescription className={"text-sm text-muted-foreground p-0"}>Add your social media profiles below.</CardDescription>
             </CardHeader>
             <CardContent className={"p-0"}>
                 <div className={"p-4 sm:px-5 sm:py-4"}>

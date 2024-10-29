@@ -15,7 +15,7 @@ import {
     PopoverTrigger,
 } from "../ui/popover";
 import { cn } from "../../lib/utils";
-import {Fragment, useState} from "react";
+import {useState} from "react";
 
 const ComboBox = ({ items, placeholder, onSelect, value, setValue,classNames,isSearchBar=true }) => {
     const [open,setOpen]=useState(false);

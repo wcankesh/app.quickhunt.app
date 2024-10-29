@@ -11,7 +11,7 @@ import {Avatar, AvatarFallback, AvatarImage} from "../ui/avatar";
 import ReadMoreText from "../Comman/ReadMoreText";
 import {DateRangePicker} from "../ui/date-range-picker";
 import {Button} from "../ui/button";
-import {useLocation, useNavigate} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import {baseUrl} from "../../utils/constent";
 import {Badge} from "../ui/badge";
 
@@ -161,15 +161,18 @@ export function Dashboard() {
         <Fragment>
 
             <div className={"md:py-8 py-4 border-b"}>
-                <div
-                    className='container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] px-3 md:px-4'>
-                    <h1 className="md:text-[32px] text-[26px]">Welcome to Quickhunt</h1>
+                <div className='container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] px-3 md:px-4 space-y-1'>
+                    <h1 className="md:text-[32px] text-[26px] capitalize">Welcome to Quickhunt</h1>
+                    <p className={"text-sm text-muted-foreground"}>Effortlessly collect and manage feedback to improve your product development.</p>
                 </div>
             </div>
             <div
                 className="container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pb-5 px-3 md:px-4 m-auto">
                 <div className={"flex items-center flex-wrap pb-6 pt-9 gap-2 md:justify-between md:flex-nowrap"}>
-                    <h3 className="text-base font-medium">Here's what has happened to your program</h3>
+                    <div className={"space-y-1"}>
+                        <h3 className="text-base font-medium capitalize">View Your Program Performance</h3>
+                        <p className={"text-sm text-muted-foreground"}>Here's a summary of what’s happening with your program.</p>
+                    </div>
                     <DateRangePicker
                         onUpdate={(values) => onChangeDate(values)}
                         initialDateFrom={state.from}
@@ -180,7 +183,7 @@ export function Dashboard() {
                     />
                 </div>
                 <div className={"flex flex-col gap-8"}>
-                    <div className={"grid lg:grid-cols-4 lg:gap-8 md:grid-cols-2 md:gap-4 gap-3"}>
+                    <div className={"grid lg:grid-cols-4 lg:gap-6 md:grid-cols-2 md:gap-4 gap-3"}>
                         {
                             (programAnalytics || []).map((x, i) => {
                                 return (

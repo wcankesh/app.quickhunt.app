@@ -13,19 +13,8 @@ import Tags from "./SettingPage/Tags";
 import Statuses from "./SettingPage/Statuses";
 import Social from "./SettingPage/Social";
 import Emoji from "./SettingPage/Emoji";
-import {
-    FileText,
-    Globe,
-    Kanban,
-    Menu,
-    SmilePlus,
-    UserRound,
-    UsersRound,
-    Settings2,
-    Tag,
-    Layers3, NotepadText, CircleDashed, CircleFadingPlus, FolderKey
-} from "lucide-react";
-import {  Popover, PopoverContent, PopoverTrigger} from "../ui/popover";
+import {FileText, Globe, Kanban, Menu, SmilePlus, UserRound, UsersRound, Settings2, Tag, Layers3, NotepadText, CircleDashed, CircleFadingPlus, FolderKey} from "lucide-react";
+import {Popover, PopoverContent, PopoverTrigger} from "../ui/popover";
 import Board from "./SettingPage/Board";
 import GeneralSettings from "./SettingPage/GeneralSettings";
 import ImportExport from "../ImportExport/ImportExport";
@@ -33,11 +22,11 @@ import ImportExport from "../ImportExport/ImportExport";
 const Settings = () => {
     let navigate = useNavigate();
     const {type, subType} = useParams();
+
     const [windowSize, setWindowSize] = useState({
         width: window.innerWidth,
     });
     const [open, setOpen] = useState(false)
-
 
     useEffect(() => {
         const handleResize = () => {
@@ -199,8 +188,11 @@ const Settings = () => {
 
     return (
         <div className='container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-3 md:px-4'>
-            <div className={"flex flex-row justify-between items-center px-1 relative"}>
-                <h1 className="text-2xl font-normal flex-initial w-auto">Settings</h1>
+            <div className={"flex flex-row justify-between items-center gap-2 relative"}>
+                <div className={"flex flex-col gap-0.5"}>
+                    <h1 className="text-2xl font-normal flex-initial w-auto">Settings</h1>
+                    <p className={"text-sm text-muted-foreground"}>Adjust your Quickhunt experience by managing your Profile, Team, and project settings. Organize workflows with Labels, Categories, and Tags, and connect social accounts. Easily Import/Export data for efficiency.</p>
+                </div>
                 {windowSize.width <= 768 && <Popover open={open} onOpenChange={setOpen}>
                     <PopoverTrigger>
                         <Button variant="outline" className={"w-[30px] h-[30px]"} size="icon">
@@ -218,7 +210,7 @@ const Settings = () => {
                                 >
                                     <div className={`${isActive(x.link) ? "active-menu" : ""}`}>{x.icon}</div>
                                     <div
-                                        className={`flex justify-between w-full ${isActive(x.link) ? "text-primary" : ""}`}>
+                                        className={`capitalize flex justify-between w-full ${isActive(x.link) ? "text-primary" : ""}`}>
                                         {x.title}
                                         <span>{x.useFor}</span>
                                     </div>
@@ -229,7 +221,7 @@ const Settings = () => {
                 </Popover>}
             </div>
             {/*<div className="mx-auto grid w-full max-w-6xl items-start gap-6 md:grid-cols-[180px_1fr] lg:grid-cols-[250px_1fr]">*/}
-            <div className="w-full flex lg:flex-nowrap flex-wrap items-start lg:gap-4 gap-6 pt-6">
+            <div className="w-full flex lg:flex-nowrap flex-wrap items-start lg:gap-4 gap-6 mt-6">
                 {windowSize.width > 768 ? <div className="w-full lg:max-w-[350px]">
                     <Card>
                         <CardHeader className={"p-4 pb-0"}>

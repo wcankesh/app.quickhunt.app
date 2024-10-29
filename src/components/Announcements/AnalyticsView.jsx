@@ -17,15 +17,16 @@ const AnalyticsView = ({onClose, analyticsObj, setAnalyticsObj}) => {
     const navigate = useNavigate();
     const location = useLocation();
     const apiService = new ApiService();
+    const allEmoji = useSelector(state => state.allStatusAndTypes.emoji);
+
     const [feedbackList, setFeedbackList] = useState([])
     const [reactionList, setReactionList] = useState([])
     const [views, setViews] = useState([])
-    const [isLoadingReaction, setIsLoadingReaction] = useState(false)
-    const [isLoadingFeedBack, setIsLoadingFeedBack] = useState(false)
     const [totalFeedback, setTotalFeedback] = useState(0)
     const [pageNo, setPageNo] = useState(1);
-    const allEmoji = useSelector(state => state.allStatusAndTypes.emoji);
     const [totalRecord, setTotalRecord] = useState(0);
+    const [isLoadingReaction, setIsLoadingReaction] = useState(false)
+    const [isLoadingFeedBack, setIsLoadingFeedBack] = useState(false)
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
@@ -53,7 +54,6 @@ const AnalyticsView = ({onClose, analyticsObj, setAnalyticsObj}) => {
             }
             getSinglePosts()
         }
-
     }, [])
 
     const getFeedback = async () => {
@@ -102,13 +102,11 @@ const AnalyticsView = ({onClose, analyticsObj, setAnalyticsObj}) => {
         <Sheet open={analyticsObj.id ? true : false} onOpenChange={analyticsObj.id ? handleClose : true}>
             <SheetOverlay className={"inset-0"}/>
             <SheetContent className={"pt-6 p-0 lg:max-w-[504px]"}>
-                {/*<SheetHeader className={`px-4 py-5 lg:px-8 lg:py-[20px] border-b text-left flex flex-row justify-between items-center gap-3 border-b`}>*/}
                 <SheetHeader className={`px-4 py-5 lg:p-6 border-b text-left flex flex-row justify-between items-center gap-3 border-b`}>
                     <h5 className={"text-sm md:text-xl font-medium"}>{analyticsObj?.post_title}</h5>
                     <X size={18} className={"cursor-pointer m-0"} onClick={handleClose}/>
                 </SheetHeader>
                 <div className={"overflow-auto h-[calc(100vh_-_79px)] pb-2"}>
-                    {/*<div className={"pt-4 px-4 pb-3 pr-8 md:pt-8 md:px-8 md:pb-6 md:pr-16 flex flex-row justify-between gap-2 border-b "}>*/}
                     <div className={"p-6 flex flex-row justify-between gap-2 border-b "}>
                         <div className={"flex flex-col gap-2"}>
                             <h5 className={"text-sm md:text-base font-semibold"}>Total Views</h5>
@@ -127,7 +125,7 @@ const AnalyticsView = ({onClose, analyticsObj, setAnalyticsObj}) => {
                         </div>
                     </div>
                     <div className={"p-6 flex flex-col gap-3 border-b"}>
-                        <h5 className={"text-base font-semibold leading-5"}>Reaction</h5>
+                        <h5 className={"text-base font-semibold"}>Reaction</h5>
                         {isLoadingReaction ? <div className="flex items-center space-x-6">
                                 {[...Array(4)].map((_, i) => {
                                     return (<Skeleton key={i} className="h-12 w-12 rounded-full"/>)
@@ -146,7 +144,7 @@ const AnalyticsView = ({onClose, analyticsObj, setAnalyticsObj}) => {
                                                             <div className={"flex flex-row gap-2 items-center"}>
                                                                 {matchedEmojiObject ? <img className={"h-10 w-10"}
                                                                                            src={matchedEmojiObject?.emoji_url}/> : Icon?.smileEmoji2}
-                                                                <h5 className={"text-2xl font-bold leading-5"}>{x.total}</h5>
+                                                                <h5 className={"text-2xl font-bold"}>{x.total}</h5>
                                                             </div>
                                                         </div>
                                                     )
@@ -155,10 +153,9 @@ const AnalyticsView = ({onClose, analyticsObj, setAnalyticsObj}) => {
                                         </Fragment>
                                 }
                             </div>}
-
                     </div>
                     <div className={"p-6 flex flex-col gap-4"}>
-                        <h5 className={"text-base font-semibold leading-5"}>Feedback</h5>
+                        <h5 className={"text-base font-semibold"}>Feedback</h5>
                         {
                             isLoadingFeedBack ?
                                 <div>
@@ -190,8 +187,8 @@ const AnalyticsView = ({onClose, analyticsObj, setAnalyticsObj}) => {
                                                                     <div className={"flex flex-col gap-1"}>
                                                                         <div
                                                                             className={"flex flex-row gap-4 items-center"}>
-                                                                            <h5 className={"text-sm font-semibold leading-5 capitalize"}>{x?.customer_name}</h5>
-                                                                            <p className={"text-muted-foreground text-[10px] leading-5 font-medium"}>{x?.customer_email_id}</p>
+                                                                            <h5 className={"text-sm font-semibold capitalize"}>{x?.customer_name}</h5>
+                                                                            <p className={"text-muted-foreground text-[10px] font-medium"}>{x?.customer_email_id}</p>
                                                                         </div>
                                                                         <p className={"text-muted-foreground text-xs font-medium"}>
                                                                             <ReadMoreText className={"text-xs"}
@@ -228,8 +225,6 @@ const AnalyticsView = ({onClose, analyticsObj, setAnalyticsObj}) => {
                                     }
                                 </Fragment>
                         }
-
-
                     </div>
                 </div>
             </SheetContent>

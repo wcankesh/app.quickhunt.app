@@ -2,7 +2,7 @@ import React, {useState, Fragment, useEffect} from 'react';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "../ui/table";
 import {Badge} from "../ui/badge";
 import {Button} from "../ui/button";
-import {BarChart, ChevronDown, ChevronUp, Circle, Ellipsis, Eye, Loader2, Pin, X,} from "lucide-react";
+import {BarChart, ChevronDown, ChevronUp, Circle, Ellipsis, Eye, Pin} from "lucide-react";
 import {useTheme} from "../theme-provider"
 import {CardContent} from "../ui/card";
 import {DropdownMenu, DropdownMenuTrigger} from "@radix-ui/react-dropdown-menu";
@@ -10,11 +10,8 @@ import {DropdownMenuContent, DropdownMenuItem} from "../ui/dropdown-menu";
 import {Select, SelectItem, SelectGroup, SelectContent, SelectTrigger, SelectValue} from "../ui/select";
 import moment from "moment";
 import {apiService, baseUrl} from "../../utils/constent";
-import {Toaster} from "../ui/toaster";
 import {toast} from "../ui/use-toast";
 import {Skeleton} from "../ui/skeleton";
-import {Dialog} from "@radix-ui/react-dialog";
-import {DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "../ui/dialog";
 import EmptyData from "../Comman/EmptyData";
 import {useNavigate} from "react-router";
 import {useLocation} from "react-router-dom";
@@ -31,18 +28,17 @@ const status2 = [
 ]
 
 const AnnouncementsTable = ({data, isLoading, setSelectedRecord, handleDelete, setAnalyticsObj,isLoadingDelete, currentPage, setCurrentPage}) => {
-
     const location = useLocation();
     const UrlParams = new URLSearchParams(location.search);
     const getPageNo = UrlParams.get("pageNo");
-
     const navigate = useNavigate();
     const {theme} = useTheme();
+
     const [announcementData, setAnnouncementData] = useState(data);
-    const [idToDelete, setIdToDelete] = useState(null);
-    const [openDelete, setOpenDelete] = useState(false);
     const [sortOrder, setSortOrder] = useState('asc');
     const [sortedColumn, setSortedColumn] = useState('');
+    const [idToDelete, setIdToDelete] = useState(null);
+    const [openDelete, setOpenDelete] = useState(false);
 
     useEffect(() => {
         // const updatedData = data.map(item => ({
@@ -72,10 +68,6 @@ const AnnouncementsTable = ({data, isLoading, setSelectedRecord, handleDelete, s
         setAnnouncementData(sortedData);
     };
 
-    const openSheet = (x) => {
-        setAnalyticsObj(x);
-    };
-
     const handleStatusChange = async (object, value) => {
         setAnnouncementData(announcementData.map(x => x.id === object.id ? {
             ...x,
@@ -98,7 +90,6 @@ const AnnouncementsTable = ({data, isLoading, setSelectedRecord, handleDelete, s
                 variant: "destructive",
             });
         }
-
     };
 
     const onEdit = (record) => {
@@ -121,7 +112,6 @@ const AnnouncementsTable = ({data, isLoading, setSelectedRecord, handleDelete, s
 
     return (
         <Fragment>
-            <Toaster/>
 
             {
                 openDelete &&

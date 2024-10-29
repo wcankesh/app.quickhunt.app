@@ -10,14 +10,18 @@ import {useSelector,useDispatch} from "react-redux";
 import moment from "moment";
 import {allStatusAndTypesAction} from "../../../redux/action/AllStatusAndTypesAction";
 import {toast} from "../../ui/use-toast";
-import {Dialog} from "@radix-ui/react-dialog";
-import {DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "../../ui/dialog";
 import EmptyData from "../../Comman/EmptyData";
 import DeleteDialog from "../../Comman/DeleteDialog";
 
 const initialState ={title:""}
 
 const Tags = () => {
+    let apiService = new ApiService();
+    const { theme } = useTheme();
+    const dispatch = useDispatch();
+    const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
+    const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
+
     const [formError, setFormError] = useState(initialState);
     const [topicLists, setTopicLists] = useState([]);
     const [isLoading,setIsLoading]=useState(true);
@@ -27,11 +31,6 @@ const Tags = () => {
     const [openDelete,setOpenDelete] = useState(false);
     const [isLoadingDelete,setIsLoadingDelete] = useState(false);
 
-    let apiService = new ApiService();
-    const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
-    const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
-    const { theme } = useTheme();
-    const dispatch = useDispatch();
 
     useEffect(() => {
         if(allStatusAndTypes.topics){
@@ -232,19 +231,19 @@ const Tags = () => {
                 <CardHeader className={"p-4 sm:px-5 sm:py-4 gap-1 border-b flex flex-row flex-wrap justify-between items-center gap-y-2"}>
                     <div>
                         <CardTitle className={"text-lg sm:text-2xl font-normal"}>Tags</CardTitle>
-                        <CardDescription className={"text-sm text-muted-foreground p-0"}>Add Tags so that users can tag them when creating Ideas.</CardDescription>
+                        <CardDescription className={"text-sm text-muted-foreground p-0"}>Create tags for users to assign when submitting ideas.</CardDescription>
                     </div>
                     <Button onClick={handleNewTopics} disabled={isEdit != null} className={"gap-2 font-medium hover:bg-primary m-0"}><Plus size={18} strokeWidth={3}/>New Tag</Button>
                 </CardHeader>
                 <CardContent className={"p-0"}>
                     <div className={"grid grid-cols-1 overflow-auto whitespace-nowrap"}>
                         <Table>
-                            <TableHeader>
+                            <TableHeader className={`dark:bg-transparent bg-muted`}>
                                 <TableRow>
                                     {
                                         ["Tag Name","Last Update","Action"].map((x,i)=>{
                                             return(
-                                                <TableHead key={x} className={`px-2 py-[10px] md:px-3 ${i === 0 ? "w-2/5" : i === 1 ? "text-center" : i === 2 ? "text-end" :""} ${theme === "dark" ? "" : "text-card-foreground"}`}>{x}</TableHead>
+                                                <TableHead key={x} className={`px-2 py-[10px] md:px-3 font-normal text-card-foreground dark:text-muted-foreground ${i === 0 ? "w-2/5" : i === 1 ? "text-center" : i === 2 ? "text-end" :""}`}>{x}</TableHead>
                                             )
                                         })
                                     }

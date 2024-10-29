@@ -1,15 +1,5 @@
 import React, {Fragment, useEffect, useState} from "react";
-import {
-    ChevronLeft,
-    ChevronRight,
-    ChevronsLeft,
-    ChevronsRight,
-    Filter,
-    GalleryVerticalEnd,
-    Plus,
-    Search,
-    Triangle
-} from "lucide-react";
+import {ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Filter, GalleryVerticalEnd, Plus, Search, Triangle} from "lucide-react";
 import {Card} from "../../ui/card";
 import {Button} from "../../ui/button";
 import {Skeleton} from "../../ui/skeleton"
@@ -21,9 +11,11 @@ import {useSelector} from "react-redux";
 
 const IdeaWidgetPreview = ({widgetsSetting}) => {
     let apiSerVice = new ApiService();
-    const [isLoading, setIsLoading] = useState(true);
-    const [ideasList, setIdeasList] = useState([]);
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
+
+    const [ideasList, setIdeasList] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+
     useEffect(() => {
         if(projectDetailsReducer.id){
             getAllIdea()
@@ -43,8 +35,10 @@ const IdeaWidgetPreview = ({widgetsSetting}) => {
             setIsLoading(false)
         }
     }
+
     const btnClass = `bg-[#f8fafc] border-[#e2e8f0] text-black hover:bg-[#f8fafc] hover:text-black`;
     const cardClass = `bg-white text-black border-[#e2e8f0]`
+
     return (
         <div className={"px-3 flex flex-col h-full"}>
             <div className="flex flex-wrap items-center gap-2 mb-3 justify-between">

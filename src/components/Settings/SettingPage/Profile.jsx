@@ -40,7 +40,11 @@ const initialStatePassWord ={
 }
 
 const Profile = () => {
+    const dispatch = useDispatch();
+    const apiSerVice = new ApiService();
+    const {theme} = useTheme();
     const userDetailsReducer = useSelector(state => state.userDetailsReducer);
+
     const [userDetails, setUserDetails] = useState(initialState);
     const [formError, setFormError] = useState(initialStateError);
     const [formErrorPassword, setFormErrorPassword] = useState(initialStateErrorPassWord);
@@ -52,9 +56,6 @@ const Profile = () => {
     const [password, setPassword] = useState(initialStatePassWord);
     const [isLoading, setIsLoading] = useState(false);
     const [isLoadingPass, setIsLoadingPass] = useState(false);
-    const dispatch = useDispatch();
-    const apiSerVice = new ApiService();
-    const {theme} = useTheme();
 
     useEffect(() => {
         setUserDetails({...userDetailsReducer});
@@ -237,8 +238,8 @@ const Profile = () => {
         <div className={"flex flex-col gap-6"}>
             <Card>
                 <CardHeader className={"gap-1 border-b p-4 sm:px-5 sm:py-4"}>
-                       <h3 className={"font-normal text-lg sm:text-2xl"}>Edit Profile</h3>
-                    <CardDescription className={" text-sm text-muted-foreground p-0"}>Manage your personal account settings.</CardDescription>
+                    <CardTitle className={"font-normal text-lg sm:text-2xl capitalize"}>Edit Profile</CardTitle>
+                    <CardDescription className={" text-sm text-muted-foreground p-0"}>Manage your account settings.</CardDescription>
                 </CardHeader>
                 <CardContent className={"py-4 px-4 sm:px-5 sm:py-4 border-b"}>
                     <div className={"flex gap-4 flex-wrap lg:flex-nowrap md:flex-nowrap sm:flex-wrap"}>
@@ -407,7 +408,7 @@ const Profile = () => {
                         </div>
 
                         <div>
-                        <Label htmlFor="password">Password</Label>
+                        <Label htmlFor="password" className={"font-normal"}>Password</Label>
                         <div className={"relative"}>
                             <Input
                                 id="password"
@@ -431,7 +432,7 @@ const Profile = () => {
                         </div>
 
                         <div>
-                        <Label htmlFor="password_confirm">Password confirmation</Label>
+                        <Label htmlFor="password_confirm" className={"font-normal"}>Password confirmation</Label>
                         <div className={"relative"}>
                             <Input
                                 id="password_confirm"

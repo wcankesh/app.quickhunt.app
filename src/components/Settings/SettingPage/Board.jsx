@@ -12,8 +12,6 @@ import {allStatusAndTypesAction} from "../../../redux/action/AllStatusAndTypesAc
 import {toast} from "../../ui/use-toast";
 import {Separator} from "../../ui/separator";
 import EmptyData from "../../Comman/EmptyData";
-import {Dialog} from "@radix-ui/react-dialog";
-import {DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "../../ui/dialog";
 import DeleteDialog from "../../Comman/DeleteDialog";
 
 const initialState ={
@@ -21,20 +19,21 @@ const initialState ={
 }
 
 const Board = () => {
-    const [boardList,setBoardList]=useState([]);
-    const [isLoading,setIsLoading]=useState(true);
-    const [isSave,setIsSave]= useState(false);
-    const [formError, setFormError] = useState(initialState);
-    const [isEdit,setIsEdit]=useState(null);
-    const [deleteId,setDeleteId]=useState(null);
-    const [openDelete,setOpenDelete] =useState(false);
-    const [isLoadingDelete,setIsLoadingDelete]=useState(false);
+    let apiService = new ApiService();
+    const {theme, onProModal} = useTheme();
     const dispatch = useDispatch();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
     const userDetailsReducer = useSelector(state => state.userDetailsReducer);
-    let apiService = new ApiService();
-    const {theme, onProModal} = useTheme();
+
+    const [formError, setFormError] = useState(initialState);
+    const [boardList,setBoardList]=useState([]);
+    const [isLoading,setIsLoading]=useState(true);
+    const [isSave,setIsSave]= useState(false);
+    const [isEdit,setIsEdit]=useState(null);
+    const [deleteId,setDeleteId]=useState(null);
+    const [openDelete,setOpenDelete] =useState(false);
+    const [isLoadingDelete,setIsLoadingDelete]=useState(false);
 
     useEffect(()=>{
         if(allStatusAndTypes?.boards){
@@ -246,8 +245,8 @@ const Board = () => {
             <Card>
                 <CardHeader className={"flex flex-row flex-wrap md:flex-nowrap justify-between gap-x-6 items-center p-4 sm:px-5 sm:py-4 gap-y-2"}>
                     <div>
-                        <CardTitle className={"text-lg sm:text-2xl font-normal	"}>Board</CardTitle>
-                        <CardDescription className={"text-sm text-muted-foreground p-0"}>Use Boards to track Ideas on your Roadmap.</CardDescription>
+                        <CardTitle className={"text-lg sm:text-2xl font-normal"}>Board</CardTitle>
+                        <CardDescription className={"text-sm text-muted-foreground p-0"}>Track ideas on your roadmap using boards.</CardDescription>
                     </div>
                     <Button
                         disabled={isEdit != null}
@@ -261,12 +260,12 @@ const Board = () => {
                 <CardContent className="p-0">
                     <div className={"grid grid-cols-1 overflow-auto whitespace-nowrap"}>
                         <Table>
-                            <TableHeader>
+                            <TableHeader className={"dark:bg-transparent bg-muted"}>
                                 <TableRow>
                                     {
                                         ["Board name","Last Update","Action"].map((x,i)=>{
                                             return(
-                                                <TableHead key={i} className={` px-2 py-[10px] md:px-3 ${i === 0 ? "w-2/5" : i === 1 ? "text-center" : "text-end "} ${theme === "dark" ? "" : "text-card-foreground"}`}>{x}</TableHead>
+                                                <TableHead key={i} className={`px-2 py-[10px] md:px-3 font-normal text-card-foreground dark:text-muted-foreground ${i === 0 ? "w-2/5" : i === 1 ? "text-center" : "text-end "}`}>{x}</TableHead>
                                             )
                                         })
                                     }

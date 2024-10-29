@@ -1,7 +1,7 @@
 import React, {useState, useEffect, Fragment} from 'react';
 import {Button} from "../ui/button";
-import {ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Loader2, Plus, Trash2, X} from "lucide-react";
-import {Card, CardContent, CardFooter} from "../ui/card";
+import {Loader2, Plus, Trash2, X} from "lucide-react";
+import {Card, CardContent} from "../ui/card";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "../ui/table";
 import {useTheme} from "../theme-provider";
 import {ApiService} from "../../utils/ApiService";
@@ -9,23 +9,14 @@ import {useSelector} from "react-redux";
 import {toast} from "../ui/use-toast";
 import {Skeleton} from "../ui/skeleton";
 import EmptyData from "../Comman/EmptyData";
-import {Dialog} from "@radix-ui/react-dialog";
-import {DialogContent, DialogDescription, DialogHeader, DialogTitle} from "../ui/dialog";
 import {Sheet, SheetContent, SheetHeader, SheetOverlay} from "../ui/sheet";
 import {Label} from "../ui/label";
 import {Input} from "../ui/input";
 import {Switch} from "../ui/switch";
 import Pagination from "../Comman/Pagination";
 import DeleteDialog from "../Comman/DeleteDialog";
-
-const tableHeadingsArray = [
-    {label:"Name"},
-    {label:"Email"},
-    {label:"Country"},
-    {label:"Browser"},
-    {label:"Os"},
-    {label:"Action"},
-];
+import {baseUrl} from "../../utils/constent";
+import {useNavigate} from "react-router";
 
 const perPageLimit = 10;
 
@@ -46,26 +37,27 @@ const initialStateError = {
 
 const Customers = () => {
     const {theme} =useTheme();
+    const navigate = useNavigate();
     const apiService = new ApiService();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
 
-    const [isSheetOpen, setSheetOpen] = useState(false);
+    const [formError, setFormError] = useState(initialStateError);
+    const [customerDetails, setCustomerDetails] = useState(initialState);
     const [customerList, setCustomerList] = useState([])
-    const [isLoading, setIsLoading] = useState(true);
-    const [isLoadingDelete,setIsLoadingDelete] = useState(false);
     const [pageNo, setPageNo] = useState(1);
     const [totalRecord, setTotalRecord] = useState(0);
     const [deleteId,setDeleteId]=useState(null);
+    const [isSheetOpen, setSheetOpen] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isLoadingDelete,setIsLoadingDelete] = useState(false);
     const [openDelete,setOpenDelete]=useState(false);
     const [isSave,setIsSave]=useState(false);
-    const [formError, setFormError] = useState(initialStateError);
-    const [customerDetails, setCustomerDetails] = useState(initialState);
-
 
     useEffect(() => {
         if(projectDetailsReducer.id){
             getAllCustomers();
         }
+        navigate(`${baseUrl}/customers?pageNo=${pageNo}`)
     }, [projectDetailsReducer.id,pageNo])
 
     const onChangeText = (event) => {
@@ -152,7 +144,7 @@ const Customers = () => {
                 variant: "destructive",
             });
             setIsLoadingDelete(false);
-        };
+        }
         setOpenDelete(false);
         setDeleteId(null);
     };
@@ -206,7 +198,6 @@ const Customers = () => {
         }
     };
 
-
     return (
         <Fragment>
 
@@ -258,23 +249,23 @@ const Customers = () => {
 
                 <div>
                     <div className={"flex flex-row gap-x-4 flex-wrap justify-between gap-y-2 items-center"}>
-                        <div>
+                        <div className={"flex flex-col gap-y-0.5"}>
                             <h1 className="text-2xl font-normal flex-initial w-auto">Customers ({totalRecord})</h1>
-                            <h5 className={"text-muted-foreground text-base"}>Last updates</h5>
+                            <h5 className={"text-sm text-muted-foreground"}>View all customers who have registered through your program link, as well as those you’ve added manually.</h5>
                         </div>
                         <Button onClick={openSheet} className={"gap-2 font-medium hover:bg-primary"}><Plus size={20} strokeWidth={3} /><span className={"text-xs md:text-sm font-medium"}>New Customer</span></Button>
                     </div>
-                    <div className={"mt-4 sm:mt-6"}>
+                    <div className={"mt-6"}>
                         <Card>
                             <CardContent className={"p-0"}>
                                 <div className={"rounded-md grid grid-cols-1 overflow-auto whitespace-nowrap"}>
                                     <Table>
-                                        <TableHeader className={"py-8 px-5"}>
-                                            <TableRow className={""}>
+                                        <TableHeader>
+                                            <TableRow>
                                                 {
-                                                    (tableHeadingsArray || []).map((x,i)=>{
+                                                    ["Name", "Email", "Country", "Browser", "Os", "Action"].map((x,i)=>{
                                                         return(
-                                                            <TableHead className={`font-medium text-card-foreground px-2 py-[10px] md:px-3 ${i >= 2 ? "text-center" : ""}  ${theme === "dark"? "text-[]" : "bg-muted"} `} key={x.label}>{x.label}</TableHead>
+                                                            <TableHead className={`font-medium text-card-foreground px-2 py-[10px] md:px-3 ${i >= 2 ? "text-center" : ""} ${theme === "dark"? "text-[]" : "bg-muted"} `} key={x}>{x}</TableHead>
                                                         )
                                                     })
                                                 }

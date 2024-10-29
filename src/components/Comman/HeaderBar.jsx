@@ -20,7 +20,7 @@ import {allProjectAction} from "../../redux/action/AllProjectAction";
 import {userDetailsAction} from "../../redux/action/UserDetailAction";
 import {allStatusAndTypesAction} from "../../redux/action/AllStatusAndTypesAction";
 import {useLocation} from "react-router";
-import {Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "../ui/dialog";
+import DeleteDialog from "./DeleteDialog";
 
 const initialState = {
     id: "",
@@ -59,27 +59,27 @@ const HeaderBar = () => {
     let navigate = useNavigate();
     let location = useLocation();
     const {type, id} = useParams();
+    const dispatch = useDispatch();
+    const {toast} = useToast();
     let apiSerVice = new ApiService();
     let url = location.pathname;
     const newUrl = url.replace(/[0-9]/g, '');
     const userDetailsReducer = useSelector(state => state.userDetailsReducer);
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const allProjectReducer = useSelector(state => state.allProjectReducer);
+
     const [userDetails, setUserDetails] = useState(initialState)
+    const [createProjectDetails, setCreateProjectDetails] = useState(initialStateProject);
+    const [formError, setFormError] = useState(initialStateErrorProject);
+    const [projectList, setProjectList] = useState([]);
     const [selectedUrl, setSelectedUrl] = useState(newUrl === "/" ? "/dashboard": newUrl);
     const [open, setOpen] = useState(false)
     const [isSheetOpen, setSheetOpen] = useState(false);
     const [isSheetOpenMobileMenu, setSheetOpenMobileMenu] = useState(false);
-    const [createProjectDetails, setCreateProjectDetails] = useState(initialStateProject);
-    const [formError, setFormError] = useState(initialStateErrorProject);
-    const [projectList, setProjectList] = useState([]);
     const [scrollingDown, setScrollingDown] = useState(false);
     const [isOpenDeleteAlert,setIsOpenDeleteAlert]=useState(false);
     const [isDeleteLoading, setDeleteIsLoading] = useState(false);
     const [isCreateLoading, setIsCreateLoading] = useState(false);
-
-    const dispatch = useDispatch();
-    const {toast} = useToast()
 
     const viewLink = () => {window.open(`https://${projectDetailsReducer.domain}/ideas`, "_blank")}
 
@@ -370,9 +370,9 @@ const HeaderBar = () => {
                 },
                 {
                     title: 'In App Message',
-                    link: '/in-app-message',
+                    link: '/app-message',
                     icon: <NotebookPen size={15} />,
-                    selected: isActive(`${baseUrl}/in-app-message`, `${baseUrl}/in-app-message/type`, `${baseUrl}/in-app-message/${type}/${id}`),
+                    selected: isActive(`${baseUrl}/app-message`, `${baseUrl}/app-message/type`, `${baseUrl}/app-message/${type}/${id}`),
                 },
                 {
                     title: 'Widget',
@@ -455,37 +455,37 @@ const HeaderBar = () => {
         }
     ];
 
+    const renderSubItems = (subItems) => {
+        return (
+            <div className={"pl-4"}>
+                {subItems.map((subItem, index) => (
+                    <Button
+                        key={index}
+                        variant={"link hover:no-underline"}
+                        className={`w-full flex gap-4 h-9 justify-start transition-none items-center rounded-md`}
+                        onClick={() => onRedirect(subItem.link)}
+                    >
+                        <div className={`${subItem.selected ? "active-menu" : "menu-icon"}`}>{subItem.icon}</div>
+                        <div
+                            className={`text-sm font-normal ${subItem.selected ? "text-primary " : ""}`}>{subItem.title}</div>
+                    </Button>
+                ))}
+            </div>
+        );
+    };
+
     return (
-        // <header className={`z-50 ltr:xl:ml-[282px] rtl:xl:mr-[282px] sticky top-0 pr-3 lg:pr-4 ${scrollingDown ? 'bg-background' : ''}`}>
         <header className={`z-50 ltr:xl:ml-[250px] rtl:xl:mr-[250px] sticky top-0 bg-primary ${scrollingDown ? 'bg-background' : ''}`}>
 
             {
                 isOpenDeleteAlert &&
-                <Fragment>
-                    <Dialog open onOpenChange={deleteAlert}>
-                        <DialogContent className={"max-w-[350px] w-full sm:max-w-[425px] p-3 md:p-6 rounded-lg"}>
-                            <DialogHeader className={"flex flex-row justify-between gap-2"}>
-                                <div className={"flex flex-col gap-2"}>
-                                    <DialogTitle className={"text-start"}>You really want delete project?</DialogTitle>
-                                    <DialogDescription className={"text-start"}>This action can't be undone.</DialogDescription>
-                                </div>
-                                <X size={16} className={"m-0 cursor-pointer"} onClick={() => setIsOpenDeleteAlert(false)}/>
-                            </DialogHeader>
-                            <DialogFooter className={"flex-row justify-end space-x-2"}>
-                                <Button variant={"outline hover:none"}
-                                        className={"text-sm font-medium border"}
-                                        onClick={() => setIsOpenDeleteAlert(false)}>Cancel</Button>
-                                <Button
-                                    variant={"hover:bg-destructive"}
-                                    className={`${theme === "dark" ? "text-card-foreground" : "text-card"} py-2 px-6 w-[76px] text-sm font-medium bg-destructive`}
-                                    onClick={onDelete}
-                                >
-                                    {isDeleteLoading ? <Loader2 size={16} className={"animate-spin"}/> : "Delete"}
-                                </Button>
-                            </DialogFooter>
-                        </DialogContent>
-                    </Dialog>
-                </Fragment>
+                <DeleteDialog
+                    title={"You really want to delete this Project ?"}
+                    isOpen={isOpenDeleteAlert}
+                    onOpenChange={() => setIsOpenDeleteAlert(false)}
+                    onDelete={onDelete}
+                    isDeleteLoading={isDeleteLoading}
+                />
             }
 
             {/*<div className={"w-full p-3 pr-0 lg:py-3"}>*/}
@@ -508,7 +508,6 @@ const HeaderBar = () => {
                                         </div>
                                         <X size={18} className={"fill-card-foreground stroke-card-foreground m-0"} onClick={closeMobileSheet}/>
                                     </SheetHeader>
-                                    {/*<div className={"h-[calc(100vh_-_64px)] flex flex-col gap-3 overflow-y-auto p-3 pt-0 md:p-6 md:pt-0"}>*/}
                                     <div className={" px-3 flex flex-col overflow-y-auto h-full bg-primary/5"}>
                                         <nav className="grid items-start">
                                             {
@@ -538,15 +537,18 @@ const HeaderBar = () => {
                                                                             {
                                                                                 (x.items || []).map((y, i) => {
                                                                                     return (
-                                                                                        <Button
-                                                                                            key={i}
-                                                                                            variant={"link hover:no-underline"}
-                                                                                            className={`flex justify-start gap-2 py-0 px-2 pr-1 h-[28px] ${y.selected ? "rounded-md bg-primary/15 transition-none" : 'items-center transition-none hover:bg-primary/10 hover:text-primary'} ${y.title === 'Announcements' ? 'gap-[10px]' : ''}`}
-                                                                                            onClick={() => onRedirect(y.link)}
-                                                                                        >
-                                                                                            <div className={`${y.selected ? "active-menu" : ""}`}>{y.icon}</div>
-                                                                                            <div className={`font-normal text-left flex-1 text-sm ${y.selected ? "text-primary" : ""}`}>{y.title}</div>
-                                                                                        </Button>
+                                                                                        <Fragment key={i}>
+                                                                                            <Button
+                                                                                                key={i}
+                                                                                                variant={"link hover:no-underline"}
+                                                                                                className={`flex justify-start gap-2 py-0 px-2 pr-1 h-[28px] ${y.selected ? "rounded-md bg-primary/15 transition-none" : 'items-center transition-none hover:bg-primary/10 hover:text-primary'} ${y.title === 'Announcements' ? 'gap-[10px]' : ''}`}
+                                                                                                onClick={() => onRedirect(y.link)}
+                                                                                            >
+                                                                                                <div className={`${y.selected ? "active-menu" : ""}`}>{y.icon}</div>
+                                                                                                <div className={`font-normal text-left flex-1 text-sm ${y.selected ? "text-primary" : ""}`}>{y.title}</div>
+                                                                                            </Button>
+                                                                                            {y.title === 'Help Center' && isHelpCenterActive && y.subItems && renderSubItems(y.subItems)}
+                                                                                        </Fragment>
                                                                                     )
                                                                                 })
                                                                             }
@@ -707,7 +709,7 @@ const HeaderBar = () => {
                             <SheetContent className={"sm:max-w-[662px] p-0"}>
                                 <SheetHeader className={"px-4 py-3 md:py-5 lg:px-8 lg:py-[20px] border-b flex flex-row justify-between items-center"}>
                                     <SheetTitle className={"text-xl font-normal flex justify-between items-center"}>
-                                        Create new Project
+                                        Create New Project
                                     </SheetTitle>
                                     <X className={"cursor-pointer m-0"} onClick={closeSheet}/>
                                 </SheetHeader>
@@ -730,7 +732,7 @@ const HeaderBar = () => {
                                         }
                                     </div>
                                     <div className="space-y-1">
-                                        <Label htmlFor="website" className="text-right font-normal">Project website</Label>
+                                        <Label htmlFor="website" className="text-right font-normal">Project Website</Label>
                                         <Input
                                             id="project_website"
                                             placeholder="https://yourcompany.com"
@@ -741,11 +743,11 @@ const HeaderBar = () => {
                                         />
                                     </div>
                                     <div className="space-y-1">
-                                        <Label htmlFor="domain" className="text-right font-normal">Project domain</Label>
+                                        <Label htmlFor="domain" className="text-right font-normal">Project Domain</Label>
                                         <div className={"relative"}>
                                             <Input
                                                 id="domain"
-                                                placeholder="projectname"
+                                                placeholder="Project Domain"
                                                 className={`${theme === "dark" ? "placeholder:text-muted-foreground/75 pr-[115px]" : "placeholder:text-muted-foreground/75 pr-[115px]"}`}
                                                 value={createProjectDetails.domain}
                                                 name="domain"

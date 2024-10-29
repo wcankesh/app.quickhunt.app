@@ -13,10 +13,10 @@ const Step1 = ({setStep}) => {
 
     return (
         <Fragment>
-            <div className={"flex flex-col items-center justify-center gap-[48px]"}>
-                <h1 className={"font-semibold text-[32px]"}>Welcome to Quickhunt !!</h1>
+            <div className={"flex flex-col justify-center gap-7"}>
+                <h1 className={"font-semibold text-[32px]"}>Welcome to Quickhunt!!</h1>
                 <div className={""}>
-                    <h3 className={"text-2xl text-primary font-semibold mb-2"}>Let’s set you up !</h3>
+                    <h3 className={"text-2xl text-primary font-semibold mb-2"}>Let’s set you up!</h3>
                     <p className={"text-sm"}>Capture feedback, prioritize ideas, manage helpdesk inquiries, and share progress with your users—all in one place.</p>
                 </div>
             </div>

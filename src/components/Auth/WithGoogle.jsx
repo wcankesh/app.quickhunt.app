@@ -9,11 +9,11 @@ import {useToast} from "../ui/use-toast";
 
 const WithGoogle = ({title}) => {
     const navigate = useNavigate();
-    let apiSerVice = new ApiService()
+    let apiSerVice = new ApiService();
+    const {toast} = useToast();
+
     const [gapi, setGapi] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
-
-    const {toast} = useToast()
 
     useEffect(() => {
         if (!token()) {

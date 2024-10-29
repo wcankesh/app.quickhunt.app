@@ -3,7 +3,6 @@ import {Label} from "../ui/label";
 import {Select, SelectGroup, SelectValue} from "@radix-ui/react-select";
 import {SelectContent, SelectItem, SelectTrigger} from "../ui/select";
 import ColorInput from "../Comman/ColorPicker";
-import {Switch} from "../ui/switch";
 import {Input} from "../ui/input";
 import {Button} from "../ui/button";
 import {CalendarIcon, Loader2, Plus, Trash2} from "lucide-react";
@@ -14,22 +13,20 @@ import {Calendar} from "../ui/calendar";
 import {useSelector} from "react-redux";
 import {baseUrl} from "../../utils/constent";
 import {addDays} from "date-fns";
-import {useTheme} from "../theme-provider";
 import {ApiService} from "../../utils/ApiService";
 import {useToast} from "../ui/use-toast";
-import {useNavigate} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import {Checkbox} from "../ui/checkbox";
 
 const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, selectedStepIndex, setSelectedStepIndex, selectedStep, setSelectedStep}) => {
+    let apiSerVice = new ApiService();
+    const {toast} = useToast();
+    const navigate = useNavigate();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
-    const userDetailsReducer = useSelector(state => state.userDetailsReducer);
+
     const [isLoading, setIsLoading] = useState(false);
     const [date, setDate] = useState([new Date(), addDays(new Date(), 4)]);
-    let apiSerVice = new ApiService();
-    const {theme} = useTheme();
-    const {toast} = useToast()
-    const navigate = useNavigate();
 
     const onChange = (name, value) => {
         setInAppMsgSetting({...inAppMsgSetting, [name]: value});
@@ -41,7 +38,6 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
         const obj = {...selectedStep, options: clone,}
         setSelectedStep(obj);
         updateStepRecord(obj)
-
     };
 
     const addOption = () => {
@@ -50,7 +46,6 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
         const obj = {...selectedStep, options: clone,}
         setSelectedStep(obj);
         updateStepRecord(obj)
-
     };
 
     const removeOption = (record, index) => {
@@ -67,14 +62,12 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
 
     const handleTimeChange = (time, type) => {
         const currentDateTime = moment(inAppMsgSetting[type]);
-
         const newDateTime = moment(currentDateTime).set({
             hour: parseInt(time.split(':')[0], 10),
             minute: parseInt(time.split(':')[1], 10),
             second: 0,
             millisecond: 0
         }).toISOString();
-
         setInAppMsgSetting({
             ...inAppMsgSetting,
             [type]: newDateTime
@@ -103,7 +96,7 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
             setIsLoading(false);
             toast({description: data.message})
             if (id === "new") {
-                navigate(`${baseUrl}/in-app-message`)
+                navigate(`${baseUrl}/app-message`)
             }
         } else {
             toast({variant: "destructive", description: data.message})
@@ -142,7 +135,6 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
             ...prevState,
             steps: clone
         }));
-
     }
 
     const onChangeQuestion = (name, value) => {
@@ -165,9 +157,9 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
     const handleCancel = () => {
         setInAppMsgSetting(inAppMsgSetting);
         if (id === "new") {
-            navigate(`${baseUrl}/in-app-message/type`)
+            navigate(`${baseUrl}/app-message/type`)
         } else {
-            navigate(`${baseUrl}/in-app-message`)
+            navigate(`${baseUrl}/app-message`)
         }
     }
 
@@ -294,9 +286,7 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                                         </div>
                                     </Fragment>
                                 }
-
                             </Fragment>
-
                     }
                     {
                         (type === "2" && inAppMsgSetting.action_type == 1) && <Fragment>
@@ -472,7 +462,7 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                     <Label className={"font-normal"}>Background Color</Label>
                     <div className={"w-full text-sm"}>
                         <ColorInput style={{width: '100%', height: "36px"}} value={inAppMsgSetting.bg_color}
-                                    onChange={onChange} name={"bg_color"}/>
+                                    onChange={(value) => onChange("bg_color", value.clr)} />
                     </div>
                 </div>
 
@@ -481,8 +471,7 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                     <div className={"w-full text-sm widget-color-picker space-y-2"}>
                         <ColorInput
                             value={inAppMsgSetting.text_color}
-                            onChange={onChange}
-                            name={"text_color"}
+                            onChange={(value) => onChange("text_color", value.clr)}
                         />
                     </div>
                 </div>
@@ -492,8 +481,8 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                     <div className={"w-full text-sm widget-color-picker space-y-2"}>
                         <ColorInput
                             value={inAppMsgSetting.icon_color}
-                            onChange={onChange}
-                            name={"icon_color"}/>
+                            onChange={(value) => onChange("icon_color", value.clr)}
+                        />
                     </div>
                 </div>}
 
@@ -501,9 +490,8 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                     <Label className={"font-normal"}>{type === "4" ? "Button Background Color": "Button Color"} </Label>
                     <div className={"w-full text-sm widget-color-picker space-y-2"}>
                         <ColorInput
-                            name={"btn_color"}
                             value={inAppMsgSetting.btn_color}
-                            onChange={onChange}
+                            onChange={(value) => onChange("btn_color", value.clr)}
                         />
                     </div>
                 </div>
@@ -566,6 +554,7 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                         </Popover>
                         <div className="custom-time-picker w-1/2">
                             <Input
+                                className={"h-9"}
                                 type={"time"}
                                 value={moment(inAppMsgSetting.start_at).format("HH:mm")}
                                 onChange={(e) => handleTimeChange(e.target.value, 'start_at')}
@@ -586,7 +575,7 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                                     >
                                         <CalendarIcon className="mr-2 h-4 w-4"/>
                                         <Fragment>
-                                            {inAppMsgSetting?.end_at ? moment(inAppMsgSetting?.end_at).format('D MMM, YYYY') : "Select a date"}
+                                            {(id === 'new' && inAppMsgSetting?.end_at === '') ? 'Select date' : `${inAppMsgSetting?.end_at ? moment(inAppMsgSetting?.end_at).format('D MMM, YYYY') : "Select a date"}`}
                                         </Fragment>
                                     </Button>
                                 </PopoverTrigger>
@@ -598,19 +587,18 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                                         onSelect={(date) => onDateChange("end_at", date)}
                                         startMonth={new Date(2024, 0)}
                                         endMonth={new Date(2050, 12)}
-
                                     />
                                 </PopoverContent>
                             </Popover>
                             <div className="custom-time-picker w-1/2">
                                 <Input
+                                    className={"h-9"}
                                     type={"time"}
                                     value={moment(inAppMsgSetting.end_at).format("HH:mm")}
                                     onChange={(e) => handleTimeChange(e.target.value, 'end_at')}
                                 />
                             </div>
                         </div>
-
                     </div>
                 </div>
             </div>

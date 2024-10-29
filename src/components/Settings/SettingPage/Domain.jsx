@@ -28,16 +28,16 @@ const initialState = {
 const Domain = () => {
     const apiService = new ApiService();
     const {onProModal} = useTheme()
-    const [settingData, setSettingData] = useState(initialState);
-    const [isSave, setIsSave] = useState(false);
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const userDetailsReducer = useSelector(state => state.userDetailsReducer);
+
+    const [settingData, setSettingData] = useState(initialState);
+    const [isSave, setIsSave] = useState(false);
 
     useEffect(() =>{
         if(projectDetailsReducer.id){
             getPortalSetting()
         }
-
     },[projectDetailsReducer.id]);
 
     const onChange = (event) => {
@@ -89,16 +89,16 @@ const Domain = () => {
     return (
         <Card className={"divide-y"}>
             <CardHeader className={"p-4 sm:px-5 sm:py-4 gap-1"}>
-                <CardTitle className={"text-lg sm:text-2xl font-normal"}>Domain Setting</CardTitle>
-                <CardDescription className={"text-sm text-muted-foreground p-0"}>Personalise your Quickhunt page with a custom domain.</CardDescription>
+                <CardTitle className={"text-lg sm:text-2xl font-normal capitalize"}>Domain Setting</CardTitle>
+                <CardDescription className={"text-sm text-muted-foreground p-0"}>Customize your project page with a personalized domain.</CardDescription>
             </CardHeader>
             <CardContent className={"p-4 sm:px-5 sm:py-4 flex flex-col gap-3"}>
                 <div className="space-y-1 relative">
-                    <Label htmlFor="domain" className={"text-right font-normal"}>Subdomain</Label>
+                    <Label htmlFor="domain" className={"text-right font-normal capitalize"}>Subdomain</Label>
                     <Input disabled  value={settingData?.domain?.replace('.quickhunt.io', '')} id="domain" placeholder="example.com" className={"pr-[115px] bg-card mt-1"} />
                 </div>
                 <div className="space-y-1">
-                    <Label htmlFor="text" className={"font-normal"}>Custom Domain</Label>
+                    <Label htmlFor="text" className={"font-normal capitalize"}>Custom Domain</Label>
                     <Input disabled={userDetailsReducer.plan === 0} value={settingData.custom_domain} name={"custom_domain"} onChange={onChange} type="text" id="text" placeholder="example.com" />
                 </div>
                 <p className={"text-sm font-normal text-muted-foreground"}>
@@ -109,7 +109,7 @@ const Domain = () => {
                     <span className={"font-medium"}> "cname.quickhunt.app"</span>.</p>
             </CardContent>
             <CardFooter className={"p-4 sm:px-5 sm:py-4 justify-end"}>
-                <Button  className={`w-[124px] text-sm font-medium hover:bg-primary`}
+                <Button  className={`w-[124px] text-sm font-medium hover:bg-primary capitalize`}
                         onClick={onUpdatePortal}>{isSave ? <Loader2 className="h-4 w-4 animate-spin" /> : "Update Domain"} </Button>
             </CardFooter>
         </Card>

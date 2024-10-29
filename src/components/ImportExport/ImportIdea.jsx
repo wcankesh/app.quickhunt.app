@@ -30,18 +30,19 @@ const ImportIdea = () => {
         const {toast} = useToast()
         let apiSerVice = new ApiService();
         let navigate = useNavigate();
+        const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
+        const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
+
+        const [columnList, setColumnList] = useState(initialColumnList);
         const [tableData, setTableData] = useState([]);
         const [headers, setHeaders] = useState([]);
         const [selectedColumn, setSelectedColumn] = useState([]);
-        const [columnList, setColumnList] = useState(initialColumnList);
         const [csvRoadmap, setCsvRoadmap] = useState([]);
         const [csvBoard, setCsvBoard] = useState([]);
-        const [selectedCSVFile, setSelectedCSVFile] = useState(null);
         const [step, setStep] = useState(1);
+        const [selectedCSVFile, setSelectedCSVFile] = useState(null);
         const [isLoading, setIsLoading] = useState(false);
         const [isDirectImport, setIsDirectImport] = useState(true);
-        const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
-        const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
 
         const handleFileUpload = (e) => {
             const file = e.target.files[0];
@@ -201,13 +202,13 @@ const ImportIdea = () => {
                     </div>
                     {
                         step >=  2 && <div className={"flex items-center gap-2"}>
-                            <Button variant={"outline"} className={'flex items-center h-9 justify-start'}
+                            <Button variant={"outline"} className={'flex items-center h-9 justify-start text-sm font-medium'}
                                     onClick={() => setStep(step - 1)}>
                                 Go Back
                             </Button>
-                            {step === 2 && !isDirectImport ? <Button disabled={selectedColumn.length <= 0} className={'flex items-center h-9 justify-start'} onClick={onNext}>
+                            {step === 2 && !isDirectImport ? <Button disabled={selectedColumn.length <= 0} className={'flex items-center w-[54px] justify-start text-sm font-medium hover:bg-primary capitalize'} onClick={onNext}>
                                 Next
-                            </Button> : <Button className={'flex items-center h-9 justify-start'} onClick={importData}>
+                            </Button> : <Button className={'flex items-center w-[122px] text-sm font-medium hover:bg-primary capitalize'} onClick={importData}>
                                 {
                                     isLoading ? <Loader2 className="h-4 w-4 animate-spin"/> : "Start importing"
                                 }
@@ -215,7 +216,6 @@ const ImportIdea = () => {
 
                         </div>
                     }
-
                 </div>
 
                 <div className={"pt-4 sm:pt-8"}>

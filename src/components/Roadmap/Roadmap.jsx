@@ -26,24 +26,21 @@ const Roadmap = () => {
     const {toast} = useToast()
     const apiService = new ApiService();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
-    const [isSheetOpen, setSheetOpen] = useState(false);
-    const [isSheetOpenCreate, setSheetOpenCreate] = useState(false);
+
     const [roadmapList, setRoadmapList] = useState({columns: []})
     const [selectedIdea, setSelectedIdea] = useState({});
     const [selectedRoadmap, setSelectedRoadmap] = useState({});
+    const [isSheetOpen, setIsSheetOpen] = useState({ open: false, type: "" });
     const [isLoading, setIsLoading] = useState(false);
 
-    const openSheet = () => setSheetOpen(true);
-    const closeSheet = () => setSheetOpen(false);
-
-    const openCreateIdea = () => setSheetOpenCreate(true);
-    const closeCreateIdea = () => setSheetOpenCreate(false);
+    const openSheet = (type) => setIsSheetOpen({ open: true, type });
+    const closeSheet = () => setIsSheetOpen({ open: false, type: "" });
 
     const openDetailsSheet = (record) => {
         const findRoadmap = roadmapList.columns.find((x) => x.id === record.roadmap_id)
         setSelectedIdea(record)
         setSelectedRoadmap(findRoadmap)
-        openSheet();
+        openSheet("update");
     };
 
     useEffect(() => {
@@ -92,16 +89,16 @@ const Roadmap = () => {
 
     const onCreateIdea = (mainRecord) => {
         setSelectedRoadmap(mainRecord)
-        openCreateIdea()
+        openSheet("create");
     }
 
     return (
         <div
             // className={"roadmap-container height-inherit h-svh overflow-y-auto container-secondary xl:max-w-[1605px] lg:max-w-[1230px] md:max-w-[960px] max-w-[639px]"}>
             className={"roadmap-container height-inherit h-svh max-w-[100%] pl-8 p-r"}>
+            {isSheetOpen.open && isSheetOpen.type === "update" && (
             <UpdateRoadMapIdea
-                isOpen={isSheetOpen}
-                onOpen={openSheet}
+                isOpen={isSheetOpen.open}
                 onClose={closeSheet}
                 selectedIdea={selectedIdea}
                 setSelectedIdea={setSelectedIdea}
@@ -110,18 +107,22 @@ const Roadmap = () => {
                 roadmapList={roadmapList}
                 setRoadmapList={setRoadmapList}
             />
+            )}
+            {isSheetOpen.open && isSheetOpen.type === "create" && (
             <CreateRoadmapIdea
-                isOpen={isSheetOpenCreate}
-                onOpen={openCreateIdea}
-                onClose={closeCreateIdea}
-                closeCreateIdea={closeCreateIdea}
+                isOpen={isSheetOpen.open}
+                onClose={closeSheet}
                 selectedRoadmap={selectedRoadmap}
                 roadmapList={roadmapList}
                 setRoadmapList={setRoadmapList}
 
             />
+            )}
             <div className={"p-4 px-2.5"}>
-                <h1 className="text-2xl font-normal flex-initial w-auto">Roadmap</h1>
+                <div className={"flex flex-col gap-y-0.5"}>
+                    <h1 className="text-2xl font-normal flex-initial w-auto">Roadmap</h1>
+                    <p className={"text-sm text-muted-foreground"}>Create and display a roadmap on your website to keep users updated on the project's progress.</p>
+                </div>
             </div>
             <div className={"py-[11px] pt-[3px]"}>
                 {
@@ -147,7 +148,6 @@ const Roadmap = () => {
                                             {CommSkel.commonParagraphOne}
                                         </div>
                                     </React.Fragment>
-
                                 )
                             }}
                         >
@@ -190,7 +190,6 @@ const Roadmap = () => {
                                             </CardContent>
                                         </Card>
                                     </Fragment>
-
                                 )
                             }}
 
@@ -220,7 +219,6 @@ const Roadmap = () => {
                                         </div>
                                         </div>
                                     </React.Fragment>
-
                                 )
                             }}
 

@@ -1,5 +1,5 @@
 import React,{Fragment} from 'react';
-import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "../ui/table";
+import {Table, TableHead, TableHeader, TableRow} from "../ui/table";
 import {useTheme} from "../theme-provider";
 import NoDataThumbnail from "../../img/Frame.png";
 

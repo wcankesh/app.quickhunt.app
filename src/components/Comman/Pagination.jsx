@@ -11,7 +11,9 @@ const Pagination = ({
                         handlePaginationClick,
                         stateLength,
                     }) => {
+
     const {theme} =useTheme();
+
     return (
         <CardFooter className={`p-0 ${theme === "dark" ? "border-t" : ""}`}>
             <div className={`w-full ${theme === 'dark' ? '' : 'bg-muted'} rounded-b-lg rounded-t-none flex justify-end p-2 md:px-3 md:py-[10px]`}>

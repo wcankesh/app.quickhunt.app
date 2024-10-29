@@ -59,7 +59,7 @@ const Post = ({inAppMsgSetting, setInAppMsgSetting, isLoading}) => {
         linkTool: LinkTool,
         image: {
             class: Image,
-            inlineToolbar : true,
+            inlineToolbar: true,
             config: {
                 endpoints: {
                     byFile: 'https://code.quickhunt.app/public/api/upload', // Your file upload endpoint
@@ -119,26 +119,26 @@ const Post = ({inAppMsgSetting, setInAppMsgSetting, isLoading}) => {
     }
 
     useEffect(() => {
-       if(!isLoading){
-           editorCore.current = new EditorJS({
-               holder: 'editorjs',
-               autofocus: true,
-               tools:editorConstants,
-               enableReInitialize:true,
-               onChange:handleSave,
-               data:{
-                   time: new Date().getTime(),
-                   blocks: inAppMsgSetting?.body_text?.blocks || [{type: "paragraph", data: {text: "Hey"}}],
-                   version: "2.12.4"
-               }
-           });
+        if (!isLoading) {
+            editorCore.current = new EditorJS({
+                holder: 'editorjs',
+                autofocus: true,
+                tools: editorConstants,
+                enableReInitialize: true,
+                onChange: handleSave,
+                data: {
+                    time: new Date().getTime(),
+                    blocks: inAppMsgSetting?.body_text?.blocks || [{type: "paragraph", data: {text: "Hey"}}],
+                    version: "2.12.4"
+                }
+            });
 
-           return () => {
-               if (editorCore.current && typeof editorCore.current.destroy === 'function') {
-                   editorCore.current.destroy(); // Destroy the editor instance
-               }
-           };
-       }
+            return () => {
+                if (editorCore.current && typeof editorCore.current.destroy === 'function') {
+                    editorCore.current.destroy(); // Destroy the editor instance
+                }
+            };
+        }
 
     }, [isLoading]);
 

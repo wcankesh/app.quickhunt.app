@@ -85,3 +85,8 @@ export const getDateFormat = (date) => {
     }
     return NewDate;
 };
+
+export const cleanQuillHtml = (htmlString) => {
+    if (!htmlString) return ''; // Handle null or undefined cases
+    return htmlString.replace(/<p><br\s*\/?><\/p>/g, '').trim();
+};

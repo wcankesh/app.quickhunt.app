@@ -19,6 +19,7 @@ const Surveys = ({inAppMsgSetting, setInAppMsgSetting, selectedStepIndex, setSel
     const {theme} = useTheme();
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
     const userDetailsReducer = allStatusAndTypes.members.find((x) => x.user_id == inAppMsgSetting.from);
+
     const [starRating, setStarRating] = useState(0);
     const [hoverRating, setHoverRating] = useState(0);
 
@@ -49,7 +50,6 @@ const Surveys = ({inAppMsgSetting, setInAppMsgSetting, selectedStepIndex, setSel
             ...prevState,
             steps: clone
         }));
-
     }
 
     const onChangeQuestion = (name, value) => {
@@ -162,7 +162,6 @@ const Surveys = ({inAppMsgSetting, setInAppMsgSetting, selectedStepIndex, setSel
         const objData = {...selectedStep,  reactions: clone}
         setSelectedStep(objData);
         updateStepRecord(objData)
-
     }
 
     const onDeleteReaction = (record, index) => {
