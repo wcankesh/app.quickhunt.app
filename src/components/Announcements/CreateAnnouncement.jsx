@@ -16,6 +16,7 @@ import {toast} from "../ui/use-toast";
 import {Badge} from "../ui/badge";
 import ReactQuillEditor from "../Comman/ReactQuillEditor";
 import {Checkbox} from "../ui/checkbox";
+import {FormControl} from "../ui/form";
 //post_status: 1=Publish/active,2=Scheduled/unpublished,3=Draft,4=Expired
 const initialState = {
     post_description: '',
@@ -110,7 +111,9 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
                     return "";
                 }
             case "post_description":
-                if (!value || value.trim() === "") {
+                const cleanValue = value.trim();
+                const emptyContent = /^(<p>\s*<\/p>|<p><br><\/p>|<\/?[^>]+>)*$/;
+                if (!value || cleanValue === "" || emptyContent.test(cleanValue)) {
                     return "Description is required.";
                 } else {
                     return "";
@@ -282,9 +285,12 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
         setChangeLogDetails({...changeLogDetails, labels: clone});
     }
 
-    const deleteAssignTo = (e, index) => {
-        e.stopPropagation();
-    }
+    const deleteAssignTo = (e, index) => {e.stopPropagation();}
+
+    const publishDate = changeLogDetails?.post_published_at ? new Date(changeLogDetails.post_published_at) : null;
+    const isDateDisabled = (date) => {
+        return publishDate && date < publishDate;
+    };
 
     return (
         <Sheet open={isOpen} onOpenChange={isOpen ? onClose : onOpen}>
@@ -336,24 +342,26 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
                                 <Label htmlFor="label" className={"font-normal"}>Label</Label>
                                 <Select value={[]} onValueChange={onChangeLabel}>
                                     <SelectTrigger className="h-9">
-                                        <SelectValue className={"text-muted-foreground text-sm"}
-                                                     placeholder="Nothing selected">
-                                            <div className={"flex gap-[2px]"}>
-                                                {
-                                                    (changeLogDetails.labels || []).slice(0, 2).map((x) => {
-                                                        const findObj = labelList.find((y) => y.id == x);
-                                                        return (
-                                                            <Badge variant={"outline"} style={{
-                                                                color: findObj?.label_color_code,
-                                                                borderColor: findObj?.label_color_code,
-                                                                textTransform: "capitalize"
-                                                            }}
-                                                                   className={`h-[20px] py-0 px-2 text-xs rounded-[5px]  font-normal text-[${findObj?.label_color_code}] border-[${findObj?.label_color_code}] capitalize`}>{findObj?.label_name}</Badge>
-                                                        )
-                                                    })
-                                                }
-                                                {(changeLogDetails.labels || []).length > 2 && <div>...</div>}
-                                            </div>
+                                        <SelectValue className={"text-muted-foreground text-sm"}>
+                                            {
+                                                changeLogDetails?.labels?.length > 0 ? (
+                                                    <div className={"flex gap-[2px]"}>
+                                                        {
+                                                            (changeLogDetails.labels || []).slice(0, 2).map((x) => {
+                                                                const findObj = labelList.find((y) => y.id == x);
+                                                                return (
+                                                                    <Badge variant={"outline"} style={{
+                                                                        color: findObj?.label_color_code,
+                                                                        borderColor: findObj?.label_color_code,
+                                                                        textTransform: "capitalize"
+                                                                    }}
+                                                                           className={`h-[20px] py-0 px-2 text-xs rounded-[5px]  font-normal text-[${findObj?.label_color_code}] border-[${findObj?.label_color_code}] capitalize`}>{findObj?.label_name}</Badge>
+                                                                )
+                                                            })
+                                                        }
+                                                        {(changeLogDetails.labels || []).length > 2 && <div>...</div>}
+                                                    </div>) : (<span className="text-muted-foreground">Select Label</span>)
+                                            }
                                         </SelectValue>
                                     </SelectTrigger>
                                     <SelectContent>
@@ -388,23 +396,26 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
                                 <Label htmlFor="label" className={"font-normal"}>Assign to</Label>
                                 <Select onValueChange={handleValueChange} value={[]}>
                                     <SelectTrigger className={"h-9"}>
-                                        <SelectValue className={"text-muted-foreground text-sm"}
-                                                     placeholder="Assign to">
-                                            <div className={"flex gap-[2px]"}>
-                                                {
-                                                    (changeLogDetails.post_assign_to || []).slice(0, 2).map((x, index) => {
-                                                        const findObj = memberList.find((y,) => y.user_id == x);
-                                                        return (
-                                                            <div key={index}
-                                                                 className={`${theme === "dark" ? "text-card bg-accent-foreground" : "bg-muted-foreground/30"} text-sm flex gap-[2px] items-center rounded py-0 px-2`}
-                                                                 onClick={(e) => deleteAssignTo(e, index)}>
-                                                                {findObj?.user_first_name ? findObj?.user_first_name : ''}
-                                                            </div>
-                                                        )
-                                                    })
-                                                }
-                                                {(changeLogDetails.post_assign_to || []).length > 2 && <div>...</div>}
-                                            </div>
+                                        <SelectValue className={"text-muted-foreground text-sm"}>
+                                            {
+                                                changeLogDetails?.post_assign_to?.length > 0 ? (
+                                                    <div className={"flex gap-[2px]"}>
+                                                        {
+                                                            (changeLogDetails.post_assign_to || []).slice(0, 2).map((x, index) => {
+                                                                const findObj = memberList.find((y,) => y.user_id == x);
+                                                                return (
+                                                                    <div key={index}
+                                                                         className={`${theme === "dark" ? "text-card bg-accent-foreground" : "bg-muted-foreground/30"} text-sm flex gap-[2px] items-center rounded py-0 px-2`}
+                                                                         onClick={(e) => deleteAssignTo(e, index)}>
+                                                                        {findObj?.user_first_name ? findObj?.user_first_name : ''}
+                                                                    </div>
+                                                                )
+                                                            })
+                                                        }
+                                                        {(changeLogDetails.post_assign_to || []).length > 2 &&
+                                                        <div>...</div>}
+                                                    </div>) : (<span className="text-muted-foreground">Select Assign To</span>)
+                                            }
                                         </SelectValue>
                                     </SelectTrigger>
                                     <SelectContent>
@@ -435,7 +446,13 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
                                     value={changeLogDetails && changeLogDetails.category_id && changeLogDetails.category_id.toString()}
                                     onValueChange={onChangeCategory}>
                                     <SelectTrigger className="h-9">
-                                        <SelectValue/>
+                                        {changeLogDetails?.category_id ? (
+                                            <SelectValue>
+                                                {categoriesList.find(x => x.id.toString() === changeLogDetails.category_id.toString())?.name}
+                                            </SelectValue>
+                                        ) : (
+                                            <span className="text-muted-foreground">Select a category</span>
+                                        )}
                                     </SelectTrigger>
                                     <SelectContent>
                                         <SelectGroup>
@@ -443,8 +460,7 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
                                             {
                                                 (categoriesList || []).map((x, i) => {
                                                     return (
-                                                        <SelectItem key={i}
-                                                                    value={x.id.toString()}>{x.name}</SelectItem>
+                                                        <SelectItem key={i} value={x.id.toString()}>{x.name}</SelectItem>
                                                     )
                                                 })
                                             }
@@ -464,8 +480,8 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
                                             {moment(changeLogDetails.post_published_at).format("LL")}
                                         </Button>
                                     </PopoverTrigger>
-                                    <PopoverContent className="w-auto p-0" align="start">
-                                        <Calendar
+                                    <PopoverContent className="w-auto p-0 pointer-events-auto" align="start">
+                                        <Calendar className={"pointer-events-auto"}
                                             mode="single"
                                             captionLayout="dropdown"
                                             showOutsideDays={false}
@@ -548,19 +564,27 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
                                                     variant={"outline"}
                                                     className={cn("justify-between text-left font-normal d-flex", "text-muted-foreground")}
                                                 >
-                                                    {moment(changeLogDetails.post_expired_at).format("LL")}
+                                                    {/*{moment(changeLogDetails.post_expired_at).format("LL")}*/}
+                                                    {changeLogDetails?.post_expired_at
+                                                        ? moment(changeLogDetails.post_expired_at).format("LL")
+                                                        : "Select Expiration Date"}
                                                     <CalendarIcon className="mr-2 h-4 w-4"/>
                                                 </Button>
                                             </PopoverTrigger>
-                                            <PopoverContent className="w-auto p-0" align="start">
-                                                <Calendar
+                                            <PopoverContent className="w-auto p-0 pointer-events-auto" align="start">
+                                                <Calendar className={"pointer-events-auto"}
                                                     mode="single"
                                                     showOutsideDays={false}
                                                     captionLayout="dropdown"
-                                                    selected={changeLogDetails.post_expired_at}
+                                                    // selected={changeLogDetails.post_expired_at}
+                                                    selected={changeLogDetails?.post_expired_at ? new Date(changeLogDetails.post_expired_at) : null}
                                                     onSelect={(date) => onDateChange("post_expired_at", date)}
-                                                    startMonth={new Date(2024, 0)}
+                                                    // startMonth={new Date(2024, 0)}
+                                                    // endMonth={new Date(2050, 12)}
+
                                                     endMonth={new Date(2050, 12)}
+                                                    startMonth={publishDate || new Date()}
+                                                    disabled={isDateDisabled}
                                                     hideNavigation
                                                 />
                                             </PopoverContent>

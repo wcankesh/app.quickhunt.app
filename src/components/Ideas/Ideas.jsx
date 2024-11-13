@@ -22,6 +22,7 @@ import {Popover, PopoverContent, PopoverTrigger} from "../ui/popover";
 import {Avatar, AvatarFallback, AvatarImage} from "../ui/avatar";
 import Pagination from "../Comman/Pagination";
 import DeleteDialog from "../Comman/DeleteDialog";
+import {RadioGroup, RadioGroupItem} from "../ui/radio-group";
 
 const filterByStatus = [
     {name: "Archived", value: "archive",},
@@ -235,8 +236,9 @@ const Ideas = () => {
                 // }
 
                 const removeStatus =
-                    (filter.bug === 1 && clone[index].is_active === 1) ||
-                    (filter.archive === 1 && clone[index].is_archive === 0);
+                    // (filter.roadmap.length && !filter.roadmap.includes(clone[index].roadmap_id)) ||
+                    (filter.bug == 1 && clone[index].is_active == 1) ||
+                    (filter.archive == 1 && clone[index].is_archive == 0);
 
                 if (removeStatus) {
                     clone.splice(index, 1);
@@ -247,7 +249,10 @@ const Ideas = () => {
                 clone[index].roadmap_id = value;
             }
             setIdeasList(clone);
-            toast({description: `${name.replace('_', ' ')} ${data.message}`});
+            let payload = {...filter, project_id: projectDetailsReducer.id, page: pageNo, limit: perPageLimit}
+            ideaSearch(payload)
+            // toast({description: `${name.replace('_', ' ')} ${data.message}`});
+            toast({description: data.message});
         } else {
             // toast({variant: "destructive", description: `Failed to update ${name.replace('_', ' ')} status`});
             toast({variant: "destructive", description: data.message});
@@ -329,12 +334,9 @@ const Ideas = () => {
                                             <CommandEmpty>No filter found.</CommandEmpty>
                                             {
                                                 openFilterType === 'topic' ? <CommandGroup>
-                                                    <CommandItem  className={"p-0 flex gap-2 items-center cursor-pointer p-1"}>
+                                                    <CommandItem onSelect={() => {setOpenFilterType('')}} className={"p-0 flex gap-2 items-center cursor-pointer p-1"}>
                                                         <ChevronLeft className="mr-2 h-4 w-4" />
-                                                        <span
-                                                            onClick={() => {setOpenFilterType('');}}
-                                                            className={"flex-1 w-full text-sm font-normal cursor-pointer flex gap-2 items-center"}
-                                                        >
+                                                        <span className={"flex-1 w-full text-sm font-normal cursor-pointer flex gap-2 items-center"}>
                                                             Back
                                                         </span>
                                                     </CommandItem>
@@ -365,12 +367,9 @@ const Ideas = () => {
                                                     })}
                                                 </CommandGroup> : openFilterType === 'roadmap' ?
                                                     <CommandGroup>
-                                                        <CommandItem className={"p-0 flex gap-2 items-center cursor-pointer p-1"}>
+                                                        <CommandItem onSelect={() => {setOpenFilterType('')}} className={"p-0 flex gap-2 items-center cursor-pointer p-1"}>
                                                             <ChevronLeft className="mr-2 h-4 w-4" />
-                                                            <span
-                                                                onClick={() => {setOpenFilterType('')}}
-                                                                className={"flex-1 w-full text-sm font-normal cursor-pointer flex gap-2 items-center"}
-                                                            >
+                                                            <span className={"flex-1 w-full text-sm font-normal cursor-pointer flex gap-2 items-center"}>
                                                                 Back
                                                             </span>
                                                         </CommandItem>
@@ -401,35 +400,43 @@ const Ideas = () => {
                                                         )
                                                     })}
                                                 </CommandGroup> : openFilterType === 'status' ?
-                                                    <CommandGroup>
-                                                        <CommandItem  className={"p-0 flex gap-2 items-center cursor-pointer p-1"}>
-                                                            <ChevronLeft className="mr-2 h-4 w-4" />
-                                                            <span
-                                                                onClick={() => {
-                                                                    setOpenFilterType('');
+                                                        <CommandGroup>
+                                                            <CommandItem onSelect={() => { setOpenFilterType('') }} className={"p-0 flex gap-2 items-center cursor-pointer p-1"}>
+                                                                <ChevronLeft className="mr-2 h-4 w-4" />
+                                                                <span className={"flex-1 w-full text-sm font-normal cursor-pointer flex gap-2 items-center"}>Back</span>
+                                                            </CommandItem>
+                                                            <RadioGroup
+                                                                value={filter.status} // Bind value to the status
+                                                                onValueChange={(value) => {
+                                                                    handleChange({ name: "status", value }); // Handle value change
+                                                                    setOpenFilter(true);
+                                                                    setOpenFilterType('status');
                                                                 }}
-                                                                className={"flex-1 w-full text-sm font-normal cursor-pointer flex gap-2 items-center"}
+                                                                className={"gap-0.5"}
                                                             >
-                                                                Back
-                                                            </span>
-                                                        </CommandItem>
-                                                        {(filterByStatus || []).map((x, i) => {
-                                                            return (
-                                                                <CommandItem key={i} value={x.value} className={"p-0 flex gap-1 items-center cursor-pointer"}>
-                                                                    <Checkbox className={'m-2'} checked={filter[x.value] === 1} onClick={() => {
-                                                                        handleChange({name: "status" , value: x.value});
-                                                                        setOpenFilter(true);
-                                                                        setOpenFilterType('status');
-                                                                    }}/>
-                                                                    <span onClick={() => {
-                                                                        handleChange({name: "status" , value: x.value});
-                                                                        setOpenFilter(true);
-                                                                        setOpenFilterType('status');
-                                                                    }} className={"flex-1 w-full text-sm font-normal cursor-pointer flex gap-2 items-center"}>{x.name}</span>
-                                                                </CommandItem>
-                                                            )
-                                                        })}
-                                                    </CommandGroup> :
+                                                                {(filterByStatus || []).map((x, i) => {
+                                                                    return (
+                                                                        <CommandItem key={i} value={x.value} className={"p-0 flex gap-1 items-center cursor-pointer"}>
+                                                                            <RadioGroupItem
+                                                                                id={x.value}
+                                                                                value={x.value}
+                                                                                className="m-2"
+                                                                                checked={filter[x.value] === 1}  // Use the value to determine the selected state
+                                                                            />
+                                                                            <span
+                                                                                onClick={() => {
+                                                                                    handleChange({ name: "status", value: x.value });
+                                                                                    setOpenFilter(true);
+                                                                                    setOpenFilterType('status');
+                                                                                }}
+                                                                                className={"flex-1 w-full text-sm font-normal cursor-pointer flex gap-2 items-center"}
+                                                                            >
+                                                                                {x.name}</span>
+                                                                        </CommandItem>
+                                                                    );
+                                                                })}
+                                                            </RadioGroup>
+                                                        </CommandGroup> :
                                                         <CommandGroup>
                                                             <CommandItem onSelect={() => {setOpenFilterType('status');}}>
                                                                 <span className={"text-sm font-normal cursor-pointer"}>Status</span>
@@ -501,7 +508,7 @@ const Ideas = () => {
 
                 <Card className={"mt-6"}>
                     {
-                        (load === 'search' || load === 'list') ? CommSkel.commonParagraphFourIdea : ideasList.length > 0 ?
+                        (load === 'search' || load === 'list') ? (CommSkel.commonParagraphFourIdea) : ideasList.length > 0 ?
                             <CardContent className={"p-0 divide-y"}>
                                 {
                                     (ideasList || []).map((x, i) => {
@@ -518,7 +525,7 @@ const Ideas = () => {
                                                         </Button>
                                                         <p className={"text-base md:text-xl font-normal"}>{x.vote}</p>
                                                     </div>
-                                                    <div className={"flex flex-col w-full gap-3"}>
+                                                    <div className={"flex flex-col w-full gap-3 max-w-[1045px]"}>
                                                         <div className={"flex flex-col gap-3"}>
                                                             <div className={"flex flex-wrap items-center justify-between gap-3"}>
                                                                 <div
@@ -561,11 +568,15 @@ const Ideas = () => {
                                                                                                         }
                                                                                                     </div>
                                                                                                 </div>
-                                                                                            <div className={"update-idea text-sm rounded-full border text-center"}>
-                                                                                                <Avatar>
-                                                                                                    <AvatarFallback>+{x?.topic?.length}</AvatarFallback>
-                                                                                                </Avatar>
-                                                                                            </div>
+                                                                                            {
+                                                                                                (x?.topic?.length > 1) &&
+                                                                                                <div
+                                                                                                    className={"update-idea text-sm rounded-full border text-center"}>
+                                                                                                    <Avatar>
+                                                                                                        <AvatarFallback>+{x?.topic?.length - 1}</AvatarFallback>
+                                                                                                    </Avatar>
+                                                                                                </div>
+                                                                                            }
                                                                                         </div>
                                                                                     </Button>
                                                                                 </PopoverTrigger>
@@ -671,7 +682,7 @@ const Ideas = () => {
                                                             </div>
                                                             <div className={"description-container text-sm text-muted-foreground"}>
                                                                 {
-                                                                    cleanQuillHtml(x?.description) ? <ReadMoreText html={x.description}/> : null
+                                                                    cleanQuillHtml(x?.description) ? <ReadMoreText html={x.description} maxLength={300}/> : null
                                                                 }
                                                             </div>
                                                         </div>

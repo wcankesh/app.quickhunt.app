@@ -107,11 +107,23 @@ const Profile = () => {
                 } else {
                     return "";
                 }
+            // case "user_email_id":
+            //     if (!value || value.trim() === "") {
+            //         return "Email is required";
+            //     } else if (!value.match(/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/)) {
+            //         return "Enter a valid email address";
+            //     } else {
+            //         return "";
+            //     }
             case "user_email_id":
                 if (!value || value.trim() === "") {
                     return "Email is required";
                 } else if (!value.match(/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/)) {
                     return "Enter a valid email address";
+                } else if (!value.endsWith(".com")) {
+                    return "Email must end with .com";
+                } else if (userDetails.user_email_id === userDetailsReducer.user_email_id) { // Check if the email already exists
+                    return "This email is already registered";
                 } else {
                     return "";
                 }
@@ -124,6 +136,12 @@ const Profile = () => {
             case "password":
                 if (!value || value.trim() === "") {
                     return "Password is required";
+                } else if (
+                    !value.match(
+                        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/
+                    )
+                ) {
+                    return "Password must be at least 6 characters with one uppercase letter, one lowercase letter, one number, and one special character";
                 } else {
                     return "";
                 }
@@ -336,28 +354,11 @@ const Profile = () => {
                                     <Input
                                         id="email"
                                         type="email"
-                                        placeholder="wc.ankesh@gmail.com"
+                                        placeholder="youremail@gmail.com"
                                         value={userDetails.user_email_id}
                                         name={'user_email_id'}
                                         onChange={onChange}
-                                        onBlur={onBlur}
-                                        className={"bg-card"}
-                                    />
-                                    {
-                                        formError.user_email_id &&
-                                        <span className="text-destructive text-sm">{formError.user_email_id}</span>
-                                    }
-                                </div>
-                                <div className={"w-[279px] hidden"}>
-                                    <Label htmlFor="email" className={"font-normal"}>Email</Label>
-                                    <Input
-                                        id="email"
-                                        type="email"
-                                        placeholder="wc.ankesh@gmail.com"
-                                        value={userDetails.user_email_id}
-                                        name={'user_email_id'}
-                                        onChange={onChange}
-                                        onBlur={onBlur}
+                                        // onBlur={onBlur}
                                         className={"bg-card"}
                                     />
                                     {

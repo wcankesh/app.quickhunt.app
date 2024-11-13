@@ -502,7 +502,7 @@ const HeaderBar = () => {
                                 </SheetTrigger>
                                 <SheetOverlay className={"inset-0"} />
                                 <SheetContent side="left" className="flex gap-0 flex-col w-[280px] md:w-[340px] p-0">
-                                    <SheetHeader className={"flex gap-2 flex-row justify-between items-center p-3 py-2.5"}>
+                                    <SheetHeader className={"flex gap-2 flex-row justify-between items-center p-3 py-2.5 dark:border-b"}>
                                         <div className={"flex w-full items-center h-[56px] cursor-pointer"}  onClick={() => onRedirect("/dashboard")}>
                                             {theme === "dark" ? Icon.whiteLogo : Icon.blackLogo}
                                         </div>

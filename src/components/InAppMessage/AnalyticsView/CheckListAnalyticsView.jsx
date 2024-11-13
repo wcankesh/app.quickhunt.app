@@ -1,9 +1,6 @@
 import React, {Fragment, useEffect, useState} from 'react';
 import {Card, CardContent, CardHeader} from "../../ui/card";
-import {Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator} from "../../ui/breadcrumb";
-import {baseUrl} from "../../../utils/constent";
 import {Skeleton} from "../../ui/skeleton";
-import {useNavigate} from "react-router";
 import {ApiService} from "../../../utils/ApiService";
 import {useSelector} from "react-redux";
 import moment from "moment";
@@ -15,6 +12,7 @@ import {useTheme} from "../../theme-provider";
 import {Avatar, AvatarFallback} from "../../ui/avatar";
 import EmptyData from "../../Comman/EmptyData";
 import CommonBreadCrumb from "../../Comman/CommonBreadCrumb";
+import {chartLoading} from "../../Comman/CommSkel";
 
 const chartConfig = {
     view: {
@@ -30,7 +28,6 @@ const chartConfig = {
 const CheckListAnalyticsView = () => {
     const {theme} = useTheme();
     const {id, type} = useParams();
-    const navigate = useNavigate();
     const apiService = new ApiService();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
 
@@ -129,53 +126,55 @@ const CheckListAnalyticsView = () => {
                     </Card>
                     <Card>
                         <CardHeader className={"p-4 border-b text-base font-medium"}>How did that change over time?</CardHeader>
-                        <CardContent className={"p-4 pl-0"}>
-                            {
-                                analytics?.chart?.length > 0 ?
-                                    <ChartContainer config={chartConfig} className="aspect-auto h-[250px] w-full">
-                                        <ResponsiveContainer width="100%" height="100%">
-                                            <LineChart
-                                                accessibilityLayer
-                                                data={analytics.chart}
+                        {
+                            isLoading ? chartLoading(15, "p-2") :
+                                <CardContent className={"p-4 pl-0"}>
+                                    {
+                                        analytics?.chart?.length > 0 ? <ChartContainer config={chartConfig} className="aspect-auto h-[250px] w-full">
+                                                <ResponsiveContainer width="100%" height="100%">
+                                                    <LineChart
+                                                        accessibilityLayer
+                                                        data={analytics.chart}
 
-                                            >
-                                                <CartesianGrid vertical={false} />
-                                                <XAxis
-                                                    dataKey="x"
-                                                    tickLine={false}
-                                                    axisLine={false}
-                                                    tickMargin={8}
-                                                    tickFormatter={(value) => {
-                                                        const date = new Date(value)
-                                                        return date.toLocaleDateString("en-US", {
-                                                            month: "short",
-                                                            day: "numeric",
-                                                        })
-                                                    }}
-                                                />
-                                                <Tooltip
-                                                    cursor={false}
-                                                    content={<ChartTooltipContent hideLabel />}
-                                                />
-                                                <YAxis tickLine={false} axisLine={false}/>
-                                                <Line
-                                                    dataKey="view"
-                                                    type="monotone"
-                                                    stroke="var(--color-view)"
-                                                    strokeWidth={2}
-                                                />
-                                                <Line
-                                                    dataKey="response"
-                                                    type="monotone"
-                                                    stroke="var(--color-response)"
-                                                    strokeWidth={2}
-                                                />
-                                            </LineChart>
-                                        </ResponsiveContainer>
-                                    </ChartContainer>
-                                    : <EmptyData />
-                            }
-                        </CardContent>
+                                                    >
+                                                        <CartesianGrid vertical={false} />
+                                                        <XAxis
+                                                            dataKey="x"
+                                                            tickLine={false}
+                                                            axisLine={false}
+                                                            tickMargin={8}
+                                                            tickFormatter={(value) => {
+                                                                const date = new Date(value)
+                                                                return date.toLocaleDateString("en-US", {
+                                                                    month: "short",
+                                                                    day: "numeric",
+                                                                })
+                                                            }}
+                                                        />
+                                                        <Tooltip
+                                                            cursor={false}
+                                                            content={<ChartTooltipContent hideLabel />}
+                                                        />
+                                                        <YAxis tickLine={false} axisLine={false}/>
+                                                        <Line
+                                                            dataKey="view"
+                                                            type="monotone"
+                                                            stroke="var(--color-view)"
+                                                            strokeWidth={2}
+                                                        />
+                                                        <Line
+                                                            dataKey="response"
+                                                            type="monotone"
+                                                            stroke="var(--color-response)"
+                                                            strokeWidth={2}
+                                                        />
+                                                    </LineChart>
+                                                </ResponsiveContainer>
+                                            </ChartContainer>
+                                            : <EmptyData />
+                                    }
+                                </CardContent>
+                        }
                     </Card>
                     <Card>
                         <CardHeader className={"p-4 border-b text-base font-medium"}>Customers who opened</CardHeader>

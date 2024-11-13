@@ -68,6 +68,7 @@
       @apply border-border;
     }
     body {
+      pointer-events: auto !important;
       /*font-family: sans-serif;*/
       @apply bg-background bg-card text-foreground;
     }
@@ -153,12 +154,16 @@ span.LinesEllipsis-ellipsis {color: hsl(var(--primary)) !important;font-weight: 
 
 /*description bg color*/
 @layer components {
-  .dark .description-container div, .dark .description-container p span, .dark .description-container p strong { color: hsl(var(--primary-foreground)) !important; }
+  .dark .description-container div, .dark .description-container p span, .dark .description-container-widget-preview p span, .dark .description-container p strong { color: hsl(var(--primary-foreground)) !important; }
   .dark .description-container div p strong, .dark .description-container div p span {background-color: hsl(var(--card)) !important; color: hsl(var(--primary-foreground)) !important; }
+  .dark .description-container-widget-preview div p strong, .dark .description-container-widget-preview div p span {background-color: white !important; color: hsl(var(--card)) !important; }
   .description-container div p strong, .description-container p strong, .description-container p span { color: hsl(var(--muted-foreground)) !important; }
+  .description-container-widget-preview div p strong, .description-container-widget-preview p strong, .description-container-widget-preview p span { color: hsl(var(--muted-foreground)) !important; }
   /*Read Button*/
   .dark .description-container div p span.LinesEllipsis-ellipsis {background-color: hsl(var(--card)) !important; color: hsl(var(--primary)) !important; font-weight: 600;cursor: pointer;}
   .light .description-container div p span.LinesEllipsis-ellipsis {background-color: hsl(var(--card)) !important; color: hsl(var(--primary)) !important; font-weight: 600;cursor: pointer;}
+  .dark .description-container-widget-preview div p span.LinesEllipsis-ellipsis {background-color: white !important; color: hsl(var(--primary)) !important; font-weight: 600;cursor: pointer;}
+  .light .description-container-widget-preview div p span.LinesEllipsis-ellipsis {background-color: hsl(var(--card)) !important; color: hsl(var(--primary)) !important; font-weight: 600;cursor: pointer;}
 
   /*span.LinesEllipsis-ellipsis {background-color: #000000;color: #ffffff;}*/
 }

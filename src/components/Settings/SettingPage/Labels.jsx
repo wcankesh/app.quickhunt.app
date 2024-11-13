@@ -65,10 +65,10 @@ const Labels = () => {
         const updatedColors = [...labelList];
         updatedColors[index] = { ...updatedColors[index], [name]: value };
         setLabelList(updatedColors);
-        setLabelError(labelError => ({
+        setLabelError({
             ...labelError,
-            [name]: ""
-        }));
+            [name]: validation(name, value)
+        });
     };
 
     const handleAddNewLabel = async (record,index) => {
@@ -107,7 +107,7 @@ const Labels = () => {
         } else {
             setIsSave(false);
             toast({
-                description:data.message,
+                description:(data.message),
                 variant: "destructive"
             })
         }
@@ -125,16 +125,20 @@ const Labels = () => {
     const validation = (name, value) => {
         switch (name) {
             case "label_name":
-                if(!value || value.trim() === "") {
-                    return "Label name is required."
-                } else {
+                if (!value || value.trim() === "") {
+                    return "Label name is required.";
+                }
+                // else if (value.length > 255) {
+                //     return "Label name must not exceed 255 characters.";
+                // }
+                else {
                     return "";
                 }
             default: {
-                return  "";
+                return "";
             }
         }
-    }
+    };
 
     const handleSaveLabel = async (index) => {
         const updatedColors = [...labelList];
@@ -147,7 +151,15 @@ const Labels = () => {
             });
             return;
         }
+        if(labelToSave?.label_name?.length > 255){
+            toast({
+                description: 'Label name must not exceed 255 characters.',
+                variant: "destructive"
+            })
+            return
+        }
         setIsSave(true);
+
         const payload = {
             project_id: `${projectDetailsReducer.id}`,
             label_name: labelToSave.label_name,
@@ -220,6 +232,7 @@ const Labels = () => {
     }
 
     const onEdit = (index) =>{
+        setLabelError(initialNewLabel);
         const clone = [...labelList]
         if(isEdit !== null && !clone[isEdit]?.id){
             clone.splice(isEdit, 1)
@@ -244,7 +257,7 @@ const Labels = () => {
             {
                 openDelete &&
                 <DeleteDialog
-                    title={"You really want to delete this Label ?"}
+                    title={"You really want to delete this Label?"}
                     isOpen={openDelete}
                     onOpenChange={() => setOpenDelete(false)}
                     onDelete={onDelete}
@@ -276,7 +289,7 @@ const Labels = () => {
                             {
                                 ["Label Name","Label Color","Action"].map((x,i)=>{
                                     return(
-                                        <TableHead key={i} className={`px-2 py-[10px] text-sm font-normal md:px-3 text-card-foreground dark:text-muted-foreground ${i === 0 ? "w-2/5" : i === 1 ? "w-1/5 text-center" : "pr-[39px] text-end"}`}>{x}</TableHead>
+                                        <TableHead key={i} className={`px-2 py-[10px] text-sm font-normal md:px-3 text-card-foreground dark:text-muted-foreground ${i === 0 ? "w-2/5" : i === 1 ? "w-2/5" : ""}`}>{x}</TableHead>
                                     )
                                 })
                             }
@@ -294,7 +307,7 @@ const Labels = () => {
                                                     {
                                                         isEdit == i ?
                                                             <Fragment>
-                                                                <TableCell className={"px-[8.5px] py-[11px]"}>
+                                                                <TableCell className={"px-[12px] py-[10px]"}>
                                                                     <Input
                                                                         className={"bg-card h-9 "}
                                                                         type="text"
@@ -302,18 +315,23 @@ const Labels = () => {
                                                                         name={"label_name"}
                                                                         onBlur={onBlur}
                                                                         onChange={(e) => handleInputChange(e, i)}
-                                                                        placeholder={"Enter label name"}
+                                                                        placeholder={"Enter Label Name"}
                                                                     />
-                                                                    {labelError.label_name && <span className="text-destructive text-sm">{labelError.label_name}</span>}
+                                                                    {
+                                                                        labelError.label_name ? <div className="grid gap-2 mt-[4px]">
+                                                                            {labelError.label_name && <span
+                                                                                className="text-destructive text-sm">{labelError.label_name}</span>}
+                                                                        </div> : ""
+                                                                    }
                                                                 </TableCell>
 
-                                                                <TableCell className={"px-[8.5px] py-[11px] align-top"}>
-                                                                    <div className={"flex justify-center items-center"}>
+                                                                <TableCell className={"px-[12px] py-[10px] align-top"}>
+                                                                    <div className={"flex items-center"}>
                                                                         <ColorInput name={"clr"} value={x.label_color_code} onChange={(color) => onChangeColorColor(color, i)}/>
                                                                     </div>
                                                                 </TableCell>
 
-                                                                <TableCell className={`flex justify-end gap-2 pr-4 ${labelError?.label_name ? "pt-[22px]" : ""} ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                                                <TableCell className={`flex gap-2 px-[12px] py-[10px] ${labelError?.label_name ? "" : ""} ${theme === "dark" ? "" : "text-muted-foreground"}`}>
                                                                     <Fragment>
                                                                         {
                                                                             x.id ? <Button
@@ -323,7 +341,7 @@ const Labels = () => {
                                                                             >
                                                                                 {isSave ? <Loader2 className="h-4 w-4 animate-spin"/> : <Check size={16}/>}
                                                                             </Button> : <Button
-                                                                                className={`text-sm font-medium h-[30px] hover:bg-primary w-[100px]`}
+                                                                                className={`text-sm font-medium h-[30px] w-[88px] hover:bg-primary`}
                                                                                 onClick={() => handleAddNewLabel(x, i)}
                                                                             >
                                                                                 {isSave ? <Loader2 className={"h-4 w-4 animate-spin"}/> : "Add Label"}
@@ -342,10 +360,10 @@ const Labels = () => {
                                                             </Fragment>
                                                             :
                                                             <Fragment>
-                                                                <TableCell className={`px-2 py-[10px] md:px-3 font-normal text-xs ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.label_name}</TableCell>
+                                                                <TableCell className={`px-2 py-[10px] md:px-3 font-normal text-xs max-w-[140px] truncate text-ellipsis overflow-hidden whitespace-nowrap ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.label_name}</TableCell>
                                                                 <TableCell className={`px-2 py-[10px] md:px-3 font-normal text-xs ${theme === "dark" ? "" : "text-muted-foreground"}`}>
                                                                     <div
-                                                                        className={"flex justify-center items-center gap-1"}>
+                                                                        className={"flex items-center gap-1"}>
                                                                         <Square size={16} strokeWidth={1}
                                                                                 fill={x.label_color_code}
                                                                                 stroke={x.label_color_code}/>
@@ -354,7 +372,7 @@ const Labels = () => {
                                                                 </TableCell>
 
                                                                 <TableCell
-                                                                    className={`flex justify-end gap-2 px-2 py-[10px] md:px-3 font-normal text-xs ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                                                    className={`flex gap-2 px-2 py-[10px] md:px-3 font-normal text-xs ${theme === "dark" ? "" : "text-muted-foreground"}`}>
                                                                     <Button
                                                                         variant="outline hover:bg-transparent"
                                                                         className="p-1 border w-[30px] h-[30px]"

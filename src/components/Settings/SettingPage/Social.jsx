@@ -32,52 +32,25 @@ const Social = () => {
        setSocialLink(allStatusAndTypes.social)
     },[allStatusAndTypes]);
 
-    const onUpdateSocialSetting = async () => {
-        let validationErrors = {};
-        Object.keys(socialLink).forEach(name => {
-            const error = formValidate(name, socialLink[name]);
-            if (error && error.length > 0) {
-                validationErrors[name] = error;
-            }
-        });
-        if (Object.keys(validationErrors).length > 0) {
-            setFormError(validationErrors);
-            return;
-        }
-        setIsSave(true)
-        const payload = {
-            project_id: projectDetailsReducer.id,
-            facebook: socialLink.facebook,
-            twitter: socialLink.twitter,
-            linkedin: socialLink.linkedin,
-            youtube: socialLink.youtube,
-            instagram: socialLink.instagram,
-            github: socialLink.github,
-        };
-        const data = await apiService.updateSocialSetting(payload);
-        if(data.status === 200){
-            setIsSave(false)
-            toast({
-                description:data.message,
-            });
-            delete payload.project_id;
-            dispatch(allStatusAndTypesAction({...allStatusAndTypes, social: payload}));
+    // const onChange =(e)=>{
+    //     setSocialLink({...socialLink,[e.target.name]:e.target.value});
+    //     setFormError(formError => ({
+    //         ...formError,
+    //         [e.target.name]: ""
+    //     }));
+    // };
 
-        } else {
-            setIsSave(false);
-            toast({
-                description:data.message,
-                variant: "destructive"
-            })
-        }
-    }
+    const onChange = (e) => {
+        const { name, value } = e.target;
+        setSocialLink((prevState) => ({
+            ...prevState,
+            [name]: value
+        }));
 
-
-    const onChange =(e)=>{
-        setSocialLink({...socialLink,[e.target.name]:e.target.value});
-        setFormError(formError => ({
-            ...formError,
-            [e.target.name]: ""
+        const error = formValidate(name, value);
+        setFormError((prevError) => ({
+            ...prevError,
+            [name]: error
         }));
     };
 
@@ -126,13 +99,64 @@ const Social = () => {
         }
     };
 
+    // const onBlur = (event) => {
+    //     const {name, value} = event.target;
+    //     setFormError({
+    //         ...formError,
+    //         [name]: formValidate(name, value)
+    //     });
+    // };
+
     const onBlur = (event) => {
-        const {name, value} = event.target;
-        setFormError({
-            ...formError,
-            [name]: formValidate(name, value)
-        });
+        const { name, value } = event.target;
+        const error = formValidate(name, value);
+
+        setFormError((prevError) => ({
+            ...prevError,
+            [name]: error
+        }));
     };
+
+
+    const onUpdateSocialSetting = async () => {
+        let validationErrors = {};
+        Object.keys(socialLink).forEach(name => {
+            const error = formValidate(name, socialLink[name]);
+            if (error && error.length > 0) {
+                validationErrors[name] = error;
+            }
+        });
+        if (Object.keys(validationErrors).length > 0) {
+            setFormError(validationErrors);
+            return;
+        }
+        setIsSave(true)
+        const payload = {
+            project_id: projectDetailsReducer.id,
+            facebook: socialLink.facebook,
+            twitter: socialLink.twitter,
+            linkedin: socialLink.linkedin,
+            youtube: socialLink.youtube,
+            instagram: socialLink.instagram,
+            github: socialLink.github,
+        };
+        const data = await apiService.updateSocialSetting(payload);
+        if(data.status === 200){
+            setIsSave(false)
+            toast({
+                description:data.message,
+            });
+            delete payload.project_id;
+            dispatch(allStatusAndTypesAction({...allStatusAndTypes, social: payload}));
+
+        } else {
+            setIsSave(false);
+            toast({
+                description:data.message,
+                variant: "destructive"
+            })
+        }
+    }
 
     return (
         <Card className={"divide-y"}>

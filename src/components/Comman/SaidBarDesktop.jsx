@@ -171,7 +171,7 @@ const SaidBarDesktop = () => {
     };
 
     return (
-        <div className={`main-sidebar pointer-events-none fixed start-0 top-0 z-[60] h-full xl:z-10 hidden md:block ${location.pathname.includes("widget/") ? "overflow-hidden" : "overflow-auto"}`}>
+        <div className={`main-sidebar fixed start-0 top-0 z-[60] h-full xl:z-10 hidden md:block ${location.pathname.includes("widget/") ? "overflow-hidden" : "overflow-auto"}`}>
             <div className="pointer-events-auto relative z-30 flex h-full w-[250px] flex-col ltr:-translate-x-full rtl:translate-x-full ltr:xl:translate-x-0 rtl:xl:translate-x-0">
                 <div className={"flex gap-3 items-center px-4 bg-primary"}>
                     <div className="flex w-full items-center h-[56px]">

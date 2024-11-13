@@ -20,14 +20,17 @@ const RestPassword = () => {
     const [formError, setFormError] = useState({password:"", confirm_password: ''});
     const [forgotPasswordDetails, setForgotPasswordDetails] = useState({password:"", confirm_password: ''});
     const [isLoading, setIsLoading] = useState(false);
-    const [showPassword, setShowPassword] = useState(false);
+    const [passwordVisibility, setPasswordVisibility] = useState({
+        password: false,
+        confirm_password: false
+    });
 
     const onChange = (event) => {
         setForgotPasswordDetails({...forgotPasswordDetails,[event.target.name]: event.target.value})
-        setFormError(formError => ({
-            ...formError,
-            [event.target.name]: formValidate(event.target.name, event.target.value)
-        }));
+        // setFormError(formError => ({
+        //     ...formError,
+        //     [event.target.name]: formValidate(event.target.name, event.target.value)
+        // }));
     };
 
     const onBlur = (event) => {
@@ -38,25 +41,42 @@ const RestPassword = () => {
         });
     };
 
+    // const formValidate = (name, value) => {
+    //     switch (name) {
+    //         case "password":
+    //             if (!value) {
+    //                 return "Password is Required";
+    //             } else {
+    //                 return "";
+    //             }
+    //         case "confirm_password":
+    //             if (!value) {
+    //                 return "Confirm Password Required";
+    //             } else if (value !== forgotPasswordDetails.password) {
+    //                 return "New Password and Confirm Password Must be Same";
+    //             } else {
+    //                 return "";
+    //             }
+    //         default: {
+    //             return "";
+    //         }
+    //     }
+    // };
+
     const formValidate = (name, value) => {
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
         switch (name) {
             case "password":
-                if (!value) {
-                    return "Password is Required";
-                } else {
-                    return "";
-                }
-            case "confirm_password":
-                if (!value) {
-                    return "Confirm Password Required";
-                } else if (value !== forgotPasswordDetails.password) {
-                    return "New Password and Confirm Password Must be Same";
-                } else {
-                    return "";
-                }
-            default: {
+                if (!value) return "Password is required";
+                if (!passwordRegex.test(value)) return "Minimum 8 characters, includes a lowercase, uppercase, number, and symbol.";
                 return "";
-            }
+            case "confirm_password":
+                if (!value) return "Confirm Password is required";
+                if (value !== forgotPasswordDetails.password) return "Passwords must match";
+                return "";
+            default:
+                return "";
         }
     };
 
@@ -87,11 +107,17 @@ const RestPassword = () => {
         }
     }
 
-    const togglePasswordVisibility = () => {setShowPassword(!showPassword);};
+    const togglePasswordVisibility = (fieldName) => {
+        setPasswordVisibility({
+            ...passwordVisibility,
+            [fieldName]: !passwordVisibility[fieldName]
+        });
+    };
 
     return (
         <div className={"w-full flex flex-col items-center justify-center p-4 md:px-4 md:py-0"}>
-            <div className={"max-w-2xl m-auto"}>
+            {/*<div className={"max-w-2xl m-auto"}>*/}
+            <div className={"max-w-[400px] m-auto"}>
                 <div className={"flex items-center justify-center mt-20"}>
                     {theme === "dark" ? Icon.whiteLogo : Icon.blackLogo}
                 </div>
@@ -105,12 +131,13 @@ const RestPassword = () => {
                 </div>
                 <div className={"mt-2.5"}>
                     <Card>
-                        <CardContent className={"p-3 md:p-6"}>
+                        <CardContent className={"p-3 md:p-6 space-y-2"}>
+                            <div className={"space-y-1"}>
                             <Label htmlFor="password" className={"font-normal"}>New Password</Label>
                             <div className={"relative"}>
                                 <Input
                                     id="password"
-                                    type={showPassword ? "text" : "password"}
+                                    type={passwordVisibility.password ? "text" : "password"}
                                     placeholder={"Password"}
                                     value={forgotPasswordDetails.password}
                                     name={'password'}
@@ -118,30 +145,32 @@ const RestPassword = () => {
                                     onBlur={onBlur}
                                 />
                                 <Button variant={"ghost hover:none"}
-                                        onClick={togglePasswordVisibility}
+                                        onClick={() => togglePasswordVisibility('password')}
                                         className={"absolute top-0 right-0"}>
-                                    {showPassword ? <Eye size={16} stroke={`${theme === "dark" ? "white" : "black"}`}/> : <EyeOff size={16} stroke={`${theme === "dark" ? "white" : "black"}`}/>}
+                                    {passwordVisibility.password ? <Eye size={16} stroke={`${theme === "dark" ? "white" : "black"}`}/> : <EyeOff size={16} stroke={`${theme === "dark" ? "white" : "black"}`}/>}
                                 </Button>
                             </div>
                             {
                                 formError.password && <span className="text-red-500 text-sm">{formError.password}</span>
                             }
-                            <div className={"mt-2 "}>
+                            </div>
+                            <div className={"space-y-1"}>
                                 <Label htmlFor="confirm_password" className={"font-normal"}>Confirm Password</Label>
                                 <div className={"relative"}>
 
                                     <Input
                                         id="confirm_password"
-                                        type={showPassword ? "text" : "password"}
+                                        type={passwordVisibility.confirm_password ? "text" : "password"}
+                                        placeholder={"Confirm Password"}
                                         value={forgotPasswordDetails.confirm_password}
                                         name={'confirm_password'}
                                         onChange={onChange}
                                         onBlur={onBlur}
                                     />
                                     <Button variant={"ghost hover:none"}
-                                            onClick={togglePasswordVisibility}
+                                            onClick={() => togglePasswordVisibility('confirm_password')}
                                             className={"absolute top-0 right-0"}>
-                                        {showPassword ? <Eye size={16} stroke={`${theme === "dark" ? "white" : "black"}`}/> : <EyeOff size={16} stroke={`${theme === "dark" ? "white" : "black"}`}/>}
+                                        {passwordVisibility.confirm_password ? <Eye size={16} stroke={`${theme === "dark" ? "white" : "black"}`}/> : <EyeOff size={16} stroke={`${theme === "dark" ? "white" : "black"}`}/>}
                                     </Button>
                                 </div>
                                 {
@@ -150,7 +179,7 @@ const RestPassword = () => {
                             </div>
 
                             <Button
-                                className={"w-full mt-2.5 bg-primary font-normal"}
+                                className={"w-full mt-2.5 bg-primary hover:bg-primary font-normal"}
                                 disabled={(forgotPasswordDetails.password === "" || forgotPasswordDetails.password.trim() === "") || (forgotPasswordDetails.confirm_password === "" || forgotPasswordDetails.confirm_password.trim() === "")}
                                 onClick={onSubmit}
                             >

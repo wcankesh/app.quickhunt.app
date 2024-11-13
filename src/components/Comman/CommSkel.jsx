@@ -33,11 +33,11 @@ export const CommSkel = {
             })
         }
     </div>,
-    commonParagraphFourIdea: <div className={"flex flex-col"}>
+    commonParagraphFourIdea: <div className={"flex flex-col divide-y"}>
         {
             Array.from(Array(4)).map((_, r) => {
                 return (
-                    <div className={"flex gap-[5px] md:gap-8 p-2 sm:p-3 lg:py-4 lg:px-5 border-b"} key={r}>
+                    <div className={"flex gap-[5px] md:gap-8 p-2 sm:p-3 lg:py-4 lg:px-5"} key={r}>
                         <Skeleton className="h-[30px] w-[30px] rounded-full"/>
                         <div className="flex flex-col w-full gap-6">
                             <div className="space-y-2 w-full">
@@ -178,4 +178,36 @@ export const CommSkel = {
             })
         }
     </div>,
+}
+
+export const commonParagraph = (count) => {
+    return <div className={"grid gap-2"}>
+        {
+            Array.from(Array(count)).map((_, r) => {
+                return (
+                    <Fragment key={r}>
+                        <Skeleton className="h-9 max-w-[100%]" />
+                    </Fragment>
+                )
+            })
+        }
+    </div>
+}
+
+export const chartLoading = (count, className) => {
+    const getRandomHeight = () => `${Math.floor(Math.random() * (350 - 150 + 1) + 150)}px`;
+
+    return (
+        <div className={`flex gap-4 items-end ${className}`}>
+            {
+                Array.from(Array(count)).map((_, r) => {
+                    return (
+                        <Fragment key={r}>
+                            <Skeleton className={`max-w-16 w-full`} style={{ height: getRandomHeight() }} />
+                        </Fragment>
+                    )
+                })
+            }
+        </div>
+    );
 }

@@ -207,7 +207,7 @@ const CreateRoadmapIdea = ({isOpen, onOpen, onClose, closeCreateIdea, selectedRo
                                                             )
                                                         })
                                                     }
-                                                    {(ideaDetail.topic || []).length > 2 && <div>...</div>}
+                                                    {(ideaDetail.topic || []).length > 2}
                                                 </div>
                                             </SelectValue>
                                         </SelectTrigger>
@@ -216,7 +216,7 @@ const CreateRoadmapIdea = ({isOpen, onOpen, onClose, closeCreateIdea, selectedRo
                                                 {
                                                     (topicLists || []).map((x, i) => {
                                                         return (
-                                                            <SelectItem className={""} key={i} value={x.id}>
+                                                            <SelectItem key={i} value={x.id} className={"px-2"}>
                                                                 <div className={"flex gap-2"}>
                                                                     <div onClick={() => handleChange(x.id)} className="checkbox-icon">
                                                                         {ideaDetail.topic.includes(x.id) ? <Check size={18} />: <div className={"h-[18px] w-[18px]"}></div>}

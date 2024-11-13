@@ -406,7 +406,7 @@ const InAppMessage = () => {
                                                                     <CommandItem key={i} className={"p-0 w-full flex flex-row gap-1 items-center cursor-pointer"}>
                                                                         <div className={"flex"} onClick={(event)=>filterPosts({name:"content_type",value:x.value == formData.content_type ? "" :x.value })}>
                                                                             <Checkbox className={'m-2'} checked={x.value === formData.content_type} onClick={(event)=>filterPosts({name:"content_type",value:x.value == formData.content_type ? "" :x.value })} />
-                                                                            <span onClick={(event)=>filterPosts({name:"content_type",value:x.value == formData.content_type ? "" :x.value })} className={`w-full font-normal flex items-center ${theme === "dark" ? "" : "text-muted-foreground"} hover:none`} onSelect={()=>setOpen(false)}>{x.icon} <span className={"ml-2"}>{x.label}</span></span>
+                                                                            <span onClick={(event)=>filterPosts({name:"content_type",value:x.value == formData.content_type ? "" :x.value })} className={`w-full font-normal flex items-center hover:none`} onSelect={()=>setOpen(false)}>{x.icon} <span className={"ml-2"}>{x.label}</span></span>
                                                                         </div>
                                                                     </CommandItem>
                                                                 )
@@ -424,7 +424,7 @@ const InAppMessage = () => {
                                                                     <CommandItem key={i}  className={"p-0 w-full flex flex-row gap-1 items-center cursor-pointer"}>
                                                                         <div className={"flex"} onClick={(event)=>filterPosts({name:"add_filter",value:x.value == formData.add_filter ? "" :x.value })}>
                                                                             <Checkbox className={'m-2'} checked={x.value === formData.add_filter} onClick={(event)=>filterPosts({name:"add_filter",value:x.value == formData.add_filter ? "" :x.value })} />
-                                                                            <span onClick={(event)=>filterPosts({name:"add_filter",value:x.value == formData.add_filter ? "" :x.value })} className={`w-full font-normal flex items-center ${theme === "dark" ? "" : "text-muted-foreground"} hover:none`} onSelect={()=>setOpen(false)}>{x.icon} <span className={"ml-2"}>{x.label}</span></span>
+                                                                            <span onClick={(event)=>filterPosts({name:"add_filter",value:x.value == formData.add_filter ? "" :x.value })} className={`w-full font-normal flex items-center hover:none`} onSelect={()=>setOpen(false)}>{x.icon} <span className={"ml-2"}>{x.label}</span></span>
                                                                         </div>
                                                                     </CommandItem>
                                                                 )
@@ -577,8 +577,8 @@ const InAppMessage = () => {
                                                                             <Ellipsis className={`font-normal`} size={18}/>
                                                                         </DropdownMenuTrigger>
                                                                         <DropdownMenuContent align={"end"}>
-                                                                            <DropdownMenuItem onClick={()=>handleCreateNew(x.id, x.type)}>Edit</DropdownMenuItem>
-                                                                            <DropdownMenuItem onClick={()=>openDeleteWidget(x.id)}>Delete</DropdownMenuItem>
+                                                                            <DropdownMenuItem className={"cursor-pointer"} onClick={()=>handleCreateNew(x.id, x.type)}>Edit</DropdownMenuItem>
+                                                                            <DropdownMenuItem className={"cursor-pointer"} onClick={()=>openDeleteWidget(x.id)}>Delete</DropdownMenuItem>
                                                                         </DropdownMenuContent>
                                                                     </DropdownMenu>
                                                                 </TableCell>

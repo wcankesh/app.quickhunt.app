@@ -18,6 +18,11 @@ import {useToast} from "../ui/use-toast";
 import {useNavigate, useParams} from "react-router-dom";
 import {Checkbox} from "../ui/checkbox";
 
+const initialStateError = {
+    start_at: undefined,
+    end_at: undefined,
+}
+
 const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, selectedStepIndex, setSelectedStepIndex, selectedStep, setSelectedStep}) => {
     let apiSerVice = new ApiService();
     const {toast} = useToast();
@@ -27,6 +32,7 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
 
     const [isLoading, setIsLoading] = useState(false);
     const [date, setDate] = useState([new Date(), addDays(new Date(), 4)]);
+    const [formError, setFormError] = useState(initialStateError);
 
     const onChange = (name, value) => {
         setInAppMsgSetting({...inAppMsgSetting, [name]: value});
@@ -72,16 +78,85 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
             ...inAppMsgSetting,
             [type]: newDateTime
         });
+        setFormError(formError => ({
+            ...formError,
+            [type]: formValidate(type, newDateTime)
+        }));
     };
 
-    const onDateChange = (name, date) => {
-        if (date) {
-            let obj = {...inAppMsgSetting, [name]: date};
-            setInAppMsgSetting(obj);
+    //old code
+    // const onDateChange = (name, date) => {
+    //     if (date) {
+    //         let obj = {...inAppMsgSetting, [name]: date};
+    //         setInAppMsgSetting(obj);
+    //     }
+    //     setFormError(formError => ({
+    //         ...formError,
+    //         [name]: formValidate(name, date)
+    //     }));
+    // };
+
+    const handleDateChange = (date, type) => {
+        const newDate = moment(date).toISOString();
+        setInAppMsgSetting({
+            ...inAppMsgSetting,
+            [type]: newDate
+        });
+        setFormError(formError => ({
+            ...formError,
+            [type]: formValidate(type, newDate)
+        }));
+    };
+
+    const formValidate = (name, value) => {
+        switch (name) {
+            case "start_at":
+                if (!value || value.trim() === "") {
+                    return "Start Date is required.";
+                }
+                return "";
+            case "end_at":
+                if (!value || value.trim() === "") {
+                    return "End Date is required.";
+                }
+                return "";
+            case "start_time":
+                if (!value || value.trim() === "") {
+                    return "Start Time is required.";
+                }
+                const startTimeFormat = /^([01]?[0-9]|2[0-3]):([0-5]?[0-9])$/;
+                if (!startTimeFormat.test(value)) {
+                    return "Start Time must be in HH:mm format.";
+                }
+                return "";
+            case "end_time":
+                if (!value || value.trim() === "") {
+                    return "End Time is required.";
+                }
+                const endTimeFormat = /^([01]?[0-9]|2[0-3]):([0-5]?[0-9])$/;
+                if (!endTimeFormat.test(value)) {
+                    return "End Time must be in HH:mm format.";
+                }
+                return "";
+            default:
+                return "";
         }
     };
 
     const createMessage = async () => {
+
+        let validationErrors = {};
+        Object.keys(inAppMsgSetting).forEach(name => {
+            const error = formValidate(name, inAppMsgSetting[name]);
+            if (error && error.length > 0) {
+                validationErrors[name] = error;
+            }
+        });
+        if (Object.keys(validationErrors).length > 0) {
+            setFormError(validationErrors);
+            return;
+        }
+
         setIsLoading(true)
         const payload = {
             ...inAppMsgSetting,
@@ -90,7 +165,6 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
             project_id: projectDetailsReducer.id,
             type: type
         }
-        console.log(payload)
         const data = await apiSerVice.createInAppMessage(payload);
         if (data.status === 200) {
             setIsLoading(false);
@@ -105,6 +179,19 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
     }
 
     const onUpdateMessage = async () => {
+
+        let validationErrors = {};
+        Object.keys(inAppMsgSetting).forEach(name => {
+            const error = formValidate(name, inAppMsgSetting[name]);
+            if (error && error.length > 0) {
+                validationErrors[name] = error;
+            }
+        });
+        if (Object.keys(validationErrors).length > 0) {
+            setFormError(validationErrors);
+            return;
+        }
+
         if(inAppMsgSetting.type == "3"){
             if(inAppMsgSetting.steps.filter((x) => x.is_active === 1 && x.question_type !== 8).length <= 0){
                 toast({variant: "destructive", description: "Add minimum 1 step"})
@@ -137,11 +224,23 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
         }));
     }
 
+    // const onChangeQuestion = (name, value) => {
+    //     const obj = {...selectedStep, [name]: value, }
+    //     setSelectedStep(obj);
+    //     updateStepRecord(obj)
+    // }
+
     const onChangeQuestion = (name, value) => {
-        const obj = {...selectedStep, [name]: value, }
-        setSelectedStep(obj);
-        updateStepRecord(obj)
-    }
+        const clone = [...inAppMsgSetting?.steps];
+        clone[selectedStepIndex] = {
+            ...clone[selectedStepIndex],
+            [name]: value
+        };
+        setInAppMsgSetting((prev) => ({
+            ...prev,
+            steps: clone,
+        }));
+    };
 
     const onChangeChecklist = (name, value) => {
         const obj = {...selectedStep, [name]: value, }
@@ -162,6 +261,11 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
             navigate(`${baseUrl}/app-message`)
         }
     }
+
+    const publishDate = inAppMsgSetting?.start_at ? new Date(inAppMsgSetting?.start_at) : null;
+    const isDateDisabled = (date) => {
+        return publishDate && date < publishDate;
+    };
 
     return (
         <Fragment>
@@ -192,7 +296,22 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                                 onValueChange={(value) => onChange("from", value, )}
                             >
                                 <SelectTrigger className="w-full h-9">
-                                    <SelectValue/>
+                                    {inAppMsgSetting.from ? (
+                                        <SelectValue>
+                                            {
+                                                allStatusAndTypes.members.find(
+                                                    (x) => Number(x.user_id) === Number(inAppMsgSetting.from)
+                                                )?.user_first_name
+                                            }{" "}
+                                            {
+                                                allStatusAndTypes.members.find(
+                                                    (x) => Number(x.user_id) === Number(inAppMsgSetting.from)
+                                                )?.user_last_name
+                                            }
+                                        </SelectValue>
+                                    ) : (
+                                        <span className="text-muted-foreground">Select a sender</span>
+                                    )}
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectGroup>
@@ -324,102 +443,116 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                     }
                 </div>
             </div>
-            {
-                type === "3" && <div className={"border-b px-4 py-6 space-y-4"}>
-                    <h5 className={"text-base font-normal"}>Question Setting</h5>
-                    {
-                        selectedStep?.question_type === 5 &&
-                        <div className="grid w-full max-w-sm items-center gap-1.5">
-                            <Label className={"font-normal text-sm"}>Answer Options</Label>
-                            <div>
-                                <div className={"space-y-[6px]"}>
 
-                                    {(selectedStep?.options || []).map((option, index) => (
-                                        <div key={index} className="relative mt-2">
-                                            <Input
-                                                className="h-9"
-                                                placeholder={`Option ${index + 1}`}
-                                                value={option.title}
-                                                onChange={(e) => onChangeAddOption(index, e.target.value)}
-                                            />
-                                            <Button
-                                                variant="ghost hover:none"
-                                                className="absolute top-0 right-0"
-                                                onClick={() => removeOption(option, index)}
-                                            >
-                                                <Trash2 size={16}/>
+            {
+                (selectedStep?.question_type !== 3 && selectedStep?.question_type !== 4 && selectedStep?.question_type !== 8) &&  <Fragment>
+                    {
+                        type === "3" &&
+                        <div className={"border-b px-4 py-6 space-y-4"}>
+                            <h5 className={"text-base font-normal"}>Question Setting</h5>
+                            {
+                                selectedStep?.question_type === 5 &&
+                                <div className="grid w-full max-w-sm items-center gap-1.5">
+                                    <Label className={"font-normal text-sm"}>Answer Options</Label>
+                                    <div>
+                                        <div className={"space-y-[6px]"}>
+
+                                            {(selectedStep?.options || []).map((option, index) => (
+                                                <div key={index} className="relative mt-2">
+                                                    <Input
+                                                        className="h-9 pr-10"
+                                                        placeholder={`Option ${index + 1}`}
+                                                        value={option.title}
+                                                        onChange={(e) => onChangeAddOption(index, e.target.value)}
+                                                    />
+                                                    <Button
+                                                        variant="ghost hover:none"
+                                                        className="absolute top-0 right-0"
+                                                        onClick={() => removeOption(option, index)}
+                                                    >
+                                                        <Trash2 size={16}/>
+                                                    </Button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                        <div className={"flex justify-end mt-[6px]"}>
+                                            <Button variant="outline" className="h-9" onClick={addOption}>
+                                                <Plus size={16} className="mr-2"/> Add Option
                                             </Button>
                                         </div>
-                                    ))}
-                                </div>
-                                <div className={"flex justify-end mt-[6px]"}>
-                                    <Button variant="outline" className="h-9" onClick={addOption}>
-                                        <Plus size={16} className="mr-2"/> Add Option
-                                    </Button>
-                                </div>
-                            </div>
+                                    </div>
 
-                        </div>
-                    }
-                    {
-                        (selectedStep?.question_type === 5 || selectedStep?.question_type === 6 || selectedStep?.question_type === 7) && <div className="grid w-full max-w-sm items-center gap-1.5 mt-2">
-                            <Label className={"font-normal text-sm"} htmlFor="placeholder_text">Placeholder
-                                text</Label>
-                            <Input value={inAppMsgSetting.placeholder_text}
-                                   onChange={(e) => onChangeQuestion("placeholder_text", e.target.value)} type="text"
-                                   className={"h-9"} id="placeholder_text" placeholder="Select One..."/>
-                        </div>
-                    }
-                    {
-                        (selectedStep?.question_type === 1 || selectedStep?.question_type === 2 || selectedStep?.question_type === 3 || selectedStep?.question_type === 4) &&
-                        <div className={"space-y-3"}>
-                            {
-                                selectedStep?.question_type === 2 &&
-                                <div className={"flex gap-4"}>
-                                    <div className="grid w-full max-w-sm items-center gap-1.5">
-                                        <Label className={"font-normal text-sm"} htmlFor="start_number">Start Number</Label>
-                                        <Input value={selectedStep?.start_number} name={"start_number"}
-                                               type="number" id="start_number"
-                                               onChange={(e) => onChangeQuestion("start_number", e.target.value)}
-                                               placeholder="1" className={"h-8"}/>
-                                    </div>
-                                    <div className="grid w-full max-w-sm items-center gap-1.5">
-                                        <Label className={"font-normal text-sm"} htmlFor="end_number">End Number</Label>
-                                        <Input value={selectedStep?.end_number} name={"end_number"}
-                                               onChange={(e) => onChangeQuestion("end_number", e.target.value)}
-                                                type="number" id="end_number"
-                                               placeholder="10" className={"h-8"}/>
-                                    </div>
                                 </div>
                             }
+                            {(selectedStep?.question_type === 5 || selectedStep?.question_type === 6 || selectedStep?.question_type === 7) && (
+                                <div className="grid w-full max-w-sm items-center gap-1.5 mt-2">
+                                    <Label className="font-normal text-sm" htmlFor="placeholder_text">Placeholder text</Label>
+                                    <Input
+                                        value={inAppMsgSetting?.steps[selectedStepIndex]?.placeholder_text || ''}
+                                        onChange={(e) => onChangeQuestion("placeholder_text", e.target.value, selectedStep?.question_type)}
+                                        type="text"
+                                        className="h-9"
+                                        id="placeholder_text"
+                                        placeholder="Select One..."
+                                    />
+                                </div>
+                            )}
+                            {
+                                (selectedStep?.question_type === 1 || selectedStep?.question_type === 2) &&
+                                <div className={"space-y-3"}>
+                                    {
+                                        selectedStep?.question_type === 2 &&
+                                        <div className={"flex gap-4"}>
+                                            <div className="grid w-full max-w-sm items-center gap-1.5">
+                                                <Label className={"font-normal text-sm"} htmlFor="start_number">Start Number</Label>
+                                                <Input value={selectedStep?.start_number} name={"start_number"}
+                                                       type="number" id="start_number"
+                                                       onChange={(e) => onChangeQuestion("start_number", e.target.value)}
+                                                       placeholder="1" className={"h-8"}/>
+                                            </div>
+                                            <div className="grid w-full max-w-sm items-center gap-1.5">
+                                                <Label className={"font-normal text-sm"} htmlFor="end_number">End Number</Label>
+                                                <Input value={selectedStep?.end_number} name={"end_number"}
+                                                       onChange={(e) => onChangeQuestion("end_number", e.target.value)}
+                                                       type="number" id="end_number"
+                                                       placeholder="10" className={"h-8"}/>
+                                            </div>
+                                        </div>
+                                    }
 
-                            <div className="grid w-full max-w-sm items-center gap-1.5">
-                                <Label className={"font-normal text-sm"} htmlFor="start_label">Start label</Label>
-                                <Input value={selectedStep?.start_label}
-                                       onChange={(e) => onChangeQuestion("start_label", e.target.value)} type="text"
-                                       id="start_label" placeholder="Very Bad" className={"h-8"}/>
-                            </div>
-                            <div className="grid w-full max-w-sm items-center gap-1.5">
-                                <Label className={"font-normal text-sm"} htmlFor="end_label">End label</Label>
-                                <Input value={selectedStep?.end_label}
-                                       onChange={(e) => onChangeQuestion("end_label", e.target.value)} type="text"
-                                       id="end_label" placeholder="Very Good" className={"h-8"}/>
-                            </div>
+                                    <div className="grid w-full max-w-sm items-center gap-1.5">
+                                        <Label className={"font-normal text-sm"} htmlFor="start_label">Start label</Label>
+                                        <Input value={selectedStep?.start_label}
+                                               onChange={(e) => onChangeQuestion("start_label", e.target.value)} type="text"
+                                               id="start_label" placeholder="Very Bad" className={"h-8"}/>
+                                    </div>
+                                    <div className="grid w-full max-w-sm items-center gap-1.5">
+                                        <Label className={"font-normal text-sm"} htmlFor="end_label">End label</Label>
+                                        <Input value={selectedStep?.end_label}
+                                               onChange={(e) => onChangeQuestion("end_label", e.target.value)} type="text"
+                                               id="end_label" placeholder="Very Good" className={"h-8"}/>
+                                    </div>
+
+                                </div>
+                            }
+                            {/*<div className="grid w-full max-w-sm items-center gap-1.5">*/}
+                            {/*    <div className={"flex gap-2 items-center"}>*/}
+                            {/*        <Checkbox*/}
+                            {/*            id={"is_answer_required"}*/}
+                            {/*            checked={selectedStep?.is_answer_required === 1}*/}
+                            {/*            onCheckedChange={(checked) => onChange("is_answer_required", checked ? 1 : 0)}*/}
+                            {/*        />*/}
+                            {/*        <Checkbox id="is_answer_required"*/}
+                            {/*                  checked={inAppMsgSetting.is_answer_required === 1}*/}
+                            {/*                  onCheckedChange={(checked) => onChange("is_answer_required", checked ? 1 : 0)}*/}
+                            {/*        />*/}
+                            {/*        <label htmlFor="is_answer_required" className="text-sm">Make answer required</label>*/}
+                            {/*    </div>*/}
+                            {/*</div>*/}
 
                         </div>
                     }
-                    <div className="grid w-full max-w-sm items-center gap-1.5">
-                        <div className={"flex gap-2 items-center"}>
-                            <Checkbox
-                                id={"is_answer_required"}
-                                checked={selectedStep?.is_answer_required === 1}
-                                onCheckedChange={(checked) => onChangeQuestion("is_answer_required", checked ? 1 : 0)}
-                            />
-                            <label htmlFor="is_answer_required" className="text-sm">Make answer required</label>
-                        </div>
-                    </div>
-
-                </div>
+                </Fragment>
             }
             <div className={"border-b px-4 py-6 space-y-4"}>
                 <h5 className={"text-base font-normal"}>Style</h5>
@@ -497,7 +630,7 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                 </div>
 
                 {
-                    (type === "2" || type === "3" || type === "4") &&
+                    (type === "2" || type === "3") &&
                     <div className="grid w-full max-w-sm items-center gap-1.5">
                         <div className="flex items-center gap-2">
                             <Checkbox id="is_close_button" checked={inAppMsgSetting.is_close_button === 1} onCheckedChange={(checked) => onChange("is_close_button", checked ? 1 : 0)}/>
@@ -530,13 +663,13 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                         <Popover>
                             <PopoverTrigger asChild>
                                 <Button
-                                    id="start_at_time"
+                                    id="start_at"
                                     variant={"outline"}
-                                    className={cn("w-1/2 justify-start text-left font-normal", !date && "text-muted-foreground")}
+                                    className={cn("w-1/2 h-9 justify-start text-left font-normal", !date && "text-muted-foreground")}
                                 >
                                     <CalendarIcon className="mr-2 h-4 w-4"/>
                                     <Fragment>
-                                        {inAppMsgSetting.start_at ? moment(inAppMsgSetting.start_at).format('D MMM, YYYY') : "Select a date"}
+                                        {(id === 'new' && inAppMsgSetting?.start_at === '') ? 'Select date' : `${inAppMsgSetting?.start_at ? moment(inAppMsgSetting?.start_at).format('D MMM, YYYY') : "Select a date"}`}
                                     </Fragment>
                                 </Button>
                             </PopoverTrigger>
@@ -545,10 +678,9 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                                     mode="single"
                                     captionLayout="dropdown"
                                     selected={inAppMsgSetting?.start_at ? new Date(inAppMsgSetting?.start_at) : new Date()}
-                                    onSelect={(date) => onDateChange("start_at", date)}
+                                    onSelect={(date) => handleDateChange(date, "start_at")}
                                     startMonth={new Date(2024, 0)}
                                     endMonth={new Date(2050, 12)}
-
                                 />
                             </PopoverContent>
                         </Popover>
@@ -564,39 +696,51 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                 </div>
                 <div className="grid w-full max-w-sm items-center gap-1.5">
                     <Label className={"font-normal"} htmlFor="email">Stop sending</Label>
-                    <div className={"flex flex-col gap-4"}>
+                    <div className={"flex flex-col gap-1"}>
                         <div className={"flex gap-4"}>
-                            <Popover>
-                                <PopoverTrigger asChild>
-                                    <Button
-                                        id="end_at_time"
-                                        variant={"outline"}
-                                        className={cn("w-1/2 h-9 justify-start text-left font-normal", !date && "text-muted-foreground")}
-                                    >
-                                        <CalendarIcon className="mr-2 h-4 w-4"/>
-                                        <Fragment>
-                                            {(id === 'new' && inAppMsgSetting?.end_at === '') ? 'Select date' : `${inAppMsgSetting?.end_at ? moment(inAppMsgSetting?.end_at).format('D MMM, YYYY') : "Select a date"}`}
-                                        </Fragment>
-                                    </Button>
-                                </PopoverTrigger>
-                                <PopoverContent className="w-auto p-0" align="start">
-                                    <Calendar
-                                        mode="single"
-                                        captionLayout="dropdown"
-                                        selected={inAppMsgSetting?.end_at ? new Date(inAppMsgSetting?.end_at) : new Date()}
-                                        onSelect={(date) => onDateChange("end_at", date)}
-                                        startMonth={new Date(2024, 0)}
-                                        endMonth={new Date(2050, 12)}
+                            <div className={"flex flex-col w-full"}>
+                                <Popover>
+                                    <PopoverTrigger asChild>
+                                        <Button
+                                            id="end_at"
+                                            variant={"outline"}
+                                            className={cn("h-9 justify-start text-left font-normal", !date && "text-muted-foreground")}
+                                        >
+                                            <CalendarIcon className="mr-2 h-4 w-4"/>
+                                            <Fragment>
+                                                {(id === 'new' && inAppMsgSetting?.end_at === '') ? 'Select date' : `${inAppMsgSetting?.end_at ? moment(inAppMsgSetting?.end_at).format('D MMM, YYYY') : "Select a date"}`}
+                                            </Fragment>
+                                        </Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-auto p-0" align="start">
+                                        <Calendar
+                                            mode="single"
+                                            captionLayout="dropdown"
+                                            // selected={inAppMsgSetting?.end_at ? new Date(inAppMsgSetting?.end_at) : new Date()}
+                                            selected={inAppMsgSetting?.end_at ? new Date(inAppMsgSetting?.end_at) : null}
+                                            onSelect={(date) => handleDateChange(date, "end_at")}
+                                            // startMonth={new Date(2024, 0)}
+                                            // endMonth={new Date(2050, 12)}
+
+                                            endMonth={new Date(2050, 12)}
+                                            startMonth={publishDate || new Date()}
+                                            disabled={isDateDisabled}
+                                        />
+                                    </PopoverContent>
+                                </Popover>
+                                {
+                                    formError.end_at && <span className="text-red-500 text-sm">{formError.end_at}</span>
+                                }
+                            </div>
+                            <div className={"flex flex-col w-full"}>
+                                <div className="custom-time-picker ">
+                                    <Input
+                                        className={"h-9"}
+                                        type={"time"}
+                                        value={moment(inAppMsgSetting.end_at).format("HH:mm")}
+                                        onChange={(e) => handleTimeChange(e.target.value, 'end_at')}
                                     />
-                                </PopoverContent>
-                            </Popover>
-                            <div className="custom-time-picker w-1/2">
-                                <Input
-                                    className={"h-9"}
-                                    type={"time"}
-                                    value={moment(inAppMsgSetting.end_at).format("HH:mm")}
-                                    onChange={(e) => handleTimeChange(e.target.value, 'end_at')}
-                                />
+                                </div>
                             </div>
                         </div>
                     </div>

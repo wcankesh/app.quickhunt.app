@@ -43,7 +43,6 @@ const GeneralSettings = () => {
             const data = await apiSerVice.getPortalSetting(projectDetailsReducer.id)
             if (data.status === 200) {
                 setGeneralSettingData(data.data);
-                console.log("generalSettingData.header_btn_background_color", data.data.header_btn_background_color)
             } else {
 
             }

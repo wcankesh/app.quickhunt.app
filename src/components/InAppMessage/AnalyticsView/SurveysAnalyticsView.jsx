@@ -1,9 +1,6 @@
 import React, {Fragment, useEffect, useState} from 'react';
 import {Card, CardContent, CardHeader} from "../../ui/card";
-import {Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator} from "../../ui/breadcrumb";
-import {baseUrl} from "../../../utils/constent";
 import {Skeleton} from "../../ui/skeleton";
-import {useNavigate} from "react-router";
 import {ApiService} from "../../../utils/ApiService";
 import {useSelector} from "react-redux";
 import moment from "moment";
@@ -15,6 +12,7 @@ import {useTheme} from "../../theme-provider";
 import {Avatar, AvatarFallback} from "../../ui/avatar";
 import EmptyData from "../../Comman/EmptyData";
 import CommonBreadCrumb from "../../Comman/CommonBreadCrumb";
+import {chartLoading} from "../../Comman/CommSkel";
 
 const chartConfig = {
     y: {
@@ -41,7 +39,6 @@ const chartConfigNPS ={
 const SurveysAnalyticsView = () => {
     const {theme} = useTheme();
     const {id} = useParams();
-    const navigate = useNavigate();
     const apiService = new ApiService();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
 
@@ -153,47 +150,48 @@ const SurveysAnalyticsView = () => {
                     </Card>
                     <Card>
                         <CardHeader className={"p-4 border-b text-base font-medium"}>How did that change over time?</CardHeader>
-                        <CardContent className={"p-4 pl-0"}>
-                            {
-                                analytics?.charts?.length > 0 ?
-                                    <ChartContainer config={chartConfig} className="aspect-auto h-[250px] w-full">
-                                        <ResponsiveContainer width="100%" height="100%">
-                                            <LineChart
-                                                accessibilityLayer
-                                                data={analytics?.charts || []}
+                        {
+                            isLoading ? chartLoading(15, "p-2") : <CardContent className={"p-4 pl-0"}>
+                                {
+                                    analytics?.charts?.length > 0 ? <ChartContainer config={chartConfig} className="aspect-auto h-[250px] w-full">
+                                            <ResponsiveContainer width="100%" height="100%">
+                                                <LineChart
+                                                    accessibilityLayer
+                                                    data={analytics?.charts || []}
 
-                                            >
-                                                <CartesianGrid vertical={false} />
-                                                <XAxis
-                                                    dataKey="x"
-                                                    tickLine={false}
-                                                    axisLine={false}
-                                                    tickMargin={8}
-                                                    tickFormatter={(value) => {
-                                                        const date = new Date(value)
-                                                        return date.toLocaleDateString("en-US", {
-                                                            month: "short",
-                                                            day: "numeric",
-                                                        })
-                                                    }}
-                                                />
-                                                <Tooltip
-                                                    cursor={false}
-                                                    content={<ChartTooltipContent hideLabel />}
-                                                />
-                                                <YAxis tickLine={false} axisLine={false}/>
-                                                <Line
-                                                    dataKey="y"
-                                                    type="monotone"
-                                                    stroke="var(--color-y)"
-                                                    strokeWidth={2}
-                                                />
-                                            </LineChart>
-                                        </ResponsiveContainer>
-                                    </ChartContainer>
-                                    : <EmptyData />
-                            }
-                        </CardContent>
+                                                >
+                                                    <CartesianGrid vertical={false} />
+                                                    <XAxis
+                                                        dataKey="x"
+                                                        tickLine={false}
+                                                        axisLine={false}
+                                                        tickMargin={8}
+                                                        tickFormatter={(value) => {
+                                                            const date = new Date(value)
+                                                            return date.toLocaleDateString("en-US", {
+                                                                month: "short",
+                                                                day: "numeric",
+                                                            })
+                                                        }}
+                                                    />
+                                                    <Tooltip
+                                                        cursor={false}
+                                                        content={<ChartTooltipContent hideLabel />}
+                                                    />
+                                                    <YAxis tickLine={false} axisLine={false}/>
+                                                    <Line
+                                                        dataKey="y"
+                                                        type="monotone"
+                                                        stroke="var(--color-y)"
+                                                        strokeWidth={2}
+                                                    />
+                                                </LineChart>
+                                            </ResponsiveContainer>
+                                        </ChartContainer>
+                                        : <EmptyData />
+                                }
+                            </CardContent>
+                        }
                     </Card>
                     <Card>
                         <CardHeader className={"p-4 border-b text-base font-medium"}>Customers who opened</CardHeader>
@@ -273,7 +271,8 @@ const SurveysAnalyticsView = () => {
                                         {
                                             (inAppMsgSetting?.steps || []).map((x, i) => {
                                                 return (
-                                                    <TableHead className={`px-2 py-[10px] md:px-3 font-medium text-card-foreground`} key={i}>
+                                                    // <TableHead className={`px-2 py-[10px] md:px-3 font-medium text-card-foreground`} key={i}>
+                                                    <TableHead className={`max-w-[140px] truncate text-ellipsis overflow-hidden whitespace-nowrap px-2 py-[10px] md:px-3 font-medium text-card-foreground`} key={i}>
                                                         {x.text}
                                                     </TableHead>
                                                 );
@@ -410,103 +409,106 @@ const SurveysAnalyticsView = () => {
                                             x.question_type === 6 || x.question_type === 7 || x.question_type === 8 ? "" :
                                                 <Card>
                                                     <CardHeader className={"p-4 border-b text-base font-medium"}>{x.text}</CardHeader>
-                                                    <CardContent className={"p-4 pl-0"}>
-                                                        {
-                                                            x.question_type === 1 ? <div>
-                                                                <ChartContainer config={chartConfigNPS}>
-                                                                    <BarChart accessibilityLayer data={x.report}>
-                                                                        <CartesianGrid vertical={false} />
-                                                                        <XAxis
-                                                                            dataKey="created_at"
-                                                                            tickLine={false}
-                                                                            tickMargin={10}
-                                                                            axisLine={false}
-                                                                            tickFormatter={(value) => {
-                                                                                const date = new Date(value)
-                                                                                return date.toLocaleDateString("en-US", {
-                                                                                    month: "short",
-                                                                                    day: "numeric",
-                                                                                })
-                                                                            }}
-                                                                        />
-                                                                        <YAxis tickLine={false} axisLine={false} tickFormatter={(value) => `${value}%`}/>
-                                                                        <ChartTooltip
-                                                                            cursor={true}
-                                                                            content={<ChartTooltipContent formatter={(value, name) => {
-                                                                                return(
-                                                                                    <Fragment>
-                                                                                        <div
-                                                                                            className="h-2.5 w-2.5 shrink-0 rounded-[2px] bg-[--color-bg]"
-                                                                                            style={
-                                                                                                {
-                                                                                                    backgroundColor: `var(--color-${name.toLowerCase()})`,
-                                                                                                }
-                                                                                            }
-                                                                                        />
-                                                                                        {chartConfigNPS?.label || name}
-                                                                                        <div className="ml-auto flex items-baseline gap-0.5 font-mono font-medium tabular-nums text-foreground">
-                                                                                            {value}
-                                                                                            <span className="font-normal text-muted-foreground">%</span>
-                                                                                        </div>
-                                                                                    </Fragment>
-                                                                                )
-                                                                            }}
-                                                                            />}
-                                                                        />
+                                                    {
+                                                        isLoading ? chartLoading(7, "p-2") :
+                                                            <CardContent className={"p-4 pl-0"}>
+                                                                {
+                                                                    x.question_type === 1 ? <div>
+                                                                        <ChartContainer config={chartConfigNPS}>
+                                                                            <BarChart accessibilityLayer data={x.report}>
+                                                                                <CartesianGrid vertical={false} />
+                                                                                <XAxis
+                                                                                    dataKey="created_at"
+                                                                                    tickLine={false}
+                                                                                    tickMargin={10}
+                                                                                    axisLine={false}
+                                                                                    tickFormatter={(value) => {
+                                                                                        const date = new Date(value)
+                                                                                        return date.toLocaleDateString("en-US", {
+                                                                                            month: "short",
+                                                                                            day: "numeric",
+                                                                                        })
+                                                                                    }}
+                                                                                />
+                                                                                <YAxis tickLine={false} axisLine={false} tickFormatter={(value) => `${value}%`}/>
+                                                                                <ChartTooltip
+                                                                                    cursor={true}
+                                                                                    content={<ChartTooltipContent formatter={(value, name) => {
+                                                                                        return(
+                                                                                            <Fragment>
+                                                                                                <div
+                                                                                                    className="h-2.5 w-2.5 shrink-0 rounded-[2px] bg-[--color-bg]"
+                                                                                                    style={
+                                                                                                        {
+                                                                                                            backgroundColor: `var(--color-${name.toLowerCase()})`,
+                                                                                                        }
+                                                                                                    }
+                                                                                                />
+                                                                                                {chartConfigNPS?.label || name}
+                                                                                                <div className="ml-auto flex items-baseline gap-0.5 font-mono font-medium tabular-nums text-foreground">
+                                                                                                    {value}
+                                                                                                    <span className="font-normal text-muted-foreground">%</span>
+                                                                                                </div>
+                                                                                            </Fragment>
+                                                                                        )
+                                                                                    }}
+                                                                                    />}
+                                                                                />
 
-                                                                        <Bar
-                                                                            dataKey="detractor_percentage"
-                                                                            stackId="a"
-                                                                            fill="var(--color-detractor)"
-                                                                            radius={[0, 0, 4, 4]}
-                                                                            name={"Detractor"}
-                                                                        />
-                                                                        <Bar
-                                                                            dataKey="passives_percentage"
-                                                                            stackId="a"
-                                                                            fill="var(--color-passives)"
-                                                                            radius={[0, 0, 0, 0]}
-                                                                            name={"Passives"}
-                                                                        />
-                                                                        <Bar
-                                                                            dataKey="promoter_percentage"
-                                                                            stackId="a"
-                                                                            fill="var(--color-promoter)"
-                                                                            name={"Promoter"}
-                                                                            radius={[4, 4, 0, 0]}
-                                                                        />
-                                                                    </BarChart>
-                                                                </ChartContainer>
-                                                            </div> : <div>
-                                                                <ChartContainer config={{
-                                                                    total: {
-                                                                        label: 'Total',
-                                                                        color: "#7c3aed26",
-                                                                    }
-                                                                }} >
-                                                                    <BarChart accessibilityLayer data={x.question_type === 2 || x.question_type === 3 ? questionType2 : x.question_type === 4 ? questionType4 : x.question_type === 5 ? questionType5 : []}>
-                                                                        <CartesianGrid vertical={false}/>
-                                                                        <XAxis
-                                                                            dataKey="response"
-                                                                            tickLine={false}
-                                                                            tickMargin={10}
-                                                                            axisLine={false}
-                                                                        />
-                                                                        <YAxis tickLine={false} axisLine={false}/>
+                                                                                <Bar
+                                                                                    dataKey="detractor_percentage"
+                                                                                    stackId="a"
+                                                                                    fill="var(--color-detractor)"
+                                                                                    radius={[0, 0, 4, 4]}
+                                                                                    name={"Detractor"}
+                                                                                />
+                                                                                <Bar
+                                                                                    dataKey="passives_percentage"
+                                                                                    stackId="a"
+                                                                                    fill="var(--color-passives)"
+                                                                                    radius={[0, 0, 0, 0]}
+                                                                                    name={"Passives"}
+                                                                                />
+                                                                                <Bar
+                                                                                    dataKey="promoter_percentage"
+                                                                                    stackId="a"
+                                                                                    fill="var(--color-promoter)"
+                                                                                    name={"Promoter"}
+                                                                                    radius={[4, 4, 0, 0]}
+                                                                                />
+                                                                            </BarChart>
+                                                                        </ChartContainer>
+                                                                    </div> : <div>
+                                                                        <ChartContainer config={{
+                                                                            total: {
+                                                                                label: 'Total',
+                                                                                color: "#7c3aed26",
+                                                                            }
+                                                                        }} >
+                                                                            <BarChart accessibilityLayer data={x.question_type === 2 || x.question_type === 3 ? questionType2 : x.question_type === 4 ? questionType4 : x.question_type === 5 ? questionType5 : []}>
+                                                                                <CartesianGrid vertical={false}/>
+                                                                                <XAxis
+                                                                                    dataKey="response"
+                                                                                    tickLine={false}
+                                                                                    tickMargin={10}
+                                                                                    axisLine={false}
+                                                                                />
+                                                                                <YAxis tickLine={false} axisLine={false}/>
 
-                                                                        <ChartTooltip
-                                                                            cursor={false}
-                                                                            content={<ChartTooltipContent indicator="line" />}
-                                                                        />
-                                                                        <Bar dataKey="total" fill="var(--color-total)"
-                                                                             className={"cursor-pointer"} radius={4}/>
+                                                                                <ChartTooltip
+                                                                                    cursor={false}
+                                                                                    content={<ChartTooltipContent indicator="line" />}
+                                                                                />
+                                                                                <Bar dataKey="total" fill="var(--color-total)"
+                                                                                     className={"cursor-pointer"} radius={4}/>
 
-                                                                    </BarChart>
-                                                                </ChartContainer>
-                                                            </div>
-                                                        }
+                                                                            </BarChart>
+                                                                        </ChartContainer>
+                                                                    </div>
+                                                                }
 
-                                                    </CardContent>
+                                                            </CardContent>
+                                                    }
                                                 </Card>
                                         )
                                     })

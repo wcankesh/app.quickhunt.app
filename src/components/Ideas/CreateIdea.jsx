@@ -87,7 +87,6 @@ const CreateIdea = ({isOpen, onOpen, onClose, closeCreateIdea, setIdeasList, ide
         }
 
         setIsLoading(true)
-        debugger
         let formData = new FormData();
         formData.append('title', ideaDetail.title);
         // formData.append('slug_url', ideaDetail.title ? ideaDetail.title.replace(/ /g,"-").replace(/\?/g, "-") :"");
@@ -171,9 +170,15 @@ const CreateIdea = ({isOpen, onOpen, onClose, closeCreateIdea, setIdeasList, ide
                                     <Label className={"font-normal capitalize"}>Choose Board for this Idea</Label>
                                     <Select
                                         onValueChange={(value) => onChangeText( "board", value)}
-                                        value={ideaDetail.board}>
+                                        value={ideaDetail.board || ""}>
                                         <SelectTrigger className="bg-card">
-                                            <SelectValue/>
+                                            {ideaDetail.board ? (
+                                                <SelectValue>
+                                                    {allStatusAndTypes?.boards.find(board => board.id === ideaDetail.board)?.title}
+                                                </SelectValue>
+                                            ) : (
+                                                <span className="text-muted-foreground">Choose Board</span>
+                                            )}
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectGroup>
@@ -199,22 +204,20 @@ const CreateIdea = ({isOpen, onOpen, onClose, closeCreateIdea, setIdeasList, ide
                                 <Label className={"font-normal capitalize"}>Choose Topics for this Idea (optional)</Label>
                                     <Select onValueChange={handleChange} value={[]}>
                                         <SelectTrigger className="bg-card">
-                                            <SelectValue className={"text-muted-foreground text-sm"} placeholder="Assign to">
+                                            <SelectValue className={"text-muted-foreground text-sm"}>
                                                 <div className={"flex gap-[2px]"}>
                                                     {
-                                                        (ideaDetail.topic || []).map((x,index)=>{
-                                                            const findObj = topicLists.find((y) => y.id === x);
-                                                            return(
-                                                                <>
+                                                        (ideaDetail.topic || []).length === 0
+                                                            ? <span className={"text-muted-foreground"}>Select topic</span>
+                                                            : (ideaDetail.topic || []).map((x, index) => {
+                                                                const findObj = topicLists.find((y) => y.id === x);
+                                                                return (
                                                                     <div key={index} className={`text-xs flex gap-[2px] ${theme === "dark" ? "text-card" : ""} bg-slate-300 items-center rounded py-0 px-2`}>
                                                                         {findObj?.title}
                                                                     </div>
-                                                                </>
-
-                                                            )
-                                                        })
+                                                                );
+                                                            })
                                                     }
-                                                    {(ideaDetail.topic || []).length > 2 && <div>...</div>}
                                                 </div>
                                             </SelectValue>
                                         </SelectTrigger>

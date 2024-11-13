@@ -11,7 +11,7 @@ import {projectDetailsAction} from "../../../redux/action/ProjectDetailsAction";
 import {allProjectAction} from "../../../redux/action/AllProjectAction";
 import {setProjectDetails} from "../../../utils/constent";
 import {toast} from "../../ui/use-toast";
-import {CircleX, Loader2, X} from "lucide-react";
+import {CircleX, Loader2} from "lucide-react";
 import DeleteDialog from "../../Comman/DeleteDialog";
 
 const initialState = {
@@ -104,13 +104,7 @@ const Project = () => {
         let formData = new FormData()
         Object.keys(payload).forEach((key) => {
             // formData.append(key, payload[key] || '')
-            if(key === "delete_logo" && createProjectDetails?.project_logo?.name){
-
-            }  else {
-                formData.append(key,createProjectDetails[key] || '');
-            }
-            if(key === "delete_favicon" && createProjectDetails?.project_favicon?.name){
-
+            if((key === "delete_logo" && createProjectDetails?.project_logo?.name) || (key === "delete_favicon" && createProjectDetails?.project_favicon?.name)){
             }  else {
                 formData.append(key,createProjectDetails[key] || '');
             }
@@ -198,7 +192,7 @@ const Project = () => {
             {
                 openDelete &&
                 <DeleteDialog
-                    title={"You really want to delete this Project ?"}
+                    title={"You really want to delete this Project?"}
                     isOpen={openDelete}
                     onOpenChange={closeDialog}
                     onDelete={onDelete}
@@ -251,14 +245,14 @@ const Project = () => {
                                             <div>
 
                                                 <input
-                                                    id="pictureInput"
+                                                    id="project_logo"
                                                     type="file"
                                                     className="hidden"
                                                     accept="image/*"
                                                     onChange={handleFileChange}
                                                 />
                                                 <label
-                                                    htmlFor="pictureInput"
+                                                    htmlFor="project_logo"
                                                     // className="border-dashed w-[80px] h-[80px] sm:w-[132px] sm:h-[128px] py-[52px] flex items-center justify-center bg-muted border border-muted-foreground rounded cursor-pointer"
                                                     className="flex w-[50px] bg-muted h-[50px] py-0 justify-center items-center flex-shrink-0 rounded cursor-pointer"
                                                 >
@@ -309,14 +303,14 @@ const Project = () => {
                                     <div>
 
                                         <input
-                                            id="pictureInput"
+                                            id="project_favicon"
                                             type="file"
                                             className="hidden"
                                             accept="image/*"
                                             onChange={handleFileChangeFav}
                                         />
                                         <label
-                                            htmlFor="pictureInput"
+                                            htmlFor="project_favicon"
                                             className="flex w-[50px] bg-muted h-[50px] py-0 justify-center items-center flex-shrink-0 rounded cursor-pointer"
                                         >
                                             <span className="text-center text-muted-foreground font-medium text-[14px]">{Icon.editImgLogo}</span>

@@ -4,12 +4,12 @@ import moment from "moment";
 import {ApiService} from "../../utils/ApiService";
 import {useSelector} from "react-redux";
 import EmptyData from "../Comman/EmptyData";
-import {CommSkel} from "../Comman/CommSkel";
+import {chartLoading, CommSkel} from "../Comman/CommSkel";
 import {Bar, BarChart, CartesianGrid, XAxis, YAxis} from "recharts"
 import {ChartContainer, ChartTooltip, ChartTooltipContent,} from "../ui/chart"
 import {Avatar, AvatarFallback, AvatarImage} from "../ui/avatar";
 import ReadMoreText from "../Comman/ReadMoreText";
-import {DateRangePicker} from "../ui/date-range-picker";
+import {DateRangePicker, formatButtonDate, formatDate, getPresetRange, PRESETS} from "../ui/date-range-picker";
 import {Button} from "../ui/button";
 import {useNavigate} from "react-router-dom";
 import {baseUrl} from "../../utils/constent";
@@ -38,6 +38,8 @@ export function Dashboard() {
         from: new Date(new Date().setDate(new Date().getDate() - 29)),
         to: new Date(),
     });
+
+    const [dateDisplay, setDateDisplay] = useState('');
 
     const [chartList, setChartList] = useState({
         reactionAnalytic: [],
@@ -114,44 +116,72 @@ export function Dashboard() {
         }
     }
 
+    const checkPreset = () => {
+        for (const preset of PRESETS) {
+            const presetRange = getPresetRange(preset.name)
+            const normalizedRangeFrom = new Date(state.from);
+            normalizedRangeFrom.setHours(0, 0, 0, 0);
+            const normalizedPresetFrom = new Date(
+                presetRange.from.setHours(0, 0, 0, 0)
+            )
+            const normalizedRangeTo = new Date(state.to ?? 0);
+            normalizedRangeTo.setHours(0, 0, 0, 0);
+            const normalizedPresetTo = new Date(
+                presetRange.to?.setHours(0, 0, 0, 0) ?? 0
+            )
+            if (
+                normalizedRangeFrom.getTime() === normalizedPresetFrom.getTime() &&
+                normalizedRangeTo.getTime() === normalizedPresetTo.getTime()
+            ) {
+                setDateDisplay(preset.displayDays)
+                return
+            }
+        }
+        setDateDisplay(`${formatDate(state.from)} - ${formatDate(state.to)}`)
+    }
+
+    useEffect(() => {
+        checkPreset()
+    }, [state])
+
     const programAnalytics = [
         {
             id: 1,
             title: "Total Views",
-            compareText: (<span>
+            compareText: (
                 <span className={chartList.totalViewCountDiff < 0 ? 'text-destructive' : 'text-primary'}>
                     {parseFloat(chartList.totalViewCountDiff).toFixed(2)}%
-            </span> {" from last month"} </span>
+            </span>
             ),
             count: chartList.totalViewCount || 0,
         },
         {
             id: 2,
             title: "Unique Views",
-            compareText: (<span>
+            compareText: (
                 <span className={chartList.uniqueViewDiff < 0 ? 'text-destructive' : 'text-primary'}>
                     {parseFloat(chartList.uniqueViewDiff).toFixed(2)}%
-            </span> {" from last month"} </span>
+            </span>
             ),
             count: chartList.uniqueViewCount || 0,
         },
         {
             id: 3,
             title: "Feedback",
-            compareText: (<span>
+            compareText: (
                 <span className={chartList.feedbackCountDiff < 0 ? 'text-destructive' : 'text-primary'}>
                     {parseFloat(chartList.feedbackCountDiff).toFixed(2)}%
-            </span> {" from last month"} </span>
+            </span>
             ),
             count: chartList.feedbackCount || 0,
         },
         {
             id: 4,
             title: "Total Reaction",
-            compareText: (<span>
+            compareText: (
                 <span className={chartList.reactionCountDiff < 0 ? 'text-destructive' : 'text-primary'}>
                     {parseFloat(chartList.reactionCountDiff).toFixed(2)}%
-            </span> {" from last month"} </span>
+            </span>
             ),
             count: chartList.reactionCount || 0,
         },
@@ -203,7 +233,7 @@ export function Dashboard() {
                                                                 {x.count}
                                                             </h3>
                                                             <p className={"text-xs"}>
-                                                                {x.compareText}
+                                                                {x.compareText} {dateDisplay}
                                                             </p>
                                                         </CardContent>
                                                     </CardHeader>
@@ -215,12 +245,12 @@ export function Dashboard() {
                         }
                     </div>
                     <div className={"flex flex-wrap gap-4 lg:gap-8 md:flex-nowrap"}>
-                        <Card className={"lg:basis-2/3 basis-full min-w-[270px] shadow border"}>
+                        <Card className={"lg:basis-2/3 basis-full min-w-[270px] shadow border flex flex-col"}>
                             <CardHeader className={"p-6 py-3 border-b"}>
                                 <CardTitle className={"text-base font-medium"}>Comments
                                     ({isLoading ? 0 : chartList.feedbacks.length})</CardTitle>
                             </CardHeader>
-                            <div className={"max-h-[300px] overflow-y-auto"}>
+                            <div className={"max-h-[300px] overflow-y-auto flex-1"}>
                                 {
                                     isLoading ? (
                                         <CardContent className={"p-0"}>{CommSkel.dashboardComments}</CardContent>
@@ -228,7 +258,7 @@ export function Dashboard() {
                                         (chartList.feedbacks && chartList.feedbacks.length > 0) ? (
                                             (chartList.feedbacks || []).map((x, i) => (
                                                 <Fragment key={i}>
-                                                    <CardContent className={"py-2.5 px-6 flex flex-col gap-4 border-b"}>
+                                                    <CardContent className={"py-2.5 px-6 flex flex-col gap-4 border-b last:border-b-0"}>
                                                         <div className="flex gap-2 items-center justify-between cursor-pointer">
                                                             <div
                                                                 className="flex gap-2 items-center"
@@ -261,17 +291,30 @@ export function Dashboard() {
                                                                 {x.type === 1 ? "Announcement" : "Idea"}
                                                             </Badge>
                                                         </div>
-                                                        <p
-                                                            className={"text-xs font-normal text-foreground cursor-pointer"}
-                                                            onClick={() => {
-                                                                if (x.type === 1) {
-                                                                    navigate(`${baseUrl}/announcements/${x.post_id}`);
-                                                                } else if (x.type === 2) {
-                                                                    navigate(`${baseUrl}/ideas/${x.post_id}`);
-                                                                }
-                                                            }}
-                                                        >
-                                                            <ReadMoreText html={x.comment} maxLine={"1"}/>
+                                                        {/*<p*/}
+                                                        {/*    className={"text-xs font-normal text-foreground cursor-pointer"}*/}
+                                                        {/*    onClick={() => {*/}
+                                                        {/*        if (x.type === 1) {*/}
+                                                        {/*            navigate(`${baseUrl}/announcements/${x.post_id}`);*/}
+                                                        {/*        } else if (x.type === 2) {*/}
+                                                        {/*            navigate(`${baseUrl}/ideas/${x.post_id}`);*/}
+                                                        {/*        }*/}
+                                                        {/*    }}*/}
+                                                        {/*>*/}
+                                                        {/*    <ReadMoreText html={x.comment} maxLength={100}/>*/}
+                                                        {/*</p>*/}
+                                                        <p className="text-xs font-normal text-foreground cursor-pointer">
+                                                            <ReadMoreText
+                                                                html={x.comment}
+                                                                maxLength={100}
+                                                                onTextClick={() => {
+                                                                    if (x.type === 1) {
+                                                                        navigate(`${baseUrl}/announcements/${x.post_id}`);
+                                                                    } else if (x.type === 2) {
+                                                                        navigate(`${baseUrl}/ideas/${x.post_id}`);
+                                                                    }
+                                                                }}
+                                                            />
                                                         </p>
                                                     </CardContent>
                                                 </Fragment>
@@ -282,7 +325,7 @@ export function Dashboard() {
                                     )
                                 }
                             </div>
-                            <div className={"p-6 py-3 text-end"}>
+                            <div className={"p-6 py-3 text-end border-t"}>
                                 <Button variant={"ghost hover:none"} className={"p-0 h-auto text-primary font-medium"}
                                         // onClick={() => navigate(`${baseUrl}/dashboard/comments?pageNo=2`)}>
                                         onClick={() => navigate(`${baseUrl}/dashboard/comments`)}>
@@ -290,12 +333,12 @@ export function Dashboard() {
                                 </Button>
                             </div>
                         </Card>
-                        <Card className={"lg:basis-1/3 basis-full min-w-[270px] shadow border"}>
+                        <Card className={"lg:basis-1/3 basis-full min-w-[270px] shadow border flex flex-col"}>
                             <CardHeader className={"p-6 py-3 border-b"}>
                                 <CardTitle className={"text-base font-medium"}>Reaction
                                     ({isLoading ? 0 : chartList.reactions.length})</CardTitle>
                             </CardHeader>
-                            <div className={"max-h-[300px] overflow-y-auto"}>
+                            <div className={"max-h-[300px] overflow-y-auto flex-1"}>
                                 {
                                     isLoading ? (
                                         <CardContent className={"p-0"}>{CommSkel.commonParagraphTwoAvatar}</CardContent>
@@ -305,7 +348,7 @@ export function Dashboard() {
                                                 const emoji = allStatusAndTypes.emoji.find((e) => e.id === x.reaction_id) || {emoji_url: ""};
                                                 return (
                                                     <Fragment key={i}>
-                                                        <CardContent className={"py-2.5 px-6 border-b"}>
+                                                        <CardContent className={"py-2.5 px-6 border-b last:border-b-0"}>
                                                             <div className={"flex gap-4"}>
                                                                 <Avatar className={"rounded-none w-[35px] h-[35px]"}>
                                                                     <AvatarImage src={emoji.emoji_url}/>
@@ -333,7 +376,7 @@ export function Dashboard() {
                                     )
                                 }
                             </div>
-                            <div className={"p-6 py-3 text-end"}>
+                            <div className={"p-6 py-3 text-end border-t"}>
                                 <Button variant={"ghost hover:none"} className={"p-0 h-auto text-primary font-medium"}
                                         onClick={() => navigate(`${baseUrl}/dashboard/reactions`)}>
                                     See All
@@ -348,42 +391,46 @@ export function Dashboard() {
                             </CardHeader>
                             {dataAvailable ? (
                                 <CardContent className={"pb-10 px-4 pt-8 m-0 md:px-7"}>
-                                    <ChartContainer config={chartConfig} className="aspect-auto h-[250px] w-full">
-                                        <BarChart accessibilityLayer data={chartList.totalViewViewList}>
-                                            <CartesianGrid vertical={false}/>
-                                            <XAxis
-                                                dataKey="x"
-                                                tickLine={false}
-                                                tickMargin={10}
-                                                axisLine={false}
+                                    {
+                                        isLoading ? chartLoading(14) : (
+                                            <ChartContainer config={chartConfig} className="aspect-auto h-[250px] w-full">
+                                                <BarChart accessibilityLayer data={chartList.totalViewViewList}>
+                                                    <CartesianGrid vertical={false}/>
+                                                    <XAxis
+                                                        dataKey="x"
+                                                        tickLine={false}
+                                                        tickMargin={10}
+                                                        axisLine={false}
 
-                                                tickFormatter={(value) => {
-                                                    const date = new Date(value)
-                                                    return date.toLocaleDateString("en-US", {
-                                                        month: "short",
-                                                        day: "numeric",
-                                                    })
-                                                }}
-                                            />
-                                            <YAxis tickLine={false} axisLine={false}/>
+                                                        tickFormatter={(value) => {
+                                                            const date = new Date(value)
+                                                            return date.toLocaleDateString("en-US", {
+                                                                month: "short",
+                                                                day: "numeric",
+                                                            })
+                                                        }}
+                                                    />
+                                                    <YAxis tickLine={false} axisLine={false}/>
 
-                                            <ChartTooltip
-                                                cursor={false}
-                                                labelFormatter={(value) => {
-                                                    return new Date(value).toLocaleDateString("en-US", {
-                                                        month: "short",
-                                                        day: "numeric",
-                                                        year: "numeric",
-                                                    })
-                                                }}
-                                                content={<ChartTooltipContent indicator="line"/>}
-                                            />
-                                            <Bar dataKey="uniqueView" fill="var(--color-uniqueView)"
-                                                 className={"cursor-pointer"} radius={4}/>
-                                            <Bar dataKey="totalView" fill="var(--color-totalView)"
-                                                 className={"cursor-pointer"} radius={4}/>
-                                        </BarChart>
-                                    </ChartContainer>
+                                                    <ChartTooltip
+                                                        cursor={false}
+                                                        labelFormatter={(value) => {
+                                                            return new Date(value).toLocaleDateString("en-US", {
+                                                                month: "short",
+                                                                day: "numeric",
+                                                                year: "numeric",
+                                                            })
+                                                        }}
+                                                        content={<ChartTooltipContent indicator="line"/>}
+                                                    />
+                                                    <Bar dataKey="uniqueView" fill="var(--color-uniqueView)"
+                                                         className={"cursor-pointer"} radius={4}/>
+                                                    <Bar dataKey="totalView" fill="var(--color-totalView)"
+                                                         className={"cursor-pointer"} radius={4}/>
+                                                </BarChart>
+                                            </ChartContainer>
+                                        )
+                                    }
                                 </CardContent>
                             ) : <EmptyData/>
                             }

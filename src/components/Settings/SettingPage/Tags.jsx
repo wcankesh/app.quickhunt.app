@@ -62,7 +62,10 @@ const Tags = () => {
         const updatedTopic = [...topicLists];
         updatedTopic[index] = { ...updatedTopic[index], [name]: value };
         setTopicLists(updatedTopic);
-        setFormError(x => ({...x, [name]: ""}));
+        setFormError({
+            ...formError,
+            [name]: formValidate(name, value)
+        });
     }
 
     const addTag = async (newTag,index) => {
@@ -218,7 +221,7 @@ const Tags = () => {
             {
                 openDelete &&
                 <DeleteDialog
-                    title={"You really want to delete this Tag ?"}
+                    title={"You really want to delete this Tag?"}
                     isOpen={openDelete}
                     onOpenChange={() => setOpenDelete(false)}
                     onDelete={onDelete}
@@ -243,7 +246,7 @@ const Tags = () => {
                                     {
                                         ["Tag Name","Last Update","Action"].map((x,i)=>{
                                             return(
-                                                <TableHead key={x} className={`px-2 py-[10px] md:px-3 font-normal text-card-foreground dark:text-muted-foreground ${i === 0 ? "w-2/5" : i === 1 ? "text-center" : i === 2 ? "text-end" :""}`}>{x}</TableHead>
+                                                <TableHead key={x} className={`px-2 py-[10px] md:px-3 font-normal text-card-foreground dark:text-muted-foreground ${i === 0 ? "w-2/5" : i === 1 ? "w-2/5" : ""}`}>{x}</TableHead>
                                             )
                                         })
                                     }
@@ -261,9 +264,9 @@ const Tags = () => {
                                                             {
                                                                 isEdit == i ?
                                                                     <Fragment>
-                                                                        <TableCell className={"px-2 py-[10px] md:px-3"}>
+                                                                        <TableCell className={"px-[12px] py-[10px]"}>
                                                                             <Input
-                                                                                placeholder={"Enter tag name"}
+                                                                                placeholder={"Enter Tag Name"}
                                                                                 className={"bg-card h-9"}
                                                                                 type="title"
                                                                                 value={x.title}
@@ -271,13 +274,17 @@ const Tags = () => {
                                                                                 onBlur={onBlur}
                                                                                 onChange={(e) => handleInputChange(e, i)}
                                                                             />
-                                                                            <div className="grid gap-2">
-                                                                                {formError.title && <span className="text-red-500 text-sm">{formError.title}</span>}
-                                                                            </div>
+                                                                            {
+                                                                                formError.title ?
+                                                                                    <div className="grid gap-2 mt-[4px]">
+                                                                                        {formError.title && <span
+                                                                                            className="text-red-500 text-sm">{formError.title}</span>}
+                                                                                    </div> : ""
+                                                                            }
                                                                         </TableCell>
                                                                         <TableCell/>
-                                                                        <TableCell className={`px-2 py-[10px] md:px-3 font-normal text-xs ${theme === "dark" ? "" : "text-muted-foreground"}`}>
-                                                                            <div className={"flex justify-end gap-2 items-center"}>
+                                                                        <TableCell className={`px-2 py-[10px] md:px-3 font-normal align-top text-xs ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                                                            <div className={"flex gap-2 items-center"}>
                                                                                 <Fragment>
                                                                                     {
                                                                                         x.id ? <Button
@@ -287,7 +294,7 @@ const Tags = () => {
                                                                                         >
                                                                                             {isSave ? <Loader2 className="mr-1 h-4 w-4 animate-spin justify-center"/> : <Check size={16}/>}
                                                                                         </Button> : <Button
-                                                                                            className="text-sm font-medium h-[30px] w-[89px] hover:bg-primary"
+                                                                                            className="text-sm font-medium h-[30px] w-[76px] hover:bg-primary"
                                                                                             onClick={() => addTag(x, i)}
                                                                                         >
                                                                                             {isSave ? <Loader2 className={"mr-2  h-4 w-4 animate-spin"}/> : "Add Tag"}
@@ -307,11 +314,11 @@ const Tags = () => {
                                                                     </Fragment>
                                                                     :
                                                                     <Fragment>
-                                                                            <TableCell className={`px-2 py-[10px] md:px-3 font-normal text-xs  ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                                                        <TableCell className={`px-2 py-[10px] md:px-3 font-normal text-xs max-w-[140px] truncate text-ellipsis overflow-hidden whitespace-nowrap ${theme === "dark" ? "" : "text-muted-foreground"}`}>
                                                                                 {x.title}
                                                                             </TableCell>
-                                                                            <TableCell className={`px-2 py-[10px] md:px-3 font-normal text-xs text-center ${theme === "dark" ? "" : "text-muted-foreground"}`}>{moment.utc(x.updated_at).local().startOf('seconds').fromNow()}</TableCell>
-                                                                            <TableCell className={`flex justify-end px-2 py-[10px] md:px-3 ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                                                            <TableCell className={`px-2 py-[10px] md:px-3 font-normal text-xs ${theme === "dark" ? "" : "text-muted-foreground"}`}>{moment.utc(x.updated_at).local().startOf('seconds').fromNow()}</TableCell>
+                                                                            <TableCell className={`flex px-2 py-[10px] md:px-3 ${theme === "dark" ? "" : "text-muted-foreground"}`}>
                                                                                 <Fragment>
                                                                                     <div className="pr-0">
                                                                                         <Button onClick={() => onEdit(i)} variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px] `}>

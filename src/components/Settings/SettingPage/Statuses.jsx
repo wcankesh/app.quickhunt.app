@@ -54,6 +54,39 @@ const Statuses = () => {
         setStatusList(allStatusAndTypes.roadmap_status);
     }
 
+    const handleInputChange = (event, index) => {
+        const { name, value } = event.target;
+        const updatedColors = [...statusList];
+        updatedColors[index] = { ...updatedColors[index], [name]: value };
+        setStatusList(updatedColors);
+        setLabelError({
+            ...labelError,
+            [name]: validation(name, value)
+        });
+    };
+
+    const onBlur = (event) => {
+        const {name, value} = event.target;
+        setLabelError({
+            ...labelError,
+            [name]: validation(name, value)
+        });
+    };
+
+    const validation = (name, value) => {
+        switch (name) {
+            case "title":
+                if(!value || value.trim() === "") {
+                    return "Status name is required."
+                } else {
+                    return "";
+                }
+            default: {
+                return  "";
+            }
+        }
+    }
+
     const onChangeColorColor = (newColor, index) => {
         const updatedColors = [...statusList];
         updatedColors[index] = { ...updatedColors[index], color_code: newColor.clr };
@@ -66,17 +99,6 @@ const Statuses = () => {
         setIsEdit(clone.length - 1);
         setStatusList(clone);
         setLabelError(initialStatus);
-    };
-
-    const handleInputChange = (event, index) => {
-        const { name, value } = event.target;
-        const updatedColors = [...statusList];
-        updatedColors[index] = { ...updatedColors[index], [name]: value };
-        setStatusList(updatedColors);
-        setLabelError(labelError => ({
-            ...labelError,
-            [name]: ""
-        }));
     };
 
     const handleAddNewStatus = async (newStatus, index) => {
@@ -118,28 +140,6 @@ const Statuses = () => {
             })
         }
     };
-
-    const onBlur = (event) => {
-        const {name, value} = event.target;
-        setLabelError({
-            ...labelError,
-            [name]: validation(name, value)
-        });
-    };
-
-    const validation = (name, value) => {
-        switch (name) {
-            case "title":
-                if(!value || value.trim() === "") {
-                    return "Status name is required."
-                } else {
-                    return "";
-                }
-            default: {
-                return  "";
-            }
-        }
-    }
 
     const handleSaveStatus = async (index) => {
         const updatedColors = [...statusList];
@@ -198,6 +198,7 @@ const Statuses = () => {
     };
 
     const onEdit = (index) => {
+        setLabelError(initialStatus);
         const clone = [...statusList]
         if(isEdit !== null && !clone[isEdit]?.id){
             clone.splice(isEdit, 1)
@@ -324,7 +325,7 @@ const Statuses = () => {
             {
                 openDelete &&
                 <DeleteDialog
-                    title={"You really want to delete this Status ?"}
+                    title={"You really want to delete this Status?"}
                     isOpen={openDelete}
                     onOpenChange={() => setOpenDelete(false)}
                     onDelete={deleteParticularRow}
@@ -356,7 +357,7 @@ const Statuses = () => {
                                 {
                                     ["","Status Name","Status Color","Action"].map((x,i)=>{
                                         return(
-                                            <TableHead className={`px-2 py-[10px] md:px-3 font-normal text-card-foreground dark:text-muted-foreground ${i === 0 ? "w-[48px]" : i === 1 ? "w-2/5" : i === 2 ? "text-center" : i === 3 ? "text-end pr-4" : ""}`}>{x}</TableHead>
+                                            <TableHead className={`px-2 py-[10px] md:px-3 font-normal text-card-foreground dark:text-muted-foreground ${i === 0 ? "w-[48px]" : i === 1 ? "w-2/5" : i === 2 ? "w-2/5" : i === 3 ? "w-2/5" : ""}`}>{x}</TableHead>
                                         )
                                     })
                                 }
@@ -371,17 +372,19 @@ const Statuses = () => {
                                         key={i}
                                         position={i}
                                         data-position={i}
-                                        draggable={isEdit ? "false" : "true"}
+                                        draggable={isEdit ? false : true}
                                         onDragStart={onDragStart}
-                                        onDragOver={onDragOver}
+                                        onDragOver={isEdit ? null : onDragOver}
                                         onDrop={onDrop}
                                         onDragLeave={onDragLeave}
                                     >
-                                        <TableCell><Menu className={"cursor-grab"} size={16}/></TableCell>
+                                        {/*<TableCell className={`px-[12px] py-[10px] ${(isEdit === i && labelError.title) ? "align-top" : ""}`}><Menu className={"cursor-grab"} size={16}/></TableCell>*/}
+                                        <TableCell className={`px-[12px] py-[10px]`}><Menu className={"cursor-grab"} size={16}/></TableCell>
                                         {
                                             isEdit === i ?
                                                 <Fragment>
-                                                    <TableCell className={"py-[8.5px] pl-0 py-[11px]"}>
+                                                    {/*<TableCell className={"py-[8.5px] pl-0 py-[11px]"}>*/}
+                                                    <TableCell className={"px-[12px] py-[10px]"}>
                                                         <Input
                                                             className={"bg-card h-9"}
                                                             type="title"
@@ -389,23 +392,27 @@ const Statuses = () => {
                                                             name={"title"}
                                                             onBlur={onBlur}
                                                             onChange={(e) => handleInputChange(e, i)}
-                                                            placeholder={"Enter status name"}
+                                                            placeholder={"Enter Status Name"}
                                                         />
-                                                        <div className="grid gap-2">
-                                                            {
-                                                                labelError.title &&
-                                                                <span className="text-red-500 text-sm">{labelError.title}</span>
-                                                            }
-                                                        </div>
+                                                        {
+                                                            labelError.title ?
+                                                                <div className="grid gap-2 mt-[4px]">
+                                                                    {
+                                                                        labelError.title &&
+                                                                        <span
+                                                                            className="text-red-500 text-sm">{labelError.title}</span>
+                                                                    }
+                                                                </div> : ""
+                                                        }
                                                     </TableCell>
                                                     <TableCell
-                                                        className={`font-normal text-xs ${theme === "dark" ? "" : "text-muted-foreground"}`}>
-                                                        <div className={"flex justify-center items-center"}>
+                                                        className={`font-normal text-xs px-[12px] py-[10px] align-top ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                                        <div className={"flex items-center"}>
                                                             <ColorInput name={"clr"} value={x.color_code} onChange={(color) => onChangeColorColor(color, i)}/>
                                                         </div>
                                                     </TableCell>
-                                                    <TableCell className={`pr-4 ${theme === "dark" ? "" : "text-muted-foreground"}`}>
-                                                        <div className={"flex justify-end items-center gap-2"}>
+                                                    <TableCell className={`px-[12px] py-[10px] align-top ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                                        <div className={"flex items-center gap-2"}>
                                                             <Fragment>
                                                                 {
                                                                     x.id ? <Button
@@ -415,7 +422,7 @@ const Statuses = () => {
                                                                     >
                                                                         {isSave ? <Loader2 className="h-4 w-4 animate-spin justify-center"/> : <Check size={16}/>}
                                                                     </Button> : <Button
-                                                                        className="text-sm font-medium h-[30px] w-[126px] hover:bg-primary"
+                                                                        className="text-sm font-medium h-[30px] w-[93px] hover:bg-primary"
                                                                         onClick={() => handleAddNewStatus(x, i)}
                                                                     >
                                                                         {isSave ? <Loader2 className={"h-4 w-4 animate-spin"}/> : "Add Status"}
@@ -435,15 +442,15 @@ const Statuses = () => {
                                                 </Fragment>
                                                 :
                                                 <Fragment>
-                                                    <TableCell className={`font-normal text-xs py-[8.5px] pl-0 ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.title}</TableCell>
+                                                    <TableCell className={`px-2 py-[10px] md:px-3 font-normal text-xs max-w-[140px] truncate text-ellipsis overflow-hidden whitespace-nowrap ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.title}</TableCell>
                                                     <TableCell
-                                                        className={`font-normal text-xs ${theme === "dark" ? "" : "text-muted-foreground"}`}>
-                                                        <div className={"flex justify-center items-center gap-1"}>
+                                                        className={`font-normal text-xs px-[12px] py-[10px] ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                                        <div className={"flex items-center gap-1"}>
                                                             <Square size={16} strokeWidth={1} fill={x.color_code} stroke={x.color_code}/>
                                                             <p>{x.color_code}</p>
                                                         </div>
                                                     </TableCell>
-                                                    <TableCell className={`flex justify-end gap-2 pr-4 ${theme === "dark" ? "" : "text-muted-foreground"} `}>
+                                                    <TableCell className={`flex gap-2 px-[12px] py-[10px] ${theme === "dark" ? "" : "text-muted-foreground"} `}>
                                                         <Fragment>
                                                             <Button
                                                                 variant="outline hover:bg-transparent"

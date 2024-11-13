@@ -98,6 +98,9 @@ const PricingPlans = () => {
         const data = await apiService.manageSubscription();
         if (data.status === 200) {
             window.open(data.url, "top");
+            toast({ description: data.message });
+        } else {
+            toast({ variant: "destructive", description: data.message });
         }
     }
 

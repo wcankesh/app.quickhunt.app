@@ -125,7 +125,9 @@ const UpdateAnnouncement = () => {
                     return "";
                 }
             case "post_description":
-                if (!value || value.trim() === "") {
+                const cleanValue = value.trim();
+                const emptyContent = /^(<p>\s*<\/p>|<p><br><\/p>|<\/?[^>]+>)*$/;
+                if (!value || cleanValue === "" || emptyContent.test(cleanValue)) {
                     return "Description is required.";
                 } else {
                     return "";
@@ -295,6 +297,11 @@ const UpdateAnnouncement = () => {
         { label: 'Announcement', path: `/announcements?pageNo=${getPageNo}` }
     ];
 
+    const publishDate = selectedRecord?.post_published_at ? new Date(selectedRecord.post_published_at) : null;
+    const isDateDisabled = (date) => {
+        return publishDate && date < publishDate;
+    };
+
     return (
         <div className={"container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-3 md:px-4"}>
             <div className={"flex justify-between items-center gap-2"}>
@@ -353,13 +360,14 @@ const UpdateAnnouncement = () => {
                                             href={`https://${projectDetailsReducer.domain?.toLowerCase()}/announcements/${selectedRecord.post_slug_url?.toLowerCase()}`}
                                             target={"_blank"}
                                             className={"text-primary max-w-[593px] w-full break-words text-sm"}>{`https://${projectDetailsReducer.domain?.toLowerCase()}/announcements/${selectedRecord.post_slug_url?.toLowerCase()}`}</a> : ""}</p>
+                                    {formError?.post_slug_url &&
+                                    <span className="text-sm text-red-500">{formError?.post_slug_url}</span>}
                                 </div>
                                 <div className="w-full flex flex-col gap-2">
                                     <Label htmlFor="description" className={"font-normal"}>Description</Label>
                                     <ReactQuillEditor className={"min-h-[145px] h-full"} value={selectedRecord.post_description} onChange={onChangeText}
                                                       name={"post_description"}/>
-                                    {formError.post_description &&
-                                    <span className="text-sm text-red-500">{formError.post_description}</span>}
+                                    {formError.post_description && <span className="text-sm text-red-500">{formError.post_description}</span>}
                                 </div>
                             </div>
                         </div>
@@ -371,26 +379,30 @@ const UpdateAnnouncement = () => {
                                     <Label className={"font-normal"}>Label</Label>
                                     <Select value={[]} onValueChange={onChangeLabel}>
                                         <SelectTrigger className="h-9">
-                                            <SelectValue className={"text-muted-foreground text-sm"}
-                                                         placeholder="Nothing selected">
-                                                <div className={"flex gap-[2px]"}>
-                                                    {
-                                                        (selectedRecord.labels || []).map((x) => {
-                                                            const findObj = labelList.find((y) => y.id == x);
-                                                            return (
-                                                                <Badge
-                                                                    variant={"outline"}
-                                                                    style={{
-                                                                        color: findObj?.label_color_code,
-                                                                        borderColor: findObj?.label_color_code,
-                                                                        textTransform: "capitalize"
-                                                                    }}
-                                                                    className={`h-[20px] py-0 px-2 text-xs rounded-[5px]  font-normal text-[${findObj?.label_color_code}] border-[${findObj?.label_color_code}] capitalize`}
-                                                                >{findObj?.label_name}</Badge>
-                                                            )
-                                                        })
-                                                    }
-                                                </div>
+                                            <SelectValue className={"text-muted-foreground text-sm"}>
+                                                {
+                                                    selectedRecord?.labels?.length > 0 ? (
+                                                    <div className={"flex gap-[2px]"}>
+                                                        {
+                                                            (selectedRecord.labels || []).map((x) => {
+                                                                const findObj = labelList.find((y) => y.id == x);
+                                                                return (
+                                                                    <Badge
+                                                                        variant={"outline"}
+                                                                        style={{
+                                                                            color: findObj?.label_color_code,
+                                                                            borderColor: findObj?.label_color_code,
+                                                                            textTransform: "capitalize"
+                                                                        }}
+                                                                        className={`h-[20px] py-0 px-2 text-xs rounded-[5px]  font-normal text-[${findObj?.label_color_code}] border-[${findObj?.label_color_code}] capitalize`}
+                                                                    >{findObj?.label_name}</Badge>
+                                                                )
+                                                            })
+                                                        }
+                                                    </div>) : (
+                                                        <span className="text-muted-foreground">Select Label</span>
+                                                    )
+                                                }
                                             </SelectValue>
                                         </SelectTrigger>
                                         <SelectContent>
@@ -425,22 +437,24 @@ const UpdateAnnouncement = () => {
                                     <Label className={"font-normal"}>Assign to</Label>
                                     <Select onValueChange={handleValueChange} value={[]}>
                                         <SelectTrigger className={"h-9"}>
-                                            <SelectValue className={"text-muted-foreground text-sm"}
-                                                         placeholder="Assign to">
-                                                <div className={"flex gap-[2px]"}>
-                                                    {
-                                                        Array.isArray(selectedRecord?.post_assign_to) && (selectedRecord?.post_assign_to || []).map((x, index) => {
-                                                            const findObj = memberList.find((y,) => y.user_id == x);
-                                                            return (
-                                                                <div key={index}
-                                                                     className={`${theme === "dark" ? "text-card bg-accent-foreground" : "bg-muted-foreground/30"} text-sm flex gap-[2px] items-center rounded py-0 px-2`}
-                                                                     onClick={(e) => deleteAssignTo(e, index)}>
-                                                                    {findObj?.user_first_name ? findObj?.user_first_name : ''}
-                                                                </div>
-                                                            )
-                                                        })
-                                                    }
-                                                </div>
+                                            <SelectValue className={"text-muted-foreground text-sm"}>
+                                                {
+                                                    selectedRecord?.post_assign_to?.length > 0 ? (
+                                                        <div className={"flex gap-[2px]"}>
+                                                            {
+                                                                Array.isArray(selectedRecord?.post_assign_to) && (selectedRecord?.post_assign_to || []).map((x, index) => {
+                                                                    const findObj = memberList.find((y,) => y.user_id == x);
+                                                                    return (
+                                                                        <div key={index}
+                                                                             className={`${theme === "dark" ? "text-card bg-accent-foreground" : "bg-muted-foreground/30"} text-sm flex gap-[2px] items-center rounded py-0 px-2`}
+                                                                             onClick={(e) => deleteAssignTo(e, index)}>
+                                                                            {findObj?.user_first_name ? findObj?.user_first_name : ''}
+                                                                        </div>
+                                                                    )
+                                                                })
+                                                            }
+                                                        </div>) : (<span className="text-muted-foreground">Select Assign To</span>)
+                                                }
                                             </SelectValue>
                                         </SelectTrigger>
                                         <SelectContent>
@@ -469,7 +483,13 @@ const UpdateAnnouncement = () => {
                                         value={selectedRecord && selectedRecord?.category_id && selectedRecord?.category_id?.toString()}
                                         onValueChange={onChangeCategory}>
                                         <SelectTrigger className="h-9">
-                                            <SelectValue/>
+                                            {selectedRecord?.category_id ? (
+                                                <SelectValue>
+                                                    {categoriesList.find(x => x.id.toString() === selectedRecord.category_id.toString())?.name}
+                                                </SelectValue>
+                                            ) : (
+                                                <span className="text-muted-foreground">Select a category</span>
+                                            )}
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectGroup>
@@ -582,7 +602,10 @@ const UpdateAnnouncement = () => {
                                                             variant="outline"
                                                             className={cn("justify-between text-left font-normal d-flex", "text-muted-foreground")}
                                                         >
-                                                            {moment(selectedRecord?.post_expired_at).format("LL")}
+                                                            {/*{moment(selectedRecord?.post_expired_at).format("LL")}*/}
+                                                            {selectedRecord?.post_expired_at
+                                                                ? moment(selectedRecord.post_expired_at).format("LL")
+                                                                : "Select Expiration Date"}
                                                             <CalendarIcon className="mr-2 h-4 w-4" />
                                                         </Button>
                                                     </PopoverTrigger>
@@ -591,10 +614,18 @@ const UpdateAnnouncement = () => {
                                                             mode="single"
                                                             showOutsideDays={false}
                                                             captionLayout="dropdown"
-                                                            selected={selectedRecord?.post_expired_at}
+                                                            // selected={selectedRecord?.post_expired_at}
+                                                            selected={selectedRecord?.post_expired_at ? new Date(selectedRecord.post_expired_at) : null}
                                                             onSelect={(date) => onDateChange("post_expired_at", date)}
-                                                            startMonth={new Date(2024, 0)}
+                                                            // startMonth={new Date(2024, 0)}
+                                                            // endMonth={new Date(2050, 12)}
+
+                                                            // startMonth={selectedRecord?.post_published_at ? new Date(selectedRecord.post_published_at) : new Date()}
+                                                            // fromDate={selectedRecord?.post_published_at ? new Date(selectedRecord.post_published_at) : null}
+
                                                             endMonth={new Date(2050, 12)}
+                                                            startMonth={publishDate || new Date()}
+                                                            disabled={isDateDisabled}
                                                             hideNavigation
                                                         />
                                                     </PopoverContent>

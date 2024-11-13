@@ -18,6 +18,7 @@ import {Badge} from "../ui/badge";
 import {useLocation, useNavigate} from "react-router-dom";
 import {baseUrl} from "../../utils/constent";
 import Pagination from "../Comman/Pagination";
+import {RadioGroup, RadioGroupItem} from "../ui/radio-group";
 
 const initialStateFilter = {l: "", s: "", q:""}
 
@@ -119,7 +120,7 @@ const Announcements = () => {
 
     const closeSheet = (record,addRecord) => {
         if (record) {
-            const updatedItems = announcementList.map((x) => x.id === record.id ? {...x, ...record} : x);
+            const updatedItems = announcementList.map((x) => x.id === record.id ? {...x, ...record, post_status: record.post_status} : x);
             setAnnouncementList(updatedItems);
             setSelectedRecord({});
         } else if (addRecord) {
@@ -270,39 +271,70 @@ const Announcements = () => {
                                                         <CommandItem className={"p-0 flex gap-2 items-center cursor-pointer p-1"} onSelect={() => {setOpenFilterType('');}}>
                                                             <ChevronLeft className="mr-2 h-4 w-4"  />  <span className={"flex-1 w-full text-sm font-normal cursor-pointer flex gap-2 items-center"}>Back</span>
                                                         </CommandItem>
-                                                        {
-                                                            (status || []).map((x, index) => {
-                                                                return (
-                                                                    <CommandItem className={"p-0 flex gap-1 items-center cursor-pointer"}>
-                                                                        <Checkbox className={'m-2'} checked={x.value === filter.s} onClick={(event) => filterPosts({name: "s", value: x.value == filter.s ? "" :x.value })} />
-                                                                        <span className={"flex-1 w-full text-sm font-normal cursor-pointer flex gap-2 items-center"} onClick={(event) => filterPosts({name: "s", value: x.value == filter.s ? "" :x.value })} key={x.label}>{x.label}</span>
-                                                                    </CommandItem>
-                                                                )
-                                                            })
-                                                        }
+                                                        {/*{*/}
+                                                        {/*    (status || []).map((x, index) => {*/}
+                                                        {/*        return (*/}
+                                                        {/*            <CommandItem className={"p-0 flex gap-1 items-center cursor-pointer"}>*/}
+                                                        {/*                <Checkbox className={'m-2'} checked={x.value === filter.s} onClick={(event) => filterPosts({name: "s", value: x.value == filter.s ? "" :x.value })} />*/}
+                                                        {/*                <span className={"flex-1 w-full text-sm font-normal cursor-pointer flex gap-2 items-center"} onClick={(event) => filterPosts({name: "s", value: x.value == filter.s ? "" :x.value })} key={x.label}>{x.label}</span>*/}
+                                                        {/*            </CommandItem>*/}
+                                                        {/*        )*/}
+                                                        {/*    })*/}
+                                                        {/*}*/}
+                                                        <RadioGroup value={filter.s} onValueChange={(value) => filterPosts({ name: "s", value })} className={"gap-0.5"}>
+                                                            {(status || []).map((x) => (
+                                                                <CommandItem key={x.value} className={"p-0 flex items-center gap-1 cursor-pointer"}>
+                                                                    <div
+                                                                        onClick={() => filterPosts({ name: "s", value: x.value })}
+                                                                        className="flex items-center gap-1 w-full"
+                                                                    >
+                                                                        <RadioGroupItem className="m-2" value={x.value} checked={x.value === filter.s} />
+                                                                        <span className={"flex-1 w-full text-sm font-normal cursor-pointer"}>{x.label}</span>
+                                                                    </div>
+                                                                </CommandItem>
+                                                            ))}
+                                                        </RadioGroup>
                                                     </CommandGroup>
                                                     : openFilterType === 'label' ?
                                                     <CommandGroup className={"w-full"}>
                                                         <CommandItem className={"p-0 flex gap-2 items-center cursor-pointer p-1"} onSelect={() => {setOpenFilterType('');}}>
                                                             <ChevronLeft className="mr-2 h-4 w-4"  />  <span className={"flex-1 w-full text-sm font-normal cursor-pointer flex gap-2 items-center"}>Back</span>
                                                         </CommandItem>
-                                                        {
-                                                            (allStatusAndTypes.labels || []).map((x, i) => {
-                                                                return (
-                                                                    <CommandItem key={x.id} className={"p-0"}>
-                                                                        <div className={"w-full flex items-center gap-1"}  key={x.label}>
-                                                                            <Checkbox className={'m-2'} checked={x.id == filter.l} onClick={(event) => filterPosts({name: "l", value: x.id == filter.l ? "" : x.id })} />
-                                                                            <div className={"flex items-center gap-2 w-full"} onClick={(event) => filterPosts({name: "l", value: x.id == filter.l ? "" : x.id })}>
-                                                                                <Circle fill={x.label_color_code}
-                                                                                        stroke={x.label_color_code}
-                                                                                        className={`${theme === "dark" ? "" : "text-muted-foreground"} w-[10px] h-[10px]`}/>
-                                                                                <span className={"flex-1 w-full text-sm font-normal cursor-pointer flex gap-2 items-center"}>{x.label_name}</span>
-                                                                            </div>
-                                                                        </div>
-                                                                    </CommandItem>
-                                                                )
-                                                            })
-                                                        }
+                                                        {/*{*/}
+                                                        {/*    (allStatusAndTypes.labels || []).map((x, i) => {*/}
+                                                        {/*        return (*/}
+                                                        {/*            <CommandItem key={x.id} className={"p-0"}>*/}
+                                                        {/*                <div className={"w-full flex items-center gap-1"}  key={x.label}>*/}
+                                                        {/*                    <Checkbox className={'m-2'} checked={x.id == filter.l} onClick={(event) => filterPosts({name: "l", value: x.id == filter.l ? "" : x.id })} />*/}
+                                                        {/*                    <div className={"flex items-center gap-2 w-full"} onClick={(event) => filterPosts({name: "l", value: x.id == filter.l ? "" : x.id })}>*/}
+                                                        {/*                        <Circle fill={x.label_color_code}*/}
+                                                        {/*                                stroke={x.label_color_code}*/}
+                                                        {/*                                className={`${theme === "dark" ? "" : "text-muted-foreground"} w-[10px] h-[10px]`}/>*/}
+                                                        {/*                        <span className={"flex-1 w-full text-sm font-normal cursor-pointer flex gap-2 items-center"}>{x.label_name}</span>*/}
+                                                        {/*                    </div>*/}
+                                                        {/*                </div>*/}
+                                                        {/*            </CommandItem>*/}
+                                                        {/*        )*/}
+                                                        {/*    })*/}
+                                                        {/*}*/}
+                                                        <RadioGroup value={filter.l} onValueChange={(value) => filterPosts({ name: "l", value })} className={"gap-0.5"}>
+                                                            {(allStatusAndTypes.labels || []).map((x) => (
+                                                                <CommandItem key={x.id} className={"p-0 flex items-center gap-1 cursor-pointer"}>
+                                                                    <div
+                                                                        onClick={() => filterPosts({ name: "l", value: x.id })}
+                                                                        className="flex items-center gap-1 w-full"
+                                                                    >
+                                                                        <RadioGroupItem className="m-2" value={x.id} checked={x.id == filter.l} />
+                                                                        <Circle
+                                                                            fill={x.label_color_code}
+                                                                            stroke={x.label_color_code}
+                                                                            className={`${theme === "dark" ? "" : "text-muted-foreground"} w-[10px] h-[10px]`}
+                                                                        />
+                                                                        <span className={"flex-1 w-full text-sm font-normal"}>{x.label_name}</span>
+                                                                    </div>
+                                                                </CommandItem>
+                                                            ))}
+                                                        </RadioGroup>
                                                     </CommandGroup>
                                                     :<CommandGroup>
                                                         <CommandItem onSelect={() => {setOpenFilterType('status');}}>
@@ -359,6 +391,7 @@ const Announcements = () => {
                     setSelectedRecord={setSelectedRecord}
                     isLoading={isLoading}
                     isLoadingDelete={isLoadingDelete}
+                    getAllPosts={getAllPosts}
                 />
                 {
                     announcementList.length > 0 ?

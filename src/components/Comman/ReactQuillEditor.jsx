@@ -3,6 +3,13 @@ import ReactQuill from "react-quill";
 import {cn} from "../../lib/utils";
 
 const ReactQuillEditor = ({name, value, onChange, className}) => {
+    const sanitizeHTML = (html) => {
+        // Remove all HTML tags and check if the result is empty
+        const stripped = html.replace(/(<([^>]+)>)/gi, "").trim();
+        // Return an empty string if there's no actual content
+        return stripped.length === 0 ? "" : html;
+    };
+
     return (
         <>
             <ReactQuill
@@ -31,9 +38,16 @@ const ReactQuillEditor = ({name, value, onChange, className}) => {
                     "link", "image", "align", "size",
                 ]}
                 value={value}
+                // onChange={(newValue, delta, source, editor) => {
+                //     if (source === "user") {
+                //         onChange({target: {name: name, value: newValue}})
+                //     }
+                // }}
                 onChange={(newValue, delta, source, editor) => {
                     if (source === "user") {
-                        onChange({target: {name: name, value: newValue}})
+                        // Sanitize the input value to remove empty tags
+                        const sanitizedValue = sanitizeHTML(newValue);
+                        onChange({ target: { name: name, value: sanitizedValue } });
                     }
                 }}
             />

@@ -15,6 +15,7 @@ import Checklist from "./Checklist";
 import {Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator} from "../ui/breadcrumb";
 import SidebarInAppMessage from "./SidebarInAppMessage";
 import {useToast} from "../ui/use-toast";
+import {tr} from "date-fns/locale";
 
 const initialState = {
     project_id: "2",
@@ -33,7 +34,7 @@ const initialState = {
     end_at: '',
     position: "top",
     alignment: "center",
-    is_close_button: true,
+    is_close_button: false,
     reply_type: 1,
     show_sender: true,
     action_type: 0,
@@ -106,7 +107,7 @@ const stepBoj = {
     end_number: "5",
     start_label: "Not likely",
     end_label: "Very likely",
-    is_answer_required: "",
+    is_answer_required: false,
     step: 1,
     options: [],
     reactions: [],
@@ -138,7 +139,7 @@ const UpdateInAppMessage = () => {
 
     const [inAppMsgSetting, setInAppMsgSetting] = useState(initialState);
     const [selectedStepIndex, setSelectedStepIndex] = useState(0);
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
     const [selectedStep, setSelectedStep] = useState(null);
     const [isSave, setIsSave] = useState(false);
 
@@ -183,7 +184,7 @@ const UpdateInAppMessage = () => {
     }, [projectDetailsReducer.id, getPageNo]);
 
     const getSingleInAppMessages = async () => {
-        setIsLoading(true)
+        // setIsLoading(true)
         const data = await apiSerVice.getSingleInAppMessage(id)
         if (data.status === 200) {
             const payload = {
@@ -277,7 +278,7 @@ const UpdateInAppMessage = () => {
                             </BreadcrumbItem>
                             <BreadcrumbSeparator/>
                             <BreadcrumbItem className={"cursor-pointer"}>
-                                <BreadcrumbPage className={`w-full ${inAppMsgSetting?.title?.length > 30 ? "max-w-[200px] truncate" : ""}`}>{inAppMsgSetting?.title}</BreadcrumbPage>
+                                <BreadcrumbPage className={`w-full ${inAppMsgSetting?.title?.length > 30 ? "max-w-[200px] truncate" : ""}`}>{isLoading && id !== 'new' ? null : inAppMsgSetting?.title}</BreadcrumbPage>
                             </BreadcrumbItem>
                         </BreadcrumbList>
                     </Breadcrumb>

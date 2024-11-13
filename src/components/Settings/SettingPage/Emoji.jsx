@@ -27,7 +27,6 @@ const Emoji = () => {
     const [emojiList, setEmojiList] = useState([]);
     const [deleteId, setDeleteId] = useState(null);
     const [editIndex, setEditIndex] = useState(null);
-    const [isLoading,setIsLoading] = useState(true);
     const [isSave,setIsSave]=useState(false);
     const [isEdit,setIsEdit]=useState(false);
     const [isChangeEditEmoji,setIsChangeEditEmoji]=useState(false);
@@ -43,7 +42,6 @@ const Emoji = () => {
 
     const getAllEmoji = async () => {
         setEmojiList(allStatusAndTypes.emoji);
-        setIsLoading(false);
     }
 
     const handleEmojiSelect = (event) => {
@@ -194,7 +192,7 @@ const Emoji = () => {
             {
                 openDelete &&
                 <DeleteDialog
-                    title={"You really want to delete this Emoji ?"}
+                    title={"You really want to delete this Emoji?"}
                     isOpen={openDelete}
                     onOpenChange={() => setOpenDelete(false)}
                     onDelete={handleDelete}
@@ -215,9 +213,9 @@ const Emoji = () => {
                         <TableHeader className={`dark:bg-transparent bg-muted`}>
                             <TableRow>
                                 {
-                                    ["Emoji","Action"].map((x,i)=>{
+                                    ["Emoji","", "Action"].map((x,i)=>{
                                         return(
-                                            <TableHead className={`px-2 py-[10px] md:px-3 text-sm font-normal text-card-foreground dark:text-muted-foreground w-1/2 ${i === 0 ? "w-1/2" : "text-end"}`} key={x}>{x}</TableHead>
+                                            <TableHead className={`px-2 py-[10px] md:px-3 text-sm font-normal text-card-foreground dark:text-muted-foreground w-1/2 ${i == 0 ? "w-2/5" : i == 1 ? "w-2/5" : ""}`} key={x}>{x}</TableHead>
                                         )
                                     })
                                 }
@@ -233,7 +231,7 @@ const Emoji = () => {
                                                     {
                                                         editIndex == i ?
                                                             <Fragment>
-                                                                 <TableCell className={"px-2 py-[10px] md:px-3"}>
+                                                                <TableCell className={"px-[12px] py-[10px]"}>
                                                                      <Popover>
                                                                          <PopoverTrigger asChild>
                                                                              <div className={""}>
@@ -258,8 +256,9 @@ const Emoji = () => {
                                                                          </PopoverContent>
                                                                      </Popover>
                                                                  </TableCell>
-                                                                <TableCell className={`pr-4 align-top ${theme === "dark" ? "" : "text-muted-foreground"}`}>
-                                                                    <div className={"flex justify-end items-center gap-2"}>
+                                                                 <TableCell/>
+                                                                <TableCell className={`px-[12px] py-[10px] align-top ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                                                    <div className={"flex items-center gap-2"}>
                                                                         <Fragment>
                                                                             {
                                                                                 x.id ? <Button
@@ -269,7 +268,7 @@ const Emoji = () => {
                                                                                 >
                                                                                     {isSave ? <Loader2 className="h-4 w-4 animate-spin"/> : <Check size={16}/>}
                                                                                 </Button> : <Button
-                                                                                    className="text-sm font-medium h-[30px] w-[99px] hover:bg-primary"
+                                                                                    className="text-sm font-medium h-[30px] w-[90px] hover:bg-primary"
                                                                                     onClick={()=>addEmoji(i)}
                                                                                 >
                                                                                     {isSave ? <Loader2 className={"h-4 w-4 animate-spin"}/> : "Add emoji"}
@@ -292,7 +291,8 @@ const Emoji = () => {
                                                                  <TableCell className={"px-2 py-[10px] md:px-3"}>
                                                                      <img className={"h-[30px] w-[30px] m-[5px]"} alt={"not-found"} src={x.emoji_url}/>
                                                                  </TableCell>
-                                                                <TableCell className={`flex justify-end gap-2 pr-4 ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                                                 <TableCell/>
+                                                                <TableCell className={`flex gap-2 px-3 py-[10px] ${theme === "dark" ? "" : "text-muted-foreground"}`}>
                                                                     <Fragment>
                                                                         <Button
                                                                             variant="outline hover:bg-transparent"

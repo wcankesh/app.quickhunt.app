@@ -5,7 +5,7 @@ import {Button} from "../../ui/button";
 import {Skeleton} from "../../ui/skeleton"
 import {Icon} from "../../../utils/Icon";
 import ReadMoreText from "../../Comman/ReadMoreText";
-import {getDateFormat} from "../../../utils/constent";
+import {cleanQuillHtml, getDateFormat} from "../../../utils/constent";
 import {ApiService} from "../../../utils/ApiService";
 import {useSelector} from "react-redux";
 
@@ -95,8 +95,12 @@ const IdeaWidgetPreview = ({widgetsSetting}) => {
                                                                 className="text-xs cursor-pointer font-medium ">{idea.title}</h2>
                                                         </div>
                                                         {widgetsSetting?.idea_description === 1 ?
-                                                            <div className={'inline-block w-full text-xs'}><ReadMoreText
-                                                                html={idea.description} isWidget={true}/></div> : ''}
+                                                            <div className={'description-container-widget-preview inline-block w-full text-xs'}>
+                                                                {/*<ReadMoreText html={idea.description} isWidget={true}/>*/}
+                                                                {
+                                                                    cleanQuillHtml(idea?.description) ? <ReadMoreText html={idea.description} isWidget={true}/> : null
+                                                                }
+                                                            </div> : ''}
 
                                                         <div
                                                             className=" w-full flex flex-wrap gap-3 items-center justify-between mt-1">

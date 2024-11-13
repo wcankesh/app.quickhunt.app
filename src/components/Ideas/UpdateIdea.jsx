@@ -4,7 +4,7 @@ import {ArrowBigUp, Check, Circle, CircleX, Dot, Ellipsis, Loader2, MessageCircl
 import {RadioGroup, RadioGroupItem} from "../ui/radio-group";
 import {Label} from "../ui/label";
 import {Input} from "../ui/input";
-import {Avatar, AvatarFallback, AvatarImage} from "../ui/avatar";
+import {Avatar, AvatarFallback} from "../ui/avatar";
 import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "../ui/select";
 import {Popover, PopoverTrigger, PopoverContent} from "../ui/popover";
 import {Textarea} from "../ui/textarea";
@@ -23,7 +23,14 @@ import {baseUrl, cleanQuillHtml} from "../../utils/constent";
 import {Skeleton} from "../ui/skeleton";
 import CommonBreadCrumb from "../Comman/CommonBreadCrumb";
 import ImageUploader from "../Comman/ImageUploader";
-import CommentEditor from "../Comman/CommentEditor";
+import {
+    ActionButtons,
+    CommentEditor,
+    ImageGallery,
+    SaveCancelButton, StatusButtonGroup,
+    UploadButton,
+    UserAvatar
+} from "../Comman/CommentEditor";
 
 const initialStateError = {
     title: "",
@@ -54,6 +61,7 @@ const UpdateIdea = () => {
     const [oldSelectedIdea, setOldSelectedIdea] = useState({});
     const [commentText, setCommentText] = useState("")
     const [subCommentText, setSubCommentText] = useState("")
+    const [subCommentTextEditIdx, setSubCommentTextEditIdx] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const [isLoadingCreateIdea, setIsLoadingCreateIdea] = useState(false);
     const [isLoadingArchive, setIsLoadingArchive] = useState(false);
@@ -157,7 +165,7 @@ const UpdateIdea = () => {
         const data = await apiSerVice.createComment(formData)
         if (data.status === 200) {
             const clone = selectedIdea && selectedIdea.comments ? [...selectedIdea.comments] : [];
-            clone.push(data.data)
+            clone.unshift(data.data)
             let obj = {...selectedIdea, comments: clone}
             setSelectedIdea(obj)
             toast({description: data.message})
@@ -170,11 +178,27 @@ const UpdateIdea = () => {
         }
     }
 
+    //old code
+    // const onShowSubComment = (index) => {
+    //     setSubCommentTextEditIdx(index)
+    //     const clone = [...selectedIdea.comments];
+    //     clone[index].show_reply = !clone[index].show_reply;
+    //     setSelectedIdea({...selectedIdea, comments: clone})
+    // }
+
     const onShowSubComment = (index) => {
-        const clone = [...selectedIdea.comments];
-        clone[index].show_reply = !clone[index].show_reply;
-        setSelectedIdea({...selectedIdea, comments: clone})
-    }
+        const updatedComments = selectedIdea.comments.map((comment, i) => ({
+            ...comment,
+            show_reply: i === index ? !comment.show_reply : false,
+        }));
+        setSelectedIdea({ ...selectedIdea, comments: updatedComments });
+        if (updatedComments[index].show_reply) {
+            setSubCommentTextEditIdx(index);
+            setSubCommentText("");
+        } else {
+            setSubCommentTextEditIdx(null);
+        }
+    };
 
     const onCreateSubComment = async (record, index) => {
         setIsSaveSubComment(true)
@@ -220,7 +244,7 @@ const UpdateIdea = () => {
     };
 
     const handleAddCommentImg = (event) => {
-        const files = event.target.files;
+        const files = Array.from(event.target.files);
         if (selectedComment && selectedComment.id) {
             const clone = [...selectedComment.images, ...files];
             let old = selectedComment.newImage && selectedComment.newImage.length ? [...selectedComment.newImage] : [];
@@ -233,6 +257,7 @@ const UpdateIdea = () => {
         } else {
             setCommentFiles([...commentFiles, ...files]);
         }
+        event.target.value = "";
     };
 
     const handleSubCommentUploadImg = (event) => {
@@ -291,6 +316,7 @@ const UpdateIdea = () => {
     const onEditComment = (record, index) => {
         setSelectedComment(record);
         setSelectedCommentIndex(index)
+        // setSubCommentTextEditIdx(null);
         setIsEditComment(true)
     }
 
@@ -389,7 +415,6 @@ const UpdateIdea = () => {
         }
     };
 
-
     const onUpdateComment = async () => {
         setIsSaveUpdateComment(true)
         let formData = new FormData();
@@ -405,7 +430,9 @@ const UpdateIdea = () => {
         formData.append('id', selectedComment.id);
         const data = await apiSerVice.updateComment(formData)
         if (data.status === 200) {
-            let obj = {...selectedComment, images: data.data.images, newImage: []}
+            let updatedImages = Array.isArray(data.data.images) ? data.data.images : [];
+            let obj = { ...selectedComment, images: updatedImages, newImage: [] };
+            // let obj = {...selectedComment, images: data.data.images, newImage: []} // old code line
             const cloneComment = [...selectedIdea.comments];
             cloneComment[selectedCommentIndex] = obj;
             let selectedIdeaObj = {...selectedIdea, comments: cloneComment}
@@ -522,7 +549,6 @@ const UpdateIdea = () => {
     }
 
     const onCreateIdea = async () => {
-        setIsLoadingCreateIdea(true)
         let validationErrors = {};
         Object.keys(selectedIdea).forEach(name => {
             const error = formValidate(name, selectedIdea[name]);
@@ -534,6 +560,7 @@ const UpdateIdea = () => {
             setFormError(validationErrors);
             return;
         }
+        setIsLoadingCreateIdea(true)
         let formData = new FormData();
         let topics = [];
 
@@ -550,12 +577,11 @@ const UpdateIdea = () => {
             setSelectedIdea({...data.data})
             setOldSelectedIdea({...data.data})
             setIsEditIdea(false)
-            setIsLoadingCreateIdea(false)
             toast({description: data.message})
         } else {
-            setIsLoadingCreateIdea(false)
             toast({description: data.message, variant: "destructive"})
         }
+            setIsLoadingCreateIdea(false)
     }
 
     const handleOnCreateCancel = () => {
@@ -578,9 +604,13 @@ const UpdateIdea = () => {
 
     const handleImageClick = (imageSrc) => {window.open(imageSrc, '_blank');};
 
-    const links = [
-        { label: 'Ideas', path: `/ideas?pageNo=${getPageNo}` }
-    ];
+    const links = [{ label: 'Ideas', path: `/ideas?pageNo=${getPageNo}` }];
+
+    const handleSubCommentTextChange = (e, index) => {
+        const newSubCommentText = [...subCommentText];
+        newSubCommentText[index] = e.target.value;
+        setSubCommentText(newSubCommentText);
+    };
 
     return (
         <Fragment>
@@ -634,21 +664,9 @@ const UpdateIdea = () => {
                         </div>
                     </div>
                     <div className={"border-b"}>
-                        {/*<ImageUploader*/}
-                        {/*    // selectedImage={selectedIdea}*/}
-                        {/*    // onChangeStatus={onChangeStatus}*/}
-                        {/*    // handleUpload={handleFeatureImgUpload}*/}
-
-                        {/*    image={selectedIdea?.cover_image}*/}
-                        {/*    onDelete={onChangeStatus}*/}
-                        {/*    onUpload={handleFeatureImgUpload}*/}
-                        {/*    altText="Cover Image"*/}
-
-                        {/*/>*/}
                         <div className="py-4 px-6 w-full space-y-1.5">
                             <Label htmlFor="picture" className={"font-normal capitalize"}>Featured image</Label>
                             <div className="w-[282px] h-[128px] flex gap-1">
-
                                 <ImageUploader
                                     // selectedImage={selectedIdea}
                                     // onChangeStatus={onChangeStatus}
@@ -658,54 +676,7 @@ const UpdateIdea = () => {
                                     onDelete={() => onChangeStatus('delete_cover_image', selectedIdea && selectedIdea?.cover_image && selectedIdea.cover_image?.name ? "" : [selectedIdea.cover_image.replace("https://code.quickhunt.app/public/storage/feature_idea/", "")])}
                                     onUpload={handleFeatureImgUpload}
                                     altText="Cover Image"
-
                                 />
-
-                                {/*{*/}
-                                {/*    selectedIdea?.cover_image ?*/}
-                                {/*        <div>*/}
-                                {/*            {selectedIdea && selectedIdea.cover_image && selectedIdea.cover_image.name ?*/}
-                                {/*                <div className={"w-[282px] h-[128px] relative border p-[5px]"}>*/}
-                                {/*                    <img*/}
-                                {/*                        className={"upload-img"}*/}
-                                {/*                        src={selectedIdea && selectedIdea.cover_image && selectedIdea.cover_image.name ? URL.createObjectURL(selectedIdea.cover_image) : selectedIdea.cover_image}*/}
-                                {/*                        alt=""*/}
-                                {/*                    />*/}
-                                {/*                    <CircleX*/}
-                                {/*                        size={20}*/}
-                                {/*                        className={`text-muted-foreground dark:text-card-foreground cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}*/}
-                                {/*                        onClick={() => onChangeStatus('delete_cover_image', selectedIdea && selectedIdea?.cover_image && selectedIdea.cover_image?.name ? "" : [selectedIdea.cover_image.replace("https://code.quickhunt.app/public/storage/feature_idea/", "")])}*/}
-                                {/*                    />*/}
-                                {/*                </div> : selectedIdea.cover_image ?*/}
-                                {/*                    <div*/}
-                                {/*                        className={"w-[282px] h-[128px] relative border p-[5px]"}>*/}
-                                {/*                        <img className={"upload-img"}*/}
-                                {/*                             src={selectedIdea.cover_image} alt=""/>*/}
-                                {/*                        <CircleX*/}
-                                {/*                            size={20}*/}
-                                {/*                            className={`text-muted-foreground dark:text-card-foreground cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}*/}
-                                {/*                            onClick={() => onChangeStatus('delete_cover_image', selectedIdea && selectedIdea?.cover_image && selectedIdea.cover_image?.name ? "" : selectedIdea.cover_image.replace("https://code.quickhunt.app/public/storage/feature_idea/", ""))}*/}
-                                {/*                        />*/}
-                                {/*                    </div>*/}
-                                {/*                    : ''}*/}
-                                {/*        </div> :*/}
-                                {/*        <div>*/}
-                                {/*            <input*/}
-                                {/*                id="pictureInput"*/}
-                                {/*                type="file"*/}
-                                {/*                className="hidden"*/}
-                                {/*                multiple*/}
-                                {/*                onChange={handleFeatureImgUpload}*/}
-                                {/*                accept={".jpg,.jpeg"}*/}
-                                {/*            />*/}
-                                {/*            <label*/}
-                                {/*                htmlFor="pictureInput"*/}
-                                {/*                className="border-dashed w-[282px] h-[128px] py-[52px] flex items-center justify-center bg-muted border border-muted-foreground rounded cursor-pointer"*/}
-                                {/*            >*/}
-                                {/*                <Upload className="h-4 w-4 text-muted-foreground" />*/}
-                                {/*            </label>*/}
-                                {/*        </div>*/}
-                                {/*}*/}
                             </div>
                         </div>
                     </div>
@@ -810,12 +781,11 @@ const UpdateIdea = () => {
                                 </div>
                                 <div className={"px-4 py-3 lg:py-6 lg:px-8 border-b space-y-2"}>
                                     <Label className={"font-normal"}>Choose Topics for this Idea (optional)</Label>
-                                    <Select onValueChange={handleChangeTopic}
-                                            value={selectedIdea.topic.map(x => x.id)}>
+                                    <Select onValueChange={handleChangeTopic} value={selectedIdea.topic.map(x => x.id)}>
                                         <SelectTrigger className="bg-card">
-                                            <SelectValue className={"text-muted-foreground text-sm"}
-                                                         placeholder="Assign to">
+                                            <SelectValue className={"text-muted-foreground text-sm"} placeholder="Assign to">
                                                 <div className={"flex flex-wrap gap-[2px]"}>
+                                                    {/*{(selectedIdea.topic || []).slice(0, 2).map((x, index) => {*/}
                                                     {(selectedIdea.topic || []).map((x, index) => {
                                                         const findObj = (topicLists || []).find((y) => y.id === x?.id);
                                                         return (
@@ -825,7 +795,8 @@ const UpdateIdea = () => {
                                                             </div>
                                                         );
                                                     })}
-                                                    {(selectedIdea.topic || []).length > 2 && <div>...</div>}
+                                                    {(selectedIdea.topic || []).length > 2}
+                                                    {/*{(selectedIdea.topic || []).length > 2 && (<div className="text-xs flex items-center">...</div>)}*/}
                                                 </div>
                                             </SelectValue>
                                         </SelectTrigger>
@@ -834,7 +805,7 @@ const UpdateIdea = () => {
                                                 {
                                                     (topicLists || []).map((x, i) => {
                                                         return (
-                                                            <SelectItem className={""} key={i} value={x.id}>
+                                                            <SelectItem className={"px-2"} key={i} value={x.id}>
                                                                 <div className={"flex gap-2"}>
                                                                     <div onClick={() => handleChangeTopic(x.id)}
                                                                          className="checkbox-icon">
@@ -851,24 +822,11 @@ const UpdateIdea = () => {
                                         </SelectContent>
                                     </Select>
                                 </div>
-                                <div className={"p-4 lg:p-8 flex gap-3"}>
-                                    <Button
-                                        className={`w-[54px] text-sm font-medium hover:bg-primary`}
-                                        onClick={onCreateIdea}
-                                    >
-                                        {
-                                            isLoadingCreateIdea ? <Loader2 className="h-4 w-4 animate-spin"/> :
-                                                "Save"
-                                        }
-                                    </Button>
-                                    <Button
-                                        variant={"outline hover:bg-transparent"}
-                                        className={"border border-primary text-sm font-medium text-primary"}
-                                        onClick={handleOnCreateCancel}
-                                    >
-                                        Cancel
-                                    </Button>
-                                </div>
+                                <SaveCancelButton
+                                    onClickSave={onCreateIdea}
+                                    load={isLoadingCreateIdea}
+                                    onClickCancel={handleOnCreateCancel}
+                                />
                             </Fragment>
                             :
                             <Fragment>
@@ -888,8 +846,7 @@ const UpdateIdea = () => {
                                                             variant={"outline"}
                                                             onClick={() => giveVote(1)}
                                                         >
-                                                            <ArrowBigUp
-                                                                className={"fill-primary stroke-primary"}/>
+                                                            <ArrowBigUp className={"fill-primary stroke-primary"}/>
                                                         </Button>
                                                         <p className={"text-xl font-normal"}>{selectedIdea?.vote}</p>
                                                         {
@@ -907,21 +864,20 @@ const UpdateIdea = () => {
                                                                                                 className={"relative"}>
                                                                                                 <div
                                                                                                     className={"update-idea text-sm rounded-full border text-center"}>
-                                                                                                    <Avatar>
-                                                                                                        {
-                                                                                                            x.user_photo ?
-                                                                                                                <AvatarImage
-                                                                                                                    src={x.user_photo}
-                                                                                                                    alt={x && x.name && x.name.substring(0, 1)}/> :
-                                                                                                                <AvatarFallback>{x && x.name && x.name.substring(0, 1).toUpperCase()}</AvatarFallback>
-                                                                                                        }
-                                                                                                    </Avatar>
+                                                                                                    <UserAvatar
+                                                                                                        userPhoto={x.user_photo}
+                                                                                                        userName={x.name}
+                                                                                                        className="w-[20px] h-[20px]"
+                                                                                                    />
                                                                                                 </div>
                                                                                             </div>
-                                                                                            <div
-                                                                                                className={"update-idea text-sm rounded-full border text-center ml-[-5px]"}>
-                                                                                                <Avatar><AvatarFallback>+{selectedIdea?.vote_list.length}</AvatarFallback></Avatar>
-                                                                                            </div>
+                                                                                            {
+                                                                                                (selectedIdea?.vote_list.length > 1) &&
+                                                                                                <div
+                                                                                                    className={"update-idea text-sm rounded-full border text-center ml-[-5px]"}>
+                                                                                                    <Avatar><AvatarFallback>+{selectedIdea?.vote_list.length - 1}</AvatarFallback></Avatar>
+                                                                                                </div>
+                                                                                            }
                                                                                         </div>
                                                                                     )
                                                                                 })
@@ -929,7 +885,7 @@ const UpdateIdea = () => {
                                                                         </Button>
                                                                     </PopoverTrigger>
                                                                     <PopoverContent className="p-0" align={"start"}>
-                                                                        <div className={""}>
+                                                                        <div>
                                                                             <div className={"py-3 px-4"}>
                                                                                 <h4 className="font-normal leading-none text-sm">{`Voters (${selectedIdea?.vote_list.length})`}</h4>
                                                                             </div>
@@ -938,22 +894,14 @@ const UpdateIdea = () => {
                                                                                 {
                                                                                     (selectedIdea?.vote_list || []).map((x, i) => {
                                                                                         return (
-                                                                                            <div
-                                                                                                className={"flex gap-2"}
-                                                                                                key={i}>
+                                                                                            <div className={"flex gap-2"} key={i}>
                                                                                                 <div
                                                                                                     className={"update-idea text-sm rounded-full border text-center"}>
-                                                                                                    <Avatar
-                                                                                                        className={"w-[20px] h-[20px]"}>
-                                                                                                        {
-                                                                                                            x.user_photo ?
-                                                                                                                <AvatarImage
-                                                                                                                    src={x.user_photo}
-                                                                                                                    alt=""/>
-                                                                                                                :
-                                                                                                                <AvatarFallback>{x && x.name && x.name.substring(0, 1).toUpperCase()}</AvatarFallback>
-                                                                                                        }
-                                                                                                    </Avatar>
+                                                                                                    <UserAvatar
+                                                                                                        userPhoto={x.user_photo}
+                                                                                                        userName={x.name}
+                                                                                                        className="w-[20px] h-[20px]"
+                                                                                                    />
                                                                                                 </div>
                                                                                                 <h4 className={"text-sm font-normal"}>{x.name}</h4>
                                                                                             </div>
@@ -968,129 +916,83 @@ const UpdateIdea = () => {
                                                         }
                                                     </div>
                                             }
-                                            <div className={"md:hidden"}>
-                                                <DropdownMenu>
-                                                    <DropdownMenuTrigger>
-                                                        <Ellipsis size={16}/>
-                                                    </DropdownMenuTrigger>
-                                                    <DropdownMenuContent align={"end"}>
-                                                        <DropdownMenuItem className={"cursor-pointer"}
-                                                                          onClick={() => setIsEditIdea(true)}>Edit</DropdownMenuItem>
-                                                        <DropdownMenuItem className={"cursor-pointer"}
-                                                                          onClick={() => onChangeStatus("pin_to_top", selectedIdea?.pin_to_top === 0 ? 1 : 0)}>
-                                                            {selectedIdea?.pin_to_top == 0 ? "Pinned" : "Unpinned"}
-                                                        </DropdownMenuItem>
-                                                        <DropdownMenuItem className={"cursor-pointer"}
-                                                                          onClick={() => onChangeStatus(
-                                                                              "is_active",
-                                                                              selectedIdea?.is_active === 1 ? 0 : 1
-                                                                          )}>
-                                                            {selectedIdea?.is_active === 0 ? "Convert to Idea" : "Mark as bug"}
-                                                        </DropdownMenuItem>
-                                                        <DropdownMenuItem className={"cursor-pointer"}
-                                                                          onClick={() => onChangeStatus(
-                                                                              "is_archive",
-                                                                              selectedIdea?.is_archive === 1 ? 0 : 1
-                                                                          )}>
-                                                            {selectedIdea?.is_archive === 1 ? "Unarchive" : "Archive"}
-                                                        </DropdownMenuItem>
-                                                    </DropdownMenuContent>
-                                                </DropdownMenu>
-                                            </div>
-                                            <div className={"lg:hidden md:block hidden"}>
-                                                <div className={"flex items-center gap-2"}>
-                                                    <div className={"flex gap-2"}>
-                                                        <div className={"flex gap-1 justify-between"}>
-                                                            <Button
-                                                                variant={"outline"}
-                                                                className={`hover:bg-muted w-[110px] h-[30px] ${theme === "dark" ? "" : "border-muted-foreground text-muted-foreground"} text-xs font-medium`}
-                                                                onClick={() => onChangeStatus(
-                                                                    "is_active",
-                                                                    selectedIdea?.is_active === 1 ? 0 : 1
-                                                                )}
-                                                            >
-                                                                {
-                                                                    isLoadingBug ? <Loader2
-                                                                        className="h-4 w-4 animate-spin"/> : (selectedIdea?.is_active === 0 ? "Convert to Idea" : "Mark as bug")
-                                                                }
-                                                            </Button>
-                                                        </div>
-                                                        <div className={"flex gap-1 justify-between"}>
-                                                            <Button
-                                                                variant={"outline"}
-                                                                className={`hover:bg-muted w-[80px] h-[30px] ${theme === "dark" ? "" : "border-muted-foreground text-muted-foreground"} text-xs font-medium`}
-                                                                onClick={() => onChangeStatus(
-                                                                    "is_archive",
-                                                                    selectedIdea?.is_archive === 1 ? 0 : 1
-                                                                )}
-                                                            >
-                                                                {
-                                                                    isLoadingArchive ? <Loader2
-                                                                        className="h-4 w-4 animate-spin"/> : (selectedIdea?.is_archive === 1 ? "Unarchive" : "Archive")
-                                                                }
-                                                            </Button>
-                                                        </div>
-                                                    </div>
-                                                    <div className={"flex gap-2"}>
-                                                        {
-                                                            selectedIdea?.is_edit === 1 ?
-                                                                <Button
-                                                                    variant={"outline"}
-                                                                    className={"w-[30px] h-[30px] p-1"}
-                                                                    onClick={() => setIsEditIdea(true)}
-                                                                >
-                                                                    <Pencil className={"w-[16px] h-[16px]"}/>
-                                                                </Button> : ""
-                                                        }
 
-                                                        <Button
-                                                            variant={"outline"}
-                                                            className={`w-[30px] h-[30px] p-1`}
-                                                            onClick={() => onChangeStatus("pin_to_top", selectedIdea?.pin_to_top === 0 ? 1 : 0)}
-                                                        >
-                                                            {selectedIdea?.pin_to_top == 0 ?
-                                                                <Pin size={16}/> :
-                                                                <Pin size={16} className={`fill-card-foreground`}/>}
-                                                        </Button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div className={"hidden lg:block"}>
-                                                <div className={"flex gap-2"}>
-                                                    {
-                                                        isLoading ?
-                                                            <div className={"flex gap-2"}>
-                                                                {
-                                                                    selectedIdea?.is_edit === 1 ?
-                                                                        <Skeleton className="w-[30px] h-[30px] rounded-full"/>
-                                                                        : ""
-                                                                }
-                                                                <Skeleton className="w-[30px] h-[30px] rounded-full" />
+                                            <div className={"flex gap-2 items-center"}>
+                                                {
+                                                    isLoading ?
+                                                        <div className={"flex gap-2"}>
+                                                            {
+                                                                selectedIdea?.is_edit === 1 ?
+                                                                    <Skeleton
+                                                                        className="w-[30px] h-[30px] rounded-full"/>
+                                                                    : ""
+                                                            }
+                                                            <Skeleton className="w-[30px] h-[30px] rounded-full"/>
+                                                        </div>
+                                                        :
+                                                        <Fragment>
+                                                            <div className={"hidden md:block"}>
+                                                                <ActionButtons
+                                                                    isEditable={selectedIdea?.is_edit === 1}
+                                                                    onEdit={() => setIsEditIdea(true)}
+                                                                    onPinChange={(newPinState) => onChangeStatus("pin_to_top", newPinState ? 1 : 0)}
+                                                                    isPinned={selectedIdea?.pin_to_top === 1}
+                                                                />
                                                             </div>
-                                                                :
-                                                            <Fragment>
-                                                                {
-                                                                    selectedIdea?.is_edit === 1 ?
-                                                                        <Button
-                                                                            variant={"outline"}
-                                                                            className={"w-[30px] h-[30px] p-1"}
-                                                                            onClick={() => setIsEditIdea(true)}
-                                                                        >
-                                                                            <Pencil className={"w-[16px] h-[16px]"}/>
-                                                                        </Button> : ""
-                                                                }
-                                                                <Button
-                                                                    variant={"outline"}
-                                                                    className={`w-[30px] h-[30px] p-1`}
-                                                                    onClick={() => onChangeStatus("pin_to_top", selectedIdea?.pin_to_top === 0 ? 1 : 0)}
-                                                                >
-                                                                    {selectedIdea?.pin_to_top == 0 ?
-                                                                        <Pin size={16}/> :
-                                                                        <Pin size={16} className={`fill-card-foreground`}/>}
-                                                                </Button>
-                                                            </Fragment>
-                                                    }
-                                                </div>
+
+                                                            <div className={"md:hidden"}>
+                                                                <DropdownMenu>
+                                                                    <DropdownMenuTrigger>
+                                                                        <Ellipsis size={16}/>
+                                                                    </DropdownMenuTrigger>
+                                                                    <DropdownMenuContent align={"end"}>
+                                                                        <DropdownMenuItem className={"cursor-pointer"}
+                                                                                          onClick={() => setIsEditIdea(true)}>Edit</DropdownMenuItem>
+                                                                        <DropdownMenuItem className={"cursor-pointer"}
+                                                                                          onClick={() => onChangeStatus("pin_to_top", selectedIdea?.pin_to_top === 0 ? 1 : 0)}>
+                                                                            {selectedIdea?.pin_to_top == 0 ? "Pinned" : "Unpinned"}
+                                                                        </DropdownMenuItem>
+                                                                        <DropdownMenuItem className={"cursor-pointer capitalize"}
+                                                                                          onClick={() => onChangeStatus(
+                                                                                              "is_active",
+                                                                                              selectedIdea?.is_active === 1 ? 0 : 1
+                                                                                          )}>
+                                                                            {selectedIdea?.is_active === 0 ? "Convert to Idea" : "Mark as bug"}
+                                                                        </DropdownMenuItem>
+                                                                        <DropdownMenuItem className={"cursor-pointer"}
+                                                                                          onClick={() => onChangeStatus(
+                                                                                              "is_archive",
+                                                                                              selectedIdea?.is_archive === 1 ? 0 : 1
+                                                                                          )}>
+                                                                            {selectedIdea?.is_archive === 1 ? "Unarchive" : "Archive"}
+                                                                        </DropdownMenuItem>
+                                                                    </DropdownMenuContent>
+                                                                </DropdownMenu>
+                                                            </div>
+
+                                                            <div className={"lg:hidden md:block hidden"}>
+                                                                <StatusButtonGroup
+                                                                    onChangeStatus={(statusKey, statusValue) => onChangeStatus(statusKey, statusValue)}
+                                                                    statusButtons={[
+                                                                        {
+                                                                            statusKey: "is_active",
+                                                                            statusValue: selectedIdea?.is_active === 1 ? 0 : 1,
+                                                                            isLoading: isLoadingBug,
+                                                                            label: selectedIdea?.is_active === 0 ? "Convert to Idea" : "Mark as Bug",
+                                                                            width: "w-[110px]"
+                                                                        },
+                                                                        {
+                                                                            statusKey: "is_archive",
+                                                                            statusValue: selectedIdea?.is_archive === 1 ? 0 : 1,
+                                                                            isLoading: isLoadingArchive,
+                                                                            label: selectedIdea?.is_archive === 1 ? "Unarchive" : "Archive",
+                                                                            width: "w-[80px]"
+                                                                        }
+                                                                    ]}
+                                                                />
+                                                            </div>
+                                                        </Fragment>
+                                                }
                                             </div>
                                         </div>
                                         {
@@ -1124,7 +1026,7 @@ const UpdateIdea = () => {
                                                 <Fragment>
                                                     {
                                                         selectedIdea && selectedIdea?.images && selectedIdea?.images?.length > 0 ?
-                                                            <div className={"flex gap-2 flex-wrap"}>
+                                                            <div className={"flex gap-3 flex-wrap"}>
                                                                 <Fragment>
                                                                     {
                                                                         (selectedIdea?.images || []).map((x, i) => {
@@ -1144,9 +1046,9 @@ const UpdateIdea = () => {
                                                                                                     className="w-[50px] h-[50px] md:w-[100px] md:h-[100px] border p-[3px] relative"
                                                                                                     onClick={() => handleImageClick(x)}
                                                                                                 >
-                                                                                                    <img className={"upload-img cursor-pointer"}
-                                                                                                         src={x} alt=""/>
-                                                                                                </div> : ""
+                                                                                                    <img className={"upload-img cursor-pointer"} src={x} alt=""/>
+                                                                                                </div>
+                                                                                                : ""
                                                                                         }
                                                                                     </Fragment>
                                                                                 )
@@ -1160,21 +1062,10 @@ const UpdateIdea = () => {
                                         <div className={"flex items-center"}>
                                             <div className={"flex items-center gap-4 md:flex-nowrap flex-wrap"}>
                                                 <div className={"flex items-center gap-2"}>
-                                                    <Avatar className={"w-[20px] h-[20px]"}>
-                                                        {
-                                                            isLoading ?
-                                                                <Skeleton className="w-[20px] h-[20px] rounded-full" /> :
-                                                                <Fragment>
-                                                                    {
-                                                                        selectedIdea?.user_photo ?
-                                                                            <AvatarImage src={selectedIdea?.user_photo}
-                                                                                         alt="@shadcn"/>
-                                                                            :
-                                                                            <AvatarFallback>{selectedIdea && selectedIdea?.name && selectedIdea?.name.substring(0, 1)}</AvatarFallback>
-                                                                    }
-                                                                </Fragment>
-                                                        }
-                                                    </Avatar>
+                                                    <UserAvatar
+                                                        userPhoto={selectedIdea?.user_photo}
+                                                        userName={selectedIdea?.name}
+                                                    />
                                                     <div className={"flex items-center"}>
                                                         {
                                                             isLoading ?
@@ -1245,23 +1136,6 @@ const UpdateIdea = () => {
                                                 <div className={"flex flex-col gap-2"}>
                                                     <div className="w-full flex flex-col gap-2">
                                                         <Label htmlFor="message" className={"font-normal capitalize"}>Add comment</Label>
-                                                        {/*{*/}
-                                                        {/*    privateNote ?*/}
-                                                        {/*        <Card*/}
-                                                        {/*            className={`shadow-none ${theme === "dark" ? "" : "border-amber-300"}`}>*/}
-                                                        {/*            <div*/}
-                                                        {/*                className={`text-xs text-card-foreground font-normal py-1 px-3 ${theme === "dark" ? "" : "bg-orange-100"} rounded-tl-md rounded-tr-md`}>Add*/}
-                                                        {/*                a private note for your team*/}
-                                                        {/*            </div>*/}
-                                                        {/*            <Textarea*/}
-                                                        {/*                className={"rounded-tl-none rounded-tr-none"}*/}
-                                                        {/*                placeholder="Private Start writing..."*/}
-                                                        {/*                id="message"*/}
-                                                        {/*                value={commentText}*/}
-                                                        {/*                onChange={(e) => setCommentText(e.target.value)}*/}
-                                                        {/*            />*/}
-                                                        {/*        </Card>*/}
-                                                        {/*        :*/}
                                                         <>
                                                             <Textarea
                                                                 placeholder="Start writing..."
@@ -1370,19 +1244,13 @@ const UpdateIdea = () => {
                                                         (selectedIdea?.comments || []).map((x, i) => {
                                                             return (
                                                                 <Fragment>
-                                                                    <div className={"flex gap-2 p-4 lg:p-8 lg:pb-0 pt-3 pb-0"}>
+                                                                    <div className={"flex gap-2 p-4 lg:px-8 border-b last:border-b-0"}>
                                                                         <div>
                                                                             <div className={"update-idea text-sm rounded-full border text-center"}>
-                                                                                <Avatar className={"w-[20px] h-[20px]"}>
-                                                                                    {
-                                                                                        x?.user_photo ?
-                                                                                            <AvatarImage
-                                                                                                src={x?.user_photo}
-                                                                                                alt="@shadcn"/>
-                                                                                            :
-                                                                                            <AvatarFallback>{x && x?.name && x?.name?.substring(0, 1).toUpperCase()}</AvatarFallback>
-                                                                                    }
-                                                                                </Avatar>
+                                                                                <UserAvatar
+                                                                                    userPhoto={x?.user_photo}
+                                                                                    userName={x?.name}
+                                                                                />
                                                                             </div>
                                                                         </div>
                                                                         <div className={"w-full flex flex-col space-y-3"}>
@@ -1399,23 +1267,27 @@ const UpdateIdea = () => {
                                                                                     {
                                                                                         selectedCommentIndex === i && isEditComment ? "" :
                                                                                             x?.is_edit === 1 ?
-                                                                                                <>
-                                                                                                    <Button
-                                                                                                    variant={"outline"}
-                                                                                                    className={"w-[30px] h-[30px] p-1"}
-                                                                                                    onClick={() => onEditComment(x, i)}
-                                                                                                >
-                                                                                                    <Pencil
-                                                                                                        className={"w-[16px] h-[16px]"}/>
-                                                                                                </Button>
-                                                                                                    <Button
-                                                                                                        variant={"outline"}
-                                                                                                        className={"w-[30px] h-[30px] p-1"}
-                                                                                                        onClick={() => deleteComment(x.id, i)}
-                                                                                                    >
-                                                                                                        <Trash2
-                                                                                                            className={"w-[16px] h-[16px]"}/>
-                                                                                                    </Button></> : ""
+                                                                                                <ActionButtons
+                                                                                                    isEditable={x?.is_edit === 1}
+                                                                                                    onEdit={() => onEditComment(x, i)}
+                                                                                                    onDelete={() => deleteComment(x.id, i)}
+                                                                                                />
+                                                                                                // <>
+                                                                                                //     <Button
+                                                                                                //     variant={"outline"}
+                                                                                                //     className={"w-[30px] h-[30px] p-1"}
+                                                                                                //     onClick={() => onEditComment(x, i)}
+                                                                                                // >
+                                                                                                //     <Pencil className={"w-[16px] h-[16px]"}/>
+                                                                                                // </Button>
+                                                                                                //     <Button
+                                                                                                //         variant={"outline"}
+                                                                                                //         className={"w-[30px] h-[30px] p-1"}
+                                                                                                //         onClick={() => deleteComment(x.id, i)}
+                                                                                                //     >
+                                                                                                //         <Trash2 className={"w-[16px] h-[16px]"}/>
+                                                                                                //     </Button></>
+                                                                                                : ""
                                                                                     }
                                                                                 </div>
                                                                             </div>
@@ -1441,111 +1313,6 @@ const UpdateIdea = () => {
                                                                                                     onImageClick={(img) => handleImageClick(img)}
                                                                                                 />
                                                                                     }
-
-                                                                                    {/*{*/}
-                                                                                    {/*    selectedCommentIndex === i && isEditComment ?*/}
-                                                                                    {/*        <div className={"space-y-2"}>*/}
-                                                                                    {/*            <Textarea*/}
-                                                                                    {/*                value={selectedComment.comment}*/}
-                                                                                    {/*                onChange={(e) => setSelectedComment({...selectedComment, comment: e.target.value})}*/}
-                                                                                    {/*            />*/}
-                                                                                    {/*            {*/}
-                                                                                    {/*                selectedComment && selectedComment?.images && selectedComment?.images?.length ?*/}
-                                                                                    {/*                    <div className={"flex gap-3 flex-wrap"}>*/}
-                                                                                    {/*                        {*/}
-                                                                                    {/*                            (selectedComment?.images || []).map((x, i) => {*/}
-                                                                                    {/*                                return (*/}
-                                                                                    {/*                                    <Fragment>*/}
-                                                                                    {/*                                        {*/}
-                                                                                    {/*                                            x && x.name ?*/}
-                                                                                    {/*                                                <div*/}
-                                                                                    {/*                                                    className={"w-[50px] h-[50px] md:w-[100px] md:h-[100px] relative border p-[3px]"}>*/}
-                                                                                    {/*                                                    <img*/}
-                                                                                    {/*                                                        className={"upload-img"}*/}
-                                                                                    {/*                                                        src={x && x.name ? URL.createObjectURL(x) : x}*/}
-                                                                                    {/*                                                        alt=""/>*/}
-                                                                                    {/*                                                    <CircleX*/}
-                                                                                    {/*                                                        size={20}*/}
-                                                                                    {/*                                                        className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}*/}
-                                                                                    {/*                                                        onClick={() => onDeleteCommentImage(i, true)}/>*/}
-                                                                                    {/*                                                </div> : x ?*/}
-                                                                                    {/*                                                <div*/}
-                                                                                    {/*                                                    className={"w-[50px] h-[50px] md:w-[100px] md:h-[100px] relative border p-[3px]"}>*/}
-                                                                                    {/*                                                    <img*/}
-                                                                                    {/*                                                        className={"upload-img"}*/}
-                                                                                    {/*                                                        src={x}*/}
-                                                                                    {/*                                                        alt={x}/>*/}
-                                                                                    {/*                                                    <CircleX*/}
-                                                                                    {/*                                                        size={20}*/}
-                                                                                    {/*                                                        className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}*/}
-                                                                                    {/*                                                        onClick={() => onDeleteCommentImage(i, false)}/>*/}
-                                                                                    {/*                                                </div> : ''*/}
-                                                                                    {/*                                        }*/}
-                                                                                    {/*                                    </Fragment>*/}
-                                                                                    {/*                                )*/}
-                                                                                    {/*                            })*/}
-                                                                                    {/*                        }*/}
-                                                                                    {/*                    </div> : ""*/}
-                                                                                    {/*            }*/}
-                                                                                    {/*            <div className={"flex gap-2"}>*/}
-                                                                                    {/*                <Button*/}
-                                                                                    {/*                    className={`w-[81px] h-[30px] text-sm font-medium hover:bg-primary`}*/}
-                                                                                    {/*                    onClick={onUpdateComment}*/}
-                                                                                    {/*                    disabled={selectedComment.comment.trim() === "" || selectedComment.comment === ""}>*/}
-                                                                                    {/*                    {*/}
-                                                                                    {/*                        isSaveUpdateComment ?*/}
-                                                                                    {/*                            <Loader2*/}
-                                                                                    {/*                                size={16}*/}
-                                                                                    {/*                                className="animate-spin"/> : "Save"*/}
-                                                                                    {/*                    }*/}
-                                                                                    {/*                </Button>*/}
-                                                                                    {/*                <Button*/}
-                                                                                    {/*                    className={`h-[30px] text-sm font-medium text-primary border border-primary`}*/}
-                                                                                    {/*                    variant={"outline hover:none"}*/}
-                                                                                    {/*                    onClick={onCancelComment}>*/}
-                                                                                    {/*                    Cancel*/}
-                                                                                    {/*                </Button>*/}
-                                                                                    {/*                <div*/}
-                                                                                    {/*                    className="p-2 max-w-sm relative w-[36px]">*/}
-                                                                                    {/*                    <Input*/}
-                                                                                    {/*                        id="selectedCommentImg"*/}
-                                                                                    {/*                        type="file"*/}
-                                                                                    {/*                        className="hidden"*/}
-                                                                                    {/*                        onChange={handleAddCommentImg}*/}
-                                                                                    {/*                        accept={".jpg,.jpeg"}*/}
-                                                                                    {/*                    />*/}
-                                                                                    {/*                    <label*/}
-                                                                                    {/*                        htmlFor="selectedCommentImg"*/}
-                                                                                    {/*                        className="absolute inset-0 flex items-center justify-center bg-white border border-primary rounded cursor-pointer">*/}
-                                                                                    {/*                        <Paperclip*/}
-                                                                                    {/*                            size={16}*/}
-                                                                                    {/*                            className={"stroke-primary"}/>*/}
-                                                                                    {/*                    </label>*/}
-                                                                                    {/*                </div>*/}
-                                                                                    {/*            </div>*/}
-                                                                                    {/*        </div>*/}
-                                                                                    {/*        : <div className={"space-y-2"}>*/}
-                                                                                    {/*            <p className={"text-xs"}>{x.comment}</p>*/}
-                                                                                    {/*            <div className={"flex gap-2 flex-wrap"}>*/}
-                                                                                    {/*                {*/}
-                                                                                    {/*                    (Array.isArray(x?.images) ? x.images : []).map((img, ind) => (*/}
-                                                                                    {/*                        <div*/}
-                                                                                    {/*                            key={ind}*/}
-                                                                                    {/*                            className={"w-[50px] h-[50px] md:w-[100px] md:h-[100px] border p-[3px]"}*/}
-                                                                                    {/*                            onClick={() => handleImageClick(img)}*/}
-                                                                                    {/*                        >*/}
-                                                                                    {/*                            <img*/}
-                                                                                    {/*                                className={"upload-img cursor-pointer"}*/}
-                                                                                    {/*                                src={img}*/}
-                                                                                    {/*                                alt={img}*/}
-                                                                                    {/*                            />*/}
-                                                                                    {/*                        </div>*/}
-                                                                                    {/*                    ))*/}
-                                                                                    {/*                }*/}
-
-                                                                                    {/*            </div>*/}
-                                                                                    {/*        </div>*/}
-                                                                                    {/*}*/}
                                                                                 </Fragment>
                                                                             </div>
 
@@ -1556,7 +1323,9 @@ const UpdateIdea = () => {
                                                                                         <Button
                                                                                             className="p-0 text-sm h-auto font-medium text-primary"
                                                                                             variant={"ghost hover-none"}
-                                                                                            onClick={() => onShowSubComment(i)}
+                                                                                            onClick={() => {
+                                                                                                onShowSubComment(i)
+                                                                                            }}
                                                                                             key={`comment-nested-reply-to-${i}`}
                                                                                         >
                                                                                             Reply
@@ -1588,15 +1357,13 @@ const UpdateIdea = () => {
                                                                                                             <div>
                                                                                                                 <div
                                                                                                                     className={"update-idea text-sm rounded-full border text-center"}>
-                                                                                                                    <Avatar><AvatarFallback>{y?.name?.substring(0, 1).toUpperCase()}</AvatarFallback></Avatar>
+                                                                                                                    <UserAvatar userName={selectedIdea?.name}/>
                                                                                                                 </div>
                                                                                                             </div>
                                                                                                             <div
                                                                                                                 className={"w-full space-y-2"}>
-                                                                                                                <div
-                                                                                                                    className={"flex justify-between"}>
-                                                                                                                    <div
-                                                                                                                        className={"flex items-start"}>
+                                                                                                                <div className={"flex justify-between"}>
+                                                                                                                    <div className={"flex items-start"}>
                                                                                                                         <h4 className={"text-sm font-normal"}>{x.name}</h4>
                                                                                                                         <p className={"text-sm font-normal flex items-center text-muted-foreground"}>
                                                                                                                             <Dot
@@ -1608,23 +1375,28 @@ const UpdateIdea = () => {
                                                                                                                     {
                                                                                                                         selectedCommentIndex === i && selectedSubCommentIndex === j ? "" :
                                                                                                                             y.is_edit === 1 ?
-                                                                                                                                <div
-                                                                                                                                    className="flex gap-2">
-                                                                                                                                    <Button
-                                                                                                                                        variant={"outline"}
-                                                                                                                                        className={"w-[30px] h-[30px] p-1"}
-                                                                                                                                        onClick={() => onEditSubComment(x, y, i, j)}>
-                                                                                                                                        <Pencil
-                                                                                                                                            className={"w-[16px] h-[16px]"}/>
-                                                                                                                                    </Button>
-                                                                                                                                    <Button
-                                                                                                                                        variant={"outline"}
-                                                                                                                                        className={"w-[30px] h-[30px] p-1"}
-                                                                                                                                        onClick={() => deleteSubComment(y.id, x, i, j)}>
-                                                                                                                                        <Trash2
-                                                                                                                                            className={"w-[16px] h-[16px]"}/>
-                                                                                                                                    </Button>
-                                                                                                                                </div> : ''
+                                                                                                                                <ActionButtons
+                                                                                                                                    isEditable={y?.is_edit === 1}
+                                                                                                                                    onEdit={() => onEditSubComment(x, y, i, j)}
+                                                                                                                                    onDelete={() => deleteSubComment(y.id, x, i, j)}
+                                                                                                                                />
+                                                                                                                                // <div
+                                                                                                                                //     className="flex gap-2">
+                                                                                                                                //     <Button
+                                                                                                                                //         variant={"outline"}
+                                                                                                                                //         className={"w-[30px] h-[30px] p-1"}
+                                                                                                                                //         onClick={() => onEditSubComment(x, y, i, j)}>
+                                                                                                                                //         <Pencil className={"w-[16px] h-[16px]"}/>
+                                                                                                                                //     </Button>
+                                                                                                                                //     <Button
+                                                                                                                                //         variant={"outline"}
+                                                                                                                                //         className={"w-[30px] h-[30px] p-1"}
+                                                                                                                                //         onClick={() => deleteSubComment(y.id, x, i, j)}>
+                                                                                                                                //         <Trash2
+                                                                                                                                //             className={"w-[16px] h-[16px]"}/>
+                                                                                                                                //     </Button>
+                                                                                                                                // </div>
+                                                                                                                        : ''
                                                                                                                     }
                                                                                                                 </div>
                                                                                                                 <div>
@@ -1649,119 +1421,6 @@ const UpdateIdea = () => {
                                                                                                                                 onImageClick={(img) => handleImageClick(img)}
                                                                                                                             />
                                                                                                                     }
-
-                                                                                                                    {/*{*/}
-                                                                                                                    {/*    selectedCommentIndex === i && selectedSubCommentIndex === j ?*/}
-                                                                                                                    {/*        <div*/}
-                                                                                                                    {/*            className={"space-y-2"}>*/}
-                                                                                                                    {/*            <Textarea*/}
-                                                                                                                    {/*                value={selectedSubComment.comment}*/}
-                                                                                                                    {/*                onChange={(e) => onChangeTextSubComment(e)}*/}
-                                                                                                                    {/*            />*/}
-                                                                                                                    {/*            {*/}
-                                                                                                                    {/*                selectedSubComment && selectedSubComment.images && selectedSubComment.images.length ?*/}
-                                                                                                                    {/*                    <div*/}
-                                                                                                                    {/*                        className={"flex gap-2 flex-wrap"}>*/}
-                                                                                                                    {/*                        {*/}
-                                                                                                                    {/*                            (selectedSubComment.images || []).map((x, ind) => {*/}
-                                                                                                                    {/*                                return (*/}
-                                                                                                                    {/*                                    <Fragment>*/}
-                                                                                                                    {/*                                        {*/}
-                                                                                                                    {/*                                            x && x.name ?*/}
-                                                                                                                    {/*                                                <div*/}
-                                                                                                                    {/*                                                    className={"w-[50px] h-[50px] md:w-[100px] md:h-[100px] relative border p-[3px]"}>*/}
-                                                                                                                    {/*                                                    <img*/}
-                                                                                                                    {/*                                                        className={"upload-img"}*/}
-                                                                                                                    {/*                                                        src={x && x.name ? URL.createObjectURL(x) : x}*/}
-                                                                                                                    {/*                                                        alt=""/>*/}
-                                                                                                                    {/*                                                    <CircleX*/}
-                                                                                                                    {/*                                                        size={20}*/}
-                                                                                                                    {/*                                                        className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}*/}
-                                                                                                                    {/*                                                        onClick={() => onDeleteSubCommentImage(ind, true)}*/}
-                                                                                                                    {/*                                                    />*/}
-                                                                                                                    {/*                                                </div> : x ?*/}
-                                                                                                                    {/*                                                <div*/}
-                                                                                                                    {/*                                                    className={"w-[50px] h-[50px] md:w-[100px] md:h-[100px] relative border p-[3px]"}>*/}
-                                                                                                                    {/*                                                    <img*/}
-                                                                                                                    {/*                                                        className={"upload-img"}*/}
-                                                                                                                    {/*                                                        src={x}*/}
-                                                                                                                    {/*                                                        alt={x}/>*/}
-                                                                                                                    {/*                                                    <CircleX*/}
-                                                                                                                    {/*                                                        size={20}*/}
-                                                                                                                    {/*                                                        className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}*/}
-                                                                                                                    {/*                                                        onClick={() => onDeleteSubCommentImage(ind, false)}*/}
-                                                                                                                    {/*                                                    />*/}
-                                                                                                                    {/*                                                </div> : ''*/}
-                                                                                                                    {/*                                        }*/}
-                                                                                                                    {/*                                    </Fragment>*/}
-                                                                                                                    {/*                                )*/}
-                                                                                                                    {/*                            })*/}
-                                                                                                                    {/*                        }*/}
-                                                                                                                    {/*                    </div> : ""*/}
-                                                                                                                    {/*            }*/}
-                                                                                                                    {/*            <div*/}
-                                                                                                                    {/*                className={"flex gap-2"}>*/}
-                                                                                                                    {/*                <Button*/}
-                                                                                                                    {/*                    className={`w-[81px] h-[30px] text-sm font-medium hover:bg-primary`}*/}
-                                                                                                                    {/*                    onClick={onUpdateSubComment}*/}
-                                                                                                                    {/*                    disabled={selectedSubComment.comment.trim() === "" || selectedSubComment.comment === ""}>*/}
-                                                                                                                    {/*                    {*/}
-                                                                                                                    {/*                        isSaveUpdateSubComment ?*/}
-                                                                                                                    {/*                            <Loader2*/}
-                                                                                                                    {/*                                size={16}*/}
-                                                                                                                    {/*                                className="animate-spin"/> : "Save"*/}
-                                                                                                                    {/*                    }*/}
-                                                                                                                    {/*                </Button>*/}
-                                                                                                                    {/*                <Button*/}
-                                                                                                                    {/*                    className={"px-3 py-2 h-[30px] text-sm font-medium text-primary border border-primary"}*/}
-                                                                                                                    {/*                    variant={"outline hover:none"}*/}
-                                                                                                                    {/*                    onClick={onCancelSubComment}>Cancel</Button>*/}
-                                                                                                                    {/*                <div*/}
-                                                                                                                    {/*                    className="p-2 max-w-sm relative w-[36px]">*/}
-                                                                                                                    {/*                    <Input*/}
-                                                                                                                    {/*                        id="commentFileInput"*/}
-                                                                                                                    {/*                        type="file"*/}
-                                                                                                                    {/*                        className="hidden"*/}
-                                                                                                                    {/*                        onChange={handleSubCommentUploadImg}*/}
-                                                                                                                    {/*                        accept={".jpg,.jpeg"}*/}
-                                                                                                                    {/*                    />*/}
-                                                                                                                    {/*                    <label*/}
-                                                                                                                    {/*                        htmlFor="commentFileInput"*/}
-                                                                                                                    {/*                        className="absolute inset-0 flex items-center justify-center bg-white border border-primary rounded cursor-pointer">*/}
-                                                                                                                    {/*                        <Paperclip*/}
-                                                                                                                    {/*                            size={16}*/}
-                                                                                                                    {/*                            className={"stroke-primary"}/>*/}
-                                                                                                                    {/*                    </label>*/}
-                                                                                                                    {/*                </div>*/}
-                                                                                                                    {/*            </div>*/}
-                                                                                                                    {/*        </div> :*/}
-                                                                                                                    {/*        <div className={"space-y-2"}>*/}
-                                                                                                                    {/*            <p className={"text-xs"}>{y.comment}</p>*/}
-                                                                                                                    {/*            <div className={"flex gap-2 flex-wrap"}>*/}
-                                                                                                                    {/*                {*/}
-                                                                                                                    {/*                    y && y.images && y.images.length ?*/}
-                                                                                                                    {/*                        <Fragment>*/}
-                                                                                                                    {/*                            {*/}
-                                                                                                                    {/*                                (Array.isArray(y?.images) ? y.images : []).map((z, i) => {*/}
-                                                                                                                    {/*                                    return (*/}
-                                                                                                                    {/*                                        <div key={i}*/}
-                                                                                                                    {/*                                             className={"w-[50px] h-[50px] md:w-[100px] md:h-[100px] border p-[3px]"}*/}
-                                                                                                                    {/*                                             onClick={() => handleImageClick(z)}*/}
-                                                                                                                    {/*                                        >*/}
-                                                                                                                    {/*                                            <img*/}
-                                                                                                                    {/*                                                className={"upload-img cursor-pointer"}*/}
-                                                                                                                    {/*                                                src={z}*/}
-                                                                                                                    {/*                                                alt={z}/>*/}
-                                                                                                                    {/*                                        </div>*/}
-                                                                                                                    {/*                                    )*/}
-                                                                                                                    {/*                                })*/}
-                                                                                                                    {/*                            }*/}
-                                                                                                                    {/*                        </Fragment>*/}
-                                                                                                                    {/*                        : ''*/}
-                                                                                                                    {/*                }*/}
-                                                                                                                    {/*            </div>*/}
-                                                                                                                    {/*        </div>*/}
-                                                                                                                    {/*}*/}
                                                                                                                 </div>
                                                                                                             </div>
                                                                                                         </div>
@@ -1771,9 +1430,12 @@ const UpdateIdea = () => {
                                                                                         }
                                                                                         <div
                                                                                             className={"space-y-2"}>
+                                                                                            {
+                                                                                                subCommentTextEditIdx === i &&
                                                                                             <Textarea
-                                                                                                value={subCommentText}
-                                                                                                onChange={(e) => setSubCommentText(e.target.value)}/>
+                                                                                                value={subCommentText[i] || ""}
+                                                                                                onChange={(e) => handleSubCommentTextChange(e, i)}/>
+                                                                                            }
                                                                                             {
                                                                                                 subCommentFiles && subCommentFiles.length ?
                                                                                                     <div
@@ -1814,38 +1476,44 @@ const UpdateIdea = () => {
                                                                                                         }
                                                                                                     </div> : ""
                                                                                             }
-                                                                                            <div
-                                                                                                className={"flex gap-2"}>
-                                                                                                <Button
-                                                                                                    className={`${isSaveSubComment === true ? "py-2 px-6" : "py-2 px-6"} w-[86px] h-[30px] text-sm font-medium`}
-                                                                                                    disabled={subCommentText.trim() === "" || subCommentText === ""}
-                                                                                                    onClick={() => onCreateSubComment(x, i)}
-                                                                                                >
-                                                                                                    {
-                                                                                                        isSaveSubComment ?
-                                                                                                            <Loader2
-                                                                                                                size={16}
-                                                                                                                className="animate-spin"/> : "Reply"
-                                                                                                    }
-                                                                                                </Button>
+                                                                                            {
+                                                                                                    subCommentTextEditIdx === i &&
                                                                                                 <div
-                                                                                                    className="p-2 max-w-sm relative w-[36px]">
-                                                                                                    <Input
-                                                                                                        id="commentFileInput"
-                                                                                                        type="file"
-                                                                                                        className="hidden"
-                                                                                                        onChange={handleSubCommentUploadImg}
-                                                                                                        accept={".jpg,.jpeg"}
-                                                                                                    />
-                                                                                                    <label
-                                                                                                        htmlFor="commentFileInput"
-                                                                                                        className="absolute inset-0 flex items-center justify-center bg-white border border-primary rounded cursor-pointer">
-                                                                                                        <Paperclip
-                                                                                                            size={16}
-                                                                                                            className={"stroke-primary"}/>
-                                                                                                    </label>
+                                                                                                    className={"flex gap-2"}>
+                                                                                                    <Button
+                                                                                                        className={`${isSaveSubComment === true ? "py-2 px-6" : "py-2 px-6"} w-[86px] h-[30px] text-sm font-medium`}
+                                                                                                        disabled={(!subCommentText[i] || subCommentText[i].trim() === "")}
+                                                                                                        onClick={() => {
+                                                                                                            onCreateSubComment(x, i)
+                                                                                                        }}
+                                                                                                    >
+                                                                                                        {
+                                                                                                            isSaveSubComment && subCommentTextEditIdx === i ?
+                                                                                                                <Loader2
+                                                                                                                    size={16}
+                                                                                                                    className="animate-spin"/> : "Reply"
+                                                                                                        }
+                                                                                                    </Button>
+                                                                                                    <UploadButton
+                                                                                                        onChange={handleSubCommentUploadImg}/>
+                                                                                                    {/*<div className="p-2 max-w-sm relative w-[36px]">*/}
+                                                                                                    {/*    <Input*/}
+                                                                                                    {/*        id="commentFileInput"*/}
+                                                                                                    {/*        type="file"*/}
+                                                                                                    {/*        className="hidden"*/}
+                                                                                                    {/*        onChange={handleSubCommentUploadImg}*/}
+                                                                                                    {/*        accept={".jpg,.jpeg"}*/}
+                                                                                                    {/*    />*/}
+                                                                                                    {/*    <label*/}
+                                                                                                    {/*        htmlFor="commentFileInput"*/}
+                                                                                                    {/*        className="absolute inset-0 flex items-center justify-center bg-white border border-primary rounded cursor-pointer">*/}
+                                                                                                    {/*        <Paperclip*/}
+                                                                                                    {/*            size={16}*/}
+                                                                                                    {/*            className={"stroke-primary"}/>*/}
+                                                                                                    {/*    </label>*/}
+                                                                                                    {/*</div>*/}
                                                                                                 </div>
-                                                                                            </div>
+                                                                                            }
                                                                                         </div>
                                                                                     </div> : ""
                                                                             }

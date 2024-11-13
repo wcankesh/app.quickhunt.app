@@ -172,7 +172,7 @@ const Forgot = () => {
                                                 <Card>
                                                     <CardContent className={"p-3 md:p-6 space-y-1.5"}>
                                                         <Label htmlFor="email" className={"font-normal"}>Your
-                                                            email</Label>
+                                                            Email</Label>
                                                         <Input
                                                             id="email"
                                                             type="email"
@@ -187,7 +187,7 @@ const Forgot = () => {
                                                                 className="text-destructive text-sm">{formError.email}</span>
                                                         }
                                                         <Button
-                                                            className={"w-full mt-2.5 bg-primary"}
+                                                            className={"w-full mt-2.5 bg-primary hover:bg-primary"}
                                                             disabled={forgotPasswordDetails.email === "" || forgotPasswordDetails.email.trim() === ""}
                                                             onClick={onSubmit}
                                                         >

@@ -310,19 +310,51 @@ const Surveys = ({inAppMsgSetting, setInAppMsgSetting, selectedStepIndex, setSel
 
                                             </Fragment>
                                         }
+                                        {/*{*/}
+                                        {/*    x?.question_type === 5 &&*/}
+                                        {/*    <Fragment>*/}
+                                        {/*        <div className="mt-3">*/}
+                                        {/*            <Select placeholder={x.placeholder_text} value={""}>*/}
+                                        {/*                <SelectTrigger className={`${theme === "dark" ? "bg-card-foreground" : ""} ring-offset-background-0`}>*/}
+                                        {/*                    <SelectValue placeholder={x.placeholder_text}/>*/}
+                                        {/*                </SelectTrigger>*/}
+                                        {/*                <SelectContent className={`max-w-[404px] ${theme === "dark" ? "bg-card-foreground" : ""}`}>*/}
+                                        {/*                    {x?.options.map((option, index) => (*/}
+                                        {/*                        option.is_active === 1 && <SelectItem className={`${theme === "dark" ? "focus:bg-card-foreground" : ""}`} key={index} value={index}>*/}
+                                        {/*                            <span className={"max-w-[270px] truncate text-ellipsis overflow-hidden whitespace-nowrap"}>{option.title}</span>*/}
+                                        {/*                        </SelectItem>*/}
+                                        {/*                    ))}*/}
+                                        {/*                </SelectContent>*/}
+                                        {/*            </Select>*/}
+                                        {/*        </div>*/}
+                                        {/*    </Fragment>*/}
+                                        {/*}*/}
                                         {
                                             x?.question_type === 5 &&
                                             <Fragment>
                                                 <div className="mt-3">
                                                     <Select placeholder={x.placeholder_text} value={""}>
                                                         <SelectTrigger className={`${theme === "dark" ? "bg-card-foreground" : ""} ring-offset-background-0`}>
-                                                            <SelectValue placeholder={x.placeholder_text}/>
+                                                            <SelectValue placeholder={x.options.length ? x.placeholder_text : "No data"} />
                                                         </SelectTrigger>
-                                                        <SelectContent className={`${theme === "dark" ? "bg-card-foreground" : ""}`}>
-                                                            {x?.options.map((option, index) => (
-                                                                option.is_active === 1 && <SelectItem className={`${theme === "dark" ? "focus:bg-card-foreground" : ""}`} key={index} value={index}>{option.title}</SelectItem>
-                                                            ))}
-                                                        </SelectContent>
+                                                        {x.options.length ? (
+                                                            <SelectContent className={`max-w-[404px] ${theme === "dark" ? "bg-card-foreground" : ""}`}>
+                                                                {x?.options.map((option, index) => (
+                                                                    option.is_active === 1 &&
+                                                                    <SelectItem className={`${theme === "dark" ? "focus:bg-card-foreground" : ""}`} key={index} value={index}>
+                                                                        <span className={"max-w-[270px] truncate text-ellipsis overflow-hidden whitespace-nowrap"}>
+                                                                            {option.title}
+                                                                        </span>
+                                                                    </SelectItem>
+                                                                ))}
+                                                            </SelectContent>
+                                                        ) : (
+                                                            <SelectContent className={`max-w-[404px] ${theme === "dark" ? "bg-card-foreground" : ""}`}>
+                                                                <SelectItem disabled>
+                                                                    <span className="text-muted-foreground">No data</span>
+                                                                </SelectItem>
+                                                            </SelectContent>
+                                                        )}
                                                     </Select>
                                                 </div>
                                             </Fragment>

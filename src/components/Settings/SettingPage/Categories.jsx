@@ -27,7 +27,6 @@ const Categories = () => {
 
     const [formError, setFormError] = useState(initialState);
     const [categoriesList, setCategoriesList] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
     const [isSave, setIsSave] = useState(false);
     const [deleteId, setDeleteId] = useState(null);
     const [openDelete, setOpenDelete] = useState(false);
@@ -42,7 +41,6 @@ const Categories = () => {
 
     const getAllCategory = async () => {
         setCategoriesList(allStatusAndTypes.categories);
-        setIsLoading(false);
     }
 
     const onBlur = (e) => {
@@ -173,7 +171,10 @@ const Categories = () => {
         const updatedCategory = [...categoriesList];
         updatedCategory[index] = { ...updatedCategory[index], [name]: value,description:value};
         setCategoriesList(updatedCategory);
-        setFormError(x => ({...x, [name]: ""}));
+        setFormError({
+            ...formError,
+            [name]: formValidate(name, value)
+        });
     }
 
     const handleSaveCategory = async (index) => {
@@ -223,7 +224,7 @@ const Categories = () => {
             {
                 openDelete &&
                 <DeleteDialog
-                    title={"You really want to delete this Category ?"}
+                    title={"You really want to delete this Category?"}
                     isOpen={openDelete}
                     onOpenChange={() => setOpenDelete(false)}
                     onDelete={onDelete}
@@ -250,7 +251,7 @@ const Categories = () => {
                                     {
                                         ["Category Name","Last Update","Action"].map((x,i)=>{
                                             return(
-                                                <TableHead className={`${i == 0 ? "w-2/5" : i == 1 ? "text-center" : i == 2 ? "text-end" : ""} text-sm font-normal px-2 py-[10px] md:px-3 text-card-foreground dark:text-muted-foreground`}>{x}</TableHead>
+                                                <TableHead className={`${i == 0 ? "w-2/5" : i == 1 ? "w-2/5" : ""} text-sm font-normal px-2 py-[10px] md:px-3 text-card-foreground dark:text-muted-foreground`}>{x}</TableHead>
                                             )
                                         })
                                     }
@@ -267,9 +268,9 @@ const Categories = () => {
                                                                 {
                                                                     isEdit == i ?
                                                                         <Fragment>
-                                                                            <TableCell className={"px-2 py-[10px] md:px-3"}>
+                                                                            <TableCell className={"px-[12px] py-[10px]"}>
                                                                                 <Input
-                                                                                    placeholder={"Enter category name"}
+                                                                                    placeholder={"Enter Category Name"}
                                                                                     className={"bg-card h-9"}
                                                                                     type="title"
                                                                                     value={x.name}
@@ -277,13 +278,17 @@ const Categories = () => {
                                                                                     onBlur={onBlur}
                                                                                     onChange={(e) => handleInputChange(e, i)}
                                                                                 />
-                                                                                <div className="grid gap-2">
-                                                                                    {formError.name && <span className="text-red-500 text-sm">{formError.name}</span>}
-                                                                                </div>
+                                                                                {
+                                                                                    formError.name ?
+                                                                                        <div className="grid gap-2 mt-[4px]">
+                                                                                            {formError.name && <span
+                                                                                                className="text-red-500 text-sm">{formError.name}</span>}
+                                                                                        </div> : ""
+                                                                                }
                                                                             </TableCell>
                                                                             <TableCell/>
                                                                             <TableCell className={`px-2 py-[10px] pt-[13px] md:px-3 font-normal text-xs align-top ${theme === "dark" ? "" : "text-muted-foreground"}`}>
-                                                                                <div className={"flex justify-end items-center gap-2"}>
+                                                                                <div className={"flex items-center gap-2"}>
                                                                                     <Fragment>
                                                                                         {
                                                                                             x.id ? <Button
@@ -293,7 +298,7 @@ const Categories = () => {
                                                                                             >
                                                                                                 {isSave ? <Loader2 className="h-4 w-4 animate-spin"/> : <Check size={16}/>}
                                                                                             </Button> : <Button
-                                                                                                className="text-sm font-medium h-[30px] w-[126px] hover:bg-primary"
+                                                                                                className="text-sm font-medium h-[30px] w-[112px] hover:bg-primary"
                                                                                                 onClick={() => addCategory(x, i)}
                                                                                             >
                                                                                                 {isSave ? <Loader2 className={"h-4 w-4 animate-spin"}/> : "Add Category"}
@@ -313,12 +318,12 @@ const Categories = () => {
                                                                         </Fragment>
                                                                         :
                                                                         <Fragment>
-                                                                            <TableCell className={`font-normal text-xs px-2 py-[10px] md:px-3 ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                                                            <TableCell className={`px-2 py-[10px] md:px-3 font-normal text-xs max-w-[140px] truncate text-ellipsis overflow-hidden whitespace-nowrap ${theme === "dark" ? "" : "text-muted-foreground"}`}>
                                                                                 {x.name}
                                                                             </TableCell>
-                                                                            <TableCell className={`px-2 py-[10px] md:px-3 font-normal text-xs text-center ${theme === "dark" ? "" : "text-muted-foreground"}`}>{moment.utc(x.updated_at).local().startOf('seconds').fromNow()}</TableCell>
+                                                                            <TableCell className={`px-2 py-[10px] md:px-3 font-normal text-xs ${theme === "dark" ? "" : "text-muted-foreground"}`}>{moment.utc(x.updated_at).local().startOf('seconds').fromNow()}</TableCell>
                                                                             <TableCell className={`px-2 py-[10px] md:px-3  ${theme === "dark" ? "" : "text-muted-foreground"}} `}>
-                                                                                <div className={"flex justify-end items-center"}>
+                                                                                <div className={"flex items-center"}>
                                                                                     <div className="pr-0">
                                                                                         <Button onClick={() => onEdit(i)} variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px] text-muted-foreground`}><Pencil size={16}/></Button>
                                                                                     </div>

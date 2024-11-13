@@ -1,42 +1,115 @@
-import React, {useEffect, useRef, useState} from 'react'
+import {Fragment, useEffect, useState} from 'react'
 import {Button} from './button'
 import {Popover, PopoverContent, PopoverTrigger} from './popover'
-import {cn} from "../../lib/utils"
-import {DateInput} from './date-input'
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from './select'
 import {Calendar} from './calendar'
-import {ChevronDownIcon, ChevronUpIcon} from '@radix-ui/react-icons'
+import {CheckIcon, ChevronDownIcon, ChevronUpIcon} from "lucide-react";
+import moment from "moment";
 
+export const formatButtonDate = (date) => {
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+    const year = date.getFullYear();
+    return `${day}-${month}-${year}`;
+};
 
-const formatDate = (date, locale = 'en-us') => {
+export const formatDate = (date, locale = 'en-us') => {
     return date.toLocaleDateString(locale, {
         month: 'short',
         day: 'numeric',
         year: 'numeric'
-    })
+    }).replace(',', '');
 }
-
 const getDateAdjustedForTimezone = (dateInput) => {
     if (typeof dateInput === 'string') {
         const parts = dateInput.split('-').map((part) => parseInt(part, 10))
-        const date = new Date(parts[0], parts[1] - 1, parts[2])
-        return date
+        return new Date(parts[0], parts[1] - 1, parts[2])
     } else {
         return dateInput
     }
 }
-
-const PRESETS = [
-    { name: 'today', label: 'Today' },
-    { name: 'yesterday', label: 'Yesterday' },
-    { name: 'last7', label: 'Last 7 days' },
-    { name: 'last14', label: 'Last 14 days' },
-    { name: 'last30', label: 'Last 30 days' },
-    { name: 'thisWeek', label: 'This Week' },
-    { name: 'lastWeek', label: 'Last Week' },
-    { name: 'thisMonth', label: 'This Month' },
-    { name: 'lastMonth', label: 'Last Month' }
+export const PRESETS = [
+    {name: 'today', label: 'Today', displayDays: 'Today'},
+    {name: 'yesterday', label: 'Yesterday', displayDays: 'Yesterday'},
+    {name: 'last7', label: 'Last 7 days', displayDays: 'Last 7 days'},
+    {name: 'last30', label: 'Last 30 days', displayDays: 'Last 30 days'},
+    // {name: 'last90', label: 'Last 90 days', displayDays: 'Last 90 days'},
+    // {name: 'last365', label: 'Last 365 days', displayDays: 'Last 365 days'},
+    {name: 'lastMonth', label: 'Last Month', displayDays: 'Last Month'},
+    {name: 'last6Month', label: 'Last 6 Month', displayDays: 'Last 6 Month'},
+    {name: 'lastYear', label: 'Last Year', displayDays: 'Last Year'},
+    // {name: 'customRange', label: 'Custom Range', displayDays: 'Custom Range'},
 ]
+
+export const getPresetRange = (presetName) => {
+    const preset = PRESETS.find(({ name }) => name === presetName);
+    if (!preset) throw new Error(`Unknown date range preset: ${presetName}`);
+    const from = new Date();
+    const to = new Date();
+    switch (preset.name) {
+        case 'today':
+            from.setHours(0, 0, 0, 0);
+            to.setHours(23, 59, 59, 999);
+            break;
+        case 'yesterday':
+            from.setDate(from.getDate() - 1);
+            from.setHours(0, 0, 0, 0);
+            to.setDate(to.getDate() - 1);
+            to.setHours(23, 59, 59, 999);
+            break;
+        case 'last7':
+            from.setDate(from.getDate() - 6);
+            from.setHours(0, 0, 0, 0);
+            to.setHours(23, 59, 59, 999);
+            break;
+        case 'last30':
+            from.setDate(from.getDate() - 29);
+            from.setHours(0, 0, 0, 0);
+            to.setHours(23, 59, 59, 999);
+            break;
+        // case 'last90':
+        //     from.setDate(from.getDate() - 89);
+        //     from.setHours(0, 0, 0, 0);
+        //     to.setHours(23, 59, 59, 999);
+        //     break;
+        // case 'last365':
+        //     from.setDate(from.getDate() - 364);
+        //     from.setHours(0, 0, 0, 0);
+        //     to.setHours(23, 59, 59, 999);
+        //     break;
+        case 'lastMonth':
+            from.setMonth(from.getMonth() - 1);
+            from.setDate(1); // First day of last month
+            from.setHours(0, 0, 0, 0);
+            to.setDate(0); // Last day of last month
+            to.setHours(23, 59, 59, 999);
+            break;
+        case 'last6Month':
+            from.setMonth(from.getMonth() - 6);
+            from.setDate(1);
+            from.setHours(0, 0, 0, 0);
+            to.setHours(23, 59, 59, 999);
+            break;
+        case 'lastYear':
+            from.setFullYear(from.getFullYear() - 1);
+            from.setMonth(0); // January
+            from.setDate(1);
+            from.setHours(0, 0, 0, 0);
+            to.setFullYear(to.getFullYear() - 1); // Set `to` to last year
+            to.setMonth(11); // December
+            to.setDate(31); // Last day of December
+            to.setHours(23, 59, 59, 999);
+            break;
+        // case 'customRange':
+        //     if (!customFrom || !customTo) {
+        //         throw new Error("Custom range requires both 'from' and 'to' dates.");
+        //     }
+        //     from.setTime(customFrom.getTime());
+        //     to.setTime(customTo.getTime());
+        //     break;
+    }
+    return { from, to };
+};
 
 export const DateRangePicker = ({
                                     initialDateFrom ,
@@ -49,12 +122,19 @@ export const DateRangePicker = ({
                                     showCompare = true
                                 }) => {
     const [isOpen, setIsOpen] = useState(false)
-
+    const [label, setLabel] = useState('')
+    const [tempLabel, setTempLabel] = useState('Last 30 days')
+    const [isApply, setIsApply] = useState(false)
     const [range, setRange] = useState({
         from: initialDateFrom,
         to: initialDateTo
     })
-
+    const [tempRange, setTempRange] = useState({
+        from: initialDateFrom,
+        to: initialDateTo
+    })
+    // const customFrom = new Date(new Date(initialCompareFrom).setHours(0, 0, 0, 0));
+    // const customTo = new Date(new Date(initialCompareTo).setHours(0, 0, 0, 0));
     const [rangeCompare, setRangeCompare] = useState(
         initialCompareFrom
             ? {
@@ -65,92 +145,25 @@ export const DateRangePicker = ({
             }
             : undefined
     )
-
-    const openedRangeRef = useRef()
-    const openedRangeCompareRef = useRef()
-
     const [selectedPreset, setSelectedPreset] = useState(undefined)
-
     const [isSmallScreen, setIsSmallScreen] = useState(
         typeof window !== 'undefined' ? window.innerWidth < 960 : false
     )
-
     useEffect(() => {
         const handleResize = () => {
             setIsSmallScreen(window.innerWidth < 960)
         }
-
         window.addEventListener('resize', handleResize)
-
         return () => {
             window.removeEventListener('resize', handleResize)
         }
     }, [])
 
-    const getPresetRange = (presetName) => {
-        const preset = PRESETS.find(({ name }) => name === presetName)
-        if (!preset) throw new Error(`Unknown date range preset: ${presetName}`)
-        const from = new Date()
-        const to = new Date()
-        const first = from.getDate() - from.getDay()
 
-        switch (preset.name) {
-            case 'today':
-                from.setHours(0, 0, 0, 0)
-                to.setHours(23, 59, 59, 999)
-                break
-            case 'yesterday':
-                from.setDate(from.getDate() - 1)
-                from.setHours(0, 0, 0, 0)
-                to.setDate(to.getDate() - 1)
-                to.setHours(23, 59, 59, 999)
-                break
-            case 'last7':
-                from.setDate(from.getDate() - 6)
-                from.setHours(0, 0, 0, 0)
-                to.setHours(23, 59, 59, 999)
-                break
-            case 'last14':
-                from.setDate(from.getDate() - 13)
-                from.setHours(0, 0, 0, 0)
-                to.setHours(23, 59, 59, 999)
-                break
-            case 'last30':
-                from.setDate(from.getDate() - 29)
-                from.setHours(0, 0, 0, 0)
-                to.setHours(23, 59, 59, 999)
-                break
-            case 'thisWeek':
-                from.setDate(first)
-                from.setHours(0, 0, 0, 0)
-                to.setHours(23, 59, 59, 999)
-                break
-            case 'lastWeek':
-                from.setDate(from.getDate() - 7 - from.getDay())
-                to.setDate(to.getDate() - to.getDay() - 1)
-                from.setHours(0, 0, 0, 0)
-                to.setHours(23, 59, 59, 999)
-                break
-            case 'thisMonth':
-                from.setDate(1)
-                from.setHours(0, 0, 0, 0)
-                to.setHours(23, 59, 59, 999)
-                break
-            case 'lastMonth':
-                from.setMonth(from.getMonth() - 1)
-                from.setDate(1)
-                from.setHours(0, 0, 0, 0)
-                to.setDate(0)
-                to.setHours(23, 59, 59, 999)
-                break
-        }
-
-        return { from, to }
-    }
-
-    const setPreset = (preset) => {
+    const setPreset = (preset, label = '') => {
         const range = getPresetRange(preset)
         setRange(range)
+        setLabel(label);
         if (rangeCompare) {
             const rangeCompare = {
                 from: new Date(
@@ -169,35 +182,31 @@ export const DateRangePicker = ({
             setRangeCompare(rangeCompare)
         }
     }
-
     const checkPreset = () => {
         for (const preset of PRESETS) {
             const presetRange = getPresetRange(preset.name)
-
             const normalizedRangeFrom = new Date(range.from);
             normalizedRangeFrom.setHours(0, 0, 0, 0);
             const normalizedPresetFrom = new Date(
                 presetRange.from.setHours(0, 0, 0, 0)
             )
-
             const normalizedRangeTo = new Date(range.to ?? 0);
             normalizedRangeTo.setHours(0, 0, 0, 0);
             const normalizedPresetTo = new Date(
                 presetRange.to?.setHours(0, 0, 0, 0) ?? 0
             )
-
             if (
                 normalizedRangeFrom.getTime() === normalizedPresetFrom.getTime() &&
                 normalizedRangeTo.getTime() === normalizedPresetTo.getTime()
             ) {
                 setSelectedPreset(preset.name)
+                setLabel(preset.label)
                 return
             }
         }
-
         setSelectedPreset(undefined)
+        setLabel('')
     }
-
     const resetValues = () => {
         setRange({
             from:
@@ -231,37 +240,62 @@ export const DateRangePicker = ({
         )
         setIsOpen(false)
     }
-
     useEffect(() => {
         checkPreset()
     }, [range])
-
     const PresetButton = ({
                               preset,
                               label,
                               isSelected
                           }) => (
         <Button
-            className={`${cn(isSelected && 'pointer-events-none bg-primary/15 text-primary')} justify-start p-2`}
+            className={`${isSelected ? 'pointer-events-none bg-primary/15 text-primary font-medium' : 'font-normal'}  justify-between hover:bg-primary/5 p-2`}
             variant="ghost" size={"sm"}
             onClick={() => {
-                setPreset(preset)
+                setPreset(preset, label);
             }}
         >
-            {/*{isSelected && <CheckIcon className="mr-2 h-4 w-4" />}*/}
             {label}
+            {isSelected && <CheckIcon className="mr-2 h-4 w-4" />}
         </Button>
     )
-
+    const onApplyDate = () => {
+        setIsOpen(false)
+        onUpdate?.(range)
+        setIsApply(true)
+        setTempLabel(label)
+        setTempRange({
+            from: range.from,
+            to: range.to
+        })
+    }
+    const onOpenDatePicker = (open) => {
+        setIsOpen(open)
+        setIsApply(false)
+    }
     return (
         <div className="flex flex-col gap-2">
             <div className="flex flex-row items-end gap-2 justify-end">
-                <Popover open={isOpen} onOpenChange={setIsOpen}>
+                <Popover open={isOpen} onOpenChange={onOpenDatePicker}>
                     <PopoverTrigger asChild>
-                        <Button variant="outline" className="w-[300px] justify-between">
+                        <Button variant="outline" className="justify-between cursor-pointer">
               <span>
-                {range.from ? formatDate(range.from, locale) : 'Pick a date'}
-                  {range.to && ` - ${formatDate(range.to, locale)}`}
+                 {/*{(!isApply && label !== '') ? tempLabel !== '' ? tempLabel : <Fragment>{(tempRange.from ? formatDate(tempRange.from, locale) : 'Pick a date')} {tempRange.to && ` - ${formatDate(tempRange.to, locale)}`}</Fragment> : label !== '' ? label : <Fragment>{(range.from ? formatDate(range.from, locale) : 'Pick a date')} {range.to && ` - ${formatDate(range.to, locale)}`}</Fragment>}*/}
+                  {(!isApply && label !== '')
+                      ? tempLabel !== ''
+                          ? tempLabel
+                          : <Fragment>
+                              {(tempRange.from ? moment(tempRange.from).format("MMM D, YYYY") : 'Pick a date')}
+                              {tempRange.to && ` - ${moment(tempRange.to).format("MMM D, YYYY")}`}
+                          </Fragment>
+                      : label !== ''
+                          ? label
+                          : <Fragment>
+                              {(range.from ? moment(range.from).format("MMM D, YYYY") : 'Pick a date')}
+                              {range.to && ` - ${moment(range.to).format("MMM D, YYYY")}`}
+                          </Fragment>
+                  }
+
               </span>
                             {isOpen ? (
                                 <ChevronUpIcon className="ml-2 h-4 w-4" />
@@ -271,19 +305,17 @@ export const DateRangePicker = ({
                         </Button>
                     </PopoverTrigger>
                     <PopoverContent align={align} className="w-auto">
-                        <div className="flex pb-2">
+                        <div className="flex border-b mb-4 pb-1">
                             {!isSmallScreen && (
-                                <div className="flex flex-col gap-1 pr-2 ">
-                                    <div className="flex w-full flex-col pr-2 gap-1">
-                                        {PRESETS.map((preset) => (
-                                            <PresetButton
-                                                key={preset.name}
-                                                preset={preset.name}
-                                                label={preset.label}
-                                                isSelected={selectedPreset === preset.name}
-                                            />
-                                        ))}
-                                    </div>
+                                <div className="flex pr-4 flex-col w-[200px] gap-0.5">
+                                    {PRESETS.map((preset) => (
+                                        <PresetButton
+                                            key={preset.name}
+                                            preset={preset.name}
+                                            label={preset.label}
+                                            isSelected={selectedPreset === preset.name}
+                                        />
+                                    ))}
                                 </div>
                             )}
                             <div className="flex">
@@ -328,25 +360,19 @@ export const DateRangePicker = ({
                                     </div>
                                 </div>
                             </div>
-
                         </div>
                         <div className="flex justify-end gap-2  pr-4">
                             <Button
                                 size={"sm"}
                                 onClick={() => {
-
                                     resetValues()
                                 }}
-                                variant="ghost"
+                                variant="outline"
                             >
                                 Cancel
                             </Button>
                             <Button size={"sm"}
-                                onClick={() => {
-                                    setIsOpen(false)
-                                    onUpdate?.(range)
-                                }}
-                            >
+                                    onClick={onApplyDate}>
                                 Apply
                             </Button>
                         </div>

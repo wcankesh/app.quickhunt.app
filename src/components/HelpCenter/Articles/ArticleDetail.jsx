@@ -73,7 +73,7 @@ const ArticleDetail = () => {
     }, [projectDetailsReducer.id])
 
     const getAllCategory = async () => {
-        setIsLoading(true);
+        // setIsLoading(true);
         const data = await apiService.getAllCategory({
             project_id: projectDetailsReducer.id,
         });
@@ -84,7 +84,7 @@ const ArticleDetail = () => {
     };
 
     const getSingleArticle = async () => {
-        setIsLoading(true);
+        // setIsLoading(true);
         const data = await apiService.getSingleArticle(id);
         if (data.status === 200) {
             setArticlesDetails({
@@ -292,7 +292,7 @@ const ArticleDetail = () => {
                         <Label className={"text-sm font-normal"}>Title</Label>
                         <Input
                             name="title"
-                            placeholder={"The Evolution of Urban Green Spaces: From Parks to Vertical Gardens"}
+                            placeholder={"Article title"}
                             value={articlesDetails.title}
                             onChange={(e) => handleOnChange("title", e.target.value)}
                             className={"text-sm font-normal w-full h-auto"}
@@ -304,7 +304,11 @@ const ArticleDetail = () => {
                         <Label className={"text-sm font-normal"}>Select Category</Label>
                         <Select value={articlesDetails.category_id} onValueChange={(value) => handleOnChange('category_id', value)}>
                             <SelectTrigger className="h-auto">
-                                <SelectValue placeholder="" />
+                                {/*{articlesDetails.category_id ? (*/}
+                                        <SelectValue>
+                                            {articleList.find(item => item.id === articlesDetails.category_id)?.title || <span className="text-muted-foreground">Select Category</span>}
+                                        </SelectValue>
+                                {/*) : (<span className="text-muted-foreground">Select Category</span>)}*/}
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectGroup>
@@ -322,10 +326,14 @@ const ArticleDetail = () => {
                         </Select>
                     </div>
                     <div className={"space-y-2"}>
-                        <Label className={"text-sm font-normal"}>Subcategory</Label>
+                        <Label className={"text-sm font-normal"}>Select Sub Category</Label>
                         <Select value={articlesDetails.sub_category_id} onValueChange={(value) => handleOnChange('sub_category_id', value)}>
                             <SelectTrigger className="h-auto">
-                                <SelectValue placeholder="" />
+                                {/*{articlesDetails.sub_category_id ? (*/}
+                                    <SelectValue>
+                                        {subcategories.find(item => item.id === articlesDetails.sub_category_id)?.title || <span className="text-muted-foreground">Select Sub Category</span>}
+                                    </SelectValue>
+                                {/*) : (<span className="text-muted-foreground">Select Category</span>)}*/}
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectGroup>
@@ -336,7 +344,7 @@ const ArticleDetail = () => {
                                             </SelectItem>
                                         ))
                                     ) : (
-                                        <SelectItem disabled>No Subcategories</SelectItem>
+                                        <SelectItem disabled>No Sub Category</SelectItem>
                                     )}
                                 </SelectGroup>
                             </SelectContent>
@@ -348,7 +356,7 @@ const ArticleDetail = () => {
     };
 
     const links = [
-        { label: 'Ideas', path: `/help/article` }
+        { label: 'Article', path: `/help/article` }
     ];
 
     return (
@@ -356,7 +364,7 @@ const ArticleDetail = () => {
             <div className={"p-4 md:py-6 md:px-4 border-b flex items-center justify-between flex-wrap gap-2"}>
                 <CommonBreadCrumb
                     links={links}
-                    currentPage={articlesDetails?.title}
+                    currentPage={(isLoading || loading) && id !== "new" ? null : articlesDetails?.title}
                     truncateLimit={30}
                 />
                 <div className={"flex gap-4 items-center"}>

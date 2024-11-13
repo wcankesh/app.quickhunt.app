@@ -181,7 +181,7 @@ const Roadmap = () => {
                                                     {
                                                         ((y && y.topic) || []).map((x, i) => {
                                                             return (
-                                                                <div className={"text-xs flex"}>{x.title}</div>
+                                                                <div key={i} className={"text-xs flex"}>{x.title}</div>
                                                             )
                                                         })
                                                     }

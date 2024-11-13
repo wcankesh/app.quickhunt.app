@@ -188,7 +188,7 @@ const Settings = () => {
 
     return (
         <div className='container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-3 md:px-4'>
-            <div className={"flex flex-row justify-between items-center gap-2 relative"}>
+            <div className={"flex flex-row justify-between items-start gap-8 relative"}>
                 <div className={"flex flex-col gap-0.5"}>
                     <h1 className="text-2xl font-normal flex-initial w-auto">Settings</h1>
                     <p className={"text-sm text-muted-foreground"}>Adjust your Quickhunt experience by managing your Profile, Team, and project settings. Organize workflows with Labels, Categories, and Tags, and connect social accounts. Easily Import/Export data for efficiency.</p>

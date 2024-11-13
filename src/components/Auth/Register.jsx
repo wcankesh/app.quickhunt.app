@@ -58,42 +58,28 @@ const Register = () => {
     const formValidate = (name, value) => {
         switch (name) {
             case "user_first_name":
-                if (!value || value.trim() === "") {
-                    return "First name is required";
-                } else {
-                    return "";
-                }
+                return value.trim() === "" ? "First name is required" : "";
             case "user_last_name":
-                if (!value || value.trim() === "") {
-                    return "Last name is required";
-                } else {
-                    return "";
-                }
+                return value.trim() === "" ? "Last name is required" : "";
             case "user_email_id":
-                if (!value || value.trim() === "") {
-                    return "Email is required";
-                } else if (!value.match(/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/)) {
+                if (value.trim() === "") return "Email is required";
+                if (!/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(value))
                     return "Enter a valid email address";
-                } else {
-                    return "";
-                }
-            case "user_password":
-                if (!value || value.trim() === "") {
-                    return "Password is required";
-                } else {
-                    return "";
-                }
-            case "user_confirm_password":
-                if (!value || value.trim() === "") {
-                    return "Confirm password is required";
-                } else if (value !== companyDetails.user_password) {
-                    return "Passwords do not match";
-                } else {
-                    return "";
-                }
-            default: {
                 return "";
-            }
+            case "user_password":
+                if (value.trim() === "") return "Password is required";
+                if (
+                    !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(value)
+                )
+                    return "Password must be at least 8 characters with one uppercase letter, one lowercase letter, one number, and one special character";
+                return "";
+            case "user_confirm_password":
+                if (value.trim() === "") return "Confirm password is required";
+                if (value !== companyDetails.user_password)
+                    return "Passwords do not match";
+                return "";
+            default:
+                return "";
         }
     };
 

@@ -48,10 +48,26 @@ const WidgetHeader = ({widgetsSetting, selected, setSelected}) => {
                     widgetsSetting?.hide_header === 1 ?
                         <div className="flex items-center gap-4 justify-between pt-3 pb-4">
                             <div className="inline-block align-middle cursor-pointer">
+
+                                {/*{*/}
+                                {/*    projectDetailsReducer?.project_logo != '' ?*/}
+                                {/*        <img src={`https://code.quickhunt.app/public/storage/project/${projectDetailsReducer.project_logo}`} alt={projectDetailsReducer?.project_name} className="max-h-10"/> : <div className="text-3xl font-medium tracking-tight transition-colors">{projectDetailsReducer?.project_name || ''}</div>*/}
+                                {/*}*/}
+
                                 {
-                                    projectDetailsReducer?.project_logo != '' ?
-                                        <img src={`https://code.quickhunt.app/public/storage/project/${projectDetailsReducer.project_logo}`} alt={projectDetailsReducer?.project_name} className="max-h-10"/> : <div className="text-3xl font-medium tracking-tight transition-colors">{projectDetailsReducer?.project_name || ''}</div>
+                                    projectDetailsReducer?.project_logo ? (
+                                        <img
+                                            src={`https://code.quickhunt.app/public/storage/project/${projectDetailsReducer.project_logo}`}
+                                            alt={projectDetailsReducer?.project_name}
+                                            className="max-h-10"
+                                        />
+                                    ) : (
+                                        <span className="text-3xl font-medium tracking-tight transition-colors">
+                                            {projectDetailsReducer?.project_name || ''}
+                                        </span>
+                                    )
                                 }
+
                             </div>
                             <div className="flex flex-wrap gap-2">
                                 <div className={`gap-2 flex`}>

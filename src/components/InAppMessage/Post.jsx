@@ -1,4 +1,4 @@
-import React,{useRef, useEffect} from 'react';
+import React, {useRef, useEffect, useCallback} from 'react';
 import {useTheme} from "../theme-provider";
 import {useSelector} from "react-redux";
 import {Button} from "../ui/button";
@@ -20,6 +20,7 @@ import Marker from "@editorjs/marker";
 import InlineCode from "@editorjs/inline-code";
 import {PopoverTrigger} from "@radix-ui/react-popover";
 import {Popover, PopoverContent} from "../ui/popover";
+import EditorComponent from "../Comman/NewEditor";
 
 const Post = ({inAppMsgSetting, setInAppMsgSetting, isLoading}) => {
     const editorCore = useRef(null);
@@ -32,7 +33,7 @@ const Post = ({inAppMsgSetting, setInAppMsgSetting, isLoading}) => {
     //     editorCore.current = instance;
     // }, []);
 
-    const handleSave = React.useCallback(async () => {
+    const handleSave = useCallback(async () => {
         const savedData = await editorCore.current.save();
         setInAppMsgSetting(prevState => ({
             ...prevState,
@@ -172,7 +173,8 @@ const Post = ({inAppMsgSetting, setInAppMsgSetting, isLoading}) => {
                             </div>
                         </div> : ""
                     }
-                    <div className={"pl-14 pt-6 m-0 w-full"}>{isLoading ? "" :  <div id="editorjs"></div>}</div>
+                    {/*<div className={"pl-14 pt-6 m-0 w-full"}>{isLoading ? "" :  <div id="editorjs"></div>}</div>*/}
+                    <EditorComponent  />
                 </CardHeader>
                 {
                     inAppMsgSetting.reply_type === 1 ? <CardContent className={`py-5 pl-8 pr-5 rounded-b-lg flex flex-row justify-between`} style={{background: inAppMsgSetting.bg_color}}>

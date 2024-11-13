@@ -238,14 +238,9 @@ const Articles = () => {
                                         {
                                             openFilterType === 'category_id' ?
                                                 <CommandGroup>
-                                                    <CommandItem  className={"p-0 flex gap-2 items-center cursor-pointer p-1"}>
+                                                    <CommandItem onSelect={() => {setOpenFilterType('')}} className={"p-0 flex gap-2 items-center cursor-pointer p-1"}>
                                                         <ChevronLeft className="mr-2 h-4 w-4" />
-                                                        <span
-                                                            onClick={() => {
-                                                                setOpenFilterType('');
-                                                            }}
-                                                            className={"flex-1 w-full text-sm font-normal cursor-pointer flex gap-2 items-center"}
-                                                        >
+                                                        <span className={"flex-1 w-full text-sm font-normal cursor-pointer flex gap-2 items-center"}>
                                                                 Back
                                                             </span>
                                                     </CommandItem>
@@ -330,7 +325,8 @@ const Articles = () => {
                                         })
                                     ) : articles.length > 0 ? <Fragment>
                                         {
-                                            articles.map((x, index) => (
+                                            articles.map((x, index) => (<>
+                                                {console.log(x?.is_active)}
                                                 <TableRow key={index}>
                                                     <TableCell onClick={() => onEdit(x.id)}
                                                         className={"px-2 py-[10px] md:px-3 font-normal cursor-pointer max-w-[270px] truncate text-ellipsis overflow-hidden whitespace-nowrap"}>{x.title}</TableCell>
@@ -383,6 +379,7 @@ const Articles = () => {
                                                         </DropdownMenu>
                                                     </TableCell>
                                                 </TableRow>
+                                                </>
                                             ))
                                         }
                                     </Fragment> : <TableRow>

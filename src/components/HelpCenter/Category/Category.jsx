@@ -84,6 +84,14 @@ const Category = () => {
         }
     };
 
+    // const handleOnChange = (name, value) => {
+    //     setSelectedCategory({ ...selectedCategory, [name]: value });
+    //     setFormError(formError => ({
+    //         ...formError,
+    //         [name]: formValidate(name, value)
+    //     }));
+    // };
+
     const handleOnChange = (name, value) => {
         setSelectedCategory({ ...selectedCategory, [name]: value });
         setFormError(formError => ({
@@ -104,13 +112,15 @@ const Category = () => {
         switch (name) {
             case "title":
                 if (!value || value.trim() === "") {
-                    return "Title is required";
+                    return "Name is required";
                 } else {
                     return "";
                 }
             case "description":
-                if (!value || value.toString().trim() === "") {
-                    return "Description is required";
+                const cleanValue = value.trim();
+                const emptyContent = /^(<p>\s*<\/p>|<p><br><\/p>|<\/?[^>]+>)*$/;
+                if (!value || cleanValue === "" || emptyContent.test(cleanValue)) {
+                    return "Description is required.";
                 } else {
                     return "";
                 }
@@ -197,7 +207,18 @@ const Category = () => {
         setSubCategoryEdit(false);
     };
 
-    const onEditCategory = async () => {
+    const updateCategory = async () => {
+        let validationErrors = {};
+        Object.keys(selectedCategory).forEach(name => {
+            const error = formValidate(name, selectedCategory[name]);
+            if (error && error.length > 0) {
+                validationErrors[name] = error;
+            }
+        });
+        if (Object.keys(validationErrors).length > 0) {
+            setFormError(validationErrors);
+            return;
+        }
         setCategoryEdit(true)
         let formData = new FormData();
         formData.append('project_id', projectDetailsReducer.id);
@@ -221,7 +242,18 @@ const Category = () => {
         setSheetOpen(false);
     }
 
-    const onEditSubCategory = async () => {
+    const updateSubCategory = async () => {
+        let validationErrors = {};
+        Object.keys(selectedSubCategory).forEach(name => {
+            const error = formValidate(name, selectedSubCategory[name]);
+            if (error && error.length > 0) {
+                validationErrors[name] = error;
+            }
+        });
+        if (Object.keys(validationErrors).length > 0) {
+            setFormError(validationErrors);
+            return;
+        }
         setSubCategoryEdit(true)
         let formData = new FormData();
         formData.append('project_id', projectDetailsReducer.id);
@@ -473,7 +505,7 @@ const Category = () => {
                         <div className={"flex gap-4 px-3 py-4 sm:py-6 sm:px-8"}>
                             <Button
                                 className={`border w-[115px] font-medium hover:bg-primary`}
-                                onClick={selectedCategory?.id ? onEditCategory : addCategory}
+                                onClick={selectedCategory?.id ? updateCategory : addCategory}
                             >
                                 {categoryEdit ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save Category"}
                             </Button>
@@ -504,7 +536,7 @@ const Category = () => {
                         <div className={"h-[calc(100%_-_69px)] overflow-y-auto"}>
                             <div className={"sm:px-8 sm:py-6 px-3 py-4 border-b space-y-6"}>
                                 <div className="grid w-full gap-2">
-                                    <Label htmlFor="category-name" className={"font-normal"}>Category Name</Label>
+                                    <Label htmlFor="category-name" className={"font-normal"}>Sub Category Name</Label>
                                     <Input
                                         value={selectedSubCategory?.title}
                                         onChange={(e) => handleOnChangeSub("title", e.target.value)}
@@ -518,7 +550,7 @@ const Category = () => {
                                     }
                                 </div>
                                 <div className="grid w-full gap-2">
-                                    <Label className={"font-normal"}>Category Description</Label>
+                                    <Label className={"font-normal"}>Sub Category Description</Label>
                                     <ReactQuillEditor
                                         value={selectedSubCategory?.description}
                                         onChange={(e) => handleOnChangeSub("description", e.target.value)}
@@ -526,7 +558,7 @@ const Category = () => {
                                     {formError?.description && <span className="text-red-500 text-sm">{formError?.description}</span>}
                                 </div>
                                 <div className={"flex flex-col gap-2"}>
-                                    <Label className={"font-normal"}>Category Icon</Label>
+                                    <Label className={"font-normal"}>Sub Category Icon</Label>
                                     <div className="w-[282px] h-[128px] flex gap-1">
                                         {
                                             selectedSubCategory?.image ?
@@ -565,10 +597,10 @@ const Category = () => {
                             </div>
                             <div className={"flex gap-4 px-3 py-4 sm:py-6 sm:px-8"}>
                                 <Button
-                                    className={`border w-[139px] font-medium hover:bg-primary`}
-                                    onClick={selectedSubCategory?.id ? onEditSubCategory : addSubCategory}
+                                    className={`border w-[145px] font-medium hover:bg-primary`}
+                                    onClick={selectedSubCategory?.id ? updateSubCategory : addSubCategory}
                                 >
-                                    {subCategoryEdit ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save Subcategory"}
+                                    {subCategoryEdit ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save Sub Category"}
                                 </Button>
 
                                 <Button
@@ -696,7 +728,7 @@ const Category = () => {
                                                                 <Button
                                                                     variant={"ghost hover:bg-none"}
                                                                     onClick={() => openSheetSubCategory("", { ...initialState, category_id: x.id })}
-                                                                    className={"border border-primary font-normal text-primary"}
+                                                                    className={"border border-primary h-8 font-normal text-primary"}
                                                                 >
                                                                     <Plus size={16} className={"mr-2"} /> Add Subcategory
                                                                 </Button>

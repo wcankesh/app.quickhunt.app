@@ -27,7 +27,7 @@ const status2 = [
     {name: "Draft", value: 4, fillColor: "#CF1322", strokeColor: "#CF1322",},
 ]
 
-const AnnouncementsTable = ({data, isLoading, setSelectedRecord, handleDelete, setAnalyticsObj,isLoadingDelete, currentPage, setCurrentPage}) => {
+const AnnouncementsTable = ({data, isLoading, setSelectedRecord, handleDelete, setAnalyticsObj,isLoadingDelete, currentPage, setCurrentPage, getAllPosts}) => {
     const location = useLocation();
     const UrlParams = new URLSearchParams(location.search);
     const getPageNo = UrlParams.get("pageNo");
@@ -74,10 +74,12 @@ const AnnouncementsTable = ({data, isLoading, setSelectedRecord, handleDelete, s
             post_status: value,
             post_published_at: value === 1 ? moment(new Date()).format("YYYY-MM-DD") : object.post_published_at
         } : x));
+        const labelIds = object.labels.map(label => label.id);
         const payload = {
             ...object,
             post_status: value,
-            post_published_at: value === 1 ? moment(new Date()).format("YYYY-MM-DD") : object.post_published_at
+            post_published_at: value === 1 ? moment(new Date()).format("YYYY-MM-DD") : object.post_published_at,
+            labels: labelIds
         }
         const data = await apiService.updatePosts(payload, object.id);
         if (data.status === 200) {
@@ -90,6 +92,7 @@ const AnnouncementsTable = ({data, isLoading, setSelectedRecord, handleDelete, s
                 variant: "destructive",
             });
         }
+        getAllPosts();
     };
 
     const onEdit = (record) => {
@@ -172,7 +175,7 @@ const AnnouncementsTable = ({data, isLoading, setSelectedRecord, handleDelete, s
                                                 <span
                                                     className={"cursor-pointer max-w-[270px] truncate text-ellipsis overflow-hidden whitespace-nowrap"}
                                                     onClick={() => onEdit(x)}>{x?.post_title}</span>
-                                                {x.post_pin_to_top === 1 && <Pin size={14} className={`${theme === "dark" ? "fill-card-foreground" : "fill-card-foreground"}`}/>}
+                                                {x.post_pin_to_top === 1 && <Pin size={14} className={`fill-card-foreground`}/>}
                                                 {
                                                     x.labels && x.labels.length > 0 ?
                                                         <div className={"flex flex-wrap gap-1"}>

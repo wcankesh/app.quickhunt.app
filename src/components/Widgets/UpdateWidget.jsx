@@ -622,7 +622,7 @@ return (
                     </BreadcrumbList>
                 </Breadcrumb>
             </Breadcrumb>
-            <div className={"flex justify-between gap-2 items-center"}>
+            <div className={"hidden md:flex justify-between gap-2 items-center"}>
             <Button className={"font-medium w-[115px] hover:bg-primary"}
                     onClick={() => id === "new" ? createWidget('head') : onUpdateWidgets('head')}>
                 {
