@@ -36,6 +36,13 @@ const status = [
     // {name: "Paused", value: 4, fillColor: "#6392D9", strokeColor: "#6392D9",},
 ];
 
+const status2 = [
+    {name: "Live", value: 1, fillColor: "#CEF291", strokeColor: "#CEF291",},
+    {name: "Draft", value: 3, fillColor: "#CF1322", strokeColor: "#CF1322",},
+    {name: "Scheduled", value: 2, fillColor: "#63C8D9", strokeColor: "#63C8D9",},
+    // {name: "Paused", value: 4, fillColor: "#6392D9", strokeColor: "#6392D9",},
+];
+
 const contentType = [
     {
         label: "Post",
@@ -303,7 +310,7 @@ const InAppMessage = () => {
                         <DialogContent className="max-w-[350px] w-full sm:max-w-[580px] bg-white rounded-lg p-3 md:p-6">
                             <DialogHeader className={"flex flex-row justify-between gap-2"}>
                                 <div className={"flex flex-col gap-2"}>
-                                    <DialogTitle className={`text-left font-medium ${theme === "dark" ? "text-card" : ""}`}>In App Message</DialogTitle>
+                                    <DialogTitle className={`text-left font-medium ${theme === "dark" ? "text-card" : ""}`}>In App Message {totalRecord}</DialogTitle>
                                     <DialogDescription className={"text-left"}>Choose how you would like to embed your
                                         message.</DialogDescription>
                                 </div>
@@ -516,15 +523,16 @@ const InAppMessage = () => {
                                                                 <TableCell className={"px-2 py-[10px] md:px-3"}>
                                                                     <Select value={x.status} onValueChange={(value) => handleStatusChange(x, value)}>
                                                                         <SelectTrigger className="w-[135px] h-7">
-                                                                            <SelectValue placeholder="Publish"/>
+                                                                            {/*<SelectValue placeholder="Publish"/>*/}
+                                                                            <SelectValue placeholder={x.post_status ? status.find(s => s.value == x.status)?.name : "Publish"}/>
                                                                         </SelectTrigger>
                                                                         <SelectContent>
                                                                             <SelectGroup>
                                                                                 {
-                                                                                    (status || []).map((x, i) => {
+                                                                                    (x.status === 2 ? status2 : status || []).map((x, i) => {
                                                                                         return (
                                                                                             <Fragment key={i}>
-                                                                                                <SelectItem value={x.value}>
+                                                                                                <SelectItem value={x.value} disabled={x.value === 2}>
                                                                                                     <div
                                                                                                         className={"flex items-center gap-2"}>
                                                                                                         {x.fillColor && <Circle fill={x.fillColor}

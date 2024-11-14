@@ -37,6 +37,7 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
     const onChange = (name, value) => {
         setInAppMsgSetting({...inAppMsgSetting, [name]: value});
     };
+    console.log("inAppMsgSetting.status", inAppMsgSetting.status)
 
     const onChangeAddOption = (index, value) => {
         const clone = [...selectedStep.options];
@@ -96,17 +97,40 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
     //     }));
     // };
 
+    // const handleDateChange = (date, type) => {
+    //     const newDate = moment(date).toISOString();
+    //     setInAppMsgSetting({
+    //         ...inAppMsgSetting,
+    //         [type]: newDate
+    //     });
+    //     setFormError(formError => ({
+    //         ...formError,
+    //         [type]: formValidate(type, newDate)
+    //     }));
+    // };
+
     const handleDateChange = (date, type) => {
         const newDate = moment(date).toISOString();
-        setInAppMsgSetting({
+        const isFutureDate = date > new Date();
+        let updatedSetting = {
             ...inAppMsgSetting,
-            [type]: newDate
-        });
+            [type]: newDate,
+        };
+
+        if (type === "start_at") {
+            updatedSetting = {
+                ...updatedSetting,
+                status: isFutureDate ? 2 : 1  // Set status based on date comparison
+            };
+        }
+
+        setInAppMsgSetting(updatedSetting);
         setFormError(formError => ({
             ...formError,
             [type]: formValidate(type, newDate)
         }));
     };
+
 
     const formValidate = (name, value) => {
         switch (name) {

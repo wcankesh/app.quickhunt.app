@@ -87,7 +87,7 @@ const ImageUploader = ({
                         type="file"
                         className="hidden"
                         onChange={onUpload}
-                        accept=".jpg,.jpeg"
+                        accept="images/*"
                     />
                     <label
                         htmlFor="pictureInput"

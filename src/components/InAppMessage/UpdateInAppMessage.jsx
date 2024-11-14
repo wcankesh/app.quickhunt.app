@@ -15,7 +15,7 @@ import Checklist from "./Checklist";
 import {Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator} from "../ui/breadcrumb";
 import SidebarInAppMessage from "./SidebarInAppMessage";
 import {useToast} from "../ui/use-toast";
-import {tr} from "date-fns/locale";
+import {Skeleton} from "../ui/skeleton";
 
 const initialState = {
     project_id: "2",
@@ -139,20 +139,56 @@ const UpdateInAppMessage = () => {
 
     const [inAppMsgSetting, setInAppMsgSetting] = useState(initialState);
     const [selectedStepIndex, setSelectedStepIndex] = useState(0);
-    const [isLoading, setIsLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
     const [selectedStep, setSelectedStep] = useState(null);
     const [isSave, setIsSave] = useState(false);
 
     const renderContent = (type) => {
         switch (type) {
             case "1":
-                return <Post inAppMsgSetting={inAppMsgSetting} setInAppMsgSetting={setInAppMsgSetting} isLoading={isLoading}  />;
+                return isLoading ? <Fragment>
+                    {
+                        [...Array(14)].map((_, i) => {
+                            return (
+                                <div className={"px-2 py-[10px] md:px-3"}>
+                                    <Skeleton className={"rounded-md w-full h-4"}/>
+                                </div>
+                            )})}
+                </Fragment>
+                    : <Post inAppMsgSetting={inAppMsgSetting} setInAppMsgSetting={setInAppMsgSetting} isLoading={isLoading}  />;
             case "2":
-                return <Banners inAppMsgSetting={inAppMsgSetting} setInAppMsgSetting={setInAppMsgSetting} isLoading={isLoading} />;
+                return isLoading ? <Fragment>
+                        {
+                            [...Array(14)].map((_, i) => {
+                                return (
+                                    <div className={"px-2 py-[10px] md:px-3"}>
+                                        <Skeleton className={"rounded-md w-full h-4"}/>
+                                    </div>
+                                )})}
+                    </Fragment>
+                    : <Banners inAppMsgSetting={inAppMsgSetting} setInAppMsgSetting={setInAppMsgSetting} isLoading={isLoading} />;
             case "3":
-                return <Surveys inAppMsgSetting={inAppMsgSetting} setInAppMsgSetting={setInAppMsgSetting} isLoading={isLoading} selectedStepIndex={selectedStepIndex} setSelectedStepIndex={setSelectedStepIndex} selectedStep={selectedStep} setSelectedStep={setSelectedStep}/>;
+                return isLoading ? <Fragment>
+                        {
+                            [...Array(14)].map((_, i) => {
+                                return (
+                                    <div className={"px-2 py-[10px] md:px-3"}>
+                                        <Skeleton className={"rounded-md w-full h-4"}/>
+                                    </div>
+                                )})}
+                    </Fragment>
+                    : <Surveys inAppMsgSetting={inAppMsgSetting} setInAppMsgSetting={setInAppMsgSetting} isLoading={isLoading} selectedStepIndex={selectedStepIndex} setSelectedStepIndex={setSelectedStepIndex} selectedStep={selectedStep} setSelectedStep={setSelectedStep}/>;
             case "4":
-                return <Checklist inAppMsgSetting={inAppMsgSetting} setInAppMsgSetting={setInAppMsgSetting} isLoading={isLoading} selectedStepIndex={selectedStepIndex} setSelectedStepIndex={setSelectedStepIndex} selectedStep={selectedStep} setSelectedStep={setSelectedStep}/>;
+                return isLoading ? <Fragment>
+                        {
+                            [...Array(14)].map((_, i) => {
+                                return (
+                                    <div className={"px-2 py-[10px] md:px-3"}>
+                                        <Skeleton className={"rounded-md w-full h-4"}/>
+                                    </div>
+                                )})}
+                    </Fragment>
+                    : <Checklist inAppMsgSetting={inAppMsgSetting} setInAppMsgSetting={setInAppMsgSetting} isLoading={isLoading} selectedStepIndex={selectedStepIndex} setSelectedStepIndex={setSelectedStepIndex} selectedStep={selectedStep} setSelectedStep={setSelectedStep}/>;
             default:
                 return null;
         }
@@ -184,7 +220,7 @@ const UpdateInAppMessage = () => {
     }, [projectDetailsReducer.id, getPageNo]);
 
     const getSingleInAppMessages = async () => {
-        // setIsLoading(true)
+        setIsLoading(true)
         const data = await apiSerVice.getSingleInAppMessage(id)
         if (data.status === 200) {
             const payload = {
@@ -305,8 +341,8 @@ const UpdateInAppMessage = () => {
                     <SidebarInAppMessage id={id} type={type} inAppMsgSetting={inAppMsgSetting} setInAppMsgSetting={setInAppMsgSetting} selectedStepIndex={selectedStepIndex} setSelectedStepIndex={setSelectedStepIndex} selectedStep={selectedStep} setSelectedStep={setSelectedStep}/>
                 </div>
                 <div className={"bg-muted w-full h-full hidden md:block overflow-y-auto"}>
-                    <Card className={"my-6 mx-4 rounded-md px-4 pt-6 pb-8 h-[calc(100%_-_48px)]"}>
-                        <Card className={"rounded-md border-b h-full"}>
+                    <Card className={`my-6 mx-4 rounded-md px-4 pt-6 pb-8 h-[calc(100%_-_48px)] `}>
+                        <Card className={`rounded-md border-b h-full ${isLoading ? "overflow-hidden" : ''}`}>
                             <div className={"p-4 flex gap-2 border-b"}>
                                 <div className={"w-3 h-3 rounded-full border border-inherit"}/>
                                 <div className={"w-3 h-3 rounded-full border border-inherit"}/>

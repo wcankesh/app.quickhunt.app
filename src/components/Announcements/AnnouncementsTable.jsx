@@ -203,8 +203,7 @@ const AnnouncementsTable = ({data, isLoading, setSelectedRecord, handleDelete, s
                                                 <Select value={x.post_status}
                                                         onValueChange={(value) => handleStatusChange(x, value)}>
                                                     <SelectTrigger className="w-[137px] h-7">
-                                                        <SelectValue
-                                                            placeholder={x.post_status ? status.find(s => s.value == x.post_status)?.name : "Publish"}/>
+                                                        <SelectValue placeholder={x.post_status ? status.find(s => s.value == x.post_status)?.name : "Publish"}/>
                                                     </SelectTrigger>
                                                     <SelectContent>
                                                         <SelectGroup>

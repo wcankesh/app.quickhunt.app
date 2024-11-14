@@ -118,13 +118,15 @@ const Profile = () => {
             case "user_email_id":
                 if (!value || value.trim() === "") {
                     return "Email is required";
-                } else if (!value.match(/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/)) {
-                    return "Enter a valid email address";
-                } else if (!value.endsWith(".com")) {
-                    return "Email must end with .com";
-                } else if (userDetails.user_email_id === userDetailsReducer.user_email_id) { // Check if the email already exists
-                    return "This email is already registered";
-                } else {
+                }
+                // else if (!value.match(/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/)) {
+                //     return "Enter a valid email address";
+                // } else if (!value.endsWith(".com")) {
+                //     return "Email must end with .com";
+                // } else if (userDetails.user_email_id === userDetailsReducer.user_email_id) { // Check if the email already exists
+                //     return "This email is already registered";
+                // }
+                else {
                     return "";
                 }
             case "current_password":
@@ -296,7 +298,7 @@ const Profile = () => {
                                             id="pictureInput"
                                             type="file"
                                             className="hidden"
-                                            accept={".jpg,.jpeg"}
+                                            accept={"images/*"}
                                             onChange={handleFileChange}
                                         />
                                         <label
@@ -361,10 +363,10 @@ const Profile = () => {
                                         // onBlur={onBlur}
                                         className={"bg-card"}
                                     />
-                                    {
-                                        formError.user_email_id &&
-                                        <span className="text-destructive text-sm">{formError.user_email_id}</span>
-                                    }
+                                    {/*{*/}
+                                    {/*    formError.user_email_id &&*/}
+                                    {/*    <span className="text-destructive text-sm">{formError.user_email_id}</span>*/}
+                                    {/*}*/}
                                 </div>
                             </div>
                         </div>

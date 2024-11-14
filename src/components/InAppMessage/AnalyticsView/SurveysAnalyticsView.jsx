@@ -339,7 +339,7 @@ const SurveysAnalyticsView = () => {
                                                         })
                                                     }
                                                 </Fragment> : <TableRow>
-                                                    <TableCell colSpan={3}>
+                                                    <TableCell colSpan={10}>
                                                         <EmptyData/>
                                                     </TableCell>
                                                 </TableRow>
@@ -521,7 +521,7 @@ const SurveysAnalyticsView = () => {
                                     return(
                                         x.question_type === 6 || x.question_type === 7 ?
                                             <Card>
-                                                <CardHeader className={"p-4 border-b text-base font-medium"}>{x.text}</CardHeader>
+                                                {x.text && <CardHeader className={"p-4 border-b text-base font-medium"}>{x.text}</CardHeader>}
                                             <CardContent className={"p-0 overflow-auto"}>
                                                     <Table>
                                                         <TableHeader className={`${theme === "dark" ? "" : "bg-muted"}`}>
@@ -539,24 +539,49 @@ const SurveysAnalyticsView = () => {
                                                         </TableHeader>
                                                         <TableBody>
                                                             {
-                                                                (x?.report || []).map((x,i)=> {
-                                                                    return (
-                                                                        <TableRow key={x.id}>
-                                                                            <TableCell className={`flex items-center px-2 py-[10px] md:px-3 gap-2`}>
-                                                                                <>
-                                                                                    <Avatar className={"w-[20px] h-[20px]"}>
-                                                                                        <AvatarFallback>{x?.name? x?.name?.substring(0, 1) : x?.email?.substring(0, 1)}</AvatarFallback>
-                                                                                    </Avatar>
-                                                                                    <p className={"font-normal"}>{x?.name? x?.name : x.email}</p>
-                                                                                </>
-                                                                            </TableCell>
-                                                                            <TableCell className={`px-2 py-[10px] md:px-3 font-normal`}>
-                                                                                {x?.response}
-                                                                            </TableCell>
-                                                                            <TableCell className={`px-2 py-[10px] md:px-3 font-normal`}>{moment(x.created_at).format("ll")}</TableCell>
-                                                                        </TableRow>
-                                                                    )
-                                                                })
+                                                                isLoading ? (
+                                                                    [...Array(10)].map((x, index) => {
+                                                                        return (
+                                                                            <TableRow key={index}>
+                                                                                {
+                                                                                    [...Array(3)].map((_, i) => {
+                                                                                        return (
+                                                                                            <TableCell key={i} className={"max-w-[373px] px-2 py-[10px] md:px-3"}>
+                                                                                                <Skeleton className={"rounded-md w-full h-7"}/>
+                                                                                            </TableCell>
+                                                                                        )
+                                                                                    })
+                                                                                }
+                                                                            </TableRow>
+                                                                        )
+                                                                    })
+                                                                ) : (x?.report || []).length > 0 ?
+                                                                    <Fragment>
+                                                                        {
+                                                                            (x?.report || []).map((x,i)=> {
+                                                                                return (
+                                                                                    <TableRow key={x.id}>
+                                                                                        <TableCell className={`flex items-center px-2 py-[10px] md:px-3 gap-2`}>
+                                                                                            <>
+                                                                                                <Avatar className={"w-[20px] h-[20px]"}>
+                                                                                                    <AvatarFallback>{x?.name? x?.name?.substring(0, 1) : x?.email?.substring(0, 1)}</AvatarFallback>
+                                                                                                </Avatar>
+                                                                                                <p className={"font-normal"}>{x?.name? x?.name : x.email}</p>
+                                                                                            </>
+                                                                                        </TableCell>
+                                                                                        <TableCell className={`px-2 py-[10px] md:px-3 font-normal`}>
+                                                                                            {x?.response}
+                                                                                        </TableCell>
+                                                                                        <TableCell className={`px-2 py-[10px] md:px-3 font-normal`}>{moment(x.created_at).format("ll")}</TableCell>
+                                                                                    </TableRow>
+                                                                                )
+                                                                            })
+                                                                        }
+                                                                    </Fragment> : <TableRow>
+                                                                        <TableCell colSpan={3}>
+                                                                            <EmptyData/>
+                                                                        </TableCell>
+                                                                    </TableRow>
                                                             }
                                                         </TableBody>
                                                     </Table>
