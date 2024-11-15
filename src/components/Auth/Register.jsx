@@ -328,7 +328,7 @@ const Register = () => {
                                                     </p>
                                                     <div className={"border-t basis-4/12 border-muted-foreground"}/>
                                                 </div>
-                                                <WithGoogle title={"Signup with Google"}/>
+                                                <WithGoogle title={"Signup With Google"}/>
 
                                                 <div className="text-center text-xs md:text-sm">
                                                     <p className={"text-sm text-muted-foreground"}>

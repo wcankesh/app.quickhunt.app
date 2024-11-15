@@ -394,7 +394,8 @@ const UpdateWidget = () => {
                                 <Label className={"font-normal"}>Title</Label>
                                 <Input value={widgetsSetting.changelog_title}
                                        disabled={widgetsSetting.is_announcement !== 1}
-                                       onChange={(e) => onChange("changelog_title", e.target.value)}/>
+                                       onChange={(e) => onChange("changelog_title", e.target.value)}
+                                />
                             </div>
                             <div className="flex flex-col gap-2">
                                 <Label className={"font-normal"}>Display</Label>
@@ -654,7 +655,8 @@ return (
                     (type !== "embed" && widgetsSetting?.is_launcher_icon == 1) &&
                     <div className='QH-floating-trigger' onClick={onToggle} style={{
                         backgroundColor: widgetsSetting.launcher_icon_bg_color,
-                        left: widgetsSetting.launcher_position === 1 ? type === "popover" ? "40px" : 355 : "inherit",
+                        // left: widgetsSetting.launcher_position === 1 ? type === "popover" ? "40px" : 355 : "inherit",
+                        left: widgetsSetting.launcher_position === 1 ? type === "popover" ? "690px" : 355 : "inherit",
                         right: widgetsSetting.launcher_position === 2 ? "40px" : "inherit",
                         position: type === "popover" ? "absolute" : "fixed"
                     }}>

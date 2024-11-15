@@ -36,7 +36,7 @@ const initialState = {
     alignment: "center",
     is_close_button: false,
     reply_type: 1,
-    show_sender: true,
+    show_sender: false,
     action_type: 0,
     action_text: "",
     action_url: "",
@@ -254,7 +254,7 @@ const UpdateInAppMessage = () => {
             project_id: projectDetailsReducer.id,
             type: type
         }
-        console.log(payload)
+        debugger
         const data = await apiSerVice.createInAppMessage(payload);
 
         if (data.status === 200) {

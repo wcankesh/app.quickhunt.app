@@ -51,7 +51,8 @@ const WidgetPreview = ({widgetsSetting, type, toggle,onToggle }) => {
             {
                 type === "popover" &&
                 <div className={`QH-popover ${toggle ? "QH-popover-open" : ""}`} style={{
-                    left: widgetsSetting.launcher_position === 1 ? "40px" : "inherit",
+                    // left: widgetsSetting.launcher_position === 1 ? "40px" : "inherit",
+                    left: widgetsSetting.launcher_position === 1 ? "690px" : "inherit",
                     right: widgetsSetting.launcher_position === 2 ? "40px" : "inherit",
                     width: `${widgetsSetting.popover_width}px`, height: `${widgetsSetting.popover_height}px`
                 }}>

@@ -119,13 +119,11 @@ const Profile = () => {
                 if (!value || value.trim() === "") {
                     return "Email is required";
                 }
-                // else if (!value.match(/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/)) {
-                //     return "Enter a valid email address";
-                // } else if (!value.endsWith(".com")) {
-                //     return "Email must end with .com";
-                // } else if (userDetails.user_email_id === userDetailsReducer.user_email_id) { // Check if the email already exists
-                //     return "This email is already registered";
-                // }
+                else if (!value.match(/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/)) {
+                    return "Enter a valid email address";
+                } else if (!value.endsWith(".com")) {
+                    return "Email must end with .com";
+                }
                 else {
                     return "";
                 }
@@ -140,10 +138,10 @@ const Profile = () => {
                     return "Password is required";
                 } else if (
                     !value.match(
-                        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/
+                        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
                     )
                 ) {
-                    return "Password must be at least 6 characters with one uppercase letter, one lowercase letter, one number, and one special character";
+                    return "Password must be at least 8 characters with one uppercase letter, one lowercase letter, one number, and one special character";
                 } else {
                     return "";
                 }
@@ -152,6 +150,12 @@ const Profile = () => {
                     return "Confirm password is required";
                 } else if (value !== password.password) {
                     return "Passwords do not match";
+                } else {
+                    return "";
+                }
+            case "user_photo":
+                if (value && value.size > 5 * 1024 * 1024) { // 5 MB
+                    return "Image size must be less than 5 MB.";
                 } else {
                     return "";
                 }
@@ -165,8 +169,29 @@ const Profile = () => {
         setPasswordVisibility({...passwordVisibility, [fieldName]: !passwordVisibility[fieldName]});
     };
 
+    // const handleFileChange = (file) => {
+    //     setUserDetails({...userDetails, user_photo : file.target.files[0]});
+    // };
+
     const handleFileChange = (file) => {
-        setUserDetails({...userDetails, user_photo : file.target.files[0]});
+        const selectedFile = file.target.files[0];
+        if (selectedFile) {
+            if (selectedFile.size > 5 * 1024 * 1024) { // 5 MB
+                setFormError(prevErrors => ({
+                    ...prevErrors,
+                    user_photo: 'Image size must be less than 5 MB.'
+                }));
+            } else {
+                setFormError(prevErrors => ({
+                    ...prevErrors,
+                    user_photo: ''
+                }));
+                setUserDetails({
+                    ...userDetails,
+                    user_photo: selectedFile
+                });
+            }
+        }
     };
 
     const onDeleteImg = async (name, value) => {
@@ -185,6 +210,10 @@ const Profile = () => {
                 validationErrors[name] = error;
             }
         });
+        setFormError(prevErrors => ({
+            ...prevErrors,
+            user_photo: ''
+        }));
         if (Object.keys(validationErrors).length > 0) {
             setFormError(validationErrors);
             return;
@@ -223,7 +252,7 @@ const Profile = () => {
         }
     }
 
-    const changePassword = async () => {
+    const updatePassword = async () => {
         let validationErrors = {};
         Object.keys(password).forEach(name => {
             const error = formValidate(name, password[name]);
@@ -242,6 +271,7 @@ const Profile = () => {
         const data = await apiSerVice.changePassword(payload);
         if(data.status === 200){
             setIsLoadingPass(false)
+            setPassword(initialStatePassWord);
             toast({
                 description: data.message,
             })
@@ -307,6 +337,7 @@ const Profile = () => {
                                         >
                                             <Upload className="h-4 w-4 text-muted-foreground" />
                                         </label>
+                                        {formError.user_photo && <div className={"text-xs text-destructive"}>{formError.user_photo}</div>}
                                     </div>
                             }
                         </div>
@@ -360,13 +391,9 @@ const Profile = () => {
                                         value={userDetails.user_email_id}
                                         name={'user_email_id'}
                                         onChange={onChange}
-                                        // onBlur={onBlur}
                                         className={"bg-card"}
+                                        disabled
                                     />
-                                    {/*{*/}
-                                    {/*    formError.user_email_id &&*/}
-                                    {/*    <span className="text-destructive text-sm">{formError.user_email_id}</span>*/}
-                                    {/*}*/}
                                 </div>
                             </div>
                         </div>
@@ -462,7 +489,7 @@ const Profile = () => {
                 </CardContent>
                 <CardFooter className={"justify-end p-4 pt-0 sm:px-6"}>
                     <Button className={`w-[134px] text-sm font-medium hover:bg-primary`}
-                            onClick={changePassword}>{isLoadingPass ? <Loader2 className="h-4 w-4 animate-spin" /> : "Update Password"}</Button>
+                            onClick={updatePassword}>{isLoadingPass ? <Loader2 className="h-4 w-4 animate-spin" /> : "Update Password"}</Button>
                 </CardFooter>
             </Card>
         </div>

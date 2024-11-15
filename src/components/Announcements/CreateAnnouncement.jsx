@@ -16,8 +16,7 @@ import {toast} from "../ui/use-toast";
 import {Badge} from "../ui/badge";
 import ReactQuillEditor from "../Comman/ReactQuillEditor";
 import {Checkbox} from "../ui/checkbox";
-import {FormControl} from "../ui/form";
-//post_status: 1=Publish/active,2=Scheduled/unpublished,3=Draft,4=Expired
+
 const initialState = {
     post_description: '',
     post_slug_url: '',
@@ -147,11 +146,20 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
                     post_title: value,
                     post_slug_url: slug
                 };
+                setFormError((formError) => ({
+                    ...formError,
+                    post_slug_url: '',
+                    [name]: formValidate(name, value),
+                }));
             } else {
                 updatedDetails = {
                     ...updatedDetails,
                     post_title: value,
                 };
+                setFormError((formError) => ({
+                    ...formError,
+                    [name]: formValidate(name, value),
+                }));
             }
 
         } else if (name === "post_slug_url") {
@@ -164,14 +172,22 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
                 ...updatedDetails,
                 post_slug_url: slug
             };
+            setFormError((formError) => ({
+                ...formError,
+                [name]: formValidate(name, value),
+            }));
         } else {
             updatedDetails[name] = value;
+            setFormError((formError) => ({
+                ...formError,
+                [name]: formValidate(name, value),
+            }));
         }
         setChangeLogDetails(updatedDetails);
-        setFormError((formError) => ({
-            ...formError,
-            [name]: formValidate(name, value)
-        }));
+        // setFormError((formError) => ({
+        //     ...formError,
+        //     [name]: formValidate(name, value)
+        // }));
     };
 
     const onChangeCategory = (selectedItems) => {
@@ -327,6 +343,7 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
                                         href={`https://${projectDetailsReducer.domain?.toLowerCase()}/announcements/${changeLogDetails.post_slug_url?.toLowerCase()}`}
                                         target={"_blank"}
                                         className={"text-primary max-w-[593px] w-full break-words text-sm"}>{`https://${projectDetailsReducer.domain?.toLowerCase()}/announcements/${changeLogDetails.post_slug_url?.toLowerCase()}`}</a> : ""}</p>
+                                {formError.post_slug_url && <span className="text-sm text-destructive">{formError.post_slug_url}</span>}
                             </div>
                             <div className="w-full flex flex-col gap-2">
                                 <Label htmlFor="description" className={"font-normal"}>Description</Label>
@@ -532,7 +549,7 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
                                                 id="pictureInput"
                                                 type="file"
                                                 className="hidden"
-                                                accept={".jpg,.jpeg"}
+                                                accept={"images/*"}
                                                 onChange={handleFileChange}
                                             />
                                             <label

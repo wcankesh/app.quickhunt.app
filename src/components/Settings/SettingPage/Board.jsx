@@ -218,6 +218,13 @@ const Board = () => {
     }
 
     const handleDeleteBoard = (id) => {
+        // if (boardList.length === 1) {
+        //     toast({
+        //         description: "Cannot delete the last remaining board.",
+        //         variant: "destructive"
+        //     });
+        //     return;
+        // }
         setDeleteId(id);
         setOpenDelete(true);
         setBoardList(allStatusAndTypes.boards);
@@ -348,7 +355,7 @@ const Board = () => {
                                                                                 </Button>
                                                                             </div>
                                                                             <div className="pl-2">
-                                                                                <Button onClick={() => {handleDeleteBoard(x.id);}} variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px]`}>
+                                                                                <Button disabled={boardList.length === 1} onClick={() => {handleDeleteBoard(x.id);}} variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px]`}>
                                                                                     <Trash2 size={16}/>
                                                                                 </Button>
                                                                             </div>

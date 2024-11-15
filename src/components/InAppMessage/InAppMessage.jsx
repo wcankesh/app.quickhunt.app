@@ -1,4 +1,4 @@
-import React, {useState, useEffect, Fragment} from 'react';
+import React, {useState, useEffect, Fragment, useRef} from 'react';
 import {Button} from "../ui/button";
 import {BarChart, BookCheck, Calendar, ChevronLeft, Circle, ClipboardList, Copy, Ellipsis, Filter, Loader2, Plus, ScrollText, SquareMousePointer, User, Users, X} from "lucide-react";
 import {Input} from "../ui/input";
@@ -8,7 +8,6 @@ import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "../
 import {Card} from "../ui/card";
 import {useTheme} from "../theme-provider";
 import {Skeleton} from "../ui/skeleton";
-import {Checkbox} from "../ui/checkbox";
 import {Badge} from "../ui/badge";
 import {useLocation, useNavigate} from "react-router-dom";
 import {baseUrl} from "../../utils/constent";
@@ -26,6 +25,7 @@ import {DropdownMenuContent, DropdownMenuItem} from "../ui/dropdown-menu";
 import {toast} from "../ui/use-toast";
 import Pagination from "../Comman/Pagination";
 import DeleteDialog from "../Comman/DeleteDialog";
+import {RadioGroup, RadioGroupItem} from "../ui/radio-group";
 
 const perPageLimit = 10;
 
@@ -50,72 +50,22 @@ const contentType = [
         icon:<ScrollText size={16}/>,
     },
     {
-        label: "Survey",
+        label: "Banner",
         value: 2,
         icon:<ClipboardList size={16}/>,
 
     },
     {
-        label: "Checklist",
+        label: "Survey",
         value: 3,
         icon:<BookCheck size={16}/>,
     },
     {
-        label: "Banners",
+        label: "Checklist",
         value: 4,
         icon:<SquareMousePointer size={16}/>,
     }
 ];
-
-const filterType = [
-    {
-        label: "People",
-        value: 1,
-        icon:<Users  size={16}/>,
-    },
-    {
-        label: "State",
-        value: 2,
-        icon:<ClipboardList size={16}/>,
-    },
-    {
-        label: "Sender",
-        value: 3,
-        icon:<User  size={16}/>,
-    },
-    {
-        label: "Date",
-        value: 4,
-        icon:<Calendar  size={16}/>,
-    }
-]
-
-
-const initialState = {
-    project_id: "2",
-    title: "Shipped",
-    type: 1, //1=post,2=banner,3=survey,4=checklist
-    status: 1, //1=Live/active,2=Scheduled/unpublished,3=Draft,4=Paused
-    from: "",
-    reply_to: "",
-    bg_color: "",
-    text_color: "",
-    icon_color: "",
-    btn_color: "",
-    delay: "", //time in seconds
-    start_at: "",
-    end_at: "",
-    position: "", //top/bottom
-    alignment: "", //left/right
-    is_close_button: "", //true/false
-    question_type: "", //1=Net Promoter Score,2=Numeric Scale,3=Star rating scale,4=Emoji rating scale,5=Drop Down / List,6=Questions
-    start_number: "",
-    end_number: "",
-    start_label: "",
-    end_label: "",
-    placeholder_text: "",
-    options: [],
-}
 
 const typeNames = {
     1: "Post",
@@ -130,6 +80,8 @@ const typeIcon = {
     4: <SquareMousePointer size={16}/>,
 };
 
+const initialStateFilter = {search: "", type: ""}
+
 const InAppMessage = () => {
     const {theme} = useTheme();
     const navigate = useNavigate();
@@ -139,8 +91,9 @@ const InAppMessage = () => {
     const apiService = new ApiService();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
+    const timeoutHandler = useRef(null);
 
-    const [formData,setFormData]=useState(initialState);
+    const [filter, setFilter] = useState(initialStateFilter);
     const [messageList,setMessageList]=useState([]);
     const [openFilterType, setOpenFilterType] = useState('');
     const [selectedId, setSelectedId] = useState("");
@@ -148,7 +101,6 @@ const InAppMessage = () => {
     const [pageNo, setPageNo] = useState(Number(getPageNo));
     const [totalRecord, setTotalRecord] = useState(0);
     const [isLoading,setIsLoading]=useState(false);
-    const [open,setOpen]=useState(false);
     const [openFilter,setOpenFilter]=useState(false);
     const [deleteId,setDeleteId] = useState(null);
     const [isLoadingDelete,setIsLoadingDelete] = useState(false);
@@ -157,31 +109,54 @@ const InAppMessage = () => {
     const [openDelete,setOpenDelete]=useState(false);
 
     useEffect(()=>{
-        if(projectDetailsReducer.id){
-            getAllInAppMessageList(pageNo, perPageLimit);
+        if (projectDetailsReducer.id) {
+            getAllInAppMessageList(filter.search, filter.type);
         }
         navigate(`${baseUrl}/app-message?pageNo=${pageNo}`)
-    },[projectDetailsReducer.id, pageNo, allStatusAndTypes, perPageLimit])
+    },[projectDetailsReducer.id, pageNo, allStatusAndTypes, ])
 
-    const getAllInAppMessageList = async () => {
+    const getAllInAppMessageList = async (search, type) => {
         setIsLoading(true);
         const data = await  apiService.getAllInAppMessage({
             project_id: projectDetailsReducer.id,
             page: pageNo,
-            limit: perPageLimit
+            limit: perPageLimit,
+            search: search,
+            type: type,
         });
         if(data.status === 200) {
             setMessageList(data.data);
             setTotalRecord(data.total || 1);
-            setIsLoading(false)
         }
-        else{
-            setIsLoading(false);
-        }
+        setIsLoading(false);
     }
 
-    const filterPosts = (event) => {
-        setFormData({...formData,[event.name]:event.value})
+    const filterMessage = async (event) => {
+        setIsLoading(true)
+        setFilter({...filter, [event.name]: event.value,});
+        const payload = {
+            ...filter,
+            project_id: projectDetailsReducer.id,
+            page:1,
+            [event.name]: event.value,
+        }
+        await getAllInAppMessageList(filter.search, event.value);
+    }
+
+    const onChangeSearch = async (event) => {
+        setFilter({...filter, [event.target.name]: event.target.value,})
+        if (timeoutHandler.current) {
+            clearTimeout(timeoutHandler.current);
+        }
+        timeoutHandler.current = setTimeout(() => {
+            setPageNo(1);
+            getAllInAppMessageList(event.target.value, '');
+        }, 2000);
+    }
+
+    const removeBadge = () => {
+        setFilter({...filter, type: "",});
+        getAllInAppMessageList(filter.search, '');
     }
 
     const totalPages = Math.ceil(totalRecord / perPageLimit);
@@ -218,11 +193,7 @@ const InAppMessage = () => {
         }
     };
 
-    const removeBadge = (name) => {
-        setFormData({...formData,[name]:""});
-    }
-
-    const handleCreateNew = (id, type) => {
+    const handleCreateUpdate = (id, type) => {
         if(id == "type"){
             navigate(`${baseUrl}/app-message/${id}`);
         } else{
@@ -230,7 +201,7 @@ const InAppMessage = () => {
         }
     }
 
-    const openDeleteWidget = (id) => {
+    const openDeletePost = (id) => {
         setDeleteId(id)
         setOpenDelete(true)
     }
@@ -310,7 +281,7 @@ const InAppMessage = () => {
                         <DialogContent className="max-w-[350px] w-full sm:max-w-[580px] bg-white rounded-lg p-3 md:p-6">
                             <DialogHeader className={"flex flex-row justify-between gap-2"}>
                                 <div className={"flex flex-col gap-2"}>
-                                    <DialogTitle className={`text-left font-medium ${theme === "dark" ? "text-card" : ""}`}>In App Message {totalRecord}</DialogTitle>
+                                    <DialogTitle className={`text-left font-medium ${theme === "dark" ? "text-card" : ""}`}>In App Message</DialogTitle>
                                     <DialogDescription className={"text-left"}>Choose how you would like to embed your
                                         message.</DialogDescription>
                                 </div>
@@ -372,18 +343,18 @@ const InAppMessage = () => {
 
                 <div className={"flex items-center justify-between flex-wrap gap-2"}>
                     <div className={"flex flex-col flex-1 gap-y-0.5"}>
-                        <h1 className="text-2xl font-normal flex-initial w-auto">In App Messages</h1>
+                        <h1 className="text-2xl font-normal flex-initial w-auto">In App Messages ({totalRecord})</h1>
                         <p className={"text-sm text-muted-foreground"}>Engage users use posts, banners, surveys, and checklists to share updates, gather feedback, and improve their experience.</p>
                     </div>
                     <div className={"w-full lg:w-auto flex sm:flex-nowrap flex-wrap gap-2 items-center"}>
                         <div className={"flex gap-2 items-center w-full lg:w-auto"}>
                             <div className={"w-full"}>
                             <Input
-                                type="search"
+                                type="search" value={filter.search}
                                 placeholder="Search..."
                                 className="w-full pl-4 pr-14 text-sm font-normal h-9"
-                                value={formData.search}
-                                onChange={(e)=>setFormData({...formData,search: e.target.value})}
+                                name={"search"}
+                                onChange={onChangeSearch}
                             />
                             </div>
                             <div className={"flex items-center"}>
@@ -407,44 +378,23 @@ const InAppMessage = () => {
                                                         <CommandItem className={"p-0 flex gap-2 items-center cursor-pointer p-1"} onSelect={() => {setOpenFilterType('');}}>
                                                             <ChevronLeft className="mr-2 h-4 w-4"  />  <span className={"flex-1 w-full text-sm font-normal cursor-pointer flex gap-2 items-center"}>Back</span>
                                                         </CommandItem>
-                                                        {
-                                                            (contentType || []).map((x, i) => {
-                                                                return (
-                                                                    <CommandItem key={i} className={"p-0 w-full flex flex-row gap-1 items-center cursor-pointer"}>
-                                                                        <div className={"flex"} onClick={(event)=>filterPosts({name:"content_type",value:x.value == formData.content_type ? "" :x.value })}>
-                                                                            <Checkbox className={'m-2'} checked={x.value === formData.content_type} onClick={(event)=>filterPosts({name:"content_type",value:x.value == formData.content_type ? "" :x.value })} />
-                                                                            <span onClick={(event)=>filterPosts({name:"content_type",value:x.value == formData.content_type ? "" :x.value })} className={`w-full font-normal flex items-center hover:none`} onSelect={()=>setOpen(false)}>{x.icon} <span className={"ml-2"}>{x.label}</span></span>
-                                                                        </div>
-                                                                    </CommandItem>
-                                                                )
-                                                            })
-                                                        }
-                                                    </CommandGroup>
-                                                    : openFilterType === 'add_filter' ?
-                                                    <CommandGroup className={"w-full"}>
-                                                        <CommandItem className={"p-0 flex gap-2 items-center cursor-pointer p-1"} onSelect={() => {setOpenFilterType('');}}>
-                                                            <ChevronLeft className="mr-2 h-4 w-4"  />  <span className={"flex-1 w-full text-sm font-normal cursor-pointer flex gap-2 items-center"}>Back</span>
-                                                        </CommandItem>
-                                                        {
-                                                            (filterType || []).map((x,i)=>{
-                                                                return (
-                                                                    <CommandItem key={i}  className={"p-0 w-full flex flex-row gap-1 items-center cursor-pointer"}>
-                                                                        <div className={"flex"} onClick={(event)=>filterPosts({name:"add_filter",value:x.value == formData.add_filter ? "" :x.value })}>
-                                                                            <Checkbox className={'m-2'} checked={x.value === formData.add_filter} onClick={(event)=>filterPosts({name:"add_filter",value:x.value == formData.add_filter ? "" :x.value })} />
-                                                                            <span onClick={(event)=>filterPosts({name:"add_filter",value:x.value == formData.add_filter ? "" :x.value })} className={`w-full font-normal flex items-center hover:none`} onSelect={()=>setOpen(false)}>{x.icon} <span className={"ml-2"}>{x.label}</span></span>
-                                                                        </div>
-                                                                    </CommandItem>
-                                                                )
-                                                            })
-                                                        }
-
+                                                        <RadioGroup value={filter.type} onValueChange={(value) => filterMessage({ name: "type", value })} className={"gap-0.5"}>
+                                                            {(contentType || []).map((x) => (
+                                                                <CommandItem key={x.value} className={"p-0 flex items-center gap-1 cursor-pointer"}>
+                                                                    <div
+                                                                        onClick={() => filterMessage({ name: "type", value: x.value })}
+                                                                        className="flex items-center gap-1 w-full"
+                                                                    >
+                                                                        <RadioGroupItem className="m-2" value={x.value} checked={x.value === filter.type} />
+                                                                        <span className={"flex-1 w-full text-sm font-normal cursor-pointer"}>{x.label}</span>
+                                                                    </div>
+                                                                </CommandItem>
+                                                            ))}
+                                                        </RadioGroup>
                                                     </CommandGroup>
                                                     :<CommandGroup>
                                                         <CommandItem onSelect={() => {setOpenFilterType('content_type');}}>
                                                             <span className={"text-sm font-normal cursor-pointer"}>Content Type</span>
-                                                        </CommandItem>
-                                                        <CommandItem onSelect={() => {setOpenFilterType('add_filter');}}>
-                                                            <span className={"text-sm font-normal cursor-pointer"}>Add Filter</span>
                                                         </CommandItem>
                                                     </CommandGroup>
                                             }
@@ -454,25 +404,17 @@ const InAppMessage = () => {
                             </Popover>
                             </div>
                         </div>
-                        <Button onClick={()=>handleCreateNew("type")} className={"gap-2 font-medium hover:bg-primary"}><Plus size={20} strokeWidth={3}/><span className={"text-xs md:text-sm font-medium"}>New Content</span></Button>
+                        <Button onClick={()=>handleCreateUpdate("type")} className={"gap-2 font-medium hover:bg-primary"}><Plus size={20} strokeWidth={3}/><span className={"text-xs md:text-sm font-medium"}>New Content</span></Button>
                     </div>
                 </div>
 
                 {
-                    (formData.add_filter || formData.content_type) && <div className={"flex flex-wrap gap-2 mt-6"}>
+                    (filter.type) && <div className={"flex flex-wrap gap-2 mt-6"}>
                         {
-                            formData.add_filter &&
+                            filter.type &&
                             <Badge variant="outline" className="rounded p-0 font-medium">
-                                <span className="px-3 py-1.5 border-r">{formData.add_filter == 1 ? "People" : formData.add_filter === 2 ? "State" : formData.add_filter === 3 ? "Sender" : formData.add_filter === 4 ? "Date" : ""}</span>
-                                <span className="w-7 h-7 flex items-center justify-center cursor-pointer" onClick={() => removeBadge("add_filter")}><X className='w-4 h-4'/></span>
-                            </Badge>
-                        }
-
-                        {
-                            formData.content_type &&
-                            <Badge variant="outline" className="rounded p-0 font-medium">
-                                <span className="px-3 py-1.5 border-r">{formData.content_type === 1 ? "Post" : formData.content_type === 2 ? "Survey": formData.content_type === 3 ? "Checklist" : formData.content_type === 4 ? "Banners" : ""}</span>
-                                <span className="w-7 h-7 flex items-center justify-center cursor-pointer" onClick={() => removeBadge("content_type")}><X className='w-4 h-4'/></span>
+                                <span className="px-3 py-1.5 border-r">{filter.type === 1 ? "Post" : filter.type === 2 ? "Survey": filter.type === 3 ? "Checklist" : filter.type === 4 ? "Banners" : ""}</span>
+                                <span className="w-7 h-7 flex items-center justify-center cursor-pointer" onClick={() => removeBadge({name: "content_type", value: "type"})}><X className='w-4 h-4'/></span>
                             </Badge>
                         }
                     </div>
@@ -519,7 +461,7 @@ const InAppMessage = () => {
                                                         const sender = allStatusAndTypes?.members.find((y)=> y.user_id == x.from);
                                                         return(
                                                             <TableRow key={x.id}>
-                                                                <TableCell className={"px-2 py-[10px] md:px-3 font-normal max-w-[270px] cursor-pointer truncate text-ellipsis overflow-hidden whitespace-nowrap"} onClick={()=>handleCreateNew(x.id, x.type)}>{x.title}</TableCell>
+                                                                <TableCell className={"px-2 py-[10px] md:px-3 font-normal max-w-[270px] cursor-pointer truncate text-ellipsis overflow-hidden whitespace-nowrap"} onClick={()=>handleCreateUpdate(x.id, x.type)}>{x.title}</TableCell>
                                                                 <TableCell className={"px-2 py-[10px] md:px-3"}>
                                                                     <Select value={x.status} onValueChange={(value) => handleStatusChange(x, value)}>
                                                                         <SelectTrigger className="w-[135px] h-7">
@@ -585,8 +527,8 @@ const InAppMessage = () => {
                                                                             <Ellipsis className={`font-normal`} size={18}/>
                                                                         </DropdownMenuTrigger>
                                                                         <DropdownMenuContent align={"end"}>
-                                                                            <DropdownMenuItem className={"cursor-pointer"} onClick={()=>handleCreateNew(x.id, x.type)}>Edit</DropdownMenuItem>
-                                                                            <DropdownMenuItem className={"cursor-pointer"} onClick={()=>openDeleteWidget(x.id)}>Delete</DropdownMenuItem>
+                                                                            <DropdownMenuItem className={"cursor-pointer"} onClick={()=>handleCreateUpdate(x.id, x.type)}>Edit</DropdownMenuItem>
+                                                                            <DropdownMenuItem className={"cursor-pointer"} onClick={()=>openDeletePost(x.id)}>Delete</DropdownMenuItem>
                                                                         </DropdownMenuContent>
                                                                     </DropdownMenu>
                                                                 </TableCell>

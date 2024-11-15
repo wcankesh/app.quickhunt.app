@@ -37,7 +37,6 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
     const onChange = (name, value) => {
         setInAppMsgSetting({...inAppMsgSetting, [name]: value});
     };
-    console.log("inAppMsgSetting.status", inAppMsgSetting.status)
 
     const onChangeAddOption = (index, value) => {
         const clone = [...selectedStep.options];
@@ -120,7 +119,7 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
         if (type === "start_at") {
             updatedSetting = {
                 ...updatedSetting,
-                status: isFutureDate ? 2 : 1  // Set status based on date comparison
+                status: isFutureDate ? 2 : 1
             };
         }
 
@@ -189,6 +188,7 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
             project_id: projectDetailsReducer.id,
             type: type
         }
+        debugger
         const data = await apiSerVice.createInAppMessage(payload);
         if (data.status === 200) {
             setIsLoading(false);

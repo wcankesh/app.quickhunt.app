@@ -4,7 +4,7 @@ import {ArrowBigUp, Check, Circle, CircleX, Dot, Ellipsis, Loader2, MessageCircl
 import {RadioGroup, RadioGroupItem} from "../ui/radio-group";
 import {Label} from "../ui/label";
 import {Input} from "../ui/input";
-import {Avatar, AvatarFallback} from "../ui/avatar";
+import {Avatar, AvatarFallback, AvatarImage} from "../ui/avatar";
 import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "../ui/select";
 import {Popover, PopoverTrigger, PopoverContent} from "../ui/popover";
 import {Textarea} from "../ui/textarea";
@@ -1242,6 +1242,7 @@ const UpdateIdea = () => {
                                                 {
                                                     selectedIdea && selectedIdea?.comments && selectedIdea?.comments.length > 0 ?
                                                         (selectedIdea?.comments || []).map((x, i) => {
+                                                            console.log(x)
                                                             return (
                                                                 <Fragment>
                                                                     <div className={"flex gap-2 p-4 lg:px-8 border-b last:border-b-0"}>
@@ -1357,14 +1358,14 @@ const UpdateIdea = () => {
                                                                                                             <div>
                                                                                                                 <div
                                                                                                                     className={"update-idea text-sm rounded-full border text-center"}>
-                                                                                                                    <UserAvatar userName={selectedIdea?.name}/>
+                                                                                                                    <UserAvatar userPhoto={y.user_photo} userName={y?.name}/>
                                                                                                                 </div>
                                                                                                             </div>
                                                                                                             <div
                                                                                                                 className={"w-full space-y-2"}>
                                                                                                                 <div className={"flex justify-between"}>
                                                                                                                     <div className={"flex items-start"}>
-                                                                                                                        <h4 className={"text-sm font-normal"}>{x.name}</h4>
+                                                                                                                        <h4 className={"text-sm font-normal"}>{y.name}</h4>
                                                                                                                         <p className={"text-sm font-normal flex items-center text-muted-foreground"}>
                                                                                                                             <Dot
                                                                                                                                 size={20}

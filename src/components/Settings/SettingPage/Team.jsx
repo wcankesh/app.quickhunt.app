@@ -20,6 +20,7 @@ import {Skeleton} from "../../ui/skeleton";
 import EmptyData from "../../Comman/EmptyData";
 import {Dialog} from "@radix-ui/react-dialog";
 import {DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "../../ui/dialog";
+import DeleteDialog from "../../Comman/DeleteDialog";
 
 const initialState = {
     email: "",
@@ -161,7 +162,8 @@ const Team = () => {
         const payload = {
             project_id: x.project_id,
             email: x.member_email,
-            type: '2'
+            type: '2',
+            id: x.id
         }
         const data = await apiService.inviteUser(payload)
         if (data.status === 200) {
@@ -248,31 +250,14 @@ const Team = () => {
         <Fragment>
             {
                 openDelete &&
-                <Fragment>
-                    <Dialog open onOpenChange={()=> setOpenDelete(false)}>
-                        <DialogContent className="max-w-[350px] w-full sm:max-w-[525px] p-3 md:p-6 rounded-lg">
-                            <DialogHeader className={"flex flex-row justify-between gap-2"}>
-                                <div className={"flex flex-col gap-2"}>
-                                    <DialogTitle className={"text-start"}>You really want delete this board?</DialogTitle>
-                                    <DialogDescription className={"text-start"}>This action can't be undone.</DialogDescription>
-                                </div>
-                                <X size={16} className={"m-0 cursor-pointer"} onClick={() => setOpenDelete(false)}/>
-                            </DialogHeader>
-                            <DialogFooter className={"flex-row justify-end space-x-2"}>
-                                <Button variant={"outline hover:none"}
-                                        className={"text-sm font-medium border"}
-                                        onClick={() => setOpenDelete(false)}>Cancel</Button>
-                                <Button
-                                    variant={"hover:bg-destructive"}
-                                    className={` ${theme === "dark" ? "text-card-foreground" : "text-card"} w-[76px] text-sm font-medium bg-destructive`}
-                                    onClick={onDelete}
-                                >
-                                    {isLoadingDelete ? <Loader2 size={16} className={"animate-spin"}/> : "Delete"}
-                                </Button>
-                            </DialogFooter>
-                        </DialogContent>
-                    </Dialog>
-                </Fragment>
+                <DeleteDialog
+                    title={"You really want to delete this Member?"}
+                    isOpen={openDelete}
+                    onOpenChange={() => setOpenDelete(false)}
+                    onDelete={onDelete}
+                    isDeleteLoading={isLoadingDelete}
+                    // deleteRecord={deleteId}
+                />
             }
 
             <Card>
@@ -437,8 +422,8 @@ const Team = () => {
                                                                     <Ellipsis className={`${theme === "dark" ? "" : "text-muted-foreground"}`} size={18}/>
                                                                 </DropdownMenuTrigger>
                                                                 <DropdownMenuContent className={"hover:none absolute right-[-20px]"}>
-                                                                    <DropdownMenuItem className={"w-[130px]"} onClick={() => onResendUser(x)}>Resend Invitation</DropdownMenuItem>
-                                                                    <DropdownMenuItem className={"w-[130px]"} onClick={() => revokePopup(x,x.id)}>Revoke Invitation</DropdownMenuItem>
+                                                                    <DropdownMenuItem className={"cursor-pointer w-[130px]"} onClick={() => onResendUser(x)}>Resend Invitation</DropdownMenuItem>
+                                                                    <DropdownMenuItem className={"cursor-pointer w-[130px]"} onClick={() => revokePopup(x,x.id)}>Revoke Invitation</DropdownMenuItem>
                                                                 </DropdownMenuContent>
                                                             </DropdownMenu>
                                                         </TableCell>

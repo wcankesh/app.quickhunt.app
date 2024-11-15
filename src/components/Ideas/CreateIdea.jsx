@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, Fragment} from 'react';
 import {Button} from "../ui/button";
 import {Label} from "../ui/label";
 import {Input} from "../ui/input";
@@ -183,15 +183,19 @@ const CreateIdea = ({isOpen, onOpen, onClose, closeCreateIdea, setIdeasList, ide
                                         <SelectContent>
                                             <SelectGroup>
                                                 {
-                                                    (allStatusAndTypes?.boards || []).map((x, i) => {
-                                                        return (
-                                                            <SelectItem key={i} value={x.id}>
-                                                                <div className={"flex items-center gap-2"}>
-                                                                    {x.title}
-                                                                </div>
-                                                            </SelectItem>
-                                                        )
-                                                    })
+                                                    allStatusAndTypes?.boards?.length > 0 ? <Fragment>
+                                                        {
+                                                            (allStatusAndTypes?.boards || []).map((x, i) => {
+                                                                return (
+                                                                    <SelectItem key={i} value={x.id}>
+                                                                        <div className={"flex items-center gap-2"}>
+                                                                            {x.title}
+                                                                        </div>
+                                                                    </SelectItem>
+                                                                )
+                                                            })
+                                                        }
+                                                    </Fragment> : <span className="text-muted-foreground flex justify-center text-sm">No Boards</span>
                                                 }
                                             </SelectGroup>
                                         </SelectContent>
@@ -224,18 +228,22 @@ const CreateIdea = ({isOpen, onOpen, onClose, closeCreateIdea, setIdeasList, ide
                                         <SelectContent>
                                             <SelectGroup>
                                                 {
-                                                    (topicLists || []).map((x, i) => {
-                                                        return (
-                                                            <SelectItem className={"p-2"} key={i} value={x.id}>
-                                                                <div className={"flex gap-2"}>
-                                                                    <div onClick={() => handleChange(x.id)} className="checkbox-icon">
-                                                                        {ideaDetail.topic.includes(x.id) ? <Check size={18} />: <div className={"h-[18px] w-[18px]"}></div>}
-                                                                    </div>
-                                                                    <span>{x.title ? x.title : ""}</span>
-                                                                </div>
-                                                            </SelectItem>
-                                                        )
-                                                    })
+                                                    topicLists?.length > 0 ? <Fragment>
+                                                        {
+                                                            (topicLists || []).map((x, i) => {
+                                                                return (
+                                                                    <SelectItem className={"p-2"} key={i} value={x.id}>
+                                                                        <div className={"flex gap-2"}>
+                                                                            <div onClick={() => handleChange(x.id)} className="checkbox-icon">
+                                                                                {ideaDetail.topic.includes(x.id) ? <Check size={18} />: <div className={"h-[18px] w-[18px]"}></div>}
+                                                                            </div>
+                                                                            <span>{x.title ? x.title : ""}</span>
+                                                                        </div>
+                                                                    </SelectItem>
+                                                                )
+                                                            })
+                                                        }
+                                                    </Fragment> : <span className="text-muted-foreground flex justify-center text-sm">No Topics</span>
                                                 }
                                             </SelectGroup>
                                         </SelectContent>

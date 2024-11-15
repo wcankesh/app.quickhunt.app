@@ -24,6 +24,7 @@ const initialStateError = {
     title: "",
     description: "",
     board: "",
+    cover_image: "",
 }
 
 const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedIdea, setSelectedRoadmap, selectedRoadmap, roadmapList, setRoadmapList,}) => {
@@ -242,6 +243,13 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
 
     const handleFeatureImgUpload = async (event) => {
         const file = event.target?.files[0];
+        // if (file && file.size > 5 * 1024 * 1024) {
+        //     toast({
+        //         variant: "destructive",
+        //         description: "The cover image field must be 5 MB or less."
+        //     });
+        //     return;
+        // }
         setSelectedIdea({...selectedIdea, cover_image: file})
         let formData = new FormData();
         formData.append("cover_image", file);

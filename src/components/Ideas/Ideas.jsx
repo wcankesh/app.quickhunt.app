@@ -220,41 +220,30 @@ const Ideas = () => {
 
     const handleStatusUpdate = async (name, value, index, record) => {
         const formData = new FormData();
+        if (name === "roadmap_id" && value === null) {
+            value = "";
+        }
         formData.append(name, value);
         const data = await apiSerVice.updateIdea(formData, record?.id);
         if (data.status === 200) {
             const clone = [...ideasList];
             if (name === "is_archive" || name === "is_active") {
                 clone[index][name] = value;
-
-                // if (filter.bug === 1 && clone[index].is_active === 1) {
-                //     clone.splice(index, 1);
-                // }
-
-                // if (filter.archive === 1 && clone[index].is_archive === 0) {
-                //     clone.splice(index, 1);
-                // }
-
                 const removeStatus =
-                    // (filter.roadmap.length && !filter.roadmap.includes(clone[index].roadmap_id)) ||
                     (filter.bug == 1 && clone[index].is_active == 1) ||
                     (filter.archive == 1 && clone[index].is_archive == 0);
-
                 if (removeStatus) {
                     clone.splice(index, 1);
                     setTotalRecord(clone.length)
                 }
-
             } else if (name === "roadmap_id") {
                 clone[index].roadmap_id = value;
             }
             setIdeasList(clone);
             let payload = {...filter, project_id: projectDetailsReducer.id, page: pageNo, limit: perPageLimit}
             ideaSearch(payload)
-            // toast({description: `${name.replace('_', ' ')} ${data.message}`});
             toast({description: data.message});
         } else {
-            // toast({variant: "destructive", description: `Failed to update ${name.replace('_', ' ')} status`});
             toast({variant: "destructive", description: data.message});
         }
     };
@@ -604,10 +593,7 @@ const Ideas = () => {
                                                                     <Select
                                                                         onValueChange={(value) => handleStatusUpdate("roadmap_id", value, i, x)}
                                                                         value={x.roadmap_id}>
-                                                                        <SelectTrigger
-                                                                            className="md:w-[200px] w-[170px] h-8 bg-card"
-                                                                            // className="md:w-[291px] w-[170px] h-[24px] px-3 py-1 bg-card"
-                                                                        >
+                                                                        <SelectTrigger className="md:w-[200px] w-[170px] h-8 bg-card">
                                                                             <SelectValue/>
                                                                         </SelectTrigger>
                                                                         <SelectContent>

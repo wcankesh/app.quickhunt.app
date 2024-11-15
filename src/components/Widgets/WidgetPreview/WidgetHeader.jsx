@@ -24,7 +24,7 @@ const WidgetHeader = ({widgetsSetting, selected, setSelected}) => {
             isRedirect: widgetsSetting.roadmap_display === 2 ? false : true,
         },
         {
-            title: widgetsSetting.announcement_title || 'Announcements',
+            title: widgetsSetting.changelog_title || 'Announcements',
             link: 'announcements',
             icon: Icon.announcement,
             selected: selected === `announcements`,

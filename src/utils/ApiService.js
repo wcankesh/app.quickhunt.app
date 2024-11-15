@@ -266,7 +266,8 @@ export class ApiService{
         return await this.postData(`${baseUrlApi}/idea/search`,payload, )
     }
     async getSingleIdea (id){
-        return await this.getData(`${baseUrlApi}/v1/feature-idea/${id}`)
+        return await this.getData(`${baseUrlApi}/feature-idea/${id}`)
+        // return await this.getData(`${baseUrlApi}/v1/feature-idea/${id}`)
     }
 
     /* ---------- Common Roadmap api and Ideas common api and Settings Statuses api ---------- */
@@ -333,6 +334,9 @@ export class ApiService{
     }
     async updateInAppMessageStatus (payload, id){
         return await this.postData(`${baseUrlApi}/app-message/status/${id}`, payload)
+    }
+    async filterMessageType (payload){
+        return await this.postData(`${baseUrlApi}/search`,payload)
     }
 
     /* ---------- Help Center Category api ans Settings Categories api ---------- */
