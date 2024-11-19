@@ -66,6 +66,14 @@ const CreateIdea = ({isOpen, onOpen, onClose, closeCreateIdea, setIdeasList, ide
         }));
     };
 
+    const onChangeBoard = (value) => {
+        setIdeaDetail({...ideaDetail, board: value});
+        setFormError(formError => ({
+            ...formError,
+            board: formValidate("board", value),
+        }));
+    };
+
     const convertToSlug = (Text) => {
         return Text.toLowerCase()
             .replace(/ /g, "-")
@@ -168,10 +176,8 @@ const CreateIdea = ({isOpen, onOpen, onClose, closeCreateIdea, setIdeasList, ide
                                 </div>
                                 <div className={"space-y-2"}>
                                     <Label className={"font-normal capitalize"}>Choose Board for this Idea</Label>
-                                    <Select
-                                        onValueChange={(value) => onChangeText( "board", value)}
-                                        value={ideaDetail.board || ""}>
-                                        <SelectTrigger className="bg-card">
+                                    <Select onValueChange={onChangeBoard} value={ideaDetail.board || ""}>
+                                        <SelectTrigger className={"bg-card"}>
                                             {ideaDetail.board ? (
                                                 <SelectValue>
                                                     {allStatusAndTypes?.boards.find(board => board.id === ideaDetail.board)?.title}

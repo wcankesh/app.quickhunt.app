@@ -1,13 +1,13 @@
-import React, {Fragment, useEffect, useState} from 'react';
+import React, {Fragment, useEffect, useRef, useState} from 'react';
 import { Input } from "../../ui/input";
 import { Select, SelectGroup, SelectValue, SelectItem, SelectTrigger, SelectContent } from "../../ui/select";
-import {ChevronLeft, Circle, Ellipsis, Filter, Plus, X} from "lucide-react";
+import {Circle, Ellipsis, Filter, Plus, X} from "lucide-react";
 import { Button } from "../../ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../ui/table";
 import {Card, CardContent} from "../../ui/card";
 import { useTheme } from "../../theme-provider";
-import { DropdownMenu, DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
-import { DropdownMenuContent, DropdownMenuItem } from "../../ui/dropdown-menu";
+import {DropdownMenu, DropdownMenuPortal, DropdownMenuSub, DropdownMenuTrigger} from "@radix-ui/react-dropdown-menu";
+import {DropdownMenuContent, DropdownMenuItem, DropdownMenuSubContent, DropdownMenuSubTrigger} from "../../ui/dropdown-menu";
 import {useNavigate} from "react-router-dom";
 import {baseUrl} from "../../../utils/constent";
 import moment from "moment";
@@ -16,29 +16,18 @@ import {useSelector} from "react-redux";
 import {useToast} from "../../ui/use-toast";
 import {Skeleton} from "../../ui/skeleton";
 import EmptyData from "../../Comman/EmptyData";
-import {Popover, PopoverContent, PopoverTrigger} from "../../ui/popover";
-import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList} from "../../ui/command";
-import {Checkbox} from "../../ui/checkbox";
 import {Badge} from "../../ui/badge";
 import Pagination from "../../Comman/Pagination";
 import DeleteDialog from "../../Comman/DeleteDialog";
+import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList} from "../../ui/command";
 
 const status = [
     {name: "Publish", value: 1, fillColor: "#389E0D", strokeColor: "#389E0D",},
     {name: "Draft", value: 0, fillColor: "#CF1322", strokeColor: "#CF1322",},
 ];
 
-// const initialFilter = {
-//     all: "",
-//     search: "",
-//     title: "",
-//     category_id: "",
-//     sub_category_id: "",
-// }
-
 const initialFilter = [
-    {name: "Category", value: "category_id",},
-    {name: "Sub Category", value: "sub_category_id",},
+    {search: "", category_id: "", sub_category_id: ""}
 ]
 
 const perPageLimit = 10
@@ -51,77 +40,113 @@ const Articles = () => {
     const UrlParams = new URLSearchParams(location.search);
     const getPageNo = UrlParams.get("pageNo") || 1;
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
+    const timeoutHandler = useRef(null);
 
-    const [filter, setFilter] = useState(initialFilter);
+    const [filter, setFilter] = useState({
+        search: "",
+        category_id: "",
+        sub_category_id: ""
+    });
     const [articles, setArticles] = useState([]);
-    const [searchTerm, setSearchTerm] = useState('');
-    const [openFilter, setOpenFilter] = useState('');
-    const [openFilterType, setOpenFilterType] = useState('');
+    const [articleList, setArticleList] = useState([]);
     const [totalRecord, setTotalRecord] = useState(0);
     const [pageNo, setPageNo] = useState(Number(getPageNo));
     const [idToDelete, setIdToDelete] = useState(null);
     const [openDelete,setOpenDelete]=useState(false);
     const [isLoadingDelete, setIsLoadingDelete] = useState(false);
-    const [isLoading, setIsLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
+
+    const [selectedCategory, setSelectedCategory] = useState(null);
+    const [selectedSubCategory, setSelectedSubCategory] = useState(null);
+
+    const handleCategorySelect = (category) => {
+        setSelectedCategory(category);
+        setSelectedSubCategory(null);
+    };
+
+    const handleSubCategorySelect = (subCategory) => {
+        setSelectedSubCategory(subCategory);
+    };
 
     useEffect(() => {
-        if(filter.sub_category_id || filter.category_id || filter.title || filter.all) {
-            let payload = {...filter, project_id: projectDetailsReducer.id, page: pageNo, limit: perPageLimit}
-            articleSearch(payload)
-        } else {
-            if (projectDetailsReducer.id) {
-                getAllArticles();
-            }
+        if (projectDetailsReducer.id) {
+            getAllArticles(filter.search, filter.category_id, filter.sub_category_id);
+            getAllCategory();
         }
         navigate(`${baseUrl}/help/article?pageNo=${pageNo}`);
     }, [projectDetailsReducer.id, pageNo])
 
-    const getAllArticles = async () => {
+    const getAllArticles = async (search, category_id, sub_category_id) => {
+        setIsLoading(true)
         const data = await apiService.getAllArticles({
             project_id: projectDetailsReducer.id,
-            search: "",
-            category_id: "",
-            sub_category_id: "",
+            search: search,
+            category_id: category_id,
+            sub_category_id: sub_category_id,
             page: pageNo,
             limit: perPageLimit
         });
         if (data.status === 200) {
             setArticles(data.data);
             setTotalRecord(data.total);
-            setIsLoading(false)
         }
         setIsLoading(false)
     };
 
-    const articleSearch = async (payload) => {
-        const data = await apiService.articleSearch(payload)
+    const getAllCategory = async () => {
+        // setIsLoading(true);
+        const data = await apiService.getAllCategory({
+            project_id: projectDetailsReducer.id,
+        });
         if (data.status === 200) {
-            setArticles(data.data)
-            setTotalRecord(data.total)
-            setPageNo(payload.page)
-            setIsLoading(false)
-        } else {
-            setIsLoading(false)
+            setArticleList(data.data);
         }
+        setIsLoading(false)
+    };
+
+    const onChangeSearch = async (event) => {
+        setFilter({...filter, [event.target.name]: event.target.value,})
+        if (timeoutHandler.current) {
+            clearTimeout(timeoutHandler.current);
+        }
+        timeoutHandler.current = setTimeout(() => {
+            setPageNo(1);
+            getAllArticles(event.target.value, '');
+        }, 2000);
     }
 
-    const handleChangeSearch = (e) => {
-        let payload = {
-            ...filter,
-            project_id: projectDetailsReducer.id,
-            page: 1,
-            limit: perPageLimit,
-        };
-        if(e.name === "category_id") {
-            if (e.value === "category_id") {
-                payload.category_id = payload.category_id === 1 ? 0 : 1;
-                payload.sub_category_id = 0;
-            } else {
-                payload.sub_category_id = payload.sub_category_id === 1 ? 0 : 1;
-                payload.category_id = 0;
-            }
+    // const filterData = (name, value) => {
+    //     debugger
+    //     console.log("name", name)
+    //     console.log("value", value)
+    //     setFilter({...filter, [name]: value})
+    //     if (timeoutHandler.current) {
+    //         clearTimeout(timeoutHandler.current);
+    //     }
+    //     timeoutHandler.current = setTimeout(() => {
+    //         setPageNo(1);
+    //         getAllArticles(value, '');
+    //     }, 2000);
+    // }
+
+    const filterData = (name, value) => {
+        console.log(name)
+        console.log(value)
+        setFilter(prevFilter => ({
+            ...prevFilter,
+            [name]: value
+        }));
+
+        if (timeoutHandler.current) {
+            clearTimeout(timeoutHandler.current);
         }
-    }
+
+        timeoutHandler.current = setTimeout(() => {
+            setPageNo(1);
+            getAllArticles(filter.search, value, value);
+        }, 2000);
+    };
+
 
     const handleCreateClick = () => {
         navigate(`${baseUrl}/help/article/new`);
@@ -160,7 +185,6 @@ const Articles = () => {
         if (newPage >= 1 && newPage <= totalPages) {
             setIsLoading(true);
             setPageNo(newPage);
-        } else {
             setIsLoading(false);
         }
     };
@@ -209,71 +233,94 @@ const Articles = () => {
                 </div>
                 <div className={"w-full lg:w-auto flex sm:flex-nowrap flex-wrap gap-2 items-center"}>
                     <div className={"flex gap-2 items-center w-full lg:w-auto"}>
-                        <div className={"w-full"}>
+                        <div className={"relative w-full"}>
                         <Input
-                            type="search"
+                            type="search" value={filter.search}
                             placeholder="Search..."
                             className={"w-full pl-4 pr-14 text-sm font-normal h-9"}
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
+                            name={"search"}
+                            onChange={onChangeSearch}
                         />
+                            {filter && (
+                                <button
+                                    type="button"
+                                    className="absolute right-2 top-1/2 transform -translate-y-1/2 w-6 h-6 flex items-center justify-center text-gray-400 hover:text-gray-600"
+                                >
+                                    <X className="w-4 h-4" />
+                                </button>
+                            )}
                         </div>
                         <div className={"flex items-center"}>
-                        <Popover
-                            open={openFilter}
-                            onOpenChange={() => {
-                                setOpenFilter(!openFilter);
-                                setOpenFilterType('');
-                            }}
-                            className="w-full p-0"
-                        >
-                            <PopoverTrigger asChild>
-                                <Button className={"h-9 w-9"} size={"icon"} variant="outline"><Filter fill="true" className='w-4 -h4' /></Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-full p-0" align='end'>
-                                <Command className="w-full">
-                                    <CommandInput placeholder="Search filter..."/>
-                                    <CommandList className="w-full">
-                                        <CommandEmpty>No filter found.</CommandEmpty>
-                                        {
-                                            openFilterType === 'category_id' ?
-                                                <CommandGroup>
-                                                    <CommandItem onSelect={() => {setOpenFilterType('')}} className={"p-0 flex gap-2 items-center cursor-pointer p-1"}>
-                                                        <ChevronLeft className="mr-2 h-4 w-4" />
-                                                        <span className={"flex-1 w-full text-sm font-normal cursor-pointer flex gap-2 items-center"}>
-                                                                Back
-                                                            </span>
-                                                    </CommandItem>
-                                                    {(initialFilter || []).map((x, i) => {
-                                                        return (
-                                                            <CommandItem key={i} value={x.value} className={"p-0 flex gap-1 items-center cursor-pointer"}>
-                                                                <Checkbox className={'m-2'} checked={filter[x.value] === 1} onClick={() => {
-                                                                    // handleChange({name: "status" , value: x.value});
-                                                                    setOpenFilter(true);
-                                                                    setOpenFilterType('category_id');
-                                                                }}/>
-                                                                <span onClick={() => {
-                                                                    // handleChange({name: "status" , value: x.value});
-                                                                    setOpenFilter(true);
-                                                                    setOpenFilterType('category_id');
-                                                                }} className={"flex-1 w-full text-sm font-normal cursor-pointer flex gap-2 items-center"}>{x.name}</span>
-                                                            </CommandItem>
-                                                        )
-                                                    })}
-                                                </CommandGroup> :
-                                                <CommandGroup>
-                                                    <CommandItem onSelect={() => {setOpenFilterType('category_id');}}>
-                                                        <span className={"text-sm font-normal cursor-pointer"}>Category</span>
-                                                    </CommandItem>
-                                                    <CommandItem onSelect={() => {setOpenFilterType('sub_category_id');}}>
-                                                        <span className={"text-sm font-normal cursor-pointer"}>Sub Category</span>
-                                                    </CommandItem>
-                                                </CommandGroup>
-                                        }
-                                    </CommandList>
-                                </Command>
-                            </PopoverContent>
-                        </Popover>
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button className="h-9 w-9" size="icon" variant="outline">
+                                        <Filter fill="true" className="w-4 h-4" />
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent className="w-56">
+                                    <DropdownMenuSub>
+                                        <DropdownMenuSubTrigger>Category</DropdownMenuSubTrigger>
+                                        <DropdownMenuPortal>
+                                            <DropdownMenuSubContent>
+                                                <Command>
+                                                    <CommandInput placeholder="Search..." />
+                                                    <CommandList>
+                                                        <CommandEmpty>No data found.</CommandEmpty>
+                                                        <CommandGroup>
+                                                            {(articleList || []).map((x) => (
+                                                                <CommandItem
+                                                                    key={x.id}
+                                                                    value={x.id}
+                                                                    // onSelect={() => filterData("category_id", x.id)}
+                                                                >
+                                                                    <Fragment key={x.id}>
+                                                                        <span onClick={() => filterData("category_id", x.id)}
+                                                                            className={"flex-1 w-full text-sm font-normal cursor-pointer flex gap-2 items-center"}
+                                                                        >
+                                                                            {x.title}
+                                                                        </span>
+                                                                    </Fragment>
+                                                                </CommandItem>
+                                                            ))}
+                                                        </CommandGroup>
+                                                    </CommandList>
+                                                </Command>
+                                            </DropdownMenuSubContent>
+                                        </DropdownMenuPortal>
+                                    </DropdownMenuSub>
+                                    <DropdownMenuSub>
+                                        <DropdownMenuSubTrigger>Sub Category</DropdownMenuSubTrigger>
+                                        <DropdownMenuPortal>
+                                            <DropdownMenuSubContent>
+                                                <Command>
+                                                    <CommandInput placeholder="Search..." />
+                                                    <CommandList>
+                                                        <CommandEmpty>No data found.</CommandEmpty>
+                                                        <CommandGroup>
+                                                            {(articleList || []).map((x) => (
+                                                                x.sub_categories.map((y) => (
+                                                                    <CommandItem
+                                                                        key={y.id}
+                                                                        value={y.id}
+                                                                        onSelect={() => filterData("sub_category_id", y.id)}
+                                                                    >
+                                                                        <Fragment key={y.id}>
+                                                                            <span
+                                                                                className={"flex-1 w-full text-sm font-normal cursor-pointer flex gap-2 items-center"}
+                                                                            >
+                                                                                {y.title}
+                                                                            </span>
+                                                                        </Fragment>
+                                                                    </CommandItem>
+                                                                ))))}
+                                                        </CommandGroup>
+                                                    </CommandList>
+                                                </Command>
+                                            </DropdownMenuSubContent>
+                                        </DropdownMenuPortal>
+                                    </DropdownMenuSub>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
                         </div>
                         </div>
                     <Button onClick={handleCreateClick} className={"gap-2 font-medium hover:bg-primary"}>
@@ -282,17 +329,30 @@ const Articles = () => {
                     </Button>
                 </div>
             </div>
-            {
-                filter.category_id === 1 &&
-                <Badge key={`selected-${filter.category_id}`} variant="outline" className="rounded p-0 font-medium">
-                    <span className="px-3 py-1.5 border-r">Category</span>
-                    <span className="w-7 h-7 flex items-center justify-center cursor-pointer"
-                        // onClick={() =>  handleChange({name: "status" , value: "archive"})}
-                    >
+            <div className="mt-4">
+                {selectedCategory && (
+                    <Badge key={`selected-${selectedCategory.id}`} variant="outline" className="rounded p-0 font-medium">
+                        <span className="px-3 py-1.5 border-r">{selectedCategory.title}</span>
+                        <span
+                            className="w-7 h-7 flex items-center justify-center cursor-pointer"
+                            onClick={() => setSelectedCategory(null)}
+                        >
                         <X className='w-4 h-4'/>
                     </span>
-                </Badge>
-            }
+                    </Badge>
+                )}
+                {selectedSubCategory && (
+                    <Badge key={`selected-${selectedSubCategory.id}`} variant="outline" className="rounded p-0 font-medium">
+                        <span className="px-3 py-1.5 border-r">{selectedSubCategory.title}</span>
+                        <span
+                            className="w-7 h-7 flex items-center justify-center cursor-pointer"
+                            onClick={() => setSelectedSubCategory(null)}
+                        >
+                        <X className='w-4 h-4'/>
+                    </span>
+                    </Badge>
+                )}
+            </div>
             <div className={"mt-6"}>
                 <Card className={""}>
                     <CardContent className={"p-0 overflow-auto"}>
@@ -326,7 +386,6 @@ const Articles = () => {
                                     ) : articles.length > 0 ? <Fragment>
                                         {
                                             articles.map((x, index) => (<>
-                                                {console.log(x?.is_active)}
                                                 <TableRow key={index}>
                                                     <TableCell onClick={() => onEdit(x.id)}
                                                         className={"px-2 py-[10px] md:px-3 font-normal cursor-pointer max-w-[270px] truncate text-ellipsis overflow-hidden whitespace-nowrap"}>{x.title}</TableCell>

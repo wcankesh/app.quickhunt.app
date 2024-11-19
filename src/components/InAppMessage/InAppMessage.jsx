@@ -216,15 +216,11 @@ const InAppMessage = () => {
             clone.splice(deleteIndex,1);
             setMessageList(clone);
             setIsLoadingDelete(false);
-            toast({
-                description:data.message
-            })
+            getAllInAppMessageList();
+            toast({description:data.message})
         } else {
             setIsLoadingDelete(false);
-            toast({
-                description:data.message,
-                variant: "destructive",
-            })
+            toast({description:data.message, variant: "destructive",})
         }
         setOpenDelete(false);
         setDeleteId(null);

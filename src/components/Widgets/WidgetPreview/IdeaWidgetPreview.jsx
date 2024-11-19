@@ -50,7 +50,7 @@ const IdeaWidgetPreview = ({widgetsSetting}) => {
                 <Button className="gap-2 inset-0 shadow-none outline-none" style={{
                     backgroundColor: widgetsSetting?.btn_background_color,
                     color: widgetsSetting?.btn_text_color
-                }}><Plus className="w-5 h-5"/> Create Idea</Button>
+                }}><Plus className="w-5 h-5"/>{widgetsSetting.idea_button_label ? widgetsSetting.idea_button_label : "Create Idea"}</Button>
 
             </div>
 

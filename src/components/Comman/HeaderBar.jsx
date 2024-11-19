@@ -306,11 +306,19 @@ const HeaderBar = () => {
         if(data.status === 200){
             const cloneProject = [...allProjectReducer.projectList]
             const index = cloneProject.findIndex((x) => x.id === projectDetailsReducer.id)
-            if(index !== -1){
-                cloneProject.splice(index, 1)
-                setProjectDetails(cloneProject[0]);
-                dispatch(projectDetailsAction(cloneProject[0]))
-                dispatch(allProjectAction({projectList: cloneProject}))
+            if (index !== -1) {
+                cloneProject.splice(index, 1);
+                const nextProject = cloneProject[0] || null;
+
+                if (nextProject) {
+                    setProjectDetails(nextProject);
+                    dispatch(projectDetailsAction(nextProject));
+                } else {
+                    setProjectDetails(null);
+                    dispatch(projectDetailsAction(null));
+                }
+
+                dispatch(allProjectAction({ projectList: cloneProject })); // Update the project list in Redux
             }
             setDeleteIsLoading(false)
             setIsOpenDeleteAlert(false)
@@ -650,7 +658,9 @@ const HeaderBar = () => {
                                 <Bell size={20} className={theme === 'light' ? 'stroke-white' : ''} />
                             </Button>
                             <Button variant="ghost hover:none" size="icon" className={"h-8 w-8"} onClick={toggleTheme}>
-                                {theme === 'light' ? <Moon size={20} className="stroke-white"/> : <Sun size={20} />}
+                                {/*{theme === 'light' ? <Moon size={20} className="stroke-white"/> : <Sun size={20} />}*/}
+                                <Moon size={20} className="block dark:hidden stroke-white"/>
+                                <Sun size={20} className="hidden dark:block stroke-white"/>
                             </Button>
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>

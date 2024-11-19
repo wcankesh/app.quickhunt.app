@@ -291,6 +291,9 @@ const UpdateIdea = () => {
             setSelectedIdea({...selectedIdea, [name]: value})
         }
         let formData = new FormData();
+        if (name === "roadmap_id" && value === null) {
+            value = "";
+        }
         formData.append(name, value);
         const data = await apiSerVice.updateIdea(formData, selectedIdea.id)
         if (data.status === 200) {
@@ -570,7 +573,8 @@ const UpdateIdea = () => {
         formData.append('title', selectedIdea.title);
         formData.append('board', selectedIdea.board);
         formData.append('slug_url', selectedIdea.title ? selectedIdea.title.replace(/ /g, "-").replace(/\?/g, "-") : "");
-        formData.append('description', selectedIdea.description?.trim() === '' ? "" : selectedIdea.description);
+        // formData.append('description', selectedIdea.description?.trim() === '' ? "" : selectedIdea.description);
+        formData.append('description', selectedIdea.description ? selectedIdea.description : "");
         formData.append('topic', topics.join(","));
         const data = await apiSerVice.updateIdea(formData, selectedIdea.id)
         if (data.status === 200) {

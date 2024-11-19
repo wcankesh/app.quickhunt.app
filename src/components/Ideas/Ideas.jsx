@@ -255,10 +255,16 @@ const Ideas = () => {
             if (data.status === 200) {
                 const filteredIdeas = ideasList.filter((idea) => idea.id !== id);
                 setIdeasList(filteredIdeas);
+                setTotalRecord(Number(totalRecord) - 1)
+                if (filteredIdeas.length === 0 && pageNo > 1) {
+                    setPageNo(pageNo - 1);
+                    getAllIdea(pageNo - 1);
+                } else {
+                    getAllIdea(pageNo);
+                }
                 setOpenDelete(false)
                 setDeleteIsLoading(false)
                 setDeleteRecord(null)
-                setTotalRecord(Number(totalRecord) - 1)
                 toast({description: data.message});
             } else {
                 toast({variant: "destructive", description: data.message});
@@ -332,15 +338,15 @@ const Ideas = () => {
                                                     {(topicLists || []).map((x, i) => {
                                                         return (
                                                             <CommandItem key={i} value={x.id} className={"p-0 flex gap-1 items-center cursor-pointer"}>
-                                                                <Checkbox
-                                                                    className={'m-2'}
-                                                                    checked={filter.topic.includes(x.id)}
-                                                                    onClick={() => {
-                                                                        handleChange({name: "topic" , value: x.id});
-                                                                        setOpenFilter(true);
-                                                                        setOpenFilterType('topic');
-                                                                    }}
-                                                                />
+                                                                    <Checkbox
+                                                                        className={'m-2'}
+                                                                        checked={filter.topic.includes(x.id)}
+                                                                        onClick={() => {
+                                                                            handleChange({name: "topic" , value: x.id});
+                                                                            setOpenFilter(true);
+                                                                            setOpenFilterType('topic');
+                                                                        }}
+                                                                    />
                                                                 <span
                                                                     onClick={() => {
                                                                         handleChange({name: "topic" , value: x.id});

@@ -608,7 +608,7 @@ return (
                         <BreadcrumbItem className={"cursor-pointer"}>
                             <BreadcrumbLink>
                                     <span
-                                        onClick={id === 'new' ? () => navigate(`${baseUrl}/widget/type`) : () => navigate(`${baseUrl}/widget`)}>
+                                        onClick={id === 'new' ? () => navigate(`${baseUrl}/widget/type`) : () => navigate(`${baseUrl}/widget?pageNo=${getPageNo}`)}>
                                     {type === 'embed' && 'Embed Widget'}
                                         {type === 'popover' && 'Popover Widget'}
                                         {type === 'modal' && 'Modal Widget'}
@@ -656,7 +656,7 @@ return (
                     <div className='QH-floating-trigger' onClick={onToggle} style={{
                         backgroundColor: widgetsSetting.launcher_icon_bg_color,
                         // left: widgetsSetting.launcher_position === 1 ? type === "popover" ? "40px" : 355 : "inherit",
-                        left: widgetsSetting.launcher_position === 1 ? type === "popover" ? "690px" : 355 : "inherit",
+                        left: widgetsSetting.launcher_position === 1 ? type === "popover" ? "690px" : 690 : "inherit",
                         right: widgetsSetting.launcher_position === 2 ? "40px" : "inherit",
                         position: type === "popover" ? "absolute" : "fixed"
                     }}>

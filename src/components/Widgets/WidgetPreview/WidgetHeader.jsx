@@ -57,7 +57,8 @@ const WidgetHeader = ({widgetsSetting, selected, setSelected}) => {
                                 {
                                     projectDetailsReducer?.project_logo ? (
                                         <img
-                                            src={`https://code.quickhunt.app/public/storage/project/${projectDetailsReducer.project_logo}`}
+                                            // src={`https://code.quickhunt.app/public/storage/project/${projectDetailsReducer.project_logo}`}
+                                            src={projectDetailsReducer.project_logo}
                                             alt={projectDetailsReducer?.project_name}
                                             className="max-h-10"
                                         />

@@ -12,9 +12,9 @@ import {Carousel, CarouselContent, CarouselItem} from "../ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
 import {baseUrl} from "../../utils/constent";
 import {useNavigate} from "react-router-dom";
-import carousel_1 from "../../img/carousel1.png";
-import carousel_2 from "../../img/carousel2.png";
-import carousel_3 from "../../img/carousel3.png";
+import carousel_1 from "../../img/carousel11.png";
+import carousel_2 from "../../img/carousel22.png";
+import carousel_3 from "../../img/carousel33.png";
 
 const Forgot = () => {
     const {theme} = useTheme();

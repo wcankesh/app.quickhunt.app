@@ -254,7 +254,6 @@ const UpdateInAppMessage = () => {
             project_id: projectDetailsReducer.id,
             type: type
         }
-        debugger
         const data = await apiSerVice.createInAppMessage(payload);
 
         if (data.status === 200) {

@@ -169,29 +169,16 @@ const Profile = () => {
         setPasswordVisibility({...passwordVisibility, [fieldName]: !passwordVisibility[fieldName]});
     };
 
-    // const handleFileChange = (file) => {
-    //     setUserDetails({...userDetails, user_photo : file.target.files[0]});
-    // };
-
     const handleFileChange = (file) => {
         const selectedFile = file.target.files[0];
-        if (selectedFile) {
-            if (selectedFile.size > 5 * 1024 * 1024) { // 5 MB
-                setFormError(prevErrors => ({
-                    ...prevErrors,
-                    user_photo: 'Image size must be less than 5 MB.'
-                }));
-            } else {
-                setFormError(prevErrors => ({
-                    ...prevErrors,
-                    user_photo: ''
-                }));
-                setUserDetails({
-                    ...userDetails,
-                    user_photo: selectedFile
-                });
-            }
-        }
+        setUserDetails({
+            ...userDetails,
+            user_photo: selectedFile
+        });
+        setFormError(formError => ({
+            ...formError,
+            'user_photo': formValidate('user_photo', selectedFile)
+        }));
     };
 
     const onDeleteImg = async (name, value) => {
@@ -210,10 +197,6 @@ const Profile = () => {
                 validationErrors[name] = error;
             }
         });
-        setFormError(prevErrors => ({
-            ...prevErrors,
-            user_photo: ''
-        }));
         if (Object.keys(validationErrors).length > 0) {
             setFormError(validationErrors);
             return;
@@ -293,7 +276,7 @@ const Profile = () => {
                 </CardHeader>
                 <CardContent className={"py-4 px-4 sm:px-5 sm:py-4 border-b"}>
                     <div className={"flex gap-4 flex-wrap lg:flex-nowrap md:flex-nowrap sm:flex-wrap"}>
-                        <div className="flex justify-center mt-2 relative">
+                        <div className="flex flex-col justify-center mt-2 relative">
                             {
                                 userDetails?.user_photo ?
                                     <div>
@@ -337,9 +320,9 @@ const Profile = () => {
                                         >
                                             <Upload className="h-4 w-4 text-muted-foreground" />
                                         </label>
-                                        {formError.user_photo && <div className={"text-xs text-destructive"}>{formError.user_photo}</div>}
                                     </div>
                             }
+                                        {formError.user_photo && <div className={"text-xs text-destructive"}>{formError.user_photo}</div>}
                         </div>
 
                         <div className={"flex flex-col gap-4 w-full sm:w-full"}>

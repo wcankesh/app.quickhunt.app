@@ -84,30 +84,6 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
         }));
     };
 
-    //old code
-    // const onDateChange = (name, date) => {
-    //     if (date) {
-    //         let obj = {...inAppMsgSetting, [name]: date};
-    //         setInAppMsgSetting(obj);
-    //     }
-    //     setFormError(formError => ({
-    //         ...formError,
-    //         [name]: formValidate(name, date)
-    //     }));
-    // };
-
-    // const handleDateChange = (date, type) => {
-    //     const newDate = moment(date).toISOString();
-    //     setInAppMsgSetting({
-    //         ...inAppMsgSetting,
-    //         [type]: newDate
-    //     });
-    //     setFormError(formError => ({
-    //         ...formError,
-    //         [type]: formValidate(type, newDate)
-    //     }));
-    // };
-
     const handleDateChange = (date, type) => {
         const newDate = moment(date).toISOString();
         const isFutureDate = date > new Date();
@@ -188,7 +164,6 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
             project_id: projectDetailsReducer.id,
             type: type
         }
-        debugger
         const data = await apiSerVice.createInAppMessage(payload);
         if (data.status === 200) {
             setIsLoading(false);
@@ -364,7 +339,7 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                                     <SelectContent>
                                         <SelectItem value={1}>Text</SelectItem>
                                         <SelectItem value={2}>Reaction</SelectItem>
-                                        <SelectItem value={3}>None</SelectItem>
+                                        <SelectItem value={null}>None</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>

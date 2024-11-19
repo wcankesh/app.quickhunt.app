@@ -342,7 +342,7 @@ const Surveys = ({inAppMsgSetting, setInAppMsgSetting, selectedStepIndex, setSel
                                                                 {x?.options.map((option, index) => (
                                                                     option.is_active === 1 &&
                                                                     <SelectItem className={`${theme === "dark" ? "focus:bg-card-foreground" : ""}`} key={index} value={index}>
-                                                                        <span className={"max-w-[270px] truncate text-ellipsis overflow-hidden whitespace-nowrap"}>
+                                                                        <span className={"block max-w-[300px] overflow-hidden whitespace-nowrap text-ellipsis"}>
                                                                             {option.title}
                                                                         </span>
                                                                     </SelectItem>

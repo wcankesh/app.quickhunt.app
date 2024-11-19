@@ -29,6 +29,8 @@ const initialState = {
 const initialStateError = {
     project_name: '',
     project_website: "",
+    project_logo: '',
+    project_favicon: '',
 }
 
 const Project = () => {
@@ -74,6 +76,18 @@ const Project = () => {
                 } else {
                     return "";
                 }
+            case "project_logo":
+                if (value && value.size > 5 * 1024 * 1024) { // 5 MB
+                    return "Image size must be less than 5 MB.";
+                } else {
+                    return "";
+                }
+            case "project_favicon":
+                if (value && value.size > 5 * 1024 * 1024) { // 5 MB
+                    return "Image size must be less than 5 MB.";
+                } else {
+                    return "";
+                }
             default: {
                 return "";
             }
@@ -88,6 +102,46 @@ const Project = () => {
         }));
     };
 
+    const handleFileChange = (file) => {
+        const selectedFile = file.target.files[0];
+        setCreateProjectDetails({
+            ...createProjectDetails,
+            project_logo: selectedFile
+        });
+        setFormError(formError => ({
+            ...formError,
+            'project_logo': formValidate('project_logo', selectedFile)
+        }));
+    };
+
+    const handleFileChangeFav = (file) => {
+        const selectedFile = file.target.files[0];
+        setCreateProjectDetails({
+            ...createProjectDetails,
+            project_favicon: selectedFile
+        });
+        setFormError(formError => ({
+            ...formError,
+            'project_favicon': formValidate('project_favicon', selectedFile)
+        }));
+    };
+
+    const onDeleteImgLogo = async (name, value) => {
+        if(createProjectDetails && createProjectDetails?.project_logo && createProjectDetails.project_logo?.name){
+            setCreateProjectDetails({...createProjectDetails, project_logo: ""})
+        } else {
+            setCreateProjectDetails({...createProjectDetails, [name]: value, project_logo: ""})
+        }
+    }
+
+    const onDeleteImgFav = async (name, value) => {
+        if(createProjectDetails && createProjectDetails?.project_favicon && createProjectDetails.project_favicon?.name){
+            setCreateProjectDetails({...createProjectDetails, project_favicon: ""})
+        } else {
+            setCreateProjectDetails({...createProjectDetails, [name]: value, project_favicon: ""})
+        }
+    }
+
     const updateProjects = async (record) =>{
         let validationErrors = {};
         Object.keys(createProjectDetails).forEach(name => {
@@ -96,6 +150,7 @@ const Project = () => {
                 validationErrors[name] = error;
             }
         });
+
         if (Object.keys(validationErrors).length > 0) {
             setFormError(validationErrors);
             return;
@@ -125,29 +180,6 @@ const Project = () => {
                 description: data.message,
                 variant: "destructive"
             })
-        }
-    }
-
-    const handleFileChange =(file)=>{
-        setCreateProjectDetails({...createProjectDetails, project_logo: file.target.files[0]})
-    }
-    const handleFileChangeFav =(file)=>{
-        setCreateProjectDetails({...createProjectDetails, project_favicon: file.target.files[0]})
-    }
-
-    const onDeleteImgLogo = async (name, value) => {
-        if(createProjectDetails && createProjectDetails?.project_logo && createProjectDetails.project_logo?.name){
-            setCreateProjectDetails({...createProjectDetails, project_logo: ""})
-        } else {
-            setCreateProjectDetails({...createProjectDetails, [name]: value, project_logo: ""})
-        }
-    }
-
-    const onDeleteImgFav = async (name, value) => {
-        if(createProjectDetails && createProjectDetails?.project_favicon && createProjectDetails.project_favicon?.name){
-            setCreateProjectDetails({...createProjectDetails, project_favicon: ""})
-        } else {
-            setCreateProjectDetails({...createProjectDetails, [name]: value, project_favicon: ""})
         }
     }
 
@@ -208,7 +240,8 @@ const Project = () => {
                 <h3 className={"text-base font-normal"}>Edit Images</h3>
                 <div className="w-full items-center ">
                     <div className={"flex flex-wrap sm:flex-nowrap gap-4 gap-x-[94px]"}>
-                        <div className={"flex gap-2"}>
+                        <div className={"space-y-2"}>
+                            <div className={"flex gap-2"}>
                             <div className="w-[50px] h-[50px] relative">
                                 <div className="flex gap-2 basis-1/2 items-center justify-center">
                                     {
@@ -267,7 +300,10 @@ const Project = () => {
                                 <h4 className={"text-sm font-normal"}>Logo</h4>
                                 <p className={"text-xs font-normal text-muted-foreground"}>50px By 50px</p>
                             </div>
+                            </div>
+                            {formError.project_logo && <div className={"text-xs text-destructive"}>{formError.project_logo}</div>}
                         </div>
+                        <div className={"space-y-2"}>
                         <div className={"flex gap-2"}>
                             {
                                 createProjectDetails?.project_favicon ?
@@ -321,6 +357,8 @@ const Project = () => {
                                 <h4 className={"text-sm font-normal"}>Favicon</h4>
                                 <p className={"text-xs font-normal text-muted-foreground"}>64px By 64px</p>
                             </div>
+                        </div>
+                            {formError.project_favicon && <div className={"text-xs text-destructive"}>{formError.project_favicon}</div>}
                         </div>
                     </div>
                 </div>

@@ -5,6 +5,7 @@ import {Button} from "../ui/button";
 import {Textarea} from "../ui/textarea";
 import {useTheme} from "../theme-provider";
 import {Avatar, AvatarFallback, AvatarImage} from "../ui/avatar";
+import {Icon} from "../../utils/Icon";
 
 export const CommentEditor = ({isEditMode, comment, images = [], onUpdateComment, onCancelComment, onDeleteImage, onImageClick, onImageUpload, onCommentChange, isSaving, idImageUpload = '',}) => {
     const {theme} = useTheme();
@@ -207,3 +208,37 @@ export const StatusButtonGroup = ({statusButtons = [], onChangeStatus,}) => {
         </div>
     );
 };
+
+export const FileUpload = ({ label, id, file, onDelete, onChange, error }) => (
+    <div className="space-y-2">
+        <div className="flex gap-2">
+            {file ? (
+                <div className="h-[50px] w-[50px] relative border rounded-lg">
+                    <img
+                        className="h-full w-full rounded-md object-cover"
+                        src={file.name ? URL.createObjectURL(file) : file}
+                        alt=""
+                    />
+                    <CircleX
+                        size={20}
+                        className="absolute top-[-10px] right-[-10px] cursor-pointer"
+                        onClick={onDelete}
+                    />
+                </div>
+            ) : (
+                <label htmlFor={id} className="flex w-[50px] bg-muted h-[50px] justify-center items-center rounded cursor-pointer">
+                    {Icon.editImgLogo}
+                </label>
+            )}
+            <input
+                id={id}
+                type="file"
+                className="hidden"
+                accept="image/*"
+                onChange={onChange}
+            />
+        </div>
+        {error && <div className="text-xs text-destructive">{error}</div>}
+    </div>
+);
+

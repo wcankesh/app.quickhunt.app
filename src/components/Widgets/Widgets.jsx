@@ -44,7 +44,7 @@ const Widgets = () => {
     const [selectedId, setSelectedId] = useState("");
     const [selectedType, setSelectedType] = useState("");
     const [deleteRecord, setDeleteRecord] = useState(null);
-    const [pageNo, setPageNo] = useState(1);
+    const [pageNo, setPageNo] = useState(Number(getPageNo));
     const [totalRecord, setTotalRecord] = useState(0);
 
     const openSheet = (id) => {
@@ -109,6 +109,12 @@ const Widgets = () => {
             if (index !== -1) {
                 clone.splice(index, 1)
                 setWidgetsSetting(clone);
+                if (clone.length === 0 && pageNo > 1) {
+                    setPageNo(pageNo - 1);
+                    getWidgetsSetting(pageNo - 1);
+                } else {
+                    getWidgetsSetting(pageNo);
+                }
                 setOpenDelete(false);
                 setDeleteIsLoading(false);
                 toast({description: data.message});

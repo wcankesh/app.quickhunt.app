@@ -1,7 +1,7 @@
 import React, {Fragment, useState, useEffect} from 'react';
 import {Sheet, SheetContent, SheetHeader, SheetOverlay} from "../ui/sheet";
 import {Button} from "../ui/button";
-import {ArrowBigUp, Check, Circle, CircleX, Dot, Loader2, MessageCircleMore, Paperclip, Pencil, Pin, Trash2, Upload, X} from "lucide-react";
+import {ArrowBigUp, Check, Circle, CircleX, Dot, Loader2, MessageCircleMore, Paperclip, Pencil, Pin, Trash2, X} from "lucide-react";
 import {RadioGroup, RadioGroupItem} from "../ui/radio-group";
 import {Label} from "../ui/label";
 import {Input} from "../ui/input";
@@ -319,6 +319,9 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
             setSelectedIdea({...selectedIdea, [name]: value})
         }
         let formData = new FormData();
+        if (name === "roadmap_id" && value === null) {
+            value = "";
+        }
         formData.append(name, value);
         const data = await apiSerVice.updateIdea(formData, selectedIdea?.id)
         if (data.status === 200) {
@@ -648,7 +651,6 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
     }
 
     const onCreateIdea = async () => {
-        setIsLoadingCreateIdea(true)
         let validationErrors = {};
         Object.keys(selectedIdea).forEach(name => {
             const error = formValidate(name, selectedIdea[name]);
@@ -660,6 +662,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
             setFormError(validationErrors);
             return;
         }
+        setIsLoadingCreateIdea(true)
         let formData = new FormData();
         let topics = [];
 
@@ -669,7 +672,8 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
         formData.append('title', selectedIdea?.title);
         formData.append('board', selectedIdea.board);
         formData.append('slug_url', selectedIdea?.title ? selectedIdea?.title.replace(/ /g, "-").replace(/\?/g, "-") : "");
-        formData.append('description', selectedIdea?.description?.trim() === '' ? "" : selectedIdea?.description);
+        // formData.append('description', selectedIdea?.description?.trim() === '' ? "" : selectedIdea?.description);
+        formData.append('description', selectedIdea.description ? selectedIdea.description : "");
         formData.append('topic', topics.join(","));
         const data = await apiSerVice.updateIdea(formData, selectedIdea?.id)
         if (data.status === 200) {
@@ -1050,15 +1054,15 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                                 </Button> : ""
                                                         }
 
-                                                        <Button
-                                                            variant={"outline"}
-                                                            className={`w-[30px] h-[30px] p-1`}
-                                                            onClick={() => onChangeStatus("pin_to_top", selectedIdea?.pin_to_top === 0 ? 1 : 0)}
-                                                        >
-                                                            {selectedIdea?.pin_to_top == 0 ?
-                                                                <Pin size={16}/> :
-                                                                <Pin size={16} className={`${theme === "dark" ? "fill-card-foreground" : "fill-card-foreground"}`}/>}
-                                                        </Button>
+                                                        {/*<Button*/}
+                                                        {/*    variant={"outline"}*/}
+                                                        {/*    className={`w-[30px] h-[30px] p-1`}*/}
+                                                        {/*    onClick={() => onChangeStatus("pin_to_top", selectedIdea?.pin_to_top === 0 ? 1 : 0)}*/}
+                                                        {/*>*/}
+                                                        {/*    {selectedIdea?.pin_to_top == 0 ?*/}
+                                                        {/*        <Pin size={16}/> :*/}
+                                                        {/*        <Pin size={16} className={`${theme === "dark" ? "fill-card-foreground" : "fill-card-foreground"}`}/>}*/}
+                                                        {/*</Button>*/}
                                                         {/*<Button*/}
                                                         {/*    variant={"outline"}*/}
                                                         {/*    className={"w-[30px] h-[30px] p-1"}*/}

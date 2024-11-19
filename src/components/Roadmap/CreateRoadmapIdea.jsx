@@ -191,7 +191,7 @@ const CreateRoadmapIdea = ({isOpen, onOpen, onClose, closeCreateIdea, selectedRo
                                 <div className={"px-4 py-3 lg:py-6 lg:px-8 border-b space-y-2"}>
                                     <Label className={"font-normal capitalize"}>Choose Topics for this Idea (optional)</Label>
                                     <Select onValueChange={handleChange} value={selectedValues}>
-                                        <SelectTrigger className="">
+                                        <SelectTrigger className="bg-card">
                                             <SelectValue className={"text-muted-foreground text-sm"} placeholder="Assign to">
                                                 <div className={"flex gap-[2px]"}>
                                                     {

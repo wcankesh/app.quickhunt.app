@@ -5,9 +5,9 @@ import {Label} from "../ui/label"
 import {useNavigate} from "react-router-dom"
 import {Carousel, CarouselContent, CarouselItem} from "../ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
-import carousel_1 from "../../img/carousel1.png";
-import carousel_2 from "../../img/carousel2.png";
-import carousel_3 from "../../img/carousel3.png";
+import carousel_1 from "../../img/carousel11.png";
+import carousel_2 from "../../img/carousel22.png";
+import carousel_3 from "../../img/carousel33.png";
 import {Icon} from "../../utils/Icon";
 import {ApiService} from "../../utils/ApiService";
 import {baseUrl} from "../../utils/constent";
