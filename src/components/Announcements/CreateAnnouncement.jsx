@@ -240,6 +240,13 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
             return;
         }
 
+        if (
+            changeLogDetails.post_expired_boolean === 1 &&
+            !changeLogDetails.post_expired_at
+        ) {
+            changeLogDetails.post_expired_boolean = 0;
+        }
+
         setIsSave(true)
         let formData = new FormData();
         formData.append("post_project_id", projectDetailsReducer.id);

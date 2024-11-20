@@ -84,9 +84,9 @@ const ReadMoreText = ({ html, maxLength = 100, onTextClick }) => {
     const [isExpanded, setIsExpanded] = useState(false);
 
     // Strip HTML tags to get the plain text content
-    const textContent = html.replace(/<[^>]*>/g, ''); // Remove HTML tags
-    const isTruncated = textContent.length > maxLength;
-    const truncatedText = isTruncated ? textContent.slice(0, maxLength) : textContent;
+    const textContent = html?.replace(/<[^>]*>/g, ''); // Remove HTML tags
+    const isTruncated = textContent?.length > maxLength;
+    const truncatedText = isTruncated ? textContent?.slice(0, maxLength) : textContent;
 
     return (
         <div className="break-words">

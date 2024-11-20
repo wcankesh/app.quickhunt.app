@@ -300,36 +300,69 @@ const HeaderBar = () => {
         setIsOpenDeleteAlert(true);
     }
 
+    //old code
+    // const onDelete = async () => {
+    //     setDeleteIsLoading(true)
+    //     const data = await apiSerVice.deleteProjects(projectDetailsReducer.id)
+    //     if(data.status === 200){
+    //         const cloneProject = [...allProjectReducer.projectList]
+    //         const index = cloneProject.findIndex((x) => x.id === projectDetailsReducer.id)
+    //         if (index !== -1) {
+    //             cloneProject.splice(index, 1);
+    //             const nextProject = cloneProject[0] || null;
+    //
+    //             if (nextProject) {
+    //                 setProjectDetails(nextProject);
+    //                 dispatch(projectDetailsAction(nextProject));
+    //             } else {
+    //                 setProjectDetails(null);
+    //                 dispatch(projectDetailsAction(null));
+    //             }
+    //
+    //             dispatch(allProjectAction({ projectList: cloneProject })); // Update the project list in Redux
+    //         }
+    //         setDeleteIsLoading(false)
+    //         setIsOpenDeleteAlert(false)
+    //         toast({description: data.message})
+    //         setTimeout(() => {
+    //             history.push('/')
+    //         },2000)
+    //     } else {
+    //
+    //     }
+    // }
+
     const onDelete = async () => {
-        setDeleteIsLoading(true)
-        const data = await apiSerVice.deleteProjects(projectDetailsReducer.id)
-        if(data.status === 200){
-            const cloneProject = [...allProjectReducer.projectList]
-            const index = cloneProject.findIndex((x) => x.id === projectDetailsReducer.id)
-            if (index !== -1) {
-                cloneProject.splice(index, 1);
-                const nextProject = cloneProject[0] || null;
+        setDeleteIsLoading(true);
+        const data = await apiSerVice.deleteProjects(projectDetailsReducer.id);
 
-                if (nextProject) {
-                    setProjectDetails(nextProject);
-                    dispatch(projectDetailsAction(nextProject));
-                } else {
-                    setProjectDetails(null);
-                    dispatch(projectDetailsAction(null));
-                }
-
-                dispatch(allProjectAction({ projectList: cloneProject })); // Update the project list in Redux
+        if (data.status === 200) {
+            const updatedProjects = allProjectReducer.projectList.filter(
+                (project) => project.id !== projectDetailsReducer.id
+            );
+            const nextProject = updatedProjects[0] || null;
+            if (nextProject) {
+                setProjectDetails(nextProject);
+                dispatch(projectDetailsAction(nextProject));
+            } else {
+                setProjectDetails(null);
+                dispatch(projectDetailsAction(null));
             }
-            setDeleteIsLoading(false)
-            setIsOpenDeleteAlert(false)
-            toast({description: data.message})
+            dispatch(allProjectAction({ projectList: updatedProjects }));
+            setProjectList(updatedProjects);
+            setDeleteIsLoading(false);
+            setIsOpenDeleteAlert(false);
+            toast({ description: data.message });
             setTimeout(() => {
-                history.push('/')
-            },2000)
+                history.push('/');
+            }, 2000);
         } else {
-
+            setDeleteIsLoading(false);
+            toast({ variant: 'destructive', description: 'Failed to delete the project.' });
         }
-    }
+    };
+
+
 
     const isActive = (link, subLink ="", subLink2 = "") => {
         return  window.location.pathname === subLink2 || window.location.pathname === subLink || window.location.pathname === link ;

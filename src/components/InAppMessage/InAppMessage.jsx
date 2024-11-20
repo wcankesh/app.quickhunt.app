@@ -126,7 +126,7 @@ const InAppMessage = () => {
         });
         if(data.status === 200) {
             setMessageList(data.data);
-            setTotalRecord(data.total || 1);
+            setTotalRecord(data.total || 0);
         }
         setIsLoading(false);
     }

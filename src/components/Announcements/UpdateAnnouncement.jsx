@@ -205,6 +205,10 @@ const UpdateAnnouncement = () => {
                 } else {
                     obj = {...obj, post_status: 1}
                 }
+                // if (selectedRecord.post_expired_at) {
+                //     obj = { ...obj, post_expired_at: null };
+                // }
+                obj = { ...obj, post_expired_at: null, post_expired_boolean: 0 };
             }
             setSelectedRecord(obj);
             setPopoverOpen(false);
@@ -224,6 +228,14 @@ const UpdateAnnouncement = () => {
             setFormError(validationErrors);
             return;
         }
+
+        if (
+            selectedRecord.post_expired_boolean === 1 &&
+            !selectedRecord.post_expired_at
+        ) {
+            selectedRecord.post_expired_boolean = 0;
+        }
+
         setIsLoad(loader)
         let formData = new FormData();
         formData.append("post_project_id", projectDetailsReducer.id);
