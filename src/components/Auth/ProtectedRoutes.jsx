@@ -9,6 +9,9 @@ const ProtectedRoutes = () => {
     const userDetailsReducer = useSelector(state => state.userDetailsReducer);
    useEffect(() => {
        if(Token){
+           document.querySelectorAll(".quickhunt").forEach((x) => {
+               x.innerHTML = ""
+           })
            removeProjectDetails()
            logout()
        }

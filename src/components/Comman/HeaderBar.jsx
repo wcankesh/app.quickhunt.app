@@ -175,6 +175,9 @@ const HeaderBar = () => {
     };
 
     const onLogout = async () => {
+        document.querySelectorAll(".quickhunt").forEach((x) => {
+            x.innerHTML = ""
+        })
         logout();
         removeProjectDetails();
         setTheme("light")
