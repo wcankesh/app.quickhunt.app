@@ -52,8 +52,13 @@ const WidgetPreview = ({widgetsSetting, type, toggle,onToggle }) => {
                 type === "popover" &&
                 <div className={`QH-popover ${toggle ? "QH-popover-open" : ""}`} style={{
                     // left: widgetsSetting.launcher_position === 1 ? "40px" : "inherit",
-                    left: widgetsSetting.launcher_position === 1 ? "690px" : "inherit",
-                    right: widgetsSetting.launcher_position === 2 ? "40px" : "inherit",
+                    left: (widgetsSetting.launcher_position === 1)
+                        ? (type === "popover" ? `${widgetsSetting.launcher_left_spacing || 20}px` : `${widgetsSetting.launcher_left_spacing || 690}px`)
+                        : "inherit",
+                    right: (widgetsSetting.launcher_position === 2)
+                        ? `${widgetsSetting.launcher_right_spacing || 20}px`
+                        : "inherit",
+                    bottom: (widgetsSetting.launcher_bottom_spacing) ? `${widgetsSetting.launcher_bottom_spacing || "20"}px` : "inherit",
                     width: `${widgetsSetting.popover_width}px`, height: `${widgetsSetting.popover_height}px`
                 }}>
                     {renderContent()}

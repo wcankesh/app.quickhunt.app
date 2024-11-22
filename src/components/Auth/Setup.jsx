@@ -67,7 +67,7 @@ const Setup = () => {
                 </div>
                 <div className={"mt-2.5"}>
                     <Card>
-                        <CardContent className={"p-3 md:p-6 flex justify-between items-center"}>
+                        <CardContent className={"p-3 md:p-6 flex justify-between items-center flex-wrap gap-2"}>
                             <div className={"flex gap-3 items-center"}>
                                 <div>
                                     <Avatar className={"w-[50px] h-[50px]"}>

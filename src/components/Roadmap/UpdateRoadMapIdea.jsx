@@ -243,13 +243,6 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
 
     const handleFeatureImgUpload = async (event) => {
         const file = event.target?.files[0];
-        // if (file && file.size > 5 * 1024 * 1024) {
-        //     toast({
-        //         variant: "destructive",
-        //         description: "The cover image field must be 5 MB or less."
-        //     });
-        //     return;
-        // }
         setSelectedIdea({...selectedIdea, cover_image: file})
         let formData = new FormData();
         formData.append("cover_image", file);
@@ -260,8 +253,10 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
             if (roadmapIndex !== -1) {
                 let clone = [...cloneRoadmap[roadmapIndex].ideas];
                 const ideaIndex = clone.findIndex((x) => x.id === selectedIdea?.id)
-                clone[ideaIndex] = data.data
-                cloneRoadmap[roadmapIndex] = {...cloneRoadmap[roadmapIndex], ideas: clone, cards: clone};
+                if (ideaIndex !== -1) {
+                    clone[ideaIndex] = data.data
+                    cloneRoadmap[roadmapIndex] = {...cloneRoadmap[roadmapIndex], ideas: clone, cards: clone};
+                }
             }
             setRoadmapList({columns: cloneRoadmap})
             setIsLoading(false)

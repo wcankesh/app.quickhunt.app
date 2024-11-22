@@ -238,7 +238,7 @@ const Surveys = ({inAppMsgSetting, setInAppMsgSetting, selectedStepIndex, setSel
                                                         ))
                                                     }
                                                 </div>
-                                                <div className={"flex justify-between mt-[18px]"}>
+                                                <div className={"flex justify-between gap-4 mt-[18px]"}>
                                                     <h5 className={"text-xs font-normal"}>{x?.start_label}</h5>
                                                     <h5 className={"text-xs font-normal"}>{x?.end_label}</h5>
                                                 </div>
@@ -248,14 +248,14 @@ const Surveys = ({inAppMsgSetting, setInAppMsgSetting, selectedStepIndex, setSel
                                             x?.question_type === 2 &&
                                             <Fragment>
                                                 <div
-                                                    className={"flex justify-center gap-3 px-[30px] pt-[18px]"}>
+                                                    className={"flex justify-center flex-wrap gap-3 px-[30px] pt-[18px]"}>
                                                     {
                                                         renderNumber(x).map(num => (
                                                             <Button key={num} variant={"outline"} className={`${theme === "dark" ? "bg-card-foreground hover:bg-card-foreground hover:text-muted" : ""} w-5 h-5 text-xs p-0`}>{num}</Button>
                                                         ))
                                                     }
                                                 </div>
-                                                <div className={"flex justify-between mt-[18px]"}>
+                                                <div className={"flex justify-between gap-4 mt-[18px]"}>
                                                     <h5 className={"text-xs font-normal"}>{x?.start_label}</h5>
                                                     <h5 className={"text-xs font-normal"}>{x?.end_label}</h5>
                                                 </div>

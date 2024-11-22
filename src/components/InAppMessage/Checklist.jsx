@@ -98,10 +98,9 @@ const checklists = ({inAppMsgSetting, setInAppMsgSetting, isLoading, selectedSte
             <div className={"flex justify-center"}>
                 <div className={`max-w-[450px] mx-auto w-full rounded-[10px] pt-4 pb-6`} style={{backgroundColor:inAppMsgSetting.bg_color}}>
                     <div className={"flex justify-between items-center px-4 gap-2"}>
-                        <ArrowLeft size={16} className={`${theme === "dark" ? "stroke-muted" : ""}`}/>
                         <Input placeholder={"checklists title"}
                                value={inAppMsgSetting.checklist_title}
-                               style={{backgroundColor:inAppMsgSetting.bg_color}}
+                               style={{backgroundColor:inAppMsgSetting.bg_color, color: inAppMsgSetting.text_color}}
                                onChange={(event) => onChange("checklist_title", event.target.value)}
                                className={"w-full text-center border-none p-0 h-auto focus-visible:ring-offset-0 focus-visible:ring-0 text-xl font-normal"}
                         />
@@ -109,7 +108,7 @@ const checklists = ({inAppMsgSetting, setInAppMsgSetting, isLoading, selectedSte
                     <div className={"flex flex-col justify-between items-center px-4 mt-3 gap-3"}>
                         <Input placeholder={"checklists description (optional)"}
                                value={inAppMsgSetting.checklist_description}
-                               style={{backgroundColor:inAppMsgSetting.bg_color}}
+                               style={{backgroundColor:inAppMsgSetting.bg_color, color: inAppMsgSetting.text_color}}
                                onChange={(event) => onChange("checklist_description", event.target.value)}
                                className={"w-full text-center text-sm border-none p-0 h-auto focus-visible:ring-offset-0 focus-visible:ring-0 font-normal"}
                         />
@@ -120,7 +119,7 @@ const checklists = ({inAppMsgSetting, setInAppMsgSetting, isLoading, selectedSte
                                         userDetailsReducer?.user_photo ?
                                             <AvatarImage src={userDetailsReducer?.user_photo} alt="@shadcn"/>
                                             :
-                                            <AvatarFallback className={`${theme === "dark" ? "bg-card-foreground text-card" : ""} text-xs`}>
+                                            <AvatarFallback className={`${theme === "dark" ? "bg-card-foreground text-card" : ""} text-xs`}  style={{color: inAppMsgSetting.text_color}}>
                                                 {userDetailsReducer && userDetailsReducer?.user_first_name && userDetailsReducer?.user_first_name.substring(0, 1)}
                                                 {userDetailsReducer && userDetailsReducer?.user_last_name && userDetailsReducer?.user_last_name?.substring(0, 1)}
                                             </AvatarFallback>
@@ -128,8 +127,8 @@ const checklists = ({inAppMsgSetting, setInAppMsgSetting, isLoading, selectedSte
                                 </Avatar>
                                 <div className={""}>
                                     <div className={"flex flex-row gap-1"}>
-                                        <h5 className={`text-xs font-normal text-muted-foreground`}>{userDetailsReducer?.user_first_name} {userDetailsReducer?.user_last_name}</h5>
-                                        <h5 className={`text-xs font-normal text-muted-foreground`}>from {projectDetailsReducer?.project_name}</h5>
+                                        <h5 className={`text-xs font-normal text-muted-foreground`} style={{color: inAppMsgSetting.text_color}}>{userDetailsReducer?.user_first_name} {userDetailsReducer?.user_last_name}</h5>
+                                        <h5 className={`text-xs font-normal text-muted-foreground`} style={{color: inAppMsgSetting.text_color}}>from {projectDetailsReducer?.project_name}</h5>
                                     </div>
                                 </div>
                             </div> : ""
@@ -138,8 +137,8 @@ const checklists = ({inAppMsgSetting, setInAppMsgSetting, isLoading, selectedSte
 
                     <div className={"px-6 pt-8"}>
                         <div className={"flex justify-between"}>
-                            <h5 className={`text-xs font-normal ${theme === "dark" ? "text-muted" : "text-muted-foreground"}`}>{(inAppMsgSetting?.checklists || []).filter((x) =>x.is_active === 1).length} steps</h5>
-                            <h5 className={`text-xs font-normal ${theme === "dark" ? "text-muted" : "text-muted-foreground"}`}>1 of {(inAppMsgSetting?.checklists || []).filter((x) =>x.is_active === 1).length} step</h5>
+                            <h5 className={`text-xs font-normal ${theme === "dark" ? "text-muted" : "text-muted-foreground"}`} style={{color: inAppMsgSetting.text_color}}>{(inAppMsgSetting?.checklists || []).filter((x) =>x.is_active === 1).length} steps</h5>
+                            <h5 className={`text-xs font-normal ${theme === "dark" ? "text-muted" : "text-muted-foreground"}`} style={{color: inAppMsgSetting.text_color}}>1 of {(inAppMsgSetting?.checklists || []).filter((x) =>x.is_active === 1).length} step</h5>
                         </div>
                         <Progress value={0} className={`${theme === "dark" ? "bg-card-foreground" : ""} w-full mt-[6px] mb-3 h-2`}/>
                         <Card className={"rounded-[10px] gap-4 px-4 pb-6 pt-4 flex flex-col"}>
@@ -171,7 +170,7 @@ const checklists = ({inAppMsgSetting, setInAppMsgSetting, isLoading, selectedSte
                                                         onChange={(newData) => handleEditorChange(i, newData)}
                                                     />
                                                     {/*<Editor id={`checklists-${i}`} blocks={x.description} onChange={(e) => onChangeChecklists("description", e, x)} />*/}
-                                                    {selectedStep?.action_type === 1 && <Button style={{backgroundColor:inAppMsgSetting.btn_color,  color: inAppMsgSetting.text_color}} className={"mt-2"}>{selectedStep?.action_text}</Button>}
+                                                    {selectedStep?.action_type === 1 && <Button style={{backgroundColor:inAppMsgSetting.btn_color,  color: inAppMsgSetting.btn_text_color}} className={"mt-2"}>{selectedStep?.action_text}</Button>}
                                                 </div>
                                             </CollapsibleContent>
                                         </Collapsible>

@@ -21,6 +21,7 @@ import {Checkbox} from "../ui/checkbox";
 const initialStateError = {
     start_at: undefined,
     end_at: undefined,
+    from: "",
 }
 
 const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, selectedStepIndex, setSelectedStepIndex, selectedStep, setSelectedStep}) => {
@@ -35,7 +36,15 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
     const [formError, setFormError] = useState(initialStateError);
 
     const onChange = (name, value) => {
-        setInAppMsgSetting({...inAppMsgSetting, [name]: value});
+        const update = {...inAppMsgSetting, [name]: value}
+        if(name === "show_sender" && value === 0) {
+            update.from = "";
+        }
+        setInAppMsgSetting(update);
+        setFormError(formError => ({
+            ...formError,
+            [name]: formValidate(name, value)
+        }));
     };
 
     const onChangeAddOption = (index, value) => {
@@ -106,34 +115,37 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
         }));
     };
 
-
     const formValidate = (name, value) => {
+        const trimmedValue = typeof value === "string" ? value.trim() : String(value || "").trim();
         switch (name) {
+            case "from":
+                if (inAppMsgSetting.show_sender === 1) {
+                    return "Sender is required.";
+                }
+                else {
+                    return ""
+                }
+                return "";
             case "start_at":
-                if (!value || value.trim() === "") {
+                if (!trimmedValue) {
                     return "Start Date is required.";
                 }
                 return "";
-            case "end_at":
-                if (!value || value.trim() === "") {
-                    return "End Date is required.";
-                }
-                return "";
             case "start_time":
-                if (!value || value.trim() === "") {
+                if (!trimmedValue) {
                     return "Start Time is required.";
                 }
                 const startTimeFormat = /^([01]?[0-9]|2[0-3]):([0-5]?[0-9])$/;
-                if (!startTimeFormat.test(value)) {
+                if (!startTimeFormat.test(trimmedValue)) {
                     return "Start Time must be in HH:mm format.";
                 }
                 return "";
             case "end_time":
-                if (!value || value.trim() === "") {
+                if (!trimmedValue) {
                     return "End Time is required.";
                 }
                 const endTimeFormat = /^([01]?[0-9]|2[0-3]):([0-5]?[0-9])$/;
-                if (!endTimeFormat.test(value)) {
+                if (!endTimeFormat.test(trimmedValue)) {
                     return "End Time must be in HH:mm format.";
                 }
                 return "";
@@ -151,6 +163,11 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                 validationErrors[name] = error;
             }
         });
+
+        // if (inAppMsgSetting.show_sender === 1 && !inAppMsgSetting.from) {
+        //     validationErrors["from"] = "Please select a member.";
+        // }
+
         if (Object.keys(validationErrors).length > 0) {
             setFormError(validationErrors);
             return;
@@ -186,6 +203,11 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                 validationErrors[name] = error;
             }
         });
+
+        // f (inAppMsgSetting.show_sender === 1 && !inAppMsgSetting.from) {
+        //     validationErrors["from"] = "Please select a member.";
+        // }i
+
         if (Object.keys(validationErrors).length > 0) {
             setFormError(validationErrors);
             return;
@@ -229,16 +251,48 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
     //     updateStepRecord(obj)
     // }
 
+    // const onChangeQuestion = (name, value) => {
+    //     const clone = [...inAppMsgSetting?.steps];
+    //     clone[selectedStepIndex] = {
+    //         ...clone[selectedStepIndex],
+    //         [name]: value
+    //     };
+    //     setInAppMsgSetting((prev) => ({
+    //         ...prev,
+    //         steps: clone,
+    //     }));
+    // };
+
+    const onChangeQuestions = (name, value) => {
+        setInAppMsgSetting((prev) => {
+            const updatedSteps = [...prev.steps];
+
+            if (selectedStepIndex >= 0 && updatedSteps[selectedStepIndex]) {
+                updatedSteps[selectedStepIndex] = {
+                    ...updatedSteps[selectedStepIndex],
+                    [name]: value,
+                };
+            }
+
+            return {
+                ...prev,
+                steps: updatedSteps,
+            };
+        });
+    };
+
     const onChangeQuestion = (name, value) => {
-        const clone = [...inAppMsgSetting?.steps];
-        clone[selectedStepIndex] = {
-            ...clone[selectedStepIndex],
-            [name]: value
-        };
-        setInAppMsgSetting((prev) => ({
-            ...prev,
-            steps: clone,
-        }));
+        setInAppMsgSetting((prev) => {
+            const updatedSteps = [...prev.steps];
+            updatedSteps[selectedStepIndex] = {
+                ...updatedSteps[selectedStepIndex],
+                [name]: value,
+            };
+            return {
+                ...prev,
+                steps: updatedSteps,
+            };
+        });
     };
 
     const onChangeChecklist = (name, value) => {
@@ -292,7 +346,7 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                             <Select
                                 value={Number(inAppMsgSetting.from)}
                                 name={"from"}
-                                onValueChange={(value) => onChange("from", value, )}
+                                onValueChange={(value) => onChange("from", value)}
                             >
                                 <SelectTrigger className="w-full h-9">
                                     {inAppMsgSetting.from ? (
@@ -322,6 +376,10 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                                     </SelectGroup>
                                 </SelectContent>
                             </Select>
+
+                            {(inAppMsgSetting.show_sender === 1 && formError?.from) && (
+                                <p className="text-red-500 text-sm mt-1">{formError.from}</p>
+                            )}
                         </div>
                     }
                     {
@@ -504,14 +562,14 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                                         <div className={"flex gap-4"}>
                                             <div className="grid w-full max-w-sm items-center gap-1.5">
                                                 <Label className={"font-normal text-sm"} htmlFor="start_number">Start Number</Label>
-                                                <Input value={selectedStep?.start_number} name={"start_number"}
+                                                <Input value={inAppMsgSetting?.steps?.[selectedStepIndex]?.start_number || ''} name={"start_number"}
                                                        type="number" id="start_number"
                                                        onChange={(e) => onChangeQuestion("start_number", e.target.value)}
                                                        placeholder="1" className={"h-8"}/>
                                             </div>
                                             <div className="grid w-full max-w-sm items-center gap-1.5">
                                                 <Label className={"font-normal text-sm"} htmlFor="end_number">End Number</Label>
-                                                <Input value={selectedStep?.end_number} name={"end_number"}
+                                                <Input value={inAppMsgSetting?.steps?.[selectedStepIndex]?.end_number || ''} name={"end_number"}
                                                        onChange={(e) => onChangeQuestion("end_number", e.target.value)}
                                                        type="number" id="end_number"
                                                        placeholder="10" className={"h-8"}/>
@@ -521,13 +579,13 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
 
                                     <div className="grid w-full max-w-sm items-center gap-1.5">
                                         <Label className={"font-normal text-sm"} htmlFor="start_label">Start label</Label>
-                                        <Input value={selectedStep?.start_label}
+                                        <Input value={inAppMsgSetting?.steps?.[selectedStepIndex]?.start_label || ''}
                                                onChange={(e) => onChangeQuestion("start_label", e.target.value)} type="text"
                                                id="start_label" placeholder="Very Bad" className={"h-8"}/>
                                     </div>
                                     <div className="grid w-full max-w-sm items-center gap-1.5">
                                         <Label className={"font-normal text-sm"} htmlFor="end_label">End label</Label>
-                                        <Input value={selectedStep?.end_label}
+                                        <Input value={inAppMsgSetting?.steps?.[selectedStepIndex]?.end_label || ''}
                                                onChange={(e) => onChangeQuestion("end_label", e.target.value)} type="text"
                                                id="end_label" placeholder="Very Good" className={"h-8"}/>
                                     </div>
@@ -590,25 +648,47 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                         </div>
                     </Fragment>
                 }
-                <div className="grid w-full max-w-sm items-center gap-1.5">
-                    <Label className={"font-normal"}>Background Color</Label>
-                    <div className={"w-full text-sm"}>
-                        <ColorInput style={{width: '100%', height: "36px"}} value={inAppMsgSetting.bg_color}
-                                    onChange={(value) => onChange("bg_color", value.clr)} />
-                    </div>
-                </div>
 
-                <div className="grid w-full max-w-sm items-center gap-1.5">
-                    <Label className={"font-normal"}>{type === "4" ? "Button Text Color": "Text Color"}</Label>
-                    <div className={"w-full text-sm widget-color-picker space-y-2"}>
-                        <ColorInput
-                            value={inAppMsgSetting.text_color}
-                            onChange={(value) => onChange("text_color", value.clr)}
-                        />
+                {(inAppMsgSetting.reply_type === 1 || inAppMsgSetting.reply_type === 2) && (
+                    <div className="grid w-full max-w-sm items-center gap-1.5">
+                        <Label className={"font-normal"}>Background Color</Label>
+                        <div className={"w-full text-sm"}>
+                            <ColorInput
+                                style={{ width: '100%', height: "36px" }}
+                                value={inAppMsgSetting.bg_color}
+                                onChange={(value) => onChange("bg_color", value.clr)}
+                            />
+                        </div>
                     </div>
-                </div>
+                )}
 
-                {type === "1" && <div className="grid w-full max-w-sm items-center gap-1.5">
+                {
+                    type === "4" || type === "3" || type === "2"  &&
+                    <div className="grid w-full max-w-sm items-center gap-1.5">
+                        <Label className={"font-normal"}>Text Color</Label>
+                        <div className={"w-full text-sm widget-color-picker space-y-2"}>
+                            <ColorInput
+                                value={inAppMsgSetting.text_color}
+                                onChange={(value) => onChange("text_color", value.clr)}
+                            />
+                        </div>
+                    </div>
+                }
+
+                {
+                    ((type === "1" && inAppMsgSetting?.reply_type == 1) || (type === "4" && inAppMsgSetting?.checklists[selectedStepIndex]?.action_type == 1)) &&
+                    <div className="grid w-full max-w-sm items-center gap-1.5">
+                        <Label className={"font-normal"}>{type === "4" ? "Button Text Color" : "Text Color"}</Label>
+                        <div className={"w-full text-sm widget-color-picker space-y-2"}>
+                            <ColorInput
+                                value={type === "4" ? inAppMsgSetting.btn_text_color : inAppMsgSetting.text_color}
+                                onChange={(value) => onChange(type === "4" ? "btn_text_color" : "text_color", value.clr)}
+                            />
+                        </div>
+                    </div>
+                }
+
+                {(type === "1" &&  inAppMsgSetting.reply_type === 1) && <div className="grid w-full max-w-sm items-center gap-1.5">
                     <Label className={"font-normal "}>Icon Color </Label>
                     <div className={"w-full text-sm widget-color-picker space-y-2"}>
                         <ColorInput
@@ -618,15 +698,20 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                     </div>
                 </div>}
 
-                <div className="grid w-full max-w-sm items-center gap-1.5">
-                    <Label className={"font-normal"}>{type === "4" ? "Button Background Color": "Button Color"} </Label>
-                    <div className={"w-full text-sm widget-color-picker space-y-2"}>
-                        <ColorInput
-                            value={inAppMsgSetting.btn_color}
-                            onChange={(value) => onChange("btn_color", value.clr)}
-                        />
+                {
+                    ((type === "1") ||
+                        (type === "4" && inAppMsgSetting?.checklists[selectedStepIndex]?.action_type == 1)) &&
+                    <div className="grid w-full max-w-sm items-center gap-1.5">
+                        <Label
+                            className={"font-normal"}>{type === "4" ? "Button Background Color" : "Close Button Color"} </Label>
+                        <div className={"w-full text-sm widget-color-picker space-y-2"}>
+                            <ColorInput
+                                value={inAppMsgSetting.btn_color}
+                                onChange={(value) => onChange("btn_color", value.clr)}
+                            />
+                        </div>
                     </div>
-                </div>
+                }
 
                 {
                     (type === "2" || type === "3") &&
@@ -637,6 +722,13 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                         </div>
                     </div>
                 }
+                {/*<div className="flex items-center gap-2">*/}
+                {/*    <Checkbox id="is_open"*/}
+                {/*              checked={inAppMsgSetting.is_open === 1}*/}
+                {/*              onCheckedChange={(checked) => onChange("is_open", checked ? 1 : 0)}*/}
+                {/*    />*/}
+                {/*    <Label htmlFor="show_sender" className={"font-normal cursor-pointer"}>Show Popover</Label>*/}
+                {/*</div>*/}
             </div>
 
             <div className={"border-b px-4 py-6 space-y-4"}>
@@ -727,9 +819,9 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                                         />
                                     </PopoverContent>
                                 </Popover>
-                                {
-                                    formError.end_at && <span className="text-red-500 text-sm">{formError.end_at}</span>
-                                }
+                                {/*{*/}
+                                {/*    formError.end_at && <span className="text-red-500 text-sm">{formError.end_at}</span>*/}
+                                {/*}*/}
                             </div>
                             <div className={"flex flex-col w-full"}>
                                 <div className="custom-time-picker ">

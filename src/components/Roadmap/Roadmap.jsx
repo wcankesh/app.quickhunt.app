@@ -36,6 +36,10 @@ const Roadmap = () => {
     const openSheet = (type) => setIsSheetOpen({ open: true, type });
     const closeSheet = () => setIsSheetOpen({ open: false, type: "" });
 
+    console.log("roadmapList", roadmapList)
+    console.log("selectedIdea", selectedIdea)
+    console.log("selectedRoadmap", selectedRoadmap)
+
     const openDetailsSheet = (record) => {
         const findRoadmap = roadmapList.columns.find((x) => x.id === record.roadmap_id)
         setSelectedIdea(record)
@@ -71,6 +75,8 @@ const Roadmap = () => {
     }
 
     const callApi = async (columnId, payload) => {
+        console.log("columnId", columnId)
+        console.log("callApi payload", payload)
         let formData = new FormData();
         formData.append("roadmap_id", columnId);
         const data = await apiService.updateIdea(formData, payload)
@@ -81,11 +87,72 @@ const Roadmap = () => {
         }
     }
 
+    //old code
+    // const handleCardMove = (_card, source, destination) => {
+    //     const updatedCard = { ..._card, roadmap_id: destination.toColumnId };
+    //     const updatedColumns = roadmapList.columns.map((column) => {
+    //         if (column.id === source.fromColumnId) {
+    //             return {
+    //                 ...column,
+    //                 cards: column.cards.filter(card => card.id !== _card.id),
+    //                 ideas: column.ideas?.filter(card => card.id !== _card.id) || [],
+    //             };
+    //         }
+    //         if (column.id === destination.toColumnId) {
+    //             const updatedCards = [...column.cards.filter(card => card.id !== _card.id)];
+    //             updatedCards.splice(destination.index, 0, updatedCard);
+    //             return {
+    //                 ...column,
+    //                 cards: updatedCards,
+    //                 ideas: column.ideas
+    //                     ? [...column.ideas.filter(card => card.id !== _card.id), updatedCard]
+    //                     : [updatedCard],
+    //             };
+    //         }
+    //         return column;
+    //     });
+    //     setRoadmapList((prevState) => ({
+    //         ...prevState,
+    //         columns: updatedColumns,
+    //     }));
+    //     callApi(destination.toColumnId, updatedCard.id);
+    // };
+
     const handleCardMove = (_card, source, destination) => {
-        const updatedBoard = moveCard(roadmapList, source, destination)
-        callApi(destination.toColumnId, _card.id)
-        setRoadmapList(updatedBoard)
-    }
+        const updatedCard = { ..._card, roadmap_id: destination.toColumnId };
+
+        // Get the target column
+        const updatedColumns = roadmapList.columns.map((column) => {
+            if (column.id === source.fromColumnId) {
+                return {
+                    ...column,
+                    cards: column.cards.filter((card) => card.id !== _card.id), // Remove the card from source
+                };
+            }
+            if (column.id === destination.toColumnId) {
+                // Add the card to the specific position within the destination column
+                const newCards = [...column.cards];
+                newCards.splice(destination.toPosition, 0, updatedCard); // Insert at the specific index
+                return {
+                    ...column,
+                    cards: newCards,
+                    ideas: column.ideas ? [...newCards] : [], // Update ideas if applicable
+                };
+            }
+            return column;
+        });
+
+        // Update the state
+        setRoadmapList((prevState) => ({
+            ...prevState,
+            columns: updatedColumns,
+        }));
+
+        // Call API to persist the roadmap ID update
+        callApi(destination.toColumnId, updatedCard.id);
+    };
+
+
 
     const onCreateIdea = (mainRecord) => {
         setSelectedRoadmap(mainRecord)
@@ -227,62 +294,6 @@ const Roadmap = () => {
                         </Board>
                 }
             </div>
-
-            {/*<div className={"flex gap-[18px] flex-col  items-start "}>*/}
-
-            {/*{(roadmapList.columns || []).map((x, i) =>{*/}
-            {/*    return(*/}
-            {/*        <div key={i}>*/}
-            {/*            <Card key={x.id} className={"w-[342px]"}>*/}
-            {/*                <CardHeader className={"p-4 px-[9px]"}>*/}
-            {/*                    <CardTitle className={"flex items-center gap-2 text-sm font-medium px-[7px]"}>*/}
-            {/*                        <Circle fill={x.color_code} stroke={x.color_code} className={"w-[10px] h-[10px]"} />*/}
-            {/*                        {x.title}*/}
-            {/*                    </CardTitle>*/}
-            {/*                </CardHeader>*/}
-            {/*                <CardContent className={"px-[9px] pb-3 border-b gap-3 flex flex-col"}>*/}
-            {/*                    {x.ideas.map((y, index) => {*/}
-            {/*                        return(*/}
-            {/*                            <Card key={index} onClick={openDetailsSheet} className={"mb-3"}>*/}
-            {/*                                <CardHeader className={"flex-row gap-2 p-2 pb-3"}>*/}
-            {/*                                    <Button variant={"outline hover:transparent"} className={"text-sm font-normal border px-[9px] py-1 w-[28px] h-[28px]"}>{y.vote}</Button>*/}
-            {/*                                    <h3 className={"text-sm font-normal"}>{y.title}</h3>*/}
-            {/*                                </CardHeader>*/}
-            {/*                                <CardContent className={"px-[20px] pb-4"}>*/}
-            {/*                                    <div className={"flex"}>*/}
-            {/*                                        {*/}
-            {/*                                            ((y && y.topic) || []).map((x, i) => {*/}
-            {/*                                                return (*/}
-
-            {/*                                                    <div className={"text-xs flex"}>{x.title}</div>*/}
-
-            {/*                                                )*/}
-            {/*                                            })*/}
-            {/*                                        }*/}
-            {/*                                    </div>*/}
-
-            {/*                                </CardContent>*/}
-            {/*                            </Card>*/}
-            {/*                        )*/}
-            {/*                    })}*/}
-            {/*                </CardContent>*/}
-            {/*                <CardFooter className={"px-4 py-3"}>*/}
-            {/*                    <Button*/}
-            {/*                        variant={"ghost hover:bg-transparent"}*/}
-            {/*                        className={`gap-2 p-0 ${theme === "dark" ? "" : "text-muted-foreground"} text-sm font-medium h-auto`}*/}
-            {/*                        onClick={() => onType('createNewRoadMapIdeas')}*/}
-            {/*                    >*/}
-            {/*                        <Plus className={"w-[20px] h-[20px]"} />Create Idea*/}
-            {/*                    </Button>*/}
-            {/*                </CardFooter>*/}
-            {/*            </Card>*/}
-            {/*        </div>*/}
-            {/*    )*/}
-            {/*})}*/}
-
-
-            {/*</div>*/}
-
         </div>
     );
 };

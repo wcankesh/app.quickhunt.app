@@ -685,10 +685,10 @@ const HeaderBar = () => {
                         </div>
                         <div className={"flex gap-2 md:gap-4 items-center"}>
                             <Button variant="ghost hover:none" size="icon" className={"h-8 w-8"} onClick={viewLink}>
-                                <Eye size={20} className={theme === 'light' ? 'stroke-white' : ''} />
+                                <Eye size={20} className={'stroke-white'} />
                             </Button>
                             <Button variant="ghost hover:none" size="icon" className={"h-8 w-8"}>
-                                <Bell size={20} className={theme === 'light' ? 'stroke-white' : ''} />
+                                <Bell size={20} className={'stroke-white'} />
                             </Button>
                             <Button variant="ghost hover:none" size="icon" className={"h-8 w-8"} onClick={toggleTheme}>
                                 {/*{theme === 'light' ? <Moon size={20} className="stroke-white"/> : <Sun size={20} />}*/}

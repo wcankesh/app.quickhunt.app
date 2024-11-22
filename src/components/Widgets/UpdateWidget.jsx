@@ -24,6 +24,9 @@ const initialState = {
     launcher_position: 2,
     launcher_icon_bg_color: "#7c3aed",
     launcher_icon_color: "#ffffff",
+    launcher_right_spacing: "20",
+    launcher_left_spacing: "20",
+    launcher_bottom_spacing: "20",
     is_idea: 1,
     is_roadmap: 1,
     is_announcement: 1,
@@ -102,8 +105,8 @@ const UpdateWidget = () => {
         setWidgetsSetting({...widgetsSetting, [name]: value});
         if (
             ["type", "launcher_icon_bg_color", "launcher_icon", "launcher_icon_color",
-                "modal_height", "launcher_position", "modal_width", "sidebar_width",
-                "sidebar_position", "popover_width", "popover_offset", "popover_height"]
+                "modal_height", "launcher_position", "modal_width", "sidebar_width", "launcher_right_spacing", "launcher_left_spacing",
+                "launcher_bottom_spacing", "sidebar_position", "popover_width", "popover_offset", "popover_height"]
                 .includes(name)
         ) {
 
@@ -185,7 +188,7 @@ const UpdateWidget = () => {
                         </div>
                         {
                             (type !== "embed") &&
-                            <div className={"flex gap-4 "}>
+                            <div className={"flex gap-2"}>
                                 {
                                     (type !== "embed") &&
                                     <div className={"space-y-4 w-1/2"}>
@@ -266,37 +269,66 @@ const UpdateWidget = () => {
                                     />
                                     <label htmlFor="is_launcher_icon" className="text-sm">Show Launcher Icon</label>
                                 </div>
-                                <div className={"space-y-2"}>
-                                    <Label className={"font-normal"}>Icon</Label>
-                                    <Select
-                                        onValueChange={(value) => onChange("launcher_icon", value)}
-                                        value={widgetsSetting.launcher_icon}
-                                    >
-                                        <SelectTrigger className="">
-                                            <SelectValue placeholder={widgetsSetting?.launcher_icon}/>
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="bolt">Bolt</SelectItem>
-                                            <SelectItem value="roadmap">Roadmap</SelectItem>
-                                            <SelectItem value="idea">Idea</SelectItem>
-                                            <SelectItem value="announcement">Announcement</SelectItem>
-                                        </SelectContent>
-                                    </Select>
+                                <div className={"flex gap-2"}>
+                                    <div className={"space-y-2 w-1/2"}>
+                                        <Label className={"font-normal"}>Icon</Label>
+                                        <Select
+                                            onValueChange={(value) => onChange("launcher_icon", value)}
+                                            value={widgetsSetting.launcher_icon}
+                                        >
+                                            <SelectTrigger className="">
+                                                <SelectValue placeholder={widgetsSetting?.launcher_icon}/>
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="bolt">Bolt</SelectItem>
+                                                <SelectItem value="roadmap">Roadmap</SelectItem>
+                                                <SelectItem value="idea">Idea</SelectItem>
+                                                <SelectItem value="announcement">Announcement</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                    <div className={"space-y-2 w-1/2"}>
+                                        <Label className={"font-normal"}>Position</Label>
+                                        <Select
+                                            value={widgetsSetting.launcher_position}
+                                            onValueChange={(value) => onChange("launcher_position", value)}
+                                        >
+                                            <SelectTrigger className="">
+                                                <SelectValue placeholder={1}/>
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value={1}>Bottom Left</SelectItem>
+                                                <SelectItem value={2}>Bottom Right</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
                                 </div>
+                                {
+                                    widgetsSetting.launcher_position === 1 &&
+                                        <div className={"space-y-2"}>
+                                            <Label className={"font-normal"}>Left Spacing</Label>
+                                            <Input value={widgetsSetting.launcher_left_spacing}
+                                                   type="number"
+                                                   onChange={(e) => onChange("launcher_left_spacing", e.target.value)}
+                                                   placeholder="1 px"/>
+                                        </div>
+                                }
+                                {
+                                    widgetsSetting.launcher_position === 2 &&
+                                        <div className={"space-y-2"}>
+                                            <Label className={"font-normal"}>Right Spacing</Label>
+                                            <Input value={widgetsSetting.launcher_right_spacing}
+                                                   type="number"
+                                                   onChange={(e) => onChange("launcher_right_spacing", e.target.value)}
+                                                   placeholder="1 px"/>
+                                        </div>
+                                }
                                 <div className={"space-y-2"}>
-                                    <Label className={"font-normal"}>Position</Label>
-                                    <Select
-                                        value={widgetsSetting.launcher_position}
-                                        onValueChange={(value) => onChange("launcher_position", value)}
-                                    >
-                                        <SelectTrigger className="">
-                                            <SelectValue placeholder={1}/>
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value={1}>Bottom Left</SelectItem>
-                                            <SelectItem value={2}>Bottom Right</SelectItem>
-                                        </SelectContent>
-                                    </Select>
+                                    <Label className={"font-normal"}>Bottom Spacing</Label>
+                                    <Input value={widgetsSetting.launcher_bottom_spacing}
+                                           type="number"
+                                           onChange={(e) => onChange("launcher_bottom_spacing", e.target.value)}
+                                           placeholder="1 px"/>
                                 </div>
                                 <div className={"widget-color-picker space-y-2"}>
                                     <Label className={"font-normal"}>Background Color</Label>
@@ -599,77 +631,81 @@ const UpdateWidget = () => {
         </svg>
     }
 
-return (
-    <Fragment>
-        <div className={"p-4 md:py-6 md:px-4 border-b flex items-center justify-between flex-wrap gap-2"}>
-            <Breadcrumb>
+    return (
+        <Fragment>
+            <div className={"p-4 md:py-6 md:px-4 border-b flex items-center justify-between flex-wrap gap-2"}>
                 <Breadcrumb>
-                    <BreadcrumbList>
-                        <BreadcrumbItem className={"cursor-pointer"}>
-                            <BreadcrumbLink>
-                                    <span
-                                        onClick={id === 'new' ? () => navigate(`${baseUrl}/widget/type`) : () => navigate(`${baseUrl}/widget?pageNo=${getPageNo}`)}>
-                                    {type === 'embed' && 'Embed Widget'}
-                                        {type === 'popover' && 'Popover Widget'}
-                                        {type === 'modal' && 'Modal Widget'}
-                                        {type === 'sidebar' && 'Sidebar Widget'}
-                                    </span>
-                            </BreadcrumbLink>
-                        </BreadcrumbItem>
-                        <BreadcrumbSeparator/>
-                        <BreadcrumbItem className={"cursor-pointer"}>
-                            <BreadcrumbPage>{widgetsSetting.name}</BreadcrumbPage>
-                        </BreadcrumbItem>
-                    </BreadcrumbList>
+                    <Breadcrumb>
+                        <BreadcrumbList>
+                            <BreadcrumbItem className={"cursor-pointer"}>
+                                <BreadcrumbLink>
+                                        <span
+                                            onClick={id === 'new' ? () => navigate(`${baseUrl}/widget/type`) : () => navigate(`${baseUrl}/widget?pageNo=${getPageNo}`)}>
+                                        {type === 'embed' && 'Embed Widget'}
+                                            {type === 'popover' && 'Popover Widget'}
+                                            {type === 'modal' && 'Modal Widget'}
+                                            {type === 'sidebar' && 'Sidebar Widget'}
+                                        </span>
+                                </BreadcrumbLink>
+                            </BreadcrumbItem>
+                            <BreadcrumbSeparator/>
+                            <BreadcrumbItem className={"cursor-pointer"}>
+                                <BreadcrumbPage>{widgetsSetting.name}</BreadcrumbPage>
+                            </BreadcrumbItem>
+                        </BreadcrumbList>
+                    </Breadcrumb>
                 </Breadcrumb>
-            </Breadcrumb>
-            <div className={"hidden md:flex justify-between gap-2 items-center"}>
-            <Button className={"font-medium w-[115px] hover:bg-primary"}
-                    onClick={() => id === "new" ? createWidget('head') : onUpdateWidgets('head')}>
-                {
-                    loading === 'head' ?
-                        <Loader2
-                            className="h-4 w-4 animate-spin"/> : (id === "new" ? "Create Widget" : "Save Changes")
-                }
-            </Button>
-                <Button variant={"ghost hover-none"} className={"font-medium border border-primary text-primary"} onClick={handleCancel}>Cancel</Button>
-            </div>
-        </div>
-        <div className={"flex h-[calc(100%_-_85px)] overflow-y-auto"}>
-            <div className={"max-w-[407px] w-full border-r h-full overflow-y-auto"}>
-                {renderSidebarItems()}
-                <div className={"px-4 py-6 border-t flex justify-between gap-2"}>
-                    <Button className={"font-medium w-[115px] hover:bg-primary"}
-                            onClick={() => id === "new" ? createWidget('side') : onUpdateWidgets('side')}>
-                        {
-                            loading === 'side' ?
-                                <Loader2
-                                    className="h-4 w-4 animate-spin"/> : (id === "new" ? "Create Widget" : "Save Changes")
-                        }
-                    </Button>
+                <div className={"hidden md:flex justify-between gap-2 items-center"}>
+                <Button className={"font-medium w-[115px] hover:bg-primary"}
+                        onClick={() => id === "new" ? createWidget('head') : onUpdateWidgets('head')}>
+                    {
+                        loading === 'head' ?
+                            <Loader2
+                                className="h-4 w-4 animate-spin"/> : (id === "new" ? "Create Widget" : "Save Changes")
+                    }
+                </Button>
                     <Button variant={"ghost hover-none"} className={"font-medium border border-primary text-primary"} onClick={handleCancel}>Cancel</Button>
                 </div>
             </div>
-            <div className={"bg-muted w-full h-full hidden md:block overflow-y-auto"}>
-                {
-                    (type !== "embed" && widgetsSetting?.is_launcher_icon == 1) &&
-                    <div className='QH-floating-trigger' onClick={onToggle} style={{
-                        backgroundColor: widgetsSetting.launcher_icon_bg_color,
-                        // left: widgetsSetting.launcher_position === 1 ? type === "popover" ? "40px" : 355 : "inherit",
-                        left: widgetsSetting.launcher_position === 1 ? type === "popover" ? "690px" : 690 : "inherit",
-                        right: widgetsSetting.launcher_position === 2 ? "40px" : "inherit",
-                        position: type === "popover" ? "absolute" : "fixed"
-                    }}>
-                        {
-                            launcherIcon[widgetsSetting.launcher_icon]
-                        }
+            <div className={"flex h-[calc(100%_-_85px)] overflow-y-auto"}>
+                <div className={"max-w-[407px] w-full border-r h-full overflow-y-auto"}>
+                    {renderSidebarItems()}
+                    <div className={"px-4 py-6 border-t flex justify-between gap-2"}>
+                        <Button className={"font-medium w-[115px] hover:bg-primary"}
+                                onClick={() => id === "new" ? createWidget('side') : onUpdateWidgets('side')}>
+                            {
+                                loading === 'side' ?
+                                    <Loader2
+                                        className="h-4 w-4 animate-spin"/> : (id === "new" ? "Create Widget" : "Save Changes")
+                            }
+                        </Button>
+                        <Button variant={"ghost hover-none"} className={"font-medium border border-primary text-primary"} onClick={handleCancel}>Cancel</Button>
                     </div>
-                }
-                <WidgetPreview widgetsSetting={widgetsSetting} type={type} toggle={toggle} onToggle={onToggle}/>
+                </div>
+                <div className={"bg-muted w-full h-full hidden md:block overflow-y-auto"}>
+                    {
+                        (type !== "embed" && widgetsSetting?.is_launcher_icon == 1) &&
+                        <div className='QH-floating-trigger' onClick={onToggle} style={{
+                            backgroundColor: widgetsSetting.launcher_icon_bg_color,
+                            left: (widgetsSetting.launcher_position === 1)
+                                ? (type === "popover" ? `${widgetsSetting.launcher_left_spacing || 20}px` : `${widgetsSetting.launcher_left_spacing || 690}px`)
+                                : "inherit",
+                            right: (widgetsSetting.launcher_position === 2)
+                                ? `${widgetsSetting.launcher_right_spacing || 20}px`
+                                : "inherit",
+                            bottom: (widgetsSetting.launcher_bottom_spacing) ? `${widgetsSetting.launcher_bottom_spacing || "20"}px` : "inherit",
+                            position: type === "popover" ? "absolute" : "fixed",
+                        }}>
+                            {
+                                launcherIcon[widgetsSetting.launcher_icon]
+                            }
+                        </div>
+                    }
+                    <WidgetPreview widgetsSetting={widgetsSetting} type={type} toggle={toggle} onToggle={onToggle}/>
+                </div>
             </div>
-        </div>
-    </Fragment>
-);
+        </Fragment>
+    );
 };
 
 export default UpdateWidget;

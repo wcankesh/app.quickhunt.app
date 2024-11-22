@@ -101,7 +101,8 @@ const CreateRoadmapIdea = ({isOpen, onOpen, onClose, closeCreateIdea, selectedRo
             setIsLoading(false)
             setIdeaDetail(initialState)
             setRoadmapList({columns: cloneRoadmap});
-            closeCreateIdea()
+            // closeCreateIdea()
+            onClose()
             toast({description: data.message})
         } else {
             setIsLoading(false)

@@ -284,14 +284,27 @@ const Team = () => {
                                         <TableHeader className={`${theme === "dark" ? "" : "bg-muted"}`}>
                                             <TableRow>
                                                 {
-                                                    ["Team", "Role" ,isAdmin === true ? "Action" : ""].map((x, i) => {
+                                                    // ["Team", "Role" ,isAdmin === true ? "Action" : ""].map((x, i) => {
+                                                    ["Team", "Role" ,"Action"].map((x, i) => {
                                                         return (
-                                                           <TableHead key={x} className={`h-[22px] px-2 py-[10px] md:px-3 text-sm font-normal ${ isAdmin === true && i === 2 ? "text-end" : isAdmin === false && i === 1 ? "text-end" : ""} ${theme === "dark" ? "border-t" : "text-card-foreground"}`}>{x}</TableHead>
+                                                           <TableHead key={x} className={`h-[22px] px-2 py-[10px] md:px-3 text-sm font-normal ${i === 2 ? "text-end" : ""} ${theme === "dark" ? "border-t" : "text-card-foreground"}`}>{x}</TableHead>
                                                            // x ? <TableHead key={x} className={`h-[22px] sm:pl-6 pb-2 text-sm font-normal ${ isAdmin === true && i === 2 ? "text-end" : isAdmin === false && i === 1 ? "text-end" : ""} ${theme === "dark" ? "" : "text-card-foreground"}`}>{x}</TableHead> :""
                                                         )
                                                     })
                                                 }
                                             </TableRow>
+                                            {/*<TableRow>*/}
+                                            {/*    {["Team", "Role", ...(isAdmin ? ["Action"] : [])].map((x, i) => (*/}
+                                            {/*        <TableHead*/}
+                                            {/*            key={x}*/}
+                                            {/*            className={`h-[22px] px-2 py-[10px] md:px-3 text-sm font-normal ${*/}
+                                            {/*                i === 2 ? "text-end" : ""*/}
+                                            {/*            } ${theme === "dark" ? "border-t" : "text-card-foreground"}`}*/}
+                                            {/*        >*/}
+                                            {/*            {x}*/}
+                                            {/*        </TableHead>*/}
+                                            {/*    ))}*/}
+                                            {/*</TableRow>*/}
                                         </TableHeader>
                                         <TableBody>
                                             {isLoading ?
@@ -302,7 +315,7 @@ const Team = () => {
                                                                 {
                                                                     [...Array(3)].map((_, i) => {
                                                                         return (
-                                                                            <TableCell key={i} className={""}>
+                                                                            <TableCell key={i} className={"py-[10px] px-[12px]"}>
                                                                                 <Skeleton
                                                                                     className={"rounded-md  w-full h-[24px]"}/>
                                                                             </TableCell>
@@ -318,7 +331,7 @@ const Team = () => {
                                                         (memberList || []).map((x) => {
                                                             return (
                                                                 <TableRow key={x.id}>
-                                                                    <TableCell className={"py-[10px]"}>
+                                                                    <TableCell className={"py-[10px] px-[12px]"}>
                                                                         <div className={"flex gap-2 items-center"}>
                                                                             <Avatar className={"w-[30px] h-[30px]"}>
                                                                                 {
@@ -338,40 +351,50 @@ const Team = () => {
                                                                         </div>
                                                                     </TableCell>
                                                                     <TableCell
-                                                                        className={`${isAdmin === true ? "" : "flex justify-end"} py-[10px] py-[17px]`}>
+                                                                        className={`py-[10px] px-[12px]`}>
                                                                         <Badge variant={"outline"}
                                                                                className={`h-[20px] py-0 px-2 text-xs rounded-[5px] ${x.role === 1 ? "text-[#63c8d9] border-[#63c8d9]" : "text-[#694949] border-[#694949]"}`}>{x?.role === 1 ? "Admin" : "Member"}</Badge>
 
                                                                     </TableCell>
 
-                                                                    {
-                                                                        isAdmin === true ? <TableCell
-                                                                            className={"flex justify-end py-[10px] py-[17px]"}>
-                                                                            {
-                                                                                x.role === 2 ? <Button
+                                                                    {/*{*/}
+                                                                    {/*    isAdmin === true && <TableCell*/}
+                                                                    {/*        className={"flex justify-end py-[10px] px-[12px]"}>*/}
+                                                                    {/*        {*/}
+                                                                    {/*            x.role === 2 ? <Button*/}
+                                                                    {/*                variant="outline hover:bg-transparent"*/}
+                                                                    {/*                className="p-1 border w-[30px] h-[30px]"*/}
+                                                                    {/*                onClick={() => removeMember(x.id)}*/}
+                                                                    {/*            >*/}
+                                                                    {/*                <Trash2 size={16}/>*/}
+                                                                    {/*            </Button> : ""*/}
+                                                                    {/*        }*/}
+                                                                    {/*    </TableCell>*/}
+                                                                    {/*}*/}
+                                                                    {isAdmin && (
+                                                                        <TableCell className="flex justify-end py-[10px] px-[12px]">
+                                                                            {x.role === 2 && (
+                                                                                <Button
                                                                                     variant="outline hover:bg-transparent"
                                                                                     className="p-1 border w-[30px] h-[30px]"
                                                                                     onClick={() => removeMember(x.id)}
                                                                                 >
-                                                                                    <Trash2 size={16}/>
-                                                                                </Button> : ""
-                                                                            }
-                                                                        </TableCell> : <TableRow>
-                                                                            <TableCell colSpan={3}>
-                                                                                <EmptyData/>
-                                                                            </TableCell>
-                                                                        </TableRow>
-                                                                    }
+                                                                                    <Trash2 size={16} />
+                                                                                </Button>
+                                                                            )}
+                                                                        </TableCell>
+                                                                    )}
                                                                 </TableRow>
                                                             )
                                                         })
                                                     }
                                                 </> : <TableRow>
-                                                    <TableCell colSpan={3}>
+                                                    <TableCell colSpan={isAdmin ? 3 : 2}>
                                                         <EmptyData/>
                                                     </TableCell>
                                                 </TableRow>
-                                            }</TableBody>
+                                            }
+                                        </TableBody>
                                     </Table>
                             </div>
                         </TabsContent>

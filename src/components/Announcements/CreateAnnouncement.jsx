@@ -250,6 +250,9 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
         setIsSave(true)
         let formData = new FormData();
         formData.append("post_project_id", projectDetailsReducer.id);
+        if (changeLogDetails.post_title && changeLogDetails.post_title.length > 250) {
+            validationErrors['post_title'] = "Post title cannot be longer than 250 characters.";
+        }
         Object.keys(changeLogDetails).map((x) => {
             if (x !== "labels") {
                 if (x === "post_assign_to") {
@@ -277,13 +280,14 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
             setChangeLogDetails(initialState)
             setIsSave(false)
             await getAllPosts()
-            toast({
-                description: data.message,
-            });
+            toast({description: data.message,});
         } else {
             setIsSave(false);
+            toast({variant: "destructive", description: data.message,});
         }
-        onClose("", data.data);
+        if (Object.keys(validationErrors).length === 0) {
+            onClose("", data.data);
+        }
     }
 
     const handleValueChange = (value) => {
