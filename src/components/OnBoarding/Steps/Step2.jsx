@@ -59,6 +59,9 @@ const Step2 = ({setStep}) => {
         }
         const data = await apiService.onBoardingFlow(payload, {Authorization: `Bearer ${token}`});
         if(data.status === 200) {
+            const token = localStorage.getItem('token-verify-onboard') || null
+            localStorage.setItem("token", token);
+            localStorage.removeItem('token-verify-onboard')
             setUserDetail(data.data)
         }
     }
