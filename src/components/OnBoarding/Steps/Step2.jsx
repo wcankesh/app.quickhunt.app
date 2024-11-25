@@ -1,10 +1,17 @@
 import React, { Fragment, useState, useEffect } from 'react';
 import { Label } from "../../ui/label";
 import { Button } from "../../ui/button";
-import { baseUrl } from "../../../utils/constent";
+import {apiService, baseUrl, getLSUserDetails} from "../../../utils/constent";
 import { useNavigate } from "react-router-dom";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "../../ui/select";
 import {Input} from "../../ui/input";
+import {useSelector} from "react-redux";
+
+const initialState = {
+    want_to: '',
+    know_from: '',
+    other: ''
+}
 
 const create = [
     { name: "Ideas", value: "ideas" },
@@ -30,10 +37,29 @@ const knowAbout = [
 
 const Step2 = ({setStep}) => {
     let navigate = useNavigate();
+
+    const [userDetail, setUserDetail] = useState(initialState);
     const [selectedCreate, setSelectedCreate] = useState('');
     const [showAdditionalSelect, setShowAdditionalSelect] = useState(false);
     const [selectedKnowAbout, setSelectedKnowAbout] = useState('');
     const [showAdditionalKnowAboutSelect, setShowAdditionalKnowAboutSelect] = useState(false);
+    const [otherInput, setOtherInput] = useState('');
+
+    // useEffect(() => {
+    //     onBoardingFlow();
+    // }, [])
+
+    const onStep = async () => {
+        const payload = {
+            want_to: userDetail.want_to,
+            know_from: userDetail.know_from,
+            other: userDetail.other
+        }
+        const data = await apiService.onBoardingFlow(payload);
+        if(data.status === 200) {
+            setUserDetail(data.data)
+        }
+    }
 
     const handleCreateChange = (value) => {
         setSelectedCreate(value);
@@ -45,10 +71,10 @@ const Step2 = ({setStep}) => {
         setShowAdditionalKnowAboutSelect(value === 'other');
     };
 
-    const onStep = (stepCount) => {
-        setStep(stepCount)
-        // navigate(`${baseUrl}/on-boarding`)
-    }
+    // const onStep = (stepCount) => {
+    //     setStep(stepCount)
+    //     // navigate(`${baseUrl}/on-boarding`)
+    // }
 
     return (
         <Fragment>
@@ -59,7 +85,7 @@ const Step2 = ({setStep}) => {
                 </div>
                 <div className={`space-y-3`}>
                     <div className={"space-y-2"}>
-                        <Label className={"text-sm font-normal mb-2"}>Hey Darshan jiyani, What can we help you create today?</Label>
+                        <Label className={"text-sm font-normal mb-2"}>Hey {getLSUserDetails()?.user_first_name} {getLSUserDetails()?.user_last_name}, What can we help you create today?</Label>
                         <Select onValueChange={handleCreateChange}>
                             <SelectTrigger className="h-auto placeholder:text-muted">
                                 <SelectValue placeholder="Ex. Announcement(changelog)"/>

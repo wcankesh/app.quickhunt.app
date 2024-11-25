@@ -10,6 +10,15 @@ export const login = () => {
     localStorage.setItem(TOKEN_KEY, 'TestLogin');
 }
 
+export const getLSUserDetails = () => {
+    const savedUser = localStorage.getItem('user-details');
+    return savedUser ? JSON.parse(savedUser) : {};
+}
+
+export const getTokenVerify = () => {
+    localStorage.setItem(TOKEN_KEY, 'token-verify-onboard');
+}
+
 export const logout = () => {
     localStorage.removeItem(TOKEN_KEY);
 }

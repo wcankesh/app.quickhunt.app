@@ -49,7 +49,7 @@ useEffect(() => {
     }
 }, [isLoading])
 
-    return isLogin() && !Token ? <Fragment> <Toaster /><Outlet/></Fragment> : <Navigate to={`${baseUrl}/login`}/>
+    return isLogin() && !Token ? <Fragment> <Toaster /><Outlet/></Fragment> : localStorage.getItem("token-verify-onboarding") ? <Navigate to={`${baseUrl}/on-bord`}/> : <Navigate to={`${baseUrl}/login`}/>
 };
 
 export default ProtectedRoutes;

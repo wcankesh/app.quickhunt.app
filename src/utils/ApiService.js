@@ -167,6 +167,11 @@ export class ApiService{
         return await this.postData(`${baseUrlApi}/join`,payload)
     }
 
+    /* --------------------------------- On Boarding ----------------------------------- */
+    async onBoardingFlow (payload) {
+        return await this.postData(`${baseUrlApi}/on-bord`, payload)
+    }
+
     /* ---------- Announcement api ---------- */
     async getAllPosts (payload){
         return await this.getData(`${baseUrlApi}/posts?${qs.stringify(payload)}`)
