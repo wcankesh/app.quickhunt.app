@@ -50,12 +50,14 @@ const Step2 = ({setStep}) => {
     // }, [])
 
     const onStep = async () => {
+        debugger
+        const token = localStorage.getItem('token-verify-onboard') || null
         const payload = {
             want_to: userDetail.want_to,
             know_from: userDetail.know_from,
             other: userDetail.other
         }
-        const data = await apiService.onBoardingFlow(payload);
+        const data = await apiService.onBoardingFlow(payload, {Authorization: `Bearer ${token}`});
         if(data.status === 200) {
             setUserDetail(data.data)
         }

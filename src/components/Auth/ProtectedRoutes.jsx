@@ -1,6 +1,15 @@
 import React, {Fragment, useEffect, useState} from 'react';
 import {Navigate, Outlet} from "react-router-dom";
-import {apiService, baseUrl, isLogin, isTokenAboutToExpire, logout, removeProjectDetails} from "../../utils/constent";
+import {
+    apiService,
+    baseUrl,
+
+    isTokenAboutToExpire,
+    logout,
+    removeProjectDetails,
+    getTokenVerify,
+    token
+} from "../../utils/constent";
 import {Toaster} from "../ui/toaster";
 import {useDispatch, useSelector} from "react-redux";
 import {userDetailsAction} from "../../redux/action/UserDetailAction";
@@ -43,13 +52,7 @@ useEffect(() => {
     loginUserDetails()
 }, [])
 
-    useEffect(() => {
-    if(!isLoading){
-        console.log("isLoading", isLoading)
-    }
-}, [isLoading])
-
-    return isLogin() && !Token ? <Fragment> <Toaster /><Outlet/></Fragment> : localStorage.getItem("token-verify-onboarding") ? <Navigate to={`${baseUrl}/on-bord`}/> : <Navigate to={`${baseUrl}/login`}/>
+    return (token() && !Token) || getTokenVerify() ? <Fragment> <Toaster/><Outlet/></Fragment> : <Navigate to={`${baseUrl}/login`}/>
 };
 
 export default ProtectedRoutes;

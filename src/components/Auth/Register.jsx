@@ -118,14 +118,6 @@ const Register = () => {
             localStorage.setItem("token-verify-onboard", data?.access_token);
             navigate(`${baseUrl}/on-bord`);
             toast({description: data.message})
-            // const urlParams = new URLSearchParams(window.location.search);
-            // const token = urlParams.get('token');
-            // if (token) {
-            //     navigate(`${baseUrl}/login?token=${token}`);
-            // } else {
-            //     navigate(`${baseUrl}/on-boarding`);
-            //     // localStorage.setItem("token", data.access_token);
-            // }
             setIsLoading(false)
         } else {
             setIsLoading(false)

@@ -4,14 +4,20 @@ import qs from 'qs';
 const baseUrlApi = 'https://code.quickhunt.app/public/api';
 let instance = axios.create();
 instance.interceptors.request.use(function (config) {
-    config.headers["Authorization"] = `Bearer ${token()}`;
+    if(config?.headers?.Authorization){
+        config.headers["Authorization"] = config?.headers?.Authorization
+    } else {
+        config.headers["Authorization"] = `Bearer ${token() || ''}`
+    }
     return config;
+
 });
 
 export class ApiService{
-    async getData(url){
+    async getData(url, header){
         const config = {
             headers: {
+                ...header || {},
                 "Content-Type": "application/json",
                 "Accept": "*/*"
             },
@@ -35,9 +41,10 @@ export class ApiService{
         return resData || response
     }
 
-    async postData(url,data,isFormData){
+    async postData(url,data,isFormData, header){
         const config = {
             headers:{
+                ...header || {},
                 "Content-Type": isFormData ? 'multipart/form-data' : "application/json",
                 "Accept": "*/*"
             }
@@ -145,8 +152,8 @@ export class ApiService{
     async logout (payload){
         return await this.postData(`${baseUrlApi}/logout`,payload)
     }
-    async getLoginUserDetails (){
-        return await this.getData(`${baseUrlApi}/user`)
+    async getLoginUserDetails (token = {}){
+        return await this.getData(`${baseUrlApi}/user`, token)
     }
     async updateLoginUserDetails (payload, id){
         return await this.postData(`${baseUrlApi}/users/${id}?_method=PUT`, payload, true)
@@ -168,8 +175,8 @@ export class ApiService{
     }
 
     /* --------------------------------- On Boarding ----------------------------------- */
-    async onBoardingFlow (payload) {
-        return await this.postData(`${baseUrlApi}/on-bord`, payload)
+    async onBoardingFlow (payload, token = {}) {
+        return await this.postData(`${baseUrlApi}/on-bord`, payload, false, token)
     }
 
     /* ---------- Announcement api ---------- */

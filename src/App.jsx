@@ -36,14 +36,15 @@ function App() {
                     </Route>
                     <Route path={`${baseUrl}/project`} element={<Project/>}/>
                     <Route path={`${baseUrl}/setup`} element={<Setup/>}/>
+
                 </Route>
                 <Route element={<ThemeProvider defaultTheme="system" storageKey="vite-ui-theme"><PublicRoutes/></ThemeProvider>}>
                     <Route path={`${baseUrl}/register`} element={<Register/>}/>
-                    <Route path={`${baseUrl}/on-bord`} element={<OnBoarding/>}/>
+
                     <Route path={`${baseUrl}/login`} element={<Login/>}/>
                     <Route path={`${baseUrl}/forgot-password`} element={<Forgot/>}/>
                     <Route path={`${baseUrl}/reset-verify`} element={<RestPassword/>}/>
-
+                    <Route path={`${baseUrl}/on-bord`} element={<OnBoarding/>}/>
                 </Route>
                 {/*<Route path="*" element={<PageNotFound/>}/>*/}
             </Routes>

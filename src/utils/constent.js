@@ -16,7 +16,10 @@ export const getLSUserDetails = () => {
 }
 
 export const getTokenVerify = () => {
-    localStorage.setItem(TOKEN_KEY, 'token-verify-onboard');
+    if (localStorage.getItem('token-verify-onboard')) {
+        return true;
+    }
+    return false;
 }
 
 export const logout = () => {
@@ -45,6 +48,7 @@ export const isLogin = () => {
     }
     return false;
 }
+
 
 // Check if the token is about to expire (within the next minute)
 export const isTokenAboutToExpire = () => {

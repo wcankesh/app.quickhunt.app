@@ -101,7 +101,6 @@ const Login = () => {
         const data = await apiSerVice.login(payload)
         if (data.access_token) {
             toast({description: data.message})
-            localStorage.setItem("token", data.access_token);
             const urlParams = new URLSearchParams(window.location.search);
             const token = urlParams.get('token');
             if (token) {
@@ -109,8 +108,10 @@ const Login = () => {
             } else {
                 urlParams.delete('token')
                 if(data.project_count === 0){
-                    navigate(`${baseUrl}/project`);
+                    navigate(`${baseUrl}/on-bord`);
+                    localStorage.setItem("token-verify-onboard", data.access_token);
                 } else {
+                    localStorage.setItem("token", data.access_token);
                     navigate(`${baseUrl}/dashboard`);
                 }
             }
