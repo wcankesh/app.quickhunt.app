@@ -168,7 +168,6 @@ const Post = ({inAppMsgSetting, setInAppMsgSetting, isLoading}) => {
                                     <h5 className={"text-xs font-normal"}>{userDetailsReducer?.user_first_name} {userDetailsReducer?.user_last_name}</h5>
                                     <h5 className={`text-xs font-normal ${theme === "dark" ? "" : "text-muted-foreground"}`}>from {projectDetailsReducer?.project_name}</h5>
                                 </div>
-                                <h5 className={`text-xs leading-5 font-normal ${theme === "dark" ? "" : "text-muted-foreground"}`}>Active</h5>
                             </div>
                         </div> : ""
                     }

@@ -112,7 +112,7 @@ const HeaderBar = () => {
 
     useEffect(() => {
         getAllProjects()
-        loginUserDetails()
+       // loginUserDetails()
     }, []);
 
     useEffect(() => {

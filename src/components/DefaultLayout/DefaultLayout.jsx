@@ -1,8 +1,8 @@
-import React, { Fragment } from 'react';
+import React, {Fragment, useEffect} from 'react';
 import SaidBarDesktop from "../Comman/SaidBarDesktop";
 import HeaderBar from "../Comman/HeaderBar";
 import {Outlet, useLocation, useParams} from "react-router-dom";
-import { Card } from "../ui/card";
+
 
 const DefaultLayout = () => {
     const location = useLocation();

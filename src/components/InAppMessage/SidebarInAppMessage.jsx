@@ -663,7 +663,7 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                 )}
 
                 {
-                    type === "4" || type === "3" || type === "2"  &&
+                    (type === "4" || type === "3" || type === "2")  &&
                     <div className="grid w-full max-w-sm items-center gap-1.5">
                         <Label className={"font-normal"}>Text Color</Label>
                         <div className={"w-full text-sm widget-color-picker space-y-2"}>
