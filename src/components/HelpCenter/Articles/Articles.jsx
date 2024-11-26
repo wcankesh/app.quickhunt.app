@@ -26,10 +26,6 @@ const status = [
     {name: "Draft", value: 0, fillColor: "#CF1322", strokeColor: "#CF1322",},
 ];
 
-const initialFilter = [
-    {search: "", category_id: "", sub_category_id: ""}
-]
-
 const perPageLimit = 10
 
 const Articles = () => {
@@ -55,18 +51,10 @@ const Articles = () => {
     const [openDelete,setOpenDelete]=useState(false);
     const [isLoadingDelete, setIsLoadingDelete] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [openFilter, setOpenFilter] = useState(false);
 
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [selectedSubCategory, setSelectedSubCategory] = useState(null);
-
-    const handleCategorySelect = (category) => {
-        setSelectedCategory(category);
-        setSelectedSubCategory(null);
-    };
-
-    const handleSubCategorySelect = (subCategory) => {
-        setSelectedSubCategory(subCategory);
-    };
 
     useEffect(() => {
         if (projectDetailsReducer.id) {
@@ -115,36 +103,41 @@ const Articles = () => {
         }, 2000);
     }
 
-    // const filterData = (name, value) => {
-    //     debugger
-    //     console.log("name", name)
-    //     console.log("value", value)
-    //     setFilter({...filter, [name]: value})
-    //     if (timeoutHandler.current) {
-    //         clearTimeout(timeoutHandler.current);
-    //     }
-    //     timeoutHandler.current = setTimeout(() => {
-    //         setPageNo(1);
-    //         getAllArticles(value, '');
-    //     }, 2000);
-    // }
-
     const filterData = (name, value) => {
         setFilter(prevFilter => ({
             ...prevFilter,
             [name]: value
         }));
 
-        if (timeoutHandler.current) {
-            clearTimeout(timeoutHandler.current);
+        let category_id = '';
+        let sub_category_id = '';
+
+        if (name === "category_id") {
+            category_id = value;
+            setSelectedCategory({ id: value, title: articleList.find(x => x.id === value)?.title || 'Unknown' });
+        } else if (name === 'sub_category_id') {
+            sub_category_id = value;
+            const subCategory = articleList.flatMap(x => x.sub_categories).find(y => y.id === value);
+            setSelectedSubCategory({ id: value, title: subCategory?.title || 'Unknown' });
         }
 
-        timeoutHandler.current = setTimeout(() => {
-            setPageNo(1);
-            getAllArticles(filter.search, value, value);
-        }, 2000);
+        setOpenFilter(false)
+        setPageNo(1);
+        getAllArticles(filter.search, category_id, sub_category_id);
     };
 
+    const clearSearchFilter = () => {
+        setFilter(prev => ({ ...prev, search: '' }));
+        setPageNo(1);
+        getAllArticles('', filter.category_id, filter.sub_category_id);
+    };
+
+    const clearFilter = (key, setSelected) => {
+        setSelected(null);
+        setFilter(prev => ({ ...prev, [key]: null }));
+        setPageNo(1);
+        getAllArticles(filter.search, key === "category_id" ? null : filter.category_id, key === "sub_category_id" ? null : filter.sub_category_id);
+    };
 
     const handleCreateClick = () => {
         navigate(`${baseUrl}/help/article/new`);
@@ -240,17 +233,18 @@ const Articles = () => {
                             name={"search"}
                             onChange={onChangeSearch}
                         />
-                            {filter && (
+                            {filter.search.trim() !== '' && (
                                 <button
                                     type="button"
                                     className="absolute right-2 top-1/2 transform -translate-y-1/2 w-6 h-6 flex items-center justify-center text-gray-400 hover:text-gray-600"
+                                    onClick={clearSearchFilter}
                                 >
                                     <X className="w-4 h-4" />
                                 </button>
                             )}
                         </div>
                         <div className={"flex items-center"}>
-                            <DropdownMenu>
+                            <DropdownMenu open={openFilter} onOpenChange={setOpenFilter}>
                                 <DropdownMenuTrigger asChild>
                                     <Button className="h-9 w-9" size="icon" variant="outline">
                                         <Filter fill="true" className="w-4 h-4" />
@@ -273,7 +267,10 @@ const Articles = () => {
                                                                     // onSelect={() => filterData("category_id", x.id)}
                                                                 >
                                                                     <Fragment key={x.id}>
-                                                                        <span onClick={() => filterData("category_id", x.id)}
+                                                                        <span onClick={() => {
+                                                                            filterData("category_id", x.id);
+                                                                            setOpenFilter(false);
+                                                                        }}
                                                                             className={"flex-1 w-full text-sm font-normal cursor-pointer flex gap-2 items-center"}
                                                                         >
                                                                             {x.title}
@@ -301,7 +298,10 @@ const Articles = () => {
                                                                     <CommandItem
                                                                         key={y.id}
                                                                         value={y.id}
-                                                                        onSelect={() => filterData("sub_category_id", y.id)}
+                                                                        onSelect={() => {
+                                                                            filterData("sub_category_id", y.id);
+                                                                            setOpenFilter(false);
+                                                                        }}
                                                                     >
                                                                         <Fragment key={y.id}>
                                                                             <span
@@ -334,7 +334,7 @@ const Articles = () => {
                         <span className="px-3 py-1.5 border-r">{selectedCategory.title}</span>
                         <span
                             className="w-7 h-7 flex items-center justify-center cursor-pointer"
-                            onClick={() => setSelectedCategory(null)}
+                            onClick={() => clearFilter("category_id", setSelectedCategory)}
                         >
                         <X className='w-4 h-4'/>
                     </span>
@@ -345,7 +345,7 @@ const Articles = () => {
                         <span className="px-3 py-1.5 border-r">{selectedSubCategory.title}</span>
                         <span
                             className="w-7 h-7 flex items-center justify-center cursor-pointer"
-                            onClick={() => setSelectedSubCategory(null)}
+                            onClick={() => clearFilter("sub_category_id", setSelectedSubCategory)}
                         >
                         <X className='w-4 h-4'/>
                     </span>

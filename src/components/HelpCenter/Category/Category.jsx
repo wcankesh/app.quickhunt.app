@@ -1,4 +1,4 @@
-import React, {Fragment, useEffect, useState} from 'react';
+import React, {Fragment, useEffect, useRef, useState} from 'react';
 import {Input} from "../../ui/input";
 import {Button} from "../../ui/button";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "../../ui/table";
@@ -43,6 +43,7 @@ const Category = () => {
     const UrlParams = new URLSearchParams(location.search);
     const getPageNo = UrlParams.get("pageNo") || 1;
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
+    const timeoutHandler = useRef(null);
 
     const [formError, setFormError] = useState(initialStateError);
     const [selectedCategory, setSelectedCategory] = useState(initialState);
@@ -61,17 +62,25 @@ const Category = () => {
     const [idToDelete, setIdToDelete] = useState(null);
     const [subIdToDelete, setSubIdToDelete] = useState(null);
     const [isLoadingDelete, setIsLoadingDelete] = useState(false);
+    const [filter, setFilter] = useState({
+        search: "",
+        category_id: "",
+        sub_category_id: ""
+    });
 
     useEffect(() => {
         if(projectDetailsReducer.id){
-            getAllCategory();
+            getAllCategory(filter.search, filter.category_id, filter.sub_category_id);
         }
         navigate(`${baseUrl}/help/category?pageNo=${pageNo}`);
     }, [projectDetailsReducer.id, pageNo])
 
-    const getAllCategory = async () => {
+    const getAllCategory = async (search, category_id, sub_category_id) => {
         const data = await apiService.getAllCategory({
             project_id: projectDetailsReducer.id,
+            search: search,
+            category_id: category_id,
+            sub_category_id: sub_category_id,
             page: pageNo,
             limit: perPageLimit
         });
@@ -84,13 +93,44 @@ const Category = () => {
         }
     };
 
-    // const handleOnChange = (name, value) => {
-    //     setSelectedCategory({ ...selectedCategory, [name]: value });
-    //     setFormError(formError => ({
-    //         ...formError,
-    //         [name]: formValidate(name, value)
-    //     }));
-    // };
+    const onChangeSearch = async (event) => {
+        setFilter({...filter, [event.target.name]: event.target.value,})
+        if (timeoutHandler.current) {
+            clearTimeout(timeoutHandler.current);
+        }
+        timeoutHandler.current = setTimeout(() => {
+            setPageNo(1);
+            getAllCategory(event.target.value, '');
+        }, 2000);
+    }
+
+    const filterData = (name, value) => {
+        setFilter(prevFilter => ({
+            ...prevFilter,
+            [name]: value
+        }));
+
+        let category_id = '';
+        let sub_category_id = '';
+
+        if (name === "category_id") {
+            category_id = value;
+            // setSelectedCategory({ id: value, title: articleList.find(x => x.id === value)?.title || 'Unknown' });
+        } else if (name === 'sub_category_id') {
+            sub_category_id = value;
+            // const subCategory = articleList.flatMap(x => x.sub_categories).find(y => y.id === value);
+            // setSelectedSubCategory({ id: value, title: subCategory?.title || 'Unknown' });
+        }
+
+        setPageNo(1);
+        getAllCategory(filter.search, category_id, sub_category_id);
+    };
+
+    const clearSearchFilter = () => {
+        setFilter(prev => ({ ...prev, search: '' }));
+        setPageNo(1);
+        getAllCategory('', filter.category_id, filter.sub_category_id);
+    };
 
     const handleOnChange = (name, value) => {
         setSelectedCategory({ ...selectedCategory, [name]: value });
@@ -543,7 +583,7 @@ const Category = () => {
                                         type="text"
                                         id="category-name"
                                         className={"h-9"}
-                                        placeholder={"Enter the category name..."}
+                                        placeholder={"Enter the sub-category name..."}
                                     />
                                     {
                                         formError?.title && <span className="text-red-500 text-sm">{formError?.title}</span>
@@ -650,12 +690,23 @@ const Category = () => {
                     </div>
                     <div className={"w-full lg:w-auto flex flex-wrap sm:flex-nowrap gap-2 items-center"}>
                         <div className={"flex gap-2 items-center w-full lg:w-auto"}>
-                            <div className={"w-full"}>
+                            <div className={"relative w-full"}>
                                 <Input
-                                    type="search"
+                                    type="search" value={filter.search}
                                     placeholder="Search..."
-                                    className={"pl-4 pr-4 text-sm font-normal h-9 w-full"}
+                                    className={"w-full pl-4 pr-14 text-sm font-normal h-9"}
+                                    name={"search"}
+                                    onChange={onChangeSearch}
                                 />
+                                {filter.search.trim() !== '' && (
+                                    <button
+                                        type="button"
+                                        className="absolute right-2 top-1/2 transform -translate-y-1/2 w-6 h-6 flex items-center justify-center text-gray-400 hover:text-gray-600"
+                                        onClick={clearSearchFilter}
+                                    >
+                                        <X className="w-4 h-4" />
+                                    </button>
+                                )}
                             </div>
                         <Button
                             onClick={() => openSheetCategory("", "")}

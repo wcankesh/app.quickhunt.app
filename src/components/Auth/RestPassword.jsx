@@ -9,11 +9,13 @@ import {Icon} from "../../utils/Icon";
 import {useTheme} from "../theme-provider";
 import {useNavigate} from "react-router-dom";
 import {baseUrl} from "../../utils/constent";
+import {useToast} from "../ui/use-toast";
 
 const RestPassword = () => {
     const {theme} = useTheme();
     let apiSerVice = new ApiService();
     let navigate = useNavigate();
+    const {toast} = useToast();
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get('token');
 
@@ -68,11 +70,14 @@ const RestPassword = () => {
 
         switch (name) {
             case "password":
-                if (!value) return "Password is required";
-                if (!passwordRegex.test(value)) return "Minimum 8 characters, includes a lowercase, uppercase, number, and symbol.";
+                if (value.trim() === "") return "Password is required";
+                if (
+                    !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(value)
+                )
+                    return "Password must be at least 8 characters with one uppercase letter, one lowercase letter, one number, and one special character";
                 return "";
             case "confirm_password":
-                if (!value) return "Confirm Password is required";
+                if (value.trim() === "") return "Confirm Password is required";
                 if (value !== forgotPasswordDetails.password) return "Passwords must match";
                 return "";
             default:
@@ -102,7 +107,9 @@ const RestPassword = () => {
         if(data.status === 200){
             setIsLoading(false)
             navigate(`${baseUrl}/login`);
+            toast({description: data.message})
         } else {
+            toast({variant: "destructive", description: data.message})
             setIsLoading(false)
         }
     }

@@ -6,7 +6,7 @@ import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "../
 import {useTheme} from "../theme-provider";
 import {ApiService} from "../../utils/ApiService";
 import {useSelector} from "react-redux";
-import {toast} from "../ui/use-toast";
+import {toast, useToast} from "../ui/use-toast";
 import {Skeleton} from "../ui/skeleton";
 import EmptyData from "../Comman/EmptyData";
 import {Sheet, SheetContent, SheetHeader, SheetOverlay} from "../ui/sheet";
@@ -39,12 +39,15 @@ const Customers = () => {
     const {theme} =useTheme();
     const navigate = useNavigate();
     const apiService = new ApiService();
+    const UrlParams = new URLSearchParams(location.search);
+    const getPageNo = UrlParams.get("pageNo") || 1;
+    const {toast} = useToast()
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
 
     const [formError, setFormError] = useState(initialStateError);
     const [customerDetails, setCustomerDetails] = useState(initialState);
     const [customerList, setCustomerList] = useState([])
-    const [pageNo, setPageNo] = useState(1);
+    const [pageNo, setPageNo] = useState(Number(getPageNo));
     const [totalRecord, setTotalRecord] = useState(0);
     const [deleteId,setDeleteId]=useState(null);
     const [isSheetOpen, setSheetOpen] = useState(false);
@@ -58,7 +61,7 @@ const Customers = () => {
             getAllCustomers();
         }
         navigate(`${baseUrl}/customers?pageNo=${pageNo}`)
-    }, [projectDetailsReducer.id,pageNo])
+    }, [projectDetailsReducer.id, pageNo])
 
     const onChangeText = (event) => {
         setCustomerDetails({...customerDetails, [event.target.name]: event.target.value});
@@ -133,6 +136,7 @@ const Customers = () => {
         if(data.status === 200) {
             clone.splice(indexToDelete,1);
             setCustomerList(clone);
+            getAllCustomers();
             toast({
                 description: data.message
             });

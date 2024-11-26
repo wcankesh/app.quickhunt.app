@@ -23,7 +23,7 @@ const PricingPlans = () => {
             priceMonthly: 0,
             priceYearly: 0,
             description: "Essential features you need to get started",
-            features: ["Unlimited posts", "1 Ideas board", "Public Roadmap", "1 Project", "1 Manager", "All core features"],
+            features: ["Unlimited Post", "1 Widget", "1 Project", "1 Ideas Board", "1 Team Member", "1 Public Roadmap", "In-App Message", "User Analytics", "Branding"],
             planType: 0,
             priceIdMonthly: "",
             priceIdYearly: "",
@@ -35,7 +35,7 @@ const PricingPlans = () => {
             priceMonthly: 19,
             priceYearly: 182.4,
             description: "Perfect for owners of small & medium businesses",
-            features: ["Unlimited Ideas board", "Unlimited Project", "Public Roadmap", "Unlimited Manager", "All core features", "Custom Domain"],
+            features: ["All In Free+", "Unlimited Widget", "Unlimited Project", "Unlimited Ideas board", "Unlimited Team Member", "Unlimited Public Roadmap", "Custom Domain", "Integration (Coming soon)", "Remove Branding"],
             planType: 1,
             priceIdMonthly: "price_1PzW6fKS40mIQp5TIJDvqEVr",
             priceIdYearly: "price_1PzWDWKS40mIQp5T2OUEiOYK",
@@ -136,7 +136,7 @@ const PricingPlans = () => {
                             <h3 className={"text-2xl font-normal mb-4"}>{x.name}</h3>
                             <h3 className={"text-[32px] font-medium pb-6"}>
                                 ${tab === 1 ? x.priceMonthly: x.priceYearly}
-                                <span className={`text-xl ${theme === "dark" ? "" : "text-muted-foreground"}`}>/month</span>
+                                <span className={`text-xl ${theme === "dark" ? "" : "text-muted-foreground"}`}>{tab === 1 ? "/month" : "/year"}</span>
                             </h3>
                             <p className={`capitalize text-sm font-normal h-[32px] ${theme === "dark" ? "" : "text-muted-foreground"}`}>
                                 {x.description}

@@ -41,10 +41,10 @@ const Register = () => {
 
     const onChange = (event) => {
         setCompanyDetails({...companyDetails, [event.target.name]: event.target.value});
-        setFormError(formError => ({
-            ...formError,
-            [event.target.name]: ""
-        }));
+        // setFormError(formError => ({
+        //     ...formError,
+        //     [event.target.name]: ""
+        // }));
     };
 
     const onBlur = (event) => {

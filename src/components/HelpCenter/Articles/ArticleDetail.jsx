@@ -23,6 +23,7 @@ import Quote from "@editorjs/quote";
 import InlineCode from "@editorjs/inline-code";
 import EditorJS from "@editorjs/editorjs";
 import CommonBreadCrumb from "../../Comman/CommonBreadCrumb";
+import {Skeleton} from "../../ui/skeleton";
 
     const statusOptions = [
         { name: "Publish", value: 1, fillColor: "#389E0D", strokeColor: "#389E0D" },
@@ -410,11 +411,24 @@ const ArticleDetail = () => {
                     {renderSidebarItems()}
                 </div>
                 <div className={"hidden md:block bg-muted w-full h-full px-16 flex flex-col gap-4 py-8 justify-start overflow-y-auto h-[calc(100%_-_94px)]"}>
-                        <Card className={`rounded-[10px] p-0 h-full overflow-auto`} >
+                    {
+                        (isLoading && id !== "new") ? <div className={"flex flex-col gap-4"}>
+                            {
+                                Array.from(Array(28)).map((_, r) => {
+                                    return (
+                                        <div key={r}>
+                                            <Skeleton className="h-[10px] rounded-full bg-muted-foreground/20"/>
+                                        </div>
+                                    )
+                                })
+                            }
+                        </div> : <Card className={`rounded-[10px] p-0 h-full overflow-auto`} >
                             <CardHeader className={"pt-0"}>
-                                <div className={"pl-14 pt-6 m-0 w-full"}>{isLoading ? "" : <div id="editorjs"/>}</div>
+                                <div className={"pl-14 pt-6 m-0 w-full"}><div id="editorjs"/></div>
                             </CardHeader>
                         </Card>
+                    }
+
                 </div>
             </div>
         </Fragment>
