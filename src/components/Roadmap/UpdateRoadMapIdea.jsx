@@ -155,19 +155,32 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
 
         if (data.status === 200) {
             setIsSaveComment(false)
-            let cloneRoadmap = [...roadmapList.columns];
+            // let cloneRoadmap = [...roadmapList.columns];
+            const cloneRoadmap = JSON.parse(JSON.stringify(roadmapList.columns));
             const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap?.id);
+            // if (roadmapIndex !== -1) {
+            //     const ideaIndex = cloneRoadmap[roadmapIndex].ideas.findIndex((x) => x.id === selectedIdea?.id);
+            //     if (ideaIndex !== -1) {
+            //         let cloneIdeas = [cloneRoadmap[roadmapIndex].ideas];
+            //         let cloneIdea = {...cloneRoadmap[roadmapIndex].ideas[ideaIndex]};
+            //         const cloneComments = cloneIdea && cloneIdea?.comments ? [...cloneIdea?.comments] : [];
+            //         cloneComments.push(data.data);
+            //         cloneIdea = {...cloneIdea, comments: cloneComments};
+            //         cloneIdeas[ideaIndex] = cloneIdea;
+            //         setSelectedIdea(cloneIdea);
+            //         cloneRoadmap[roadmapIndex] = {...cloneRoadmap[roadmapIndex], ideas: cloneIdeas, cards: cloneIdeas}
+            //     }
+            // }
             if (roadmapIndex !== -1) {
                 const ideaIndex = cloneRoadmap[roadmapIndex].ideas.findIndex((x) => x.id === selectedIdea?.id);
                 if (ideaIndex !== -1) {
-                    let cloneIdeas = [cloneRoadmap[roadmapIndex].ideas];
-                    let cloneIdea = {...cloneRoadmap[roadmapIndex].ideas[ideaIndex]};
-                    const cloneComments = cloneIdea && cloneIdea?.comments ? [...cloneIdea?.comments] : [];
+                    let cloneIdea = { ...cloneRoadmap[roadmapIndex].ideas[ideaIndex] };
+                    const cloneComments = cloneIdea.comments ? [...cloneIdea.comments] : [];
                     cloneComments.push(data.data);
-                    cloneIdea = {...cloneIdea, comments: cloneComments};
-                    cloneIdeas[ideaIndex] = cloneIdea;
+                    cloneIdea = { ...cloneIdea, comments: cloneComments };
+                    cloneRoadmap[roadmapIndex].ideas[ideaIndex] = cloneIdea;
                     setSelectedIdea(cloneIdea);
-                    cloneRoadmap[roadmapIndex] = {...cloneRoadmap[roadmapIndex], ideas: cloneIdeas, cards: cloneIdeas}
+                    cloneRoadmap[roadmapIndex].cards = [...cloneRoadmap[roadmapIndex].ideas]; // Maintain cards
                 }
             }
             setRoadmapList({columns: cloneRoadmap});
@@ -598,12 +611,12 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                 } else {
                     return "";
                 }
-            case "description":
-                if (!value || value.trim() === "") {
-                    return "Description is required";
-                } else {
-                    return "";
-                }
+            // case "description":
+            //     if (!value || value.trim() === "") {
+            //         return "Description is required";
+            //     } else {
+            //         return "";
+            //     }
             case "board":
                 if (!value || value?.toString()?.trim() === "") {
                     return "Board is required";
@@ -626,7 +639,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
 
     const handleUpdate = (event) => {
         const {value} = event.target;
-        setDescription(value);
+        // setDescription(value);
         setSelectedIdea(selectedIdea => ({...selectedIdea, description: value}));
         // setFormError(formError => ({
         //     ...formError,
@@ -645,7 +658,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
         setSelectedIdea({...selectedIdea, topic: clone})
     }
 
-    const onCreateIdea = async () => {
+    const onUpdateIdea = async () => {
         let validationErrors = {};
         Object.keys(selectedIdea).forEach(name => {
             const error = formValidate(name, selectedIdea[name]);
@@ -682,7 +695,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
         }
     }
 
-    const handleOnCreateCancel = () => {
+    const handleOnUpdateCancel = () => {
         setFormError(initialStateError);
         setIsEditIdea(false);
     }
@@ -951,9 +964,9 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                             </Select>
                                         </div>
                                         <SaveCancelButton
-                                            onClickSave={onCreateIdea}
+                                            onClickSave={onUpdateIdea}
                                             load={isLoadingCreateIdea}
-                                            onClickCancel={handleOnCreateCancel}
+                                            onClickCancel={handleOnUpdateCancel}
                                         />
                                     </div>
                                     :

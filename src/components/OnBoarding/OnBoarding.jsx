@@ -19,6 +19,10 @@ const OnBoarding = () => {
 
     const [progress, setProgress] = useState(33.33);
 
+    useEffect(() => {
+        navigate(`${baseUrl}/on-boarding?step=${step}`);
+    },[step])
+
     // useEffect(() => {
     //     const urlParams = new URLSearchParams(window.location.search);
     //     const token = urlParams.get('token') || localStorage.getItem("token");
@@ -28,15 +32,15 @@ const OnBoarding = () => {
     //     // setProgress(step == 1 ? 0 : step == 2 ? 50 : step == 3 ? 100 : 0);
     // }, []);
 
-    useEffect(() => {
-        const urlParams = new URLSearchParams(location.search);
-        const urlStep = parseInt(urlParams.get('step'), 10);
-
-        if (urlStep && urlStep >= 1 && urlStep <= 4) {
-            setStep(urlStep);
-            setProgress((urlStep - 1) * 33.33);
-        }
-    }, [location.search]);
+    // useEffect(() => {
+    //     const urlParams = new URLSearchParams(location.search);
+    //     const urlStep = parseInt(urlParams.get('step'), 10);
+    //
+    //     if (urlStep && urlStep >= 1 && urlStep <= 4) {
+    //         setStep(urlStep);
+    //         setProgress((urlStep - 1) * 33.33);
+    //     }
+    // }, [location.search]);
 
     useEffect(() => {
         const urlParams = new URLSearchParams(window.location.search);

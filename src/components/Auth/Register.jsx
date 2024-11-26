@@ -116,7 +116,7 @@ const Register = () => {
             delete userDetails?.access_token;
             localStorage.setItem("user-details", JSON.stringify(userDetails));
             localStorage.setItem("token-verify-onboard", data?.access_token);
-            navigate(`${baseUrl}/on-bord`);
+            navigate(`${baseUrl}/on-boarding`);
             toast({description: data.message})
             setIsLoading(false)
         } else {

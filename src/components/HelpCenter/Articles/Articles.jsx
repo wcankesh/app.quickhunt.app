@@ -130,8 +130,6 @@ const Articles = () => {
     // }
 
     const filterData = (name, value) => {
-        console.log(name)
-        console.log(value)
         setFilter(prevFilter => ({
             ...prevFilter,
             [name]: value
@@ -170,6 +168,7 @@ const Articles = () => {
             if (index !== -1) {
                 clone.splice(index, 1)
                 setArticles(clone);
+                getAllArticles();
             }
             toast({description: data.message,})
         } else {

@@ -54,7 +54,7 @@ const initialStateErrorProject = {
     project_name: '',
 }
 
-const HeaderBar = () => {
+const HeaderBar = ({setIsMobile}) => {
     const {setTheme, theme, onProModal} = useTheme()
     let navigate = useNavigate();
     let location = useLocation();
@@ -538,6 +538,14 @@ const HeaderBar = () => {
                     <div className={"flex gap-3 items-center"}>
 
                         {/*Mobile said bar start */}
+                        {/*<span>*/}
+                        {/*    <Button variant="outline" size="icon" className="shrink-0 xl:hidden">*/}
+                        {/*                <Menu size={20}/>*/}
+                        {/*            </Button>*/}
+                        {/*</span>*/}
+                        {/*Mobile said bar End */}
+
+                        {/*Mobile said bar start */}
                             <Sheet open={isSheetOpenMobileMenu} onOpenChange={isSheetOpenMobileMenu ? closeMobileSheet : openMobileSheet}>
                                 <SheetTrigger asChild>
                                     <Button variant="outline" size="icon" className="shrink-0 xl:hidden">
@@ -631,7 +639,6 @@ const HeaderBar = () => {
 
                         <div className="flex h-11 items-center xl:hidden md:block hidden">
                             <div className={"app-logo cursor-pointer h-[45px]"}  onClick={() => onRedirect("/dashboard")}>
-                                {/*{theme === "dark" ? Icon.whiteLogo : Icon.blackLogo}*/}
                                 {Icon.whiteLogo}
                             </div>
                         </div>
@@ -770,7 +777,6 @@ const HeaderBar = () => {
                                             value={createProjectDetails.project_name}
                                             name="project_name"
                                             onChange={onChangeText}
-                                            // onBlur={onBlur}
                                         />
                                         {
                                             formError.project_name &&

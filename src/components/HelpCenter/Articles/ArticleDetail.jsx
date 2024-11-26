@@ -32,9 +32,9 @@ import CommonBreadCrumb from "../../Comman/CommonBreadCrumb";
     const initialState =
         {
             title: 'New Article',
-            category_id: 1,
+            category_id: null,
             category_title: "",
-            sub_category_id: 1,
+            sub_category_id: null,
             sub_category_title: "",
             description: "",
             is_active: 1,
@@ -43,9 +43,9 @@ import CommonBreadCrumb from "../../Comman/CommonBreadCrumb";
     const initialStateError =
     {
         title: '',
-        category_id: 1,
+        category_id: null,
         category_title: "",
-        sub_category_id: 1,
+        sub_category_id: null,
         sub_category_title: "",
         description: "",
         is_active: 1,
@@ -113,6 +113,18 @@ const ArticleDetail = () => {
             case "title":
                 if (!value || value.trim() === "") {
                     return "Title is required";
+                } else {
+                    return "";
+                }
+            case "category_id":
+                if (!value || value?.toString()?.trim() === "") {
+                    return "Select a Category";
+                } else {
+                    return "";
+                }
+            case "sub_category_id":
+                if (!value || value?.toString()?.trim() === "") {
+                    return "Select a Sub Category";
                 } else {
                     return "";
                 }
@@ -315,15 +327,16 @@ const ArticleDetail = () => {
                                     {
                                         articleList.length > 0 ?
                                             articleList.map((item) => (
-                                                <SelectItem key={item.id} value={item.id}>
+                                                <SelectItem key={item.id} value={item.id} className={"cursor-pointer"}>
                                                     {item.title}
                                                 </SelectItem>
                                             )) : (
-                                                <SelectItem disabled>No Categories</SelectItem>
+                                                <SelectItem disabled className={"cursor-pointer"}>No Categories</SelectItem>
                                             )}
                                 </SelectGroup>
                             </SelectContent>
                         </Select>
+                        {formError.category_id && <span className="text-red-500 text-sm">{formError.category_id}</span>}
                     </div>
                     <div className={"space-y-2"}>
                         <Label className={"text-sm font-normal"}>Select Sub Category</Label>
@@ -339,16 +352,17 @@ const ArticleDetail = () => {
                                 <SelectGroup>
                                     {subcategories.length > 0 ? (
                                         subcategories.map((subCategory) => (
-                                            <SelectItem key={subCategory.id} value={subCategory.id}>
+                                            <SelectItem key={subCategory.id} value={subCategory.id} className={"cursor-pointer"}>
                                                 {subCategory.title}
                                             </SelectItem>
                                         ))
                                     ) : (
-                                        <SelectItem disabled>No Sub Category</SelectItem>
+                                        <SelectItem disabled className={"cursor-pointer"}>No Sub Category</SelectItem>
                                     )}
                                 </SelectGroup>
                             </SelectContent>
                         </Select>
+                        {formError.sub_category_id && <span className="text-red-500 text-sm">{formError.sub_category_id}</span>}
                     </div>
                 </div>
             </div>

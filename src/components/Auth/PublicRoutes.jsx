@@ -27,7 +27,7 @@ const PublicRoutes = () => {
     }, [])
 
 
-    return isLogin() ? <Navigate to={`${baseUrl}/dashboard`}/>:<Fragment><Toaster/> <Outlet/></Fragment> ;
+    return isLogin() ? <Navigate to={`${baseUrl}/dashboard`}/>: <Fragment><Toaster/> <Outlet/></Fragment> ;
 };
 
 export default PublicRoutes;

@@ -44,7 +44,7 @@ function App() {
                     <Route path={`${baseUrl}/login`} element={<Login/>}/>
                     <Route path={`${baseUrl}/forgot-password`} element={<Forgot/>}/>
                     <Route path={`${baseUrl}/reset-verify`} element={<RestPassword/>}/>
-                    <Route path={`${baseUrl}/on-bord`} element={<OnBoarding/>}/>
+                    <Route path={`${baseUrl}/on-boarding`} element={<OnBoarding/>}/>
                 </Route>
                 {/*<Route path="*" element={<PageNotFound/>}/>*/}
             </Routes>

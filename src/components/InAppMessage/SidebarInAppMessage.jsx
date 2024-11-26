@@ -131,24 +131,24 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                     return "Start Date is required.";
                 }
                 return "";
-            case "start_time":
-                if (!trimmedValue) {
-                    return "Start Time is required.";
-                }
-                const startTimeFormat = /^([01]?[0-9]|2[0-3]):([0-5]?[0-9])$/;
-                if (!startTimeFormat.test(trimmedValue)) {
-                    return "Start Time must be in HH:mm format.";
-                }
-                return "";
-            case "end_time":
-                if (!trimmedValue) {
-                    return "End Time is required.";
-                }
-                const endTimeFormat = /^([01]?[0-9]|2[0-3]):([0-5]?[0-9])$/;
-                if (!endTimeFormat.test(trimmedValue)) {
-                    return "End Time must be in HH:mm format.";
-                }
-                return "";
+            // case "start_time":
+            //     if (!trimmedValue) {
+            //         return "Start Time is required.";
+            //     }
+            //     const startTimeFormat = /^([01]?[0-9]|2[0-3]):([0-5]?[0-9])$/;
+            //     if (!startTimeFormat.test(trimmedValue)) {
+            //         return "Start Time must be in HH:mm format.";
+            //     }
+            //     return "";
+            // case "end_time":
+            //     if (!trimmedValue) {
+            //         return "End Time is required.";
+            //     }
+            //     const endTimeFormat = /^([01]?[0-9]|2[0-3]):([0-5]?[0-9])$/;
+            //     if (!endTimeFormat.test(trimmedValue)) {
+            //         return "End Time must be in HH:mm format.";
+            //     }
+            //     return "";
             default:
                 return "";
         }

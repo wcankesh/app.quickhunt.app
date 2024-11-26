@@ -1,4 +1,4 @@
-import React, { Fragment, useState, useEffect } from 'react';
+import React, { Fragment, useState } from 'react';
 import { Label } from "../../ui/label";
 import { Button } from "../../ui/button";
 import {apiService, baseUrl, getLSUserDetails} from "../../../utils/constent";
@@ -43,26 +43,23 @@ const Step2 = ({setStep}) => {
     const [showAdditionalSelect, setShowAdditionalSelect] = useState(false);
     const [selectedKnowAbout, setSelectedKnowAbout] = useState('');
     const [showAdditionalKnowAboutSelect, setShowAdditionalKnowAboutSelect] = useState(false);
-    const [otherInput, setOtherInput] = useState('');
+    const userDetailsReducer = useSelector(state => state.userDetailsReducer);
 
-    // useEffect(() => {
-    //     onBoardingFlow();
-    // }, [])
+    const [additionalCreateValue, setAdditionalCreateValue] = useState('');
+    const [additionalKnowAboutValue, setAdditionalKnowAboutValue] = useState('');
 
-    const onStep = async () => {
-        debugger
+    const onNextStep = async () => {
         const token = localStorage.getItem('token-verify-onboard') || null
         const payload = {
-            want_to: userDetail.want_to,
-            know_from: userDetail.know_from,
-            other: userDetail.other
+            want_to: selectedCreate === 'other' ? additionalCreateValue : selectedCreate,
+            know_from: selectedKnowAbout === 'other' ? additionalKnowAboutValue : selectedKnowAbout,
+            other: userDetail.other,
         }
         const data = await apiService.onBoardingFlow(payload, {Authorization: `Bearer ${token}`});
         if(data.status === 200) {
-            const token = localStorage.getItem('token-verify-onboard') || null
-            localStorage.setItem("token", token);
-            localStorage.removeItem('token-verify-onboard')
+
             setUserDetail(data.data)
+            setStep(3);
         }
     }
 
@@ -76,10 +73,10 @@ const Step2 = ({setStep}) => {
         setShowAdditionalKnowAboutSelect(value === 'other');
     };
 
-    // const onStep = (stepCount) => {
-    //     setStep(stepCount)
-    //     // navigate(`${baseUrl}/on-boarding`)
-    // }
+    const onStep = (stepCount) => {
+        setStep(stepCount)
+        // navigate(`${baseUrl}/on-boarding`)
+    }
 
     return (
         <Fragment>
@@ -90,7 +87,7 @@ const Step2 = ({setStep}) => {
                 </div>
                 <div className={`space-y-3`}>
                     <div className={"space-y-2"}>
-                        <Label className={"text-sm font-normal mb-2"}>Hey {getLSUserDetails()?.user_first_name} {getLSUserDetails()?.user_last_name}, What can we help you create today?</Label>
+                        <Label className={"text-sm font-normal mb-2"}>Hey {userDetailsReducer?.user_first_name} {userDetailsReducer?.user_last_name}, What can we help you create today?</Label>
                         <Select onValueChange={handleCreateChange}>
                             <SelectTrigger className="h-auto placeholder:text-muted">
                                 <SelectValue placeholder="Ex. Announcement(changelog)"/>
@@ -139,7 +136,7 @@ const Step2 = ({setStep}) => {
             </div>
             <div className={"flex gap-2 justify-end"}>
                 <Button variant={"outline hover:bg-none"} className={"border border-primary text-primary font-semibold px-[29px]"} onClick={() => onStep(1)}>Back</Button>
-                <Button className={"font-semibold px-[29px] hover:bg-primary"} onClick={() => onStep(3)}>Continue</Button>
+                <Button className={"font-semibold px-[29px] hover:bg-primary"} onClick={() => onNextStep(3)}>Continue</Button>
             </div>
         </Fragment>
     );

@@ -36,10 +36,6 @@ const Roadmap = () => {
     const openSheet = (type) => setIsSheetOpen({ open: true, type });
     const closeSheet = () => setIsSheetOpen({ open: false, type: "" });
 
-    console.log("roadmapList", roadmapList)
-    console.log("selectedIdea", selectedIdea)
-    console.log("selectedRoadmap", selectedRoadmap)
-
     const openDetailsSheet = (record) => {
         const findRoadmap = roadmapList.columns.find((x) => x.id === record.roadmap_id)
         setSelectedIdea(record)
@@ -75,8 +71,6 @@ const Roadmap = () => {
     }
 
     const callApi = async (columnId, payload) => {
-        console.log("columnId", columnId)
-        console.log("callApi payload", payload)
         let formData = new FormData();
         formData.append("roadmap_id", columnId);
         const data = await apiService.updateIdea(formData, payload)
@@ -86,37 +80,6 @@ const Roadmap = () => {
 
         }
     }
-
-    //old code
-    // const handleCardMove = (_card, source, destination) => {
-    //     const updatedCard = { ..._card, roadmap_id: destination.toColumnId };
-    //     const updatedColumns = roadmapList.columns.map((column) => {
-    //         if (column.id === source.fromColumnId) {
-    //             return {
-    //                 ...column,
-    //                 cards: column.cards.filter(card => card.id !== _card.id),
-    //                 ideas: column.ideas?.filter(card => card.id !== _card.id) || [],
-    //             };
-    //         }
-    //         if (column.id === destination.toColumnId) {
-    //             const updatedCards = [...column.cards.filter(card => card.id !== _card.id)];
-    //             updatedCards.splice(destination.index, 0, updatedCard);
-    //             return {
-    //                 ...column,
-    //                 cards: updatedCards,
-    //                 ideas: column.ideas
-    //                     ? [...column.ideas.filter(card => card.id !== _card.id), updatedCard]
-    //                     : [updatedCard],
-    //             };
-    //         }
-    //         return column;
-    //     });
-    //     setRoadmapList((prevState) => ({
-    //         ...prevState,
-    //         columns: updatedColumns,
-    //     }));
-    //     callApi(destination.toColumnId, updatedCard.id);
-    // };
 
     const handleCardMove = (_card, source, destination) => {
         const updatedCard = { ..._card, roadmap_id: destination.toColumnId };

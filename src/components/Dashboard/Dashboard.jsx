@@ -198,7 +198,7 @@ export function Dashboard() {
             </div>
             <div
                 className="container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pb-5 px-3 md:px-4 m-auto">
-                <div className={"flex items-center flex-wrap pb-6 pt-9 gap-2 md:justify-between md:flex-nowrap"}>
+                <div className={"flex items-center flex-wrap pb-6 pt-9 gap-2 justify-between md:flex-nowrap"}>
                     <div className={"space-y-1"}>
                         <h3 className="text-base font-medium capitalize">View Your Program Performance</h3>
                         <p className={"text-sm text-muted-foreground"}>Here's a summary of what’s happening with your program.</p>

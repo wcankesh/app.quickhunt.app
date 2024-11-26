@@ -33,12 +33,9 @@ export const PRESETS = [
     {name: 'yesterday', label: 'Yesterday', displayDays: 'Yesterday'},
     {name: 'last7', label: 'Last 7 days', displayDays: 'Last 7 days'},
     {name: 'last30', label: 'Last 30 days', displayDays: 'Last 30 days'},
-    // {name: 'last90', label: 'Last 90 days', displayDays: 'Last 90 days'},
-    // {name: 'last365', label: 'Last 365 days', displayDays: 'Last 365 days'},
     {name: 'lastMonth', label: 'Last Month', displayDays: 'Last Month'},
     {name: 'last6Month', label: 'Last 6 Month', displayDays: 'Last 6 Month'},
     {name: 'lastYear', label: 'Last Year', displayDays: 'Last Year'},
-    // {name: 'customRange', label: 'Custom Range', displayDays: 'Custom Range'},
 ]
 
 export const getPresetRange = (presetName) => {

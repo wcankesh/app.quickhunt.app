@@ -138,7 +138,7 @@ const UpdateIdea = () => {
                 }
             }
         } else {
-            toast({variant: "destructive", description: "Login user can not use upvote or down vote"})
+            toast({variant: "destructive", description: "You can't vote your own ideas"})
         }
     }
 

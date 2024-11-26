@@ -53,6 +53,7 @@ useEffect(() => {
 }, [])
 
     return (token() && !Token) || getTokenVerify() ? <Fragment> <Toaster/><Outlet/></Fragment> : <Navigate to={`${baseUrl}/login`}/>
+    // return (token() && !Token) ? <Fragment> <Toaster/><Outlet/></Fragment> : getTokenVerify() ?<Navigate to={`${baseUrl}/on-boarding`}/>:  <Navigate to={`${baseUrl}/login`}/>
 };
 
 export default ProtectedRoutes;
