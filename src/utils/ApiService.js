@@ -178,6 +178,9 @@ export class ApiService{
     async onBoardingFlow (payload, token = {}) {
         return await this.postData(`${baseUrlApi}/on-bord`, payload, false, token)
     }
+    async onBoardingFlowComplete () {
+        return await this.getData(`${baseUrlApi}/on-bord/complete`)
+    }
 
     /* ---------- Announcement api ---------- */
     async getAllPosts (payload){

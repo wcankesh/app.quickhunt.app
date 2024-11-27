@@ -174,10 +174,19 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
         }
 
         setIsLoading(true)
+        const startAt = inAppMsgSetting?.start_at
+            ? moment(inAppMsgSetting.start_at).format('YYYY-MM-DD HH:mm:ss')
+            : null;
+
+        const endAt = inAppMsgSetting?.end_at && moment(inAppMsgSetting.end_at).isValid()
+            ? moment(inAppMsgSetting.end_at).format('YYYY-MM-DD HH:mm:ss')
+            : null;
         const payload = {
             ...inAppMsgSetting,
-            start_at: moment(inAppMsgSetting?.start_at).format('YYYY-MM-DD HH:mm:ss'),
-            end_at: moment(inAppMsgSetting?.end_at).format('YYYY-MM-DD HH:mm:ss'),
+            // start_at: moment(inAppMsgSetting?.start_at).format('YYYY-MM-DD HH:mm:ss'),
+            // end_at: moment(inAppMsgSetting?.end_at).format('YYYY-MM-DD HH:mm:ss'),
+            start_at: startAt,
+            end_at: endAt,
             project_id: projectDetailsReducer.id,
             type: type
         }

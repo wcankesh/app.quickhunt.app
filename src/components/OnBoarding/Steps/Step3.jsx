@@ -8,6 +8,7 @@ import {projectDetailsAction} from "../../../redux/action/ProjectDetailsAction";
 import {useDispatch} from "react-redux";
 import {useToast} from "../../ui/use-toast";
 import {useTheme} from "../../theme-provider";
+import {Loader2} from "lucide-react";
 
 const initialState = {
     projectName: '',
@@ -52,6 +53,14 @@ const Step3 = ({setStep}) => {
     const [formError, setFormError] = useState(initialStateErrorProject);
     const [isCreateLoading, setIsCreateLoading] = useState(false);
 
+    const onBoardingFlowComplete = async () => {
+        const data = await apiService.onBoardingFlowComplete();
+        if(data.status === 200) {
+            console.log("complete", data.data)
+            setStep(4);
+        }
+    }
+
     const onChangeText = (event) => {
         const { name, value } = event.target;
         if(name === "project_name" || name === 'domain'){
@@ -89,7 +98,6 @@ const Step3 = ({setStep}) => {
     };
 
     const onFinishSetup = async () => {
-        debugger
         setIsCreateLoading(true);
         let validationErrors = {};
         Object.keys(createProjectDetails).forEach(name => {
@@ -127,7 +135,7 @@ const Step3 = ({setStep}) => {
             toast({description: data.message})
             setCreateProjectDetails(initialStateProject)
             setIsCreateLoading(false);
-            setStep(4);
+            onBoardingFlowComplete();
             localStorage.setItem("token", token);
             localStorage.removeItem('token-verify-onboard')
         } else {
@@ -208,9 +216,8 @@ const Step3 = ({setStep}) => {
                     {/*</div>*/}
                 </div>
             </div>
-            <div className={"flex justify-between gap-2"}>
-                <Button variant={"ghost hover:none"} className={"h-auto p-0 text-primary text-sm font-bold"}>Need help?</Button>
-                <Button className={"font-semibold px-[29px] hover:bg-primary"} onClick={() => onFinishSetup(4)}>Finish Signing up</Button>
+            <div className={"flex justify-end gap-2"}>
+                <Button className={"font-semibold px-[29px] hover:bg-primary w-[167px]"} onClick={() => onFinishSetup(4)}>{isCreateLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : "Finish Signing up"}</Button>
             </div>
         </Fragment>
     );

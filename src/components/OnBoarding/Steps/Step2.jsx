@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "../../ui/select";
 import {Input} from "../../ui/input";
 import {useSelector} from "react-redux";
+import {Loader2} from "lucide-react";
 
 const initialState = {
     want_to: '',
@@ -44,11 +45,13 @@ const Step2 = ({setStep}) => {
     const [selectedKnowAbout, setSelectedKnowAbout] = useState('');
     const [showAdditionalKnowAboutSelect, setShowAdditionalKnowAboutSelect] = useState(false);
     const userDetailsReducer = useSelector(state => state.userDetailsReducer);
+    const [isLoading, setIsLoading] = useState(false);
 
     const [additionalCreateValue, setAdditionalCreateValue] = useState('');
     const [additionalKnowAboutValue, setAdditionalKnowAboutValue] = useState('');
 
     const onNextStep = async () => {
+        setIsLoading(true);
         const token = localStorage.getItem('token-verify-onboard') || null
         const payload = {
             want_to: selectedCreate === 'other' ? additionalCreateValue : selectedCreate,
@@ -57,9 +60,9 @@ const Step2 = ({setStep}) => {
         }
         const data = await apiService.onBoardingFlow(payload, {Authorization: `Bearer ${token}`});
         if(data.status === 200) {
-
             setUserDetail(data.data)
             setStep(3);
+            setIsLoading(false);
         }
     }
 
@@ -136,7 +139,7 @@ const Step2 = ({setStep}) => {
             </div>
             <div className={"flex gap-2 justify-end"}>
                 <Button variant={"outline hover:bg-none"} className={"border border-primary text-primary font-semibold px-[29px]"} onClick={() => onStep(1)}>Back</Button>
-                <Button className={"font-semibold px-[29px] hover:bg-primary"} onClick={() => onNextStep(3)}>Continue</Button>
+                <Button className={"font-semibold px-[29px] hover:bg-primary w-[116px]"} onClick={() => onNextStep(3)}>{isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : "Continue"}</Button>
             </div>
         </Fragment>
     );

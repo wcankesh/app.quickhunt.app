@@ -107,7 +107,7 @@ const Login = () => {
                 navigate(`${baseUrl}/setup?token=${token}`);
             } else {
                 urlParams.delete('token')
-                if(data?.onboarding == 1){
+                if(data?.onboarding == 0){
                     navigate(`${baseUrl}/on-boarding`);
                     localStorage.setItem("token-verify-onboard", data.access_token);
                 } else {
