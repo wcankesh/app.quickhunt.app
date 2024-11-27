@@ -5,6 +5,7 @@ import {useToast} from "../ui/use-toast";
 import {ApiService} from "../../utils/ApiService";
 import {Icon} from "../../utils/Icon";
 import {Avatar, AvatarFallback} from "../ui/avatar";
+import {Skeleton} from "../ui/skeleton";
 import {baseUrl} from "../../utils/constent";
 import {useNavigate} from "react-router-dom";
 
@@ -15,6 +16,7 @@ const initialState= {
     user_email_id: '',
     user_first_name: '',
     user_last_name: '',
+    status: '',
 }
 
 const Setup = () => {
@@ -25,6 +27,7 @@ const Setup = () => {
     const {toast} = useToast();
 
     const [invitationDetail, setInvitationDetail] = useState(initialState)
+    const [isLoading, setIsLoading] = useState(true)
 
     useEffect(() => {
         getInvitationDetail()
@@ -34,7 +37,9 @@ const Setup = () => {
         const data = await apiSerVice.getInvitationDetail(token)
         if(data.status === 200){
             setInvitationDetail({...data.data[0]})
+            setIsLoading(false)
         } else {
+            setIsLoading(false)
         }
     }
 
@@ -66,26 +71,51 @@ const Setup = () => {
                     </p>
                 </div>
                 <div className={"mt-2.5"}>
-                    <Card>
-                        <CardContent className={"p-3 md:p-6 flex justify-between items-center flex-wrap gap-2"}>
-                            <div className={"flex gap-3 items-center"}>
-                                <div>
-                                    <Avatar className={"w-[50px] h-[50px]"}>
-                                        <AvatarFallback className={"bg-primary/10 border-primary border text-sm text-primary font-medium"}>{invitationDetail && invitationDetail.project_name && invitationDetail.project_name.substring(0,1).toUpperCase() }</AvatarFallback>
-                                    </Avatar>
+                    {
+                        isLoading ? <Card>
+                            <CardContent className={"p-3 md:p-6 flex justify-between items-center flex-wrap gap-2"}>
+                                <div className={"flex gap-3 items-center"}>
+                                    <div>
+                                        <Skeleton className="w-[50px] h-[50px] rounded-full" />
+                                    </div>
+                                  <div>
+                                      <Skeleton className="w-56 h-[10px] rounded-full mb-2" />
+                                      <Skeleton className="w-56 h-[10px] rounded-full" />
+                                  </div>
                                 </div>
-                                <div>
-                                    <h3 className={"text-sm font-normal mb-1"}>{invitationDetail.project_name}</h3>
-                                    <p className={"text-xs pb-1"}>{invitationDetail.domain}</p>
-                                    <p className={"text-xs text-muted-foreground"}>Invited by {invitationDetail.user_first_name} {invitationDetail.user_last_name ? invitationDetail.user_last_name : ''}. Expired in 7days </p>
+                                <div className={"flex gap-2"}>
+                                    <Skeleton className="w-[70px] h-[30px] " />
+                                    <Skeleton className="w-[70px] h-[30px]" />
                                 </div>
-                            </div>
-                            <div className={"flex gap-2"}>
-                                <Button onClick={() =>joinInvite(2)}>Accept</Button>
-                                <Button variant={"outline"} onClick={() =>joinInvite(3)}>Reject</Button>
-                            </div>
-                        </CardContent>
-                    </Card>
+
+                            </CardContent>
+                        </Card> : <Card>
+                            <CardContent className={"p-3 md:p-6 flex justify-between items-center flex-wrap gap-2"}>
+                                <div className={"flex gap-3 items-center"}>
+                                    <div>
+                                        <Avatar className={"w-[50px] h-[50px]"}>
+                                            <AvatarFallback className={"bg-primary/10 border-primary border text-sm text-primary font-medium"}>{invitationDetail && invitationDetail.project_name && invitationDetail.project_name.substring(0,1).toUpperCase() }</AvatarFallback>
+                                        </Avatar>
+                                    </div>
+                                    <div>
+                                        <h3 className={"text-sm font-normal mb-1"}>{invitationDetail.project_name}</h3>
+                                        <p className={"text-xs pb-1"}>{invitationDetail.domain}</p>
+                                        <p className={"text-xs text-muted-foreground"}>Invited by {invitationDetail.user_first_name} {invitationDetail.user_last_name ? invitationDetail.user_last_name : ''}. {invitationDetail?.status === 1 ? "Expired in 7days": ""} </p>
+                                    </div>
+                                </div>
+                                {
+                                    invitationDetail?.status === 1 ?  <div className={"flex gap-2"}>
+                                        <Button onClick={() =>joinInvite(2)}>Accept</Button>
+                                        <Button variant={"outline"} onClick={() =>joinInvite(3)}>Reject</Button>
+                                    </div> :   <div className={"flex gap-2"}>
+                                        <Button disabled>{invitationDetail?.status === 2 ? "Accepted" : "Rejected"}</Button>
+                                    </div>
+                                }
+
+                            </CardContent>
+                        </Card>
+                    }
+
                 </div>
             </div>
         </div>

@@ -185,7 +185,7 @@ const Customers = () => {
         } else {
             setIsSave(false);
             toast({
-                description:"Something went wrong",
+                description:data.message,
                 variant: "destructive",
             })
         }
