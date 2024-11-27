@@ -61,10 +61,9 @@ const Domain = () => {
             onProModal(true)
         } else {
             setIsSave(true)
-            debugger
             const payload = {
                 project_id: projectDetailsReducer.id,
-                custom_domain: settingData.custom_domain || "",
+                custom_domain: settingData.custom_domain || null,
                 google_analytics_id: settingData.google_analytics_id,
                 private_mode: settingData.private_mode,
                 hide_from_search_engine: settingData.hide_from_search_engine,

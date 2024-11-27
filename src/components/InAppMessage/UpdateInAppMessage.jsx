@@ -249,10 +249,17 @@ const UpdateInAppMessage = () => {
             }
         }
         setIsSave(true)
+        const startAt = inAppMsgSetting?.start_at
+            ? moment(inAppMsgSetting.start_at).format('YYYY-MM-DD HH:mm:ss')
+            : null;
+
+        const endAt = inAppMsgSetting?.end_at && moment(inAppMsgSetting.end_at).isValid()
+            ? moment(inAppMsgSetting.end_at).format('YYYY-MM-DD HH:mm:ss')
+            : null;
         const payload = {
             ...inAppMsgSetting,
-            start_at: moment(inAppMsgSetting?.start_at).format('YYYY-MM-DD HH:mm:ss'),
-            end_at: moment(inAppMsgSetting?.end_at).format('YYYY-MM-DD HH:mm:ss'),
+            start_at: startAt,
+            end_at: endAt,
             project_id: projectDetailsReducer.id,
             type: type
         }
@@ -272,11 +279,19 @@ const UpdateInAppMessage = () => {
 
     const onUpdateMessage = async () => {
         setIsSave(true)
+        const startAt = inAppMsgSetting?.start_at
+            ? moment(inAppMsgSetting.start_at).format('YYYY-MM-DD HH:mm:ss')
+            : null;
+
+        const endAt = inAppMsgSetting?.end_at && moment(inAppMsgSetting.end_at).isValid()
+            ? moment(inAppMsgSetting.end_at).format('YYYY-MM-DD HH:mm:ss')
+            : null;
         const payload = {
             ...inAppMsgSetting,
-            start_at: moment(inAppMsgSetting?.start_at).format('YYYY-MM-DD HH:mm:ss'),
-            end_at: moment(inAppMsgSetting?.end_at).format('YYYY-MM-DD HH:mm:ss'),
-            type: type
+            start_at: startAt,
+            end_at: endAt,
+            type: type,
+            body_text: JSON.stringify(inAppMsgSetting.body_text)
         }
         const data = await apiSerVice.updateInAppMessage(payload, inAppMsgSetting.id)
         if (data.status === 200) {
