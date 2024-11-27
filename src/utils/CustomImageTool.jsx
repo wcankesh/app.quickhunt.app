@@ -4,7 +4,6 @@ import ImageTool from '@editorjs/image';
 class CustomImageTool extends ImageTool {
     constructor({ data, config, api, readOnly, block }) {
         super({ data, config, api, readOnly, block });
-        debugger
         this.api = api;
         this.data = data;
     }
@@ -31,7 +30,6 @@ class CustomImageTool extends ImageTool {
 
         // Add event listener to the delete button
         deleteButton.addEventListener('click', async () => {
-            debugger
             try {
                 // Retrieve the current block's index
                 const blockIndex = this.api.blocks.getCurrentBlockIndex();

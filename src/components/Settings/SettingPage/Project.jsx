@@ -195,7 +195,6 @@ const Project = () => {
 
     const onDelete = async () => {
         setIsLoadingDelete(true);
-        debugger
         const data = await apiService.deleteProjects(projectDetailsReducer.id)
         if(data.status === 200){
             const cloneProject = [...allProjectReducer.projectList]
