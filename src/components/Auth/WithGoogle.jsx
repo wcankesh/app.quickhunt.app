@@ -54,16 +54,17 @@ const WithGoogle = ({title}) => {
         const data = await apiSerVice.login(payload)
         if (data.access_token) {
             toast({description: data.message})
-            localStorage.setItem("token", data.access_token);
             const urlParams = new URLSearchParams(window.location.search);
             const token = urlParams.get('token');
             if (token) {
                 navigate(`${baseUrl}/setup?token=${token}`);
             } else {
                 urlParams.delete('token')
-                if(data.project_count === 0){
-                    navigate(`${baseUrl}/project`);
+                if(data?.onboarding == 0){
+                    navigate(`${baseUrl}/on-boarding`);
+                    localStorage.setItem("token-verify-onboard", data.access_token);
                 } else {
+                    localStorage.setItem("token", data.access_token);
                     navigate(`${baseUrl}/dashboard`);
                 }
             }
