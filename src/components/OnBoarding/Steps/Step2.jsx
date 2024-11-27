@@ -66,6 +66,14 @@ const Step2 = ({setStep}) => {
         }
     }
 
+    const handleChange = (event) => {
+        setUserDetail({...userDetail, [event.target.name]: event.target.value});
+        // setFormError(formError => ({
+        //     ...formError,
+        //     [event.target.name]: ""
+        // }));
+    }
+
     const handleCreateChange = (value) => {
         setSelectedCreate(value);
         setShowAdditionalSelect(value === 'other');
@@ -108,7 +116,7 @@ const Step2 = ({setStep}) => {
                     </div>
                     {showAdditionalSelect && (
                         <div>
-                            <Input placeholder={"Write here..."} />
+                            <Input placeholder={"Write here..."} value={userDetail.other} onChange={handleChange} name={"other"} />
                         </div>
                     )}
                 </div>
@@ -132,7 +140,7 @@ const Step2 = ({setStep}) => {
                     </div>
                     {showAdditionalKnowAboutSelect && (
                         <div>
-                            <Input placeholder={"Write here..."} />
+                            <Input placeholder={"Write here..."} value={userDetail.other} onChange={handleChange} name={"other"} />
                         </div>
                     )}
                 </div>

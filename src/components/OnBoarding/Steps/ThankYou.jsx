@@ -12,8 +12,7 @@ const ThankYou = () => {
             <div className={"flex flex-col gap-4"}>
                 <h3 className={"text-xl md:text-2xl font-semibold"}>We’re excited to have you on board.</h3>
                 <p className={"text-sm"}>Your journey with Quickhunt starts now! Here’s what you can do next:</p>
-                <div className={"flex justify-between gap-2"}>
-                    <Button className={"font-semibold hover:bg-primary"}>Create in app message</Button>
+                <div className={"flex justify-end gap-2"}>
                     <Button variant={"ghost hover:none"} className={"font-semibold border border-primary text-primary border-2"} onClick={() => navigate(`${baseUrl}/dashboard`)}>Go to dashboard</Button>
                 </div>
                 <p className={"text-sm"}>Need help? Check out our help center or contact our <Button variant={"ghost hover:none"} className={"p-0 text-primary h-auto font-bold"}>24/7 support team.</Button></p>

@@ -20,6 +20,7 @@ import {baseUrl} from "../../../utils/constent";
 import {useNavigate} from "react-router";
 import Pagination from "../../Comman/Pagination";
 import DeleteDialog from "../../Comman/DeleteDialog";
+import {debounce} from "lodash";
 
 const initialState = {
     title: "",
@@ -79,8 +80,6 @@ const Category = () => {
         const data = await apiService.getAllCategory({
             project_id: projectDetailsReducer.id,
             search: search,
-            category_id: category_id,
-            sub_category_id: sub_category_id,
             page: pageNo,
             limit: perPageLimit
         });
@@ -93,43 +92,38 @@ const Category = () => {
         }
     };
 
-    const onChangeSearch = async (event) => {
-        setFilter({...filter, [event.target.name]: event.target.value,})
-        if (timeoutHandler.current) {
-            clearTimeout(timeoutHandler.current);
-        }
-        timeoutHandler.current = setTimeout(() => {
-            setPageNo(1);
-            getAllCategory(event.target.value, '');
-        }, 2000);
-    }
+    // const onChangeSearch = async (event) => {
+    //     setFilter({...filter, [event.target.name]: event.target.value,})
+    //     if (timeoutHandler.current) {
+    //         clearTimeout(timeoutHandler.current);
+    //     }
+    //     timeoutHandler.current = setTimeout(() => {
+    //         setPageNo(1);
+    //         getAllCategory(event.target.value, '');
+    //     }, 2000);
+    // }
 
-    const filterData = (name, value) => {
-        setFilter(prevFilter => ({
-            ...prevFilter,
-            [name]: value
-        }));
-
-        let category_id = '';
-        let sub_category_id = '';
-
-        if (name === "category_id") {
-            category_id = value;
-            // setSelectedCategory({ id: value, title: articleList.find(x => x.id === value)?.title || 'Unknown' });
-        } else if (name === 'sub_category_id') {
-            sub_category_id = value;
-            // const subCategory = articleList.flatMap(x => x.sub_categories).find(y => y.id === value);
-            // setSelectedSubCategory({ id: value, title: subCategory?.title || 'Unknown' });
-        }
-
+    const debounceGetAllArticles = debounce((searchValue) => {
         setPageNo(1);
-        getAllCategory(filter.search, category_id, sub_category_id);
+        setIsLoading(true);
+        getAllCategory(searchValue).then(() => {
+            setIsLoading(false);
+        });
+    }, 500);
+
+    const onChangeSearch = (event) => {
+        const value = event.target.value;
+        setFilter((prev) => ({ ...prev, search: value }));
+        debounceGetAllArticles(value);
     };
 
     const clearSearchFilter = () => {
         setFilter(prev => ({ ...prev, search: '' }));
         setPageNo(1);
-        getAllCategory('', filter.category_id, filter.sub_category_id);
+        setIsLoading(true);
+        getAllCategory('').then(() => {
+            setIsLoading(false);
+        });
     };
 
     const handleOnChange = (name, value) => {

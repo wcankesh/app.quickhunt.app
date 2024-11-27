@@ -20,6 +20,7 @@ import {Badge} from "../../ui/badge";
 import Pagination from "../../Comman/Pagination";
 import DeleteDialog from "../../Comman/DeleteDialog";
 import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList} from "../../ui/command";
+import { debounce } from 'lodash';
 
 const status = [
     {name: "Publish", value: 1, fillColor: "#389E0D", strokeColor: "#389E0D",},
@@ -92,16 +93,27 @@ const Articles = () => {
         setIsLoading(false)
     };
 
-    const onChangeSearch = async (event) => {
-        setFilter({...filter, [event.target.name]: event.target.value,})
-        if (timeoutHandler.current) {
-            clearTimeout(timeoutHandler.current);
-        }
-        timeoutHandler.current = setTimeout(() => {
-            setPageNo(1);
-            getAllArticles(event.target.value, '');
-        }, 2000);
-    }
+    // const onChangeSearch = async (event) => {
+    //     setFilter({...filter, [event.target.name]: event.target.value,})
+    //     if (timeoutHandler.current) {
+    //         clearTimeout(timeoutHandler.current);
+    //     }
+    //     timeoutHandler.current = setTimeout(() => {
+    //         setPageNo(1);
+    //         getAllArticles(event.target.value, '');
+    //     }, 2000);
+    // }
+
+    const debounceGetAllArticles = debounce((searchValue) => {
+        setPageNo(1);
+        getAllArticles(searchValue, filter.category_id, filter.sub_category_id);
+    }, 500);
+
+    const onChangeSearch = (event) => {
+        const value = event.target.value;
+        setFilter((prev) => ({ ...prev, search: value }));
+        debounceGetAllArticles(value);
+    };
 
     const filterData = (name, value) => {
         setFilter(prevFilter => ({

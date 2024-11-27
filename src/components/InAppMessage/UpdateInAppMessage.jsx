@@ -202,7 +202,12 @@ const UpdateInAppMessage = () => {
                 ...prevState,
                 title: `${type === "1" ? "Post": type === "2" ? "Banner" : type === "3" ? "Survey" : "Checklist"} in app message`,
                 reactions: type === "1" ? reactionPost : type === "2" ? reactionBanner : [],
-                body_text: type === "1" ? { blocks: [{type: "paragraph", data: {text: "Hey"}}]} : "",
+                // body_text: type === "1" ? { blocks: [{type: "paragraph", data: {text: "Hey"}}]} : "",
+                body_text: type === "1"
+                    ? JSON.stringify({
+                        blocks: [{ type: "paragraph", data: { text: "Hey" } }]
+                    })
+                    : "",
                 text_color: type === "4" ? "#FFFFFF" : "#000000",
                 steps: type === "3" ?  [stepBoj] : [],
                 checklists: type === "4" ? [
