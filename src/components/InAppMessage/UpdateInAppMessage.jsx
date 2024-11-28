@@ -296,7 +296,7 @@ const UpdateInAppMessage = () => {
             start_at: startAt,
             end_at: endAt,
             type: type,
-            body_text: JSON.stringify(inAppMsgSetting.body_text)
+            body_text: type === "1" ? typeof(inAppMsgSetting.body_text) === "string" ? inAppMsgSetting.body_text : JSON.stringify(inAppMsgSetting.body_text) : inAppMsgSetting.body_text
         }
         const data = await apiSerVice.updateInAppMessage(payload, inAppMsgSetting.id)
         if (data.status === 200) {
