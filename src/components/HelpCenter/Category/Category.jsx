@@ -387,7 +387,7 @@ const Category = () => {
 
     const onDeleteImg = async (name, value) => {
         const payload = {
-            name: [value],
+            [name]: [value],
             type: "post"
         }
         const data = await apiService.deletePostsImage(payload);
@@ -529,7 +529,7 @@ const Category = () => {
                                                 <CircleX
                                                     size={20}
                                                     className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
-                                                    onClick={() => onDeleteImg('image', selectedCategory && selectedCategory?.image && selectedCategory?.image?.name ? "" : selectedCategory?.image.replace("https://code.quickhunt.app/public/storage/post/", ""))}
+                                                    onClick={() => onDeleteImg('images', selectedCategory && selectedCategory?.image && selectedCategory?.image?.name ? "" : selectedCategory?.image.replace("https://code.quickhunt.app/public/storage/post/", ""))}
                                                 />
                                             </div>
                                         </div> :
