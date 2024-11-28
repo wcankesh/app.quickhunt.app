@@ -119,7 +119,7 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
         const trimmedValue = typeof value === "string" ? value.trim() : String(value || "").trim();
         switch (name) {
             case "from":
-                if (inAppMsgSetting.show_sender === 1) {
+                if (inAppMsgSetting.show_sender === 1 && !value) {
                     return "Sender is required.";
                 }
                 else {
