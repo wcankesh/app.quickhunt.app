@@ -403,11 +403,8 @@ export function Dashboard() {
                                                         axisLine={false}
 
                                                         tickFormatter={(value) => {
-                                                            const date = new Date(value)
-                                                            return date.toLocaleDateString("en-US", {
-                                                                month: "short",
-                                                                day: "numeric",
-                                                            })
+                                                            const date = new Date(value);
+                                                            return moment(value).format("MMM D")
                                                         }}
                                                     />
                                                     <YAxis tickLine={false} axisLine={false}/>
@@ -415,11 +412,7 @@ export function Dashboard() {
                                                     <ChartTooltip
                                                         cursor={false}
                                                         labelFormatter={(value) => {
-                                                            return new Date(value).toLocaleDateString("en-US", {
-                                                                month: "short",
-                                                                day: "numeric",
-                                                                year: "numeric",
-                                                            })
+                                                            return moment(value).format("MMMM DD, YYYY")
                                                         }}
                                                         content={<ChartTooltipContent indicator="line"/>}
                                                     />
