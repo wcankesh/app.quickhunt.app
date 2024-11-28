@@ -386,10 +386,17 @@ const Category = () => {
     };
 
     const onDeleteImg = async (name, value) => {
-        if (selectedCategory && selectedCategory?.image) {
-            setSelectedCategory({...selectedCategory, image: ""})
-        } else {
-            setSelectedCategory({...selectedCategory, [name]: value, image: ""})
+        let formData = new FormData();
+        formData.append(name, value);
+        const data = await apiService.deletePostsImage(formData);
+        if(data.status === 200) {
+            // if (selectedCategory && selectedCategory?.image) {
+            if (name === "image") {
+                setSelectedCategory({...selectedCategory, image: ""})
+            } else {
+                setSelectedCategory({...selectedCategory, [name]: value})
+                // setSelectedCategory({...selectedCategory, [name]: value, image: ""})
+            }
         }
     }
 

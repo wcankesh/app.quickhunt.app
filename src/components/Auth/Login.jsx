@@ -10,11 +10,13 @@ import carousel_2 from "../../img/carousel22.png";
 import carousel_3 from "../../img/carousel33.png";
 import {Icon} from "../../utils/Icon";
 import {ApiService} from "../../utils/ApiService";
-import {baseUrl} from "../../utils/constent";
+import {apiService, baseUrl} from "../../utils/constent";
 import {Eye, EyeOff, Loader2} from "lucide-react";
 import {useToast} from "../ui/use-toast";
 import {useTheme} from "../theme-provider";
 import WithGoogle from "./WithGoogle";
+import {userDetailsAction} from "../../redux/action/UserDetailAction";
+import {useDispatch} from "react-redux";
 
 const initialState = {
     user_email_id: '',
@@ -31,7 +33,7 @@ const Login = () => {
     const [formError, setFormError] = useState(initialState);
     const [isLoading, setIsLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
-
+    const dispatch = useDispatch();
     const onChange = (event) => {
         setCompanyDetails({...companyDetails, [event.target.name]: event.target.value});
         setFormError(formError => ({
@@ -108,6 +110,13 @@ const Login = () => {
             } else {
                 urlParams.delete('token')
                 if(data?.onboarding == 0){
+                    const datas = await apiService.getLoginUserDetails({Authorization: `Bearer ${data.access_token}`})
+                    if(datas.status === 200){
+                        dispatch(userDetailsAction({...datas.data}))
+                        setIsLoading(false)
+                    } else {
+                        setIsLoading(false)
+                    }
                     navigate(`${baseUrl}/on-boarding`);
                     localStorage.setItem("token-verify-onboard", data.access_token);
                 } else {

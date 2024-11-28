@@ -4,6 +4,29 @@ import {Icon} from "../../../utils/Icon";
 import {useNavigate} from "react-router-dom";
 import {baseUrl} from "../../../utils/constent";
 
+const socialLinks = [
+    {
+        name: "Facebook",
+        url: "https://www.facebook.com/quickhuntapp",
+        icon: Icon.facebookIcon,
+    },
+    {
+        name: "TwitterX",
+        url: "https://x.com/quickhuntapp",
+        icon: Icon.twitterX,
+    },
+    {
+        name: "LinkedIn",
+        url: "https://www.linkedin.com/company/quickhunt-app",
+        icon: Icon.linkedIn,
+    },
+    {
+        name: "Instagram",
+        url: "https://www.instagram.com/quickhunt.app",
+        icon: Icon.onBoardInsta,
+    },
+];
+
 const ThankYou = () => {
     let navigate = useNavigate();
     return (
@@ -12,18 +35,23 @@ const ThankYou = () => {
             <div className={"flex flex-col gap-4"}>
                 <h3 className={"text-xl md:text-2xl font-semibold"}>We’re excited to have you on board.</h3>
                 <p className={"text-sm"}>Your journey with Quickhunt starts now! Here’s what you can do next:</p>
-                <div className={"flex justify-end gap-2"}>
-                    <Button variant={"ghost hover:none"} className={"font-semibold border border-primary text-primary border-2"} onClick={() => navigate(`${baseUrl}/dashboard`)}>Go to dashboard</Button>
-                </div>
+                <Button variant={"ghost hover:none"} className={"font-semibold border border-primary text-primary border-2"} onClick={() => navigate(`${baseUrl}/dashboard`)}>Go to dashboard</Button>
                 <p className={"text-sm"}>Need help? Check out our help center or contact our <Button variant={"ghost hover:none"} className={"p-0 text-primary h-auto font-bold"}>24/7 support team.</Button></p>
             </div>
             <div className={"space-y-8"}>
                 <p className={"text-sm"}>Follow us on social media for the latest updates and tips!</p>
                 <div className={"flex justify-center gap-[56px]"}>
-                    <Button variant={"ghost hover:none"} className={"h-auto p-0"} onClick={() => window.open(`https://www.facebook.com/quickhuntapp`, "_blank")}>{Icon.facebookIcon}</Button>
-                    <Button variant={"ghost hover:none"} className={"h-auto p-0"} onClick={() => window.open(`https://x.com/quickhuntapp`, "_blank")}>{Icon.twitterX}</Button>
-                    <Button variant={"ghost hover:none"} className={"h-auto p-0"} onClick={() => window.open(`https://www.linkedin.com/company/quickhunt-app`, "_blank")}>{Icon.linkedIn}</Button>
-                    <Button variant={"ghost hover:none"} className={"h-auto p-0"} onClick={() => window.open(`https://www.instagram.com/quickhunt.app`, "_blank")}>{Icon.onBoardInsta}</Button>
+                    {socialLinks.map((link, index) => (
+                        <Button
+                            key={index}
+                            variant={"ghost hover:none"}
+                            className={"h-auto p-0"}
+                            onClick={() => window.open(link.url, "_blank")}
+                            aria-label={`Open ${link.name}`}
+                        >
+                            {link.icon}
+                        </Button>
+                    ))}
                 </div>
             </div>
         </Fragment>

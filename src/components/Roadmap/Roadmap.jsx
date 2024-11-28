@@ -81,41 +81,42 @@ const Roadmap = () => {
         }
     }
 
+    // old code
+    // const handleCardMove = (_card, source, destination) => {
+    //     const updatedBoard = moveCard(roadmapList, source, destination)
+    //     callApi(destination.toColumnId, _card.id)
+    //     setRoadmapList(updatedBoard)
+    // }
+
     const handleCardMove = (_card, source, destination) => {
         const updatedCard = { ..._card, roadmap_id: destination.toColumnId };
 
-        // Get the target column
         const updatedColumns = roadmapList.columns.map((column) => {
             if (column.id === source.fromColumnId) {
                 return {
                     ...column,
-                    cards: column.cards.filter((card) => card.id !== _card.id), // Remove the card from source
+                    cards: column.cards.filter((card) => card.id !== _card.id),
                 };
             }
             if (column.id === destination.toColumnId) {
-                // Add the card to the specific position within the destination column
                 const newCards = [...column.cards];
-                newCards.splice(destination.toPosition, 0, updatedCard); // Insert at the specific index
+                newCards.splice(destination.toPosition, 0, updatedCard);
                 return {
                     ...column,
                     cards: newCards,
-                    ideas: column.ideas ? [...newCards] : [], // Update ideas if applicable
+                    ideas: column.ideas ? [...newCards] : [],
                 };
             }
             return column;
         });
 
-        // Update the state
         setRoadmapList((prevState) => ({
             ...prevState,
             columns: updatedColumns,
         }));
 
-        // Call API to persist the roadmap ID update
         callApi(destination.toColumnId, updatedCard.id);
     };
-
-
 
     const onCreateIdea = (mainRecord) => {
         setSelectedRoadmap(mainRecord)

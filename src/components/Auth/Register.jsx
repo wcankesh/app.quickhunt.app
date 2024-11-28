@@ -15,6 +15,8 @@ import {Eye, EyeOff, Loader2} from "lucide-react";
 import {useToast} from "../ui/use-toast";
 import {useTheme} from "../theme-provider";
 import WithGoogle from "./WithGoogle";
+import {userDetailsAction} from "../../redux/action/UserDetailAction";
+import {useDispatch} from "react-redux";
 
 const initialState = {
     user_first_name: '',
@@ -30,6 +32,7 @@ const Register = () => {
     let apiSerVice = new ApiService()
     let navigate = useNavigate();
     const {toast} = useToast();
+    const dispatch = useDispatch();
 
     const [companyDetails, setCompanyDetails] = useState(initialState);
     const [formError, setFormError] = useState(initialState);
@@ -116,6 +119,7 @@ const Register = () => {
             delete userDetails?.access_token;
             localStorage.setItem("user-details", JSON.stringify(userDetails));
             localStorage.setItem("token-verify-onboard", data?.access_token);
+            dispatch(userDetailsAction({...data.data}))
             navigate(`${baseUrl}/on-boarding`);
             toast({description: data.message})
             setIsLoading(false)

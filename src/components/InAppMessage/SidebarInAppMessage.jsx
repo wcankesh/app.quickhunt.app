@@ -183,8 +183,6 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
             : null;
         const payload = {
             ...inAppMsgSetting,
-            // start_at: moment(inAppMsgSetting?.start_at).format('YYYY-MM-DD HH:mm:ss'),
-            // end_at: moment(inAppMsgSetting?.end_at).format('YYYY-MM-DD HH:mm:ss'),
             start_at: startAt,
             end_at: endAt,
             project_id: projectDetailsReducer.id,
@@ -228,12 +226,19 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                 return
             }
         }
+        const startAt = inAppMsgSetting?.start_at
+            ? moment(inAppMsgSetting.start_at).format('YYYY-MM-DD HH:mm:ss')
+            : null;
+
+        const endAt = inAppMsgSetting?.end_at && moment(inAppMsgSetting.end_at).isValid()
+            ? moment(inAppMsgSetting.end_at).format('YYYY-MM-DD HH:mm:ss')
+            : null;
         setIsLoading(true)
         const payload = {
             ...inAppMsgSetting,
-            start_at: moment(inAppMsgSetting?.start_at).format('YYYY-MM-DD HH:mm:ss'),
-            end_at: moment(inAppMsgSetting?.end_at).format('YYYY-MM-DD HH:mm:ss'),
-            type: type
+            start_at: startAt,
+            end_at: endAt,
+            type: type,
         }
         const data = await apiSerVice.updateInAppMessage(payload, inAppMsgSetting.id)
         if (data.status === 200) {
@@ -572,7 +577,7 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                                             <div className="grid w-full max-w-sm items-center gap-1.5">
                                                 <Label className={"font-normal text-sm"} htmlFor="start_number">Start Number</Label>
                                                 <Input value={inAppMsgSetting?.steps?.[selectedStepIndex]?.start_number || ''} name={"start_number"}
-                                                       type="number" id="start_number"
+                                                       type="number" id="start_number" min={0}
                                                        onChange={(e) => onChangeQuestion("start_number", e.target.value)}
                                                        placeholder="1" className={"h-8"}/>
                                             </div>
@@ -580,7 +585,7 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                                                 <Label className={"font-normal text-sm"} htmlFor="end_number">End Number</Label>
                                                 <Input value={inAppMsgSetting?.steps?.[selectedStepIndex]?.end_number || ''} name={"end_number"}
                                                        onChange={(e) => onChangeQuestion("end_number", e.target.value)}
-                                                       type="number" id="end_number"
+                                                       type="number" id="end_number" min={0}
                                                        placeholder="10" className={"h-8"}/>
                                             </div>
                                         </div>

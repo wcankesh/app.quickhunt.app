@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from 'react';
+import React, {Fragment, useEffect, useState} from 'react';
 import { Label } from "../../ui/label";
 import { Button } from "../../ui/button";
 import {apiService, baseUrl, getLSUserDetails} from "../../../utils/constent";
@@ -11,7 +11,6 @@ import {Loader2} from "lucide-react";
 const initialState = {
     want_to: '',
     know_from: '',
-    other: ''
 }
 
 const create = [
@@ -19,7 +18,7 @@ const create = [
     { name: "Announcement(changelog)", value: "announcement" },
     { name: "In App Messages", value: "inAppMessages" },
     { name: "Helpdesk", value: "helpdesk" },
-    { name: "Other", value: "other" },
+    // { name: "Other", value: "wantOthers" },
 ];
 
 const knowAbout = [
@@ -33,7 +32,7 @@ const knowAbout = [
     { name: "Twitter mention", value: "TwitterMention" },
     { name: "Product Hunt feature", value: "productHuntFeature" },
     { name: "Email newsletter", value: "emailNewsletter" },
-    { name: "Other", value: "other" },
+    // { name: "Other", value: "other" },
 ];
 
 const Step2 = ({setStep}) => {
@@ -41,22 +40,18 @@ const Step2 = ({setStep}) => {
 
     const [userDetail, setUserDetail] = useState(initialState);
     const [selectedCreate, setSelectedCreate] = useState('');
-    const [showAdditionalSelect, setShowAdditionalSelect] = useState(false);
     const [selectedKnowAbout, setSelectedKnowAbout] = useState('');
+    const [showAdditionalSelect, setShowAdditionalSelect] = useState(false);
     const [showAdditionalKnowAboutSelect, setShowAdditionalKnowAboutSelect] = useState(false);
     const userDetailsReducer = useSelector(state => state.userDetailsReducer);
     const [isLoading, setIsLoading] = useState(false);
-
-    const [additionalCreateValue, setAdditionalCreateValue] = useState('');
-    const [additionalKnowAboutValue, setAdditionalKnowAboutValue] = useState('');
 
     const onNextStep = async () => {
         setIsLoading(true);
         const token = localStorage.getItem('token-verify-onboard') || null
         const payload = {
-            want_to: selectedCreate === 'other' ? additionalCreateValue : selectedCreate,
-            know_from: selectedKnowAbout === 'other' ? additionalKnowAboutValue : selectedKnowAbout,
-            other: userDetail.other,
+            want_to: selectedCreate,
+            know_from: selectedKnowAbout,
         }
         const data = await apiService.onBoardingFlow(payload, {Authorization: `Bearer ${token}`});
         if(data.status === 200) {
@@ -75,20 +70,24 @@ const Step2 = ({setStep}) => {
     }
 
     const handleCreateChange = (value) => {
-        setSelectedCreate(value);
-        setShowAdditionalSelect(value === 'other');
+        const selectedItem = create.find(item => item.value === value);
+        setSelectedCreate(selectedItem.name);
+        // setShowAdditionalSelect(value === 'wantOthers');
     };
 
     const handleKnowAboutChange = (value) => {
-        setSelectedKnowAbout(value);
-        setShowAdditionalKnowAboutSelect(value === 'other');
+        const selectedItem = knowAbout.find(item => item.value === value);
+        setSelectedKnowAbout(selectedItem.name);
+        // setShowAdditionalKnowAboutSelect(value === 'other');
     };
 
     const onStep = (stepCount) => {
         setStep(stepCount)
         // navigate(`${baseUrl}/on-boarding`)
     }
-
+    useEffect(() => {
+        setUserDetail(userDetailsReducer)
+    },[userDetailsReducer])
     return (
         <Fragment>
             <div className={"flex flex-col justify-center gap-6"}>
@@ -98,7 +97,7 @@ const Step2 = ({setStep}) => {
                 </div>
                 <div className={`space-y-3`}>
                     <div className={"space-y-2"}>
-                        <Label className={"text-sm font-normal mb-2"}>Hey {userDetailsReducer?.user_first_name} {userDetailsReducer?.user_last_name}, What can we help you create today?</Label>
+                        <Label className={"text-sm font-normal mb-2"}>Hey {userDetail?.user_first_name} {userDetail?.user_last_name}, What can we help you create today?</Label>
                         <Select onValueChange={handleCreateChange}>
                             <SelectTrigger className="h-auto placeholder:text-muted">
                                 <SelectValue placeholder="Ex. Announcement(changelog)"/>
@@ -114,11 +113,11 @@ const Step2 = ({setStep}) => {
                             </SelectContent>
                         </Select>
                     </div>
-                    {showAdditionalSelect && (
-                        <div>
-                            <Input placeholder={"Write here..."} value={userDetail.other} onChange={handleChange} name={"other"} />
-                        </div>
-                    )}
+                    {/*{showAdditionalSelect && (*/}
+                    {/*    <div>*/}
+                    {/*        <Input placeholder={"Write here..."} value={userDetail.wantOthers} onChange={handleChange} name={"wantOthers"} />*/}
+                    {/*    </div>*/}
+                    {/*)}*/}
                 </div>
                 <div className={"space-y-3"}>
                     <div className={"space-y-2"}>
@@ -138,11 +137,11 @@ const Step2 = ({setStep}) => {
                             </SelectContent>
                         </Select>
                     </div>
-                    {showAdditionalKnowAboutSelect && (
-                        <div>
-                            <Input placeholder={"Write here..."} value={userDetail.other} onChange={handleChange} name={"other"} />
-                        </div>
-                    )}
+                    {/*{showAdditionalKnowAboutSelect && (*/}
+                    {/*    <div>*/}
+                    {/*        <Input placeholder={"Write here..."} value={userDetail.other} onChange={handleChange} name={"other"} />*/}
+                    {/*    </div>*/}
+                    {/*)}*/}
                 </div>
             </div>
             <div className={"flex gap-2 justify-end"}>

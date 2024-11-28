@@ -153,9 +153,13 @@ const PricingPlans = () => {
                             </div>
                             <Button
                                 className={`w-full font-medium`}
-                                disabled={isActivated && x.disabled}
+                                // disabled={isActivated && x.disabled}
+                                disabled={
+                                    isActivated ||
+                                    (userDetailsReducer.plan === x.planType && userDetailsReducer.subscr_type !== tab)
+                                }
                                 variant={isActivated ? "outline" : ""}
-                                onClick={() =>redirectToCheckout(tab === 2 ? x.priceIdYearly : tab === 1 ? x.priceMonthly : "", x.planType)}
+                                onClick={() => redirectToCheckout(tab === 2 ? x.priceIdYearly : tab === 1 ? x.priceMonthly : "", x.planType)}
                             >
                                 {x.btnText}
                             </Button>
