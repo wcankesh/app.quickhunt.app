@@ -950,8 +950,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                                             <div onClick={() => handleChangeTopic(x.id)}
                                                                                  className="checkbox-icon">
                                                                                 {(selectedIdea?.topic.map((x) => x.id) || []).includes(x.id) ?
-                                                                                    <Check size={18}/> : <div
-                                                                                        className={"h-[18px] w-[18px]"}/>}
+                                                                                    <Check size={18}/> : <div className={"h-[18px] w-[18px]"}/>}
                                                                             </div>
                                                                             <span>{x.title ? x.title : ""}</span>
                                                                         </div>

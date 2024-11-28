@@ -1,7 +1,7 @@
 import React, {Fragment, useEffect, useRef, useState} from 'react';
 import { Input } from "../../ui/input";
 import { Select, SelectGroup, SelectValue, SelectItem, SelectTrigger, SelectContent } from "../../ui/select";
-import {Circle, Ellipsis, Filter, Plus, X} from "lucide-react";
+import {Check, Circle, Ellipsis, Filter, Plus, X} from "lucide-react";
 import { Button } from "../../ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../ui/table";
 import {Card, CardContent} from "../../ui/card";
@@ -55,7 +55,9 @@ const Articles = () => {
     const [openFilter, setOpenFilter] = useState(false);
 
     const [selectedCategory, setSelectedCategory] = useState(null);
+    const [selectedCategoryId, setSelectedCategoryId] = useState(null);
     const [selectedSubCategory, setSelectedSubCategory] = useState(null);
+    const [selectedSubCategoryId, setSelectedSubCategoryId] = useState(null);
 
     useEffect(() => {
         if (projectDetailsReducer.id) {
@@ -173,7 +175,11 @@ const Articles = () => {
             if (index !== -1) {
                 clone.splice(index, 1)
                 setArticles(clone);
-                getAllArticles();
+                if (clone.length === 0 && pageNo > 1) {
+                    handlePaginationClick(pageNo - 1);
+                } else {
+                    getAllArticles();
+                }
             }
             toast({description: data.message,})
         } else {
@@ -280,12 +286,14 @@ const Articles = () => {
                                                                 >
                                                                     <Fragment key={x.id}>
                                                                         <span onClick={() => {
+                                                                            setSelectedCategoryId(x.id);
                                                                             filterData("category_id", x.id);
                                                                             setOpenFilter(false);
                                                                         }}
                                                                             className={"flex-1 w-full text-sm font-normal cursor-pointer flex gap-2 items-center"}
                                                                         >
-                                                                            {x.title}
+                                                                            {selectedCategoryId === x.id ? <Check size={18} /> : <div className={"h-[18px] w-[18px]"}/>}
+                                                                            <span className={"max-w-[140px] truncate text-ellipsis overflow-hidden whitespace-nowrap"}>{x.title}</span>
                                                                         </span>
                                                                     </Fragment>
                                                                 </CommandItem>
@@ -311,6 +319,7 @@ const Articles = () => {
                                                                         key={y.id}
                                                                         value={y.id}
                                                                         onSelect={() => {
+                                                                            setSelectedSubCategoryId(x.id);
                                                                             filterData("sub_category_id", y.id);
                                                                             setOpenFilter(false);
                                                                         }}
@@ -319,7 +328,8 @@ const Articles = () => {
                                                                             <span
                                                                                 className={"flex-1 w-full text-sm font-normal cursor-pointer flex gap-2 items-center"}
                                                                             >
-                                                                                {y.title}
+                                                                                {selectedSubCategoryId === x.id ? <Check size={18} /> : <div className={"h-[18px] w-[18px]"}/>}
+                                                                                <span className={"max-w-[140px] truncate text-ellipsis overflow-hidden whitespace-nowrap"}>{y.title}</span>
                                                                             </span>
                                                                         </Fragment>
                                                                     </CommandItem>
@@ -340,7 +350,7 @@ const Articles = () => {
                     </Button>
                 </div>
             </div>
-            <div className="mt-4">
+            <div className="mt-4 flex gap-4">
                 {selectedCategory && (
                     <Badge key={`selected-${selectedCategory.id}`} variant="outline" className="rounded p-0 font-medium">
                         <span className="px-3 py-1.5 border-r">{selectedCategory.title}</span>
@@ -442,8 +452,8 @@ const Articles = () => {
                                                                 <Ellipsis size={16}/>
                                                             </DropdownMenuTrigger>
                                                             <DropdownMenuContent align={"end"}>
-                                                                <DropdownMenuItem onClick={() => onEdit(x.id)}>Edit</DropdownMenuItem>
-                                                                <DropdownMenuItem
+                                                                <DropdownMenuItem className={"cursor-pointer"} onClick={() => onEdit(x.id)}>Edit</DropdownMenuItem>
+                                                                <DropdownMenuItem className={"cursor-pointer"}
                                                                     onClick={() => deleteRow(x.id)}>Delete</DropdownMenuItem>
                                                             </DropdownMenuContent>
                                                         </DropdownMenu>

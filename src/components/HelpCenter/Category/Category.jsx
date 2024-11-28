@@ -333,6 +333,7 @@ const Category = () => {
         setSelectedCategory(initialState);
         navigate(`${baseUrl}/help/category?pageNo=${pageNo}`);
         setFormError(initialStateError);
+        getAllCategory();
     };
 
     const closeSheetSubCategory = () => {
@@ -420,6 +421,11 @@ const Category = () => {
             if (index !== -1) {
                 clone.splice(index, 1)
                 setCategoryList(clone);
+                if (clone.length === 0 && pageNo > 1) {
+                    handlePaginationClick(pageNo - 1);
+                } else {
+                    getAllCategory();
+                }
             }
             toast({description: data.message,})
         } else {
@@ -442,6 +448,7 @@ const Category = () => {
                 }
             });
             setCategoryList(clone);
+            getAllCategory()
             toast({description: data.message,})
         } else {
             toast({description: data.message, variant: "destructive"})

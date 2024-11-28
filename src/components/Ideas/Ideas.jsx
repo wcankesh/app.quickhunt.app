@@ -240,8 +240,8 @@ const Ideas = () => {
                 clone[index].roadmap_id = value;
             }
             setIdeasList(clone);
-            let payload = {...filter, project_id: projectDetailsReducer.id, page: pageNo, limit: perPageLimit}
-            ideaSearch(payload)
+            // let payload = {...filter, project_id: projectDetailsReducer.id, page: pageNo, limit: perPageLimit}
+            // ideaSearch(payload)
             toast({description: data.message});
         } else {
             toast({variant: "destructive", description: data.message});
@@ -401,9 +401,9 @@ const Ideas = () => {
                                                                 <span className={"flex-1 w-full text-sm font-normal cursor-pointer flex gap-2 items-center"}>Back</span>
                                                             </CommandItem>
                                                             <RadioGroup
-                                                                value={filter.status} // Bind value to the status
+                                                                value={filter.status}
                                                                 onValueChange={(value) => {
-                                                                    handleChange({ name: "status", value }); // Handle value change
+                                                                    handleChange({ name: "status", value });
                                                                     setOpenFilter(true);
                                                                     setOpenFilterType('status');
                                                                 }}
@@ -416,7 +416,7 @@ const Ideas = () => {
                                                                                 id={x.value}
                                                                                 value={x.value}
                                                                                 className="m-2"
-                                                                                checked={filter[x.value] === 1}  // Use the value to determine the selected state
+                                                                                checked={filter[x.value] === 1}
                                                                             />
                                                                             <span
                                                                                 onClick={() => {
