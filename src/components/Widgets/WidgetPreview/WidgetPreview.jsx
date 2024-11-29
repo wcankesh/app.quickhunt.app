@@ -58,7 +58,7 @@ const WidgetPreview = ({widgetsSetting, type, toggle,onToggle }) => {
                     right: (widgetsSetting.launcher_position === 2)
                         ? `${widgetsSetting.launcher_right_spacing || 20}px`
                         : "inherit",
-                    bottom: (widgetsSetting.launcher_bottom_spacing) ? `${widgetsSetting.launcher_bottom_spacing || "20"}px` : "inherit",
+                    bottom: (widgetsSetting.launcher_bottom_spacing) ? `${widgetsSetting.launcher_bottom_spacing || "90"}px` : "inherit",
                     width: `${widgetsSetting.popover_width}px`, height: `${widgetsSetting.popover_height}px`
                 }}>
                     {renderContent()}

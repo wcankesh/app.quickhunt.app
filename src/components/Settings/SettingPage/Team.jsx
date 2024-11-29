@@ -167,6 +167,19 @@ const Team = () => {
         }
         const data = await apiService.inviteUser(payload)
         if (data.status === 200) {
+            const updatedExpirationDate = moment().add(7, 'days').toISOString();
+            const updatedCreatedAt = moment().toISOString();
+            const updatedList = invitationList.map((item) => {
+                if (item.id === x.id) {
+                    return {
+                        ...item,
+                        expire_at: updatedExpirationDate,
+                        created_at: updatedCreatedAt,
+                    };
+                }
+                return item;
+            });
+            setInvitationList(updatedList);
             toast({
                 description: "Resend invitation successfully"
             })
@@ -406,7 +419,7 @@ const Team = () => {
                                             {
                                                 ["Email", "Status", "Invited", "Action"].map((x, i) => {
                                                     return (
-                                                        <TableHead key={i} className={`h-[22px] px-2 py-[10px] text-sm font-normal ${i === 0 ? "sm:pl-6" : i === 3 ? "pr-3" : ""} ${theme === "dark" ? "border-t" : "text-card-foreground"}`}>{x}</TableHead>
+                                                        <TableHead key={i} className={`h-[22px] px-2 py-[10px] md:px-3 text-sm font-normal ${i === 0 ? "sm:pl-6" : i === 3 ? "text-right" : ""} ${theme === "dark" ? "border-t" : "text-card-foreground"}`}>{x}</TableHead>
                                                     )
                                                 })
                                             }
@@ -422,7 +435,7 @@ const Team = () => {
                                                             {
                                                                 [...Array(4)].map((_, i) => {
                                                                     return (
-                                                                        <TableCell key={i} className={""}>
+                                                                        <TableCell key={i} className={"py-[10px] px-[12px]"}>
                                                                             <Skeleton className={"rounded-md  w-full h-[24px]"}/>
                                                                         </TableCell>
                                                                     )
@@ -436,16 +449,16 @@ const Team = () => {
                                         : invitationList?.length > 0 ? <>
                                                 {(invitationList || []).map((x, i) => (
                                                     <TableRow key={i}>
-                                                        <TableCell className="font-normal sm:pl-6">{x?.member_email}</TableCell>
-                                                        <TableCell>
+                                                        <TableCell className="font-normal py-[10px] px-[12px]">{x?.member_email}</TableCell>
+                                                        <TableCell className={"py-[10px] px-[12px]"}>
                                                             {moment().startOf('day').isSameOrAfter(moment(x?.expire_at).startOf('day')) ? (
                                                                 <span>Expired</span>
                                                             ) : (
                                                                 <span>Expires in {moment(x?.expire_at).diff(moment().startOf('day'), 'days')} days</span>
                                                             )}
                                                         </TableCell>
-                                                        <TableCell>Invited about {moment.utc(x.created_at).local().startOf('seconds').fromNow()}</TableCell>
-                                                        <TableCell className="pr-6 text-right">
+                                                        <TableCell className={"py-[10px] px-[12px]"}>Invited about {moment.utc(x.created_at).local().startOf('seconds').fromNow()}</TableCell>
+                                                        <TableCell className="py-[10px] px-[12px] text-right">
                                                             <DropdownMenu className={"relative"} >
                                                                 <DropdownMenuTrigger>
                                                                     <Ellipsis className={`${theme === "dark" ? "" : "text-muted-foreground"}`} size={18}/>

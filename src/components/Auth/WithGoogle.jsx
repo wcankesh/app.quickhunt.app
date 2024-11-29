@@ -7,11 +7,13 @@ import {Button} from "../ui/button";
 import {ApiService} from "../../utils/ApiService";
 import {useToast} from "../ui/use-toast";
 import {userDetailsAction} from "../../redux/action/UserDetailAction";
+import {useDispatch} from "react-redux";
 
 const WithGoogle = ({title}) => {
     const navigate = useNavigate();
     let apiSerVice = new ApiService();
     const {toast} = useToast();
+    const dispatch = useDispatch();
 
     const [gapi, setGapi] = useState(null);
     const [isLoading, setIsLoading] = useState(false);

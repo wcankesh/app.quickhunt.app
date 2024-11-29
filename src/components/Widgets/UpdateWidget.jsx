@@ -26,7 +26,7 @@ const initialState = {
     launcher_icon_color: "#ffffff",
     launcher_right_spacing: "20",
     launcher_left_spacing: "20",
-    launcher_bottom_spacing: "20",
+    launcher_bottom_spacing: "90",
     is_idea: 1,
     is_roadmap: 1,
     is_announcement: 1,
@@ -196,19 +196,19 @@ const UpdateWidget = () => {
                                             <Label className={"font-normal"}>Width</Label>
                                             {
                                                 type === "popover" &&
-                                                <Input type={"number"} value={widgetsSetting.popover_width}
+                                                <Input type={"number"} value={widgetsSetting.popover_width} min={0}
                                                        onChange={(e) => onChange("popover_width", e.target.value)}
                                                        className={"w-full"}/>
                                             }
                                             {
                                                 type === "modal" &&
-                                                <Input type={"number"} value={widgetsSetting.modal_width}
+                                                <Input type={"number"} value={widgetsSetting.modal_width} min={0}
                                                        onChange={(e) => onChange("modal_width", e.target.value)}
                                                        className={"w-full"}/>
                                             }
                                             {
                                                 type === "sidebar" &&
-                                                <Input type={"number"} value={widgetsSetting.sidebar_width}
+                                                <Input type={"number"} value={widgetsSetting.sidebar_width} min={0}
                                                        onChange={(e) => onChange("sidebar_width", e.target.value)}
                                                        className={"w-full"}/>
                                             }
@@ -221,12 +221,12 @@ const UpdateWidget = () => {
                                         <Label className={"font-normal"}>Height</Label>
                                         {
                                             type === "modal" &&
-                                            <Input type={"number"} value={widgetsSetting.modal_height}
+                                            <Input type={"number"} value={widgetsSetting.modal_height} min={0}
                                                    onChange={(e) => onChange("modal_height", e.target.value)}
                                                    className={"w-full"}/>
                                         }
                                         {
-                                            type === "popover" && <Input type={"number"} value={widgetsSetting.popover_height}
+                                            type === "popover" && <Input type={"number"} value={widgetsSetting.popover_height} min={0}
                                                                          onChange={(e) => onChange('popover_height', e.target.value)}
                                                                          className={"w-full"}/>
                                         }
@@ -308,7 +308,7 @@ const UpdateWidget = () => {
                                         <div className={"space-y-2"}>
                                             <Label className={"font-normal"}>Left Spacing</Label>
                                             <Input value={widgetsSetting.launcher_left_spacing}
-                                                   type="number"
+                                                   type="number" min={0}
                                                    onChange={(e) => onChange("launcher_left_spacing", e.target.value)}
                                                    placeholder="1 px"/>
                                         </div>
@@ -318,7 +318,7 @@ const UpdateWidget = () => {
                                         <div className={"space-y-2"}>
                                             <Label className={"font-normal"}>Right Spacing</Label>
                                             <Input value={widgetsSetting.launcher_right_spacing}
-                                                   type="number"
+                                                   type="number" min={0}
                                                    onChange={(e) => onChange("launcher_right_spacing", e.target.value)}
                                                    placeholder="1 px"/>
                                         </div>
@@ -326,7 +326,7 @@ const UpdateWidget = () => {
                                 <div className={"space-y-2"}>
                                     <Label className={"font-normal"}>Bottom Spacing</Label>
                                     <Input value={widgetsSetting.launcher_bottom_spacing}
-                                           type="number"
+                                           type="number" min={0}
                                            onChange={(e) => onChange("launcher_bottom_spacing", e.target.value)}
                                            placeholder="1 px"/>
                                 </div>
@@ -693,7 +693,8 @@ const UpdateWidget = () => {
                             right: (widgetsSetting.launcher_position === 2)
                                 ? `${widgetsSetting.launcher_right_spacing || 20}px`
                                 : "inherit",
-                            bottom: (widgetsSetting.launcher_bottom_spacing) ? `${widgetsSetting.launcher_bottom_spacing || "20"}px` : "inherit",
+                            // bottom: (widgetsSetting.launcher_bottom_spacing) ? `${widgetsSetting.launcher_bottom_spacing || "20"}px` : "inherit",
+                            bottom: (widgetsSetting.launcher_bottom_spacing) ? `${widgetsSetting.launcher_bottom_spacing}` : "20px",
                             position: type === "popover" ? "absolute" : "fixed",
                         }}>
                             {
