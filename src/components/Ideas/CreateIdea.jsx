@@ -223,7 +223,9 @@ const CreateIdea = ({isOpen, onOpen, onClose, closeCreateIdea, setIdeasList, ide
                                                                 const findObj = topicLists.find((y) => y.id === x);
                                                                 return (
                                                                     <div key={index} className={`text-xs flex gap-[2px] ${theme === "dark" ? "text-card" : ""} bg-slate-300 items-center rounded py-0 px-2`}>
-                                                                        {findObj?.title}
+                                                                        <span className={"max-w-[85px] truncate text-ellipsis overflow-hidden whitespace-nowrap"}>
+                                                                            {findObj?.title}
+                                                                        </span>
                                                                     </div>
                                                                 );
                                                             })

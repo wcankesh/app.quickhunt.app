@@ -786,6 +786,12 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                                     onSelect={(date) => handleDateChange(date, "start_at")}
                                     startMonth={new Date(2024, 0)}
                                     endMonth={new Date(2050, 12)}
+                                    defaultMonth={
+                                        inAppMsgSetting?.start_at
+                                            ? new Date(inAppMsgSetting?.start_at) // Use selected date
+                                            : publishDate || new Date() // Fallback to startMonth or current date
+                                    }
+
                                 />
                             </PopoverContent>
                         </Popover>
@@ -830,6 +836,11 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                                             endMonth={new Date(2050, 12)}
                                             startMonth={publishDate || new Date()}
                                             disabled={isDateDisabled}
+                                            defaultMonth={
+                                                inAppMsgSetting?.end_at
+                                                    ? new Date(inAppMsgSetting?.end_at) // Use selected date
+                                                    : publishDate || new Date() // Fallback to startMonth or current date
+                                            }
                                         />
                                     </PopoverContent>
                                 </Popover>

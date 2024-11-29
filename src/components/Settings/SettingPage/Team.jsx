@@ -437,16 +437,13 @@ const Team = () => {
                                                 {(invitationList || []).map((x, i) => (
                                                     <TableRow key={i}>
                                                         <TableCell className="font-normal sm:pl-6">{x?.member_email}</TableCell>
-                                                        {/*<TableCell>Expires in {moment(x?.expire_at).diff(moment(new Date()), 'days')} days</TableCell>*/}
-                                                        {/*<TableCell>*/}
-                                                        {/*    {moment(x?.expire_at).isBefore(moment(new Date()))*/}
-                                                        {/*        ? "Expired"*/}
-                                                        {/*        : `Expires in ${moment(x?.expire_at).diff(moment(new Date()), 'days')} days`}*/}
-                                                        {/*</TableCell>*/}
                                                         <TableCell>
-                                                            Expires in {Math.max(moment(x?.expire_at).diff(moment(new Date()), 'days'), 0)} days
+                                                            {moment().startOf('day').isSameOrAfter(moment(x?.expire_at).startOf('day')) ? (
+                                                                <span>Expired</span>
+                                                            ) : (
+                                                                <span>Expires in {moment(x?.expire_at).diff(moment().startOf('day'), 'days')} days</span>
+                                                            )}
                                                         </TableCell>
-
                                                         <TableCell>Invited about {moment.utc(x.created_at).local().startOf('seconds').fromNow()}</TableCell>
                                                         <TableCell className="pr-6 text-right">
                                                             <DropdownMenu className={"relative"} >

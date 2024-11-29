@@ -27,6 +27,7 @@ const initialState = {
     description: "",
     createdAt: moment().fromNow(),
     image: "",
+    delete_image: ""
 };
 
 const initialStateError = {
@@ -81,7 +82,8 @@ const Category = () => {
             project_id: projectDetailsReducer.id,
             search: search,
             page: pageNo,
-            limit: perPageLimit
+            limit: perPageLimit,
+
         });
         if (data.status === 200) {
             setCategoryList(data.data);
@@ -241,7 +243,8 @@ const Category = () => {
         setSubCategoryEdit(false);
     };
 
-    const updateCategory = async () => {
+    const updateCategory = async (name, value) => {
+
         let validationErrors = {};
         Object.keys(selectedCategory).forEach(name => {
             const error = formValidate(name, selectedCategory[name]);
@@ -253,12 +256,23 @@ const Category = () => {
             setFormError(validationErrors);
             return;
         }
+        if (name === "delete_image") {
+            setSelectedCategory({...selectedCategory, image: ""})
+        } else {
+            setSelectedCategory({...selectedCategory, [name]: value})
+        }
         setCategoryEdit(true)
         let formData = new FormData();
         formData.append('project_id', projectDetailsReducer.id);
         formData.append('title', selectedCategory.title);
         formData.append('description', selectedCategory.description);
-        formData.append(`image`, selectedCategory.image);
+
+
+        if (selectedCategory?.image === "") {
+            formData.append("delete_image", selectedCategory.delete_image);
+        }else {
+            formData.append(`image`, selectedCategory.image);
+        }
         
         const data = await apiService.updateCategory(formData, selectedCategory.id)
         if (data.status === 200) {
@@ -276,7 +290,7 @@ const Category = () => {
         setSheetOpen(false);
     }
 
-    const updateSubCategory = async () => {
+    const updateSubCategory = async (name, value) => {
         let validationErrors = {};
         Object.keys(selectedSubCategory).forEach(name => {
             const error = formValidate(name, selectedSubCategory[name]);
@@ -288,13 +302,22 @@ const Category = () => {
             setFormError(validationErrors);
             return;
         }
+        if (name === "delete_image") {
+            setSelectedSubCategory({...selectedSubCategory, image: ""})
+        } else {
+            setSelectedSubCategory({...selectedSubCategory, [name]: value})
+        }
         setSubCategoryEdit(true)
         let formData = new FormData();
         formData.append('project_id', projectDetailsReducer.id);
         formData.append('category_id', selectedSubCategory.category_id);
         formData.append('title', selectedSubCategory.title);
         formData.append('description', selectedSubCategory.description);
-        formData.append(`image`, selectedSubCategory.image);
+        if (selectedSubCategory?.image === "") {
+            formData.append("delete_image", selectedSubCategory.delete_image);
+        }else {
+            formData.append(`image`, selectedSubCategory.image);
+        }
         
         const data = await apiService.updateSubCategory(formData, selectedSubCategory.id)
         if (data.status === 200) {
@@ -316,13 +339,26 @@ const Category = () => {
     }
 
     const openSheetCategory = (id, data) => {
-        setSelectedCategory(id ? data : initialState);
-        navigate(`${baseUrl}/help/category`)
+        const updatedData = {
+            ...data,
+            delete_image: data?.image
+                ? data.image.replace("https://code.quickhunt.app/public/storage/post/", "")
+                : ""
+        };
+        setSelectedCategory(id ? updatedData : initialState);
+        navigate(`${baseUrl}/help/category`);
         setSheetOpen(true);
     };
 
+
     const openSheetSubCategory = (id, data) => {
-        setSelectedSubCategory(id ? data : initialState);
+        const updatedData = {
+            ...data,
+            delete_image: data?.image
+                ? data.image.replace("https://code.quickhunt.app/public/storage/post/", "")
+                : ""
+        };
+        setSelectedSubCategory(id ? updatedData : initialState);
         navigate(`${baseUrl}/help/category`)
         setSheetOpenSub(true);
         setSubCategoryId(data.category_id)
@@ -385,24 +421,15 @@ const Category = () => {
         }
     };
 
-    const onDeleteImg = async (name, value) => {
-        const payload = {
-            [name]: [value],
-            type: "post"
+    const onDeleteImg = (name, value) => {
+        if (selectedCategory && selectedCategory?.image) {
+            setSelectedCategory({...selectedCategory, image: ""})
+        } else {
+            setSelectedCategory({...selectedCategory, [name]: value, image: ""})
         }
-        const data = await apiService.deletePostsImage(payload);
-        if(data.status === 200) {
-            // if (selectedCategory && selectedCategory?.image) {
-            if (name === "image") {
-                setSelectedCategory({...selectedCategory, image: ""})
-            } else {
-                setSelectedCategory({...selectedCategory, [name]: value})
-                // setSelectedCategory({...selectedCategory, [name]: value, image: ""})
-            }
-        }
-    }
+    };
 
-    const onSubDeleteImg = async (name, value) => {
+    const onSubDeleteImg = (name, value) => {
         if (selectedSubCategory && selectedSubCategory?.image) {
             setSelectedSubCategory({...selectedSubCategory, image: ""})
         } else {
@@ -529,7 +556,7 @@ const Category = () => {
                                                 <CircleX
                                                     size={20}
                                                     className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
-                                                    onClick={() => onDeleteImg('images', selectedCategory && selectedCategory?.image && selectedCategory?.image?.name ? "" : selectedCategory?.image.replace("https://code.quickhunt.app/public/storage/post/", ""))}
+                                                    onClick={() => onDeleteImg('delete_image', selectedCategory && selectedCategory?.image && selectedCategory?.image?.name ? "" : selectedCategory?.image.replace("https://code.quickhunt.app/public/storage/post/", ""))}
                                                 />
                                             </div>
                                         </div> :
@@ -622,7 +649,7 @@ const Category = () => {
                                                         <CircleX
                                                             size={20}
                                                             className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
-                                                            onClick={() => onSubDeleteImg('image', selectedSubCategory && selectedSubCategory?.image && selectedSubCategory?.image?.name ? "" : selectedSubCategory?.image.replace("https://code.quickhunt.app/public/storage/post", ""))}
+                                                            onClick={() => onSubDeleteImg('delete_image', selectedSubCategory && selectedSubCategory?.image && selectedSubCategory?.image?.name ? "" : selectedSubCategory?.image.replace("https://code.quickhunt.app/public/storage/post/", ""))}
                                                         />
                                                     </div>
                                                 </div> :

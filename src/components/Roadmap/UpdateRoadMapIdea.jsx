@@ -1182,6 +1182,24 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                     </div>
                                                 </div>
 
+                                                <div className="w-full space-y-1.5 lg:hidden">
+                                                    <Label htmlFor="picture" className={"font-normal capitalize"}>Featured image</Label>
+                                                    <div className="w-[282px] h-[128px] flex gap-1">
+
+                                                        <ImageUploader
+                                                            // selectedImage={selectedIdea}
+                                                            // onChangeStatus={onChangeStatus}
+                                                            // handleUpload={handleFeatureImgUpload}
+
+                                                            image={selectedIdea?.cover_image}
+                                                            onDelete={() => onChangeStatus('delete_cover_image', selectedIdea && selectedIdea?.cover_image && selectedIdea?.cover_image?.name ? "" : [selectedIdea?.cover_image.replace("https://code.quickhunt.app/public/storage/feature_idea/", "")])}
+                                                            onUpload={handleFeatureImgUpload}
+                                                            altText="Cover Image"
+
+                                                        />
+                                                    </div>
+                                                </div>
+
                                                 {
                                                     isLoading ?
                                                         <div className={"flex flex-col gap-2"}>
@@ -1198,8 +1216,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                         <div className={"flex flex-col gap-2"}>
                                                             <div className="w-full flex flex-col gap-2">
                                                                 <Label htmlFor="message"
-                                                                       className={"font-normal capitalize"}>Add
-                                                                    comment</Label>
+                                                                       className={"font-normal capitalize"}>Add comment</Label>
                                                                 {/*{*/}
                                                                 {/*    privateNote ?*/}
                                                                 {/*        <Card*/}

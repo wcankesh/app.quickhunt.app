@@ -407,7 +407,7 @@ const UpdateAnnouncement = () => {
                                                                             textTransform: "capitalize"
                                                                         }}
                                                                         className={`h-[20px] py-0 px-2 text-xs rounded-[5px]  font-normal text-[${findObj?.label_color_code}] border-[${findObj?.label_color_code}] capitalize`}
-                                                                    >{findObj?.label_name}</Badge>
+                                                                    ><span className={"max-w-[100px] truncate text-ellipsis overflow-hidden whitespace-nowrap"}>{findObj?.label_name}</span></Badge>
                                                                 )
                                                             })
                                                         }
@@ -434,7 +434,7 @@ const UpdateAnnouncement = () => {
                                                                         <Circle fill={x.label_color_code}
                                                                                 stroke={x.label_color_code}
                                                                                 className={`${theme === "dark" ? "" : "text-muted-foreground"} w-[10px] h-[10px]`}/>
-                                                                        {x.label_name}
+                                                                        <span className={"max-w-[150px] truncate text-ellipsis overflow-hidden whitespace-nowrap"}>{x.label_name}</span>
                                                                     </div>
                                                                 </div>
                                                             </SelectItem>
@@ -579,7 +579,10 @@ const UpdateAnnouncement = () => {
                                                     variant="outline"
                                                     className={cn("justify-between text-left font-normal d-flex", "text-muted-foreground")}
                                                 >
-                                                    {moment(selectedRecord?.post_published_at).format("LL")}
+                                                    {/*{moment(selectedRecord?.post_published_at).format("LL")}*/}
+                                                    {selectedRecord.post_published_at
+                                                        ? moment(selectedRecord.post_published_at).format("LL")
+                                                        : "Select Date"}
                                                 </Button>
                                             </PopoverTrigger>
                                             <PopoverContent className="w-auto p-0" align="start">
@@ -592,6 +595,11 @@ const UpdateAnnouncement = () => {
                                                     startMonth={new Date(2024, 0)}
                                                     endMonth={new Date(2050, 12)}
                                                     hideNavigation
+                                                    defaultMonth={
+                                                        selectedRecord.post_published_at
+                                                            ? new Date(selectedRecord.post_published_at)
+                                                            : new Date()
+                                                    }
                                                 />
                                             </PopoverContent>
                                         </Popover>

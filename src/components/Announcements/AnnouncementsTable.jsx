@@ -189,7 +189,9 @@ const AnnouncementsTable = ({data, isLoading, setSelectedRecord, handleDelete, s
                                                                                        borderColor: y.label_color_code,
                                                                                        textTransform: "capitalize"
                                                                                    }}
-                                                                                   className={`h-[20px] py-0 px-2 text-xs rounded-[5px]  font-medium text-[${y.label_color_code}] border-[${y.label_color_code}] capitalize`}>{y.label_name}</Badge>
+                                                                                   className={`h-[20px] py-0 px-2 text-xs rounded-[5px]  font-medium text-[${y.label_color_code}] border-[${y.label_color_code}] capitalize`}>
+                                                                                <span className={"max-w-[85px] truncate text-ellipsis overflow-hidden whitespace-nowrap"}>{y.label_name}</span>
+                                                                            </Badge>
                                                                         )
                                                                     })
                                                                 }

@@ -282,7 +282,6 @@ const Articles = () => {
                                                                 <CommandItem
                                                                     key={x.id}
                                                                     value={x.id}
-                                                                    // onSelect={() => filterData("category_id", x.id)}
                                                                 >
                                                                     <Fragment key={x.id}>
                                                                         <span onClick={() => {
@@ -319,7 +318,7 @@ const Articles = () => {
                                                                         key={y.id}
                                                                         value={y.id}
                                                                         onSelect={() => {
-                                                                            setSelectedSubCategoryId(x.id);
+                                                                            setSelectedSubCategoryId(y.id);
                                                                             filterData("sub_category_id", y.id);
                                                                             setOpenFilter(false);
                                                                         }}
@@ -328,7 +327,7 @@ const Articles = () => {
                                                                             <span
                                                                                 className={"flex-1 w-full text-sm font-normal cursor-pointer flex gap-2 items-center"}
                                                                             >
-                                                                                {selectedSubCategoryId === x.id ? <Check size={18} /> : <div className={"h-[18px] w-[18px]"}/>}
+                                                                                {selectedSubCategoryId === y.id ? <Check size={18} /> : <div className={"h-[18px] w-[18px]"}/>}
                                                                                 <span className={"max-w-[140px] truncate text-ellipsis overflow-hidden whitespace-nowrap"}>{y.title}</span>
                                                                             </span>
                                                                         </Fragment>

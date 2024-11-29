@@ -788,14 +788,16 @@ const UpdateIdea = () => {
                                     <Select onValueChange={handleChangeTopic} value={selectedIdea.topic.map(x => x.id)}>
                                         <SelectTrigger className="bg-card">
                                             <SelectValue className={"text-muted-foreground text-sm"} placeholder="Assign to">
-                                                <div className={"flex flex-wrap gap-[2px]"}>
+                                                <div className={"flex gap-[2px]"}>
                                                     {/*{(selectedIdea.topic || []).slice(0, 2).map((x, index) => {*/}
                                                     {(selectedIdea.topic || []).map((x, index) => {
                                                         const findObj = (topicLists || []).find((y) => y.id === x?.id);
                                                         return (
                                                             <div key={index}
                                                                  className={`text-xs flex gap-[2px] ${theme === "dark" ? "text-card" : ""} bg-slate-300 items-center rounded py-0 px-2`}>
-                                                                {findObj?.title}
+                                                                <span className={"max-w-[85px] truncate text-ellipsis overflow-hidden whitespace-nowrap"}>
+                                                                    {findObj?.title}
+                                                                </span>
                                                             </div>
                                                         );
                                                     })}
@@ -1124,6 +1126,23 @@ const UpdateIdea = () => {
                                                 }
                                             </div>
                                         </div>
+
+                                        <div className="w-full space-y-1.5 lg:hidden">
+                                            <Label htmlFor="picture" className={"font-normal capitalize"}>Featured image</Label>
+                                            <div className="w-[282px] h-[128px] flex gap-1">
+                                                <ImageUploader
+                                                    // selectedImage={selectedIdea}
+                                                    // onChangeStatus={onChangeStatus}
+                                                    // handleUpload={handleFeatureImgUpload}
+
+                                                    image={selectedIdea?.cover_image}
+                                                    onDelete={() => onChangeStatus('delete_cover_image', selectedIdea && selectedIdea?.cover_image && selectedIdea.cover_image?.name ? "" : [selectedIdea.cover_image.replace("https://code.quickhunt.app/public/storage/feature_idea/", "")])}
+                                                    onUpload={handleFeatureImgUpload}
+                                                    altText="Cover Image"
+                                                />
+                                            </div>
+                                        </div>
+
                                         {
                                             isLoading ?
                                                 <div className={"flex flex-col gap-2"}>

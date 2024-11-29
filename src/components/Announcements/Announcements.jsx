@@ -63,13 +63,13 @@ const Announcements = () => {
     const [isFilter, setIsFilter] = useState(false);
 
     useEffect(() => {
-            if(filter.l || filter.s || filter.q || isFilter){
-                searchAnnouncement({...filter, page: pageNo, project_id: projectDetailsReducer.id,})
-            } else {
+            // if(filter.l || filter.s || filter.q || isFilter){
+                // searchAnnouncement({...filter, page: pageNo, project_id: projectDetailsReducer.id,})
+            // } else {
                 if(!isFilter && projectDetailsReducer.id){
                     getAllPosts()
                 }
-            }
+            // }
             navigate(`${baseUrl}/announcements?pageNo=${pageNo}`);
     }, [projectDetailsReducer.id, allStatusAndTypes, pageNo]);
 
@@ -147,6 +147,7 @@ const Announcements = () => {
                 setAnnouncementList(clone);
             }
             setTotalRecord(Number(totalRecord) - 1)
+            getAllPosts()
             toast({
                 description: data.message,
             })

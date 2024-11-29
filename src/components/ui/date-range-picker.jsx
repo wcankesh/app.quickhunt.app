@@ -276,24 +276,27 @@ export const DateRangePicker = ({
                 <Popover open={isOpen} onOpenChange={onOpenDatePicker}>
                     <PopoverTrigger asChild>
                         <Button variant="outline" className="justify-between cursor-pointer">
-              <span>
-                 {/*{(!isApply && label !== '') ? tempLabel !== '' ? tempLabel : <Fragment>{(tempRange.from ? formatDate(tempRange.from, locale) : 'Pick a date')} {tempRange.to && ` - ${formatDate(tempRange.to, locale)}`}</Fragment> : label !== '' ? label : <Fragment>{(range.from ? formatDate(range.from, locale) : 'Pick a date')} {range.to && ` - ${formatDate(range.to, locale)}`}</Fragment>}*/}
-                  {(!isApply && label !== '')
-                      ? tempLabel !== ''
-                          ? tempLabel
-                          : <Fragment>
-                              {(tempRange.from ? moment(tempRange.from).format("MMM D, YYYY") : 'Pick a date')}
-                              {tempRange.to && ` - ${moment(tempRange.to).format("MMM D, YYYY")}`}
-                          </Fragment>
-                      : label !== ''
-                          ? label
-                          : <Fragment>
-                              {(range.from ? moment(range.from).format("MMM D, YYYY") : 'Pick a date')}
-                              {range.to && ` - ${moment(range.to).format("MMM D, YYYY")}`}
-                          </Fragment>
-                  }
+              {/*<span>*/}
+              {/*   /!*{(!isApply && label !== '') ? tempLabel !== '' ? tempLabel : <Fragment>{(tempRange.from ? formatDate(tempRange.from, locale) : 'Pick a date')} {tempRange.to && ` - ${formatDate(tempRange.to, locale)}`}</Fragment> : label !== '' ? label : <Fragment>{(range.from ? formatDate(range.from, locale) : 'Pick a date')} {range.to && ` - ${formatDate(range.to, locale)}`}</Fragment>}*!/*/}
+              {/*    {(!isApply && label !== '')*/}
+              {/*        ? tempLabel !== ''*/}
+              {/*            ? tempLabel*/}
+              {/*            : <Fragment>*/}
+              {/*                {(tempRange.from ? moment(tempRange.from).format("MMM D, YYYY") : 'Pick a date')}*/}
+              {/*                {tempRange.to && ` - ${moment(tempRange.to).format("MMM D, YYYY")}`}*/}
+              {/*            </Fragment>*/}
+              {/*        : label !== ''*/}
+              {/*            ? label*/}
+              {/*            : <Fragment>*/}
+              {/*                {(range.from ? moment(range.from).format("MMM D, YYYY") : 'Pick a date')}*/}
+              {/*                {range.to && ` - ${moment(range.to).format("MMM D, YYYY")}`}*/}
+              {/*            </Fragment>*/}
+              {/*    }*/}
 
-              </span>
+              {/*</span>*/}
+                            <span>{isApply ? (label !== '' ? label :
+                                <Fragment>{range.from ? formatDate(range.from, locale) : 'Pick a date'}{range.to && ` - ${formatDate(range.to, locale)}`}</Fragment>) : (tempLabel !== '' ? tempLabel :
+                                <Fragment>{tempRange.from ? formatDate(tempRange.from, locale) : 'Pick a date'}{tempRange.to && ` - ${formatDate(tempRange.to, locale)}`}</Fragment>)}</span>
                             {isOpen ? (
                                 <ChevronUpIcon className="ml-2 h-4 w-4" />
                             ) : (

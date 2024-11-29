@@ -198,16 +198,35 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
         setChangeLogDetails({...changeLogDetails, [name]: value})
     }
 
+    // const onDateChange = (name, date) => {
+    //     if (date) {
+    //         let obj = {...changeLogDetails, [name]: date};
+    //         if (name === "post_published_at") {
+    //             if (date > new Date()) {
+    //                 obj = {...obj, post_status: 2}
+    //             } else {
+    //                 obj = {...obj, post_status: 1}
+    //             }
+    //         }
+    //         setChangeLogDetails(obj);
+    //         setPopoverOpen(false);
+    //         setPopoverOpenExpired(false);
+    //     }
+    // };
+
     const onDateChange = (name, date) => {
         if (date) {
-            let obj = {...changeLogDetails, [name]: date};
+            const formattedDate = new Date(date); // Ensure it's a valid Date object
+            let obj = { ...changeLogDetails, [name]: formattedDate };
+
             if (name === "post_published_at") {
-                if (date > new Date()) {
-                    obj = {...obj, post_status: 2}
+                if (formattedDate > new Date()) {
+                    obj = { ...obj, post_status: 2 }; // Future date
                 } else {
-                    obj = {...obj, post_status: 1}
+                    obj = { ...obj, post_status: 1 }; // Past or current date
                 }
             }
+
             setChangeLogDetails(obj);
             setPopoverOpen(false);
             setPopoverOpenExpired(false);
@@ -335,7 +354,7 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
                         <X onClick={onClose} size={18} className={"cursor-pointer"}/>
                     </div>
                 </SheetHeader>
-                <div className={"h-[calc(100vh_-_53px)] lg:h-[calc(100vh_-_69px)] overflow-y-auto"}>
+                <div className={"h-[calc(100vh_-_120px)] lg:h-[calc(100vh_-_69px)] overflow-y-auto"}>
                     <div className={"px-3 py-6 lg:px-8 border-b"}>
                         <div className={"flex flex-col gap-6"}>
                             <div className="w-full flex flex-col gap-2">
@@ -375,7 +394,7 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
                                                 changeLogDetails?.labels?.length > 0 ? (
                                                     <div className={"flex gap-[2px]"}>
                                                         {
-                                                            (changeLogDetails.labels || []).slice(0, 2).map((x) => {
+                                                            (changeLogDetails.labels || []).map((x) => {
                                                                 const findObj = labelList.find((y) => y.id == x);
                                                                 return (
                                                                     <Badge variant={"outline"} style={{
@@ -383,11 +402,11 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
                                                                         borderColor: findObj?.label_color_code,
                                                                         textTransform: "capitalize"
                                                                     }}
-                                                                           className={`h-[20px] py-0 px-2 text-xs rounded-[5px]  font-normal text-[${findObj?.label_color_code}] border-[${findObj?.label_color_code}] capitalize`}>{findObj?.label_name}</Badge>
+                                                                           className={`h-[20px] py-0 px-2 text-xs rounded-[5px]  font-normal text-[${findObj?.label_color_code}] border-[${findObj?.label_color_code}] capitalize`}>
+                                                                        <span className={"max-w-[100px] truncate text-ellipsis overflow-hidden whitespace-nowrap"}>{findObj?.label_name}</span></Badge>
                                                                 )
                                                             })
                                                         }
-                                                        {(changeLogDetails.labels || []).length > 2 && <div>...</div>}
                                                     </div>) : (<span className="text-muted-foreground">Select Label</span>)
                                             }
                                         </SelectValue>
@@ -409,7 +428,7 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
                                                                     <Circle fill={x.label_color_code}
                                                                             stroke={x.label_color_code}
                                                                             className={`${theme === "dark" ? "" : "text-muted-foreground"} w-[10px] h-[10px]`}/>
-                                                                    {x.label_name}
+                                                                    <span className={"max-w-[150px] truncate text-ellipsis overflow-hidden whitespace-nowrap"}>{x.label_name}</span>
                                                                 </div>
                                                             </div>
                                                         </SelectItem>
@@ -505,7 +524,10 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
                                             variant={"outline"}
                                             className={cn("justify-between text-left font-normal d-flex px-3 h-9", "text-muted-foreground")}
                                         >
-                                            {moment(changeLogDetails.post_published_at).format("LL")}
+                                            {/*{moment(changeLogDetails.post_published_at).format("LL")}*/}
+                                            {changeLogDetails.post_published_at
+                                                ? moment(changeLogDetails.post_published_at).format("LL")
+                                                : "Select Date"}
                                         </Button>
                                     </PopoverTrigger>
                                     <PopoverContent className="w-auto p-0 pointer-events-auto" align="start">
@@ -518,6 +540,11 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
                                             startMonth={new Date(2024, 0)}
                                             endMonth={new Date(2050, 12)}
                                             hideNavigation
+                                              defaultMonth={
+                                                  changeLogDetails.post_published_at
+                                                      ? new Date(changeLogDetails.post_published_at)
+                                                      : new Date()
+                                              }
                                         />
                                     </PopoverContent>
                                 </Popover>
