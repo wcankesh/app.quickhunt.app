@@ -33,6 +33,10 @@ const Roadmap = () => {
     const [isSheetOpen, setIsSheetOpen] = useState({ open: false, type: "" });
     const [isLoading, setIsLoading] = useState(false);
 
+    console.log("roadmapList", roadmapList)
+    console.log("selectedIdea", selectedIdea)
+    console.log("selectedRoadmap", selectedRoadmap)
+
     const openSheet = (type) => setIsSheetOpen({ open: true, type });
     const closeSheet = () => setIsSheetOpen({ open: false, type: "" });
 
@@ -70,10 +74,11 @@ const Roadmap = () => {
         }
     }
 
+    //old code
     const callApi = async (columnId, payload) => {
         let formData = new FormData();
         formData.append("roadmap_id", columnId);
-        const data = await apiService.updateIdea(formData, payload)
+        const data = await apiService.updateIdea(formData, payload?.id)
         if (data.status === 200) {
             toast({description: data.message})
         } else {
@@ -81,42 +86,109 @@ const Roadmap = () => {
         }
     }
 
-    // old code
+    //old code
     // const handleCardMove = (_card, source, destination) => {
+    //     console.log("_card", _card)
+    //     console.log("source", source)
+    //     console.log("destination", destination)
+    //     debugger
     //     const updatedBoard = moveCard(roadmapList, source, destination)
     //     callApi(destination.toColumnId, _card.id)
     //     setRoadmapList(updatedBoard)
     // }
 
+    //worked index and card update but issue is down to top index and cloumn updated particular index
+    // const handleCardMove = (_card, source, destination) => {
+    //     console.log("_card", _card);
+    //     console.log("source", source);
+    //     console.log("destination", destination);
+    //
+    //     // Update the card's roadmap_id for the destination column if moved to a new column
+    //     const updatedCard = { ..._card, roadmap_id: destination.toColumnId };
+    //
+    //     // Check if the card is being moved within the same column
+    //     const isSameColumn = source.fromColumnId === destination.toColumnId;
+    //
+    //     // Update the columns and synchronize ideas with cards
+    //     const updatedColumns = roadmapList.columns.map((column) => {
+    //         if (column.id === source.fromColumnId) {
+    //             // If the card is being moved within the same column, reorder it
+    //             if (isSameColumn) {
+    //                 const reorderedCards = column.cards.filter((card) => card.id !== _card.id);
+    //                 const targetIndex = destination.index;  // Get the target index for reordering
+    //                 reorderedCards.splice(targetIndex, 0, updatedCard);  // Insert the updated card at the target index
+    //                 return { ...column, cards: reorderedCards, ideas: reorderedCards };
+    //             } else {
+    //                 // Remove the card from the source column when moving to a different column
+    //                 const updatedCards = column.cards.filter((card) => card.id !== _card.id);
+    //                 return { ...column, cards: updatedCards, ideas: updatedCards };
+    //             }
+    //         } else if (column.id === destination.toColumnId) {
+    //             // If the card is moved to a different column, add it to the destination column
+    //             if (!isSameColumn) {
+    //                 const updatedCards = [...column.cards, updatedCard];
+    //                 return { ...column, cards: updatedCards, ideas: updatedCards };
+    //             }
+    //         }
+    //         return column;
+    //     });
+    //
+    //     // Update the state with the modified roadmap list
+    //     setRoadmapList({ columns: updatedColumns });
+    //
+    //     // Call API to persist the change with the correct payload
+    //     callApi(destination.toColumnId, updatedCard);
+    // };
+
     const handleCardMove = (_card, source, destination) => {
+        console.log("_card", _card);
+        console.log("source", source);
+        console.log("destination", destination);
+
+        // Update the card's roadmap_id for the destination column
         const updatedCard = { ..._card, roadmap_id: destination.toColumnId };
 
+        // Check if the card is being moved within the same column
+        const isSameColumn = source.fromColumnId === destination.toColumnId;
+
+        // Update the columns and synchronize ideas with cards
         const updatedColumns = roadmapList.columns.map((column) => {
             if (column.id === source.fromColumnId) {
-                return {
-                    ...column,
-                    cards: column.cards.filter((card) => card.id !== _card.id),
-                };
-            }
-            if (column.id === destination.toColumnId) {
-                const newCards = [...column.cards];
-                newCards.splice(destination.toPosition, 0, updatedCard);
-                return {
-                    ...column,
-                    cards: newCards,
-                    ideas: column.ideas ? [...newCards] : [],
-                };
+                // If the card is being moved within the same column, reorder it
+                if (isSameColumn) {
+                    // Filter the card out of the source column
+                    const reorderedCards = column.cards.filter((card) => card.id !== _card.id);
+
+                    // Insert the updated card at the target index (destination.index)
+                    reorderedCards.splice(destination.index, 0, updatedCard);
+                    return { ...column, cards: reorderedCards, ideas: reorderedCards };
+                } else {
+                    // Remove the card from the source column when moving to a different column
+                    const updatedCards = column.cards.filter((card) => card.id !== _card.id);
+                    return { ...column, cards: updatedCards, ideas: updatedCards };
+                }
+            } else if (column.id === destination.toColumnId) {
+                // If the card is moved to a different column, add it to the destination column
+                if (!isSameColumn) {
+                    // Add the updated card to the destination column at the correct index
+                    const updatedCards = [
+                        ...column.cards.slice(0, destination.index),  // Cards before the target index
+                        updatedCard,                                  // Insert updated card
+                        ...column.cards.slice(destination.index)      // Cards after the target index
+                    ];
+                    return { ...column, cards: updatedCards, ideas: updatedCards };
+                }
             }
             return column;
         });
 
-        setRoadmapList((prevState) => ({
-            ...prevState,
-            columns: updatedColumns,
-        }));
+        // Update the state with the modified roadmap list
+        setRoadmapList({ columns: updatedColumns });
 
-        callApi(destination.toColumnId, updatedCard.id);
+        // Call API to persist the change with the correct payload
+        callApi(destination.toColumnId, updatedCard);
     };
+
 
     const onCreateIdea = (mainRecord) => {
         setSelectedRoadmap(mainRecord)

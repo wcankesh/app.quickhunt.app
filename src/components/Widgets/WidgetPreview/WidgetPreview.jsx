@@ -41,7 +41,7 @@ const WidgetPreview = ({widgetsSetting, type, toggle,onToggle }) => {
                     </ul>
                 </main>
                 <section className={'py-4'}>
-                    <h6 className="text-sm font-medium text-center ">Powered by <a className="text-primary underline" href="https://quickhunt.app" target="_blank">quickhunt</a></h6>
+                    <h6 className="text-sm font-medium text-end ">Powered by <a className="text-primary mr-2" href="https://quickhunt.app" target="_blank">quickhunt</a></h6>
                 </section>
             </div>
         )
@@ -67,7 +67,7 @@ const WidgetPreview = ({widgetsSetting, type, toggle,onToggle }) => {
 
             {
                 type === "sidebar" &&
-                <div className={"relative h-full"}>
+                // <div className={"relative h-full"}>
                     <div className={`QH-sidebar ${toggle ? "QH-sidebar-open" : ""} relative`} style={{
                         left: widgetsSetting.sidebar_position === 1 ? "350px" : "inherit",
                         right: widgetsSetting.sidebar_position === 2 ? "0" : "inherit",
@@ -81,7 +81,7 @@ const WidgetPreview = ({widgetsSetting, type, toggle,onToggle }) => {
                         </div>
                         <div className="QH-sidebar-shadow" onClick={onToggle}>&nbsp;</div>
                     </div>
-                </div>
+                // </div>
             }
 
             {

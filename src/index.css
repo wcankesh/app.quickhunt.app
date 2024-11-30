@@ -266,10 +266,11 @@ em {color: var(--muted-foreground) !important;}
   overflow: hidden;
   padding: 0;
   pointer-events: all;
-
+  opacity: 1;
   right: 0;
   top: 0;
   z-index: 99999;
+  visibility: visible;
 }
 .QH-sidebar-content{
   bottom: 0;
