@@ -217,7 +217,7 @@ em {color: var(--muted-foreground) !important;}
   .bodyScreenHeight {height: auto;}
 }
 
-.QH-popover{
+.QH-popover-admin{
   width: 410px;
   height: 600px;
   max-height: calc(100% - 120px);
@@ -240,7 +240,7 @@ em {color: var(--muted-foreground) !important;}
   z-index: 99999;
   display: none;
 }
-.QH-popover-open{
+.QH-popover-open-admin{
   display: block;
   -webkit-animation-duration: .3s;
   animation-duration: .3s;
@@ -255,60 +255,8 @@ em {color: var(--muted-foreground) !important;}
   appearance: none;
 }
 
-/*.QH-sidebar {*/
-/*  position: fixed; !* Sidebar fixed to the screen *!*/
-/*  bottom: 0;*/
-/*  left: 0;*/
-/*  top: 0;*/
-/*  width: 300px; !* Adjust width as needed *!*/
-/*  background-color: #fff; !* Background color for the sidebar *!*/
-/*  display: block; !* Default display is block *!*/
-/*  visibility: hidden; !* Initially hidden *!*/
-/*  opacity: 0; !* Initially transparent *!*/
-/*  pointer-events: none; !* Disable interactions when closed *!*/
-/*  overflow: hidden;*/
-/*  z-index: 99999;*/
-/*  transform: translateX(-100%); !* Hide the sidebar off-screen *!*/
-/*  transition: transform 0.3s cubic-bezier(0.46, 0.39, 0.11, 0.96),*/
-/*  opacity 0.3s ease-in-out;*/
-/*}*/
 
-/*.QH-sidebar-open {*/
-/*  visibility: visible;*/
-/*  opacity: 1;*/
-/*  pointer-events: all;*/
-/*  transform: translateX(0); !* Slide-in effect *!*/
-/*}*/
-
-/*.QH-sidebar-content {*/
-/*  display: flex;*/
-/*  flex-direction: column;*/
-/*  height: 100%;*/
-/*  box-shadow: 0 8px 16px rgba(27, 39, 51, 0.07);*/
-/*  overflow: auto;*/
-/*}*/
-
-/*.QH-sidebar-shadow {*/
-/*  position: fixed; !* Shadow covers entire screen *!*/
-/*  left: 0;*/
-/*  top: 0;*/
-/*  width: 100%;*/
-/*  height: 100vh;*/
-/*  background-color: rgba(0, 0, 0, 0.4); !* Shadow effect *!*/
-/*  opacity: 0;*/
-/*  visibility: hidden;*/
-/*  z-index: 99998; !* Slightly below the sidebar *!*/
-/*  transition: opacity 0.3s ease-in-out;*/
-/*}*/
-
-/*.QH-sidebar-open + .QH-sidebar-shadow {*/
-/*  visibility: visible;*/
-/*  opacity: 1; !* Make the shadow visible when the sidebar is open *!*/
-/*}*/
-
-
-
-.QH-sidebar{
+.QH-sidebar-admin{
   bottom: 0;
   display: none;
   left: 0;
@@ -324,7 +272,7 @@ em {color: var(--muted-foreground) !important;}
   z-index: 99999;
   visibility: visible;
 }
-.QH-sidebar-content{
+.QH-sidebar-content-admin{
   bottom: 0;
   display: -webkit-box;
   display: -ms-flexbox;
@@ -339,10 +287,10 @@ em {color: var(--muted-foreground) !important;}
   transition: transform .3s cubic-bezier(.46,.39,.11,.96);
   box-shadow: 0 8px 16px rgba(27, 39, 51, .07);
 }
-.QH-sidebar-open{
+.QH-sidebar-open-admin{
   display: block;
 }
-.QH-sidebar-shadow{
+.QH-sidebar-shadow-admin{
 
   left: 0;
   opacity: .4;
@@ -357,7 +305,7 @@ em {color: var(--muted-foreground) !important;}
   height: 100vh;
 }
 
-.QH-modal{
+.QH-modal-admin{
   display: none;
   left: 1px;
   right: 0;
@@ -374,7 +322,7 @@ em {color: var(--muted-foreground) !important;}
   transition: opacity .3s ease-in-out;
   z-index: 99999;
 }
-.QH-modal-open{
+.QH-modal-open-admin{
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -387,7 +335,7 @@ em {color: var(--muted-foreground) !important;}
   /*background: #000000a3;*/
   opacity: 1;
 }
-.QH-modal-content{
+.QH-modal-content-admin{
   border-radius: 5px;
   display: -webkit-box;
   display: -ms-flexbox;
@@ -397,10 +345,10 @@ em {color: var(--muted-foreground) !important;}
   overflow: hidden;
   box-shadow: 0 8px 16px rgba(27, 39, 51, .07);
 }
-.QH-widget-embed{margin: 0 auto; height: 100%}
-.QH-embed{width: 100%; height: 100%}
+.QH-widget-embed-admin{margin: 0 auto; height: 100%}
+.QH-embed-admin{width: 100%; height: 100%}
 
-.QH-frame{
+.QH-frame-admin{
   border: 0px;
   outline: 0px;
   width: 100%;
@@ -414,7 +362,7 @@ em {color: var(--muted-foreground) !important;}
   overscroll-behavior: none;
 }
 
-.QH-floating-trigger{
+.QH-floating-trigger-admin{
   color: rgb(255, 255, 255);
   background-color: rgb(89, 86, 240);
   bottom: 20px;

@@ -52,7 +52,7 @@ const WidgetPreview = ({widgetsSetting, type, toggle,onToggle }) => {
         <Fragment>
             {
                 type === "popover" &&
-                <div className={`QH-popover ${toggle ? "QH-popover-open" : ""}`} style={{
+                <div className={`QH-popover-admin ${toggle ? "QH-popover-open-admin" : ""}`} style={{
                     // left: widgetsSetting.launcher_position === 1 ? "40px" : "inherit",
                     left: (widgetsSetting.launcher_position === 1)
                         ? (type === "popover" ? `${widgetsSetting.launcher_left_spacing || 20}px` : `${widgetsSetting.launcher_left_spacing || 690}px`)
@@ -70,12 +70,12 @@ const WidgetPreview = ({widgetsSetting, type, toggle,onToggle }) => {
             {
                 type === "sidebar" &&
                 // <div className={"relative h-full"}>
-                    <div className={`QH-sidebar ${toggle ? "QH-sidebar-open" : ""} relative`} style={{
+                    <div className={`QH-sidebar-admin ${toggle ? "QH-sidebar-open-admin" : ""} relative`} style={{
                         // left: widgetsSetting.sidebar_position === 1 ? "350px" : "inherit",
                         left: widgetsSetting.sidebar_position === 1 ? "0px" : "inherit",
                         right: widgetsSetting.sidebar_position === 2 ? "0" : "inherit",
                     }}>
-                        <div className="QH-sidebar-content" style={{
+                        <div className="QH-sidebar-content-admin" style={{
                             // left: widgetsSetting.sidebar_position === 1 ? "350px" : "inherit",
                             left: widgetsSetting.sidebar_position === 1 ? "0px" : "inherit",
                             right: widgetsSetting.sidebar_position === 2 ? "0" : "inherit",
@@ -84,7 +84,7 @@ const WidgetPreview = ({widgetsSetting, type, toggle,onToggle }) => {
                         }}>
                             {renderContent()}
                         </div>
-                        <div className="QH-sidebar-shadow" onClick={onToggle}>&nbsp;</div>
+                        <div className="QH-sidebar-shadow-admin" onClick={onToggle}>&nbsp;</div>
                     </div>
                 // </div>
             }
@@ -92,8 +92,8 @@ const WidgetPreview = ({widgetsSetting, type, toggle,onToggle }) => {
             {
                 type === "modal" &&
                 <div className={"relative h-full"}>
-                    <div className={`QH-modal ${toggle ? "QH-modal-open" : ""}`}>
-                        <div className={"QH-modal-content"}
+                    <div className={`QH-modal-admin ${toggle ? "QH-modal-open-admin" : ""}`}>
+                        <div className={"QH-modal-content-admin"}
                              style={{
                                  width: `${widgetsSetting.modal_width}px`,
                                  height: `${widgetsSetting.modal_height}px`,
@@ -107,8 +107,8 @@ const WidgetPreview = ({widgetsSetting, type, toggle,onToggle }) => {
             {
                 type === "embed" &&
                 <div className={"p-[64px] h-full "}>
-                    <div className={"QH-widget-embed border rounded-lg"}>
-                        <div className={"QH-embed"}>
+                    <div className={"QH-widget-embed-admin border rounded-lg"}>
+                        <div className={"QH-embed-admin"}>
                             {renderContent()}
                         </div>
                     </div>
