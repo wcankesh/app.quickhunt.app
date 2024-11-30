@@ -102,7 +102,6 @@ const Roadmap = () => {
 
     }
 
-
     const onCreateIdea = (mainRecord) => {
         setSelectedRoadmap(mainRecord)
         openSheet("create");

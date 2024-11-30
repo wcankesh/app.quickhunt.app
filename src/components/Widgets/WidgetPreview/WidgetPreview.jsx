@@ -5,8 +5,10 @@ import WidgetHeader from "./WidgetHeader";
 import IdeaWidgetPreview from "./IdeaWidgetPreview";
 import RoadmapWidgetPreview from "./RoadmapWidgetPreview";
 import AnnouncementWidgetPreview from "./AnnouncementWidgetPreview";
+import {useTheme} from "../../theme-provider";
 
 const WidgetPreview = ({widgetsSetting, type, toggle,onToggle }) => {
+    const {theme} = useTheme();
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
 
     const [selected, setSelected] = useState("ideas")
@@ -40,8 +42,8 @@ const WidgetPreview = ({widgetsSetting, type, toggle,onToggle }) => {
                         })}
                     </ul>
                 </main>
-                <section className={'py-4'}>
-                    <h6 className="text-sm font-medium text-end ">Powered by <a className="text-primary mr-2" href="https://quickhunt.app" target="_blank">quickhunt</a></h6>
+                <section className={`py-4 ${theme == "dark" ? "bg-card-foreground text-card" : "bg-card"} `}>
+                    <h6 className="text-sm font-medium text-end mr-2">Powered by <a className="text-primary" href="https://quickhunt.app" target="_blank">quickhunt</a></h6>
                 </section>
             </div>
         )
@@ -69,12 +71,15 @@ const WidgetPreview = ({widgetsSetting, type, toggle,onToggle }) => {
                 type === "sidebar" &&
                 // <div className={"relative h-full"}>
                     <div className={`QH-sidebar ${toggle ? "QH-sidebar-open" : ""} relative`} style={{
-                        left: widgetsSetting.sidebar_position === 1 ? "350px" : "inherit",
+                        // left: widgetsSetting.sidebar_position === 1 ? "350px" : "inherit",
+                        left: widgetsSetting.sidebar_position === 1 ? "0px" : "inherit",
                         right: widgetsSetting.sidebar_position === 2 ? "0" : "inherit",
                     }}>
                         <div className="QH-sidebar-content" style={{
-                            left: widgetsSetting.sidebar_position === 1 ? "350px" : "inherit",
+                            // left: widgetsSetting.sidebar_position === 1 ? "350px" : "inherit",
+                            left: widgetsSetting.sidebar_position === 1 ? "0px" : "inherit",
                             right: widgetsSetting.sidebar_position === 2 ? "0" : "inherit",
+                            bottom: (widgetsSetting.launcher_bottom_spacing) ? `${widgetsSetting.launcher_bottom_spacing || "90"}px` : "inherit",
                             width: `${widgetsSetting.sidebar_width}px`,
                         }}>
                             {renderContent()}

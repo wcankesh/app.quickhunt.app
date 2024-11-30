@@ -682,7 +682,7 @@ const UpdateWidget = () => {
                         <Button variant={"ghost hover-none"} className={"font-medium border border-primary text-primary"} onClick={handleCancel}>Cancel</Button>
                     </div>
                 </div>
-                <div className={"bg-muted w-full h-full hidden md:block overflow-y-auto"}>
+                <div className={"bg-muted w-full h-full hidden md:block overflow-y-auto relative"}>
                     {
                         (type !== "embed" && widgetsSetting?.is_launcher_icon == 1) &&
                         <div className='QH-floating-trigger' onClick={onToggle} style={{
@@ -695,7 +695,7 @@ const UpdateWidget = () => {
                                 : "inherit",
                             // bottom: (widgetsSetting.launcher_bottom_spacing) ? `${widgetsSetting.launcher_bottom_spacing || "20"}px` : "inherit",
                             bottom: (widgetsSetting.launcher_bottom_spacing) ? `${widgetsSetting.launcher_bottom_spacing}` : "20px",
-                            position: type === "popover" ? "absolute" : "fixed",
+                            position: (type === "popover" || type === "sidebar" || type === "modal") ? "absolute" : "fixed",
                         }}>
                             {
                                 launcherIcon[widgetsSetting.launcher_icon]

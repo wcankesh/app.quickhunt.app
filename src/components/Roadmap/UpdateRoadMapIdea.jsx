@@ -926,13 +926,15 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                 <SelectTrigger>
                                                     <SelectValue className={"text-muted-foreground text-sm"}
                                                                  placeholder="Assign to">
-                                                        <div className={"flex flex-wrap gap-[2px]"}>
+                                                        <div className={"flex gap-[2px]"}>
                                                             {(selectedIdea?.topic || []).map((x, index) => {
                                                                 const findObj = (topicLists || []).find((y) => y.id === x?.id);
                                                                 return (
                                                                     <div key={index}
                                                                          className={`text-xs flex gap-[2px] ${theme === "dark" ? "text-card" : ""} bg-slate-300 items-center rounded py-0 px-2`}>
-                                                                        {findObj?.title}
+                                                                        <span className={"max-w-[85px] truncate text-ellipsis overflow-hidden whitespace-nowrap"}>
+                                                                    {findObj?.title}
+                                                                </span>
                                                                     </div>
                                                                 );
                                                             })}
