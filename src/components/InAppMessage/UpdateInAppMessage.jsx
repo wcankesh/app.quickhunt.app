@@ -138,6 +138,9 @@ const UpdateInAppMessage = () => {
     const {id, type} = useParams()
     const {theme} = useTheme();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
+    const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
+
+    console.log("allStatusAndTypes", allStatusAndTypes)
 
     const [inAppMsgSetting, setInAppMsgSetting] = useState(initialState);
     const [selectedStepIndex, setSelectedStepIndex] = useState(0);
@@ -369,19 +372,12 @@ const UpdateInAppMessage = () => {
                                 <div className={"w-3 h-3 rounded-full border border-inherit"}/>
                                 <div className={"w-3 h-3 rounded-full border border-inherit"}/>
                             </div>
-                            <div className={"p-2 border-b"}>
-                                <div className="flex items-center space-x-3">
-                                    <ArrowLeft className={`${theme === "dark" ? "" : "text-[#CBD5E1]"}`}/>
-                                    <ArrowRight className={`${theme === "dark" ? "" : "text-[#CBD5E1]"}`}/>
-                                    <RotateCcw className={`${theme === "dark" ? "" : "text-[#CBD5E1]"}`}/>
-
-                                    <div className="flex-grow border border-inherit h-8 rounded-2xl"/>
-                                    <div className={"h-7 w-7 rounded-full border border-inherit"}/>
-                                </div>
-                            </div>
                             {renderContent(type)}
                         </Card>
-                        <h6 className="text-sm font-medium text-end mt-1 mr-2">Powered by <a className="text-primary" href="https://quickhunt.app" target="_blank">quickhunt</a></h6>
+                        {
+                            (allStatusAndTypes?.setting?.is_branding === 1) &&
+                                <h6 className="text-sm font-medium text-end mt-1 mr-2">Powered by <a className="text-primary" href="https://quickhunt.app" target="_blank">quickhunt</a></h6>
+                        }
                     </Card>
                 </div>
             </div>

@@ -55,7 +55,7 @@ const WidgetHeader = ({widgetsSetting, selected, setSelected}) => {
                                 {/*}*/}
 
                                 {
-                                    projectDetailsReducer?.project_logo ? (
+                                    (projectDetailsReducer && projectDetailsReducer?.project_logo) ? (
                                         <img
                                             // src={`https://code.quickhunt.app/public/storage/project/${projectDetailsReducer.project_logo}`}
                                             src={projectDetailsReducer.project_logo}

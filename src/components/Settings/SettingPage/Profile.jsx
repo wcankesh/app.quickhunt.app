@@ -311,7 +311,7 @@ const Profile = () => {
                                             id="pictureInput"
                                             type="file"
                                             className="hidden"
-                                            accept={"images/*"}
+                                            accept={"image/*"}
                                             onChange={handleFileChange}
                                         />
                                         <label

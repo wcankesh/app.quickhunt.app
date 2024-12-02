@@ -447,6 +447,7 @@ const Team = () => {
                                         : invitationList?.length > 0 ? <>
                                                 {(invitationList || []).map((x, i) => (
                                                     <TableRow key={i}>
+                                                        {console.log("x", x)}
                                                         <TableCell className="font-normal py-[10px] px-[12px]">{x?.member_email}</TableCell>
                                                         <TableCell className={"py-[10px] px-[12px]"}>
                                                             {moment().startOf('day').isSameOrAfter(moment(x?.expire_at).startOf('day')) ? (
@@ -458,7 +459,15 @@ const Team = () => {
                                                         {/*<TableCell className={"py-[10px] px-[12px]"}>*/}
                                                         {/*    Expires in {Math.max(moment(x?.expire_at).diff(moment(new Date()), 'days'), 0)} days*/}
                                                         {/*</TableCell>*/}
-                                                        <TableCell className={"py-[10px] px-[12px]"}>Invited about {moment.utc(x.created_at).local().startOf('seconds').fromNow()}</TableCell>
+                                                        {/*<TableCell className={"py-[10px] px-[12px]"}>Invited about {moment.utc(x.created_at).local().startOf('seconds').fromNow()}</TableCell>*/}
+                                                        <TableCell className={"py-[10px] px-[12px]"}>
+                                                            Invited about{" "}
+                                                            {x.updated_at && x.updated_at !== x.created_at ? (
+                                                                <>resent {moment.utc(x.updated_at).local().startOf("seconds").fromNow()}</>
+                                                            ) : (
+                                                                <>initially invited {moment.utc(x.created_at).local().startOf("seconds").fromNow()}</>
+                                                            )}
+                                                        </TableCell>
                                                         <TableCell className="py-[10px] px-[12px] text-right">
                                                             <DropdownMenu className={"relative"} >
                                                                 <DropdownMenuTrigger>

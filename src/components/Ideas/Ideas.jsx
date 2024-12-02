@@ -24,6 +24,8 @@ import Pagination from "../Comman/Pagination";
 import DeleteDialog from "../Comman/DeleteDialog";
 import {RadioGroup, RadioGroupItem} from "../ui/radio-group";
 import {Label} from "../ui/label";
+import {Input} from "../ui/input";
+import {debounce} from "lodash";
 
 const filterByStatus = [
     {name: "Archived", value: "archive",},
@@ -40,6 +42,7 @@ const initialStateFilter = {
     roadmap: [],
     topic: [],
     status: [],
+    search: ""
 };
 
 const Ideas = () => {
@@ -70,7 +73,7 @@ const Ideas = () => {
     const closeCreateIdea = () => {setSheetOpenCreate(false)};
 
     useEffect(() => {
-        if (filter.topic.length || filter.roadmap.length || filter.bug || filter.archive /*|| filter.no_status*/ || filter.all) {
+        if (filter?.topic?.length || filter?.roadmap?.length || filter?.bug || filter?.archive /*|| filter.no_status*/ || filter?.all || filter?.search) {
             let payload = {...filter, project_id: projectDetailsReducer.id, page: pageNo, limit: perPageLimit}
             ideaSearch(payload)
         } else {
@@ -278,6 +281,41 @@ const Ideas = () => {
         setOpenDelete(!openDelete)
     }
 
+    // const debouncedSearch = debounce((value) => {
+    //     const updatedFilter = {
+    //         ...filter,
+    //         project_id: projectDetailsReducer.id,
+    //         search: value,
+    //         page: 1,
+    //     };
+    //     setFilter(updatedFilter);
+    //     ideaSearch(updatedFilter);
+    // }, 500);
+
+    // const handleSearchChange = (e) => {
+    //     const value = e.target.value;
+    //     setFilter((prev) => ({ ...prev, search: value }));
+    //     // debouncedSearch(value);
+    // };
+
+    const handleSearchChange = (e) => {
+        const value = e.target.value;
+        const updatedFilter = {
+            ...filter,
+            project_id: projectDetailsReducer.id,
+            search: value,
+            page: 1,
+        };
+        setFilter(updatedFilter);
+        ideaSearch(updatedFilter);
+    };
+
+    const clearSearchFilter = () => {
+        setFilter(prev => ({ ...prev, search: '' }));
+        setPageNo(1);
+        getAllIdea('', filter.search);
+    };
+
     return (
         <Fragment>
             {
@@ -307,11 +345,31 @@ const Ideas = () => {
                 }
 
                     <div className="flex flex-wrap items-center gap-2 justify-between">
-                        <div className={"flex flex-col gap-y-0.5"}>
+                        <div className={"flex flex-col flex-1 gap-y-0.5"}>
                             <h1 className="text-2xl font-normal flex-initial w-auto">Ideas ({totalRecord})</h1>
                             <p className={"text-sm text-muted-foreground"}>Create and display your ideas on your website and encourage users to upvote and comment with their feedback.</p>
                         </div>
-                        <div className="flex gap-2">
+                        <div className="w-full lg:w-auto flex sm:flex-nowrap flex-wrap gap-2 items-center">
+                            <div className={"flex gap-2 items-center w-full lg:w-auto"}>
+                            <div className={"relative w-full"}>
+                                <Input
+                                    type="search"
+                                    placeholder="Search..."
+                                    className={"w-full pl-4 pr-14 text-sm font-normal h-9"}
+                                    name={"search"}
+                                    value={filter.search}
+                                    onChange={handleSearchChange}
+                                />
+                                {filter?.search?.trim() !== '' && (
+                                    <button
+                                        type="button"
+                                        className="absolute right-2 top-1/2 transform -translate-y-1/2 w-6 h-6 flex items-center justify-center text-gray-400 hover:text-gray-600"
+                                        onClick={clearSearchFilter}
+                                    >
+                                        <X className="w-4 h-4" />
+                                    </button>
+                                )}
+                            </div>
                             <Popover
                                 open={openFilter}
                                 onOpenChange={() => {
@@ -448,11 +506,12 @@ const Ideas = () => {
                                     </Command>
                                 </PopoverContent>
                             </Popover>
+                            </div>
                             <Button className={"gap-2 font-medium hover:bg-primary"} onClick={openCreateIdea}><Plus size={20} strokeWidth={3}/>Create Idea</Button>
                         </div>
                     </div>
                     {
-                        (filter.topic.length > 0 || filter.roadmap.length > 0 || filter.archive === 1 || filter.bug === 1) && <div className="flex flex-wrap gap-2 my-6">
+                        (filter?.topic?.length > 0 || filter?.roadmap?.length > 0 || filter?.archive === 1 || filter?.bug === 1) && <div className="flex flex-wrap gap-2 my-6">
                             {
                                 (filter.topic || []).map((data,index) =>{
                                     const findTopic = (topicLists || []).find((topic) => topic.id === data);
