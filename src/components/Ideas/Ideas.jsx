@@ -1,4 +1,4 @@
-import React, {Fragment, useEffect, useState} from 'react';
+import React, {Fragment, useEffect, useState,useCallback} from 'react';
 import {Button} from "../ui/button";
 import {ArrowBigUp, ChevronLeft, Circle, Dot, Ellipsis, Filter, MessageCircleMore, Pin, Plus, X,} from "lucide-react";
 import {Card, CardContent} from "../ui/card";
@@ -57,7 +57,7 @@ const Ideas = () => {
     const [ideasList, setIdeasList] = useState([]);
     const [topicLists, setTopicLists] = useState([]);
     const [roadmapStatus, setRoadmapStatus] = useState([]);
-    const [filter, setFilter] = useState(initialStateFilter);
+    const [filter, setFilter] = useState({...initialStateFilter, project_id: projectDetailsReducer.id});
     const [openFilter, setOpenFilter] = useState('');
     const [openFilterType, setOpenFilterType] = useState('');
     const [pageNo, setPageNo] = useState(Number(getPageNo));
@@ -281,7 +281,31 @@ const Ideas = () => {
         setOpenDelete(!openDelete)
     }
 
-    // const debouncedSearch = debounce((value) => {
+
+
+
+    const throttledDebouncedSearch = useCallback(
+        debounce((value) => {
+            const updatedFilter = {
+                ...filter,
+                project_id: projectDetailsReducer.id,
+                search: value,
+                page: 1,
+            };
+            ideaSearch(updatedFilter);
+        }, 500), // 500 ms delay
+        []
+    );
+
+
+    const handleSearchChange = (e) => {
+        const value = e.target.value;
+        setFilter( { ...filter, search: value });
+        throttledDebouncedSearch(value)
+    };
+
+    // const handleSearchChange = (e) => {
+    //     const value = e.target.value;
     //     const updatedFilter = {
     //         ...filter,
     //         project_id: projectDetailsReducer.id,
@@ -290,25 +314,7 @@ const Ideas = () => {
     //     };
     //     setFilter(updatedFilter);
     //     ideaSearch(updatedFilter);
-    // }, 500);
-
-    // const handleSearchChange = (e) => {
-    //     const value = e.target.value;
-    //     setFilter((prev) => ({ ...prev, search: value }));
-    //     // debouncedSearch(value);
     // };
-
-    const handleSearchChange = (e) => {
-        const value = e.target.value;
-        const updatedFilter = {
-            ...filter,
-            project_id: projectDetailsReducer.id,
-            search: value,
-            page: 1,
-        };
-        setFilter(updatedFilter);
-        ideaSearch(updatedFilter);
-    };
 
     const clearSearchFilter = () => {
         setFilter(prev => ({ ...prev, search: '' }));
