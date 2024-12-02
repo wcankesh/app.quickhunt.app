@@ -268,12 +268,12 @@ const SaidBarDesktop = ({isMobile, setIsMobile}) => {
             <div className="pointer-events-auto relative z-30 flex h-full w-[250px] flex-col ltr:-translate-x-full rtl:translate-x-full ltr:xl:translate-x-0 rtl:xl:translate-x-0">
 
                 <Sheet open={isMobile} onOpenChange={(open) => setIsMobile(open)}>
+                    {/*<SheetOverlay className={"inset-0"} />*/}
                     <SheetTrigger asChild>
                         <Button variant="outline" size="icon" className="shrink-0 xl:hidden">
                             <Menu size={20}/>
                         </Button>
                     </SheetTrigger>
-                    <SheetOverlay className={"inset-0"} />
                     <SheetContent side="left" className="flex gap-0 flex-col w-[280px] md:w-[340px] p-0">
                         <SheetHeader className={"flex gap-2 flex-row justify-between items-center p-3 py-2.5 dark:border-b"}>
                             <div className={"flex w-full items-center h-[56px] cursor-pointer"}  onClick={() => onRedirect("/dashboard")}>
@@ -286,7 +286,7 @@ const SaidBarDesktop = ({isMobile, setIsMobile}) => {
                         </div>
                     </SheetContent>
                 </Sheet>
-                <div className={`h-[calc(100vh_-_56px)] px-3 flex flex-col overflow-y-auto h-full bg-primary/5 ${theme === "dark" ? "border border-r" : ""}`}>
+                <div className={`h-[calc(100vh_-_56px)] mt-[56px] px-3 flex flex-col overflow-y-auto h-full bg-primary/5 ${theme === "dark" ? "border border-r" : ""}`}>
                     {commonRender()}
                 </div>
             </div>

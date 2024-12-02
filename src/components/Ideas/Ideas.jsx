@@ -599,9 +599,16 @@ const Ideas = () => {
                                                                     }
                                                                     <Select
                                                                         onValueChange={(value) => handleStatusUpdate("roadmap_id", value, i, x)}
-                                                                        value={x.roadmap_id}>
+                                                                        value={x.roadmap_id !== "" ? x.roadmap_id : null}>
                                                                         <SelectTrigger className="md:w-[200px] w-[170px] h-8 bg-card">
-                                                                            <SelectValue/>
+                                                                            <SelectValue>
+                                                                                {/* Fallback text if no value is selected */}
+                                                                                {x.roadmap_id ? (
+                                                                                    allStatusAndTypes.roadmap_status.find((status) => status.id === x.roadmap_id)?.title
+                                                                                ) : (
+                                                                                    <span className="text-gray-500">No status</span> // Display "No status" text
+                                                                                )}
+                                                                            </SelectValue>
                                                                         </SelectTrigger>
                                                                         <SelectContent>
                                                                             <SelectGroup>

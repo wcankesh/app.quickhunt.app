@@ -18,8 +18,6 @@ import {DropdownMenuContent, DropdownMenuItem} from "../../ui/dropdown-menu";
 import {toast} from "../../ui/use-toast";
 import {Skeleton} from "../../ui/skeleton";
 import EmptyData from "../../Comman/EmptyData";
-import {Dialog} from "@radix-ui/react-dialog";
-import {DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "../../ui/dialog";
 import DeleteDialog from "../../Comman/DeleteDialog";
 
 const initialState = {
@@ -457,6 +455,9 @@ const Team = () => {
                                                                 <span>Expires in {moment(x?.expire_at).diff(moment().startOf('day'), 'days')} days</span>
                                                             )}
                                                         </TableCell>
+                                                        {/*<TableCell className={"py-[10px] px-[12px]"}>*/}
+                                                        {/*    Expires in {Math.max(moment(x?.expire_at).diff(moment(new Date()), 'days'), 0)} days*/}
+                                                        {/*</TableCell>*/}
                                                         <TableCell className={"py-[10px] px-[12px]"}>Invited about {moment.utc(x.created_at).local().startOf('seconds').fromNow()}</TableCell>
                                                         <TableCell className="py-[10px] px-[12px] text-right">
                                                             <DropdownMenu className={"relative"} >
@@ -486,7 +487,7 @@ const Team = () => {
             </Card>
             {isSheetOpen && (
                 <Sheet open={isSheetOpen} onOpenChange={isSheetOpen ? closeSheet : openSheet}>
-                    <SheetOverlay className={"inset-0"} />
+                    {/*<SheetOverlay className={"inset-0"} />*/}
                     <SheetContent className={"sm:max-w-[662px] p-0"}>
                         <SheetHeader className={"px-4 py-3 md:py-5 lg:px-8 lg:py-[20px] border-b flex flex-row justify-between items-center"}>
                             <SheetTitle className={"text-sm md:text-xl font-normal flex justify-between items-center"}>

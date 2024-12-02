@@ -664,7 +664,7 @@ const HeaderBar = ({setIsMobile}) => {
 
                     {isSheetOpen && (
                         <Sheet open={isSheetOpen} onOpenChange={isSheetOpen ? closeSheet : openSheet}>
-                            <SheetOverlay className={"inset-0"} />
+                            {/*<SheetOverlay className={"inset-0"} />*/}
                             <SheetContent className={"sm:max-w-[662px] p-0"}>
                                 <SheetHeader className={"px-4 py-3 md:py-5 lg:px-8 lg:py-[20px] border-b flex flex-row justify-between items-center"}>
                                     <SheetTitle className={"text-xl font-normal flex justify-between items-center"}>

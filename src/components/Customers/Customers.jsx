@@ -206,7 +206,7 @@ const Customers = () => {
         <Fragment>
 
             {isSheetOpen && <Sheet open={isSheetOpen} onOpenChange={isSheetOpen ? closeSheet : openSheet}>
-                <SheetOverlay className={"inset-0"}/>
+                {/*<SheetOverlay className={"inset-0"}/>*/}
                 <SheetContent className={"sm:max-w-[662px] p-0"}>
                     <SheetHeader className={"px-3 py-4 lg:px-8 lg:py-[20px] flex flex-row justify-between items-center border-b"}>
                         <h2 className={"text-sm md:text-xl font-normal"}>Add New Customer</h2>

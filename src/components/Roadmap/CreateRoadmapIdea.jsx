@@ -139,7 +139,7 @@ const CreateRoadmapIdea = ({isOpen, onOpen, onClose, closeCreateIdea, selectedRo
     return (
         <div>
             <Sheet open={isOpen} onOpenChange={isOpen ? onCancel : onOpen} closeCreateIdea={closeCreateIdea}>
-                <SheetOverlay className={"inset-0"} />
+                {/*<SheetOverlay className={"inset-0"} />*/}
                 <SheetContent className={"lg:max-w-[800px] md:max-w-full sm:max-w-full p-0"}>
                     <SheetHeader className={"px-4 py-5 lg:px-8 lg:py-[20px] border-b"}>
                         <div className={"flex justify-between items-center w-full"}>

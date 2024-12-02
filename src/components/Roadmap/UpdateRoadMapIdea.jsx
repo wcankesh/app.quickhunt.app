@@ -685,6 +685,22 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
         formData.append('topic', topics.join(","));
         const data = await apiSerVice.updateIdea(formData, selectedIdea?.id)
         if (data.status === 200) {
+
+            let cloneRoadmap = [...roadmapList.columns];
+            const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedIdea?.roadmap_id);
+
+            if (roadmapIndex !== -1) {
+                const ideaIndex = cloneRoadmap[roadmapIndex].ideas.findIndex((x) => x.id === selectedIdea?.id);
+                if (ideaIndex !== -1) {
+                    // Update the idea in the roadmap list
+                    cloneRoadmap[roadmapIndex].ideas[ideaIndex] = { ...data.data };
+                    cloneRoadmap[roadmapIndex].cards = [...cloneRoadmap[roadmapIndex].ideas]; // Synchronize cards with ideas
+                }
+            }
+
+            // Update the roadmap state
+            setRoadmapList({ columns: cloneRoadmap });
+
             setSelectedIdea({...data.data})
             setIsEditIdea(false)
             setIsLoadingCreateIdea(false)
@@ -808,7 +824,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
             {/*    </Fragment>*/}
             {/*}*/}
             <Sheet open={isOpen} onOpenChange={isOpen ? onCloseBoth : onOpen}>
-                <SheetOverlay className={"inset-0"}/>
+                {/*<SheetOverlay className={"inset-0"}/>*/}
                 <SheetContent className={"lg:max-w-[1101px] md:max-w-[720px] sm:max-w-full p-0"}>
                     <SheetHeader className={"px-4 py-3 md:py-5 lg:px-8 lg:py-[20px] border-b"}>
                         <X onClick={onCloseBoth} className={"cursor-pointer"}/>

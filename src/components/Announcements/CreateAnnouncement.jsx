@@ -340,7 +340,7 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
 
     return (
         <Sheet open={isOpen} onOpenChange={isOpen ? onClose : onOpen}>
-            <SheetOverlay className={"inset-0"}/>
+            {/*<SheetOverlay className={"inset-0"}/>*/}
             <SheetContent className={"pt-6 p-0 lg:max-w-[663px] md:max-w-[720px] sm:max-w-[520px]"}>
                 <SheetHeader
                     className={`px-3 py-4 lg:px-8 lg:py-[20px] flex flex-row justify-between items-center border-b`}>

@@ -33,7 +33,7 @@ const WidgetAnalytics = ({ isOpen, onOpen, onClose, widgetsSetting, selectedReco
 
     return (
         <Sheet open={isOpen} onOpenChange={isOpen ? onClose : onOpen}>
-            <SheetOverlay className={"inset-0"} />
+            {/*<SheetOverlay className={"inset-0"} />*/}
             <SheetContent className={"lg:max-w-[800px] md:max-w-[620px] sm:max-w-[420px] p-0 outline-none"}>
                 <SheetHeader className={"px-4 py-3 md:py-5 lg:px-8 lg:py-[20px] border-b"}>
                     <div className={"flex justify-between items-center w-full"}>

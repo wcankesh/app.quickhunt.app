@@ -100,7 +100,7 @@ const AnalyticsView = ({onClose, analyticsObj, setAnalyticsObj}) => {
 
     return (
         <Sheet open={analyticsObj.id ? true : false} onOpenChange={analyticsObj.id ? handleClose : true}>
-            <SheetOverlay className={"inset-0"}/>
+            {/*<SheetOverlay className={"inset-0"}/>*/}
             <SheetContent className={"pt-6 p-0 lg:max-w-[504px]"}>
                 <SheetHeader className={`px-4 py-5 lg:p-6 border-b text-left flex flex-row justify-between items-center gap-3 border-b`}>
                     <h5 className={"text-sm md:text-xl font-medium"}>{analyticsObj?.post_title}</h5>

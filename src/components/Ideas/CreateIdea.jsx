@@ -149,7 +149,7 @@ const CreateIdea = ({isOpen, onOpen, onClose, closeCreateIdea, setIdeasList, ide
     return (
         <div>
             <Sheet open={isOpen} onOpenChange={isOpen ? onCancel : onOpen} closeCreateIdea={closeCreateIdea}>
-                <SheetOverlay className={"inset-0"} />
+                {/*<SheetOverlay className={"inset-0"} />*/}
                 <SheetContent className={"lg:max-w-[800px] md:max-w-full sm:max-w-full p-0"}>
                     <SheetHeader className={"px-4 py-5 lg:px-8 lg:py-[20px] border-b"}>
                         <div className={"flex justify-between items-center w-full"}>
@@ -170,7 +170,7 @@ const CreateIdea = ({isOpen, onOpen, onClose, closeCreateIdea, setIdeasList, ide
                                 <div className="space-y-2">
                                     <Label htmlFor="message" className={"font-normal"}>Description</Label>
 
-                                    <ReactQuillEditor value={ideaDetail.description} onChange={(e) => onChangeText("description", e.target.value)}/>
+                                    <ReactQuillEditor value={ideaDetail?.description} onChange={(e) => onChangeText("description", e.target.value)}/>
 
                                     {/*{formError.description && <span className="text-red-500 text-sm">{formError.description}</span>}*/}
                                 </div>
