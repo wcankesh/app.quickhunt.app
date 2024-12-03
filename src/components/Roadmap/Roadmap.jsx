@@ -78,7 +78,7 @@ const Roadmap = () => {
         }));
         const data = await apiService.setRoadmapRank({ rank: rankPayload });
         if (data.status === 200) {
-            toast({ description: data.message });
+           // toast({ description: data.message });
         } else {
             toast({ variant: "destructive", description: data.message });
         }
@@ -95,56 +95,6 @@ const Roadmap = () => {
         }
     }
 
-    //old code
-    // const handleCardMove = (_card, source, destination) => {
-    //     const updatedBoard = moveCard(roadmapList, source, destination)
-    //     callApi(destination.toColumnId, _card.id)
-    //     const clone = [...updatedBoard.columns];
-    //     const findIndex = clone.findIndex((x) => x.id == destination.toColumnId)
-    //     if(findIndex !== -1){
-    //         let cloneCards = [...clone[findIndex].cards];
-    //         const findCardIndex =  cloneCards.findIndex((x) =>x.id === _card.id);
-    //         if(findCardIndex !== -1){
-    //             cloneCards[findCardIndex] = {...cloneCards[findCardIndex], roadmap_id: destination.toColumnId}
-    //         }
-    //         clone[findIndex] = {...clone[findIndex],cards: cloneCards, ideas: cloneCards}
-    //         setRoadmapList({columns: clone})
-    //     } else {
-    //         setRoadmapList(updatedBoard)
-    //     }
-    //     setRoadmapRank(destination?.toColumnId);
-    // }
-
-    // const handleCardMove = (_card, source, destination) => {
-    //     const updatedBoard = moveCard(roadmapList, source, destination);
-    //     callApi(destination.toColumnId, _card.id);
-    //
-    //     const clone = [...updatedBoard.columns];
-    //     const findIndex = clone.findIndex((x) => x.id == destination.toColumnId);
-    //
-    //     if (findIndex !== -1) {
-    //         let cloneCards = [...clone[findIndex].cards];
-    //         const findCardIndex = cloneCards.findIndex((x) => x.id === _card.id);
-    //
-    //         if (findCardIndex !== -1) {
-    //             cloneCards[findCardIndex] = {
-    //                 ...cloneCards[findCardIndex],
-    //                 roadmap_id: destination.toColumnId,
-    //             };
-    //         }
-    //
-    //         cloneCards = cloneCards.map((card, index) => ({
-    //             ...card,
-    //             rank: index,
-    //         }));
-    //
-    //         clone[findIndex] = { ...clone[findIndex], cards: cloneCards, ideas: cloneCards };
-    //         setRoadmapList({ columns: clone });
-    //         setRoadmapRank(cloneCards, destination.toColumnId);
-    //     } else {
-    //         setRoadmapList(updatedBoard);
-    //     }
-    // };
 
     const handleCardMove = (_card, source, destination) => {
         const updatedBoard = moveCard(roadmapList, source, destination);
@@ -179,8 +129,9 @@ const Roadmap = () => {
             };
         }
         setRoadmapList({ columns: updatedColumns });
-        setRoadmapRank(updatedColumns[destinationIndex].cards, destination.toColumnId);
         callApi(destination.toColumnId, _card.id);
+        setRoadmapRank(updatedColumns[destinationIndex].cards, destination.toColumnId);
+
     };
 
     const onCreateIdea = (mainRecord) => {

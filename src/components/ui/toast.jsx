@@ -77,8 +77,7 @@ ToastTitle.displayName = ToastPrimitives.Title.displayName
 
 const ToastDescription = React.forwardRef(({ className, variant = "default", ...props }, ref) => (
   <ToastPrimitives.Description ref={ref} className={cn("text-sm opacity-90 flex gap-2", className)} {...props}>
-      {variant === "default" && <CheckCircle className="h-5 w-5 text-green-500" />}
-      {variant === "destructive" && <XCircle className="h-5 w-5 text-red-500" />}
+
       <span>{props.children}</span>
   </ToastPrimitives.Description>
 ))
