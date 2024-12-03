@@ -165,19 +165,21 @@ const Team = () => {
         }
         const data = await apiService.inviteUser(payload)
         if (data.status === 200) {
-            const updatedExpirationDate = moment().add(7, 'days').toISOString();
-            const updatedCreatedAt = moment().toISOString();
-            const updatedList = invitationList.map((item) => {
-                if (item.id === x.id) {
-                    return {
-                        ...item,
-                        expire_at: updatedExpirationDate,
-                        created_at: updatedCreatedAt,
-                    };
-                }
-                return item;
-            });
-            setInvitationList(updatedList);
+            getInvitations(true)
+            // const updatedExpirationDate = moment().add(7, 'days').toISOString();
+            // const updatedCreatedAt = moment().toISOString();
+            // const updatedList = invitationList.map((item) => {
+            //     if (item.id === x.id) {
+            //         return {
+            //             ...item,
+            //             expire_at: updatedExpirationDate,
+            //             created_at: updatedCreatedAt,
+            //             updated_at: Date.now(),
+            //         };
+            //     }
+            //     return item;
+            // });
+            // setInvitationList(updatedList);
             toast({
                 description: "Resend invitation successfully"
             })
@@ -463,9 +465,9 @@ const Team = () => {
                                                         <TableCell className={"py-[10px] px-[12px]"}>
                                                             Invited about{" "}
                                                             {x.updated_at && x.updated_at !== x.created_at ? (
-                                                                <>resent {moment.utc(x.updated_at).local().startOf("seconds").fromNow()}</>
+                                                                <>{moment.utc(x.updated_at).local().startOf("seconds").fromNow()}</>
                                                             ) : (
-                                                                <>initially invited {moment.utc(x.created_at).local().startOf("seconds").fromNow()}</>
+                                                                <>{moment.utc(x.created_at).local().startOf("seconds").fromNow()}</>
                                                             )}
                                                         </TableCell>
                                                         <TableCell className="py-[10px] px-[12px] text-right">

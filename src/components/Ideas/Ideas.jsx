@@ -281,9 +281,6 @@ const Ideas = () => {
         setOpenDelete(!openDelete)
     }
 
-
-
-
     const throttledDebouncedSearch = useCallback(
         debounce((value) => {
             const updatedFilter = {
@@ -293,28 +290,15 @@ const Ideas = () => {
                 page: 1,
             };
             ideaSearch(updatedFilter);
-        }, 500), // 500 ms delay
+        }, 500),
         []
     );
-
 
     const handleSearchChange = (e) => {
         const value = e.target.value;
         setFilter( { ...filter, search: value });
         throttledDebouncedSearch(value)
     };
-
-    // const handleSearchChange = (e) => {
-    //     const value = e.target.value;
-    //     const updatedFilter = {
-    //         ...filter,
-    //         project_id: projectDetailsReducer.id,
-    //         search: value,
-    //         page: 1,
-    //     };
-    //     setFilter(updatedFilter);
-    //     ideaSearch(updatedFilter);
-    // };
 
     const clearSearchFilter = () => {
         setFilter(prev => ({ ...prev, search: '' }));
@@ -667,11 +651,19 @@ const Ideas = () => {
                                                                         value={x.roadmap_id !== "" ? x.roadmap_id : null}>
                                                                         <SelectTrigger className="md:w-[200px] w-[170px] h-8 bg-card">
                                                                             <SelectValue>
-                                                                                {/* Fallback text if no value is selected */}
-                                                                                {x.roadmap_id ? (
-                                                                                    allStatusAndTypes.roadmap_status.find((status) => status.id === x.roadmap_id)?.title
-                                                                                ) : (
-                                                                                    <span className="text-gray-500">No status</span> // Display "No status" text
+                                                                                {x.roadmap_id ?  <div className="flex items-center gap-2">
+                                                                                    <Circle
+                                                                                        fill={
+                                                                                            allStatusAndTypes.roadmap_status.find((status) => status.id === x.roadmap_id)?.color_code
+                                                                                        }
+                                                                                        stroke={
+                                                                                            allStatusAndTypes.roadmap_status.find((status) => status.id === x.roadmap_id)?.color_code
+                                                                                        }
+                                                                                        className="w-[10px] h-[10px]"
+                                                                                    />
+                                                                                    {allStatusAndTypes.roadmap_status.find((status) => status.id === x.roadmap_id)?.title ?? "No status"}
+                                                                                </div> : (
+                                                                                    <span className="text-gray-500">No status</span>
                                                                                 )}
                                                                             </SelectValue>
                                                                         </SelectTrigger>

@@ -95,7 +95,7 @@ const CreateRoadmapIdea = ({isOpen, onOpen, onClose, closeCreateIdea, selectedRo
             const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap);
             if(roadmapIndex !== -1) {
                 const cloneIdea = [...cloneRoadmap[roadmapIndex].ideas];
-                cloneIdea.push(data.data);
+                cloneIdea.unshift(data.data);
                 cloneRoadmap[roadmapIndex] = {...cloneRoadmap[roadmapIndex], ideas: cloneIdea, cards: cloneIdea}
             }
             setIsLoading(false)

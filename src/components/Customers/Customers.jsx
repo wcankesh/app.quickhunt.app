@@ -165,7 +165,6 @@ const Customers = () => {
             setFormError(validationErrors);
             return;
         }
-        const clone = [...customerList];
         setIsSave(true);
         const payload = {
             ...customerDetails,
@@ -180,7 +179,8 @@ const Customers = () => {
             toast({
                 description: data.message,
             });
-            clone.push(data.data);
+            const clone = [...customerList];
+            clone.unshift(data.data);
             setCustomerList(clone);
         } else {
             setIsSave(false);

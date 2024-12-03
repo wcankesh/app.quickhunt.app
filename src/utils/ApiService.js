@@ -295,6 +295,9 @@ export class ApiService{
     async onDeleteIdea (id){
         return await this.deleteData(`${baseUrlApi}/feature-idea/${id}`)
     }
+    async setRoadmapRank (payload){
+        return await this.postData(`${baseUrlApi}/feature-idea/rank`, payload)
+    }
     async createIdea (payload){
         return await this.postData(`${baseUrlApi}/feature-idea`,payload, true)
     }
