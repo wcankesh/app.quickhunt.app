@@ -194,6 +194,7 @@ const Roadmap = () => {
             destinationCards = destinationCards.map((card, index) => ({
                 ...card,
                 rank: index,
+                roadmap_id: destination.toColumnId
             }));
             updatedColumns[destinationIndex] = {
                 ...updatedColumns[destinationIndex],
