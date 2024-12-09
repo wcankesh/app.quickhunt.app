@@ -1,4 +1,4 @@
-import React, {Fragment, useEffect, useRef, useState} from 'react';
+import React, {Fragment, useEffect, useRef, useState, useCallback} from 'react';
 import { Input } from "../../ui/input";
 import { Select, SelectGroup, SelectValue, SelectItem, SelectTrigger, SelectContent } from "../../ui/select";
 import {Check, Circle, Ellipsis, Filter, Plus, X} from "lucide-react";
@@ -21,6 +21,7 @@ import Pagination from "../../Comman/Pagination";
 import DeleteDialog from "../../Comman/DeleteDialog";
 import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList} from "../../ui/command";
 import { debounce } from 'lodash';
+import {EmptyDataContent} from "../../Comman/EmptyDataContent";
 
 const status = [
     {name: "Publish", value: 1, fillColor: "#389E0D", strokeColor: "#389E0D",},
@@ -58,6 +59,9 @@ const Articles = () => {
     const [selectedCategoryId, setSelectedCategoryId] = useState(null);
     const [selectedSubCategory, setSelectedSubCategory] = useState(null);
     const [selectedSubCategoryId, setSelectedSubCategoryId] = useState(null);
+    const [emptyContentBlock, setEmptyContentBlock] = useState(true);
+
+    const emptyContent = (status) => {setEmptyContentBlock(status);};
 
     useEffect(() => {
         if (projectDetailsReducer.id) {
@@ -91,20 +95,14 @@ const Articles = () => {
         });
         if (data.status === 200) {
             setArticleList(data.data);
+            if (!data.data || data.data.length === 0) {
+                emptyContent(true);
+            } else {
+                emptyContent(false);
+            }
         }
         setIsLoading(false)
     };
-
-    // const onChangeSearch = async (event) => {
-    //     setFilter({...filter, [event.target.name]: event.target.value,})
-    //     if (timeoutHandler.current) {
-    //         clearTimeout(timeoutHandler.current);
-    //     }
-    //     timeoutHandler.current = setTimeout(() => {
-    //         setPageNo(1);
-    //         getAllArticles(event.target.value, '');
-    //     }, 2000);
-    // }
 
     const debounceGetAllArticles = debounce((searchValue) => {
         setPageNo(1);
@@ -116,6 +114,25 @@ const Articles = () => {
         setFilter((prev) => ({ ...prev, search: value }));
         debounceGetAllArticles(value);
     };
+
+    // const throttledDebouncedSearch = useCallback(
+    //     debounce((value) => {
+    //         const updatedFilter = {
+    //             ...filter,
+    //             project_id: projectDetailsReducer.id,
+    //             search: value,
+    //             page: 1,
+    //         };
+    //         getAllArticles(updatedFilter);
+    //     }, 500), // 500ms debounce delay
+    //     [] // Add dependencies
+    // );
+    //
+    // const onChangeSearch = (e) => {
+    //     const value = e.target.value;
+    //     setFilter({ ...filter, search: value });
+    //     throttledDebouncedSearch(value);
+    // };
 
     const filterData = (name, value) => {
         setFilter(prevFilter => ({
@@ -220,6 +237,16 @@ const Articles = () => {
             });
         }
     };
+
+    const EmptyInArticlesContent = [
+        {
+            title: "Start Adding Helpful Articles",
+            description: `No articles yet? Begin by creating informative articles that address common customer questions, reduce support queries, and empower users to find answers quickly.`,
+            btnText: [
+                {title: "Create First Article", redirect: "", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
+            ],
+        },
+    ];
 
     return (
         <div className={"container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-3 md:px-4"}>
@@ -373,7 +400,7 @@ const Articles = () => {
                     </Badge>
                 )}
             </div>
-            <div className={"mt-6"}>
+            <div className={"my-6"}>
                 <Card className={""}>
                     <CardContent className={"p-0 overflow-auto"}>
                         <Table>
@@ -482,6 +509,10 @@ const Articles = () => {
                     }
                 </Card>
             </div>
+            {
+                (isLoading || !emptyContentBlock) ? "" :
+                    <EmptyDataContent data={EmptyInArticlesContent} onClose={() => emptyContent(false)}/>
+            }
         </div>
     );
 };

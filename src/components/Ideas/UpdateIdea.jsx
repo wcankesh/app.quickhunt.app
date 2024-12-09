@@ -1,6 +1,23 @@
 import React, {Fragment, useState, useEffect} from 'react';
 import {Button} from "../ui/button";
-import {ArrowBigUp, Check, Circle, CircleX, Dot, Ellipsis, Loader2, MessageCircleMore, Paperclip, Pencil, Pin, Trash2, Upload} from "lucide-react";
+import {
+    ArrowBigUp,
+    Check,
+    ChevronDown, ChevronsUpDown,
+    ChevronUp,
+    Circle, CirclePlus,
+    CircleX,
+    Dot,
+    Ellipsis,
+    Loader2,
+    Mail,
+    MessageCircleMore,
+    Paperclip,
+    Pencil,
+    Pin, Plus,
+    Trash2,
+    Upload, User
+} from "lucide-react";
 import {RadioGroup, RadioGroupItem} from "../ui/radio-group";
 import {Label} from "../ui/label";
 import {Input} from "../ui/input";
@@ -8,7 +25,9 @@ import {Avatar, AvatarFallback, AvatarImage} from "../ui/avatar";
 import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "../ui/select";
 import {Popover, PopoverTrigger, PopoverContent} from "../ui/popover";
 import {Textarea} from "../ui/textarea";
+import {Dialog, DialogTrigger, DialogTitle, DialogPortal, DialogClose, DialogHeader, DialogFooter, DialogOverlay, DialogDescription, DialogContent} from "../ui/dialog";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "../ui/tabs";
+import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "../ui/table";
 import {useTheme} from "../theme-provider";
 import {useToast} from "../ui/use-toast";
 import {ApiService} from "../../utils/ApiService";
@@ -31,6 +50,7 @@ import {
     UploadButton,
     UserAvatar
 } from "../Comman/CommentEditor";
+import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList} from "../ui/command";
 
 const initialStateError = {
     title: "",
@@ -576,6 +596,13 @@ const UpdateIdea = () => {
         // formData.append('description', selectedIdea.description?.trim() === '' ? "" : selectedIdea.description);
         formData.append('description', selectedIdea.description ? selectedIdea.description : "");
         formData.append('topic', topics.join(","));
+
+        // Handle image resizing/compression here
+        if (selectedIdea.image) {
+            const resizedImage = await resizeImage(selectedIdea.image); // Implement this function to resize/compress
+            formData.append('image', resizedImage);
+        }
+
         const data = await apiSerVice.updateIdea(formData, selectedIdea.id)
         if (data.status === 200) {
             setSelectedIdea({...data.data})
@@ -587,6 +614,41 @@ const UpdateIdea = () => {
         }
             setIsLoadingCreateIdea(false)
     }
+
+    const resizeImage = (file) => {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.src = URL.createObjectURL(file);
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                const MAX_WIDTH = 800; // Set your desired max width
+                const MAX_HEIGHT = 800; // Set your desired max height
+                let width = img.width;
+                let height = img.height;
+
+                if (width > height) {
+                    if (width > MAX_WIDTH) {
+                        height *= MAX_WIDTH / width;
+                        width = MAX_WIDTH;
+                    }
+                } else {
+                    if (height > MAX_HEIGHT) {
+                        width *= MAX_HEIGHT / height;
+                        height = MAX_HEIGHT;
+                    }
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+                ctx.drawImage(img, 0, 0, width, height);
+                canvas.toBlob((blob) => {
+                    resolve(blob);
+                }, 'image/jpeg', 0.7); // Adjust quality as needed
+            };
+            img.onerror = (err) => reject(err);
+        });
+    };
 
     const handleOnCreateCancel = () => {
         setSelectedIdea(oldSelectedIdea);
@@ -744,7 +806,7 @@ const UpdateIdea = () => {
                                         }
                                     </div>
                                     <div className="space-y-2">
-                                        <Label htmlFor="message" className={"font-normal"}>Description</Label>
+                                        <Label htmlFor="description" className={"font-normal"}>Description</Label>
                                         <ReactQuillEditor value={selectedIdea.description} name={"description"}
                                                           onChange={onChangeText}/>
                                         {formError.description &&
@@ -892,8 +954,128 @@ const UpdateIdea = () => {
                                                                     </PopoverTrigger>
                                                                     <PopoverContent className="p-0" align={"start"}>
                                                                         <div>
-                                                                            <div className={"py-3 px-4"}>
-                                                                                <h4 className="font-normal leading-none text-sm">{`Voters (${selectedIdea?.vote_list.length})`}</h4>
+                                                                            <div className={" flex gap-2 justify-between items-center py-3 px-4"}>
+                                                                                <h4 className="font-normal text-sm">{`Voters (${selectedIdea?.vote_list.length})`}</h4>
+                                                                                <Dialog>
+                                                                                    <DialogTrigger asChild>
+                                                                                        <Button variant={"link"} className={"h-auto p-0 text-card-foreground font-normal text-sm"}>View upvoters</Button>
+                                                                                    </DialogTrigger>
+                                                                                    <DialogContent className={"max-w-[1022px]"}>
+                                                                                        <DialogHeader className={"gap-2"}>
+                                                                                            <DialogTitle className={"font-medium"}>View & add upvoters</DialogTitle>
+                                                                                            <DialogDescription>
+                                                                                                Upvoters will receive notifications by email when you make changes to the post.
+                                                                                            </DialogDescription>
+                                                                                        </DialogHeader>
+                                                                                        <Table>
+                                                                                            <TableHeader className={`${theme === "dark" ? "" : "bg-muted"}`}>
+                                                                                                <TableRow>
+                                                                                                    {['Name', 'Email'].map((x, i) => {
+                                                                                                        const icons = [<User className="w-4 h-4" />, <Mail className="w-4 h-4" />];
+                                                                                                        return (
+                                                                                                            <TableHead
+                                                                                                                className={`font-medium text-card-foreground px-2 py-[10px] md:px-3 ${
+                                                                                                                    i > 0 ? 'max-w-[140px] truncate text-ellipsis overflow-hidden whitespace-nowrap' : ''
+                                                                                                                }`}
+                                                                                                                key={i}
+                                                                                                            >
+                                                                                                                <div className="flex items-center gap-2">
+                                                                                                                    {icons[i]}
+                                                                                                                    {x}
+                                                                                                                </div>
+                                                                                                            </TableHead>
+                                                                                                        );
+                                                                                                    })}
+                                                                                                </TableRow>
+                                                                                            </TableHeader>
+                                                                                            <TableBody>
+                                                                                                {
+                                                                                                    isLoading ? (
+                                                                                                        [...Array(10)].map((_, index) => {
+                                                                                                            return (
+                                                                                                                <TableRow key={index}>
+                                                                                                                    {
+                                                                                                                        [...Array(2)].map((_, i) => {
+                                                                                                                            return (
+                                                                                                                                <TableCell className={"px-2 py-[10px] md:px-3"}>
+                                                                                                                                    <Skeleton className={"rounded-md w-full h-7"}/>
+                                                                                                                                </TableCell>
+                                                                                                                            )
+                                                                                                                        })
+                                                                                                                    }
+                                                                                                                </TableRow>
+                                                                                                            )
+                                                                                                        })
+                                                                                                    ) : ""
+                                                                                                }
+                                                                                            </TableBody>
+                                                                                        </Table>
+                                                                                        <DialogFooter>
+                                                                                            <Button variant={"outline hover:none"} className={"font-medium border bg-muted-foreground/5"}><Mail size={18} className={"mr-2"} strokeWidth={2} />Email all upvoters</Button>
+                                                                                            <Popover>
+                                                                                                <PopoverTrigger asChild>
+                                                                                                    <Button role="combobox" className={"font-medium"}><CirclePlus size={18} className={"mr-2"} strokeWidth={2} /> Add new upvoter</Button>
+                                                                                                </PopoverTrigger>
+                                                                                                <PopoverContent className="w-[200px] p-0">
+                                                                                                    <Command>
+                                                                                                        <CommandInput placeholder="Search users..."/>
+                                                                                                        <CommandList>
+                                                                                                            <CommandEmpty>No User found.</CommandEmpty>
+                                                                                                            <CommandGroup className={"p-0"}>
+                                                                                                                {/*{(projectList || []).map((x, i) => (*/}
+                                                                                                                {/*    <Fragment key={i}>*/}
+                                                                                                                {/*        <CommandItem*/}
+                                                                                                                {/*            className={`${projectDetailsReducer.id === x.id ? `${theme === "dark" ? "text-card-foreground  hov-primary-dark" : "text-card hov-primary"} bg-primary` : 'bg-card'}`}*/}
+                                                                                                                {/*            value={x.id}*/}
+                                                                                                                {/*            onSelect={() => {*/}
+                                                                                                                {/*                onChangeProject(x.id);*/}
+                                                                                                                {/*                setOpen(false)*/}
+                                                                                                                {/*            }}*/}
+                                                                                                                {/*        >*/}
+                                                                                                                {/*            <span className={"flex justify-between items-center w-full text-sm font-medium cursor-pointer"}>*/}
+                                                                                                                {/*                {x.project_name}*/}
+                                                                                                                {/*                <Trash2 className={"cursor-pointer"} size={16} onClick={deleteAlert}/>*/}
+                                                                                                                {/*            </span>*/}
+                                                                                                                {/*        </CommandItem>*/}
+                                                                                                                {/*    </Fragment>*/}
+                                                                                                                {/*))}*/}
+                                                                                                                <div className={"border-t"}>
+                                                                                                                    <Dialog>
+                                                                                                                        <DialogTrigger asChild className={"p-1"}>
+                                                                                                                            <Button variant="ghost" className={"w-full font-medium"}><CirclePlus size={16} className={"mr-2"}/>Add a brand new user</Button>
+                                                                                                                        </DialogTrigger>
+                                                                                                                        <DialogContent className={"max-w-[576px]"}>
+                                                                                                                            <DialogHeader>
+                                                                                                                                <DialogTitle>Add new user</DialogTitle>
+                                                                                                                            </DialogHeader>
+                                                                                                                            <div className="space-y-2">
+                                                                                                                                <div className="space-y-1">
+                                                                                                                                    <Label htmlFor="name" className="font-normal">
+                                                                                                                                        Email (optional)
+                                                                                                                                    </Label>
+                                                                                                                                    <Input id="name" placeholder="Enter upvoter email" className="col-span-3" />
+                                                                                                                                </div>
+                                                                                                                                <div className="space-y-1">
+                                                                                                                                    <Label htmlFor="username" className="font-normal">
+                                                                                                                                        Name (optional)
+                                                                                                                                    </Label>
+                                                                                                                                    <Input id="username" placeholder="Enter upvoter name" className="col-span-3" />
+                                                                                                                                </div>
+                                                                                                                            </div>
+                                                                                                                            <DialogFooter>
+                                                                                                                                <Button className={"font-medium"}>Add User</Button>
+                                                                                                                            </DialogFooter>
+                                                                                                                        </DialogContent>
+                                                                                                                    </Dialog>
+                                                                                                                </div>
+                                                                                                            </CommandGroup>
+                                                                                                        </CommandList>
+                                                                                                    </Command>
+                                                                                                </PopoverContent>
+                                                                                            </Popover>
+                                                                                        </DialogFooter>
+                                                                                    </DialogContent>
+                                                                                </Dialog>
                                                                             </div>
                                                                             <div
                                                                                 className="border-t px-4 py-3 space-y-2">
@@ -1068,15 +1250,19 @@ const UpdateIdea = () => {
                                         <div className={"flex items-center"}>
                                             <div className={"flex items-center gap-4 md:flex-nowrap flex-wrap"}>
                                                 <div className={"flex items-center gap-2"}>
-                                                    <UserAvatar
-                                                        userPhoto={selectedIdea?.user_photo}
-                                                        userName={selectedIdea?.name}
-                                                    />
-                                                    <div className={"flex items-center"}>
-                                                        {
-                                                            isLoading ?
-                                                                <Skeleton className="w-[50px] h-[20px]" />
-                                                                :
+                                                    {
+                                                        isLoading ? (
+                                                            <Fragment>
+                                                                <Skeleton className="w-[20px] h-[20px] rounded-lg"/>
+                                                                <div className={"flex items-center"}><Skeleton className="w-[50px] h-[20px]" /></div>
+                                                            </Fragment>
+                                                        ) : (
+                                                            <Fragment>
+                                                                <UserAvatar
+                                                                    userPhoto={selectedIdea?.user_photo}
+                                                                    userName={selectedIdea?.name}
+                                                                />
+                                                                <div className={"flex items-center"}>
                                                                 <Fragment>
                                                                     <h4 className={"text-sm font-normal"}>{selectedIdea?.name}</h4>
                                                                     <p className={"text-sm font-normal flex items-center text-muted-foreground"}>
@@ -1085,9 +1271,10 @@ const UpdateIdea = () => {
                                                                         {moment(selectedIdea?.created_at).format('D MMM')}
                                                                     </p>
                                                                 </Fragment>
-                                                        }
-
-                                                    </div>
+                                                                </div>
+                                                            </Fragment>
+                                                        )
+                                                    }
                                                 </div>
                                                 {
                                                     isLoading ? <Skeleton className={"w-[224px] h-[24px] px-3 py-1"} /> :

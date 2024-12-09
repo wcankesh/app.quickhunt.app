@@ -1,4 +1,4 @@
-import React, {Fragment, useEffect, useRef, useState} from 'react';
+import React, {Fragment, useEffect, useCallback, useState} from 'react';
 import {Input} from "../../ui/input";
 import {Button} from "../../ui/button";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "../../ui/table";
@@ -21,6 +21,7 @@ import {useNavigate} from "react-router";
 import Pagination from "../../Comman/Pagination";
 import DeleteDialog from "../../Comman/DeleteDialog";
 import {debounce} from "lodash";
+import {EmptyDataContent} from "../../Comman/EmptyDataContent";
 
 const initialState = {
     title: "",
@@ -45,7 +46,6 @@ const Category = () => {
     const UrlParams = new URLSearchParams(location.search);
     const getPageNo = UrlParams.get("pageNo") || 1;
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
-    const timeoutHandler = useRef(null);
 
     const [formError, setFormError] = useState(initialStateError);
     const [selectedCategory, setSelectedCategory] = useState(initialState);
@@ -69,6 +69,9 @@ const Category = () => {
         category_id: "",
         sub_category_id: ""
     });
+    const [emptyContentBlock, setEmptyContentBlock] = useState(true);
+
+    const emptyContent = (status) => {setEmptyContentBlock(status);};
 
     useEffect(() => {
         if(projectDetailsReducer.id){
@@ -89,21 +92,35 @@ const Category = () => {
             setCategoryList(data.data);
             setTotalRecord(data.total);
             setIsLoading(false)
+            if (!data.data || data.data.length === 0) {
+                emptyContent(true);
+            } else {
+                emptyContent(false);
+            }
         } else {
             setIsLoading(false)
+            emptyContent(true);
         }
     };
 
-    // const onChangeSearch = async (event) => {
-    //     setFilter({...filter, [event.target.name]: event.target.value,})
-    //     if (timeoutHandler.current) {
-    //         clearTimeout(timeoutHandler.current);
-    //     }
-    //     timeoutHandler.current = setTimeout(() => {
-    //         setPageNo(1);
-    //         getAllCategory(event.target.value, '');
-    //     }, 2000);
-    // }
+    // const throttledDebouncedSearch = useCallback(
+    //     debounce((value) => {
+    //         const updatedFilter = {
+    //             ...filter,
+    //             project_id: projectDetailsReducer.id,
+    //             search: value,
+    //             page: 1,
+    //         };
+    //         getAllCategory(updatedFilter);
+    //     }, 500), // 500ms debounce delay
+    //     [] // Add dependencies
+    // );
+    //
+    // const onChangeSearch = (e) => {
+    //     const value = e.target.value;
+    //     setFilter({ ...filter, search: value });
+    //     throttledDebouncedSearch(value);
+    // };
 
     const debounceGetAllArticles = debounce((searchValue) => {
         setPageNo(1);
@@ -504,6 +521,16 @@ const Category = () => {
         }
     };
 
+    const EmptyInCategoryContent = [
+        {
+            title: "Build a Structured Knowledge Base",
+            description: `Create categories and sub-categories to better organize your content, helping users navigate your articles with ease.`,
+            btnText: [
+                {title: "Create Categories", redirect: "", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
+            ],
+        },
+    ];
+
     return (
         <Fragment>
 
@@ -799,7 +826,7 @@ const Category = () => {
                 ) : (
                     categoryList?.length > 0 ? (
                         categoryList.map((x, i) => (
-                            <div key={i} className={"mt-6"}>
+                            <div key={i} className={"my-6"}>
                                 <Card>
                                     <CardContent className={"p-0"}>
                                         <div className={"rounded-md grid grid-cols-1 overflow-auto whitespace-nowrap"}>
@@ -875,7 +902,7 @@ const Category = () => {
                             </div>
                         ))
                     ) : (
-                        <Card className={"mt-6"}>
+                        <Card className={"my-6"}>
                             <EmptyData />
                         </Card>
                     )
@@ -897,6 +924,10 @@ const Category = () => {
                             </Card>
                         </div>
                         : ""
+                }
+                {
+                    (isLoading || !emptyContentBlock) ? "" :
+                        <EmptyDataContent data={EmptyInCategoryContent} onClose={() => emptyContent(false)}/>
                 }
             </div>
         </Fragment>

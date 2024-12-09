@@ -74,6 +74,8 @@
     }
   }
 
+.description-container p a{color: blue; text-decoration: underline}
+
 .sidebar {transition: transform 0.3s ease;transform: translateX(0);}
 .sidebar-hidden {transform: translateX(-100%);}
 

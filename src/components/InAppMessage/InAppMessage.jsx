@@ -1,4 +1,4 @@
-import React, {useState, useEffect, Fragment, useRef} from 'react';
+import React, {useState, useEffect, Fragment, useRef, useCallback} from 'react';
 import {Button} from "../ui/button";
 import {BarChart, BookCheck, Calendar, ChevronLeft, Circle, ClipboardList, Copy, Ellipsis, Filter, Loader2, Plus, ScrollText, SquareMousePointer, User, Users, X} from "lucide-react";
 import {Input} from "../ui/input";
@@ -26,6 +26,8 @@ import {toast} from "../ui/use-toast";
 import Pagination from "../Comman/Pagination";
 import DeleteDialog from "../Comman/DeleteDialog";
 import {RadioGroup, RadioGroupItem} from "../ui/radio-group";
+import {EmptyDataContent} from "../Comman/EmptyDataContent";
+import {debounce} from "lodash";
 
 const perPageLimit = 10;
 
@@ -107,6 +109,9 @@ const InAppMessage = () => {
     const [openCopyCode, setOpenCopyCode] = useState(false);
     const [isCopyLoading, setCopyIsLoading] = useState(false);
     const [openDelete,setOpenDelete]=useState(false);
+    const [emptyContentBlock, setEmptyContentBlock] = useState(true);
+
+    const emptyContent = (status) => {setEmptyContentBlock(status);};
 
     useEffect(()=>{
         if (projectDetailsReducer.id) {
@@ -127,6 +132,13 @@ const InAppMessage = () => {
         if(data.status === 200) {
             setMessageList(data.data);
             setTotalRecord(data.total || 0);
+            if (!data.data || data.data.length === 0) {
+                emptyContent(true);
+            } else {
+                emptyContent(false);
+            }
+        } else {
+            emptyContent(true);
         }
         setIsLoading(false);
     }
@@ -153,6 +165,25 @@ const InAppMessage = () => {
             getAllInAppMessageList(event.target.value, '');
         }, 2000);
     }
+
+    // const throttledDebouncedSearch = useCallback(
+    //     debounce((value) => {
+    //         const updatedFilter = {
+    //             ...filter,
+    //             project_id: projectDetailsReducer.id,
+    //             search: value,
+    //             page: 1,
+    //         };
+    //         getAllInAppMessageList(updatedFilter.search, updatedFilter.type);
+    //     }, 500), // 500ms debounce delay
+    //     [filter, projectDetailsReducer.id] // Add dependencies
+    // );
+    //
+    // const handleSearchChange = (e) => {
+    //     const value = e.target.value;
+    //     setFilter({ ...filter, search: value });
+    //     throttledDebouncedSearch(value);
+    // };
 
     const removeBadge = () => {
         setFilter({...filter, type: "",});
@@ -241,6 +272,51 @@ const InAppMessage = () => {
             console.error('Failed to copy text: ', err);
         });
     };
+
+    const EmptyInAppContent = [
+        {
+            title: "Create Welcome Message",
+            description: `Use in-app messages, such as posts or banners, to greet new users and introduce them to your app.`,
+            btnText: [
+                {title: "Create Welcome Message", redirect: "", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
+            ],
+        },
+        {
+            title: "Create Onboarding Flow",
+            description: `Guide users through the onboarding process with a checklist and in-app messages to ensure they get the most out of your app.`,
+            btnText: [
+                {title: "Create Checklist", redirect: "", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
+            ],
+        },
+        {
+            title: "Share Ideas",
+            description: `Share your product ideas directly with users using in-app messages through posts or banners to gather feedback and keep them engaged.`,
+            btnText: [
+                {title: "Share Ideas", redirect: "", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
+            ],
+        },
+        {
+            title: "Display Announcements",
+            description: `Keep users updated with in-app messages about new features, product updates, and improvements through posts or banners.   `,
+            btnText: [
+                {title: "Display Announcement", redirect: "", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
+            ],
+        },
+        {
+            title: "Get Feedback",
+            description: `Use in-app surveys to collect feedback directly within the app, helping you improve the user experience and gather insights.`,
+            btnText: [
+                {title: "Collect Feedback", redirect: "", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
+            ],
+        },
+        {
+            title: "Redirect to Knowledge Base",
+            description: `Promote new feature articles through in-app messages, directing users to relevant resources in your knowledge base for more information.`,
+            btnText: [
+                {title: "Create In-App Message", redirect: "", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
+            ],
+        },
+    ];
 
     const codeString = `
 <script>
@@ -416,7 +492,7 @@ const InAppMessage = () => {
                     </div>
                 }
 
-                <Card className={"mt-6"}>
+                <Card className={"my-6"}>
                     <div className={"grid grid-cols-1 overflow-auto whitespace-nowrap"}>
                         <Table>
                             <TableHeader className={`${theme === "dark" ? "" : "bg-muted"}`}>
@@ -554,6 +630,10 @@ const InAppMessage = () => {
                             /> : ""
                     }
                 </Card>
+                {
+                    (isLoading || !emptyContentBlock) ? "" :
+                        <EmptyDataContent data={EmptyInAppContent} onClose={() => emptyContent(false)}/>
+                }
             </div>
         </Fragment>
     )

@@ -19,6 +19,7 @@ import EmptyData from "../Comman/EmptyData";
 import moment from "moment";
 import Pagination from "../Comman/Pagination";
 import DeleteDialog from "../Comman/DeleteDialog";
+import {EmptyDataContent} from "../Comman/EmptyDataContent";
 
 const perPageLimit = 10;
 
@@ -46,6 +47,9 @@ const Widgets = () => {
     const [deleteRecord, setDeleteRecord] = useState(null);
     const [pageNo, setPageNo] = useState(Number(getPageNo));
     const [totalRecord, setTotalRecord] = useState(0);
+    const [emptyContentBlock, setEmptyContentBlock] = useState(true);
+
+    const emptyContent = (status) => {setEmptyContentBlock(status);};
 
     const openSheet = (id) => {
         setSheetOpen(true);
@@ -75,8 +79,14 @@ const Widgets = () => {
             setWidgetsSetting(data.data);
             setTotalRecord(data.total);
             setIsLoading(false);
+            if (!data.data || data.data.length === 0) {
+                emptyContent(true);
+            } else {
+                emptyContent(false);
+            }
         } else {
             setIsLoading(false);
+            emptyContent(true);
         }
     }
 
@@ -153,6 +163,52 @@ const Widgets = () => {
             console.error('Failed to copy text: ', err);
         });
     };
+
+    const EmptyInWidgetContent = [
+        {
+            title: "Embed Widget",
+            description: `Easily embed a widget on your website to display key information or engage users without disrupting the browsing experience.`,
+            btnText: [
+                {title: "Create Embed Widget", redirect: "", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
+            ],
+        },
+        {
+            title: "Popover Widget",
+            description: `Use a popover widget to show important updates or offers in a small, non-intrusive popup that appears on the screen.`,
+            btnText: [
+                {title: "Create Popover Widget", redirect: "", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
+            ],
+        },
+        {
+            title: "Modal Widget",
+            description: `Create a modal widget to display more detailed information or prompts in a full-screen overlay, ensuring user attention.`,
+            btnText: [
+                {title: "Create Modal Widget", redirect: "", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
+            ],
+        },
+        {
+            title: "Sidebar Widget",
+            description: `Add a sidebar widget to your website to showcase updates, product features, or quick links, offering easy access without overwhelming the page.`,
+            btnText: [
+                {title: "Create Sidebar Widget", redirect: "", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
+            ],
+        },
+        {
+            title: "General Settings",
+            description: `Customize the appearance and behavior of your widgets to match your website design and provide a seamless user experience.`,
+            btnText: [
+                {title: "Manage General Settings", redirect: "", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
+            ],
+        },
+        {
+            title: "Social Links",
+            description: `Integrate social media links directly into your widget to encourage user engagement and promote your online presence.`,
+            btnText: [
+                {title: "Add Social Links", redirect: "", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
+            ],
+        },
+    ];
+
     const codeString = selectedType === "embed" ? `
     <div class="quickhunt-widget-embed" Quickhunt_Widget_Key=${selectedId} widget-width="740px" widget-height="460px"></div>
     <script src="https://fw.quickhunt.app/widgetScript.js"></script>
@@ -405,7 +461,7 @@ const Widgets = () => {
                             </Button>
                         </div>
                     </div>
-                    <Card className={"mt-6"}>
+                    <Card className={"my-6"}>
                         <CardContent className={"p-0 overflow-auto"}>
                             <Table>
                                 <TableHeader className={`p-2 lg:py-5 lg:px-8 ${theme === "dark" ? "" : "bg-muted"}`}>
@@ -498,6 +554,10 @@ const Widgets = () => {
                                 /> : ""
                         }
                     </Card>
+                    {
+                        (isLoading || !emptyContentBlock) ? "" :
+                            <EmptyDataContent data={EmptyInWidgetContent} onClose={() => emptyContent(false)}/>
+                    }
                 </div>
             </div>
         </Fragment>

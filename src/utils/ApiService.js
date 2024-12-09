@@ -242,7 +242,7 @@ export class ApiService{
         return await this.deleteData(`${baseUrlApi}/projects/${id}`)
     }
 
-    /* ---------- Customers api ---------- */
+    /* ---------- Users api ---------- */
     async getAllCustomers (id){
         return await this.getData(`${baseUrlApi}/customers?${qs.stringify(id)}`)
     }

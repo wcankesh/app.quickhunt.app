@@ -61,32 +61,32 @@ const Surveys = ({inAppMsgSetting, setInAppMsgSetting, selectedStepIndex, setSel
     const reactionPost = [
         {
             "id": "",
-            "emoji": "👌",
-            "emoji_url": "https://cdn.jsdelivr.net/npm/emoji-datasource-apple/img/apple/64/1f44c.png",
+            "emoji": "😣",
+            "emoji_url": "https://cdn.jsdelivr.net/npm/emoji-datasource-apple@15.1.2/img/apple/64/1f623.png",
             is_active: 1,
         },
         {
             "id": "",
-            "emoji": "🙏",
-            "emoji_url": "https://cdn.jsdelivr.net/npm/emoji-datasource-apple/img/apple/64/1f64f.png",
+            "emoji": "😔",
+            "emoji_url": "https://cdn.jsdelivr.net/npm/emoji-datasource-apple@15.1.2/img/apple/64/1f614.png",
             is_active: 1
         },
         {
             "id": "",
-            "emoji": "👍",
-            "emoji_url": "https://cdn.jsdelivr.net/npm/emoji-datasource-apple/img/apple/64/1f44d.png",
+            "emoji": "😑",
+            "emoji_url": "https://cdn.jsdelivr.net/npm/emoji-datasource-apple@15.1.2/img/apple/64/1f610.png",
             is_active: 1
         },
         {
             "id": "",
-            "emoji": "😀",
-            "emoji_url": "https://cdn.jsdelivr.net/npm/emoji-datasource-apple/img/apple/64/1f600.png",
+            "emoji": "🙂",
+            "emoji_url": "https://cdn.jsdelivr.net/npm/emoji-datasource-apple@15.1.2/img/apple/64/1f642.png",
             is_active: 1
         },
         {
             "id": "",
-            "emoji": "❤️",
-            "emoji_url": "https://cdn.jsdelivr.net/npm/emoji-datasource-apple/img/apple/64/2764-fe0f.png",
+            "emoji": "😍️",
+            "emoji_url": "https://cdn.jsdelivr.net/npm/emoji-datasource-apple@15.1.2/img/apple/64/1f60d.png",
             is_active: 1
         }
     ];
@@ -112,38 +112,84 @@ const Surveys = ({inAppMsgSetting, setInAppMsgSetting, selectedStepIndex, setSel
         8: "Thanks for taking the survey!",
     }
 
+    // const handleSelectQuestionType = (value) => {
+    //     let clone = [...inAppMsgSetting.steps].filter((x) => x.is_active === 1);
+    //     const stepBoj = {
+    //         question_type: value,
+    //         text: question[value],
+    //         placeholder_text: value == 5 ? "Select one": "Enter text...",
+    //         start_number: "1",
+    //         end_number: "5",
+    //         start_label: "Not likely",
+    //         end_label: "Very likely",
+    //         is_answer_required: "",
+    //         // step: value === 8 ? 1000 : clone.length + 1,
+    //         options: value == 5 ? [
+    //             {id: "", title: "", is_active: 1}
+    //         ] : [],
+    //         reactions: value == 4 ? reactionPost : [],
+    //         is_active: 1,
+    //         step_id: ""
+    //     };
+    //     const index = clone.findIndex(item => item.question_type === 8);
+    //     if(index !== -1){
+    //         clone.splice(index, 0, stepBoj);
+    //     } else {
+    //         clone.push(stepBoj);
+    //     }
+    //     setSelectedStep(stepBoj);
+    //     setSelectedStepIndex(clone.length - 1);
+    //     setInAppMsgSetting(prevState => ({
+    //         ...prevState,
+    //         steps: clone
+    //     }));
+    // };
+
+
     const handleSelectQuestionType = (value) => {
         let clone = [...inAppMsgSetting.steps].filter((x) => x.is_active === 1);
+        let existingQuestionType8 = clone.find((x) => x.question_type === 8);
+        if (existingQuestionType8) {
+            clone = clone.filter((x) => x.question_type !== 8);
+        }
+        const nextStepNumber = clone.length > 0 ? Math.max(...clone.map((step) => step.step)) + 1 : 1;
         const stepBoj = {
             question_type: value,
             text: question[value],
-            placeholder_text: value == 5 ? "Select one": "Enter text...",
+            placeholder_text: value == 5 ? "Select one" : "Enter text...",
             start_number: "1",
             end_number: "5",
             start_label: "Not likely",
             end_label: "Very likely",
             is_answer_required: "",
-            step: value === 8 ? 1000 : clone.length + 1,
-            options: value == 5 ? [
-                {id: "", title: "", is_active: 1}
-            ] : [],
+            step: nextStepNumber,
+            options: value == 5
+                ? [{ id: "", title: "", is_active: 1 }]
+                : [],
             reactions: value == 4 ? reactionPost : [],
             is_active: 1,
             step_id: ""
         };
-        const index = clone.findIndex(item => item.question_type === 8);
-        if(index !== -1){
-            clone.splice(index, 0, stepBoj);
-        } else {
+        if (value !== 8) {
             clone.push(stepBoj);
         }
+        if (existingQuestionType8 || value === 8) {
+            const type8StepObj = existingQuestionType8 || {
+                ...stepBoj,
+                step: clone.length + 1,
+            };
+            type8StepObj.step = clone.length + 1;
+            clone.push(type8StepObj);
+        }
         setSelectedStep(stepBoj);
-        setSelectedStepIndex(clone.length - 1);
-        setInAppMsgSetting(prevState => ({
+        // setSelectedStepIndex(clone.length - 1);
+        setInAppMsgSetting((prevState) => ({
             ...prevState,
             steps: clone
         }));
     };
+
+
 
     const onSelectStep = (stepBoj, i) => {
         setSelectedStep(stepBoj);
@@ -176,7 +222,7 @@ const Surveys = ({inAppMsgSetting, setInAppMsgSetting, selectedStepIndex, setSel
         updateStepRecord(obj)
     }
 
-    const onDeleteStep = (record, index) => {
+   /* const onDeleteStep = (record, index) => {
         let clone = [...inAppMsgSetting.steps];
         if (record.step_id) {
             const indexFind =  clone.findIndex((x) => x.step_id === record.step_id)
@@ -191,15 +237,47 @@ const Surveys = ({inAppMsgSetting, setInAppMsgSetting, selectedStepIndex, setSel
         let newRecord = clone.filter((x) => x.is_active === 1);
         setSelectedStep({...newRecord[index]});
         setSelectedStepIndex(index);
-    }
+    }*/
+
+    const onDeleteStep = (record, index) => {
+        let clone = [...inAppMsgSetting.steps];
+        if (record.step_id) {
+            const indexFind = clone.findIndex((x) => x.step_id === record.step_id);
+            clone[indexFind] = { ...record, is_active: 0 };
+        } else {
+            clone.splice(index, 1);
+        }
+        let activeSteps = clone.filter((x) => x.is_active === 1);
+        activeSteps = activeSteps
+            .filter((x) => x.question_type !== 8)
+            .map((step, idx) => ({
+                ...step,
+                step: idx + 1,
+            }));
+        const questionType8Step = clone.find((x) => x.question_type === 8 && x.is_active === 1);
+        if (questionType8Step) {
+            questionType8Step.step = activeSteps.length + 1;
+            activeSteps.push(questionType8Step);
+        }
+        setInAppMsgSetting((prevState) => ({
+            ...prevState,
+            steps: activeSteps,
+        }));
+        const newSelectedIndex = Math.min(index, activeSteps.length - 1);
+        setSelectedStep({ ...activeSteps[newSelectedIndex] });
+        setSelectedStepIndex(newSelectedIndex);
+    };
+
 
     return (
         <div className={"flex flex-col gap-4 py-8 bg-muted justify-start overflow-y-auto h-[calc(100%_-_94px)]"}>
             {
                 inAppMsgSetting.steps.filter((x) => x.is_active === 1).map((x, i) => {
                     return(
-                        <div className={`flex flex-col mx-auto gap-8 w-full max-w-[550px]`} key={i}>
-                            <div onClick={(e) => onSelectStep(x, i)} className={"relative rounded-[10px] pt-8 p-6 cursor-pointer"} style={{backgroundColor: selectedStep.step === x.step ? inAppMsgSetting.bg_color : "#fff", color: selectedStep.step === x.step ?inAppMsgSetting.text_color : "#000"}}>
+                        // <div className={`flex flex-col mx-auto gap-8 w-full max-w-[550px]`} key={i}>
+                        <div className={`flex items-center mx-auto gap-8 w-full max-w-[623px] w-full`} key={i}>
+                            <div className={"flex gap-1"}><span>Step</span> <span>{x.step}</span></div>
+                            <div onClick={(e) => onSelectStep(x, i)} className={"relative rounded-[10px] pt-8 p-6 cursor-pointer w-full"} style={{backgroundColor: selectedStep.step === x.step ? inAppMsgSetting.bg_color : "#fff", color: selectedStep.step === x.step ?inAppMsgSetting.text_color : "#000"}}>
                                 <div className={"absolute top-[8px] right-[8px]"}>
                                 {
                                     inAppMsgSetting.is_close_button ? <X size={16} stroke={inAppMsgSetting?.btn_color}/> : ""
@@ -334,10 +412,10 @@ const Surveys = ({inAppMsgSetting, setInAppMsgSetting, selectedStepIndex, setSel
                                             <Fragment>
                                                 <div className="mt-3">
                                                     <Select placeholder={x.placeholder_text} value={""}>
-                                                        <SelectTrigger className={`${theme === "dark" ? "bg-card-foreground" : ""} ring-offset-background-0`}>
+                                                        <SelectTrigger className={`${theme === "dark" ? "bg-card-foreground" : "border-card"} ring-offset-background-0`}>
                                                             <SelectValue placeholder={x.options.length ? x.placeholder_text : "No data"} />
                                                         </SelectTrigger>
-                                                        {x.options.length ? (
+                                                        {x.options.length > 0 ? (
                                                             <SelectContent className={`max-w-[404px] ${theme === "dark" ? "bg-card-foreground" : ""}`}>
                                                                 {x?.options.map((option, index) => (
                                                                     option.is_active === 1 &&

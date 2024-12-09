@@ -168,7 +168,7 @@ const CreateIdea = ({isOpen, onOpen, onClose, closeCreateIdea, setIdeasList, ide
                                     }
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="message" className={"font-normal"}>Description</Label>
+                                    <Label htmlFor="description" className={"font-normal"}>Description</Label>
 
                                     <ReactQuillEditor value={ideaDetail?.description} onChange={(e) => onChangeText("description", e.target.value)}/>
 

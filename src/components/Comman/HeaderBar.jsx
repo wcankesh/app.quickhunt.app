@@ -407,7 +407,7 @@ const HeaderBar = ({setIsMobile}) => {
                     selected: isActive(`${baseUrl}/announcements`, `${baseUrl}/announcements/${id}`, `${baseUrl}/announcements/analytic-view`),
                 },
                 {
-                    title: 'Customers',
+                    title: 'User',
                     link: '/customers',
                     icon: <Users size={15} />,
                     selected: isActive(`${baseUrl}/customers`),

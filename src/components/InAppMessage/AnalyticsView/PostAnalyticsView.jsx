@@ -83,7 +83,7 @@ const PostAnalyticsView = () => {
         },
         {
             title: "Completion Rate",
-            count: `${analytics?.response_percentage?.toFixed(2) || 0}%`,
+            count: `${((analytics?.response_percentage|| 0) / 100).toFixed(2)}%`,
             show: inAppMsgSetting?.reply_type === 1,
         },
     ]
@@ -252,7 +252,7 @@ const PostAnalyticsView = () => {
                                 <TableHeader className={`${theme === "dark" ? "" : "bg-muted"}`}>
                                     <TableRow>
                                         {
-                                            ["Name", "Replay", "Reaction", "When they replied"].map((x, i) => {
+                                            ["Name", "Reply", "Reaction", "When they replied"].map((x, i) => {
                                                 return (
                                                     <TableHead className={`px-2 py-[10px] md:px-3 font-medium text-card-foreground`} key={i}>
                                                         {x}

@@ -17,6 +17,7 @@ import Pagination from "../Comman/Pagination";
 import DeleteDialog from "../Comman/DeleteDialog";
 import {baseUrl} from "../../utils/constent";
 import {useNavigate} from "react-router";
+import {EmptyDataContent} from "../Comman/EmptyDataContent";
 
 const perPageLimit = 10;
 
@@ -35,7 +36,7 @@ const initialStateError = {
     customer_email_id: "",
 }
 
-const Customers = () => {
+const Users = () => {
     const {theme} =useTheme();
     const navigate = useNavigate();
     const apiService = new ApiService();
@@ -55,12 +56,15 @@ const Customers = () => {
     const [isLoadingDelete,setIsLoadingDelete] = useState(false);
     const [openDelete,setOpenDelete]=useState(false);
     const [isSave,setIsSave]=useState(false);
+    const [emptyContentBlock, setEmptyContentBlock] = useState(true);
+
+    const emptyContent = (status) => {setEmptyContentBlock(status);};
 
     useEffect(() => {
         if(projectDetailsReducer.id){
             getAllCustomers();
         }
-        navigate(`${baseUrl}/customers?pageNo=${pageNo}`)
+        navigate(`${baseUrl}/user?pageNo=${pageNo}`)
     }, [projectDetailsReducer.id, pageNo])
 
     const onChangeText = (event) => {
@@ -80,13 +84,13 @@ const Customers = () => {
         switch (name) {
             case "customer_name":
                 if (!value || value.trim() === "") {
-                    return "Customer name is required.";
+                    return "User name is required.";
                 } else {
                     return "";
                 }
             case "customer_email_id":
                 if (!value || value.trim() === "") {
-                    return "Customer e-mail is required.";
+                    return "User e-mail is required.";
                 } else if (!value.match(/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/)) {
                     return "Enter a valid email address.";
                 }
@@ -118,7 +122,13 @@ const Customers = () => {
         if (data.status === 200) {
             setCustomerList(data.data);
             setTotalRecord(data?.total);
-            // setIsLoading(false);
+            if (!data.data || data.data.length === 0) {
+                emptyContent(true);
+            } else {
+                emptyContent(false);
+            }
+        } else {
+            emptyContent(true);
         }
         setIsLoading(false)
     };
@@ -202,6 +212,51 @@ const Customers = () => {
         }
     };
 
+    const EmptyUserContent = [
+        {
+            title: "Start Adding Users",
+            description: `Manually add user details to build your base, track interactions, and personalize engagement to foster loyalty.`,
+            btnText: [
+                {title: "Add User", redirect: "", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
+            ],
+        },
+        {
+            title: "Create Ideas",
+            description: `Encourage user engagement by capturing and sharing ideas that resonate with your audience, turning visitors into active users.`,
+            btnText: [
+                {title: "Create Ideas", redirect: "", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
+            ],
+        },
+        {
+            title: "Create Roadmap",
+            description: `Showcase your product’s journey with a roadmap, keeping users informed about upcoming features and updates to build trust and attract users.`,
+            btnText: [
+                {title: "Create Roadmap", redirect: "", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
+            ],
+        },
+        {
+            title: "Create Announcement",
+            description: `Share key updates, new features, and milestones through announcements to keep users engaged and excited about your product.`,
+            btnText: [
+                {title: "Create Announcement", redirect: "", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
+            ],
+        },
+        {
+            title: "Create Widget",
+            description: `Add a widget to your website to display ideas, roadmaps, or updates, making it easy for users to interact and connect with your product.`,
+            btnText: [
+                {title: "Create Widget", redirect: "", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
+            ],
+        },
+        {
+            title: "Create Knowledge Base",
+            description: `Offer valuable resources and answers to build confidence in your product and convert visitors into loyal users.`,
+            btnText: [
+                {title: "Create Knowledge Base", redirect: "", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
+            ],
+        },
+    ];
+
     return (
         <Fragment>
 
@@ -209,7 +264,7 @@ const Customers = () => {
                 {/*<SheetOverlay className={"inset-0"}/>*/}
                 <SheetContent className={"sm:max-w-[662px] p-0"}>
                     <SheetHeader className={"px-3 py-4 lg:px-8 lg:py-[20px] flex flex-row justify-between items-center border-b"}>
-                        <h2 className={"text-sm md:text-xl font-normal"}>Add New Customer</h2>
+                        <h2 className={"text-sm md:text-xl font-normal"}>Add New User</h2>
                         <X onClick={closeSheet} size={18} className={"cursor-pointer m-0"}/>
                     </SheetHeader>
                     <div className={"sm:px-8 sm:py-6 px-3 py-4 border-b"}>
@@ -231,7 +286,7 @@ const Customers = () => {
                         </div>
                     </div>
                     <div className={"px-3 py-4 sm:p-8"}>
-                        <Button onClick={addCustomer} className={`border w-[117px] font-medium hover:bg-primary`}>{isSave ? <Loader2 className="h-4 w-4 animate-spin" /> : "Add Customer"}</Button>
+                        <Button onClick={addCustomer} className={`border w-[117px] font-medium hover:bg-primary`}>{isSave ? <Loader2 className="h-4 w-4 animate-spin" /> : "Add User"}</Button>
                     </div>
                 </SheetContent>
             </Sheet>}
@@ -254,12 +309,12 @@ const Customers = () => {
                 <div>
                     <div className={"flex flex-row gap-x-4 flex-wrap justify-between gap-y-2 items-center"}>
                         <div className={"flex flex-col gap-y-0.5"}>
-                            <h1 className="text-2xl font-normal flex-initial w-auto">Customers ({totalRecord})</h1>
-                            <h5 className={"text-sm text-muted-foreground"}>View all customers who have registered through your program link, as well as those you’ve added manually.</h5>
+                            <h1 className="text-2xl font-normal flex-initial w-auto">Users ({totalRecord})</h1>
+                            <h5 className={"text-sm text-muted-foreground"}>View all users who have registered through your program link, as well as those you’ve added manually.</h5>
                         </div>
-                        <Button onClick={openSheet} className={"gap-2 font-medium hover:bg-primary"}><Plus size={20} strokeWidth={3} /><span className={"text-xs md:text-sm font-medium"}>New Customer</span></Button>
+                        <Button onClick={openSheet} className={"gap-2 font-medium hover:bg-primary"}><Plus size={20} strokeWidth={3} /><span className={"text-xs md:text-sm font-medium"}>New User</span></Button>
                     </div>
-                    <div className={"mt-6"}>
+                    <div className={"my-6"}>
                         <Card>
                             <CardContent className={"p-0"}>
                                 <div className={"rounded-md grid grid-cols-1 overflow-auto whitespace-nowrap"}>
@@ -335,10 +390,14 @@ const Customers = () => {
                             }
                         </Card>
                     </div>
+                    {
+                        (isLoading || !emptyContentBlock) ? "" :
+                            <EmptyDataContent data={EmptyUserContent} onClose={() => emptyContent(false)}/>
+                    }
                 </div>
             </div>
         </Fragment>
     );
 }
 
-export default Customers;
+export default Users;

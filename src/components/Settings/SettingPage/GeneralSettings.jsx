@@ -10,6 +10,9 @@ import {Button} from "../../ui/button";
 import {Loader2} from "lucide-react";
 import ColorInput from "../../Comman/ColorPicker";
 import {Checkbox} from "../../ui/checkbox";
+import {Select, SelectValue} from "@radix-ui/react-select";
+import {SelectContent, SelectItem, SelectTrigger} from "../../ui/select";
+import {timeZoneJson} from "../../../utils/constent";
 
 const initialState = {
     announcement_title: "",
@@ -27,6 +30,7 @@ const initialState = {
     is_reaction: 1,
     is_roadmap: 1,
     roadmap_title: "",
+    timezone: "Asia/Calcutta",
 }
 
 const GeneralSettings = () => {
@@ -166,6 +170,16 @@ const GeneralSettings = () => {
             ],
         },
         {
+            title: "Time Zone",
+            input: [
+                {
+                    field: "select",
+                    label: "Select Time",
+                    name: "timezone",
+                },
+            ],
+        },
+        {
             title: "Branding",
             input: [
                 {
@@ -240,7 +254,24 @@ const GeneralSettings = () => {
                                                                                             />
                                                                                         </div>
                                                                                     </div>
-                                                                                    : y.field === "switch" ?
+                                                                                    : y.field === "select" ?
+                                                                                        <div className="announce-create-switch flex gap-4">
+                                                                                            <Select onValueChange={(value) => onChange('timezone', value)} value={generalSettingData.timezone}>
+                                                                                                <SelectTrigger>
+                                                                                                    <SelectValue placeholder="Select a Time Zone" />
+                                                                                                </SelectTrigger>
+                                                                                                <SelectContent>
+                                                                                                    {
+                                                                                                        (timeZoneJson || []).map((x, i) => {
+                                                                                                            return (
+                                                                                                                <SelectItem key={i} value={x.tzCode}>{x.label}</SelectItem>
+                                                                                                            )
+                                                                                                        })
+                                                                                                    }
+                                                                                                </SelectContent>
+                                                                                            </Select>
+                                                                                        </div>
+                                                                                        : y.field === "switch" ?
                                                                                         <div className="announce-create-switch flex gap-4">
                                                                                             <Switch
                                                                                                 className="w-[38px] h-[20px]"

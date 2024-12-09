@@ -76,10 +76,10 @@ const SaidBarDesktop = ({isMobile, setIsMobile}) => {
                     selected: isActive(`${baseUrl}/announcements`, `${baseUrl}/announcements/${id}`, `${baseUrl}/announcements/analytic-view`),
                 },
                 {
-                    title: 'Customers',
-                    link: '/customers',
+                    title: 'Users',
+                    link: '/user',
                     icon: <Users size={15} />,
-                    selected: isActive(`${baseUrl}/customers`),
+                    selected: isActive(`${baseUrl}/user`),
                 },
                 {
                     title: 'In App Message',

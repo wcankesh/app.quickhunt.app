@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef,} from 'react';
+import React, {useState, useEffect, useRef, useCallback,} from 'react';
 import {Button} from "../ui/button";
 import {Input} from "../ui/input";
 import AnnouncementsTable from "./AnnouncementsTable";
@@ -19,6 +19,8 @@ import {useLocation, useNavigate} from "react-router-dom";
 import {baseUrl} from "../../utils/constent";
 import Pagination from "../Comman/Pagination";
 import {RadioGroup, RadioGroupItem} from "../ui/radio-group";
+import {EmptyDataContent} from "../Comman/EmptyDataContent";
+import {debounce} from "lodash";
 
 const initialStateFilter = {l: "", s: "", q:""}
 
@@ -48,12 +50,11 @@ const Announcements = () => {
     const apiService = new ApiService();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
-    const timeoutHandler = useRef(null);
 
     const [announcementList, setAnnouncementList] = useState([]);
     const [selectedRecord, setSelectedRecord] = useState({})
     const [analyticsObj, setAnalyticsObj] = useState({})
-    const [filter, setFilter] = useState(initialStateFilter);
+    const [filter, setFilter] = useState({...initialStateFilter, project_id: projectDetailsReducer.id});
     const [pageNo, setPageNo] = useState(Number(getPageNo));
     const [openFilterType, setOpenFilterType] = useState('');
     const [openFilter, setOpenFilter] = useState('');
@@ -61,6 +62,9 @@ const Announcements = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [isLoadingDelete, setIsLoadingDelete] = useState(false);
     const [isFilter, setIsFilter] = useState(false);
+    const [emptyContentBlock, setEmptyContentBlock] = useState(true);
+
+    const emptyContent = (status) => {setEmptyContentBlock(status);};
 
     useEffect(() => {
             // if(filter.l || filter.s || filter.q || isFilter){
@@ -92,6 +96,13 @@ const Announcements = () => {
             setAnnouncementList(data.data)
             setTotalRecord(data.total)
             setIsFilter(true)
+            if (!data.data || data.data.length === 0) {
+                emptyContent(true);
+            } else {
+                emptyContent(false);
+            }
+        } else {
+            emptyContent(true);
         }
         setIsLoading(false)
     }
@@ -108,6 +119,43 @@ const Announcements = () => {
             setIsLoading(false);
         }
     }
+
+    const throttledDebouncedSearch = useCallback(
+        debounce((value) => {
+            const updatedFilter = {
+                ...filter,
+                project_id: projectDetailsReducer.id,
+                q: value,
+                page: 1,
+            };
+            searchAnnouncement(updatedFilter);
+        }, 500),
+        []
+    );
+
+    const onChange = (e) => {
+        const value = e.target.value;
+        setFilter( { ...filter, q: value });
+        throttledDebouncedSearch(value)
+    };
+
+    const filterPosts = async (event) => {
+        setIsLoading(true)
+        setFilter({...filter, [event.name]: event.value,});
+        const payload = {
+            ...filter,
+            project_id: projectDetailsReducer.id,
+            page:1,
+            [event.name]: event.value,
+        }
+        await searchAnnouncement(payload);
+    }
+
+    const clearSearchFilter = () => {
+        setFilter(prev => ({ ...prev, q: '' }));
+        setPageNo(1);
+        getAllPosts('', filter.q);
+    };
 
     const openSheet = () => {
         setSelectedRecord({id: "new"})
@@ -160,36 +208,6 @@ const Announcements = () => {
         }
     }
 
-    const onChange = async (event) => {
-        const payload = {
-            ...filter,
-            project_id: projectDetailsReducer.id,
-            page:1,
-            [event.target.name]: event.target.value,
-        }
-        setFilter({...filter, [event.target.name]: event.target.value,});
-        setIsLoading(true);
-
-        if (timeoutHandler.current) {
-            clearTimeout(timeoutHandler.current);
-        }
-        timeoutHandler.current = setTimeout(() => {
-             searchAnnouncement(payload);
-        }, 2000);
-    }
-
-    const filterPosts = async (event) => {
-        setIsLoading(true)
-        setFilter({...filter, [event.name]: event.value,});
-        const payload = {
-            ...filter,
-            project_id: projectDetailsReducer.id,
-            page:1,
-            [event.name]: event.value,
-        }
-        await searchAnnouncement(payload);
-    }
-
     const totalPages = Math.ceil(totalRecord / perPageLimit);
 
     const handlePaginationClick = async (newPage) => {
@@ -213,6 +231,53 @@ const Announcements = () => {
     }
 
     const matchedObject = allStatusAndTypes.labels ? allStatusAndTypes.labels.find(x => x.id === filter.l) : null;
+
+    const EmptyAnnounceContent = [
+        {
+            title: "Start Sharing Updates",
+            description: `No announcements yet? Create your first one to keep users informed about product updates, new features, and improvements.`,
+            btnText: [
+                {title: "Create Announcement", redirect: "", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
+            ],
+        },
+        {
+            title: "Create Labels",
+            description: `Organize your announcements by adding labels like "Update," "New Feature," or "Bug Fix" for easy categorization and clarity.`,
+            btnText: [
+                {title: "Create Labels", redirect: "", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
+            ],
+        },
+        {
+            title: "Create Categories",
+            description: `Group your announcements into categories such as "Product Updates," "Feature Launches," or "Changelog" to help users find relevant information quickly.`,
+            btnText: [
+                {title: "Create Categories", redirect: "", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
+            ],
+        },
+        {
+            title: "Add Emoji",
+            description: `Make your announcements more engaging by adding emojis to highlight key updates or set the tone for your message.`,
+            btnText: [
+                {title: "Add Emojis", redirect: "", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
+            ],
+        },
+        {
+            title: "Create In-App Message",
+            description: `Share announcements directly with users through in-app messages to ensure they stay informed about important updates.`,
+            btnText: [
+                {title: "Create In-App Message", redirect: "", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
+            ],
+        },
+        {
+            title: "Explore Examples",
+            description: `See how platforms like Utterbond, Webform, and Rivyo efficiently share announcements to keep their users informed.`,
+            btnText: [
+                {title: "Utterbond", redirect: ""},
+                {title: "Webform", redirect: ""},
+                {title: "Rivyo", redirect: ""},
+            ],
+        },
+    ];
 
     return (
         <div className={"container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-3 md:px-4"}>
@@ -243,14 +308,24 @@ const Announcements = () => {
                 </div>
                 <div className={"w-full lg:w-auto flex sm:flex-nowrap flex-wrap gap-2 items-center"}>
                     <div className={"flex gap-2 items-center w-full lg:w-auto"}>
-                        <div className={"w-full"}>
+                        <div className={"relative w-full"}>
                             <Input
                                 type="search"
                                 placeholder="Search..."
                                 className="w-full pl-4 pr-14 text-sm font-normal h-9"
                                 name={"q"}
+                                value={filter.q}
                                 onChange={onChange}
                             />
+                            {filter?.q?.trim() !== '' && (
+                                <button
+                                    type="button"
+                                    className="absolute right-2 top-1/2 transform -translate-y-1/2 w-6 h-6 flex items-center justify-center text-gray-400 hover:text-gray-600"
+                                    onClick={clearSearchFilter}
+                                >
+                                    <X className="w-4 h-4" />
+                                </button>
+                            )}
                         </div>
                         <div className={"flex items-center"}>
                             <Popover open={openFilter}
@@ -384,7 +459,7 @@ const Announcements = () => {
                 }
             </div>}
 
-            <Card className={"mt-6"}>
+            <Card className={"my-6"}>
                 <AnnouncementsTable
                     setAnalyticsObj={setAnalyticsObj}
                     handleDelete={handleDelete}
@@ -406,7 +481,10 @@ const Announcements = () => {
                         /> : ""
                 }
             </Card>
-
+            {
+                (isLoading || !emptyContentBlock) ? "" :
+                        <EmptyDataContent data={EmptyAnnounceContent} onClose={() => emptyContent(false)}/>
+            }
         </div>
     );
 }

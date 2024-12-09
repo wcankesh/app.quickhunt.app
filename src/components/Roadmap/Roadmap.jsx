@@ -10,6 +10,7 @@ import "@asseinfo/react-kanban/dist/styles.css";
 import CreateRoadmapIdea from "./CreateRoadmapIdea";
 import {useToast} from "../ui/use-toast";
 import {CommSkel} from "../Comman/CommSkel";
+import {EmptyDataContent} from "../Comman/EmptyDataContent";
 
 const loading = {
     columns: Array.from({ length: 5 }, (_, index) => ({
@@ -32,6 +33,11 @@ const Roadmap = () => {
     const [selectedRoadmap, setSelectedRoadmap] = useState({});
     const [isSheetOpen, setIsSheetOpen] = useState({ open: false, type: "" });
     const [isLoading, setIsLoading] = useState(false);
+    const [emptyContentBlock, setEmptyContentBlock] = useState(true);
+
+    const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
+
+    const emptyContent = (status) => {setEmptyContentBlock(status);};
 
     const openSheet = (type) => setIsSheetOpen({ open: true, type });
     const closeSheet = () => setIsSheetOpen({ open: false, type: "" });
@@ -65,8 +71,15 @@ const Roadmap = () => {
             });
             setRoadmapList({columns: roadmapListClone})
             setIsLoading(false)
+            const hasNoCards = roadmapListClone.every((item) => !item.cards || item.cards.length === 0);
+            if (hasNoCards || !data.data || data.data.length === 0) {
+                emptyContent(true);
+            } else {
+                emptyContent(false);
+            }
         } else {
             setIsLoading(false)
+            emptyContent(true);
         }
     }
 
@@ -95,12 +108,72 @@ const Roadmap = () => {
         }
     }
 
+    // const moveCard = (roadmapList, source, destination) => {
+    //     debugger
+    //     const updatedColumns = roadmapList.columns.map((column) => {
+    //         if (column.id === source.fromColumnId) {
+    //             return {
+    //                 ...column,
+    //                 cards: column.cards.filter(card => card.id !== source.cardId),
+    //                 ideas: column.ideas.filter(idea => idea.id !== source.cardId),
+    //             };
+    //         }
+    //
+    //         if (column.id === destination.toColumnId) {
+    //             const cardToMove = roadmapList.columns
+    //                 .find(col => col.id === source.fromColumnId)
+    //                 .cards.find(card => card.id === source.cardId);
+    //
+    //             return {
+    //                 ...column,
+    //                 cards: [...column.cards, cardToMove],
+    //                 ideas: [...column.ideas, cardToMove],
+    //             };
+    //         }
+    //
+    //         return column;
+    //     });
+    //
+    //     return { columns: updatedColumns };
+    // };
+    //
+    // const handleCardMove = (_card, source, destination) => {
+    //     debugger
+    //     const sourceWithCardId = {
+    //         fromColumnId: source.fromColumnId,
+    //         cardId: _card.id,
+    //     };
+    //
+    //     const updatedBoard = moveCard(roadmapList, sourceWithCardId, destination);
+    //     console.log("updatedBoard", updatedBoard);
+    //
+    //     const sourceIndex = updatedBoard.columns.findIndex((col) => col.id == source.fromColumnId);
+    //     const destinationIndex = updatedBoard.columns.findIndex((col) => col.id == destination.toColumnId);
+    //
+    //     setRoadmapList(updatedBoard);
+    //
+    //     callApi(destination.toColumnId, _card.id);
+    //
+    //     if (destinationIndex !== -1) {
+    //         setRoadmapRank(updatedBoard.columns[destinationIndex].cards, destination.toColumnId);
+    //     }
+    //
+    //     const updatedCard = {
+    //         ..._card,
+    //         roadmap_id: destination.toColumnId,
+    //     };
+    //     setSelectedIdea(updatedCard);
+    // };
+
 
     const handleCardMove = (_card, source, destination) => {
         const updatedBoard = moveCard(roadmapList, source, destination);
-
         const updatedColumns = [...updatedBoard.columns];
 
+        // const updatedColumns = roadmapList.columns.map((col) => ({
+        //     ...col,
+        //     cards: [...col.cards],
+        // }));
         const sourceIndex = updatedColumns.findIndex((col) => col.id == source.fromColumnId);
         const destinationIndex = updatedColumns.findIndex((col) => col.id == destination.toColumnId);
 
@@ -132,12 +205,64 @@ const Roadmap = () => {
         callApi(destination.toColumnId, _card.id);
         setRoadmapRank(updatedColumns[destinationIndex].cards, destination.toColumnId);
 
+        const updatedCard = {
+            ..._card,
+            roadmap_id: destination.toColumnId,
+        };
+        setSelectedIdea(updatedCard);
     };
 
     const onCreateIdea = (mainRecord) => {
         setSelectedRoadmap(mainRecord)
         openSheet("create");
     }
+
+    const EmptyRoadmapContent = [
+        {
+            title: "Create First Roadmap",
+            description: `Don’t keep users guessing! Start your roadmap to outline future plans and showcase it on your website for everyone to see.`,
+            btnText: [
+                {title: "Create Roadmap", redirect: "", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
+            ],
+        },
+        {
+            title: "Create Roadmap Statuses",
+            description: `Define statuses like "Planned," "In Progress," and "Completed" to keep users informed about the progress of your roadmap items.`,
+            btnText: [
+                {title: "Create Statuses", redirect: "", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
+            ],
+        },
+        {
+            title: "Turn Ideas into a Roadmap",
+            description: `Easily transform shared ideas into actionable roadmap items to plan and showcase your product's future.`,
+            btnText: [
+                {title: "Move Ideas to Roadmap", redirect: "", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
+            ],
+        },
+        {
+            title: "Create Widget",
+            description: `Add a widget to display your Roadmap on your website with options like embed, popover, modal, or sidebar.`,
+            btnText: [
+                {title: "Create Widget", redirect: "", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
+            ],
+        },
+        {
+            title: "Create Announcement",
+            description: `Share updates or milestones from your roadmap with users to keep them engaged and in the loop.`,
+            btnText: [
+                {title: "Create Announcement", redirect: "", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
+            ],
+        },
+        {
+            title: "Explore Examples",
+            description: `Discover how platforms like Utterbond, Webform, and Rivyo effectively manage their roadmaps.`,
+            btnText: [
+                {title: "Utterbond", redirect: ""},
+                {title: "Webform", redirect: ""},
+                {title: "Rivyo", redirect: ""},
+            ],
+        },
+    ];
 
     return (
         <div
@@ -200,7 +325,11 @@ const Roadmap = () => {
                         >
                             {loading}
                         </Board>
-                        :  <Board
+                        :  roadmapList.columns.length === 0 ? (
+                            <div className="text-center mt-8 text-gray-500">
+                                No data available.
+                            </div>
+                        ) : <Board
                             allowAddColumn
                             disableColumnDrag
                             onCardDragEnd={handleCardMove}
@@ -208,6 +337,8 @@ const Roadmap = () => {
                             allowAddCard={{on: "bottom"}}
                             addCard={{on: "bottom"}}
                             renderCard={(y) => {
+                                const boardTitle =
+                                    allStatusAndTypes?.boards?.find((board) => board.id === y.board)?.title || "";
                                 return (
                                     <Fragment>
                                         <Card onClick={() => openDetailsSheet(y)} className={"mb-3"}>
@@ -217,10 +348,15 @@ const Roadmap = () => {
                                                     <img className="object-center object-cover w-full h-[125px]"
                                                          src={y?.cover_image} alt={""}/>
                                                 }
-                                                <div className={"flex gap-2"}>
-                                                    <Button variant={"outline hover:transparent"}
-                                                            className={"text-sm font-normal border px-[9px] py-1 w-[28px] h-[28px]"}>{y.vote}</Button>
+                                                <div className={"space-y-1"}>
                                                     <h3 className={"text-sm font-normal m-0"}>{y.title}</h3>
+                                                    <div className={"flex justify-between gap-2"}>
+                                                        {
+                                                            boardTitle?.length ? <div className={"h-7 p-1 px-2 text-xs font-medium text-muted-foreground border border-input rounded-lg"}>{boardTitle}</div> : ""
+                                                        }
+                                                    <Button variant={"outline hover:transparent"}
+                                                            className={"text-sm font-normal border px-[9px] py-1 w-7 h-7"}>{y.vote}</Button>
+                                                    </div>
                                                 </div>
                                             </CardHeader>
                                             <CardContent className={"px-[20px] pb-4"}>
@@ -240,7 +376,7 @@ const Roadmap = () => {
                                 )
                             }}
 
-                            renderColumnHeader={({title, color_code, id}) => {
+                            renderColumnHeader={({title, color_code, id, cards}) => {
 
                                 const column = roadmapList?.columns?.find(col => col.id === id);
                                 const cardCount = column ? column?.cards?.length : 0;
@@ -263,6 +399,11 @@ const Roadmap = () => {
                                                 <Plus size={20} strokeWidth={2}/>
                                             </Button>
                                         </div>
+                                        {cardCount === 0 ? (
+                                            <div className="text-center mt-4 text-gray-500">
+                                                No data.
+                                            </div>
+                                        ) : ""}
                                     </React.Fragment>
                                 )
                             }}
@@ -271,6 +412,12 @@ const Roadmap = () => {
                         </Board>
                 }
             </div>
+            {
+                (isLoading || !emptyContentBlock) ? "" :
+                    <div className={"max-w-[1600px] w-full pl-[10px]"}>
+                        <EmptyDataContent data={EmptyRoadmapContent} onClose={() => emptyContent(false)}/>
+                    </div>
+            }
         </div>
     );
 };

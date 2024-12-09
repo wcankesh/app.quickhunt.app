@@ -3,7 +3,7 @@ import {Dashboard} from "../components/Dashboard/Dashboard";
 import Announcements from "../components/Announcements/Announcements";
 import Ideas from "../components/Ideas/Ideas";
 import Roadmap from "../components/Roadmap/Roadmap";
-import Customers from "../components/Customers/Customers";
+import Users from "../components/User/Users";
 import Widgets from "../components/Widgets/Widgets";
 import Notification from "../components/Notification/Notification";
 import Settings from "../components/Settings/Settings";
@@ -36,7 +36,7 @@ export const routes = [
      {path: `${baseUrl}/ideas`, component: <Ideas/>},
      {path: `${baseUrl}/ideas/:id`, component: <UpdateIdea/>},
      {path: `${baseUrl}/roadmap`, component: <Roadmap/>},
-     {path: `${baseUrl}/customers`, component: <Customers/>},
+     {path: `${baseUrl}/user`, component: <Users/>},
      {path: `${baseUrl}/widget`, component: <Widgets/>},
      {path: `${baseUrl}/widget/type`, component: <WidgetsTypes/>},
      {path: `${baseUrl}/widget/:type/:id`, component: <UpdateWidget/>},

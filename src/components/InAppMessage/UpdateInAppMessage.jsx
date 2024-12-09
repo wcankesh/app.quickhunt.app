@@ -140,8 +140,6 @@ const UpdateInAppMessage = () => {
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
 
-    console.log("allStatusAndTypes", allStatusAndTypes)
-
     const [inAppMsgSetting, setInAppMsgSetting] = useState(initialState);
     const [selectedStepIndex, setSelectedStepIndex] = useState(0);
     const [isLoading, setIsLoading] = useState(false);

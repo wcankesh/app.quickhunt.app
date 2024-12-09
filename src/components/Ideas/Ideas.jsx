@@ -1,4 +1,4 @@
-import React, {Fragment, useEffect, useState,useCallback} from 'react';
+import React, {Fragment, useCallback, useEffect, useState} from 'react';
 import {Button} from "../ui/button";
 import {ArrowBigUp, ChevronLeft, Circle, Dot, Ellipsis, Filter, MessageCircleMore, Pin, Plus, X,} from "lucide-react";
 import {Card, CardContent} from "../ui/card";
@@ -19,13 +19,13 @@ import {DropdownMenu, DropdownMenuTrigger} from "@radix-ui/react-dropdown-menu";
 import {DropdownMenuContent, DropdownMenuItem,} from "../ui/dropdown-menu";
 import {Badge} from "../ui/badge";
 import {Popover, PopoverContent, PopoverTrigger} from "../ui/popover";
-import {Avatar, AvatarFallback, AvatarImage} from "../ui/avatar";
+import {Avatar, AvatarFallback} from "../ui/avatar";
 import Pagination from "../Comman/Pagination";
 import DeleteDialog from "../Comman/DeleteDialog";
 import {RadioGroup, RadioGroupItem} from "../ui/radio-group";
-import {Label} from "../ui/label";
 import {Input} from "../ui/input";
 import {debounce} from "lodash";
+import {EmptyDataContent} from "../Comman/EmptyDataContent";
 
 const filterByStatus = [
     {name: "Archived", value: "archive",},
@@ -67,6 +67,9 @@ const Ideas = () => {
     const [load, setLoad] = useState('');
     const [openDelete, setOpenDelete] = useState(false);
     const [deleteRecord, setDeleteRecord] = useState(null);
+    const [emptyContentBlock, setEmptyContentBlock] = useState(true);
+
+    const emptyContent = (status) => {setEmptyContentBlock(status);};
 
     const openCreateIdea = () => {setSheetOpenCreate(true)};
 
@@ -97,8 +100,14 @@ const Ideas = () => {
             setIdeasList(data.data)
             setTotalRecord(data.total)
             setLoad('')
+            if (!data.data || data.data.length === 0) {
+                emptyContent(true);
+            } else {
+                emptyContent(false);
+            }
         } else {
-            setLoad('')
+            setLoad('');
+            emptyContent(true);
         }
     }
 
@@ -305,6 +314,54 @@ const Ideas = () => {
         setPageNo(1);
         getAllIdea('', filter.search);
     };
+
+
+    const EmptyIdeaContent = [
+        {
+            title: "Create First Idea",
+            description: `It's time to start the conversation! Create your first idea and get feedback from your team or community.`,
+            btnText: [
+                {title: "Create Ideas", redirect: "", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
+            ],
+        },
+        {
+            title: "Create Tags",
+            description: `Organize your ideas with customizable tags like "High Priority" or "Internal Idea" for better management.`,
+            btnText: [
+                {title: "Create Tags", redirect: "", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
+            ],
+        },
+        {
+            title: "Create Board",
+            description: `Visually manage your ideas with boards like "Feature Request" or "Bug Reports" to track progress and prioritize tasks.`,
+            btnText: [
+                {title: "Create Board", redirect: "", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
+            ],
+        },
+        {
+            title: "Create Widget",
+            description: `Add a widget to display your ideas on your website with options like embed, popover, modal, or sidebar.`,
+            btnText: [
+                {title: "Create Widget", redirect: "", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
+            ],
+        },
+        {
+            title: "Create Feedback",
+            description: `Share your ideas via in-app messages and let users upvote and comment to refine and improve your suggestions.`,
+            btnText: [
+                {title: "Create In-App Message", redirect: "", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
+            ],
+        },
+        {
+            title: "Explore Examples",
+            description: `See how platforms like Utterbond, Webform, and Rivyo manage customer feedback efficiently and effortlessly.`,
+            btnText: [
+                {title: "Utterbond", redirect: ""},
+                {title: "Webform", redirect: ""},
+                {title: "Rivyo", redirect: ""},
+            ],
+        },
+    ];
 
     return (
         <Fragment>
@@ -551,7 +608,7 @@ const Ideas = () => {
                         </div>
                     }
 
-                <Card className={"mt-6"}>
+                <Card className={"my-6"}>
                     {
                         (load === 'search' || load === 'list') ? (CommSkel.commonParagraphFourIdea) : ideasList.length > 0 ?
                             <CardContent className={"p-0 divide-y"}>
@@ -743,65 +800,6 @@ const Ideas = () => {
                                                                 }
                                                             </div>
                                                         </div>
-                                                        {/*<div className={`flex ${x.topic && x.topic.length > 0 ? "justify-between gap-2" : "sm:justify-between gap-0 justify-start"} items-center flex-wrap`}>*/}
-                                                        {/*    /!*<div className={`flex flex-wrap gap-2`}>*!/*/}
-                                                        {/*    /!*    {*!/*/}
-                                                        {/*    /!*        (x.topic && x.topic.length > 0) &&*!/*/}
-                                                        {/*    /!*        <div className={`flex flex-wrap gap-2`}>*!/*/}
-                                                        {/*    /!*            {*!/*/}
-                                                        {/*    /!*                x.topic.map((y, i) => (*!/*/}
-                                                        {/*    /!*                    <div className={"text-sm font-normal"} key={i}> {y?.title}</div>*!/*/}
-                                                        {/*    /!*                ))*!/*/}
-                                                        {/*    /!*            }*!/*/}
-                                                        {/*    /!*        </div>*!/*/}
-                                                        {/*    /!*    }*!/*/}
-                                                        {/*    /!*</div>*!/*/}
-                                                        {/*    /!*<div className={"flex items-center md:gap-8 gap-1"}>*!/*/}
-                                                        {/*    /!*    <Select*!/*/}
-                                                        {/*    /!*        onValueChange={(value) => handleStatusUpdate("roadmap_id", value, i, x)}*!/*/}
-                                                        {/*    /!*        value={x.roadmap_id}>*!/*/}
-                                                        {/*    /!*        <SelectTrigger*!/*/}
-                                                        {/*    /!*            className="md:w-[224px] w-[170px] h-8 bg-card"*!/*/}
-                                                        {/*    /!*            // className="md:w-[291px] w-[170px] h-[24px] px-3 py-1 bg-card"*!/*/}
-                                                        {/*    /!*        >*!/*/}
-                                                        {/*    /!*            <SelectValue/>*!/*/}
-                                                        {/*    /!*        </SelectTrigger>*!/*/}
-                                                        {/*    /!*        <SelectContent>*!/*/}
-                                                        {/*    /!*            <SelectGroup>*!/*/}
-                                                        {/*    /!*                <SelectItem value={null}>*!/*/}
-                                                        {/*    /!*                    <div className={"flex items-center gap-2"}>No status</div>*!/*/}
-                                                        {/*    /!*                </SelectItem>*!/*/}
-                                                        {/*    /!*                {*!/*/}
-                                                        {/*    /!*                    (allStatusAndTypes.roadmap_status || []).map((x, i) => {*!/*/}
-                                                        {/*    /!*                        return (*!/*/}
-                                                        {/*    /!*                            <SelectItem key={i}*!/*/}
-                                                        {/*    /!*                                        value={x.id}>*!/*/}
-                                                        {/*    /!*                                <div*!/*/}
-                                                        {/*    /!*                                    className={"flex items-center gap-2"}>*!/*/}
-                                                        {/*    /!*                                    <Circle*!/*/}
-                                                        {/*    /!*                                        fill={x.color_code}*!/*/}
-                                                        {/*    /!*                                        stroke={x.color_code}*!/*/}
-                                                        {/*    /!*                                        className={` w-[10px] h-[10px]`}/>*!/*/}
-                                                        {/*    /!*                                    {x.title || "No status"}*!/*/}
-                                                        {/*    /!*                                </div>*!/*/}
-                                                        {/*    /!*                            </SelectItem>*!/*/}
-                                                        {/*    /!*                        )*!/*/}
-                                                        {/*    /!*                    })*!/*/}
-                                                        {/*    /!*                }*!/*/}
-                                                        {/*    /!*            </SelectGroup>*!/*/}
-                                                        {/*    /!*        </SelectContent>*!/*/}
-                                                        {/*    /!*    </Select>*!/*/}
-                                                        {/*    /!*    <div*!/*/}
-                                                        {/*    /!*        className={"flex items-center gap-1 sm:gap-2 cursor-pointer"}*!/*/}
-                                                        {/*    /!*        onClick={() => openDetailsSheet(x)}*!/*/}
-                                                        {/*    /!*    >*!/*/}
-                                                        {/*    /!*        <span><MessageCircleMore size={16} className={"stroke-primary"}/></span>*!/*/}
-                                                        {/*    /!*        <p className={"text-base font-normal"}>*!/*/}
-                                                        {/*    /!*            {x && x.comments && x.comments.length ? x.comments.length : 0}*!/*/}
-                                                        {/*    /!*        </p>*!/*/}
-                                                        {/*    /!*    </div>*!/*/}
-                                                        {/*    /!*</div>*!/*/}
-                                                        {/*</div>*/}
                                                     </div>
                                                 </div>
                                             </Fragment>
@@ -823,6 +821,10 @@ const Ideas = () => {
                     }
 
                 </Card>
+                {
+                    (load === "search" || load === "list" || !emptyContentBlock) ? "" :
+                        <EmptyDataContent data={EmptyIdeaContent} onClose={() => emptyContent(false)}/>
+                }
             </div>
         </Fragment>
     );
