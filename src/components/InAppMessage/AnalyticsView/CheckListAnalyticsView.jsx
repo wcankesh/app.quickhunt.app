@@ -247,7 +247,7 @@ const CheckListAnalyticsView = () => {
                                 <TableHeader className={`${theme === "dark" ? "" : "bg-muted"}`}>
                                     <TableRow>
                                         {
-                                            ["Name", "Linked", "Reaction", "Collected Email", "When they replied"].map((x, i) => {
+                                            ["Name", "When they replied"].map((x, i) => {
                                                 return (
                                                     <TableHead className={`px-2 py-[10px] md:px-3 font-medium text-card-foreground`} key={i}>
                                                         {x}
@@ -264,10 +264,9 @@ const CheckListAnalyticsView = () => {
                                                     return (
                                                         <TableRow key={index}>
                                                             {
-                                                                [...Array(5)].map((_, i) => {
+                                                                [...Array(2)].map((_, i) => {
                                                                     return (
-                                                                        <TableCell key={i}
-                                                                                   className={"max-w-[373px] px-2 py-[10px] md:px-3"}>
+                                                                        <TableCell key={i} className={"max-w-[373px] px-2 py-[10px] md:px-3"}>
                                                                             <Skeleton className={"rounded-md w-full h-7"}/>
                                                                         </TableCell>
                                                                     )
@@ -290,9 +289,6 @@ const CheckListAnalyticsView = () => {
                                                                             <p className={"font-normal"}>{x?.name? x?.name : x.email}</p>
                                                                         </>
                                                                     </TableCell>
-                                                                    <TableCell className={`px-2 py-[10px] md:px-3 font-normal`}>{"-"}</TableCell>
-                                                                    <TableCell className={`px-2 py-[10px] md:px-3 font-normal`}>{x.emoji_url ? <img key={i} className={"h-6 w-6 cursor-pointer"} src={x.emoji_url}/> : "-"}</TableCell>
-                                                                    <TableCell className={`px-2 py-[10px] md:px-3 font-normal`}>{x.submit_mail || "-"}</TableCell>
                                                                     <TableCell className={`px-2 py-[10px] md:px-3 font-normal`}>{moment(x.created_at).format("ll")}</TableCell>
                                                                 </TableRow>
                                                             )

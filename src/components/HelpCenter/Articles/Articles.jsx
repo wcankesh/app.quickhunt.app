@@ -104,35 +104,18 @@ const Articles = () => {
         setIsLoading(false)
     };
 
-    const debounceGetAllArticles = debounce((searchValue) => {
-        setPageNo(1);
-        getAllArticles(searchValue, filter.category_id, filter.sub_category_id);
-    }, 500);
+    const throttledDebouncedSearch = useCallback(
+        debounce((value) => {
+            getAllArticles(value, filter.category_id, filter.sub_category_id);
+        }, 500),
+        [projectDetailsReducer.id]
+    );
 
-    const onChangeSearch = (event) => {
-        const value = event.target.value;
-        setFilter((prev) => ({ ...prev, search: value }));
-        debounceGetAllArticles(value);
+    const onChangeSearch = (e) => {
+        const value = e.target.value;
+        setFilter({ ...filter, search: value });
+        throttledDebouncedSearch(value);
     };
-
-    // const throttledDebouncedSearch = useCallback(
-    //     debounce((value) => {
-    //         const updatedFilter = {
-    //             ...filter,
-    //             project_id: projectDetailsReducer.id,
-    //             search: value,
-    //             page: 1,
-    //         };
-    //         getAllArticles(updatedFilter);
-    //     }, 500), // 500ms debounce delay
-    //     [] // Add dependencies
-    // );
-    //
-    // const onChangeSearch = (e) => {
-    //     const value = e.target.value;
-    //     setFilter({ ...filter, search: value });
-    //     throttledDebouncedSearch(value);
-    // };
 
     const filterData = (name, value) => {
         setFilter(prevFilter => ({

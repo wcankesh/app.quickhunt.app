@@ -30,7 +30,7 @@ const initialState = {
     is_reaction: 1,
     is_roadmap: 1,
     roadmap_title: "",
-    timezone: "Asia/Calcutta",
+    timezone: "Asia/Kolkata",
 }
 
 const GeneralSettings = () => {
@@ -258,7 +258,7 @@ const GeneralSettings = () => {
                                                                                         <div className="announce-create-switch flex gap-4">
                                                                                             <Select onValueChange={(value) => onChange('timezone', value)} value={generalSettingData.timezone}>
                                                                                                 <SelectTrigger>
-                                                                                                    <SelectValue placeholder="Select a Time Zone" />
+                                                                                                    <SelectValue placeholder={generalSettingData.timezone} />
                                                                                                 </SelectTrigger>
                                                                                                 <SelectContent>
                                                                                                     {

@@ -27,7 +27,7 @@ const initialStateError = {
     cover_image: "",
 }
 
-const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedIdea, setSelectedRoadmap, selectedRoadmap, roadmapList, setRoadmapList,}) => {
+const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedIdea, setSelectedRoadmap, selectedRoadmap, roadmapList, setRoadmapList, originalIdea, setOriginalIdea}) => {
     const {theme} = useTheme()
     let apiSerVice = new ApiService();
     const {toast} = useToast()
@@ -58,8 +58,6 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
     const [isSaveUpdateSubComment, setIsSaveUpdateSubComment] = useState(false);
     const [isSaveSubComment, setIsSaveSubComment] = useState(false);
     const [formError, setFormError] = useState(initialStateError);
-    const [openDelete, setOpenDelete] = useState(false);
-    const [deleteRecord, setDeleteRecord] = useState(null);
 
     useEffect(() => {
         if (projectDetailsReducer.id) {
@@ -192,12 +190,6 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
             toast({variant: "destructive", description: data.message})
         }
     }
-
-    // const onShowSubComment = (index) => {
-    //     const clone = [...selectedIdea?.comments];
-    //     clone[index].show_reply = !clone[index].show_reply;
-    //     setSelectedIdea({...selectedIdea, comments: clone})
-    // }
 
     const onShowSubComment = (index) => {
         const updatedComments = selectedIdea.comments.map((comment, i) => ({
@@ -647,17 +639,6 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
         // }));
     };
 
-    const handleChange = (tag) => {
-        const clone = selectedIdea && selectedIdea?.topic && selectedIdea?.topic.length ? [...selectedIdea?.topic] : [];
-        let index = clone.findIndex((t) => t.id === tag.id);
-        if (index === -1) {
-            clone.push(tag);
-        } else {
-            clone.splice(index, 1);
-        }
-        setSelectedIdea({...selectedIdea, topic: clone})
-    }
-
     const onUpdateIdea = async () => {
         let validationErrors = {};
         Object.keys(selectedIdea).forEach(name => {
@@ -685,20 +666,15 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
         formData.append('topic', topics.join(","));
         const data = await apiSerVice.updateIdea(formData, selectedIdea?.id)
         if (data.status === 200) {
-
             let cloneRoadmap = [...roadmapList.columns];
             const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedIdea?.roadmap_id);
-
             if (roadmapIndex !== -1) {
                 const ideaIndex = cloneRoadmap[roadmapIndex].ideas.findIndex((x) => x.id === selectedIdea?.id);
                 if (ideaIndex !== -1) {
-                    // Update the idea in the roadmap list
                     cloneRoadmap[roadmapIndex].ideas[ideaIndex] = { ...data.data };
                     cloneRoadmap[roadmapIndex].cards = [...cloneRoadmap[roadmapIndex].ideas]; // Synchronize cards with ideas
                 }
             }
-
-            // Update the roadmap state
             setRoadmapList({ columns: cloneRoadmap });
 
             setSelectedIdea({...data.data})
@@ -711,8 +687,11 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
         }
     }
 
+    const openEdit = () => {setIsEditIdea(true)}
+
     const handleOnUpdateCancel = () => {
         setFormError(initialStateError);
+        setSelectedIdea(originalIdea);
         setIsEditIdea(false);
     }
 
@@ -740,51 +719,6 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
         setSelectedSubCommentIndex(null)
     }
 
-    // const onDeleteIdea = async () => {
-    //     setIsLoadingSidebar("delete")
-    //     const data = await apiSerVice.onDeleteIdea(selectedIdea?.id)
-    //     if (data.status === 200) {
-    //         let cloneRoadmap = [...roadmapList.columns];
-    //         const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap?.id);
-    //         if(roadmapIndex !== -1) {
-    //             const ideaIndex = cloneRoadmap[roadmapIndex].ideas.findIndex((x) => x.id === selectedIdea?.id);
-    //             if (ideaIndex !== -1) {
-    //                 const cloneRoadmapIdeas = [...cloneRoadmap[roadmapIndex].ideas]
-    //                 cloneRoadmapIdeas.splice(ideaIndex, 1);
-    //                 cloneRoadmap[roadmapIndex].ideas = cloneRoadmapIdeas
-    //                 // setRoadmapList(cloneRoadmap)
-    //                 // setSelectedIdea({})
-    //                 // setSelectedRoadmap({})
-    //             } else {
-    //                 // const clone = [...roadmapList.columns];
-    //                 // const index = cloneRoadmap.findIndex((x) => x.id === selectedIdea?.id)
-    //                 // if (index !== -1) {
-    //                 //     cloneRoadmap.splice(index, 1);
-    //                 // }
-    //             }
-    //         }
-    //         setRoadmapList({columns: cloneRoadmap})
-    //
-    //         setSelectedIdea({});
-    //         setSelectedRoadmap({});
-    //
-    //         setIsUpdateIdea(false);
-    //         setOpenDelete(false)
-    //         onClose()
-    //         setDeleteRecord(null)
-    //         toast({description: "Idea delete successfully"})
-    //         setIsLoadingSidebar("")
-    //     } else {
-    //         setIsLoadingSidebar("")
-    //         toast({description: data.message})
-    //     }
-    // }
-    //
-    // const deleteIdea = (record) => {
-    //     setDeleteRecord(record.id)
-    //     setOpenDelete(!openDelete)
-    // }
-
     const handleImageClick = (imageSrc) => {window.open(imageSrc, '_blank');};
 
     const handleSubCommentTextChange = (e, index) => {
@@ -795,41 +729,12 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
 
     return (
         <Fragment>
-            {/*{*/}
-            {/*    openDelete &&*/}
-            {/*    <Fragment>*/}
-            {/*        <Dialog open onOpenChange={deleteIdea}>*/}
-            {/*            <DialogContent className="sm:max-w-[425px]">*/}
-            {/*                <DialogHeader className={"flex flex-col gap-2"}>*/}
-            {/*                    <DialogTitle>You really want delete this idea?</DialogTitle>*/}
-            {/*                    <DialogDescription>*/}
-            {/*                        This action can't be undone.*/}
-            {/*                    </DialogDescription>*/}
-            {/*                </DialogHeader>*/}
-            {/*                <DialogFooter>*/}
-            {/*                    <Button type="submit" variant={"outline"}*/}
-            {/*                            className={"text-sm font-medium"}*/}
-            {/*                            onClick={() => setOpenDelete(false)}>Cancel</Button>*/}
-            {/*                    <Button*/}
-            {/*                        type="submit"*/}
-            {/*                        variant={"hover:bg-destructive"}*/}
-            {/*                        className={`text-sm ${theme === "dark" ? "text-card-foreground" : "text-card"} w-[77px] font-medium bg-destructive`}*/}
-            {/*                        onClick={() => onDeleteIdea(deleteRecord)}*/}
-            {/*                    >*/}
-            {/*                        {isLoadingSidebar ? <Loader2 size={16} className={"animate-spin"}/> : "Delete"}*/}
-            {/*                    </Button>*/}
-            {/*                </DialogFooter>*/}
-            {/*            </DialogContent>*/}
-            {/*        </Dialog>*/}
-            {/*    </Fragment>*/}
-            {/*}*/}
             <Sheet open={isOpen} onOpenChange={isOpen ? onCloseBoth : onOpen}>
                 {/*<SheetOverlay className={"inset-0"}/>*/}
                 <SheetContent className={"lg:max-w-[1101px] md:max-w-[720px] sm:max-w-full p-0"}>
                     <SheetHeader className={"px-4 py-3 md:py-5 lg:px-8 lg:py-[20px] border-b"}>
                         <X onClick={onCloseBoth} className={"cursor-pointer"}/>
                     </SheetHeader>
-                    {/*<div className={"grid lg:grid-cols-12 md:grid-cols-1 overflow-auto idea-sheet-height"}>*/}
                     <div className={`grid lg:grid-cols-12 md:grid-cols-1 overflow-auto ${selectedIdea?.comments?.length > 2 ? "h-[calc(100vh_-_100px)]" : "h-[calc(100vh_-_50px)]"} sm:h-[calc(100vh_-_65px)]`}>
                         <div
                             className={`col-span-4 lg:block hidden ${theme === "dark" ? "" : "bg-muted"} border-r lg:overflow-auto idea-sheet-height`}>
@@ -1073,7 +978,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                                 <Button
                                                                     variant={"outline"}
                                                                     className={"w-[30px] h-[30px] p-1"}
-                                                                    onClick={() => setIsEditIdea(true)}
+                                                                    onClick={openEdit}
                                                                 >
                                                                     <Pencil size={16}/>
                                                                 </Button> : ""

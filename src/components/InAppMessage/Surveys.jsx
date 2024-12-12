@@ -222,23 +222,6 @@ const Surveys = ({inAppMsgSetting, setInAppMsgSetting, selectedStepIndex, setSel
         updateStepRecord(obj)
     }
 
-   /* const onDeleteStep = (record, index) => {
-        let clone = [...inAppMsgSetting.steps];
-        if (record.step_id) {
-            const indexFind =  clone.findIndex((x) => x.step_id === record.step_id)
-            clone[indexFind] = {...record, is_active: 0};
-        } else {
-            clone.splice(index, 1)
-        }
-        setInAppMsgSetting(prevState => ({
-            ...prevState,
-            steps: clone
-        }));
-        let newRecord = clone.filter((x) => x.is_active === 1);
-        setSelectedStep({...newRecord[index]});
-        setSelectedStepIndex(index);
-    }*/
-
     const onDeleteStep = (record, index) => {
         let clone = [...inAppMsgSetting.steps];
         if (record.step_id) {
@@ -283,28 +266,36 @@ const Surveys = ({inAppMsgSetting, setInAppMsgSetting, selectedStepIndex, setSel
                                     inAppMsgSetting.is_close_button ? <X size={16} stroke={inAppMsgSetting?.btn_color}/> : ""
                                 }</div>
                                 <div className={"flex gap-3"}>
-                                    <div className={"flex-none pt-2 flex-1 w-8"}>
-                                        {
-                                            (inAppMsgSetting.show_sender === 1 && inAppMsgSetting.from) ? <Avatar className={"w-[32px] h-[32px]"}>
+                                    {
+                                        (inAppMsgSetting.from) ?
+                                            <div className={"flex-none pt-2 flex-1 w-8"}>
                                                 {
-                                                    userDetailsReducer?.user_photo ?
-                                                        <AvatarImage src={userDetailsReducer?.user_photo} alt="@shadcn"/>
-                                                        :
-                                                        <AvatarFallback className={`${theme === "dark" ? "bg-card-foreground" : ""} text-sm`}>
-                                                            {userDetailsReducer && userDetailsReducer?.user_first_name && userDetailsReducer?.user_first_name.substring(0, 1)}
-                                                            {userDetailsReducer && userDetailsReducer?.user_last_name && userDetailsReducer?.user_last_name?.substring(0, 1)}
-                                                        </AvatarFallback>
+                                                    (inAppMsgSetting.show_sender === 1 && inAppMsgSetting.from) ?
+                                                        <Avatar className={"w-[32px] h-[32px]"}>
+                                                            {
+                                                                userDetailsReducer?.user_photo ?
+                                                                    <AvatarImage src={userDetailsReducer?.user_photo}
+                                                                                 alt="@shadcn"/>
+                                                                    :
+                                                                    <AvatarFallback
+                                                                        className={`${theme === "dark" ? "bg-card-foreground" : ""} text-sm`}>
+                                                                        {userDetailsReducer && userDetailsReducer?.user_first_name && userDetailsReducer?.user_first_name.substring(0, 1)}
+                                                                        {userDetailsReducer && userDetailsReducer?.user_last_name && userDetailsReducer?.user_last_name?.substring(0, 1)}
+                                                                    </AvatarFallback>
+                                                            }
+                                                        </Avatar> : <div>&nbsp;</div>
                                                 }
-                                            </Avatar> : <div>&nbsp;</div>
+                                            </div> : ""
+                                    }
+                                    <div className={`shrink p-2 border border-transparent hover:border hover:border-[#FFFFFF] w-full`}>
+                                        {
+                                            (selectedStep.step === x.step) ? <Input placeholder={"What's your question?"}
+                                                            value={x?.text || ""}
+                                                            onChange={(event) => onChangeQuestion("text", event.target.value)}
+                                                            className={"w-full text-sm border-none p-0 h-auto focus-visible:ring-offset-0 focus-visible:ring-0 text-wrap"}
+                                                            style={{backgroundColor: selectedStep.step === x.step ? inAppMsgSetting.bg_color : "#fff", color: selectedStep.step === x.step ?inAppMsgSetting.text_color : "#000"}}
+                                            /> : <span className={"text-wrap text-sm"}>{x.text}</span>
                                         }
-                                    </div>
-                                    <div className={`shrink p-2 border border-transparent hover:border hover:border-[#FFFFFF] w-full`} >
-                                        <Input placeholder={"What's your question?"}
-                                               value={x?.text || ""}
-                                               onChange={(event) => onChangeQuestion("text", event.target.value)}
-                                               className={"w-full text-sm border-none p-0 h-auto focus-visible:ring-offset-0 focus-visible:ring-0"}
-                                               style={{backgroundColor: selectedStep.step === x.step ? inAppMsgSetting.bg_color : "#fff", color: selectedStep.step === x.step ?inAppMsgSetting.text_color : "#000"}}
-                                        />
                                         {
                                             x?.question_type === 1 && <Fragment>
                                                 <div className={"flex gap-3 px-[30px] pt-[18px]"}>
@@ -388,25 +379,6 @@ const Surveys = ({inAppMsgSetting, setInAppMsgSetting, selectedStepIndex, setSel
 
                                             </Fragment>
                                         }
-                                        {/*{*/}
-                                        {/*    x?.question_type === 5 &&*/}
-                                        {/*    <Fragment>*/}
-                                        {/*        <div className="mt-3">*/}
-                                        {/*            <Select placeholder={x.placeholder_text} value={""}>*/}
-                                        {/*                <SelectTrigger className={`${theme === "dark" ? "bg-card-foreground" : ""} ring-offset-background-0`}>*/}
-                                        {/*                    <SelectValue placeholder={x.placeholder_text}/>*/}
-                                        {/*                </SelectTrigger>*/}
-                                        {/*                <SelectContent className={`max-w-[404px] ${theme === "dark" ? "bg-card-foreground" : ""}`}>*/}
-                                        {/*                    {x?.options.map((option, index) => (*/}
-                                        {/*                        option.is_active === 1 && <SelectItem className={`${theme === "dark" ? "focus:bg-card-foreground" : ""}`} key={index} value={index}>*/}
-                                        {/*                            <span className={"max-w-[270px] truncate text-ellipsis overflow-hidden whitespace-nowrap"}>{option.title}</span>*/}
-                                        {/*                        </SelectItem>*/}
-                                        {/*                    ))}*/}
-                                        {/*                </SelectContent>*/}
-                                        {/*            </Select>*/}
-                                        {/*        </div>*/}
-                                        {/*    </Fragment>*/}
-                                        {/*}*/}
                                         {
                                             x?.question_type === 5 &&
                                             <Fragment>

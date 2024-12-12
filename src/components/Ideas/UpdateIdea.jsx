@@ -1,11 +1,10 @@
-import React, {Fragment, useState, useEffect} from 'react';
+import React, {Fragment, useCallback, useEffect, useState} from 'react';
 import {Button} from "../ui/button";
 import {
     ArrowBigUp,
     Check,
-    ChevronDown, ChevronsUpDown,
-    ChevronUp,
-    Circle, CirclePlus,
+    Circle,
+    CirclePlus,
     CircleX,
     Dot,
     Ellipsis,
@@ -13,19 +12,17 @@ import {
     Mail,
     MessageCircleMore,
     Paperclip,
-    Pencil,
-    Pin, Plus,
     Trash2,
-    Upload, User
+    User, X
 } from "lucide-react";
 import {RadioGroup, RadioGroupItem} from "../ui/radio-group";
 import {Label} from "../ui/label";
 import {Input} from "../ui/input";
-import {Avatar, AvatarFallback, AvatarImage} from "../ui/avatar";
+import {Avatar, AvatarFallback} from "../ui/avatar";
 import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "../ui/select";
-import {Popover, PopoverTrigger, PopoverContent} from "../ui/popover";
+import {Popover, PopoverContent, PopoverTrigger} from "../ui/popover";
 import {Textarea} from "../ui/textarea";
-import {Dialog, DialogTrigger, DialogTitle, DialogPortal, DialogClose, DialogHeader, DialogFooter, DialogOverlay, DialogDescription, DialogContent} from "../ui/dialog";
+import {Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger} from "../ui/dialog";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "../ui/tabs";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "../ui/table";
 import {useTheme} from "../theme-provider";
@@ -36,26 +33,36 @@ import moment from "moment";
 import {DropdownMenu, DropdownMenuTrigger} from "@radix-ui/react-dropdown-menu";
 import {DropdownMenuContent, DropdownMenuItem} from "../ui/dropdown-menu";
 import ReactQuillEditor from "../Comman/ReactQuillEditor";
-import {useLocation, useNavigate, useParams} from "react-router-dom";
-import {Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator} from "../ui/breadcrumb";
-import {baseUrl, cleanQuillHtml} from "../../utils/constent";
+import {useLocation, useParams} from "react-router-dom";
+import {cleanQuillHtml} from "../../utils/constent";
 import {Skeleton} from "../ui/skeleton";
 import CommonBreadCrumb from "../Comman/CommonBreadCrumb";
 import ImageUploader from "../Comman/ImageUploader";
-import {
-    ActionButtons,
-    CommentEditor,
-    ImageGallery,
-    SaveCancelButton, StatusButtonGroup,
-    UploadButton,
-    UserAvatar
-} from "../Comman/CommentEditor";
+import {ActionButtons, CommentEditor, SaveCancelButton, StatusButtonGroup, UploadButton, UserAvatar} from "../Comman/CommentEditor";
 import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList} from "../ui/command";
+import {debounce} from "lodash";
+import EmptyData from "../Comman/EmptyData";
 
 const initialStateError = {
     title: "",
     description: "",
     board: "",
+}
+
+const initialUserError = {
+    customer_email_id: "",
+    customer_name: "",
+}
+
+const initialStateUser = {
+    project_id: '',
+    customer_name: '',
+    customer_email_id: '',
+    customer_email_notification: false,
+    customer_first_seen: '',
+    customer_last_seen: '',
+    user_browser: '',
+    user_ip_address : '',
 }
 
 const UpdateIdea = () => {
@@ -66,11 +73,11 @@ const UpdateIdea = () => {
     let apiSerVice = new ApiService();
     const {toast} = useToast();
     const { id } = useParams();
-    const navigate = useNavigate();
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
 
     const [formError, setFormError] = useState(initialStateError);
+    const [userDetailError, setUserDetailError] = useState(initialUserError);
     const [topicLists, setTopicLists] = useState([]);
     const [commentFiles, setCommentFiles] = useState([])
     const [subCommentFiles, setSubCommentFiles] = useState([])
@@ -96,6 +103,13 @@ const UpdateIdea = () => {
     const [isSaveUpdateComment, setIsSaveUpdateComment] = useState(false);
     const [isSaveUpdateSubComment, setIsSaveUpdateSubComment] = useState(false);
     const [isSaveSubComment, setIsSaveSubComment] = useState(false);
+    const [filter, setFilter] = useState({search: "", project_id: projectDetailsReducer.id});
+    const [customerDetails, setCustomerDetails] = useState(initialStateUser);
+    const [customerList, setCustomerList] = useState([]);
+    const [addUserDialog, setAddUserDialog] = useState({addUser: false, viewUpvote: false});
+    const [deleteId,setDeleteId]=useState(null);
+
+    const openDialogs = (name, value) => {setAddUserDialog(prev => ({...prev, [name]: value}))}
 
     useEffect(() => {
         if (projectDetailsReducer.id) {
@@ -104,6 +118,82 @@ const UpdateIdea = () => {
             getSingleIdea()
         }
     }, [projectDetailsReducer.id, allStatusAndTypes, getPageNo]);
+
+    const getAllCustomers = async (value,project_id) => {
+        const payload = {
+            project_id: project_id,
+            search: value,
+        }
+        const data = await apiSerVice.getAllCustomers(payload);
+        if (data.status === 200) {
+            setCustomerList(data.data)
+        }
+    };
+
+    const throttledDebouncedSearch = useCallback(
+        debounce((value, project_id, getAllCustomers) => {
+            getAllCustomers(value, project_id);
+        }, 500),
+        []
+    );
+
+    const handleSearchChange = (value) => {
+        setFilter((prevFilter) => ({
+            ...prevFilter,
+            search: value,
+            project_id: projectDetailsReducer.id,
+        }));
+        throttledDebouncedSearch(value, projectDetailsReducer.id, getAllCustomers);
+    };
+
+    const addCustomer = async () => {
+        let validationErrors = {};
+        Object.keys(customerDetails).forEach(name => {
+            const error = formValidate(name, customerDetails[name]);
+            if (error && error.length > 0) {
+                validationErrors[name] = error;
+            }
+        });
+        if (Object.keys(validationErrors).length > 0) {
+            setUserDetailError(validationErrors);
+            return;
+        }
+        setIsLoading(true);
+        const payload = {
+            ...customerDetails,
+            project_id: projectDetailsReducer.id,
+            customer_first_seen: new Date(),
+            customer_last_seen: new Date(),
+        }
+        const data = await apiSerVice.createCustomers(payload)
+        if(data.status === 200) {
+            setCustomerDetails(initialStateUser);
+            toast({description: data.message,});
+            // const updatedCustomerList = [data.data, ...customerList];
+            // setCustomerList(updatedCustomerList);
+            const clone = [...customerList];
+            clone.unshift(data.data);
+            setCustomerList(clone);
+            const upvoteResponse = await apiSerVice.userManualUpVote({
+                feature_idea_id: selectedIdea.id,
+                user_id: data.data.id,
+            });
+            if(upvoteResponse.status === 200) {
+                toast({description: upvoteResponse.message,});
+            } else {
+                toast({description:upvoteResponse.message, variant: "destructive",})
+            }
+            setIsLoading(false);
+            setUserDetailError(initialUserError);
+        } else {
+            toast({description:data.message, variant: "destructive",})
+        }
+        openDialogs("addUser", false);
+    };
+
+    const deleteCustomer =  (id) => {
+        setDeleteId(id);
+    };
 
     const getSingleIdea = async () => {
         setIsLoading(true)
@@ -197,14 +287,6 @@ const UpdateIdea = () => {
             toast({variant: "destructive", description: data.message})
         }
     }
-
-    //old code
-    // const onShowSubComment = (index) => {
-    //     setSubCommentTextEditIdx(index)
-    //     const clone = [...selectedIdea.comments];
-    //     clone[index].show_reply = !clone[index].show_reply;
-    //     setSelectedIdea({...selectedIdea, comments: clone})
-    // }
 
     const onShowSubComment = (index) => {
         const updatedComments = selectedIdea.comments.map((comment, i) => ({
@@ -356,27 +438,6 @@ const UpdateIdea = () => {
         setSelectedSubCommentIndex(null)
     }
 
-    // const onDeleteCommentImage = (index, isOld) => {
-    //     const clone = [...selectedComment.images];
-    //     if (isOld) {
-    //         clone.splice(index, 1);
-    //         if (selectedComment && selectedComment.newImage && selectedComment.newImage.length) {
-    //             const cloneNewImage = [...selectedComment.newImage];
-    //             cloneNewImage.splice(index, 1);
-    //             setSelectedComment({...selectedComment, newImage: cloneNewImage});
-    //         }
-    //         setSelectedComment({...selectedComment, images: clone});
-    //         console.log({...selectedComment, images: clone})
-    //     } else {
-    //         const cloneImage = [...deletedCommentImage];
-    //         cloneImage.push(clone[index]);
-    //         clone.splice(index, 1);
-    //         setSelectedComment({...selectedComment, images: clone});
-    //         console.log({...selectedComment, images: clone})
-    //         setDeletedCommentImage(cloneImage);
-    //     }
-    // }
-
     const onDeleteCommentImage = (index, isOld) => {
         if (isOld) {
             const cloneImages = [...selectedComment.images];
@@ -397,25 +458,6 @@ const UpdateIdea = () => {
             });
         }
     };
-
-    // const onDeleteSubCommentImage = (index, isOld) => {
-    //     const clone = [...selectedSubComment.images];
-    //     if (isOld) {
-    //         clone.splice(index, 1);
-    //         if (selectedSubComment && selectedSubComment.newImage && selectedSubComment.newImage.length) {
-    //             const cloneNewImage = [...selectedSubComment.newImage];
-    //             cloneNewImage.splice(index, 1);
-    //             setSelectedSubComment({...selectedSubComment, newImage: cloneNewImage});
-    //         }
-    //         setSelectedSubComment({...selectedSubComment, images: clone});
-    //     } else {
-    //         const cloneImage = [...deletedSubCommentImage];
-    //         cloneImage.push(clone[index]);
-    //         clone.splice(index, 1);
-    //         setSelectedSubComment({...selectedSubComment, images: clone});
-    //         setDeletedSubCommentImage(cloneImage);
-    //     }
-    // }
 
     const onDeleteSubCommentImage = (index, isOld) => {
         if (isOld) {
@@ -557,6 +599,17 @@ const UpdateIdea = () => {
                 } else {
                     return "";
                 }
+            case "customer_name":
+                if (!value || value.trim() === "") {
+                    return "User name is required";
+                } else {
+                    return "";
+                }
+            case "customer_email_id":
+                if (value.trim() === "") return "User email is required";
+                if (!/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(value))
+                    return "Enter a valid email address";
+                return "";
             default: {
                 return "";
             }
@@ -565,7 +618,12 @@ const UpdateIdea = () => {
 
     const onChangeText = (event) => {
         setSelectedIdea(selectedIdea => ({...selectedIdea, [event.target.name]: event.target.value}))
+        setCustomerDetails({...customerDetails, [event.target.name]: event.target.value});
         setFormError(formError => ({
+            ...formError,
+            [event.target.name]: formValidate(event.target.name, event.target.value)
+        }));
+        setUserDetailError(formError => ({
             ...formError,
             [event.target.name]: formValidate(event.target.name, event.target.value)
         }));
@@ -680,20 +738,182 @@ const UpdateIdea = () => {
 
     return (
         <Fragment>
+            {
+                (addUserDialog.addUser) &&
+                <Dialog open={addUserDialog.addUser} onOpenChange={(value) => openDialogs("addUser", value)}>
+                    <DialogContent className={"max-w-[576px]"}>
+                        <DialogHeader className={"flex-row gap-2 justify-between"}>
+                            <DialogTitle>Add new user</DialogTitle>
+                            <X className={"cursor-pointer m-0"} onClick={() => openDialogs("addUser", false)}/>
+                        </DialogHeader>
+                        <div className="space-y-2">
+                            <div className="space-y-1">
+                                <Label htmlFor="name" className="font-normal">Email</Label>
+                                <Input id="name" value={customerDetails.customer_email_id} name="customer_email_id" onChange={onChangeText} placeholder="Enter upvoter email" className="col-span-3" />
+                                {userDetailError.customer_email_id && <span className="text-red-500 text-sm">{userDetailError.customer_email_id}</span>}
+                            </div>
+                            <div className="space-y-1">
+                                <Label htmlFor="username" className="font-normal">Name</Label>
+                                <Input id="username" value={customerDetails.customer_name} name="customer_name" onChange={onChangeText} placeholder="Enter upvoter name" className="col-span-3" />
+                                {userDetailError.customer_name && <span className="text-red-500 text-sm">{userDetailError.customer_name}</span>}
+                            </div>
+                        </div>
+                        <DialogFooter>
+                            <Button className={"font-medium w-[83px]"} onClick={addCustomer}>
+                                {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Add User"}
+                            </Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
+            }
+            {
+                (addUserDialog.viewUpvote) &&
+                    <Dialog open={addUserDialog.viewUpvote} onOpenChange={(value) => openDialogs("viewUpvote", value)}>
+                        <DialogContent className={"max-w-[1022px] p-0 gap-0"}>
+                            <DialogHeader className={"flex-row justify-between gap-2 p-3 lg:p-6"}>
+                                <div className={"flex flex-col gap-2"}>
+                                    <DialogTitle className={"font-medium"}>View & add upvoters</DialogTitle>
+                                    <DialogDescription>
+                                        Upvoters will receive notifications by email when you make changes to the post.
+                                    </DialogDescription>
+                                </div>
+                                <X className={"cursor-pointer m-0"} onClick={() => openDialogs("viewUpvote", false)}/>
+                            </DialogHeader>
+                            <div className={"overflow-y-auto h-full flex-1"}>
+                                <Table>
+                                    <TableHeader className={`bg-muted sticky top-0`}>
+                                        <TableRow>
+                                            {['Name', 'Email', ""].map((x, i) => {
+                                                const icons = [<User className="w-4 h-4" />, <Mail className="w-4 h-4" />];
+                                                return (
+                                                    <TableHead
+                                                        className={`font-medium text-card-foreground px-2 py-[10px] md:px-3 ${
+                                                            i > 0 ? 'max-w-[140px] truncate text-ellipsis overflow-hidden whitespace-nowrap' : ''
+                                                        }`}
+                                                        key={i}
+                                                    >
+                                                        <div className="flex items-center gap-2">
+                                                            {icons[i]}
+                                                            {x}
+                                                        </div>
+                                                    </TableHead>
+                                                );
+                                            })}
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody className={"overflow-y-auto h-[300px]"}>
+                                        {
+                                            isLoading ? (
+                                                [...Array(10)].map((_, index) => {
+                                                    return (
+                                                        <TableRow key={index}>
+                                                            {
+                                                                [...Array(3)].map((_, i) => {
+                                                                    return (
+                                                                        <TableCell className={"px-2 py-[10px] md:px-3"}>
+                                                                            <Skeleton className={"rounded-md w-full h-7"}/>
+                                                                        </TableCell>
+                                                                    )
+                                                                })
+                                                            }
+                                                        </TableRow>
+                                                    )
+                                                })
+                                            ) : (selectedIdea?.vote_list?.length > 0) ? <>
+                                                {
+                                                    (selectedIdea?.vote_list || []).map((x,index)=>{
+                                                        return(
+                                                            <TableRow key={index} className={"font-normal"}>
+                                                                <TableCell className={`px-2 py-[10px] md:px-3 max-w-[140px] cursor-pointer truncate text-ellipsis overflow-hidden whitespace-nowrap`}>{x.name ? x.name : "-"}</TableCell>
+                                                                <TableCell className={`px-2 py-[10px] md:px-3 max-w-[140px] cursor-pointer truncate text-ellipsis overflow-hidden whitespace-nowrap`}>{x?.email}</TableCell>
+                                                                <TableCell className={`px-2 py-[10px] md:px-3 text-center`}>
+                                                                    <Button onClick={() => deleteCustomer(x.id,index)} variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px]`}>
+                                                                        <Trash2 size={16}/>
+                                                                    </Button>
+                                                                </TableCell>
+                                                            </TableRow>
+                                                        )
+                                                    })
+                                                }
+                                            </> : <TableRow>
+                                                <TableCell colSpan={6}>
+                                                    <EmptyData/>
+                                                </TableCell>
+                                            </TableRow>
+                                        }
+                                    </TableBody>
+                                </Table>
+                            </div>
+                            <DialogFooter className={"p-3 lg:p-6 gap-3 border-t"}>
+                                <Button
+                                    variant={"outline hover:none"}
+                                    className={"font-medium border bg-muted-foreground/5"}
+                                    onClick={() => {
+                                        const recipients = selectedIdea?.vote_list?.map((x) => x.email).join(",");
+                                        window.location.href = `mailto:${recipients}`;
+                                    }}
+                                >
+                                    <Mail size={18} className={"mr-2"} strokeWidth={2} />Email all upvoters
+                                </Button>
+                                <Popover>
+                                    <PopoverTrigger asChild>
+                                        <Button role="combobox" className={"font-medium"}><CirclePlus size={18} className={"mr-2"} strokeWidth={2} /> Add new upvoter</Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-[200px] p-0">
+                                        <Command>
+                                            <CommandInput placeholder="Search users..." value={filter?.search} onValueChange={handleSearchChange}/>
+                                            <CommandList className={"overflow-hidden"}>
+                                            <div className={"overflow-y-auto max-h-[300px]"}>
+                                                {
+                                                    (filter?.search) ? <CommandEmpty>{(filter?.search) ? "No User found." : ""}</CommandEmpty> : ""
+                                                }
+                                                <CommandGroup className={"p-0"}>
+                                                    {(customerList || []).map((x, i) => {
+                                                        return (
+                                                            <Fragment
+                                                                key={i}>
+                                                                <CommandItem>
+                                                                    <span
+                                                                        className={"flex justify-between items-center w-full text-sm font-medium cursor-pointer"}
+                                                                        onClick={() => {
+                                                                            const selectedUser  = customerList.find((user) => user.customer_name === x.customer_name);
+                                                                            if (selectedUser ) {
+                                                                                const newVoteList = [...selectedIdea.vote_list];
+                                                                                const existingUserIndex = newVoteList.findIndex((user) => user.customer_name === selectedUser.customer_name);
+                                                                                if (existingUserIndex === -1) {
+                                                                                    const payload = {
+                                                                                        ...selectedUser,
+                                                                                        name: selectedUser?.customer_name,
+                                                                                        email: selectedUser.customer_email_id
+                                                                                    }
+                                                                                    newVoteList.push(payload );
+                                                                                } else {
+                                                                                    newVoteList.splice(existingUserIndex, 1);
+                                                                                }
+                                                                                setSelectedIdea({ ...selectedIdea, vote_list: newVoteList });
+                                                                            }
+                                                                        }}
+                                                                    >
+                                                                        {x.customer_name}
+                                                                    </span>
+                                                                </CommandItem>
+                                                            </Fragment>
+                                                        )
+                                                    })}
+                                                    <div className={"border-t"}>
+                                                        <Button variant="ghost" className={"w-full font-medium"} onClick={() => openDialogs("addUser", true)}><CirclePlus size={16} className={"mr-2"}/>Add a brand new user</Button>
+                                                    </div>
+                                                </CommandGroup>
+                                            </div>
+                                            </CommandList>
+                                        </Command>
+                                    </PopoverContent>
+                                </Popover>
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
+            }
             <div className={"px-4 py-3 lg:py-6 lg:px-8 border-b"}>
-                {/*<Breadcrumb>*/}
-                {/*    <BreadcrumbList>*/}
-                {/*        <BreadcrumbItem className={"cursor-pointer"}>*/}
-                {/*            <BreadcrumbLink onClick={() => navigate(`${baseUrl}/ideas?pageNo=${getPageNo}`)}>*/}
-                {/*                Ideas*/}
-                {/*            </BreadcrumbLink>*/}
-                {/*        </BreadcrumbItem>*/}
-                {/*        <BreadcrumbSeparator />*/}
-                {/*        <BreadcrumbItem className={"cursor-pointer"}>*/}
-                {/*            <BreadcrumbPage className={`w-full ${selectedIdea?.title?.length > 30 ? "max-w-[200px] truncate" : ""}`}>{selectedIdea?.title}</BreadcrumbPage>*/}
-                {/*        </BreadcrumbItem>*/}
-                {/*    </BreadcrumbList>*/}
-                {/*</Breadcrumb>*/}
                 <CommonBreadCrumb
                     links={links}
                     currentPage={selectedIdea?.title}
@@ -809,8 +1029,7 @@ const UpdateIdea = () => {
                                         <Label htmlFor="description" className={"font-normal"}>Description</Label>
                                         <ReactQuillEditor value={selectedIdea.description} name={"description"}
                                                           onChange={onChangeText}/>
-                                        {formError.description &&
-                                        <span className="text-red-500 text-sm">{formError.description}</span>}
+                                        {formError.description && <span className="text-red-500 text-sm">{formError.description}</span>}
                                     </div>
                                     <div className={"space-y-2"}>
                                         <Label className={"font-normal"}>Choose Board for this Idea</Label>
@@ -841,8 +1060,7 @@ const UpdateIdea = () => {
                                                 </SelectGroup>
                                             </SelectContent>
                                         </Select>
-                                        {formError.board &&
-                                        <span className="text-red-500 text-sm">{formError.board}</span>}
+                                        {formError.board && <span className="text-red-500 text-sm">{formError.board}</span>}
                                     </div>
                                 </div>
                                 <div className={"px-4 py-3 lg:py-6 lg:px-8 border-b space-y-2"}>
@@ -956,129 +1174,9 @@ const UpdateIdea = () => {
                                                                         <div>
                                                                             <div className={" flex gap-2 justify-between items-center py-3 px-4"}>
                                                                                 <h4 className="font-normal text-sm">{`Voters (${selectedIdea?.vote_list.length})`}</h4>
-                                                                                <Dialog>
-                                                                                    <DialogTrigger asChild>
-                                                                                        <Button variant={"link"} className={"h-auto p-0 text-card-foreground font-normal text-sm"}>View upvoters</Button>
-                                                                                    </DialogTrigger>
-                                                                                    <DialogContent className={"max-w-[1022px]"}>
-                                                                                        <DialogHeader className={"gap-2"}>
-                                                                                            <DialogTitle className={"font-medium"}>View & add upvoters</DialogTitle>
-                                                                                            <DialogDescription>
-                                                                                                Upvoters will receive notifications by email when you make changes to the post.
-                                                                                            </DialogDescription>
-                                                                                        </DialogHeader>
-                                                                                        <Table>
-                                                                                            <TableHeader className={`${theme === "dark" ? "" : "bg-muted"}`}>
-                                                                                                <TableRow>
-                                                                                                    {['Name', 'Email'].map((x, i) => {
-                                                                                                        const icons = [<User className="w-4 h-4" />, <Mail className="w-4 h-4" />];
-                                                                                                        return (
-                                                                                                            <TableHead
-                                                                                                                className={`font-medium text-card-foreground px-2 py-[10px] md:px-3 ${
-                                                                                                                    i > 0 ? 'max-w-[140px] truncate text-ellipsis overflow-hidden whitespace-nowrap' : ''
-                                                                                                                }`}
-                                                                                                                key={i}
-                                                                                                            >
-                                                                                                                <div className="flex items-center gap-2">
-                                                                                                                    {icons[i]}
-                                                                                                                    {x}
-                                                                                                                </div>
-                                                                                                            </TableHead>
-                                                                                                        );
-                                                                                                    })}
-                                                                                                </TableRow>
-                                                                                            </TableHeader>
-                                                                                            <TableBody>
-                                                                                                {
-                                                                                                    isLoading ? (
-                                                                                                        [...Array(10)].map((_, index) => {
-                                                                                                            return (
-                                                                                                                <TableRow key={index}>
-                                                                                                                    {
-                                                                                                                        [...Array(2)].map((_, i) => {
-                                                                                                                            return (
-                                                                                                                                <TableCell className={"px-2 py-[10px] md:px-3"}>
-                                                                                                                                    <Skeleton className={"rounded-md w-full h-7"}/>
-                                                                                                                                </TableCell>
-                                                                                                                            )
-                                                                                                                        })
-                                                                                                                    }
-                                                                                                                </TableRow>
-                                                                                                            )
-                                                                                                        })
-                                                                                                    ) : ""
-                                                                                                }
-                                                                                            </TableBody>
-                                                                                        </Table>
-                                                                                        <DialogFooter>
-                                                                                            <Button variant={"outline hover:none"} className={"font-medium border bg-muted-foreground/5"}><Mail size={18} className={"mr-2"} strokeWidth={2} />Email all upvoters</Button>
-                                                                                            <Popover>
-                                                                                                <PopoverTrigger asChild>
-                                                                                                    <Button role="combobox" className={"font-medium"}><CirclePlus size={18} className={"mr-2"} strokeWidth={2} /> Add new upvoter</Button>
-                                                                                                </PopoverTrigger>
-                                                                                                <PopoverContent className="w-[200px] p-0">
-                                                                                                    <Command>
-                                                                                                        <CommandInput placeholder="Search users..."/>
-                                                                                                        <CommandList>
-                                                                                                            <CommandEmpty>No User found.</CommandEmpty>
-                                                                                                            <CommandGroup className={"p-0"}>
-                                                                                                                {/*{(projectList || []).map((x, i) => (*/}
-                                                                                                                {/*    <Fragment key={i}>*/}
-                                                                                                                {/*        <CommandItem*/}
-                                                                                                                {/*            className={`${projectDetailsReducer.id === x.id ? `${theme === "dark" ? "text-card-foreground  hov-primary-dark" : "text-card hov-primary"} bg-primary` : 'bg-card'}`}*/}
-                                                                                                                {/*            value={x.id}*/}
-                                                                                                                {/*            onSelect={() => {*/}
-                                                                                                                {/*                onChangeProject(x.id);*/}
-                                                                                                                {/*                setOpen(false)*/}
-                                                                                                                {/*            }}*/}
-                                                                                                                {/*        >*/}
-                                                                                                                {/*            <span className={"flex justify-between items-center w-full text-sm font-medium cursor-pointer"}>*/}
-                                                                                                                {/*                {x.project_name}*/}
-                                                                                                                {/*                <Trash2 className={"cursor-pointer"} size={16} onClick={deleteAlert}/>*/}
-                                                                                                                {/*            </span>*/}
-                                                                                                                {/*        </CommandItem>*/}
-                                                                                                                {/*    </Fragment>*/}
-                                                                                                                {/*))}*/}
-                                                                                                                <div className={"border-t"}>
-                                                                                                                    <Dialog>
-                                                                                                                        <DialogTrigger asChild className={"p-1"}>
-                                                                                                                            <Button variant="ghost" className={"w-full font-medium"}><CirclePlus size={16} className={"mr-2"}/>Add a brand new user</Button>
-                                                                                                                        </DialogTrigger>
-                                                                                                                        <DialogContent className={"max-w-[576px]"}>
-                                                                                                                            <DialogHeader>
-                                                                                                                                <DialogTitle>Add new user</DialogTitle>
-                                                                                                                            </DialogHeader>
-                                                                                                                            <div className="space-y-2">
-                                                                                                                                <div className="space-y-1">
-                                                                                                                                    <Label htmlFor="name" className="font-normal">
-                                                                                                                                        Email (optional)
-                                                                                                                                    </Label>
-                                                                                                                                    <Input id="name" placeholder="Enter upvoter email" className="col-span-3" />
-                                                                                                                                </div>
-                                                                                                                                <div className="space-y-1">
-                                                                                                                                    <Label htmlFor="username" className="font-normal">
-                                                                                                                                        Name (optional)
-                                                                                                                                    </Label>
-                                                                                                                                    <Input id="username" placeholder="Enter upvoter name" className="col-span-3" />
-                                                                                                                                </div>
-                                                                                                                            </div>
-                                                                                                                            <DialogFooter>
-                                                                                                                                <Button className={"font-medium"}>Add User</Button>
-                                                                                                                            </DialogFooter>
-                                                                                                                        </DialogContent>
-                                                                                                                    </Dialog>
-                                                                                                                </div>
-                                                                                                            </CommandGroup>
-                                                                                                        </CommandList>
-                                                                                                    </Command>
-                                                                                                </PopoverContent>
-                                                                                            </Popover>
-                                                                                        </DialogFooter>
-                                                                                    </DialogContent>
-                                                                                </Dialog>
+                                                                                <Button variant={"link"} className={"h-auto p-0 text-card-foreground font-normal text-sm"} onClick={() => openDialogs("viewUpvote", true)}>View upvoters</Button>
                                                                             </div>
-                                                                            <div
-                                                                                className="border-t px-4 py-3 space-y-2">
+                                                                            <div className="border-t px-4 py-3 space-y-2 max-h-[300px] overflow-y-auto">
                                                                                 {
                                                                                     (selectedIdea?.vote_list || []).map((x, i) => {
                                                                                         return (
@@ -1452,7 +1550,6 @@ const UpdateIdea = () => {
                                                 {
                                                     selectedIdea && selectedIdea?.comments && selectedIdea?.comments.length > 0 ?
                                                         (selectedIdea?.comments || []).map((x, i) => {
-                                                            console.log(x)
                                                             return (
                                                                 <Fragment>
                                                                     <div className={"flex gap-2 p-4 lg:px-8 border-b last:border-b-0"}>

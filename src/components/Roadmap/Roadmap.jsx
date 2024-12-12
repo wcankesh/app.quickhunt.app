@@ -34,6 +34,7 @@ const Roadmap = () => {
     const [isSheetOpen, setIsSheetOpen] = useState({ open: false, type: "" });
     const [isLoading, setIsLoading] = useState(false);
     const [emptyContentBlock, setEmptyContentBlock] = useState(true);
+    const [originalIdea, setOriginalIdea] = useState({});
 
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
 
@@ -45,6 +46,7 @@ const Roadmap = () => {
     const openDetailsSheet = (record) => {
         const findRoadmap = roadmapList.columns.find((x) => x.id === record.roadmap_id)
         setSelectedIdea(record)
+        setOriginalIdea(record)
         setSelectedRoadmap(findRoadmap)
         openSheet("update");
     };
@@ -108,72 +110,10 @@ const Roadmap = () => {
         }
     }
 
-    // const moveCard = (roadmapList, source, destination) => {
-    //     debugger
-    //     const updatedColumns = roadmapList.columns.map((column) => {
-    //         if (column.id === source.fromColumnId) {
-    //             return {
-    //                 ...column,
-    //                 cards: column.cards.filter(card => card.id !== source.cardId),
-    //                 ideas: column.ideas.filter(idea => idea.id !== source.cardId),
-    //             };
-    //         }
-    //
-    //         if (column.id === destination.toColumnId) {
-    //             const cardToMove = roadmapList.columns
-    //                 .find(col => col.id === source.fromColumnId)
-    //                 .cards.find(card => card.id === source.cardId);
-    //
-    //             return {
-    //                 ...column,
-    //                 cards: [...column.cards, cardToMove],
-    //                 ideas: [...column.ideas, cardToMove],
-    //             };
-    //         }
-    //
-    //         return column;
-    //     });
-    //
-    //     return { columns: updatedColumns };
-    // };
-    //
-    // const handleCardMove = (_card, source, destination) => {
-    //     debugger
-    //     const sourceWithCardId = {
-    //         fromColumnId: source.fromColumnId,
-    //         cardId: _card.id,
-    //     };
-    //
-    //     const updatedBoard = moveCard(roadmapList, sourceWithCardId, destination);
-    //     console.log("updatedBoard", updatedBoard);
-    //
-    //     const sourceIndex = updatedBoard.columns.findIndex((col) => col.id == source.fromColumnId);
-    //     const destinationIndex = updatedBoard.columns.findIndex((col) => col.id == destination.toColumnId);
-    //
-    //     setRoadmapList(updatedBoard);
-    //
-    //     callApi(destination.toColumnId, _card.id);
-    //
-    //     if (destinationIndex !== -1) {
-    //         setRoadmapRank(updatedBoard.columns[destinationIndex].cards, destination.toColumnId);
-    //     }
-    //
-    //     const updatedCard = {
-    //         ..._card,
-    //         roadmap_id: destination.toColumnId,
-    //     };
-    //     setSelectedIdea(updatedCard);
-    // };
-
-
     const handleCardMove = (_card, source, destination) => {
         const updatedBoard = moveCard(roadmapList, source, destination);
         const updatedColumns = [...updatedBoard.columns];
 
-        // const updatedColumns = roadmapList.columns.map((col) => ({
-        //     ...col,
-        //     cards: [...col.cards],
-        // }));
         const sourceIndex = updatedColumns.findIndex((col) => col.id == source.fromColumnId);
         const destinationIndex = updatedColumns.findIndex((col) => col.id == destination.toColumnId);
 
@@ -274,6 +214,8 @@ const Roadmap = () => {
                 isOpen={isSheetOpen.open}
                 onClose={closeSheet}
                 selectedIdea={selectedIdea}
+                originalIdea={originalIdea}
+                setOriginalIdea={setOriginalIdea}
                 setSelectedIdea={setSelectedIdea}
                 setSelectedRoadmap={setSelectedRoadmap}
                 selectedRoadmap={selectedRoadmap}

@@ -242,6 +242,14 @@ export class ApiService{
         return await this.deleteData(`${baseUrlApi}/projects/${id}`)
     }
 
+    /* ---------- Inbox api ---------- */
+    async inboxNotification (payload){
+        return await this.postData(`${baseUrlApi}/notifications`,payload)
+    }
+    async inboxMarkAllRead (payload){
+        return await this.postData(`${baseUrlApi}/mark-read`,payload)
+    }
+
     /* ---------- Users api ---------- */
     async getAllCustomers (id){
         return await this.getData(`${baseUrlApi}/customers?${qs.stringify(id)}`)
@@ -251,6 +259,12 @@ export class ApiService{
     }
     async createCustomers (payload){
         return await this.postData(`${baseUrlApi}/customers`,payload)
+    }
+    async userManualUpVote (payload){
+        return await this.postData(`${baseUrlApi}/customer/vote`,payload)
+    }
+    async customersAction (payload){
+        return await this.postData(`${baseUrlApi}/customer-actions`,payload)
     }
     async updateCustomers (payload, id){
         return await this.putData(`${baseUrlApi}/customers/${id}`,payload)

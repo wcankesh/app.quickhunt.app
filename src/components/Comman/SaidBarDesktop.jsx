@@ -1,7 +1,7 @@
-import React, {Fragment, useState} from 'react';
+import React, {Fragment, useEffect, useState} from 'react';
 import {Button} from "../ui/button";
 import {Icon} from "../../utils/Icon";
-import {baseUrl} from "../../utils/constent";
+import {apiService, baseUrl} from "../../utils/constent";
 import {useNavigate, useLocation, useParams} from "react-router-dom";
 import {useTheme} from "../theme-provider";
 import {useSelector} from "react-redux";
@@ -12,7 +12,7 @@ import {
     CircleHelp,
     DatabaseBackup,
     FileSliders,
-    House,
+    House, Inbox,
     LayoutTemplate,
     Lightbulb,
     Megaphone,
@@ -31,9 +31,33 @@ const SaidBarDesktop = ({isMobile, setIsMobile}) => {
     let location = useLocation();
     const {type, id} = useParams();
     const userDetailsReducer = useSelector(state => state.userDetailsReducer);
+    const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
+
+    const [unreadCount, setUnreadCount] = useState(0);
+
+    useEffect(() => {
+        if(projectDetailsReducer.id){
+            getInboxNotification();
+        }
+    }, [projectDetailsReducer.id, ])
+
+    const getInboxNotification = async () => {
+        const payload = {
+            project_id: projectDetailsReducer.id,
+            type: 1,
+        }
+        const data = await apiService.inboxNotification(payload);
+        if(data.status === 200) {
+            const unreadNotifications = data.data.filter(notification => notification?.is_read === 0);
+            setUnreadCount(unreadNotifications.length);
+        }
+    }
 
     const onRedirect = (link) => {
         navigate(`${baseUrl}${link}`);
+        if(link !== "/inbox") {
+            getInboxNotification();
+        }
     };
 
     const isActive = (link, subLink = "", subLink2 = "", subLink3 = "") => {
@@ -57,6 +81,13 @@ const SaidBarDesktop = ({isMobile, setIsMobile}) => {
         {
             mainTitle: 'Modules',
             items: [
+                {
+                    title: 'Inbox',
+                    link: '/inbox',
+                    icon: <Inbox size={15} />,
+                    selected: isActive(`${baseUrl}/inbox`, `${baseUrl}/inbox`),
+                    unreadCount: unreadCount,
+                },
                 {
                     title: 'Ideas',
                     link: '/ideas',
@@ -226,6 +257,15 @@ const SaidBarDesktop = ({isMobile, setIsMobile}) => {
                                                                 >
                                                                     <div className={`${y.selected ? "active-menu" : ""}`}>{y.icon}</div>
                                                                     <div className={`font-normal text-left flex-1 text-sm ${y.selected ? "text-primary" : ""}`}>{y.title}</div>
+                                                                    {y.title === 'Inbox' && unreadCount > 0 && (
+                                                                        <span className="bg-red-500 rounded-full w-2 h-2 ml-2" />
+                                                                        // <span className={''}>
+                                                                        //     <span className="relative flex h-2 w-2">
+                                                                        //         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-300 opacity-75"/>
+                                                                        //         <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"/>
+                                                                        //     </span>
+                                                                        // </span>
+                                                                    )}
                                                                 </Button>
                                                                 {y.title === 'Help Center' && isHelpCenterActive && y.subItems && renderSubItems(y.subItems)}
                                                             </Fragment>

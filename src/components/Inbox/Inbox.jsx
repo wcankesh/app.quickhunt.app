@@ -1,0 +1,244 @@
+import React, {Fragment, useEffect, useState} from 'react';
+import {
+    Check,
+    ChevronUp, Eye, EyeOff,
+    GalleryVerticalEnd,
+    Lightbulb,
+    MessageCircleMore,
+    MessageSquare,
+    MessagesSquare,
+    Zap
+} from "lucide-react";
+import {Button} from "../ui/button";
+import {Tabs, TabsContent, TabsList, TabsTrigger} from "../ui/tabs";
+import EmptyData from "../Comman/EmptyData";
+import {ApiService} from "../../utils/ApiService";
+import {useToast} from "../ui/use-toast";
+import {useSelector} from "react-redux";
+import moment from "moment";
+import {Skeleton} from "../ui/skeleton";
+import {Avatar, AvatarFallback, AvatarImage} from "../ui/avatar";
+import {Card, CardContent} from "../ui/card";
+import Pagination from "../Comman/Pagination";
+
+const perPageLimit = 10;
+
+const UserActionsList = ({ userActions, sourceTitle, isLoading, selectedTab, isEyeTabActive}) => {
+    const filteredActions = isEyeTabActive
+        ? userActions.filter(action => action?.is_read === 0)
+        : userActions;
+
+    if (isLoading || !filteredActions.length) {
+        return (
+            <div className="divide-y">
+                {isLoading ? (
+                    Array.from({ length: 13 }).map((_, index) => (
+                        <div key={index} className="px-2 py-[10px] md:px-3 flex justify-between gap-2">
+                            <Skeleton className="rounded-md w-full h-7 bg-muted-foreground/[0.1]" />
+                        </div>
+                    ))
+                ) : (
+                    <EmptyData />
+                )}
+            </div>
+        );
+    }
+
+    return (
+        <div className={"divide-y"}>
+            {(filteredActions || []).map((action, index) => {
+                return (
+                    <Fragment key={index}>
+                        {sourceTitle.map((source, i) => {
+                            if (action.source === source.value) {
+                                return (
+                                    <div className={"px-2 py-[10px] md:px-3 flex justify-between gap-2"} key={i}>
+                                        <div className={"flex gap-3"}>
+                                            <Avatar className={"w-[30px] h-[30px]"}>
+                                                <AvatarFallback className={"text-base"}>{action?.customer_first_name && action?.customer_first_name.substring(0, 1).toUpperCase()}</AvatarFallback>
+                                            </Avatar>
+                                            <div className={"space-y-3"}>
+                                                <div className={"flex gap-4"}>
+                                                    <h2 className={"font-medium"}>{action?.customer_first_name} {action?.customer_last_name}</h2>
+                                                    <p className={"font-normal flex gap-2 items-center"}><MessageCircleMore size={15} /><span className={"text-muted-foreground"}>{source.title}</span></p>
+                                                </div>
+                                                <div>
+                                                    {source.value === "post_reactions" ? (
+                                                        <div className={"flex items-center gap-2"}>
+                                                            <Avatar className={"rounded-none w-[20px] h-[20px]"}>
+                                                                <AvatarImage src={action.emoji_url} />
+                                                            </Avatar>
+                                                            <span className={"text-sm text-muted-foreground"}>{action.title}</span>
+                                                        </div>
+                                                    ) : (
+                                                        <span className={"text-sm text-muted-foreground"}>{action.title}</span>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <span className={"text-sm text-muted-foreground"}>
+                                            {action?.created_at ? moment(action?.created_at).format('D MMM, YYYY') : "-"}
+                                        </span>
+                                    </div>
+                                );
+                            }
+                            return null;
+                        })}
+                    </Fragment>
+                );
+            })}
+        </div>
+    );
+};
+
+const Inbox = () => {
+    const apiService = new ApiService();
+    const UrlParams = new URLSearchParams(location.search);
+    const getPageNo = UrlParams.get("pageNo") || 1;
+    const {toast} = useToast()
+    const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
+
+    const [userActions, setUserActions] = useState([]);
+    const [pageNo, setPageNo] = useState(Number(getPageNo));
+    const [totalRecord, setTotalRecord] = useState(0);
+    const [isLoading, setIsLoading] = useState(true);
+    const [selectedTab, setSelectedTab] = useState(1);
+    const [allRead, setAllRead] = useState(false);
+    const [isEyeTabActive, setIsEyeTabActive] = useState(false);
+
+    useEffect(() => {
+        if(selectedTab !== "icon" && projectDetailsReducer.id){
+            getInboxNotification();
+        }
+        // navigate(`${baseUrl}/notifications?pageNo=${pageNo}`)
+    }, [projectDetailsReducer.id, pageNo, selectedTab])
+
+    const getInboxNotification = async () => {
+        setIsLoading(true);
+        const payload = {
+            project_id: projectDetailsReducer.id,
+            type: selectedTab,
+            page: pageNo,
+            limit: perPageLimit
+        }
+        const data = await apiService.inboxNotification(payload);
+        if(data.status === 200) {
+            setUserActions(Array.isArray(data.data) ? data.data : []);
+            setTotalRecord(data.total);
+            toast({description: data.message,});
+            setIsLoading(false)
+        } else {
+            toast({description:data.message, variant: "destructive",})
+        }
+    }
+
+    const markAsAllRead = async () => {
+        setIsLoading(true);
+        const data = await apiService.inboxMarkAllRead({project_id: projectDetailsReducer.id});
+        if(data.status === 200) {
+            setUserActions([]);
+            setAllRead(true);
+            toast({description: data.message,});
+        } else {
+            toast({description:data.message, variant: "destructive",})
+        }
+        setIsLoading(false);
+    }
+
+    const onTabChange = (value) => {
+        setSelectedTab(value);
+        setAllRead(false);
+        if (value === "icon") {
+            const unreadCount = userActions.filter(action => action?.is_read === 0).length;
+            setTotalRecord(unreadCount);
+            setIsEyeTabActive(!isEyeTabActive);
+        }
+    }
+
+    const totalPages = Math.ceil(totalRecord / perPageLimit);
+
+    const handlePaginationClick = async (newPage) => {
+        if (newPage >= 1 && newPage <= totalPages) {
+            setIsLoading(true);
+            setPageNo(newPage);
+            setIsLoading(false)
+        }
+    };
+
+    const sourceTitle = [
+        {title: "Created a Idea", value: "feature_ideas"},
+        {title: "Commented on idea", value: "feature_idea_comments"},
+        {title: "Upvoted on idea", value: "feature_idea_votes"},
+        {title: "Feedback on post", value: "post_feedbacks"},
+        {title: "Reaction on post", value: "post_reactions"},
+    ]
+
+    const tabs = [
+        {label: "All", value: 1, icon: <Zap size={18} className={"mr-2"} />,},
+        { label: "Announcement feedback", value: 2, icon: <MessagesSquare size={18} className={"mr-2"} />,},
+        { label: "Announcement reaction", value: 3, icon: <GalleryVerticalEnd size={18} className={"mr-2"} />,},
+        { label: "Create idea", value: 4, icon: <Lightbulb size={18} className={"mr-2"} />,},
+        { label: "Idea comment", value: 5, icon: <MessageSquare size={18} className={"mr-2"} />,},
+        { label: "Idea upvote", value: 6, icon: <ChevronUp size={18} className={"mr-2"} />,},
+    ];
+
+    return (
+        <Fragment>
+            <div className={"container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-3 md:px-4"}>
+                <div className="flex flex-wrap items-center gap-2 justify-between">
+                    <h1 className="text-2xl font-normal flex-initial w-auto">Inbox</h1>
+                    <div className={"flex gap-3"}>
+                        {userActions.length > 0 && !allRead && !isEyeTabActive && (
+                            <Button variant={"outline"} className={"flex gap-2 items-center"} onClick={markAsAllRead}><Check size={18}/>Mark all as read</Button>
+                        )}
+                        <Button variant="outline" size="icon" onClick={() => setIsEyeTabActive(!isEyeTabActive)} className={"h-9"}>
+                            { isEyeTabActive ? <EyeOff size={18} /> : <Eye size={18} />}
+                        </Button>
+                    </div>
+                </div>
+                <Card className="my-6">
+                    <CardContent className={"p-0"}>
+                        <Tabs defaultValue={1} onValueChange={onTabChange}>
+                            <div className={"border-b flex bg-background"}>
+                                {/*<TabsList className="grid w-full grid-cols-6 bg-card">*/}
+                                <TabsList className="w-full">
+                                    {(tabs || []).map((tab, i) => (
+                                        <TabsTrigger
+                                            key={i}
+                                            value={tab.value}
+                                            className={`text-sm font-medium w-full team-tab-active team-tab-text-active dark:text-card-foreground`}
+                                        >
+                                            {tab.icon}{tab.label}
+                                        </TabsTrigger>
+                                    ))}
+                                </TabsList>
+                            </div>
+                            {
+                                (tabs || []).map((y, i) => (
+                                    <TabsContent key={i} value={y.value} className={"mt-0"}>
+                                        <div className={"grid grid-cols-1 overflow-auto whitespace-nowrap"}>
+                                            <UserActionsList userActions={userActions} sourceTitle={sourceTitle} isLoading={isLoading} selectedTab={selectedTab} isEyeTabActive={isEyeTabActive}/>
+                                        </div>
+                                    </TabsContent>
+                                ))
+                            }
+                        </Tabs>
+                    </CardContent>
+                    {
+                        (selectedTab !== 1 && userActions?.length > 0) ?
+                            <Pagination
+                                pageNo={pageNo}
+                                totalPages={totalPages}
+                                isLoading={isLoading}
+                                handlePaginationClick={handlePaginationClick}
+                                stateLength={userActions?.length}
+                            /> : ""
+                    }
+                    {allRead && <div className="text-center text-muted-foreground text-lg font-semibold my-4">You're all caught up!</div>}
+                </Card>
+            </div>
+        </Fragment>
+    );
+};
+
+export default Inbox;

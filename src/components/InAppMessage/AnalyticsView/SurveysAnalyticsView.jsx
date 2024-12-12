@@ -415,7 +415,7 @@ const SurveysAnalyticsView = () => {
                                                                 {
                                                                     x.question_type === 1 ? <div>
                                                                         <ChartContainer config={chartConfigNPS}>
-                                                                            <BarChart accessibilityLayer data={x.report}>
+                                                                            <BarChart accessibilityLayer data={x?.report1}>
                                                                                 <CartesianGrid vertical={false} />
                                                                                 <XAxis
                                                                                     dataKey="created_at"

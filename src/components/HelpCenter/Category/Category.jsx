@@ -80,7 +80,7 @@ const Category = () => {
         navigate(`${baseUrl}/help/category?pageNo=${pageNo}`);
     }, [projectDetailsReducer.id, pageNo])
 
-    const getAllCategory = async (search, category_id, sub_category_id) => {
+    const getAllCategory = async (search) => {
         const data = await apiService.getAllCategory({
             project_id: projectDetailsReducer.id,
             search: search,
@@ -103,37 +103,17 @@ const Category = () => {
         }
     };
 
-    // const throttledDebouncedSearch = useCallback(
-    //     debounce((value) => {
-    //         const updatedFilter = {
-    //             ...filter,
-    //             project_id: projectDetailsReducer.id,
-    //             search: value,
-    //             page: 1,
-    //         };
-    //         getAllCategory(updatedFilter);
-    //     }, 500), // 500ms debounce delay
-    //     [] // Add dependencies
-    // );
-    //
-    // const onChangeSearch = (e) => {
-    //     const value = e.target.value;
-    //     setFilter({ ...filter, search: value });
-    //     throttledDebouncedSearch(value);
-    // };
+    const throttledDebouncedSearch = useCallback(
+        debounce((value) => {
+            getAllCategory(value, filter.category_id, filter.sub_category_id);
+        }, 500),
+        [projectDetailsReducer.id]
+    );
 
-    const debounceGetAllArticles = debounce((searchValue) => {
-        setPageNo(1);
-        setIsLoading(true);
-        getAllCategory(searchValue).then(() => {
-            setIsLoading(false);
-        });
-    }, 500);
-
-    const onChangeSearch = (event) => {
-        const value = event.target.value;
-        setFilter((prev) => ({ ...prev, search: value }));
-        debounceGetAllArticles(value);
+    const onChangeSearch = (e) => {
+        const value = e.target.value;
+        setFilter({ ...filter, search: value });
+        throttledDebouncedSearch(value);
     };
 
     const clearSearchFilter = () => {
