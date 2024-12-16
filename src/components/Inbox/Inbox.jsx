@@ -19,6 +19,7 @@ import moment from "moment";
 import {Skeleton} from "../ui/skeleton";
 import {Avatar, AvatarFallback, AvatarImage} from "../ui/avatar";
 import {Card, CardContent} from "../ui/card";
+import {Tooltip, TooltipTrigger, TooltipProvider, TooltipContent} from "../ui/tooltip";
 import Pagination from "../Comman/Pagination";
 
 const perPageLimit = 10;
@@ -52,13 +53,16 @@ const UserActionsList = ({ userActions, sourceTitle, isLoading, selectedTab, isE
                         {sourceTitle.map((source, i) => {
                             if (action.source === source.value) {
                                 return (
-                                    <div className={"px-2 py-[10px] md:px-3 flex justify-between gap-2"} key={i}>
-                                        <div className={"flex gap-3"}>
+                                    <div className={"px-2 py-[10px] md:px-3 flex gap-4"} key={i}>
+                                        <div>
                                             <Avatar className={"w-[30px] h-[30px]"}>
                                                 <AvatarFallback className={"text-base"}>{action?.customer_first_name && action?.customer_first_name.substring(0, 1).toUpperCase()}</AvatarFallback>
                                             </Avatar>
+                                        </div>
+                                        <div className={"w-full flex flex-wrap justify-between gap-2"}>
+                                        <div className={"flex gap-3"}>
                                             <div className={"space-y-3"}>
-                                                <div className={"flex gap-4"}>
+                                                <div className={"flex flex-wrap gap-4"}>
                                                     <h2 className={"font-medium"}>{action?.customer_first_name} {action?.customer_last_name}</h2>
                                                     <p className={"font-normal flex gap-2 items-center"}><MessageCircleMore size={15} /><span className={"text-muted-foreground"}>{source.title}</span></p>
                                                 </div>
@@ -68,10 +72,10 @@ const UserActionsList = ({ userActions, sourceTitle, isLoading, selectedTab, isE
                                                             <Avatar className={"rounded-none w-[20px] h-[20px]"}>
                                                                 <AvatarImage src={action.emoji_url} />
                                                             </Avatar>
-                                                            <span className={"text-sm text-muted-foreground"}>{action.title}</span>
+                                                            <span className={"text-sm text-muted-foreground text-wrap"}>{action.title}</span>
                                                         </div>
                                                     ) : (
-                                                        <span className={"text-sm text-muted-foreground"}>{action.title}</span>
+                                                        <span className={"text-sm text-muted-foreground text-wrap"}>{action.title}</span>
                                                     )}
                                                 </div>
                                             </div>
@@ -79,6 +83,7 @@ const UserActionsList = ({ userActions, sourceTitle, isLoading, selectedTab, isE
                                         <span className={"text-sm text-muted-foreground"}>
                                             {action?.created_at ? moment(action?.created_at).format('D MMM, YYYY') : "-"}
                                         </span>
+                                        </div>
                                     </div>
                                 );
                             }
@@ -125,10 +130,10 @@ const Inbox = () => {
         if(data.status === 200) {
             setUserActions(Array.isArray(data.data) ? data.data : []);
             setTotalRecord(data.total);
-            toast({description: data.message,});
+            // toast({description: data.message,});
             setIsLoading(false)
         } else {
-            toast({description:data.message, variant: "destructive",})
+            // toast({description:data.message, variant: "destructive",})
         }
     }
 
@@ -191,17 +196,25 @@ const Inbox = () => {
                         {userActions.length > 0 && !allRead && !isEyeTabActive && (
                             <Button variant={"outline"} className={"flex gap-2 items-center"} onClick={markAsAllRead}><Check size={18}/>Mark all as read</Button>
                         )}
-                        <Button variant="outline" size="icon" onClick={() => setIsEyeTabActive(!isEyeTabActive)} className={"h-9"}>
-                            { isEyeTabActive ? <EyeOff size={18} /> : <Eye size={18} />}
-                        </Button>
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button variant="outline" size="icon" onClick={() => setIsEyeTabActive(!isEyeTabActive)} className={"h-9"}>
+                                        { isEyeTabActive ? <EyeOff size={18} /> : <Eye size={18} />}
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent side={"bottom"}>
+                                    {isEyeTabActive ? (<p>View all notifications</p>) : (<p>View unread notifications</p>)}
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
                     </div>
                 </div>
                 <Card className="my-6">
                     <CardContent className={"p-0"}>
                         <Tabs defaultValue={1} onValueChange={onTabChange}>
                             <div className={"border-b flex bg-background"}>
-                                {/*<TabsList className="grid w-full grid-cols-6 bg-card">*/}
-                                <TabsList className="w-full">
+                                <TabsList className="w-full overflow-x-auto whitespace-nowrap justify-start">
                                     {(tabs || []).map((tab, i) => (
                                         <TabsTrigger
                                             key={i}

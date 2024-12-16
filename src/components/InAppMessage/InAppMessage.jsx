@@ -146,44 +146,33 @@ const InAppMessage = () => {
     const filterMessage = async (event) => {
         setIsLoading(true)
         setFilter({...filter, [event.name]: event.value,});
-        const payload = {
-            ...filter,
-            project_id: projectDetailsReducer.id,
-            page:1,
-            [event.name]: event.value,
-        }
         await getAllInAppMessageList(filter.search, event.value);
     }
 
-    const onChangeSearch = async (event) => {
-        setFilter({...filter, [event.target.name]: event.target.value,})
-        if (timeoutHandler.current) {
-            clearTimeout(timeoutHandler.current);
-        }
-        timeoutHandler.current = setTimeout(() => {
-            setPageNo(1);
-            getAllInAppMessageList(event.target.value, '');
-        }, 2000);
-    }
+    const throttledDebouncedSearch = useCallback(
+        debounce((value) => {
+            const updatedFilter = {
+                ...filter,
+                project_id: projectDetailsReducer.id,
+                search: value,
+                page: 1,
+            };
+            getAllInAppMessageList(updatedFilter.search, updatedFilter.type);
+        }, 500),
+        [projectDetailsReducer.id]
+    );
 
-    // const throttledDebouncedSearch = useCallback(
-    //     debounce((value) => {
-    //         const updatedFilter = {
-    //             ...filter,
-    //             project_id: projectDetailsReducer.id,
-    //             search: value,
-    //             page: 1,
-    //         };
-    //         getAllInAppMessageList(updatedFilter.search, updatedFilter.type);
-    //     }, 500), // 500ms debounce delay
-    //     [filter, projectDetailsReducer.id] // Add dependencies
-    // );
-    //
-    // const handleSearchChange = (e) => {
-    //     const value = e.target.value;
-    //     setFilter({ ...filter, search: value });
-    //     throttledDebouncedSearch(value);
-    // };
+    const onChangeSearch = (e) => {
+        const value = e.target.value;
+        setFilter({ ...filter, search: value});
+        throttledDebouncedSearch(value);
+    };
+
+    const clearSearchFilter = () => {
+        setFilter(prev => ({ ...prev, search: '', type: '' }));
+        setPageNo(1);
+        getAllInAppMessageList('', '', filter.search);
+    };
 
     const removeBadge = () => {
         setFilter({...filter, type: "",});
@@ -278,42 +267,42 @@ const InAppMessage = () => {
             title: "Create Welcome Message",
             description: `Use in-app messages, such as posts or banners, to greet new users and introduce them to your app.`,
             btnText: [
-                {title: "Create Welcome Message", redirect: "", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
+                {title: "Create Welcome Message", navigateTo: "type", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
             ],
         },
         {
             title: "Create Onboarding Flow",
             description: `Guide users through the onboarding process with a checklist and in-app messages to ensure they get the most out of your app.`,
             btnText: [
-                {title: "Create Checklist", redirect: "", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
+                {title: "Create Checklist", navigateTo: "4/new", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
             ],
         },
         {
             title: "Share Ideas",
             description: `Share your product ideas directly with users using in-app messages through posts or banners to gather feedback and keep them engaged.`,
             btnText: [
-                {title: "Share Ideas", redirect: "", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
+                {title: "Share Ideas", navigateTo: `${baseUrl}/ideas`, icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
             ],
         },
         {
             title: "Display Announcements",
             description: `Keep users updated with in-app messages about new features, product updates, and improvements through posts or banners.   `,
             btnText: [
-                {title: "Display Announcement", redirect: "", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
+                {title: "Display Announcement", navigateTo: `${baseUrl}/announcements`, icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
             ],
         },
         {
             title: "Get Feedback",
             description: `Use in-app surveys to collect feedback directly within the app, helping you improve the user experience and gather insights.`,
             btnText: [
-                {title: "Collect Feedback", redirect: "", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
+                {title: "Collect Feedback", navigateTo: "3/new", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
             ],
         },
         {
             title: "Redirect to Knowledge Base",
             description: `Promote new feature articles through in-app messages, directing users to relevant resources in your knowledge base for more information.`,
             btnText: [
-                {title: "Create In-App Message", redirect: "", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
+                {title: "Create In-App Message", navigateTo: "type", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
             ],
         },
     ];
@@ -420,7 +409,7 @@ const InAppMessage = () => {
                     </div>
                     <div className={"w-full lg:w-auto flex sm:flex-nowrap flex-wrap gap-2 items-center"}>
                         <div className={"flex gap-2 items-center w-full lg:w-auto"}>
-                            <div className={"w-full"}>
+                            <div className={"relative w-full"}>
                             <Input
                                 type="search" value={filter.search}
                                 placeholder="Search..."
@@ -428,6 +417,15 @@ const InAppMessage = () => {
                                 name={"search"}
                                 onChange={onChangeSearch}
                             />
+                                {filter?.search?.trim() !== '' && (
+                                    <button
+                                        type="button"
+                                        className="absolute right-2 top-1/2 transform -translate-y-1/2 w-6 h-6 flex items-center justify-center text-gray-400 hover:text-gray-600"
+                                        onClick={clearSearchFilter}
+                                    >
+                                        <X className="w-4 h-4" />
+                                    </button>
+                                )}
                             </div>
                             <div className={"flex items-center"}>
                             <Popover open={openFilter}

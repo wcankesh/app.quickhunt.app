@@ -430,7 +430,10 @@ const HeaderBar = ({setIsMobile}) => {
                                                             >
                                                                 <span className={"flex justify-between items-center w-full text-sm font-medium cursor-pointer"}>
                                                                     {x.project_name}
+                                                                    {
+                                                                        (userDetailsReducer?.id == x?.user_id) &&
                                                                     <Trash2 className={"cursor-pointer"} size={16} onClick={deleteAlert}/>
+                                                                    }
                                                                 </span>
                                                             </CommandItem>
                                                         </Fragment>
@@ -454,7 +457,6 @@ const HeaderBar = ({setIsMobile}) => {
                                 <Bell size={20} className={'stroke-white'} />
                             </Button>
                             <Button variant="ghost hover:none" size="icon" className={"h-8 w-8"} onClick={toggleTheme}>
-                                {/*{theme === 'light' ? <Moon size={20} className="stroke-white"/> : <Sun size={20} />}*/}
                                 <Moon size={20} className="block dark:hidden stroke-white"/>
                                 <Sun size={20} className="hidden dark:block stroke-white"/>
                             </Button>

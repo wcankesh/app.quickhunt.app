@@ -321,44 +321,44 @@ const Ideas = () => {
             title: "Create First Idea",
             description: `It's time to start the conversation! Create your first idea and get feedback from your team or community.`,
             btnText: [
-                {title: "Create Ideas", redirect: "", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
+                {title: "Create Ideas", openSheet: true, icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
             ],
         },
         {
             title: "Create Tags",
             description: `Organize your ideas with customizable tags like "High Priority" or "Internal Idea" for better management.`,
             btnText: [
-                {title: "Create Tags", redirect: "", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
+                {title: "Create Tags", navigateTo: `${baseUrl}/settings/tags`, icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
             ],
         },
         {
             title: "Create Board",
             description: `Visually manage your ideas with boards like "Feature Request" or "Bug Reports" to track progress and prioritize tasks.`,
             btnText: [
-                {title: "Create Board", redirect: "", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
+                {title: "Create Board", navigateTo: `${baseUrl}/settings/board`, icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
             ],
         },
         {
             title: "Create Widget",
             description: `Add a widget to display your ideas on your website with options like embed, popover, modal, or sidebar.`,
             btnText: [
-                {title: "Create Widget", redirect: "", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
+                {title: "Create Widget", navigateTo: `${baseUrl}/widget/type`, icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
             ],
         },
         {
             title: "Create Feedback",
             description: `Share your ideas via in-app messages and let users upvote and comment to refine and improve your suggestions.`,
             btnText: [
-                {title: "Create In-App Message", redirect: "", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
+                {title: "Create In-App Message", navigateTo: `${baseUrl}/app-message/type`, icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
             ],
         },
         {
             title: "Explore Examples",
             description: `See how platforms like Utterbond, Webform, and Rivyo manage customer feedback efficiently and effortlessly.`,
             btnText: [
-                {title: "Utterbond", redirect: ""},
-                {title: "Webform", redirect: ""},
-                {title: "Rivyo", redirect: ""},
+                {title: "Utterbond", redirect: `https://utterbond.quickhunt.app/ideas`},
+                {title: "Webform", redirect: `https://webform.quickhunt.app/ideas`},
+                {title: "Rivyo", redirect: `https://rivyo.quickhunt.app/ideas`},
             ],
         },
     ];
@@ -823,7 +823,7 @@ const Ideas = () => {
                 </Card>
                 {
                     (load === "search" || load === "list" || !emptyContentBlock) ? "" :
-                        <EmptyDataContent data={EmptyIdeaContent} onClose={() => emptyContent(false)}/>
+                        <EmptyDataContent data={EmptyIdeaContent} onClose={() => emptyContent(false)} setSheetOpenCreate={() => setSheetOpenCreate(true)}/>
                 }
             </div>
         </Fragment>

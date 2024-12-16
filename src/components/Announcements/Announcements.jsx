@@ -237,44 +237,44 @@ const Announcements = () => {
             title: "Start Sharing Updates",
             description: `No announcements yet? Create your first one to keep users informed about product updates, new features, and improvements.`,
             btnText: [
-                {title: "Create Announcement", redirect: "", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
+                {title: "Create Announcement", openSheet: true, icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
             ],
         },
         {
             title: "Create Labels",
             description: `Organize your announcements by adding labels like "Update," "New Feature," or "Bug Fix" for easy categorization and clarity.`,
             btnText: [
-                {title: "Create Labels", redirect: "", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
+                {title: "Create Labels", navigateTo: `${baseUrl}/settings/labels`, icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
             ],
         },
         {
             title: "Create Categories",
             description: `Group your announcements into categories such as "Product Updates," "Feature Launches," or "Changelog" to help users find relevant information quickly.`,
             btnText: [
-                {title: "Create Categories", redirect: "", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
+                {title: "Create Categories", navigateTo: `${baseUrl}/settings/categories`, icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
             ],
         },
         {
             title: "Add Emoji",
             description: `Make your announcements more engaging by adding emojis to highlight key updates or set the tone for your message.`,
             btnText: [
-                {title: "Add Emojis", redirect: "", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
+                {title: "Add Emojis", navigateTo: `${baseUrl}/settings/emoji`, icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
             ],
         },
         {
             title: "Create In-App Message",
             description: `Share announcements directly with users through in-app messages to ensure they stay informed about important updates.`,
             btnText: [
-                {title: "Create In-App Message", redirect: "", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
+                {title: "Create In-App Message", navigateTo: `${baseUrl}/app-message/type`, icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
             ],
         },
         {
             title: "Explore Examples",
             description: `See how platforms like Utterbond, Webform, and Rivyo efficiently share announcements to keep their users informed.`,
             btnText: [
-                {title: "Utterbond", redirect: ""},
-                {title: "Webform", redirect: ""},
-                {title: "Rivyo", redirect: ""},
+                {title: "Utterbond", redirect: "https://webform.quickhunt.app/announcements"},
+                {title: "Webform", redirect: "https://utterbond.quickhunt.app/announcements"},
+                {title: "Rivyo", redirect: "https://rivyo.quickhunt.app/announcements"},
             ],
         },
     ];
@@ -483,7 +483,7 @@ const Announcements = () => {
             </Card>
             {
                 (isLoading || !emptyContentBlock) ? "" :
-                        <EmptyDataContent data={EmptyAnnounceContent} onClose={() => emptyContent(false)}/>
+                        <EmptyDataContent data={EmptyAnnounceContent} onClose={() => emptyContent(false)} setSheetOpenCreate={openSheet}/>
             }
         </div>
     );

@@ -7,7 +7,7 @@ import {DropdownMenuContent, DropdownMenuItem} from "../ui/dropdown-menu";
 import {baseUrl} from "../../utils/constent";
 import {useNavigate} from "react-router";
 
-export const EmptyDataContent = ({data, onClose}) => {
+export const EmptyDataContent = ({data, onClose, onClick, setSheetOpenCreate}) => {
     const navigate = useNavigate();
     return (
         <Card className={"p-4 space-y-2"}>
@@ -36,7 +36,36 @@ export const EmptyDataContent = ({data, onClose}) => {
                                     {
                                         (x.btnText || []).map((y, j) => {
                                             return (
-                                                <Button variant={"link"} key={j} className={"font-medium p-0"}>{y.icon}{y.title}</Button>
+                                                // <Button variant={"link"} key={j} className={"font-medium p-0"} onClick={() => {
+                                                //     if (y.redirect) {
+                                                //         window.open(y.redirect, "_blank");
+                                                //     } else if (onClick) {
+                                                //         onClick();
+                                                //     }
+                                                // }}>
+                                                //     {y.icon}{y.title}
+                                                // </Button>
+                                                <Button
+                                                    variant={"link"}
+                                                    key={j}
+                                                    className={"font-medium p-0"}
+                                                    onClick={() => {
+                                                        if (y.redirect) {
+                                                            window.open(y.redirect, "_blank");
+                                                        }
+                                                        if (y.openSheet) {
+                                                            setSheetOpenCreate(true);
+                                                        }
+                                                        if (y.navigateTo) {
+                                                            navigate(y.navigateTo);
+                                                        }
+                                                        if (onClick) {
+                                                            onClick();
+                                                        }
+                                                    }}
+                                                >
+                                                    {y.icon}{y.title}
+                                                </Button>
                                             )
                                         })
                                     }

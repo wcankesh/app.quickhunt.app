@@ -42,6 +42,9 @@ import {ActionButtons, CommentEditor, SaveCancelButton, StatusButtonGroup, Uploa
 import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList} from "../ui/command";
 import {debounce} from "lodash";
 import EmptyData from "../Comman/EmptyData";
+import Pagination from "../Comman/Pagination";
+
+const perPageLimit = 10
 
 const initialStateError = {
     title: "",
@@ -76,6 +79,8 @@ const UpdateIdea = () => {
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
 
+    const [pageNo, setPageNo] = useState(Number(getPageNo));
+    const [totalRecord, setTotalRecord] = useState(0);
     const [formError, setFormError] = useState(initialStateError);
     const [userDetailError, setUserDetailError] = useState(initialUserError);
     const [topicLists, setTopicLists] = useState([]);
@@ -104,12 +109,47 @@ const UpdateIdea = () => {
     const [isSaveUpdateSubComment, setIsSaveUpdateSubComment] = useState(false);
     const [isSaveSubComment, setIsSaveSubComment] = useState(false);
     const [filter, setFilter] = useState({search: "", project_id: projectDetailsReducer.id});
-    const [customerDetails, setCustomerDetails] = useState(initialStateUser);
-    const [customerList, setCustomerList] = useState([]);
+    const [usersDetails, setUsersDetails] = useState(initialStateUser);
+    const [ideasVoteList, setIdeasVoteList] = useState([]);
+    const [getAllUsersList, setGetAllUsersList] = useState([]);
     const [addUserDialog, setAddUserDialog] = useState({addUser: false, viewUpvote: false});
     const [deleteId,setDeleteId]=useState(null);
 
-    const openDialogs = (name, value) => {setAddUserDialog(prev => ({...prev, [name]: value}))}
+    const openDialogs = (name, value) => {
+        setAddUserDialog(prev => ({...prev, [name]: value}))
+    }
+
+    useEffect(() => {
+        const getIdeaVotes = async (name, value) => {
+            setIsLoading(true);
+            const payload = {
+                feature_idea_id: selectedIdea.id,
+                page: pageNo,
+                limit: perPageLimit
+            }
+            const data = await apiSerVice.getIdeaVote(payload)
+            if(data.status === 200) {
+                setIdeasVoteList(data.data)
+                setTotalRecord(data.total)
+                setAddUserDialog(prev => ({...prev, [name]: value}))
+                setIsLoading(false);
+            }
+        }
+        if(addUserDialog.viewUpvote){
+            getIdeaVotes()
+        }
+    },[addUserDialog.viewUpvote, pageNo])
+
+    const totalPages = Math.ceil(totalRecord / perPageLimit);
+
+    const handlePaginationClick = async (newPage) => {
+        if (newPage >= 1 && newPage <= totalPages) {
+            setIsLoading(true);
+            setPageNo(newPage);
+            setIsLoading(false);
+        } else {
+        }
+    };
 
     useEffect(() => {
         if (projectDetailsReducer.id) {
@@ -126,12 +166,12 @@ const UpdateIdea = () => {
         }
         const data = await apiSerVice.getAllCustomers(payload);
         if (data.status === 200) {
-            setCustomerList(data.data)
+            setGetAllUsersList(data.data)
         }
     };
 
     const throttledDebouncedSearch = useCallback(
-        debounce((value, project_id, getAllCustomers) => {
+        debounce((value, project_id) => {
             getAllCustomers(value, project_id);
         }, 500),
         []
@@ -143,13 +183,13 @@ const UpdateIdea = () => {
             search: value,
             project_id: projectDetailsReducer.id,
         }));
-        throttledDebouncedSearch(value, projectDetailsReducer.id, getAllCustomers);
+        throttledDebouncedSearch(value, projectDetailsReducer.id);
     };
 
     const addCustomer = async () => {
         let validationErrors = {};
-        Object.keys(customerDetails).forEach(name => {
-            const error = formValidate(name, customerDetails[name]);
+        Object.keys(usersDetails).forEach(name => {
+            const error = formValidate(name, usersDetails[name]);
             if (error && error.length > 0) {
                 validationErrors[name] = error;
             }
@@ -160,20 +200,20 @@ const UpdateIdea = () => {
         }
         setIsLoading(true);
         const payload = {
-            ...customerDetails,
+            ...usersDetails,
             project_id: projectDetailsReducer.id,
             customer_first_seen: new Date(),
             customer_last_seen: new Date(),
         }
         const data = await apiSerVice.createCustomers(payload)
         if(data.status === 200) {
-            setCustomerDetails(initialStateUser);
+            setUsersDetails(initialStateUser);
             toast({description: data.message,});
-            // const updatedCustomerList = [data.data, ...customerList];
-            // setCustomerList(updatedCustomerList);
-            const clone = [...customerList];
+            // const updatedCustomerList = [data.data, ...ideasVoteList];
+            // setIdeasVoteList(updatedCustomerList);
+            const clone = [...ideasVoteList];
             clone.unshift(data.data);
-            setCustomerList(clone);
+            setIdeasVoteList(clone);
             const upvoteResponse = await apiSerVice.userManualUpVote({
                 feature_idea_id: selectedIdea.id,
                 user_id: data.data.id,
@@ -191,8 +231,41 @@ const UpdateIdea = () => {
         openDialogs("addUser", false);
     };
 
-    const deleteCustomer =  (id) => {
-        setDeleteId(id);
+    const deleteCustomer = async (id, index) => {
+        const payload = {
+            id: id,
+            feature_idea_id: selectedIdea.id
+        }
+        const data = await apiSerVice.removeUserVote(payload)
+        let clone = [...ideasVoteList];
+        if(data.status === 200) {
+            clone.splice(index,1);
+            setIdeasVoteList(clone);
+            toast({description: data.message});
+        } else {
+            toast({description: data.message, variant: "destructive",});
+        }
+        setDeleteId(null);
+    };
+
+    const handleUserClick = (user) => {
+        const selectedUser = getAllUsersList.find((u) => u.customer_name === user.customer_name);
+        if (selectedUser) {
+            const updatedVoteList = [...ideasVoteList];
+            const existingUserIndex = updatedVoteList.findIndex((u) => u.name === selectedUser.customer_name);
+            if (existingUserIndex === -1) {
+                const newUserPayload = {
+                    name: selectedUser.customer_name,
+                    id: '',
+                    user_photo: '',
+                    email: selectedUser.customer_email_id,
+                };
+                updatedVoteList.push(newUserPayload);
+            } else {
+                updatedVoteList.splice(existingUserIndex, 1);
+            }
+            setIdeasVoteList(updatedVoteList);
+        }
     };
 
     const getSingleIdea = async () => {
@@ -618,7 +691,7 @@ const UpdateIdea = () => {
 
     const onChangeText = (event) => {
         setSelectedIdea(selectedIdea => ({...selectedIdea, [event.target.name]: event.target.value}))
-        setCustomerDetails({...customerDetails, [event.target.name]: event.target.value});
+        setUsersDetails({...usersDetails, [event.target.name]: event.target.value});
         setFormError(formError => ({
             ...formError,
             [event.target.name]: formValidate(event.target.name, event.target.value)
@@ -742,19 +815,19 @@ const UpdateIdea = () => {
                 (addUserDialog.addUser) &&
                 <Dialog open={addUserDialog.addUser} onOpenChange={(value) => openDialogs("addUser", value)}>
                     <DialogContent className={"max-w-[576px]"}>
-                        <DialogHeader className={"flex-row gap-2 justify-between"}>
+                        <DialogHeader className={"flex-row gap-2 justify-between space-y-0 items-center"}>
                             <DialogTitle>Add new user</DialogTitle>
-                            <X className={"cursor-pointer m-0"} onClick={() => openDialogs("addUser", false)}/>
+                            <span className={"max-w-[24px]"}><X className={"cursor-pointer m-0"} onClick={() => openDialogs("addUser", false)}/></span>
                         </DialogHeader>
                         <div className="space-y-2">
                             <div className="space-y-1">
                                 <Label htmlFor="name" className="font-normal">Email</Label>
-                                <Input id="name" value={customerDetails.customer_email_id} name="customer_email_id" onChange={onChangeText} placeholder="Enter upvoter email" className="col-span-3" />
+                                <Input id="name" value={usersDetails.customer_email_id} name="customer_email_id" onChange={onChangeText} placeholder="Enter upvoter email" className="col-span-3" />
                                 {userDetailError.customer_email_id && <span className="text-red-500 text-sm">{userDetailError.customer_email_id}</span>}
                             </div>
                             <div className="space-y-1">
                                 <Label htmlFor="username" className="font-normal">Name</Label>
-                                <Input id="username" value={customerDetails.customer_name} name="customer_name" onChange={onChangeText} placeholder="Enter upvoter name" className="col-span-3" />
+                                <Input id="username" value={usersDetails.customer_name} name="customer_name" onChange={onChangeText} placeholder="Enter upvoter name" className="col-span-3" />
                                 {userDetailError.customer_name && <span className="text-red-500 text-sm">{userDetailError.customer_name}</span>}
                             </div>
                         </div>
@@ -770,18 +843,18 @@ const UpdateIdea = () => {
                 (addUserDialog.viewUpvote) &&
                     <Dialog open={addUserDialog.viewUpvote} onOpenChange={(value) => openDialogs("viewUpvote", value)}>
                         <DialogContent className={"max-w-[1022px] p-0 gap-0"}>
-                            <DialogHeader className={"flex-row justify-between gap-2 p-3 lg:p-6"}>
+                            <DialogHeader className={"flex-row justify-between gap-2 p-3 lg:p-6 space-y-0"}>
                                 <div className={"flex flex-col gap-2"}>
                                     <DialogTitle className={"font-medium"}>View & add upvoters</DialogTitle>
                                     <DialogDescription>
                                         Upvoters will receive notifications by email when you make changes to the post.
                                     </DialogDescription>
                                 </div>
-                                <X className={"cursor-pointer m-0"} onClick={() => openDialogs("viewUpvote", false)}/>
+                                <span className={"max-w-[24px]"}><X className={"cursor-pointer m-0"} onClick={() => openDialogs("viewUpvote", false)}/></span>
                             </DialogHeader>
                             <div className={"overflow-y-auto h-full flex-1"}>
                                 <Table>
-                                    <TableHeader className={`bg-muted sticky top-0`}>
+                                    <TableHeader className={`bg-muted sticky -top-1`}>
                                         <TableRow>
                                             {['Name', 'Email', ""].map((x, i) => {
                                                 const icons = [<User className="w-4 h-4" />, <Mail className="w-4 h-4" />];
@@ -801,7 +874,7 @@ const UpdateIdea = () => {
                                             })}
                                         </TableRow>
                                     </TableHeader>
-                                    <TableBody className={"overflow-y-auto h-[300px]"}>
+                                    <TableBody className={"overflow-y-auto"}>
                                         {
                                             isLoading ? (
                                                 [...Array(10)].map((_, index) => {
@@ -819,9 +892,9 @@ const UpdateIdea = () => {
                                                         </TableRow>
                                                     )
                                                 })
-                                            ) : (selectedIdea?.vote_list?.length > 0) ? <>
+                                            ) : (ideasVoteList?.length > 0) ? <>
                                                 {
-                                                    (selectedIdea?.vote_list || []).map((x,index)=>{
+                                                    (ideasVoteList || []).map((x,index)=>{
                                                         return(
                                                             <TableRow key={index} className={"font-normal"}>
                                                                 <TableCell className={`px-2 py-[10px] md:px-3 max-w-[140px] cursor-pointer truncate text-ellipsis overflow-hidden whitespace-nowrap`}>{x.name ? x.name : "-"}</TableCell>
@@ -843,6 +916,16 @@ const UpdateIdea = () => {
                                         }
                                     </TableBody>
                                 </Table>
+                                {
+                                    ideasVoteList?.length > 0 ?
+                                        <Pagination
+                                            pageNo={pageNo}
+                                            totalPages={totalPages}
+                                            isLoading={isLoading}
+                                            handlePaginationClick={handlePaginationClick}
+                                            stateLength={ideasVoteList?.length}
+                                        /> : ""
+                                }
                             </div>
                             <DialogFooter className={"p-3 lg:p-6 gap-3 border-t"}>
                                 <Button
@@ -861,49 +944,28 @@ const UpdateIdea = () => {
                                     </PopoverTrigger>
                                     <PopoverContent className="w-[200px] p-0">
                                         <Command>
-                                            <CommandInput placeholder="Search users..." value={filter?.search} onValueChange={handleSearchChange}/>
+                                            <CommandInput placeholder="Search users..." name={"search"} value={filter?.search} onValueChange={handleSearchChange}/>
                                             <CommandList className={"overflow-hidden"}>
                                             <div className={"overflow-y-auto max-h-[300px]"}>
-                                                {
-                                                    (filter?.search) ? <CommandEmpty>{(filter?.search) ? "No User found." : ""}</CommandEmpty> : ""
-                                                }
-                                                <CommandGroup className={"p-0"}>
-                                                    {(customerList || []).map((x, i) => {
-                                                        return (
-                                                            <Fragment
-                                                                key={i}>
-                                                                <CommandItem>
-                                                                    <span
-                                                                        className={"flex justify-between items-center w-full text-sm font-medium cursor-pointer"}
-                                                                        onClick={() => {
-                                                                            const selectedUser  = customerList.find((user) => user.customer_name === x.customer_name);
-                                                                            if (selectedUser ) {
-                                                                                const newVoteList = [...selectedIdea.vote_list];
-                                                                                const existingUserIndex = newVoteList.findIndex((user) => user.customer_name === selectedUser.customer_name);
-                                                                                if (existingUserIndex === -1) {
-                                                                                    const payload = {
-                                                                                        ...selectedUser,
-                                                                                        name: selectedUser?.customer_name,
-                                                                                        email: selectedUser.customer_email_id
-                                                                                    }
-                                                                                    newVoteList.push(payload );
-                                                                                } else {
-                                                                                    newVoteList.splice(existingUserIndex, 1);
-                                                                                }
-                                                                                setSelectedIdea({ ...selectedIdea, vote_list: newVoteList });
-                                                                            }
-                                                                        }}
-                                                                    >
-                                                                        {x.customer_name}
-                                                                    </span>
-                                                                </CommandItem>
-                                                            </Fragment>
-                                                        )
-                                                    })}
-                                                    <div className={"border-t"}>
-                                                        <Button variant="ghost" className={"w-full font-medium"} onClick={() => openDialogs("addUser", true)}><CirclePlus size={16} className={"mr-2"}/>Add a brand new user</Button>
-                                                    </div>
-                                                </CommandGroup>
+                                                <CommandEmpty>No User found.</CommandEmpty>
+                                                    <CommandGroup className={"p-0"}>
+                                                        {getAllUsersList.length > 0 && (getAllUsersList || []).map((x, i) => {
+                                                            return (
+                                                                <Fragment key={i}>
+                                                                    <CommandItem value={x.customer_name}>
+                                                                        <span className={"flex justify-between items-center w-full text-sm font-medium cursor-pointer"}
+                                                                            onClick={() => handleUserClick(x)}
+                                                                        >
+                                                                            {x.customer_name}
+                                                                        </span>
+                                                                    </CommandItem>
+                                                                </Fragment>
+                                                            )
+                                                        })}
+                                                    </CommandGroup>
+                                                <div className={"border-t"}>
+                                                    <Button variant="ghost" className={"w-full font-medium"} onClick={() => openDialogs("addUser", true)}><CirclePlus size={16} className={"mr-2"}/>Add a brand new user</Button>
+                                                </div>
                                             </div>
                                             </CommandList>
                                         </Command>
@@ -925,9 +987,7 @@ const UpdateIdea = () => {
                     <div className={"border-b py-4 px-6 flex flex-col gap-3"}>
                         <div className={"flex flex-col gap-1"}>
                             <h3 className={"text-sm font-normal"}>Status</h3>
-                            <p className={"text-muted-foreground text-xs font-normal"}>Apply a status to Manage
-                                this
-                                idea on roadmap.</p>
+                            <p className={"text-muted-foreground text-xs font-normal"}>Apply a status to Manage this idea on roadmap.</p>
                         </div>
                         <div className={"flex flex-col "}>
                             <RadioGroup

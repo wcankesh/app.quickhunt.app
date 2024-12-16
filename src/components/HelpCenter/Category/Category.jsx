@@ -75,7 +75,8 @@ const Category = () => {
 
     useEffect(() => {
         if(projectDetailsReducer.id){
-            getAllCategory(filter.search, filter.category_id, filter.sub_category_id);
+            // getAllCategory(filter.search, filter.category_id, filter.sub_category_id);
+            getAllCategory(filter.search);
         }
         navigate(`${baseUrl}/help/category?pageNo=${pageNo}`);
     }, [projectDetailsReducer.id, pageNo])
@@ -506,7 +507,7 @@ const Category = () => {
             title: "Build a Structured Knowledge Base",
             description: `Create categories and sub-categories to better organize your content, helping users navigate your articles with ease.`,
             btnText: [
-                {title: "Create Categories", redirect: "", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
+                {title: "Create Categories", openSheet: true, icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
             ],
         },
     ];
@@ -907,7 +908,7 @@ const Category = () => {
                 }
                 {
                     (isLoading || !emptyContentBlock) ? "" :
-                        <EmptyDataContent data={EmptyInCategoryContent} onClose={() => emptyContent(false)}/>
+                        <EmptyDataContent data={EmptyInCategoryContent} onClose={() => emptyContent(false)} setSheetOpenCreate={openSheetCategory}/>
                 }
             </div>
         </Fragment>

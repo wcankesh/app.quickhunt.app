@@ -1,4 +1,4 @@
-import React, {Fragment, useEffect, useRef, useState, useCallback} from 'react';
+import React, {Fragment, useEffect, useState, useCallback} from 'react';
 import { Input } from "../../ui/input";
 import { Select, SelectGroup, SelectValue, SelectItem, SelectTrigger, SelectContent } from "../../ui/select";
 import {Check, Circle, Ellipsis, Filter, Plus, X} from "lucide-react";
@@ -38,7 +38,6 @@ const Articles = () => {
     const UrlParams = new URLSearchParams(location.search);
     const getPageNo = UrlParams.get("pageNo") || 1;
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
-    const timeoutHandler = useRef(null);
 
     const [filter, setFilter] = useState({
         search: "",
@@ -65,27 +64,37 @@ const Articles = () => {
 
     useEffect(() => {
         if (projectDetailsReducer.id) {
-            getAllArticles(filter.search, filter.category_id, filter.sub_category_id);
+            // getAllArticles(filter.search, filter.category_id, filter.sub_category_id);
+            getAllArticles(filter.search);
             getAllCategory();
         }
         navigate(`${baseUrl}/help/article?pageNo=${pageNo}`);
     }, [projectDetailsReducer.id, pageNo])
 
-    const getAllArticles = async (search, category_id, sub_category_id) => {
+    // const getAllArticles = async (search, category_id, sub_category_id) => {
+    const getAllArticles = async (search) => {
         setIsLoading(true)
         const data = await apiService.getAllArticles({
             project_id: projectDetailsReducer.id,
             search: search,
-            category_id: category_id,
-            sub_category_id: sub_category_id,
+            // category_id: category_id,
+            // sub_category_id: sub_category_id,
             page: pageNo,
             limit: perPageLimit
         });
         if (data.status === 200) {
             setArticles(data.data);
             setTotalRecord(data.total);
+            setIsLoading(false)
+            if (!data.data || data.data.length === 0) {
+                emptyContent(true);
+            } else {
+                emptyContent(false);
+            }
+        } else {
+            setIsLoading(false)
+            emptyContent(true);
         }
-        setIsLoading(false)
     };
 
     const getAllCategory = async () => {
@@ -226,7 +235,7 @@ const Articles = () => {
             title: "Start Adding Helpful Articles",
             description: `No articles yet? Begin by creating informative articles that address common customer questions, reduce support queries, and empower users to find answers quickly.`,
             btnText: [
-                {title: "Create First Article", redirect: "", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
+                {title: "Create First Article", openSheet: true, icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
             ],
         },
     ];
@@ -494,7 +503,7 @@ const Articles = () => {
             </div>
             {
                 (isLoading || !emptyContentBlock) ? "" :
-                    <EmptyDataContent data={EmptyInArticlesContent} onClose={() => emptyContent(false)}/>
+                    <EmptyDataContent data={EmptyInArticlesContent} onClose={() => emptyContent(false)} setSheetOpenCreate={handleCreateClick}/>
             }
         </div>
     );

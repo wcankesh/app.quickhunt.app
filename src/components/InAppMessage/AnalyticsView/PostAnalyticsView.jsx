@@ -35,6 +35,8 @@ const PostAnalyticsView = () => {
     const [analytics, setAnalytics] = useState({})
     const [isLoading, setIsLoading] = useState(false);
 
+    const handleImageClick = (imageSrc) => {window.open(imageSrc, '_blank');};
+
     useEffect(() => {
         if (id !== "new" && projectDetailsReducer.id) {
             getSingleInAppMessages();
@@ -252,7 +254,7 @@ const PostAnalyticsView = () => {
                                 <TableHeader className={`${theme === "dark" ? "" : "bg-muted"}`}>
                                     <TableRow>
                                         {
-                                            ["Name", "Reply", "Reaction", "When they replied"].map((x, i) => {
+                                            ["Name", "Reply", "Reaction", "Image View", "When they replied"].map((x, i) => {
                                                 return (
                                                     <TableHead className={`px-2 py-[10px] md:px-3 font-medium text-card-foreground`} key={i}>
                                                         {x}
@@ -299,6 +301,18 @@ const PostAnalyticsView = () => {
                                                                     </TableCell>
                                                                     <TableCell className={`px-2 py-[10px] md:px-3 font-normal`}>{x?.response ||  "-" }</TableCell>
                                                                     <TableCell className={`px-2 py-[10px] md:px-3 font-normal`}>{x.emoji_url ? <img key={i} className={"h-6 w-6 cursor-pointer"} src={x.emoji_url}/> : "-" }</TableCell>
+                                                                    <TableCell className={`px-2 py-[10px] md:px-3 font-normal`}>
+                                                                        {Array.isArray(x.files) && x.files.length > 0 ? (
+                                                                            x.files.map((fileUrl, index) => (
+                                                                                <div key={index} onClick={() => handleImageClick(fileUrl)} className="inline-block mr-2">
+                                                                                    <img
+                                                                                        className={"h-6 w-6 cursor-pointer"}
+                                                                                        src={fileUrl}
+                                                                                        alt={`file-${index}`}/>
+                                                                                </div>
+                                                                            ))
+                                                                        ) : "-"}
+                                                                    </TableCell>
                                                                     <TableCell className={`px-2 py-[10px] md:px-3 font-normal`}>{moment(x.created_at).format("ll")}</TableCell>
                                                                 </TableRow>
                                                             )

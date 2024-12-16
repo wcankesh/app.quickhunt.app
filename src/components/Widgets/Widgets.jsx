@@ -169,42 +169,42 @@ const Widgets = () => {
             title: "Embed Widget",
             description: `Easily embed a widget on your website to display key information or engage users without disrupting the browsing experience.`,
             btnText: [
-                {title: "Create Embed Widget", redirect: "", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
+                {title: "Create Embed Widget", navigateTo: "embed/new", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
             ],
         },
         {
             title: "Popover Widget",
             description: `Use a popover widget to show important updates or offers in a small, non-intrusive popup that appears on the screen.`,
             btnText: [
-                {title: "Create Popover Widget", redirect: "", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
+                {title: "Create Popover Widget", navigateTo: "popover/new", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
             ],
         },
         {
             title: "Modal Widget",
             description: `Create a modal widget to display more detailed information or prompts in a full-screen overlay, ensuring user attention.`,
             btnText: [
-                {title: "Create Modal Widget", redirect: "", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
+                {title: "Create Modal Widget", navigateTo: "modal/new", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
             ],
         },
         {
             title: "Sidebar Widget",
             description: `Add a sidebar widget to your website to showcase updates, product features, or quick links, offering easy access without overwhelming the page.`,
             btnText: [
-                {title: "Create Sidebar Widget", redirect: "", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
+                {title: "Create Sidebar Widget", navigateTo: "sidebar/new", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
             ],
         },
         {
             title: "General Settings",
             description: `Customize the appearance and behavior of your widgets to match your website design and provide a seamless user experience.`,
             btnText: [
-                {title: "Manage General Settings", redirect: "", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
+                {title: "Manage General Settings", navigateTo: `${baseUrl}/settings/general-settings`, icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
             ],
         },
         {
             title: "Social Links",
             description: `Integrate social media links directly into your widget to encourage user engagement and promote your online presence.`,
             btnText: [
-                {title: "Add Social Links", redirect: "", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
+                {title: "Add Social Links", navigateTo: `${baseUrl}/settings/social`, icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
             ],
         },
     ];

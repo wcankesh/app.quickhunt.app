@@ -11,6 +11,7 @@ import CreateRoadmapIdea from "./CreateRoadmapIdea";
 import {useToast} from "../ui/use-toast";
 import {CommSkel} from "../Comman/CommSkel";
 import {EmptyDataContent} from "../Comman/EmptyDataContent";
+import {baseUrl} from "../../utils/constent";
 
 const loading = {
     columns: Array.from({ length: 5 }, (_, index) => ({
@@ -163,44 +164,44 @@ const Roadmap = () => {
             title: "Create First Roadmap",
             description: `Don’t keep users guessing! Start your roadmap to outline future plans and showcase it on your website for everyone to see.`,
             btnText: [
-                {title: "Create Roadmap", redirect: "", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
+                {title: "Create Roadmap", openSheet: true, icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
             ],
         },
         {
             title: "Create Roadmap Statuses",
             description: `Define statuses like "Planned," "In Progress," and "Completed" to keep users informed about the progress of your roadmap items.`,
             btnText: [
-                {title: "Create Statuses", redirect: "", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
+                {title: "Create Statuses", navigateTo: `${baseUrl}/settings/statuses`, icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
             ],
         },
         {
             title: "Turn Ideas into a Roadmap",
             description: `Easily transform shared ideas into actionable roadmap items to plan and showcase your product's future.`,
             btnText: [
-                {title: "Move Ideas to Roadmap", redirect: "", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
+                {title: "Move Ideas to Roadmap", navigateTo: `${baseUrl}/ideas`, icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
             ],
         },
         {
             title: "Create Widget",
             description: `Add a widget to display your Roadmap on your website with options like embed, popover, modal, or sidebar.`,
             btnText: [
-                {title: "Create Widget", redirect: "", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
+                {title: "Create Widget", navigateTo: `${baseUrl}/widget/type`, icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
             ],
         },
         {
             title: "Create Announcement",
             description: `Share updates or milestones from your roadmap with users to keep them engaged and in the loop.`,
             btnText: [
-                {title: "Create Announcement", redirect: "", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
+                {title: "Create Announcement", navigateTo: `${baseUrl}/announcements`, icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
             ],
         },
         {
             title: "Explore Examples",
             description: `Discover how platforms like Utterbond, Webform, and Rivyo effectively manage their roadmaps.`,
             btnText: [
-                {title: "Utterbond", redirect: ""},
-                {title: "Webform", redirect: ""},
-                {title: "Rivyo", redirect: ""},
+                {title: "Utterbond", redirect: "https://utterbond.quickhunt.app/roadmap"},
+                {title: "Webform", redirect: "https://webform.quickhunt.app/roadmap"},
+                {title: "Rivyo", redirect: "https://rivyo.quickhunt.app/roadmap"},
             ],
         },
     ];
@@ -358,7 +359,7 @@ const Roadmap = () => {
             {
                 (isLoading || !emptyContentBlock) ? "" :
                     <div className={"max-w-[1600px] w-full pl-[10px]"}>
-                        <EmptyDataContent data={EmptyRoadmapContent} onClose={() => emptyContent(false)}/>
+                        <EmptyDataContent data={EmptyRoadmapContent} onClose={() => emptyContent(false)} setSheetOpenCreate={() => openSheet("create")}/>
                     </div>
             }
         </div>

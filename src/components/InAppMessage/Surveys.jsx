@@ -289,11 +289,15 @@ const Surveys = ({inAppMsgSetting, setInAppMsgSetting, selectedStepIndex, setSel
                                     }
                                     <div className={`shrink p-2 border border-transparent hover:border hover:border-[#FFFFFF] w-full`}>
                                         {
-                                            (selectedStep.step === x.step) ? <Input placeholder={"What's your question?"}
-                                                            value={x?.text || ""}
-                                                            onChange={(event) => onChangeQuestion("text", event.target.value)}
-                                                            className={"w-full text-sm border-none p-0 h-auto focus-visible:ring-offset-0 focus-visible:ring-0 text-wrap"}
-                                                            style={{backgroundColor: selectedStep.step === x.step ? inAppMsgSetting.bg_color : "#fff", color: selectedStep.step === x.step ?inAppMsgSetting.text_color : "#000"}}
+                                            (selectedStep.step === x.step) ? <Textarea
+                                                placeholder="What's your question?"
+                                                value={x?.text || ""}
+                                                onChange={(event) => onChangeQuestion("text", event.target.value)}
+                                                className={`w-full text-sm border-none p-0 h-auto focus-visible:ring-offset-0 focus-visible:ring-0 text-wrap`}
+                                                style={{
+                                                    backgroundColor: selectedStep.step === x.step ? inAppMsgSetting.bg_color : "#fff",
+                                                    color: selectedStep.step === x.step ? inAppMsgSetting.text_color : "#000"
+                                                }}
                                             /> : <span className={"text-wrap text-sm"}>{x.text}</span>
                                         }
                                         {

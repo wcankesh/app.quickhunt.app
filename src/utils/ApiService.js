@@ -294,6 +294,12 @@ export class ApiService{
     async ideaSearch (payload){
         return await this.postData(`${baseUrlApi}/idea/search`,payload, )
     }
+    async getIdeaVote (payload){
+        return await this.postData(`${baseUrlApi}/idea/votes`,payload, )
+    }
+    async removeUserVote (payload){
+        return await this.postData(`${baseUrlApi}/idea/remove-vote`,payload, )
+    }
     async getSingleIdea (id){
         return await this.getData(`${baseUrlApi}/feature-idea/${id}`)
         // return await this.getData(`${baseUrlApi}/v1/feature-idea/${id}`)

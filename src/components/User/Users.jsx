@@ -128,6 +128,7 @@ const Users = () => {
     const [deleteId,setDeleteId]=useState(null);
     const [isSheetOpen, setSheetOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+    const [isLoadingUserDetail, setIsLoadingUserDetail] = useState(true);
     const [isLoadingDelete,setIsLoadingDelete] = useState(false);
     const [openDelete,setOpenDelete]=useState(false);
     const [isSave,setIsSave]=useState(false);
@@ -231,16 +232,11 @@ const Users = () => {
             clone.splice(indexToDelete,1);
             setCustomerList(clone);
             getAllCustomers();
-            toast({
-                description: data.message
-            });
+            toast({description: data.message});
             setIsLoadingDelete(false);
         }
         else{
-            toast({
-                description:data.message,
-                variant: "destructive",
-            });
+            toast({description:data.message, variant: "destructive",});
             setIsLoadingDelete(false);
         }
         setOpenDelete(false);
@@ -282,7 +278,7 @@ const Users = () => {
     };
 
     const getUserActions = async () => {
-        setIsLoading(true);
+        setIsLoadingUserDetail(true);
         const payload = {
             user_id: selectedCustomer?.id,
             type: selectedTab,
@@ -292,10 +288,10 @@ const Users = () => {
         const data = await apiService.customersAction(payload);
         if(data.status === 200) {
             setUserActions(Array.isArray(data.data) ? data.data : []);
-            toast({description: data.message,});
-            setIsLoading(false)
+            // toast({description: data.message,});
+            setIsLoadingUserDetail(false)
         } else {
-            toast({description:data.message, variant: "destructive",})
+            // toast({description:data.message, variant: "destructive",})
         }
     }
 
@@ -320,42 +316,42 @@ const Users = () => {
             title: "Start Adding Users",
             description: `Manually add user details to build your base, track interactions, and personalize engagement to foster loyalty.`,
             btnText: [
-                {title: "Add User", redirect: "", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
+                {title: "Add User", openSheet: true, icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
             ],
         },
         {
             title: "Create Ideas",
             description: `Encourage user engagement by capturing and sharing ideas that resonate with your audience, turning visitors into active users.`,
             btnText: [
-                {title: "Create Ideas", redirect: "", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
+                {title: "Create Ideas", navigateTo: `${baseUrl}/ideas`, icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
             ],
         },
         {
             title: "Create Roadmap",
             description: `Showcase your product’s journey with a roadmap, keeping users informed about upcoming features and updates to build trust and attract users.`,
             btnText: [
-                {title: "Create Roadmap", redirect: "", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
+                {title: "Create Roadmap", navigateTo: `${baseUrl}/roadmap`, icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
             ],
         },
         {
             title: "Create Announcement",
             description: `Share key updates, new features, and milestones through announcements to keep users engaged and excited about your product.`,
             btnText: [
-                {title: "Create Announcement", redirect: "", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
+                {title: "Create Announcement", navigateTo: `${baseUrl}/announcements`, icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
             ],
         },
         {
             title: "Create Widget",
             description: `Add a widget to your website to display ideas, roadmaps, or updates, making it easy for users to interact and connect with your product.`,
             btnText: [
-                {title: "Create Widget", redirect: "", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
+                {title: "Create Widget", navigateTo: `${baseUrl}/widget/type`, icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
             ],
         },
         {
             title: "Create Knowledge Base",
             description: `Offer valuable resources and answers to build confidence in your product and convert visitors into loyal users.`,
             btnText: [
-                {title: "Create Knowledge Base", redirect: "", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
+                {title: "Create Knowledge Base", navigateTo: `${baseUrl}/app-message/type`, icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
             ],
         },
     ];
@@ -605,7 +601,7 @@ const Users = () => {
                     </div>
                     {
                         (isLoading || !emptyContentBlock) ? "" :
-                            <EmptyDataContent data={EmptyUserContent} onClose={() => emptyContent(false)}/>
+                            <EmptyDataContent data={EmptyUserContent} onClose={() => emptyContent(false)} setSheetOpenCreate={openSheet}/>
                     }
                 </div>
             </div>
