@@ -38,7 +38,7 @@ const Widgets = () => {
     const [selectedRecordAnalytics, setSelectedRecordAnalytics] = useState({})
     const [isDeleteLoading, setDeleteIsLoading] = useState(false);
     const [isCopyLoading, setCopyIsLoading] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
     const [isSheetOpen, setSheetOpen] = useState(false);
     const [openDelete, setOpenDelete] = useState(false);
     const [openCopyCode, setOpenCopyCode] = useState(false);

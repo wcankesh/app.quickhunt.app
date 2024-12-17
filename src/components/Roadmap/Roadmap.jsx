@@ -33,7 +33,7 @@ const Roadmap = () => {
     const [selectedIdea, setSelectedIdea] = useState({});
     const [selectedRoadmap, setSelectedRoadmap] = useState({});
     const [isSheetOpen, setIsSheetOpen] = useState({ open: false, type: "" });
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
     const [emptyContentBlock, setEmptyContentBlock] = useState(true);
     const [originalIdea, setOriginalIdea] = useState({});
 

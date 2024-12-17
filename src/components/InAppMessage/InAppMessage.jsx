@@ -102,7 +102,7 @@ const InAppMessage = () => {
     const [selectedType, setSelectedType] = useState("");
     const [pageNo, setPageNo] = useState(Number(getPageNo));
     const [totalRecord, setTotalRecord] = useState(0);
-    const [isLoading,setIsLoading]=useState(false);
+    const [isLoading,setIsLoading]=useState(true);
     const [openFilter,setOpenFilter]=useState(false);
     const [deleteId,setDeleteId] = useState(null);
     const [isLoadingDelete,setIsLoadingDelete] = useState(false);
@@ -513,7 +513,7 @@ const InAppMessage = () => {
                                                         {
                                                             [...Array(7)].map((_, i) => {
                                                                 return (
-                                                                    <TableCell key={i} className={"max-w-[373px] px-2 py-[10px] md:px-3"}>
+                                                                    <TableCell key={i} className={"px-2 py-[10px] md:px-3"}>
                                                                         <Skeleton className={"rounded-md w-full h-7"}/>
                                                                     </TableCell>
                                                                 )

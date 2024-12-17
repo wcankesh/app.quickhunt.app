@@ -51,7 +51,7 @@ const Articles = () => {
     const [idToDelete, setIdToDelete] = useState(null);
     const [openDelete,setOpenDelete]=useState(false);
     const [isLoadingDelete, setIsLoadingDelete] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
     const [openFilter, setOpenFilter] = useState(false);
 
     const [selectedCategory, setSelectedCategory] = useState(null);

@@ -823,7 +823,7 @@ const Ideas = () => {
 
                 </Card>
                 {
-                    (load === "search" || load === "list" || !emptyContentBlock) ? "" :
+                    (load === "search" || load === "list") ? "" : !emptyContentBlock ? "" :
                         <EmptyDataContent data={EmptyIdeaContent} onClose={() => emptyContent(false)} setSheetOpenCreate={() => setSheetOpenCreate(true)}/>
                 }
             </div>
