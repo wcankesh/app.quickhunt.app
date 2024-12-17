@@ -770,7 +770,7 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                                 <Button
                                     id="start_at"
                                     variant={"outline"}
-                                    className={cn("w-1/2 h-9 justify-start text-left font-normal", !date && "text-muted-foreground")}
+                                    className={`w-1/2 h-9 hover:bg-card bg-card justify-start text-left font-normal ${!date && "text-muted-foreground"}`}
                                 >
                                     <CalendarIcon className="mr-2 h-4 w-4"/>
                                     <Fragment>
@@ -815,7 +815,7 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                                         <Button
                                             id="end_at"
                                             variant={"outline"}
-                                            className={cn("h-9 justify-start text-left font-normal", !date && "text-muted-foreground")}
+                                            className={`h-9 justify-start hover:bg-card bg-card text-left font-normal ${!date && "text-muted-foreground"}`}
                                         >
                                             <CalendarIcon className="mr-2 h-4 w-4"/>
                                             <Fragment>

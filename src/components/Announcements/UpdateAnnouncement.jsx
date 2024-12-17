@@ -577,7 +577,7 @@ const UpdateAnnouncement = () => {
                                                 <Button
                                                     id="date"
                                                     variant="outline"
-                                                    className={cn("justify-between text-left font-normal d-flex", "text-muted-foreground")}
+                                                    className={"justify-between hover:bg-card text-left font-normal d-flex text-muted-foreground hover:text-muted-foreground bg-card"}
                                                 >
                                                     {/*{moment(selectedRecord?.post_published_at).format("LL")}*/}
                                                     {selectedRecord.post_published_at
@@ -620,7 +620,7 @@ const UpdateAnnouncement = () => {
                                                         <Button
                                                             id="date"
                                                             variant="outline"
-                                                            className={cn("justify-between text-left font-normal d-flex", "text-muted-foreground")}
+                                                            className={"justify-between hover:bg-card text-left font-normal d-flex text-muted-foreground hover:text-muted-foreground bg-card"}
                                                         >
                                                             {/*{moment(selectedRecord?.post_expired_at).format("LL")}*/}
                                                             {selectedRecord?.post_expired_at

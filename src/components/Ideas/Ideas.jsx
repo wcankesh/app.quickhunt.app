@@ -76,6 +76,7 @@ const Ideas = () => {
     const closeCreateIdea = () => {setSheetOpenCreate(false)};
 
     useEffect(() => {
+        setLoad('list');
         if (filter?.topic?.length || filter?.roadmap?.length || filter?.bug || filter?.archive /*|| filter.no_status*/ || filter?.all || filter?.search) {
             let payload = {...filter, project_id: projectDetailsReducer.id, page: pageNo, limit: perPageLimit}
             ideaSearch(payload)

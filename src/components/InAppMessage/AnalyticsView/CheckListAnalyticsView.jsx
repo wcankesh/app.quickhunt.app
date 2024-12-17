@@ -84,7 +84,7 @@ const CheckListAnalyticsView = () => {
         },
         {
             title: "Completion Rate",
-            count: `${analytics?.response_percentage?.toFixed(2) || 0}%`,
+            count: `${((analytics?.response_percentage|| 0) / 100).toFixed(2)}%`,
             show: inAppMsgSetting?.reply_type === 1,
         },
     ]

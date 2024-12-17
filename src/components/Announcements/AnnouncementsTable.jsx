@@ -135,7 +135,7 @@ const AnnouncementsTable = ({data, isLoading, setSelectedRecord, handleDelete, s
                             {
                                 ["Title", "Last Updated", "Published At", "Status", "", "", ""].map((x, i) => {
                                     return (
-                                        <TableHead className={`font-medium text-card-foreground px-2 py-[10px] md:px-3 ${i > 0 ? "max-w-[140px] truncate text-ellipsis overflow-hidden whitespace-nowrap" : ""}`} key={i}
+                                        <TableHead className={`font-medium text-card-foreground px-2 py-[10px] md:px-3 ${i === 2 && "cursor-pointer"} ${i > 0 ? "max-w-[140px] truncate text-ellipsis overflow-hidden whitespace-nowrap" : ""}`} key={i}
                                                    onClick={() => x === "Published At" && toggleSort("Published At")}>
                                             {x}
                                             {x === "Published At" && (

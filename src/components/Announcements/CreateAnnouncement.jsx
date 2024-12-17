@@ -522,7 +522,7 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
                                         <Button
                                             id="date"
                                             variant={"outline"}
-                                            className={cn("justify-between text-left font-normal d-flex px-3 h-9", "text-muted-foreground")}
+                                            className={"justify-between hover:bg-card text-left font-normal d-flex px-3 h-9 text-muted-foreground hover:text-muted-foreground bg-card"}
                                         >
                                             {/*{moment(changeLogDetails.post_published_at).format("LL")}*/}
                                             {changeLogDetails.post_published_at
@@ -617,7 +617,7 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
                                                 <Button
                                                     id="date"
                                                     variant={"outline"}
-                                                    className={cn("justify-between text-left font-normal d-flex", "text-muted-foreground")}
+                                                    className={"justify-between hover:bg-card text-left font-normal d-flex text-muted-foreground hover:text-muted-foreground bg-card"}
                                                 >
                                                     {/*{moment(changeLogDetails.post_expired_at).format("LL")}*/}
                                                     {changeLogDetails?.post_expired_at

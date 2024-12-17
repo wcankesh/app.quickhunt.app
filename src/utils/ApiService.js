@@ -251,25 +251,25 @@ export class ApiService{
     }
 
     /* ---------- Users api ---------- */
-    async getAllCustomers (id){
+    async getAllUsers (id){
         return await this.getData(`${baseUrlApi}/customers?${qs.stringify(id)}`)
     }
-    async getSingleCustomers (id){
+    async getSingleUser (id){
         return await this.getData(`${baseUrlApi}/customers/${id}?is_history=1`)
     }
-    async createCustomers (payload){
+    async createUsers (payload){
         return await this.postData(`${baseUrlApi}/customers`,payload)
     }
     async userManualUpVote (payload){
         return await this.postData(`${baseUrlApi}/customer/vote`,payload)
     }
-    async customersAction (payload){
+    async userAction (payload){
         return await this.postData(`${baseUrlApi}/customer-actions`,payload)
     }
-    async updateCustomers (payload, id){
+    async updateUsers (payload, id){
         return await this.putData(`${baseUrlApi}/customers/${id}`,payload)
     }
-    async deleteCustomers (id){
+    async deleteUsers (id){
         return await this.deleteData(`${baseUrlApi}/customers/${id}`)
     }
 

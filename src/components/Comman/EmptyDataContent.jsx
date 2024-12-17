@@ -17,7 +17,7 @@ export const EmptyDataContent = ({data, onClose, onClick, setSheetOpenCreate}) =
                         <Ellipsis className={`font-medium`} size={18}/>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align={"end"}>
-                        <DropdownMenuItem className={"cursor-pointer"} onClick={() => navigate(`${baseUrl}/app-message`)}>Leave feedback</DropdownMenuItem>
+                        <DropdownMenuItem className={"cursor-pointer"} onClick={() => navigate(`${baseUrl}/app-message/3/new`)}>Leave feedback</DropdownMenuItem>
                         <DropdownMenuItem className={"cursor-pointer"} onClick={onClose}>Close</DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>

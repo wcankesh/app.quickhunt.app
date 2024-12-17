@@ -33,7 +33,7 @@ const UserActionsList = ({ userActions, sourceTitle, isLoading, selectedTab, isE
         return (
             <div className="divide-y">
                 {isLoading ? (
-                    Array.from({ length: 13 }).map((_, index) => (
+                    Array.from({ length: 10 }).map((_, index) => (
                         <div key={index} className="px-2 py-[10px] md:px-3 flex justify-between gap-2">
                             <Skeleton className="rounded-md w-full h-7 bg-muted-foreground/[0.1]" />
                         </div>
@@ -129,10 +129,11 @@ const Inbox = () => {
         const data = await apiService.inboxNotification(payload);
         if(data.status === 200) {
             setUserActions(Array.isArray(data.data) ? data.data : []);
-            setTotalRecord(data.total);
+            setTotalRecord(data.total || 0);
             // toast({description: data.message,});
             setIsLoading(false)
         } else {
+            setIsLoading(false);
             // toast({description:data.message, variant: "destructive",})
         }
     }
@@ -164,9 +165,9 @@ const Inbox = () => {
 
     const handlePaginationClick = async (newPage) => {
         if (newPage >= 1 && newPage <= totalPages) {
-            setIsLoading(true);
+            // setIsLoading(true);
             setPageNo(newPage);
-            setIsLoading(false)
+            // setIsLoading(false)
         }
     };
 
@@ -179,7 +180,7 @@ const Inbox = () => {
     ]
 
     const tabs = [
-        {label: "All", value: 1, icon: <Zap size={18} className={"mr-2"} />,},
+        { label: "All", value: 1, icon: <Zap size={18} className={"mr-2"} />,},
         { label: "Announcement feedback", value: 2, icon: <MessagesSquare size={18} className={"mr-2"} />,},
         { label: "Announcement reaction", value: 3, icon: <GalleryVerticalEnd size={18} className={"mr-2"} />,},
         { label: "Create idea", value: 4, icon: <Lightbulb size={18} className={"mr-2"} />,},
@@ -191,7 +192,10 @@ const Inbox = () => {
         <Fragment>
             <div className={"container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-3 md:px-4"}>
                 <div className="flex flex-wrap items-center gap-2 justify-between">
-                    <h1 className="text-2xl font-normal flex-initial w-auto">Inbox</h1>
+                    <div className={"flex flex-col gap-y-0.5"}>
+                        <h1 className="text-2xl font-normal flex-initial w-auto">Inbox</h1>
+                        <h5 className={"text-sm text-muted-foreground"}>Track announcement feedback and reactions, and stay updated on ideas, their comments, and upvotes.</h5>
+                    </div>
                     <div className={"flex gap-3"}>
                         {userActions.length > 0 && !allRead && !isEyeTabActive && (
                             <Button variant={"outline"} className={"flex gap-2 items-center"} onClick={markAsAllRead}><Check size={18}/>Mark all as read</Button>

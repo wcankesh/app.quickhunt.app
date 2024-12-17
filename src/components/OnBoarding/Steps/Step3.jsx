@@ -143,8 +143,6 @@ const Step3 = ({setStep}) => {
             toast({variant: "destructive" ,description: data.message})
         }
 
-
-
         setStep(stepCount)
         // navigate(`${baseUrl}/dashboard`)
     }

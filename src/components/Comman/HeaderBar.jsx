@@ -1,7 +1,7 @@
 import React, {Fragment, useEffect, useState} from 'react';
-import {Sheet, SheetContent, SheetHeader, SheetOverlay, SheetTitle, SheetTrigger} from "../ui/sheet";
+import {Sheet, SheetContent, SheetHeader, SheetTitle} from "../ui/sheet";
 import {Button} from "../ui/button";
-import {Activity, Bell, ChevronsUpDown, CircleHelp, CreditCard, DatabaseBackup, Eye, FileSliders, FileText, House, LayoutTemplate, Lightbulb, Loader2, LogOut, Megaphone, Menu, Moon, NotebookPen, Plus, Settings, Sun, Tag, Trash2, User, Users, UsersRound, X} from "lucide-react";
+import {Bell, ChevronsUpDown, CreditCard, Eye, FileText, Loader2, LogOut, Menu, Moon, Plus, Sun, Trash2, User, X} from "lucide-react";
 import {Input} from "../ui/input";
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger} from "../ui/dropdown-menu";
 import {useTheme} from "../theme-provider";
@@ -456,10 +456,10 @@ const HeaderBar = ({setIsMobile}) => {
                             <Button variant="ghost hover:none" size="icon" className={"h-8 w-8"}>
                                 <Bell size={20} className={'stroke-white'} />
                             </Button>
-                            <Button variant="ghost hover:none" size="icon" className={"h-8 w-8"} onClick={toggleTheme}>
-                                <Moon size={20} className="block dark:hidden stroke-white"/>
-                                <Sun size={20} className="hidden dark:block stroke-white"/>
-                            </Button>
+                            {/*<Button variant="ghost hover:none" size="icon" className={"h-8 w-8"} onClick={toggleTheme}>*/}
+                            {/*    <Moon size={20} className="block dark:hidden stroke-white"/>*/}
+                            {/*    <Sun size={20} className="hidden dark:block stroke-white"/>*/}
+                            {/*</Button>*/}
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                     <Button variant="secondary" size="icon" className="rounded-full w-[30px] h-[30px]">

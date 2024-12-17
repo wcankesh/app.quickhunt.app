@@ -159,12 +159,12 @@ const UpdateIdea = () => {
         }
     }, [projectDetailsReducer.id, allStatusAndTypes, getPageNo]);
 
-    const getAllCustomers = async (value,project_id) => {
+    const getAllUsers = async (value,project_id) => {
         const payload = {
             project_id: project_id,
             search: value,
         }
-        const data = await apiSerVice.getAllCustomers(payload);
+        const data = await apiSerVice.getAllUsers(payload);
         if (data.status === 200) {
             setGetAllUsersList(data.data)
         }
@@ -172,7 +172,7 @@ const UpdateIdea = () => {
 
     const throttledDebouncedSearch = useCallback(
         debounce((value, project_id) => {
-            getAllCustomers(value, project_id);
+            getAllUsers(value, project_id);
         }, 500),
         []
     );
@@ -186,7 +186,7 @@ const UpdateIdea = () => {
         throttledDebouncedSearch(value, projectDetailsReducer.id);
     };
 
-    const addCustomer = async () => {
+    const addUser = async () => {
         let validationErrors = {};
         Object.keys(usersDetails).forEach(name => {
             const error = formValidate(name, usersDetails[name]);
@@ -205,7 +205,7 @@ const UpdateIdea = () => {
             customer_first_seen: new Date(),
             customer_last_seen: new Date(),
         }
-        const data = await apiSerVice.createCustomers(payload)
+        const data = await apiSerVice.createUsers(payload)
         if(data.status === 200) {
             setUsersDetails(initialStateUser);
             toast({description: data.message,});
@@ -231,7 +231,7 @@ const UpdateIdea = () => {
         openDialogs("addUser", false);
     };
 
-    const deleteCustomer = async (id, index) => {
+    const onDeleteUser = async (id, index) => {
         const payload = {
             id: id,
             feature_idea_id: selectedIdea.id
@@ -248,7 +248,7 @@ const UpdateIdea = () => {
         setDeleteId(null);
     };
 
-    const handleUserClick = (user) => {
+    const handleUserClick = async (user) => {
         const selectedUser = getAllUsersList.find((u) => u.customer_name === user.customer_name);
         if (selectedUser) {
             const updatedVoteList = [...ideasVoteList];
@@ -261,6 +261,15 @@ const UpdateIdea = () => {
                     email: selectedUser.customer_email_id,
                 };
                 updatedVoteList.push(newUserPayload);
+                const upvoteResponse = await apiSerVice.userManualUpVote({
+                    feature_idea_id: selectedIdea.id,
+                    user_id: selectedUser.id,
+                });
+                if(upvoteResponse.status === 200) {
+                    toast({description: upvoteResponse.message,});
+                } else {
+                    toast({description:upvoteResponse.message, variant: "destructive",})
+                }
             } else {
                 updatedVoteList.splice(existingUserIndex, 1);
             }
@@ -832,7 +841,7 @@ const UpdateIdea = () => {
                             </div>
                         </div>
                         <DialogFooter>
-                            <Button className={"font-medium w-[83px]"} onClick={addCustomer}>
+                            <Button className={"font-medium w-[83px]"} onClick={addUser}>
                                 {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Add User"}
                             </Button>
                         </DialogFooter>
@@ -854,7 +863,7 @@ const UpdateIdea = () => {
                             </DialogHeader>
                             <div className={"overflow-y-auto h-full flex-1"}>
                                 <Table>
-                                    <TableHeader className={`bg-muted sticky -top-1`}>
+                                    <TableHeader className={`bg-muted`}>
                                         <TableRow>
                                             {['Name', 'Email', ""].map((x, i) => {
                                                 const icons = [<User className="w-4 h-4" />, <Mail className="w-4 h-4" />];
@@ -900,7 +909,7 @@ const UpdateIdea = () => {
                                                                 <TableCell className={`px-2 py-[10px] md:px-3 max-w-[140px] cursor-pointer truncate text-ellipsis overflow-hidden whitespace-nowrap`}>{x.name ? x.name : "-"}</TableCell>
                                                                 <TableCell className={`px-2 py-[10px] md:px-3 max-w-[140px] cursor-pointer truncate text-ellipsis overflow-hidden whitespace-nowrap`}>{x?.email}</TableCell>
                                                                 <TableCell className={`px-2 py-[10px] md:px-3 text-center`}>
-                                                                    <Button onClick={() => deleteCustomer(x.id,index)} variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px]`}>
+                                                                    <Button onClick={() => onDeleteUser(x.id,index)} variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px]`}>
                                                                         <Trash2 size={16}/>
                                                                     </Button>
                                                                 </TableCell>
@@ -943,17 +952,56 @@ const UpdateIdea = () => {
                                         <Button role="combobox" className={"font-medium"}><CirclePlus size={18} className={"mr-2"} strokeWidth={2} /> Add new upvoter</Button>
                                     </PopoverTrigger>
                                     <PopoverContent className="w-[200px] p-0">
+                                        {/*<Command>*/}
+                                        {/*    <CommandInput placeholder="Search users..." name={"search"} value={filter?.search} onValueChange={handleSearchChange}/>*/}
+                                        {/*    <CommandList className={"overflow-hidden"}>*/}
+                                        {/*    <div className={"overflow-y-auto max-h-[300px]"}>*/}
+                                        {/*        <CommandEmpty>No User found.</CommandEmpty>*/}
+                                        {/*            <CommandGroup className={"p-0"}>*/}
+                                        {/*                {getAllUsersList.length > 0 && (getAllUsersList || []).map((x, i) => {*/}
+                                        {/*                    return (*/}
+                                        {/*                        <Fragment key={i}>*/}
+                                        {/*                            <CommandItem value={x.customer_name}>*/}
+                                        {/*                                <span className={"flex justify-between items-center w-full text-sm font-medium cursor-pointer"}*/}
+                                        {/*                                    onClick={() => handleUserClick(x)}*/}
+                                        {/*                                >*/}
+                                        {/*                                    {x.customer_name}*/}
+                                        {/*                                </span>*/}
+                                        {/*                            </CommandItem>*/}
+                                        {/*                        </Fragment>*/}
+                                        {/*                    )*/}
+                                        {/*                })}*/}
+                                        {/*            </CommandGroup>*/}
+                                        {/*        <div className={"border-t"}>*/}
+                                        {/*            <Button variant="ghost" className={"w-full font-medium"} onClick={() => openDialogs("addUser", true)}><CirclePlus size={16} className={"mr-2"}/>Add a brand new user</Button>*/}
+                                        {/*        </div>*/}
+                                        {/*    </div>*/}
+                                        {/*    </CommandList>*/}
+                                        {/*</Command>*/}
                                         <Command>
-                                            <CommandInput placeholder="Search users..." name={"search"} value={filter?.search} onValueChange={handleSearchChange}/>
+                                            <CommandInput
+                                                placeholder="Search users..."
+                                                name={"search"}
+                                                value={filter?.search}
+                                                onValueChange={handleSearchChange}
+                                            />
                                             <CommandList className={"overflow-hidden"}>
-                                            <div className={"overflow-y-auto max-h-[300px]"}>
-                                                <CommandEmpty>No User found.</CommandEmpty>
+                                                <div className={"overflow-y-auto max-h-[300px]"}>
+                                                    {getAllUsersList.length > 0 &&
+                                                    (getAllUsersList.filter(x =>
+                                                        x.customer_name.toLowerCase().includes(filter?.search?.toLowerCase())
+                                                    ) || []).length === 0 && (
+                                                        <CommandEmpty>No User found.</CommandEmpty>
+                                                    )}
                                                     <CommandGroup className={"p-0"}>
-                                                        {getAllUsersList.length > 0 && (getAllUsersList || []).map((x, i) => {
+                                                        {getAllUsersList.filter(x =>
+                                                            x.customer_name.toLowerCase().includes(filter?.search?.toLowerCase())
+                                                        ).map((x, i) => {
                                                             return (
                                                                 <Fragment key={i}>
                                                                     <CommandItem value={x.customer_name}>
-                                                                        <span className={"flex justify-between items-center w-full text-sm font-medium cursor-pointer"}
+                                                                        <span
+                                                                            className={"flex justify-between items-center w-full text-sm font-medium cursor-pointer"}
                                                                             onClick={() => handleUserClick(x)}
                                                                         >
                                                                             {x.customer_name}
@@ -963,12 +1011,19 @@ const UpdateIdea = () => {
                                                             )
                                                         })}
                                                     </CommandGroup>
-                                                <div className={"border-t"}>
-                                                    <Button variant="ghost" className={"w-full font-medium"} onClick={() => openDialogs("addUser", true)}><CirclePlus size={16} className={"mr-2"}/>Add a brand new user</Button>
+                                                    <div className={"border-t"}>
+                                                        <Button
+                                                            variant="ghost"
+                                                            className={"w-full font-medium"}
+                                                            onClick={() => openDialogs("addUser", true)}
+                                                        >
+                                                            <CirclePlus size={16} className={"mr-2"} />Add a brand new user
+                                                        </Button>
+                                                    </div>
                                                 </div>
-                                            </div>
                                             </CommandList>
                                         </Command>
+
                                     </PopoverContent>
                                 </Popover>
                             </DialogFooter>

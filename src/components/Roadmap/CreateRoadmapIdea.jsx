@@ -193,24 +193,22 @@ const CreateRoadmapIdea = ({isOpen, onOpen, onClose, closeCreateIdea, selectedRo
                                     <Label className={"font-normal capitalize"}>Choose Topics for this Idea (optional)</Label>
                                     <Select onValueChange={handleChange} value={selectedValues}>
                                         <SelectTrigger className="bg-card">
-                                            <SelectValue className={"text-muted-foreground text-sm"} placeholder="Assign to">
+                                            <SelectValue className={"text-muted-foreground text-sm"}>
                                                 <div className={"flex gap-[2px]"}>
                                                     {
-                                                        (ideaDetail.topic || []).map((x,index)=>{
-                                                            const findObj = topicLists.find((y) => y.id === x);
-                                                            return(
-                                                                <>
+                                                        (ideaDetail.topic || []).length === 0
+                                                            ? <span className={"text-muted-foreground"}>Select topic</span>
+                                                            : (ideaDetail.topic || []).map((x, index) => {
+                                                                const findObj = topicLists.find((y) => y.id === x);
+                                                                return (
                                                                     <div key={index} className={`text-xs flex gap-[2px] ${theme === "dark" ? "text-card" : ""} bg-slate-300 items-center rounded py-0 px-2`}>
                                                                         <span className={"max-w-[85px] truncate text-ellipsis overflow-hidden whitespace-nowrap"}>
-                                                                    {findObj?.title}
-                                                                </span>
+                                                                            {findObj?.title}
+                                                                        </span>
                                                                     </div>
-                                                                </>
-
-                                                            )
-                                                        })
+                                                                );
+                                                            })
                                                     }
-                                                    {(ideaDetail.topic || []).length > 2}
                                                 </div>
                                             </SelectValue>
                                         </SelectTrigger>

@@ -297,27 +297,13 @@ const Team = () => {
                                         <TableHeader className={`${theme === "dark" ? "" : "bg-muted"}`}>
                                             <TableRow>
                                                 {
-                                                    // ["Team", "Role" ,isAdmin === true ? "Action" : ""].map((x, i) => {
                                                     ["Team", "Role" ,"Action"].map((x, i) => {
                                                         return (
                                                            <TableHead key={x} className={`h-[22px] px-2 py-[10px] md:px-3 text-sm font-normal ${i === 2 ? "text-end" : ""} ${theme === "dark" ? "border-t" : "text-card-foreground"}`}>{x}</TableHead>
-                                                           // x ? <TableHead key={x} className={`h-[22px] sm:pl-6 pb-2 text-sm font-normal ${ isAdmin === true && i === 2 ? "text-end" : isAdmin === false && i === 1 ? "text-end" : ""} ${theme === "dark" ? "" : "text-card-foreground"}`}>{x}</TableHead> :""
                                                         )
                                                     })
                                                 }
                                             </TableRow>
-                                            {/*<TableRow>*/}
-                                            {/*    {["Team", "Role", ...(isAdmin ? ["Action"] : [])].map((x, i) => (*/}
-                                            {/*        <TableHead*/}
-                                            {/*            key={x}*/}
-                                            {/*            className={`h-[22px] px-2 py-[10px] md:px-3 text-sm font-normal ${*/}
-                                            {/*                i === 2 ? "text-end" : ""*/}
-                                            {/*            } ${theme === "dark" ? "border-t" : "text-card-foreground"}`}*/}
-                                            {/*        >*/}
-                                            {/*            {x}*/}
-                                            {/*        </TableHead>*/}
-                                            {/*    ))}*/}
-                                            {/*</TableRow>*/}
                                         </TableHeader>
                                         <TableBody>
                                             {isLoading ?
@@ -369,21 +355,6 @@ const Team = () => {
                                                                                className={`h-[20px] py-0 px-2 text-xs rounded-[5px] ${x.role === 1 ? "text-[#63c8d9] border-[#63c8d9]" : "text-[#694949] border-[#694949]"}`}>{x?.role === 1 ? "Admin" : "Member"}</Badge>
 
                                                                     </TableCell>
-
-                                                                    {/*{*/}
-                                                                    {/*    isAdmin === true && <TableCell*/}
-                                                                    {/*        className={"flex justify-end py-[10px] px-[12px]"}>*/}
-                                                                    {/*        {*/}
-                                                                    {/*            x.role === 2 ? <Button*/}
-                                                                    {/*                variant="outline hover:bg-transparent"*/}
-                                                                    {/*                className="p-1 border w-[30px] h-[30px]"*/}
-                                                                    {/*                onClick={() => removeMember(x.id)}*/}
-                                                                    {/*            >*/}
-                                                                    {/*                <Trash2 size={16}/>*/}
-                                                                    {/*            </Button> : ""*/}
-                                                                    {/*        }*/}
-                                                                    {/*    </TableCell>*/}
-                                                                    {/*}*/}
                                                                     {isAdmin && (
                                                                         <TableCell className="flex justify-end py-[10px] px-[12px]">
                                                                             {x.role === 2 && (
@@ -402,7 +373,7 @@ const Team = () => {
                                                         })
                                                     }
                                                 </> : <TableRow>
-                                                    <TableCell colSpan={isAdmin ? 3 : 2}>
+                                                    <TableCell colSpan={3}>
                                                         <EmptyData/>
                                                     </TableCell>
                                                 </TableRow>

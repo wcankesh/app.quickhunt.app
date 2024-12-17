@@ -1,21 +1,6 @@
 import React, {Fragment, useEffect, useState} from 'react';
 import {Button} from "../ui/button";
-import {
-    ArrowUp, ChevronUp,
-    Clock,
-    GalleryVerticalEnd,
-    Info,
-    Lightbulb,
-    Loader2,
-    Mail,
-    MapPin, MessageSquare,
-    MessagesSquare,
-    Plus,
-    Settings,
-    Trash2,
-    X,
-    Zap
-} from "lucide-react";
+import {ChevronUp, Clock, GalleryVerticalEnd, Info, Lightbulb, Loader2, Mail, MapPin, MessageSquare, MessagesSquare, Plus, Settings, Trash2, X, Zap} from "lucide-react";
 import {Card, CardContent} from "../ui/card";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "../ui/table";
 import {useTheme} from "../theme-provider";
@@ -56,11 +41,11 @@ const initialStateError = {
     customer_email_id: "",
 }
 
-const UserActionsList = ({ userActions, sourceTitle, isLoading }) => {
-    if (isLoading || !userActions.length) {
+const UserActionsList = ({ userActions, sourceTitle, isLoadingUserDetail, selectedTab, pageNoAction, totalPagesAction, handlePaginationClickAction }) => {
+    if (isLoadingUserDetail || !userActions.length) {
         return (
             <div className="divide-y h-[calc(100vh_-_204px)]">
-                {isLoading ? (
+                {isLoadingUserDetail ? (
                     Array.from({ length: 13 }).map((_, index) => (
                         <div key={index} className="px-2 py-[10px] md:px-3 flex justify-between gap-2">
                             <Skeleton className="rounded-md w-full h-7 bg-muted-foreground/[0.1]" />
@@ -74,7 +59,7 @@ const UserActionsList = ({ userActions, sourceTitle, isLoading }) => {
     }
 
     return (
-        <div className={"divide-y h-[calc(100vh_-_204px)]"}>
+        <div className={"divide-y"}>
             {(userActions || []).map((action, index) => {
                 return (
                     <Fragment key={index}>
@@ -106,6 +91,16 @@ const UserActionsList = ({ userActions, sourceTitle, isLoading }) => {
                     </Fragment>
                 );
             })}
+            {
+                (selectedTab !== "details" && selectedTab !== 1 && userActions?.length > 0) ?
+                    <Pagination
+                        pageNo={pageNoAction}
+                        totalPages={totalPagesAction}
+                        isLoading={isLoadingUserDetail}
+                        handlePaginationClick={handlePaginationClickAction}
+                        stateLength={userActions?.length}
+                    /> : ""
+            }
         </div>
     );
 };
@@ -124,7 +119,9 @@ const Users = () => {
     const [customerList, setCustomerList] = useState([]);
     const [userActions, setUserActions] = useState([]);
     const [pageNo, setPageNo] = useState(Number(getPageNo));
+    const [pageNoAction, setPageNoAction] = useState(1);
     const [totalRecord, setTotalRecord] = useState(0);
+    const [totalRecordAction, setTotalRecordAction] = useState(0);
     const [deleteId,setDeleteId]=useState(null);
     const [isSheetOpen, setSheetOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
@@ -141,7 +138,7 @@ const Users = () => {
 
     useEffect(() => {
         if(projectDetailsReducer.id){
-            getAllCustomers();
+            getAllUsers();
         }
         navigate(`${baseUrl}/user?pageNo=${pageNo}`)
     }, [projectDetailsReducer.id, pageNo])
@@ -196,14 +193,14 @@ const Users = () => {
         setFormError(initialStateError);
     };
 
-    const getAllCustomers = async () => {
+    const getAllUsers = async () => {
         setIsLoading(true);
         const payload = {
             project_id: projectDetailsReducer.id,
             page: pageNo,
             limit: perPageLimit
         }
-        const data = await apiService.getAllCustomers(payload);
+        const data = await apiService.getAllUsers(payload);
         if (data.status === 200) {
             setCustomerList(data.data);
             setTotalRecord(data?.total);
@@ -225,13 +222,13 @@ const Users = () => {
 
     const handleDelete = async () =>{
         setIsLoadingDelete(true);
-        const data = await apiService.deleteCustomers(deleteId);
+        const data = await apiService.deleteUsers(deleteId);
         const clone = [...customerList];
         const indexToDelete = clone.findIndex((x)=> x.id == deleteId);
         if(data.status === 200) {
             clone.splice(indexToDelete,1);
             setCustomerList(clone);
-            getAllCustomers();
+            getAllUsers();
             toast({description: data.message});
             setIsLoadingDelete(false);
         }
@@ -262,7 +259,7 @@ const Users = () => {
             customer_first_seen: new Date(),
             customer_last_seen: new Date(),
         }
-        const data = await apiService.createCustomers(payload)
+        const data = await apiService.createUsers(payload)
         if(data.status === 200) {
             setIsSave(false);
             setCustomerDetails(initialState);
@@ -282,12 +279,13 @@ const Users = () => {
         const payload = {
             user_id: selectedCustomer?.id,
             type: selectedTab,
-            page: pageNo,
+            page: pageNoAction,
             limit: perPageLimit
         }
-        const data = await apiService.customersAction(payload);
+        const data = await apiService.userAction(payload);
         if(data.status === 200) {
             setUserActions(Array.isArray(data.data) ? data.data : []);
+            setTotalRecordAction(data.total)
             // toast({description: data.message,});
             setIsLoadingUserDetail(false)
         } else {
@@ -299,15 +297,23 @@ const Users = () => {
         if (selectedTab !== "details" && selectedCustomer?.id) {
             getUserActions();
         }
-    }, [selectedTab, selectedCustomer?.id]);
+    }, [selectedTab, selectedCustomer?.id, pageNoAction]);
 
     const totalPages = Math.ceil(totalRecord / perPageLimit);
+    const totalPagesAction = Math.ceil(totalRecordAction / perPageLimit);
 
     const handlePaginationClick = (newPage) => {
         if (newPage >= 1 && newPage <= totalPages) {
             setIsLoading(true);
             setPageNo(newPage);
             setIsLoading(false);
+        }
+    };
+
+    const handlePaginationClickAction = (newPage) => {
+        if (newPage >= 1 && newPage <= totalPagesAction) {
+            setIsLoadingUserDetail(true);
+            setPageNoAction(newPage);
         }
     };
 
@@ -388,25 +394,12 @@ const Users = () => {
                 </div>
             </Fragment>
         },
-        {
-            label: "Action", value: 1, icon: <Zap size={18} className={"mr-2"}/>,
-            component: <UserActionsList userActions={userActions} sourceTitle={sourceTitle} isLoading={isLoading} />
-        },
-        { label: "Announcement feedback", value: 2, icon: <MessagesSquare size={18} className={"mr-2"} />,
-            component: <UserActionsList userActions={userActions} sourceTitle={sourceTitle} isLoading={isLoading} />
-        },
-        { label: "Announcement reaction", value: 3, icon: <GalleryVerticalEnd size={18} className={"mr-2"} />,
-            component: <UserActionsList userActions={userActions} sourceTitle={sourceTitle} isLoading={isLoading} />
-        },
-        { label: "Create idea", value: 4, icon: <Lightbulb size={18} className={"mr-2"} />,
-            component: <UserActionsList userActions={userActions} sourceTitle={sourceTitle} isLoading={isLoading} />
-        },
-        { label: "Idea comment", value: 5, icon: <MessageSquare size={18} className={"mr-2"} />,
-            component: <UserActionsList userActions={userActions} sourceTitle={sourceTitle} isLoading={isLoading} />
-        },
-        { label: "Idea upvote", value: 6, icon: <ChevronUp size={18} className={"mr-2"} />,
-            component: <UserActionsList userActions={userActions} sourceTitle={sourceTitle} isLoading={isLoading} />
-        },
+        { label: "Action", value: 1, icon: <Zap size={18} className={"mr-2"}/>},
+        { label: "Announcement feedback", value: 2, icon: <MessagesSquare size={18} className={"mr-2"} />},
+        { label: "Announcement reaction", value: 3, icon: <GalleryVerticalEnd size={18} className={"mr-2"} />},
+        { label: "Create idea", value: 4, icon: <Lightbulb size={18} className={"mr-2"} />},
+        { label: "Idea comment", value: 5, icon: <MessageSquare size={18} className={"mr-2"} />},
+        { label: "Idea upvote", value: 6, icon: <ChevronUp size={18} className={"mr-2"} />},
     ];
 
     return (
@@ -487,8 +480,19 @@ const Users = () => {
                                 {
                                     (tabs || []).map((y, i) => (
                                         <TabsContent key={i} value={y.value} className={"mt-0"}>
-                                            <div className={"grid grid-cols-1 overflow-auto whitespace-nowrap"}>
-                                                {y.component}
+                                            <div className={"grid grid-cols-1 overflow-auto whitespace-nowrap h-[calc(100vh_-_204px)]"}>
+                                                {
+                                                    y.value === "details" ? y.component :
+                                                        <UserActionsList
+                                                            userActions={userActions}
+                                                            sourceTitle={sourceTitle}
+                                                            isLoadingUserDetail={isLoadingUserDetail}
+                                                            selectedTab={selectedTab}
+                                                            pageNoAction={pageNoAction}
+                                                            totalPagesAction={totalPagesAction}
+                                                            handlePaginationClickAction={handlePaginationClickAction}
+                                                        />
+                                                }
                                             </div>
                                         </TabsContent>
                                     ))
@@ -499,9 +503,8 @@ const Users = () => {
                 </Sheet>
             )}
 
-
             <div className={"container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-3 md:px-4"}>
-                {/*<NewCustomerSheet isOpen={isSheetOpen} onOpen={openSheet} callback={getAllCustomers} onClose={closeSheet}/>*/}
+                {/*<NewCustomerSheet isOpen={isSheetOpen} onOpen={openSheet} callback={getAllUsers} onClose={closeSheet}/>*/}
 
                 {
                     openDelete &&
