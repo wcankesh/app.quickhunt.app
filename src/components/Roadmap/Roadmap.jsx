@@ -192,7 +192,7 @@ const Roadmap = () => {
             title: "Create Announcement",
             description: `Share updates or milestones from your roadmap with users to keep them engaged and in the loop.`,
             btnText: [
-                {title: "Create Announcement", navigateTo: `${baseUrl}/announcements`, icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
+                {title: "Create Announcement", navigateTo: `${baseUrl}/announcements?opensheet=open`, icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
             ],
         },
         {

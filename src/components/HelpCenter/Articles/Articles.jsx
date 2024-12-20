@@ -1,11 +1,10 @@
-import React, {Fragment, useEffect, useState, useCallback} from 'react';
-import { Input } from "../../ui/input";
-import { Select, SelectGroup, SelectValue, SelectItem, SelectTrigger, SelectContent } from "../../ui/select";
+import React, {Fragment, useCallback, useEffect, useState} from 'react';
+import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "../../ui/select";
 import {Check, Circle, Ellipsis, Filter, Plus, X} from "lucide-react";
-import { Button } from "../../ui/button";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../ui/table";
+import {Button} from "../../ui/button";
+import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "../../ui/table";
 import {Card, CardContent} from "../../ui/card";
-import { useTheme } from "../../theme-provider";
+import {useTheme} from "../../theme-provider";
 import {DropdownMenu, DropdownMenuPortal, DropdownMenuSub, DropdownMenuTrigger} from "@radix-ui/react-dropdown-menu";
 import {DropdownMenuContent, DropdownMenuItem, DropdownMenuSubContent, DropdownMenuSubTrigger} from "../../ui/dropdown-menu";
 import {useNavigate} from "react-router-dom";
@@ -20,8 +19,9 @@ import {Badge} from "../../ui/badge";
 import Pagination from "../../Comman/Pagination";
 import DeleteDialog from "../../Comman/DeleteDialog";
 import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList} from "../../ui/command";
-import { debounce } from 'lodash';
+import {debounce} from 'lodash';
 import {EmptyDataContent} from "../../Comman/EmptyDataContent";
+import {CommSearchBar} from "../../Comman/CommentEditor";
 
 const status = [
     {name: "Publish", value: 1, fillColor: "#389E0D", strokeColor: "#389E0D",},
@@ -262,24 +262,12 @@ const Articles = () => {
                 </div>
                 <div className={"w-full lg:w-auto flex sm:flex-nowrap flex-wrap gap-2 items-center"}>
                     <div className={"flex gap-2 items-center w-full lg:w-auto"}>
-                        <div className={"relative w-full"}>
-                        <Input
-                            type="search" value={filter.search}
-                            placeholder="Search..."
-                            className={"w-full pl-4 pr-14 text-sm font-normal h-9"}
-                            name={"search"}
+                        <CommSearchBar
+                            value={filter.search}
                             onChange={onChangeSearch}
+                            onClear={clearSearchFilter}
+                            placeholder="Search..."
                         />
-                            {filter.search.trim() !== '' && (
-                                <button
-                                    type="button"
-                                    className="absolute right-2 top-1/2 transform -translate-y-1/2 w-6 h-6 flex items-center justify-center text-gray-400 hover:text-gray-600"
-                                    onClick={clearSearchFilter}
-                                >
-                                    <X className="w-4 h-4" />
-                                </button>
-                            )}
-                        </div>
                         <div className={"flex items-center"}>
                             <DropdownMenu open={openFilter} onOpenChange={setOpenFilter}>
                                 <DropdownMenuTrigger asChild>

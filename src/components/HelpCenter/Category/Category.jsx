@@ -1,17 +1,14 @@
 import React, {Fragment, useEffect, useCallback, useState} from 'react';
-import {Input} from "../../ui/input";
 import {Button} from "../../ui/button";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "../../ui/table";
 import {Card, CardContent} from "../../ui/card";
 import {DropdownMenu, DropdownMenuTrigger} from "@radix-ui/react-dropdown-menu";
 import {DropdownMenuContent, DropdownMenuItem} from "../../ui/dropdown-menu";
-import {CircleX, Ellipsis, Loader2, Plus, Upload, X} from "lucide-react";
+import {Ellipsis, Plus, X} from "lucide-react";
 import {Sheet, SheetContent, SheetHeader, SheetOverlay} from "../../ui/sheet";
-import {Label} from "../../ui/label";
 import moment from 'moment';
 import {useToast} from "../../ui/use-toast";
 import {useTheme} from "../../theme-provider";
-import ReactQuillEditor from "../../Comman/ReactQuillEditor";
 import {useSelector} from "react-redux";
 import {ApiService} from "../../../utils/ApiService";
 import {Skeleton} from "../../ui/skeleton";
@@ -22,6 +19,8 @@ import Pagination from "../../Comman/Pagination";
 import DeleteDialog from "../../Comman/DeleteDialog";
 import {debounce} from "lodash";
 import {EmptyDataContent} from "../../Comman/EmptyDataContent";
+import CategoryForm from "../../Comman/CategoryForm";
+import {CommSearchBar} from "../../Comman/CommentEditor";
 
 const initialState = {
     title: "",
@@ -64,11 +63,7 @@ const Category = () => {
     const [idToDelete, setIdToDelete] = useState(null);
     const [subIdToDelete, setSubIdToDelete] = useState(null);
     const [isLoadingDelete, setIsLoadingDelete] = useState(false);
-    const [filter, setFilter] = useState({
-        search: "",
-        category_id: "",
-        sub_category_id: ""
-    });
+    const [filter, setFilter] = useState({search: "", category_id: "", sub_category_id: ""});
     const [emptyContentBlock, setEmptyContentBlock] = useState(true);
 
     const emptyContent = (status) => {setEmptyContentBlock(status);};
@@ -124,22 +119,6 @@ const Category = () => {
         getAllCategory('').then(() => {
             setIsLoading(false);
         });
-    };
-
-    const handleOnChange = (name, value) => {
-        setSelectedCategory({ ...selectedCategory, [name]: value });
-        setFormError(formError => ({
-            ...formError,
-            [name]: formValidate(name, value)
-        }));
-    };
-
-    const handleOnChangeSub = (name, value) => {
-        setSelectedSubCategory({ ...selectedSubCategory, [name]: value });
-        setFormError(formError => ({
-            ...formError,
-            [name]: formValidate(name, value)
-        }));
     };
 
     const formValidate = (name, value) => {
@@ -348,7 +327,6 @@ const Category = () => {
         setSheetOpen(true);
     };
 
-
     const openSheetSubCategory = (id, data) => {
         const updatedData = {
             ...data,
@@ -418,22 +396,6 @@ const Category = () => {
             }
         }
     };
-
-    const onDeleteImg = (name, value) => {
-        if (selectedCategory && selectedCategory?.image) {
-            setSelectedCategory({...selectedCategory, image: ""})
-        } else {
-            setSelectedCategory({...selectedCategory, [name]: value, image: ""})
-        }
-    };
-
-    const onSubDeleteImg = (name, value) => {
-        if (selectedSubCategory && selectedSubCategory?.image) {
-            setSelectedSubCategory({...selectedSubCategory, image: ""})
-        } else {
-            setSelectedSubCategory({...selectedSubCategory, [name]: value, image: ""})
-        }
-    }
 
     const deleteRow = (id) => {
         setIdToDelete(id);
@@ -525,85 +487,16 @@ const Category = () => {
                             </h5>
                             <X onClick={closeSheetCategory} size={18} className={"cursor-pointer m-0"} />
                         </SheetHeader>
-                        <div className={"h-[calc(100%_-_69px)] overflow-y-auto"}>
-                        <div className={"sm:px-8 sm:py-6 px-3 py-4 border-b space-y-6"}>
-                            <div className="grid w-full gap-2">
-                                <Label htmlFor="category-name" className={"font-normal"}>Category Name</Label>
-                                <Input
-                                    value={selectedCategory?.title}
-                                    onChange={(e) => handleOnChange("title", e.target.value)}
-                                    type="text"
-                                    id="category-name"
-                                    className={"h-9"}
-                                    placeholder={"Enter the category name..."}
-                                />
-                                {
-                                    formError?.title && <span className="text-red-500 text-sm">{formError?.title}</span>
-                                }
-                            </div>
-                            <div className="grid w-full gap-2">
-                                <Label className={"font-normal"}>Category Description</Label>
-                                <ReactQuillEditor
-                                    value={selectedCategory?.description}
-                                    onChange={(e) => handleOnChange("description", e.target.value)}
-                                />
-                                {formError?.description && <span className="text-red-500 text-sm">{formError?.description}</span>}
-                            </div>
-                            <div className={"flex flex-col gap-2"}>
-                                <Label className={"font-normal"}>Category Icon</Label>
-                            <div className="w-[282px] h-[128px] flex gap-1">
-                                {
-                                    selectedCategory?.image ?
-                                        <div>
-                                            <div className={"w-[282px] h-[128px] relative border p-[5px]"}>
-                                                <img
-                                                    className={"upload-img"}
-                                                    src={selectedCategory && selectedCategory?.image && selectedCategory?.image?.name ? URL.createObjectURL(selectedCategory?.image) : selectedCategory?.image}
-                                                    alt=""
-                                                />
-                                                <CircleX
-                                                    size={20}
-                                                    className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
-                                                    onClick={() => onDeleteImg('delete_image', selectedCategory && selectedCategory?.image && selectedCategory?.image?.name ? "" : selectedCategory?.image.replace("https://code.quickhunt.app/public/storage/post/", ""))}
-                                                />
-                                            </div>
-                                        </div> :
-                                        <div>
-                                            <input
-                                                id="pictureInput"
-                                                type="file"
-                                                className="hidden"
-                                                accept={".jpg,.jpeg"}
-                                                onChange={handleImageUpload}
-                                            />
-                                            <label
-                                                htmlFor="pictureInput"
-                                                className="border-dashed w-[282px] h-[128px] py-[52px] flex items-center justify-center bg-muted border border-muted-foreground rounded cursor-pointer"
-                                            >
-                                                <Upload className="h-4 w-4 text-muted-foreground" />
-                                            </label>
-                                        </div>
-                                }
-                            </div>
-                            </div>
-                        </div>
-                        <div className={"flex gap-4 px-3 py-4 sm:py-6 sm:px-8"}>
-                            <Button
-                                className={`border w-[115px] font-medium hover:bg-primary`}
-                                onClick={selectedCategory?.id ? updateCategory : addCategory}
-                            >
-                                {categoryEdit ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save Category"}
-                            </Button>
-
-                            <Button
-                                variant={"ghost hover:bg-none"}
-                                onClick={closeSheetCategory}
-                                className={`border border-primary font-medium text-primary`}
-                            >
-                                Cancel
-                            </Button>
-                        </div>
-                        </div>
+                        <CategoryForm
+                            selectedData={selectedCategory}
+                            setSelectedData={setSelectedCategory}
+                            formError={formError}
+                            setFormError={setFormError}
+                            handleImageUpload={handleImageUpload}
+                            handleSubmit={selectedCategory?.id ? updateCategory : addCategory}
+                            isLoading={categoryEdit}
+                            closeSheet={closeSheetCategory}
+                        />
                     </SheetContent>
                 </Sheet>
             )}
@@ -618,85 +511,16 @@ const Category = () => {
                             </h5>
                             <X onClick={closeSheetSubCategory} size={18} className={"cursor-pointer m-0"} />
                         </SheetHeader>
-                        <div className={"h-[calc(100%_-_69px)] overflow-y-auto"}>
-                            <div className={"sm:px-8 sm:py-6 px-3 py-4 border-b space-y-6"}>
-                                <div className="grid w-full gap-2">
-                                    <Label htmlFor="category-name" className={"font-normal"}>Sub Category Name</Label>
-                                    <Input
-                                        value={selectedSubCategory?.title}
-                                        onChange={(e) => handleOnChangeSub("title", e.target.value)}
-                                        type="text"
-                                        id="category-name"
-                                        className={"h-9"}
-                                        placeholder={"Enter the sub-category name..."}
-                                    />
-                                    {
-                                        formError?.title && <span className="text-red-500 text-sm">{formError?.title}</span>
-                                    }
-                                </div>
-                                <div className="grid w-full gap-2">
-                                    <Label className={"font-normal"}>Sub Category Description</Label>
-                                    <ReactQuillEditor
-                                        value={selectedSubCategory?.description}
-                                        onChange={(e) => handleOnChangeSub("description", e.target.value)}
-                                    />
-                                    {formError?.description && <span className="text-red-500 text-sm">{formError?.description}</span>}
-                                </div>
-                                <div className={"flex flex-col gap-2"}>
-                                    <Label className={"font-normal"}>Sub Category Icon</Label>
-                                    <div className="w-[282px] h-[128px] flex gap-1">
-                                        {
-                                            selectedSubCategory?.image ?
-                                                <div>
-                                                    <div className={"w-[282px] h-[128px] relative border p-[5px]"}>
-                                                        <img
-                                                            className={"upload-img"}
-                                                            src={selectedSubCategory && selectedSubCategory?.image && selectedSubCategory?.image?.name ? URL.createObjectURL(selectedSubCategory?.image) : selectedSubCategory?.image}
-                                                            alt=""
-                                                        />
-                                                        <CircleX
-                                                            size={20}
-                                                            className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
-                                                            onClick={() => onSubDeleteImg('delete_image', selectedSubCategory && selectedSubCategory?.image && selectedSubCategory?.image?.name ? "" : selectedSubCategory?.image.replace("https://code.quickhunt.app/public/storage/post/", ""))}
-                                                        />
-                                                    </div>
-                                                </div> :
-                                                <div>
-                                                    <input
-                                                        id="pictureInput"
-                                                        type="file"
-                                                        className="hidden"
-                                                        accept={".jpg,.jpeg"}
-                                                        onChange={handleImageUploadSub}
-                                                    />
-                                                    <label
-                                                        htmlFor="pictureInput"
-                                                        className="border-dashed w-[282px] h-[128px] py-[52px] flex items-center justify-center bg-muted border border-muted-foreground rounded cursor-pointer"
-                                                    >
-                                                        <Upload className="h-4 w-4 text-muted-foreground" />
-                                                    </label>
-                                                </div>
-                                        }
-                                    </div>
-                                </div>
-                            </div>
-                            <div className={"flex gap-4 px-3 py-4 sm:py-6 sm:px-8"}>
-                                <Button
-                                    className={`border w-[145px] font-medium hover:bg-primary`}
-                                    onClick={selectedSubCategory?.id ? updateSubCategory : addSubCategory}
-                                >
-                                    {subCategoryEdit ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save Sub Category"}
-                                </Button>
-
-                                <Button
-                                    variant={"ghost hover:bg-none"}
-                                    onClick={closeSheetSubCategory}
-                                    className={`border border-primary font-medium text-primary`}
-                                >
-                                    Cancel
-                                </Button>
-                            </div>
-                        </div>
+                        <CategoryForm
+                            selectedData={selectedSubCategory}
+                            setSelectedData={setSelectedSubCategory}
+                            formError={formError}
+                            setFormError={setFormError}
+                            handleImageUpload={handleImageUploadSub}
+                            handleSubmit={selectedSubCategory?.id ? updateSubCategory : addSubCategory}
+                            isLoading={subCategoryEdit}
+                            closeSheet={closeSheetSubCategory}
+                        />
                     </SheetContent>
                 </Sheet>
             )}
@@ -727,7 +551,6 @@ const Category = () => {
                     />
                 }
 
-
                 <div className={"flex items-center justify-between flex-wrap gap-2"}>
                     <div className={"flex flex-col flex-1 gap-y-0.5"}>
                         <h1 className={"text-2xl font-normal flex-initial w-auto"}>All Category ({totalRecord})</h1>
@@ -735,30 +558,18 @@ const Category = () => {
                     </div>
                     <div className={"w-full lg:w-auto flex flex-wrap sm:flex-nowrap gap-2 items-center"}>
                         <div className={"flex gap-2 items-center w-full lg:w-auto"}>
-                            <div className={"relative w-full"}>
-                                <Input
-                                    type="search" value={filter.search}
-                                    placeholder="Search..."
-                                    className={"w-full pl-4 pr-14 text-sm font-normal h-9"}
-                                    name={"search"}
-                                    onChange={onChangeSearch}
-                                />
-                                {filter.search.trim() !== '' && (
-                                    <button
-                                        type="button"
-                                        className="absolute right-2 top-1/2 transform -translate-y-1/2 w-6 h-6 flex items-center justify-center text-gray-400 hover:text-gray-600"
-                                        onClick={clearSearchFilter}
-                                    >
-                                        <X className="w-4 h-4" />
-                                    </button>
-                                )}
-                            </div>
-                        <Button
-                            onClick={() => openSheetCategory("", "")}
-                            className={"gap-2 font-medium hover:bg-primary"}
-                        >
-                            <Plus size={20} strokeWidth={3} /><span className={"text-xs md:text-sm font-medium"}>New Category</span>
-                        </Button>
+                            <CommSearchBar
+                                value={filter.search}
+                                onChange={onChangeSearch}
+                                onClear={clearSearchFilter}
+                                placeholder="Search..."
+                            />
+                            <Button
+                                onClick={() => openSheetCategory("", "")}
+                                className={"gap-2 font-medium hover:bg-primary"}
+                            >
+                                <Plus size={20} strokeWidth={3} /><span className={"text-xs md:text-sm font-medium"}>New Category</span>
+                            </Button>
                         </div>
                     </div>
                 </div>

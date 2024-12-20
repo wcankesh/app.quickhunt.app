@@ -1,6 +1,23 @@
 import React, {Fragment, useEffect, useState} from 'react';
 import {Button} from "../ui/button";
-import {ChevronUp, Clock, GalleryVerticalEnd, Info, Lightbulb, Loader2, Mail, MapPin, MessageSquare, MessagesSquare, Plus, Settings, Trash2, X, Zap} from "lucide-react";
+import {
+    ChevronUp,
+    Clock,
+    GalleryVerticalEnd,
+    Info,
+    Lightbulb,
+    Loader2,
+    Mail,
+    MapPin,
+    MessageSquare,
+    MessagesSquare,
+    Plus,
+    Settings,
+    Trash2,
+    Vote,
+    X,
+    Zap
+} from "lucide-react";
 import {Card, CardContent} from "../ui/card";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "../ui/table";
 import {useTheme} from "../theme-provider";
@@ -66,7 +83,7 @@ const UserActionsList = ({ userActions, sourceTitle, isLoadingUserDetail, select
                         {sourceTitle.map((source, i) => {
                             if (action.source === source.value) {
                                 return (
-                                    <div className={"px-2 py-[10px] md:px-3 flex justify-between gap-2"} key={i}>
+                                    <div className={"px-2 py-[10px] md:px-3 flex flex-wrap justify-between gap-2"} key={i}>
                                         <div className={"space-y-3"}>
                                             <h2 className={"font-medium"}>{source.title}</h2>
                                             {source.value === "post_reactions" ? (
@@ -74,10 +91,10 @@ const UserActionsList = ({ userActions, sourceTitle, isLoadingUserDetail, select
                                                     <Avatar className={"rounded-none w-[20px] h-[20px]"}>
                                                         <AvatarImage src={action.emoji_url} />
                                                     </Avatar>
-                                                    <span className={"text-sm text-muted-foreground"}>{action.title}</span>
+                                                    <span className={"text-sm text-wrap text-muted-foreground"}>{action.title}</span>
                                                 </div>
                                             ) : (
-                                                <span className={"text-sm text-muted-foreground"}>{action.title}</span>
+                                                <span className={"text-sm text-wrap text-muted-foreground"}>{action.title}</span>
                                             )}
                                         </div>
                                         <span className={"text-sm text-muted-foreground"}>
@@ -228,7 +245,12 @@ const Users = () => {
         if(data.status === 200) {
             clone.splice(indexToDelete,1);
             setCustomerList(clone);
-            getAllUsers();
+            if (clone.length === 0 && pageNo > 1) {
+                navigate(`${baseUrl}/user?pageNo=${pageNo - 1}`);
+                setPageNo((prev) => prev - 1);
+            } else {
+                getAllUsers();
+            }
             toast({description: data.message});
             setIsLoadingDelete(false);
         }
@@ -267,6 +289,7 @@ const Users = () => {
             const clone = [...customerList];
             clone.unshift(data.data);
             setCustomerList(clone);
+            getAllUsers();
         } else {
             setIsSave(false);
             toast({description:data.message, variant: "destructive",})
@@ -329,7 +352,7 @@ const Users = () => {
             title: "Create Ideas",
             description: `Encourage user engagement by capturing and sharing ideas that resonate with your audience, turning visitors into active users.`,
             btnText: [
-                {title: "Create Ideas", navigateTo: `${baseUrl}/ideas`, icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
+                {title: "Create Ideas", openSheet: true, navigateTo: `${baseUrl}/ideas?opensheet=open`, icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
             ],
         },
         {
@@ -343,7 +366,7 @@ const Users = () => {
             title: "Create Announcement",
             description: `Share key updates, new features, and milestones through announcements to keep users engaged and excited about your product.`,
             btnText: [
-                {title: "Create Announcement", navigateTo: `${baseUrl}/announcements`, icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
+                {title: "Create Announcement", openSheet: true, navigateTo: `${baseUrl}/announcements?opensheet=open`, icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
             ],
         },
         {
@@ -399,7 +422,7 @@ const Users = () => {
         { label: "Announcement reaction", value: 3, icon: <GalleryVerticalEnd size={18} className={"mr-2"} />},
         { label: "Create idea", value: 4, icon: <Lightbulb size={18} className={"mr-2"} />},
         { label: "Idea comment", value: 5, icon: <MessageSquare size={18} className={"mr-2"} />},
-        { label: "Idea upvote", value: 6, icon: <ChevronUp size={18} className={"mr-2"} />},
+        { label: "Idea upvote", value: 6, icon: <Vote size={18} className={"mr-2"} />},
     ];
 
     return (
@@ -444,7 +467,7 @@ const Users = () => {
                             <X onClick={() => setDetailsSheetOpen(false)} size={18} className={"cursor-pointer m-0"} />
                         </SheetHeader>
                         <div className={"divide-y"}>
-                            <div className={"px-2 py-[10px] md:px-3 flex justify-between gap-4"}>
+                            <div className={"px-2 py-[10px] md:px-3 flex flex-wrap justify-between gap-4"}>
                                 <div className={"flex items-center gap-4"}>
                                     <Avatar className={"w-[50px] h-[50px]"}>
                                         <AvatarFallback className={"text-xl"}>{selectedCustomer?.customer_first_name && selectedCustomer?.customer_first_name.substring(0, 1).toUpperCase()}</AvatarFallback>
@@ -465,7 +488,7 @@ const Users = () => {
                             </div>
                             <Tabs defaultValue="details" onValueChange={(value) => setSelectedTab(value)}>
                                 <div className={"border-b p-3"}>
-                                    <TabsList className="justify-start w-full bg-background">
+                                    <TabsList className="w-full h-auto overflow-x-auto whitespace-nowrap justify-start bg-background">
                                 {(tabs || []).map((tab, i) => (
                                     <TabsTrigger
                                         key={i}
@@ -480,7 +503,7 @@ const Users = () => {
                                 {
                                     (tabs || []).map((y, i) => (
                                         <TabsContent key={i} value={y.value} className={"mt-0"}>
-                                            <div className={"grid grid-cols-1 overflow-auto whitespace-nowrap h-[calc(100vh_-_204px)]"}>
+                                            <div className={"grid grid-cols-1 overflow-auto whitespace-nowrap h-[calc(100vh_-_245px)] md:h-[calc(100vh_-_193px)] lg:h-[calc(100vh_-_204px)]"}>
                                                 {
                                                     y.value === "details" ? y.component :
                                                         <UserActionsList
@@ -509,7 +532,7 @@ const Users = () => {
                 {
                     openDelete &&
                     <DeleteDialog
-                        title={"You really want to delete this Customer?"}
+                        title={"You really want to delete this User?"}
                         isOpen={openDelete}
                         onOpenChange={() => setOpenDelete(false)}
                         onDelete={handleDelete}
@@ -566,8 +589,8 @@ const Users = () => {
                                                         (customerList || []).map((x,index)=>{
                                                             return(
                                                                 <TableRow key={index} className={"font-normal"}>
-                                                                    <TableCell className={`px-2 py-[10px] md:px-3 cursor-pointer`} onClick={() => openUserDetails(x)}>{x.customer_name ? x.customer_name : "-"}</TableCell>
-                                                                    <TableCell className={`px-2 py-[10px] md:px-3`}>{x?.customer_email_id}</TableCell>
+                                                                    <TableCell className={`px-2 py-[10px] md:px-3 cursor-pointer max-w-[170px] truncate text-ellipsis overflow-hidden whitespace-nowrap`} onClick={() => openUserDetails(x)}>{x.customer_name ? x.customer_name : "-"}</TableCell>
+                                                                    <TableCell className={`px-2 py-[10px] md:px-3 max-w-[170px] truncate text-ellipsis overflow-hidden whitespace-nowrap`}>{x?.customer_email_id}</TableCell>
                                                                     <TableCell className={`px-2 py-[10px] md:px-3 text-center`}>{x?.last_activity ? moment(x?.last_activity).format('D MMM, YYYY') : "-"}</TableCell>
                                                                     <TableCell className={`px-2 py-[10px] md:px-3 text-center`}>{x?.comments ? x?.comments : "-"}</TableCell>
                                                                     <TableCell className={`px-2 py-[10px] md:px-3 text-center`}>{x?.posts ? x?.posts : "-"}</TableCell>

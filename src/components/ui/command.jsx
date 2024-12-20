@@ -5,6 +5,7 @@ import { Search } from "lucide-react"
 
 import { cn } from "../../lib/utils"
 import { Dialog, DialogContent } from "./dialog"
+import {useState} from "react";
 
 const Command = React.forwardRef(({ className, ...props }, ref) => (
   <CommandPrimitive
@@ -33,18 +34,35 @@ const CommandDialog = ({
   );
 }
 
-const CommandInput = React.forwardRef(({ className, ...props }, ref) => (
-  <div className="flex items-center border-b px-3" cmdk-input-wrapper="">
-    <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
-    <CommandPrimitive.Input
-      ref={ref}
-      className={cn(
-        "flex h-11 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50",
-        className
-      )}
-      {...props} />
-  </div>
-))
+// const CommandInput = React.forwardRef(({ className, ...props }, ref) => (
+//   <div className="flex items-center border-b px-3" cmdk-input-wrapper="">
+//     <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+//     <CommandPrimitive.Input
+//       ref={ref}
+//       className={cn(
+//         "flex h-11 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50",
+//         className
+//       )}
+//       {...props} />
+//   </div>
+// ))
+
+const CommandInput = React.forwardRef(({ className, ...props }, ref) => {
+    const [value, setValue] = useState('');
+    return (
+        <div className="flex items-center border-b px-3" cmdk-input-wrapper="">
+            <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+            <CommandPrimitive.Input value={value}
+                                    ref={ref} onValueChange={(e) => setValue(e)}
+                                    className={cn(
+                                        "flex h-11 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50",
+                                        className
+                                    )}
+                                    {...props} />
+            {value !== '' && <X onClick={() => setValue("")} size={17} className={'cursor-pointer shrink-0 opacity-80'}/>}
+        </div>
+    )
+})
 
 CommandInput.displayName = CommandPrimitive.Input.displayName
 

@@ -1,7 +1,6 @@
 import React, {useState, useEffect, Fragment, useRef, useCallback} from 'react';
 import {Button} from "../ui/button";
-import {BarChart, BookCheck, Calendar, ChevronLeft, Circle, ClipboardList, Copy, Ellipsis, Filter, Loader2, Plus, ScrollText, SquareMousePointer, User, Users, X} from "lucide-react";
-import {Input} from "../ui/input";
+import {BarChart, BookCheck, ChevronLeft, Circle, ClipboardList, Copy, Ellipsis, Filter, Loader2, Plus, ScrollText, SquareMousePointer, X} from "lucide-react";
 import {Popover, PopoverContent, PopoverTrigger} from "../ui/popover";
 import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList} from "../ui/command";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "../ui/table";
@@ -28,6 +27,7 @@ import DeleteDialog from "../Comman/DeleteDialog";
 import {RadioGroup, RadioGroupItem} from "../ui/radio-group";
 import {EmptyDataContent} from "../Comman/EmptyDataContent";
 import {debounce} from "lodash";
+import {CommSearchBar} from "../Comman/CommentEditor";
 
 const perPageLimit = 10;
 
@@ -93,7 +93,6 @@ const InAppMessage = () => {
     const apiService = new ApiService();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
-    const timeoutHandler = useRef(null);
 
     const [filter, setFilter] = useState(initialStateFilter);
     const [messageList,setMessageList]=useState([]);
@@ -235,8 +234,13 @@ const InAppMessage = () => {
             // setDeleteId(null);
             clone.splice(deleteIndex,1);
             setMessageList(clone);
+            if (clone.length === 0 && pageNo > 1) {
+                navigate(`${baseUrl}/app-message?pageNo=${pageNo - 1}`);
+                setPageNo((prev) => prev - 1);
+            } else {
+                getAllInAppMessageList();
+            }
             setIsLoadingDelete(false);
-            getAllInAppMessageList();
             toast({description:data.message})
         } else {
             setIsLoadingDelete(false);
@@ -286,7 +290,7 @@ const InAppMessage = () => {
         },
         {
             title: "Display Announcements",
-            description: `Keep users updated with in-app messages about new features, product updates, and improvements through posts or banners.   `,
+            description: `Keep users updated with in-app messages about new features, product updates, and improvements through posts or banners.`,
             btnText: [
                 {title: "Display Announcement", navigateTo: `${baseUrl}/announcements`, icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
             ],
@@ -409,24 +413,12 @@ const InAppMessage = () => {
                     </div>
                     <div className={"w-full lg:w-auto flex sm:flex-nowrap flex-wrap gap-2 items-center"}>
                         <div className={"flex gap-2 items-center w-full lg:w-auto"}>
-                            <div className={"relative w-full"}>
-                            <Input
-                                type="search" value={filter.search}
-                                placeholder="Search..."
-                                className="w-full pl-4 pr-14 text-sm font-normal h-9"
-                                name={"search"}
+                            <CommSearchBar
+                                value={filter.search}
                                 onChange={onChangeSearch}
+                                onClear={clearSearchFilter}
+                                placeholder="Search..."
                             />
-                                {filter?.search?.trim() !== '' && (
-                                    <button
-                                        type="button"
-                                        className="absolute right-2 top-1/2 transform -translate-y-1/2 w-6 h-6 flex items-center justify-center text-gray-400 hover:text-gray-600"
-                                        onClick={clearSearchFilter}
-                                    >
-                                        <X className="w-4 h-4" />
-                                    </button>
-                                )}
-                            </div>
                             <div className={"flex items-center"}>
                             <Popover open={openFilter}
                                      onOpenChange={() => {

@@ -291,18 +291,6 @@ export function Dashboard() {
                                                                 {x.type === 1 ? "Announcement" : "Idea"}
                                                             </Badge>
                                                         </div>
-                                                        {/*<p*/}
-                                                        {/*    className={"text-xs font-normal text-foreground cursor-pointer"}*/}
-                                                        {/*    onClick={() => {*/}
-                                                        {/*        if (x.type === 1) {*/}
-                                                        {/*            navigate(`${baseUrl}/announcements/${x.post_id}`);*/}
-                                                        {/*        } else if (x.type === 2) {*/}
-                                                        {/*            navigate(`${baseUrl}/ideas/${x.post_id}`);*/}
-                                                        {/*        }*/}
-                                                        {/*    }}*/}
-                                                        {/*>*/}
-                                                        {/*    <ReadMoreText html={x.comment} maxLength={100}/>*/}
-                                                        {/*</p>*/}
                                                         <p className="text-xs font-normal text-foreground cursor-pointer">
                                                             <ReadMoreText
                                                                 html={x.comment}

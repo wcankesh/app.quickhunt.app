@@ -14,7 +14,7 @@ import CommonBreadCrumb from "../Comman/CommonBreadCrumb";
 
 const perPageLimit = 10;
 
-const AnnouncementAnalyticsViews = () => {
+const AnalyticsViews = () => {
     const location = useLocation();
     const urlParams = new URLSearchParams(location.search);
     const postId = urlParams.get("postId");
@@ -274,4 +274,4 @@ const AnnouncementAnalyticsViews = () => {
     );
 };
 
-export default AnnouncementAnalyticsViews;
+export default AnalyticsViews;

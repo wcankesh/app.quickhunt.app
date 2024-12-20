@@ -1,5 +1,5 @@
 import React from 'react';
-import {ArrowLeft, ChevronDown, Trash2} from "lucide-react";
+import {ChevronDown, Trash2} from "lucide-react";
 import {Progress} from "../ui/progress";
 import {Card} from "../ui/card";
 import {Checkbox} from "../ui/checkbox";

@@ -284,7 +284,7 @@ const Team = () => {
                 <CardContent className={"p-0"}>
                     <Tabs defaultValue="users" className="space-y-3">
                         <div className={"px-4 sm:px-5"}>
-                            <TabsList className="grid w-[141px] grid-cols-2 bg-card border">
+                            <TabsList className="grid h-auto w-[141px] grid-cols-2 bg-card border">
                                 <TabsTrigger value="users"
                                              className={`text-sm font-normal team-tab-active team-tab-text-active ${theme === "dark" ? "text-card-foreground" : ""}`}>Users</TabsTrigger>
                                 <TabsTrigger value="invites"
@@ -420,7 +420,6 @@ const Team = () => {
                                         : invitationList?.length > 0 ? <>
                                                 {(invitationList || []).map((x, i) => (
                                                     <TableRow key={i}>
-                                                        {console.log("x", x)}
                                                         <TableCell className="font-normal py-[10px] px-[12px]">{x?.member_email}</TableCell>
                                                         <TableCell className={"py-[10px] px-[12px]"}>
                                                             {moment().startOf('day').isSameOrAfter(moment(x?.expire_at).startOf('day')) ? (

@@ -1,8 +1,9 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {Button} from "../ui/button";
 import {ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight} from "lucide-react";
 import {CardFooter} from "../ui/card";
 import {useTheme} from "../theme-provider";
+import {Input} from "../ui/input";
 
 const Pagination = ({
                         pageNo,
@@ -11,13 +12,24 @@ const Pagination = ({
                         handlePaginationClick,
                         stateLength,
                     }) => {
+    const {theme} = useTheme();
+    const [inputPage, setInputPage] = useState(pageNo);
 
-    const {theme} =useTheme();
+    useEffect(() => {
+        setInputPage(pageNo);
+    }, [pageNo]);
+
+    const handleInputChange = (e) => {
+        const value = e.target.value;
+        setInputPage(value);
+        const page = Number(value);
+        handlePaginationClick(page);
+    };
 
     return (
         <CardFooter className={`p-0 ${theme === "dark" ? "border-t" : ""}`}>
             <div className={`w-full ${theme === 'dark' ? '' : 'bg-muted'} rounded-b-lg rounded-t-none flex justify-end p-2 md:px-3 md:py-[10px]`}>
-                <div className={'w-full flex gap-2 items-center justify-between sm:justify-end'}>
+                <div className={'w-full flex gap-2 items-center justify-between'}>
                     <div>
                         <h5 className={'text-sm font-medium'}>
                             Page {stateLength <= 0 ? 0 : pageNo} of {totalPages}
@@ -40,6 +52,16 @@ const Pagination = ({
                         >
                             <ChevronLeft className={pageNo === 1 || isLoading ? 'stroke-muted-foreground' : 'stroke-primary'} />
                         </Button>
+                        <Input
+                            type="number"
+                            value={inputPage}
+                            onChange={handleInputChange}
+                            className="h-[30px] text-center border rounded p-1"
+                            placeholder="0"
+                            min={1}
+                            max={totalPages}
+                            disabled={isLoading}
+                        />
                         <Button
                             variant={'outline'}
                             className={'h-[30px] w-[30px] p-1.5'}

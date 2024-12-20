@@ -58,7 +58,6 @@ const initialState = {
     idea_description: 0,
     roadmap_image: 0,
     is_comment: 0,
-
 }
 
 const UpdateWidget = () => {
@@ -75,7 +74,6 @@ const UpdateWidget = () => {
     const [loading, setLoading] = useState('');
     const [selectedToggle, setSelectedToggle] = useState('ideas');
     const [index, setIndex] = useState(0);
-    const [editWidgetName, setEditWidgetName] = useState(false);
     const [toggle, setToggle] = useState(true);
 
     const handleToggle = (value) => {setSelectedToggle(value);};
@@ -182,7 +180,6 @@ const UpdateWidget = () => {
                                 value={widgetsSetting?.name}
                                 onChange={(e) => onChange("name", e.target.value)}
                                 className={"text-sm font-normal w-full h-auto"}
-                                onBlur={handleBlur}
                                 autoFocus
                             />
                         </div>
@@ -230,7 +227,6 @@ const UpdateWidget = () => {
                                                                          onChange={(e) => onChange('popover_height', e.target.value)}
                                                                          className={"w-full"}/>
                                         }
-
                                     </div>
                                 }
                                 {
@@ -598,8 +594,6 @@ const UpdateWidget = () => {
             </div>
         );
     };
-
-    const handleBlur = () => {setEditWidgetName(false);};
 
     const onToggle = () => {setToggle(!toggle)}
 

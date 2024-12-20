@@ -56,7 +56,6 @@ const Step3 = ({setStep}) => {
     const onBoardingFlowComplete = async () => {
         const data = await apiService.onBoardingFlowComplete();
         if(data.status === 200) {
-            console.log("complete", data.data)
             setStep(4);
         }
     }

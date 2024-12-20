@@ -23,9 +23,9 @@ import Comments from "../components/Dashboard/Comments";
 import Reactions from "../components/Dashboard/Reactions";
 import UpdateIdea from "../components/Ideas/UpdateIdea";
 import UpdateAnnouncement from "../components/Announcements/UpdateAnnouncement";
-import AnnouncementAnalyticsViews from "../components/Announcements/AnnouncementAnalyticsViews";
 import InAppMessageAnalyticsView from "../components/InAppMessage/InAppMessageAnalyticsView";
 import Inbox from "../components/Inbox/Inbox";
+import AnalyticsViews from "../components/Announcements/AnalyticsViews";
 
 export const routes = [
      {path: `${baseUrl}/dashboard`, component: <Dashboard/>},
@@ -33,7 +33,7 @@ export const routes = [
      {path: `${baseUrl}/dashboard/reactions`, component: <Reactions/>},
      {path: `${baseUrl}/announcements`, component: <Announcements/>},
      {path: `${baseUrl}/announcements/:id`, component: <UpdateAnnouncement/>},
-     {path: `${baseUrl}/announcements/analytic-view`, component: <AnnouncementAnalyticsViews/>},
+     {path: `${baseUrl}/announcements/analytic-view`, component: <AnalyticsViews/>},
      {path: `${baseUrl}/inbox`, component: <Inbox/>},
      {path: `${baseUrl}/ideas`, component: <Ideas/>},
      {path: `${baseUrl}/ideas/:id`, component: <UpdateIdea/>},

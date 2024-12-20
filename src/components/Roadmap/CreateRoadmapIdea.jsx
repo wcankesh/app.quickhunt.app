@@ -1,15 +1,9 @@
 import React, {useState, useEffect} from 'react';
-import {Button} from "../ui/button";
-import {Label} from "../ui/label";
-import {Input} from "../ui/input";
 import {ApiService} from "../../utils/ApiService";
 import {useSelector} from "react-redux";
-import {Check, Loader2, X} from "lucide-react";
-import {Sheet, SheetContent, SheetHeader, SheetOverlay} from "../ui/sheet";
-import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "../ui/select";
 import {useToast} from "../ui/use-toast";
-import ReactQuillEditor from "../Comman/ReactQuillEditor";
 import {useTheme} from "../theme-provider";
+import CommCreateSheet from "../Comman/CommCreateSheet";
 
 const initialState = {
     title: "",
@@ -57,14 +51,6 @@ const CreateRoadmapIdea = ({isOpen, onOpen, onClose, closeCreateIdea, selectedRo
         }
         setIdeaDetail({ ...ideaDetail, topic: clone });
     };
-
-    const onChangeText = (event) => {
-        setIdeaDetail(ideaDetail => ({...ideaDetail, [event.target.name]:event.target.value}))
-        setFormError(formError => ({
-            ...formError,
-            [event.target.name]: formValidate(event.target.name, event.target.value)
-        }));
-    }
 
     const onCreateIdea = async () => {
         let validationErrors = {};
@@ -138,112 +124,19 @@ const CreateRoadmapIdea = ({isOpen, onOpen, onClose, closeCreateIdea, selectedRo
 
     return (
         <div>
-            <Sheet open={isOpen} onOpenChange={isOpen ? onCancel : onOpen} closeCreateIdea={closeCreateIdea}>
-                {/*<SheetOverlay className={"inset-0"} />*/}
-                <SheetContent className={"lg:max-w-[800px] md:max-w-full sm:max-w-full p-0"}>
-                    <SheetHeader className={"px-4 py-5 lg:px-8 lg:py-[20px] border-b"}>
-                        <div className={"flex justify-between items-center w-full"}>
-                            <h2 className={"text-xl font-normal capitalize"}>Tell us your Idea!</h2>
-                            <X size={18} onClick={onCancel} className={"cursor-pointer"}/>
-                        </div>
-                    </SheetHeader>
-                    <div className={"w-full overflow-y-auto h-[calc(100vh_-_69px)]"}>
-                            <div className={"pb-[60px] sm:p-0"}>
-                                <div className={"px-4 py-3 lg:py-6 lg:px-8 flex flex-col gap-6 border-b"}>
-                                    <div className="space-y-2">
-                                        <Label htmlFor="text" className={"font-normal"}>Title</Label>
-                                        <Input type="text" id="text" placeholder="" value={ideaDetail.title} name={"title"} onChange={onChangeText} />
-                                        {
-                                            formError.title && <span className="text-red-500 text-sm">{formError.title}</span>
-                                        }
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label htmlFor="message" className={"font-normal"}>Description</Label>
-                                        <ReactQuillEditor value={ideaDetail?.description} name={"description"} onChange={onChangeText}/>
-                                        {/*{formError.description && <span className="text-red-500 text-sm">{formError.description}</span>}*/}
-                                    </div>
-                                    <div className={"space-y-2"}>
-                                        <Label className={"font-normal capitalize"}>Choose Board for this Idea</Label>
-                                        <Select
-                                            onValueChange={(value) => onChangeText({target:{name: "board", value}})}
-                                            value={ideaDetail.board}>
-                                            <SelectTrigger className="bg-card">
-                                                <SelectValue/>
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectGroup>
-                                                    {
-                                                        (allStatusAndTypes?.boards || []).map((x, i) => {
-                                                            return (
-                                                                <SelectItem key={i} value={x.id}>
-                                                                    <div className={"flex items-center gap-2"}>
-                                                                        {x.title}
-                                                                    </div>
-                                                                </SelectItem>
-                                                            )
-                                                        })
-                                                    }
-                                                </SelectGroup>
-                                            </SelectContent>
-                                        </Select>
-                                        {formError.board && <span className="text-red-500 text-sm">{formError.board}</span>}
-                                    </div>
-                                </div>
-                                <div className={"px-4 py-3 lg:py-6 lg:px-8 border-b space-y-2"}>
-                                    <Label className={"font-normal capitalize"}>Choose Topics for this Idea (optional)</Label>
-                                    <Select onValueChange={handleChange} value={selectedValues}>
-                                        <SelectTrigger className="bg-card">
-                                            <SelectValue className={"text-muted-foreground text-sm"}>
-                                                <div className={"flex gap-[2px]"}>
-                                                    {
-                                                        (ideaDetail.topic || []).length === 0
-                                                            ? <span className={"text-muted-foreground"}>Select topic</span>
-                                                            : (ideaDetail.topic || []).map((x, index) => {
-                                                                const findObj = topicLists.find((y) => y.id === x);
-                                                                return (
-                                                                    <div key={index} className={`text-xs flex gap-[2px] ${theme === "dark" ? "text-card" : ""} bg-slate-300 items-center rounded py-0 px-2`}>
-                                                                        <span className={"max-w-[85px] truncate text-ellipsis overflow-hidden whitespace-nowrap"}>
-                                                                            {findObj?.title}
-                                                                        </span>
-                                                                    </div>
-                                                                );
-                                                            })
-                                                    }
-                                                </div>
-                                            </SelectValue>
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectGroup>
-                                                {
-                                                    (topicLists || []).map((x, i) => {
-                                                        return (
-                                                            <SelectItem key={i} value={x.id} className={"px-2"}>
-                                                                <div className={"flex gap-2"}>
-                                                                    <div onClick={() => handleChange(x.id)} className="checkbox-icon">
-                                                                        {ideaDetail.topic.includes(x.id) ? <Check size={18} />: <div className={"h-[18px] w-[18px]"}></div>}
-                                                                    </div>
-                                                                    <span>{x.title ? x.title : ""}</span>
-                                                                </div>
-                                                            </SelectItem>
-                                                        )
-                                                    })
-                                                }
-                                            </SelectGroup>
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                                <div className={"p-4 lg:p-8 flex gap-6"}>
-                                    <Button className={`w-[96px] text-sm font-medium hover:bg-primary`} onClick={onCreateIdea}>
-                                        {
-                                            isLoading ? <Loader2 className="h-4 w-4 animate-spin"/> : "Create Idea"
-                                        }
-                                        </Button>
-                                    <Button variant={"outline hover:bg-transparent"} className={"border border-primary text-sm font-medium text-primary"} onClick={onCancel}>Cancel</Button>
-                                </div>
-                            </div>
-                    </div>
-                </SheetContent>
-            </Sheet>
+            <CommCreateSheet
+                isOpen={isOpen}
+                onOpen={onOpen}
+                onCancel={onCancel}
+                ideaDetail={ideaDetail}
+                setIdeaDetail={setIdeaDetail}
+                handleChange={handleChange}
+                topicLists={topicLists}
+                allStatusAndTypes={allStatusAndTypes}
+                formError={formError}
+                isLoading={isLoading}
+                onCreateIdea={onCreateIdea}
+            />
         </div>
     );
 };

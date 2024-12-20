@@ -7,7 +7,6 @@ import {Input} from "../ui/input";
 import {Button} from "../ui/button";
 import {CalendarIcon, Loader2, Plus, Trash2} from "lucide-react";
 import {Popover, PopoverContent, PopoverTrigger} from "../ui/popover";
-import {cn} from "../../lib/utils";
 import moment from "moment";
 import {Calendar} from "../ui/calendar";
 import {useSelector} from "react-redux";
@@ -15,7 +14,7 @@ import {baseUrl} from "../../utils/constent";
 import {addDays} from "date-fns";
 import {ApiService} from "../../utils/ApiService";
 import {useToast} from "../ui/use-toast";
-import {useNavigate, useParams} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import {Checkbox} from "../ui/checkbox";
 
 const initialStateError = {
@@ -258,42 +257,6 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
             steps: clone
         }));
     }
-
-    // const onChangeQuestion = (name, value) => {
-    //     const obj = {...selectedStep, [name]: value, }
-    //     setSelectedStep(obj);
-    //     updateStepRecord(obj)
-    // }
-
-    // const onChangeQuestion = (name, value) => {
-    //     const clone = [...inAppMsgSetting?.steps];
-    //     clone[selectedStepIndex] = {
-    //         ...clone[selectedStepIndex],
-    //         [name]: value
-    //     };
-    //     setInAppMsgSetting((prev) => ({
-    //         ...prev,
-    //         steps: clone,
-    //     }));
-    // };
-
-    const onChangeQuestions = (name, value) => {
-        setInAppMsgSetting((prev) => {
-            const updatedSteps = [...prev.steps];
-
-            if (selectedStepIndex >= 0 && updatedSteps[selectedStepIndex]) {
-                updatedSteps[selectedStepIndex] = {
-                    ...updatedSteps[selectedStepIndex],
-                    [name]: value,
-                };
-            }
-
-            return {
-                ...prev,
-                steps: updatedSteps,
-            };
-        });
-    };
 
     const onChangeQuestion = (name, value) => {
         setInAppMsgSetting((prev) => {
@@ -788,8 +751,8 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                                     endMonth={new Date(2050, 12)}
                                     defaultMonth={
                                         inAppMsgSetting?.start_at
-                                            ? new Date(inAppMsgSetting?.start_at) // Use selected date
-                                            : publishDate || new Date() // Fallback to startMonth or current date
+                                            ? new Date(inAppMsgSetting?.start_at)
+                                            : publishDate || new Date()
                                     }
 
                                 />
@@ -838,8 +801,8 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                                             disabled={isDateDisabled}
                                             defaultMonth={
                                                 inAppMsgSetting?.end_at
-                                                    ? new Date(inAppMsgSetting?.end_at) // Use selected date
-                                                    : publishDate || new Date() // Fallback to startMonth or current date
+                                                    ? new Date(inAppMsgSetting?.end_at)
+                                                    : publishDate || new Date()
                                             }
                                         />
                                     </PopoverContent>

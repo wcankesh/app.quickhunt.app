@@ -3,7 +3,6 @@ import {Navigate, Outlet} from "react-router-dom";
 import {
     apiService,
     baseUrl,
-
     isTokenAboutToExpire,
     logout,
     removeProjectDetails,

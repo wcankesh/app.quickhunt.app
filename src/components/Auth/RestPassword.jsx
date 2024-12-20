@@ -43,28 +43,6 @@ const RestPassword = () => {
         });
     };
 
-    // const formValidate = (name, value) => {
-    //     switch (name) {
-    //         case "password":
-    //             if (!value) {
-    //                 return "Password is Required";
-    //             } else {
-    //                 return "";
-    //             }
-    //         case "confirm_password":
-    //             if (!value) {
-    //                 return "Confirm Password Required";
-    //             } else if (value !== forgotPasswordDetails.password) {
-    //                 return "New Password and Confirm Password Must be Same";
-    //             } else {
-    //                 return "";
-    //             }
-    //         default: {
-    //             return "";
-    //         }
-    //     }
-    // };
-
     const formValidate = (name, value) => {
         const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 

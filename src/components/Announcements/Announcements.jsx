@@ -8,7 +8,7 @@ import {useTheme} from "../theme-provider";
 import {useSelector} from "react-redux";
 import {ApiService} from "../../utils/ApiService";
 import {Card} from "../ui/card";
-import AnalyticsView from "./AnalyticsView";
+import SheetAnalyticsView from "./SheetAnalyticsView";
 import {toast} from "../ui/use-toast";
 import {Popover, PopoverTrigger} from "@radix-ui/react-popover";
 import {PopoverContent} from "../ui/popover";
@@ -21,25 +21,13 @@ import Pagination from "../Comman/Pagination";
 import {RadioGroup, RadioGroupItem} from "../ui/radio-group";
 import {EmptyDataContent} from "../Comman/EmptyDataContent";
 import {debounce} from "lodash";
+import {CommSearchBar} from "../Comman/CommentEditor";
 
 const initialStateFilter = {l: "", s: "", q:""}
 
 const perPageLimit = 10;
 
-const status = [
-    {
-        label: "Published",
-        value: 1
-    },
-    {
-        label: "Scheduled",
-        value: 2
-    },
-    {
-        label: "Draft",
-        value: 4
-    },
-];
+const status = [{label: "Published", value: 1}, {label: "Scheduled", value: 2}, {label: "Draft", value: 4},];
 
 const Announcements = () => {
     const location = useLocation();
@@ -47,6 +35,7 @@ const Announcements = () => {
     const {theme} = useTheme();
     const UrlParams = new URLSearchParams(location.search);
     const getPageNo = UrlParams.get("pageNo") || 1;
+    const getNavOpenSheet = UrlParams.get("opensheet") || false;
     const apiService = new ApiService();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
@@ -66,15 +55,29 @@ const Announcements = () => {
 
     const emptyContent = (status) => {setEmptyContentBlock(status);};
 
+    const openSheet = () => {
+        setSelectedRecord({id: "new"})
+    };
+
     useEffect(() => {
-            // if(filter.l || filter.s || filter.q || isFilter){
-                // searchAnnouncement({...filter, page: pageNo, project_id: projectDetailsReducer.id,})
-            // } else {
+        if(getNavOpenSheet === "open"){
+            openSheet();
+        }
+    }, [getNavOpenSheet])
+
+    useEffect(() => {
+            if(filter.l || filter.s || filter.q || isFilter){
+                searchAnnouncement({...filter, page: pageNo, project_id: projectDetailsReducer.id,})
+            } else {
                 if(!isFilter && projectDetailsReducer.id){
                     getAllPosts()
                 }
-            // }
+            }
+        if(getNavOpenSheet) {
+            navigate(`${baseUrl}/announcements?opensheet=${getNavOpenSheet}&pageNo=${pageNo}`);
+        } else {
             navigate(`${baseUrl}/announcements?pageNo=${pageNo}`);
+        }
     }, [projectDetailsReducer.id, allStatusAndTypes, pageNo]);
 
     useEffect(() => {
@@ -130,10 +133,10 @@ const Announcements = () => {
             };
             searchAnnouncement(updatedFilter);
         }, 500),
-        []
+        [projectDetailsReducer.id]
     );
 
-    const onChange = (e) => {
+    const onChangeSearch = (e) => {
         const value = e.target.value;
         setFilter( { ...filter, q: value });
         throttledDebouncedSearch(value)
@@ -157,14 +160,7 @@ const Announcements = () => {
         getAllPosts('', filter.q);
     };
 
-    const openSheet = () => {
-        setSelectedRecord({id: "new"})
-        navigate(`${baseUrl}/announcements`);
-    };
-
-    const onCloseAnalyticsSheet = () => {
-        setAnalyticsObj({})
-    }
+    const onCloseAnalyticsSheet = () => {setAnalyticsObj({})}
 
     const closeSheet = (record,addRecord) => {
         if (record) {
@@ -195,7 +191,12 @@ const Announcements = () => {
                 setAnnouncementList(clone);
             }
             setTotalRecord(Number(totalRecord) - 1)
-            getAllPosts()
+            if (clone.length === 0 && pageNo > 1) {
+                navigate(`${baseUrl}/announcements?pageNo=${pageNo - 1}`);
+                setPageNo((prev) => prev - 1);
+            } else {
+                getAllPosts();
+            }
             toast({
                 description: data.message,
             })
@@ -212,6 +213,7 @@ const Announcements = () => {
 
     const handlePaginationClick = async (newPage) => {
         if (newPage >= 1 && newPage <= totalPages) {
+            navigate(`${baseUrl}/announcements?pageNo=${newPage}`);
             setIsLoading(true);
             setPageNo(newPage);
             setIsLoading(false);
@@ -272,8 +274,8 @@ const Announcements = () => {
             title: "Explore Examples",
             description: `See how platforms like Utterbond, Webform, and Rivyo efficiently share announcements to keep their users informed.`,
             btnText: [
-                {title: "Utterbond", redirect: "https://webform.quickhunt.app/announcements"},
-                {title: "Webform", redirect: "https://utterbond.quickhunt.app/announcements"},
+                {title: "Utterbond", redirect: "https://utterbond.quickhunt.app/announcements"},
+                {title: "Webform", redirect: "https://webform.quickhunt.app/announcements"},
                 {title: "Rivyo", redirect: "https://rivyo.quickhunt.app/announcements"},
             ],
         },
@@ -295,7 +297,7 @@ const Announcements = () => {
             />}
 
             {analyticsObj?.id &&
-            <AnalyticsView
+            <SheetAnalyticsView
                 onClose={onCloseAnalyticsSheet}
                 analyticsObj={analyticsObj}
                 setAnalyticsObj={setAnalyticsObj}
@@ -308,25 +310,12 @@ const Announcements = () => {
                 </div>
                 <div className={"w-full lg:w-auto flex sm:flex-nowrap flex-wrap gap-2 items-center"}>
                     <div className={"flex gap-2 items-center w-full lg:w-auto"}>
-                        <div className={"relative w-full"}>
-                            <Input
-                                type="search"
-                                placeholder="Search..."
-                                className="w-full pl-4 pr-14 text-sm font-normal h-9"
-                                name={"q"}
-                                value={filter.q}
-                                onChange={onChange}
-                            />
-                            {filter?.q?.trim() !== '' && (
-                                <button
-                                    type="button"
-                                    className="absolute right-2 top-1/2 transform -translate-y-1/2 w-6 h-6 flex items-center justify-center text-gray-400 hover:text-gray-600"
-                                    onClick={clearSearchFilter}
-                                >
-                                    <X className="w-4 h-4" />
-                                </button>
-                            )}
-                        </div>
+                        <CommSearchBar
+                            value={filter.q}
+                            onChange={onChangeSearch}
+                            onClear={clearSearchFilter}
+                            placeholder="Search..."
+                        />
                         <div className={"flex items-center"}>
                             <Popover open={openFilter}
                                      onOpenChange={() => {
@@ -347,16 +336,6 @@ const Announcements = () => {
                                                         <CommandItem className={"p-0 flex gap-2 items-center cursor-pointer p-1"} onSelect={() => {setOpenFilterType('');}}>
                                                             <ChevronLeft className="mr-2 h-4 w-4"  />  <span className={"flex-1 w-full text-sm font-normal cursor-pointer flex gap-2 items-center"}>Back</span>
                                                         </CommandItem>
-                                                        {/*{*/}
-                                                        {/*    (status || []).map((x, index) => {*/}
-                                                        {/*        return (*/}
-                                                        {/*            <CommandItem className={"p-0 flex gap-1 items-center cursor-pointer"}>*/}
-                                                        {/*                <Checkbox className={'m-2'} checked={x.value === filter.s} onClick={(event) => filterPosts({name: "s", value: x.value == filter.s ? "" :x.value })} />*/}
-                                                        {/*                <span className={"flex-1 w-full text-sm font-normal cursor-pointer flex gap-2 items-center"} onClick={(event) => filterPosts({name: "s", value: x.value == filter.s ? "" :x.value })} key={x.label}>{x.label}</span>*/}
-                                                        {/*            </CommandItem>*/}
-                                                        {/*        )*/}
-                                                        {/*    })*/}
-                                                        {/*}*/}
                                                         <RadioGroup value={filter.s} onValueChange={(value) => filterPosts({ name: "s", value })} className={"gap-0.5"}>
                                                             {(status || []).map((x) => (
                                                                 <CommandItem key={x.value} className={"p-0 flex items-center gap-1 cursor-pointer"}>
@@ -376,23 +355,6 @@ const Announcements = () => {
                                                         <CommandItem className={"p-0 flex gap-2 items-center cursor-pointer p-1"} onSelect={() => {setOpenFilterType('');}}>
                                                             <ChevronLeft className="mr-2 h-4 w-4"  />  <span className={"flex-1 w-full text-sm font-normal cursor-pointer flex gap-2 items-center"}>Back</span>
                                                         </CommandItem>
-                                                        {/*{*/}
-                                                        {/*    (allStatusAndTypes.labels || []).map((x, i) => {*/}
-                                                        {/*        return (*/}
-                                                        {/*            <CommandItem key={x.id} className={"p-0"}>*/}
-                                                        {/*                <div className={"w-full flex items-center gap-1"}  key={x.label}>*/}
-                                                        {/*                    <Checkbox className={'m-2'} checked={x.id == filter.l} onClick={(event) => filterPosts({name: "l", value: x.id == filter.l ? "" : x.id })} />*/}
-                                                        {/*                    <div className={"flex items-center gap-2 w-full"} onClick={(event) => filterPosts({name: "l", value: x.id == filter.l ? "" : x.id })}>*/}
-                                                        {/*                        <Circle fill={x.label_color_code}*/}
-                                                        {/*                                stroke={x.label_color_code}*/}
-                                                        {/*                                className={`${theme === "dark" ? "" : "text-muted-foreground"} w-[10px] h-[10px]`}/>*/}
-                                                        {/*                        <span className={"flex-1 w-full text-sm font-normal cursor-pointer flex gap-2 items-center"}>{x.label_name}</span>*/}
-                                                        {/*                    </div>*/}
-                                                        {/*                </div>*/}
-                                                        {/*            </CommandItem>*/}
-                                                        {/*        )*/}
-                                                        {/*    })*/}
-                                                        {/*}*/}
                                                         <RadioGroup value={filter.l} onValueChange={(value) => filterPosts({ name: "l", value })} className={"gap-0.5"}>
                                                             {(allStatusAndTypes.labels || []).map((x) => (
                                                                 <CommandItem key={x.id} className={"p-0 flex items-center gap-1 cursor-pointer"}>

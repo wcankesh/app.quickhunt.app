@@ -527,3 +527,6 @@ h6.ce-header {
 .nested-menu:hover .color-options {
   display: block; /* Show color options on hover */
 }
+
+/*-------------- Survey Bar Chart -------------------*/
+path.recharts-rectangle.recharts-tooltip-cursor {display: none}

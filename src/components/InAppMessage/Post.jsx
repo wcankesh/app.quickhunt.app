@@ -28,10 +28,6 @@ const Post = ({inAppMsgSetting, setInAppMsgSetting, isLoading}) => {
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const userDetailsReducer =  allStatusAndTypes.members.find((x) => x.user_id == inAppMsgSetting.from);
 
-    // const handleInitialize = useCallback((instance) => {
-    //     editorCore.current = instance;
-    // }, []);
-
     const handleSave = useCallback(async () => {
         const savedData = await editorCore.current.save();
         setInAppMsgSetting(prevState => ({

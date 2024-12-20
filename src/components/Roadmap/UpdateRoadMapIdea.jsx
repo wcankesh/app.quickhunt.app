@@ -1,5 +1,5 @@
 import React, {Fragment, useState, useEffect} from 'react';
-import {Sheet, SheetContent, SheetHeader, SheetOverlay} from "../ui/sheet";
+import {Sheet, SheetContent, SheetHeader} from "../ui/sheet";
 import {Button} from "../ui/button";
 import {ArrowBigUp, Check, Circle, CircleX, Dot, Loader2, MessageCircleMore, Paperclip, Pencil, Pin, Trash2, X} from "lucide-react";
 import {RadioGroup, RadioGroupItem} from "../ui/radio-group";
@@ -26,6 +26,8 @@ const initialStateError = {
     board: "",
     cover_image: "",
 }
+
+const pathUrl = "https://code.quickhunt.app/public/storage/feature_idea/";
 
 const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedIdea, setSelectedRoadmap, selectedRoadmap, roadmapList, setRoadmapList, originalIdea, setOriginalIdea}) => {
     const {theme} = useTheme()
@@ -274,41 +276,59 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
     };
 
     const handleAddCommentImg = (event) => {
-        const files = event.target.files;
-
+        const {files} = event.target;
         if (selectedComment && selectedComment.id) {
-            const clone = [...selectedComment.images, ...files];
-            let old = selectedComment.newImage && selectedComment.newImage.length ? [...selectedComment.newImage] : [];
-            const newImageClone = [...old, ...files];
-
+            const clone = [...selectedComment.images];
+            clone.push(files[0]);
             setSelectedComment({
                 ...selectedComment,
                 images: clone,
-                newImage: newImageClone
             });
         } else {
             setCommentFiles([...commentFiles, ...files]);
         }
+        event.target.value = "";
     };
 
     const handleSubCommentUploadImg = (event) => {
-        const files = event.target.files;
+        const { files } = event.target;
+
         if (selectedSubComment && selectedSubComment.id && selectedComment && selectedComment.id) {
-            const clone = [...selectedSubComment.images, ...files,]
-            let old = selectedSubComment && selectedSubComment.newImage && selectedSubComment.newImage.length ? [...selectedSubComment.newImage] : [];
-            const newImageClone = [...old, ...files,];
-            let selectedSubCommentObj = {...selectedSubComment, images: clone, newImage: newImageClone}
-            setSelectedSubComment(selectedSubCommentObj);
-            let index = ((selectedComment && selectedComment.reply) || []).findIndex((x) => x.id === selectedSubComment.id)
-            if (index !== -1) {
-                const cloneReplay = [...selectedComment.reply];
-                cloneReplay[index] = selectedSubCommentObj;
-                setSelectedComment({...selectedComment, reply: cloneReplay})
+            // Clone and update images for selectedSubComment
+            const cloneImages = [...selectedSubComment.images, files[0]];
+            const oldImages = selectedSubComment?.newImage?.length
+                ? [...selectedSubComment.newImage]
+                : [];
+            const newImageClone = [...oldImages, files[0]];
+
+            const updatedSubComment = {
+                ...selectedSubComment,
+                images: cloneImages,
+                newImage: newImageClone,
+            };
+
+            setSelectedSubComment(updatedSubComment);
+
+            // Update the selectedComment's reply array
+            const replyIndex = (selectedComment.reply || []).findIndex(
+                (reply) => reply.id === selectedSubComment.id
+            );
+            if (replyIndex !== -1) {
+                const updatedReplies = [...selectedComment.reply];
+                updatedReplies[replyIndex] = updatedSubComment;
+                setSelectedComment({
+                    ...selectedComment,
+                    reply: updatedReplies,
+                });
             }
         } else {
-            setSubCommentFiles([...subCommentFiles, ...files])
+            // Handle cases where subComment is not linked to a selectedComment
+            setSubCommentFiles([...subCommentFiles, files[0]]);
         }
-    }
+
+        event.target.value = ""; // Clear input value to allow re-uploads
+    };
+
 
     const onChangeStatus = async (name, value) => {
         setIsLoadingSidebar(name);
@@ -408,43 +428,80 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
         setSelectedSubCommentIndex(null)
     }
 
-    const onDeleteCommentImage = (index, isOld) => {
-        const clone = [...selectedComment.images];
-        if (isOld) {
-            clone.splice(index, 1);
-            if (selectedComment && selectedComment.newImage && selectedComment.newImage.length) {
-                const cloneNewImage = [...selectedComment.newImage];
-                cloneNewImage.splice(index, 1);
-                setSelectedComment({...selectedComment, newImage: cloneNewImage});
-            }
-            setSelectedComment({...selectedComment, images: clone});
+    const onDeleteCommentImage = (index) => {
+        // const clone = [...selectedComment.images];
+        // if (isOld) {
+        //     clone.splice(index, 1);
+        //     if (selectedComment && selectedComment.newImage && selectedComment.newImage.length) {
+        //         const cloneNewImage = [...selectedComment.newImage];
+        //         cloneNewImage.splice(index, 1);
+        //         setSelectedComment({...selectedComment, newImage: cloneNewImage});
+        //     }
+        //     setSelectedComment({...selectedComment, images: clone});
+        // } else {
+        //     const cloneImage = [...deletedCommentImage];
+        //     cloneImage.push(clone[index]);
+        //     clone.splice(index, 1);
+        //     setSelectedComment({...selectedComment, images: clone});
+        //     setDeletedCommentImage(cloneImage);
+        // }
+        const cloneImages = [...selectedComment.images];
+        const isServerImage = typeof cloneImages[index] === "string" &&
+            cloneImages[index].startsWith('https://code.quickhunt.app/public/');
+        if (isServerImage) {
+            const cloneDeletedImages = [...deletedCommentImage];
+            cloneDeletedImages.push(
+                cloneImages[index].replace(pathUrl, '')
+            );
+            cloneImages.splice(index, 1);
+            setDeletedCommentImage(cloneDeletedImages);
         } else {
-            const cloneImage = [...deletedCommentImage];
-            cloneImage.push(clone[index]);
-            clone.splice(index, 1);
-            setSelectedComment({...selectedComment, images: clone});
-            setDeletedCommentImage(cloneImage);
+            cloneImages.splice(index, 1);
         }
+        setSelectedComment({
+            ...selectedComment,
+            images: cloneImages,
+        });
     }
 
-    const onDeleteSubCommentImage = (index, isOld) => {
-        const clone = [...selectedSubComment.images];
-        if (isOld) {
-            clone.splice(index, 1);
-            if (selectedSubComment && selectedSubComment.newImage && selectedSubComment.newImage.length) {
-                const cloneNewImage = [...selectedSubComment.newImage];
-                cloneNewImage.splice(index, 1);
-                setSelectedSubComment({...selectedSubComment, newImage: cloneNewImage});
-            }
-            setSelectedSubComment({...selectedSubComment, images: clone});
+    const onDeleteSubCommentImage = (index) => {
+        const cloneImages = [...selectedSubComment.images];
+
+        // Check if the image is from the server or is a File object
+        const isServerImage = typeof cloneImages[index] === "string" &&
+            cloneImages[index].startsWith('https://code.quickhunt.app/public/');
+
+        if (isServerImage) {
+            // Handle old (server-side) images
+            const cloneDeletedImages = [...deletedSubCommentImage];
+            cloneDeletedImages.push(
+                cloneImages[index].replace('https://code.quickhunt.app/public/storage/feature_idea/', '')
+            );
+            cloneImages.splice(index, 1); // Remove the image from the cloneImages array
+            setDeletedSubCommentImage(cloneDeletedImages);
         } else {
-            const cloneImage = [...deletedSubCommentImage];
-            cloneImage.push(clone[index]);
-            clone.splice(index, 1);
-            setSelectedSubComment({...selectedSubComment, images: clone});
-            setDeletedSubCommentImage(cloneImage);
+            // Handle new (File object) images
+            cloneImages.splice(index, 1); // Remove the image from cloneImages
         }
-    }
+
+        // If there are new images, update them too
+        if (selectedSubComment && selectedSubComment.newImage && selectedSubComment.newImage.length) {
+            const cloneNewImage = [...selectedSubComment.newImage];
+            cloneNewImage.splice(index, 1);
+            setSelectedSubComment({
+                ...selectedSubComment,
+                // newImage: cloneNewImage,
+                images: cloneImages,
+            });
+        } else {
+            // Only update images
+            setSelectedSubComment({
+                ...selectedSubComment,
+                images: cloneImages,
+            });
+        }
+    };
+
 
     const onUpdateComment = async () => {
         setIsSaveUpdateComment(true)
@@ -495,11 +552,11 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
         let formData = new FormData();
         if (selectedSubComment && selectedSubComment.newImage && selectedSubComment.newImage.length) {
             for (let i = 0; i < selectedSubComment.newImage.length; i++) {
-                formData.append(`images[]`, selectedSubComment.newImage[i]);
+                formData.append(`images[${i}]`, selectedSubComment.newImage[i]);
             }
         }
         for (let i = 0; i < deletedSubCommentImage.length; i++) {
-            formData.append(`delete_image[]`, deletedSubCommentImage[i].replace('https://code.quickhunt.app/public/storage/feature_idea/', ''));
+            formData.append(`delete_image[${i}]`, deletedSubCommentImage[i].replace('https://code.quickhunt.app/public/storage/feature_idea/', ''));
         }
         formData.append('comment', selectedSubComment.comment);
         formData.append('id', selectedSubComment.id);
@@ -1417,7 +1474,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                                                                                                     images={selectedSubComment?.images}
                                                                                                                                     onUpdateComment={onUpdateSubComment}
                                                                                                                                     onCancelComment={onCancelSubComment}
-                                                                                                                                    onDeleteImage={(i) => onDeleteSubCommentImage(i, true)}
+                                                                                                                                    onDeleteImage={(i) => onDeleteSubCommentImage(i)}
                                                                                                                                     onImageUpload={handleSubCommentUploadImg}
                                                                                                                                     onCommentChange={(e) => onChangeTextSubComment(e)}
                                                                                                                                     isSaving={isSaveUpdateSubComment}

@@ -1,11 +1,10 @@
-import React, {useState} from 'react';
-import { Sheet, SheetContent, SheetHeader, SheetOverlay } from "../ui/sheet";
+import React from 'react';
+import { Sheet, SheetContent, SheetHeader } from "../ui/sheet";
 import { X } from "lucide-react";
 import {Card, CardContent, CardHeader, CardTitle} from "../ui/card";
 
 const WidgetAnalytics = ({ isOpen, onOpen, onClose, widgetsSetting, selectedRecordAnalytics }) => {
 
-    const [isLoading, setIsLoading] = useState(true);
     const widgetData = widgetsSetting.find(widget => widget.id == selectedRecordAnalytics) || {};
 
     const widAnalytics = [

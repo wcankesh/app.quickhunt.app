@@ -1,11 +1,12 @@
 import React, {Fragment} from 'react';
-import {CircleX, Loader2, Paperclip, Pencil, Pin, Trash2} from "lucide-react";
+import {CircleX, Loader2, Paperclip, Pencil, Pin, Trash2, X} from "lucide-react";
 import {Input} from "../ui/input";
 import {Button} from "../ui/button";
 import {Textarea} from "../ui/textarea";
 import {useTheme} from "../theme-provider";
 import {Avatar, AvatarFallback, AvatarImage} from "../ui/avatar";
 import {Icon} from "../../utils/Icon";
+import {Label} from "../ui/label";
 
 export const CommentEditor = ({isEditMode, comment, images = [], onUpdateComment, onCancelComment, onDeleteImage, onImageClick, onImageUpload, onCommentChange, isSaving, idImageUpload = '',}) => {
     const {theme} = useTheme();
@@ -241,4 +242,33 @@ export const FileUpload = ({ label, id, file, onDelete, onChange, error }) => (
         {error && <div className="text-xs text-destructive">{error}</div>}
     </div>
 );
+
+export const CommSearchBar = ({ value, onChange, onClear, placeholder = "Search...", className = "" }) => (
+    <div className={`relative w-full ${className}`}>
+        <Input
+            type="search" value={value}
+            placeholder={placeholder}
+            className={"w-full pl-4 pr-14 text-sm font-normal h-9"}
+            name={"search"}
+            onChange={onChange}
+        />
+        {value.trim() !== '' && (
+            <button
+                type="button"
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 w-6 h-6 flex items-center justify-center text-gray-400 hover:text-gray-600"
+                onClick={onClear}
+            >
+                <X className="w-4 h-4" />
+            </button>
+        )}
+    </div>
+)
+
+export const CommInputField = ({id, value, label, onChange, error}) => (
+    <div className={"space-y-2"}>
+        <Label htmlFor={id} className="font-normal">{label}</Label>
+        <Input id={id} value={value} onChange={onChange} placeholder={`Enter ${label.toLowerCase()}`} />
+        {error && <span className="text-red-500 text-sm">{error}</span>}
+    </div>
+)
 

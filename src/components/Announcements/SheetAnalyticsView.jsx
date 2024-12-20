@@ -13,7 +13,7 @@ import moment from "moment";
 
 const perPageLimit = 10;
 
-const AnalyticsView = ({onClose, analyticsObj, setAnalyticsObj}) => {
+const SheetAnalyticsView = ({onClose, analyticsObj, setAnalyticsObj}) => {
     const navigate = useNavigate();
     const location = useLocation();
     const apiService = new ApiService();
@@ -232,4 +232,4 @@ const AnalyticsView = ({onClose, analyticsObj, setAnalyticsObj}) => {
     );
 };
 
-export default AnalyticsView;
+export default SheetAnalyticsView;

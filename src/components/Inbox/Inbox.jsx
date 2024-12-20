@@ -1,14 +1,5 @@
 import React, {Fragment, useEffect, useState} from 'react';
-import {
-    Check,
-    ChevronUp, Eye, EyeOff,
-    GalleryVerticalEnd,
-    Lightbulb,
-    MessageCircleMore,
-    MessageSquare,
-    MessagesSquare,
-    Zap
-} from "lucide-react";
+import {Check, Eye, EyeOff, GalleryVerticalEnd, Lightbulb, MessageCircleMore, MessageSquare, MessagesSquare, Vote, Zap} from "lucide-react";
 import {Button} from "../ui/button";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "../ui/tabs";
 import EmptyData from "../Comman/EmptyData";
@@ -53,7 +44,7 @@ const UserActionsList = ({ userActions, sourceTitle, isLoading, selectedTab, isE
                         {sourceTitle.map((source, i) => {
                             if (action.source === source.value) {
                                 return (
-                                    <div className={"px-2 py-[10px] md:px-3 flex gap-4"} key={i}>
+                                    <div onClick={""} className={`px-2 py-[10px] md:px-3 flex gap-4 cursor-pointer ${action?.is_read === 0 ? "bg-muted/[0.6] hover:bg-card" : "bg-card"}`} key={i}>
                                         <div>
                                             <Avatar className={"w-[30px] h-[30px]"}>
                                                 <AvatarFallback className={"text-base"}>{action?.customer_first_name && action?.customer_first_name.substring(0, 1).toUpperCase()}</AvatarFallback>
@@ -105,14 +96,15 @@ const Inbox = () => {
 
     const [userActions, setUserActions] = useState([]);
     const [pageNo, setPageNo] = useState(Number(getPageNo));
-    const [totalRecord, setTotalRecord] = useState(0);
     const [isLoading, setIsLoading] = useState(true);
     const [selectedTab, setSelectedTab] = useState(1);
     const [allRead, setAllRead] = useState(false);
     const [isEyeTabActive, setIsEyeTabActive] = useState(false);
+    const [totalPages, setTotalPages] = useState(0);
+    const [isTooltipVisible, setIsTooltipVisible] = useState(false);
 
     useEffect(() => {
-        if(selectedTab !== "icon" && projectDetailsReducer.id){
+        if(projectDetailsReducer.id){
             getInboxNotification();
         }
         // navigate(`${baseUrl}/notifications?pageNo=${pageNo}`)
@@ -129,8 +121,9 @@ const Inbox = () => {
         const data = await apiService.inboxNotification(payload);
         if(data.status === 200) {
             setUserActions(Array.isArray(data.data) ? data.data : []);
-            setTotalRecord(data.total || 0);
             // toast({description: data.message,});
+            const totalPage = Math.ceil(data.total / perPageLimit);
+            setTotalPages(totalPage)
             setIsLoading(false)
         } else {
             setIsLoading(false);
@@ -154,20 +147,13 @@ const Inbox = () => {
     const onTabChange = (value) => {
         setSelectedTab(value);
         setAllRead(false);
-        if (value === "icon") {
-            const unreadCount = userActions.filter(action => action?.is_read === 0).length;
-            setTotalRecord(unreadCount);
-            setIsEyeTabActive(!isEyeTabActive);
-        }
+        setPageNo(1);
+        setTotalPages(1);
     }
-
-    const totalPages = Math.ceil(totalRecord / perPageLimit);
 
     const handlePaginationClick = async (newPage) => {
         if (newPage >= 1 && newPage <= totalPages) {
-            // setIsLoading(true);
             setPageNo(newPage);
-            // setIsLoading(false)
         }
     };
 
@@ -185,8 +171,14 @@ const Inbox = () => {
         { label: "Announcement reaction", value: 3, icon: <GalleryVerticalEnd size={18} className={"mr-2"} />,},
         { label: "Create idea", value: 4, icon: <Lightbulb size={18} className={"mr-2"} />,},
         { label: "Idea comment", value: 5, icon: <MessageSquare size={18} className={"mr-2"} />,},
-        { label: "Idea upvote", value: 6, icon: <ChevronUp size={18} className={"mr-2"} />,},
+        { label: "Idea upvote", value: 6, icon: <Vote size={18} className={"mr-2"} />,},
     ];
+
+    const handleToolTipShow = () => {
+        setIsEyeTabActive(!isEyeTabActive);
+        setIsTooltipVisible(true);
+        setTimeout(() => setIsTooltipVisible(false), 2000);
+    };
 
     return (
         <Fragment>
@@ -201,9 +193,15 @@ const Inbox = () => {
                             <Button variant={"outline"} className={"flex gap-2 items-center"} onClick={markAsAllRead}><Check size={18}/>Mark all as read</Button>
                         )}
                         <TooltipProvider>
+                            {/*<Tooltip open={isTooltipVisible}>*/}
                             <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <Button variant="outline" size="icon" onClick={() => setIsEyeTabActive(!isEyeTabActive)} className={"h-9"}>
+                                <TooltipTrigger asChild
+                                                // onMouseEnter={() => setIsTooltipVisible(true)}
+                                                // onMouseLeave={() => setIsTooltipVisible(false)}
+                                                // onClick={handleToolTipShow}
+                                >
+                                    {/*<Button variant="outline" size="icon" className={"h-9"}>*/}
+                                        <Button variant="outline" size="icon" onClick={() => setIsEyeTabActive(!isEyeTabActive)} className={"h-9"}>
                                         { isEyeTabActive ? <EyeOff size={18} /> : <Eye size={18} />}
                                     </Button>
                                 </TooltipTrigger>
@@ -218,7 +216,7 @@ const Inbox = () => {
                     <CardContent className={"p-0"}>
                         <Tabs defaultValue={1} onValueChange={onTabChange}>
                             <div className={"border-b flex bg-background"}>
-                                <TabsList className="w-full overflow-x-auto whitespace-nowrap justify-start">
+                                <TabsList className="w-full h-auto overflow-x-auto whitespace-nowrap justify-start">
                                     {(tabs || []).map((tab, i) => (
                                         <TabsTrigger
                                             key={i}

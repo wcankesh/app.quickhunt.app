@@ -13,6 +13,8 @@ import {Avatar, AvatarFallback} from "../../ui/avatar";
 import EmptyData from "../../Comman/EmptyData";
 import CommonBreadCrumb from "../../Comman/CommonBreadCrumb";
 import {chartLoading} from "../../Comman/CommSkel";
+import {cleanQuillHtml} from "../../../utils/constent";
+import ReadMoreText from "../../Comman/ReadMoreText";
 
 const chartConfig = {
     y: {
@@ -82,16 +84,19 @@ const SurveysAnalyticsView = () => {
 
     const analyticsViews = [
         {
-            title: "Sent",
-            // count: views && views[0] && views[0].totalView ? views[0].totalView : 0,
+            title: "Total View",
+            show: true,
+            count: analytics?.open_count || 0,
         },
         {
-            title: "Responded",
-            // count: views && views[0] && views[0].uniqueView ? views[0].uniqueView : 0,
+            title: "Total Response",
+            show: inAppMsgSetting?.reply_type === 1,
+            count: analytics?.response_count || 0,
         },
         {
-            title: "Report",
-            // count: views && views[0] && views[0].uniqueView ? views[0].uniqueView : 0,
+            title: "Completion Rate",
+            count: `${((analytics?.response_percentage|| 0) / 100).toFixed(2)}%`,
+            show: inAppMsgSetting?.reply_type === 1,
         },
     ]
 
@@ -132,15 +137,16 @@ const SurveysAnalyticsView = () => {
                                     (analyticsViews || []).map((x, i) => {
                                         return (
                                             <Fragment key={i}>
-                                                {
-                                                    isLoading ?
-                                                        <div className={"space-y-[14px] w-full p-4 border-b md:border-r md:border-0 last:border-b-0 last:border-r-0"}>
-                                                            <Skeleton className="h-4"/>
-                                                            <Skeleton className="h-4"/></div> :
-                                                        <div className={`p-4 border-b md:border-r md:border-0 last:border-b-0 last:border-r-0`}>
-                                                            <h3 className={"text-base font-medium"}>{x.title}</h3>
+                                                {isLoading ? <div className={"space-y-[14px] w-full p-4 border-b md:border-r md:border-0 last:border-b-0 last:border-r-0"}>
+                                                    <Skeleton className="h-4"/>
+                                                    <Skeleton className="h-4"/></div> : (
+                                                    <div className={`p-4 border-b md:border-r md:border-0 last:border-b-0 last:border-r-0`}>
+                                                        <h3 className={"text-base font-medium"}>{x.title}</h3>
+                                                        <div className={"flex gap-1"}>
+                                                            <h3 className={`text-2xl font-medium`}>{x.count}</h3>
                                                         </div>
-                                                }
+                                                    </div>
+                                                )}
                                             </Fragment>
                                         )
                                     })
@@ -269,9 +275,8 @@ const SurveysAnalyticsView = () => {
                                             Name
                                         </TableHead>
                                         {
-                                            (inAppMsgSetting?.steps || []).map((x, i) => {
+                                            (inAppMsgSetting?.steps || []).filter((step, index) => index !== 7).map((x, i) => {
                                                 return (
-                                                    // <TableHead className={`px-2 py-[10px] md:px-3 font-medium text-card-foreground`} key={i}>
                                                     <TableHead className={`max-w-[140px] truncate text-ellipsis overflow-hidden whitespace-nowrap px-2 py-[10px] md:px-3 font-medium text-card-foreground`} key={i}>
                                                         {x.text}
                                                     </TableHead>
@@ -290,7 +295,7 @@ const SurveysAnalyticsView = () => {
                                                     return (
                                                         <TableRow key={index}>
                                                             {
-                                                                [...Array(3)].map((_, i) => {
+                                                                [...Array(inAppMsgSetting?.steps?.length + 1 || 3)].map((_, i) => {
                                                                     return (
                                                                         <TableCell key={i} className={"max-w-[373px] px-2 py-[10px] md:px-3"}>
                                                                             <Skeleton className={"rounded-md w-full h-7"}/>
@@ -303,37 +308,45 @@ const SurveysAnalyticsView = () => {
                                                 })
                                             )
                                             :
-                                            (analytics?.analytics || []).length >  0 ?
+                                            (analytics?.responses || []).length >  0 ?
                                                 <Fragment>
                                                     {
-                                                        (analytics?.analytics || []).map((x,i)=> {
+                                                        (analytics?.responses || []).map((response,i)=> {
+                                                            const userName = response?.name || response?.email;
+                                                            const createdAt = moment(response?.created_at).format("ll");
                                                             return (
-                                                                <TableRow key={x.id}>
-                                                                    <TableCell className={`flex items-center px-2 py-[10px] md:px-3 gap-2`}>
-                                                                        <>
-                                                                            <Avatar className={"w-[20px] h-[20px]"}>
-                                                                                <AvatarFallback>{x?.name? x?.name?.substring(0, 1) : x?.email?.substring(0, 1)}</AvatarFallback>
-                                                                            </Avatar>
-                                                                            <p className={"font-normal"}>{x?.name? x?.name : x.email}</p>
-                                                                        </>
+                                                                <TableRow key={response.user_id || i}>
+                                                                    {/* User Information */}
+                                                                    <TableCell className="flex items-center px-2 py-[10px] md:px-3 gap-2">
+                                                                        <Avatar className="w-[20px] h-[20px]">
+                                                                            <AvatarFallback>
+                                                                                {userName?.substring(0, 1)}
+                                                                            </AvatarFallback>
+                                                                        </Avatar>
+                                                                        <p className="font-normal">{userName}</p>
                                                                     </TableCell>
-                                                                    {/*{*/}
-                                                                    {/*    (inAppMsgSetting?.steps || []).map((s, i) => {*/}
-                                                                    {/*        const findResponse = x.response.find((f) => s.step_id === f.step_id) || {response: "-"}*/}
-                                                                    {/*        return (*/}
-                                                                    {/*            <TableCell className={`px-2 py-[10px] md:px-3 font-normal`}>*/}
-                                                                    {/*                {findResponse?.response}*/}
-                                                                    {/*            </TableCell>*/}
-                                                                    {/*        );*/}
-                                                                    {/*    })*/}
-                                                                    {/*}*/}
-                                                                    <TableCell className={`px-2 py-[10px] md:px-3 font-normal`}>
-                                                                        {x.response ?
-                                                                            (x.response.find((f) => s.step_id === f.step_id)?.response || "-") :
-                                                                            "-"
-                                                                        }
+                                                                    {/* Responses for Steps */}
+                                                                    {(inAppMsgSetting?.steps || []).filter((_, index) => index !== 7).map((step, stepIndex) => {
+                                                                        const matchedResponse = response?.response?.find(
+                                                                            (r) => r.step_id === step.step_id
+                                                                        ) || { response: "-" };
+
+                                                                        return (
+                                                                            <TableCell
+                                                                                key={`response-${response.user_id}-${stepIndex}`}
+                                                                                className="px-2 py-[10px] md:px-3 font-normal"
+                                                                            >
+                                                                                {
+                                                                                    cleanQuillHtml(matchedResponse.response) ? <ReadMoreText html={matchedResponse.response} maxLength={30}/> : "-"
+                                                                                }
+                                                                            </TableCell>
+                                                                        );
+                                                                    })}
+
+                                                                    {/* Creation Date */}
+                                                                    <TableCell className="px-2 py-[10px] md:px-3 font-normal">
+                                                                        {createdAt}
                                                                     </TableCell>
-                                                                    <TableCell className={`px-2 py-[10px] md:px-3 font-normal`}>{moment(x.created_at).format("ll")}</TableCell>
                                                                 </TableRow>
                                                             )
                                                         })
@@ -526,15 +539,15 @@ const SurveysAnalyticsView = () => {
                                                     <Table>
                                                         <TableHeader className={`${theme === "dark" ? "" : "bg-muted"}`}>
                                                             <TableRow>
-                                                                <TableHead className={`px-2 py-[10px] md:px-3 font-medium text-card-foreground`} >
-                                                                    Name
-                                                                </TableHead>
-                                                                <TableHead className={`px-2 py-[10px] md:px-3 font-medium text-card-foreground`} >
-                                                                    Response
-                                                                </TableHead>
-                                                                <TableHead className={`px-2 py-[10px] md:px-3 font-medium text-card-foreground`} >
-                                                                    Date Responded
-                                                                </TableHead>
+                                                                {
+                                                                    ["Name", "Response", "Date Responded"].map((x, i) => {
+                                                                        return (
+                                                                            <TableHead key={i} className={`px-2 py-[10px] md:px-3 font-medium text-card-foreground`} >
+                                                                                {x}
+                                                                            </TableHead>
+                                                                        )
+                                                                    })
+                                                                }
                                                             </TableRow>
                                                         </TableHeader>
                                                         <TableBody>
@@ -546,7 +559,7 @@ const SurveysAnalyticsView = () => {
                                                                                 {
                                                                                     [...Array(3)].map((_, i) => {
                                                                                         return (
-                                                                                            <TableCell key={i} className={"max-w-[373px] px-2 py-[10px] md:px-3"}>
+                                                                                            <TableCell key={i} className={"px-2 py-[10px] md:px-3"}>
                                                                                                 <Skeleton className={"rounded-md w-full h-7"}/>
                                                                                             </TableCell>
                                                                                         )
@@ -569,8 +582,11 @@ const SurveysAnalyticsView = () => {
                                                                                                 <p className={"font-normal"}>{x?.name? x?.name : x.email}</p>
                                                                                             </>
                                                                                         </TableCell>
-                                                                                        <TableCell className={`px-2 py-[10px] md:px-3 font-normal`}>
-                                                                                            {x?.response}
+                                                                                        <TableCell className={`px-2 py-[10px] md:px-3 font-normal max-w-[270px]`}>
+                                                                                            {/*{x?.response}*/}
+                                                                                            {
+                                                                                                cleanQuillHtml(x?.response) ? <ReadMoreText html={x.response} maxLength={300}/> : null
+                                                                                            }
                                                                                         </TableCell>
                                                                                         <TableCell className={`px-2 py-[10px] md:px-3 font-normal`}>{moment(x.created_at).format("ll")}</TableCell>
                                                                                     </TableRow>

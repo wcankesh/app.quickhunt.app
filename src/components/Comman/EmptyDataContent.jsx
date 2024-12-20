@@ -36,15 +36,6 @@ export const EmptyDataContent = ({data, onClose, onClick, setSheetOpenCreate}) =
                                     {
                                         (x.btnText || []).map((y, j) => {
                                             return (
-                                                // <Button variant={"link"} key={j} className={"font-medium p-0"} onClick={() => {
-                                                //     if (y.redirect) {
-                                                //         window.open(y.redirect, "_blank");
-                                                //     } else if (onClick) {
-                                                //         onClick();
-                                                //     }
-                                                // }}>
-                                                //     {y.icon}{y.title}
-                                                // </Button>
                                                 <Button
                                                     variant={"link"}
                                                     key={j}

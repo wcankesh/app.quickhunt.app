@@ -47,7 +47,7 @@ const AnnouncementsTable = ({data, isLoading, setSelectedRecord, handleDelete, s
         // }));
         // setAnnouncementData(updatedData);
         setAnnouncementData(data.map((item) => ({...item, post_status: item.post_status ?? 1})));
-        navigate(`${baseUrl}/announcements?pageNo=${getPageNo}`);
+        // navigate(`${baseUrl}/announcements?pageNo=${getPageNo}`);
     }, [data]);
 
     const toggleSort = (column) => {

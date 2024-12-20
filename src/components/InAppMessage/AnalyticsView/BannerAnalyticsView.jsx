@@ -52,15 +52,15 @@ const BannerAnalyticsView = () => {
             const combinedData = {};
             data.analytics.charts.forEach(({ x, y }) => {
                 if (!combinedData[x]) {
-                    combinedData[x] = { view: 0, response: 0, x }; // Initialize object
+                    combinedData[x] = { view: 0, response: 0, x };
                 }
-                combinedData[x].view = parseFloat(y); // Add 'view' from charts
+                combinedData[x].view = parseFloat(y);
             });
             data.analytics.response_charts.forEach(({ x, y }) => {
                 if (!combinedData[x]) {
-                    combinedData[x] = { view: 0, response: 0, x }; // Initialize object
+                    combinedData[x] = { view: 0, response: 0, x };
                 }
-                combinedData[x].response = parseFloat(y); // Add 'response' from response_charts
+                combinedData[x].response = parseFloat(y);
             });
             const result = Object.values(combinedData).sort((a, b) => new Date(a.x) - new Date(b.x))
             setAnalytics({chart:result, analytics: data.analytics.analytics, open_count: data.analytics.open_count, response_count: data.analytics.response_count, responses: data.analytics.responses, response_percentage: data.analytics.response_percentage})
@@ -136,7 +136,6 @@ const BannerAnalyticsView = () => {
                                                 <LineChart
                                                     accessibilityLayer
                                                     data={analytics.chart}
-
                                                 >
                                                     <CartesianGrid vertical={false} />
                                                     <XAxis

@@ -23,9 +23,9 @@ import {Avatar, AvatarFallback} from "../ui/avatar";
 import Pagination from "../Comman/Pagination";
 import DeleteDialog from "../Comman/DeleteDialog";
 import {RadioGroup, RadioGroupItem} from "../ui/radio-group";
-import {Input} from "../ui/input";
 import {debounce} from "lodash";
 import {EmptyDataContent} from "../Comman/EmptyDataContent";
+import {CommSearchBar} from "../Comman/CommentEditor";
 
 const filterByStatus = [
     {name: "Archived", value: "archive",},
@@ -49,6 +49,7 @@ const Ideas = () => {
     const navigate = useNavigate();
     const UrlParams = new URLSearchParams(location.search);
     const getPageNo = UrlParams.get("pageNo") || 1;
+    const getNavOpenSheet = UrlParams.get("opensheet") || false;
     let apiSerVice = new ApiService();
     const {toast} = useToast()
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
@@ -64,19 +65,27 @@ const Ideas = () => {
     const [totalRecord, setTotalRecord] = useState(0);
     const [isSheetOpenCreate, setSheetOpenCreate] = useState(false);
     const [isDeleteLoading, setDeleteIsLoading] = useState(false);
-    const [load, setLoad] = useState('');
+    const [load, setLoad] = useState('list');
     const [openDelete, setOpenDelete] = useState(false);
     const [deleteRecord, setDeleteRecord] = useState(null);
     const [emptyContentBlock, setEmptyContentBlock] = useState(true);
 
     const emptyContent = (status) => {setEmptyContentBlock(status);};
 
-    const openCreateIdea = () => {setSheetOpenCreate(true)};
+    const openCreateIdea = () => {
+        setSheetOpenCreate(true)
+        navigate(`${baseUrl}/ideas`);
+    };
+
+    useEffect(() => {
+        if(getNavOpenSheet === "open"){
+            openCreateIdea();
+        }
+    }, [getNavOpenSheet])
 
     const closeCreateIdea = () => {setSheetOpenCreate(false)};
 
     useEffect(() => {
-        setLoad('list');
         if (filter?.topic?.length || filter?.roadmap?.length || filter?.bug || filter?.archive /*|| filter.no_status*/ || filter?.all || filter?.search) {
             let payload = {...filter, project_id: projectDetailsReducer.id, page: pageNo, limit: perPageLimit}
             ideaSearch(payload)
@@ -87,7 +96,11 @@ const Ideas = () => {
         }
         setTopicLists(allStatusAndTypes.topics)
         setRoadmapStatus(allStatusAndTypes.roadmap_status)
-        navigate(`${baseUrl}/ideas?pageNo=${pageNo}`);
+        if(getNavOpenSheet) {
+            navigate(`${baseUrl}/ideas?opensheet=${getNavOpenSheet}&pageNo=${pageNo}`);
+        } else {
+            navigate(`${baseUrl}/ideas?pageNo=${pageNo}`);
+        }
     }, [projectDetailsReducer.id, pageNo, allStatusAndTypes])
 
     const getAllIdea = async () => {
@@ -124,6 +137,31 @@ const Ideas = () => {
             setLoad('')
         }
     }
+
+    const throttledDebouncedSearch = useCallback(
+        debounce((value) => {
+            const updatedFilter = {
+                ...filter,
+                project_id: projectDetailsReducer.id,
+                search: value,
+                page: 1,
+            };
+            ideaSearch(updatedFilter);
+        }, 500),
+        []
+    );
+
+    const onChangeSearch = (e) => {
+        const value = e.target.value;
+        setFilter( { ...filter, search: value });
+        throttledDebouncedSearch(value)
+    };
+
+    const clearSearchFilter = () => {
+        setFilter(prev => ({ ...prev, search: '' }));
+        setPageNo(1);
+        getAllIdea('', filter.search);
+    };
 
     const openDetailsSheet = (record) => {
         navigate(`${baseUrl}/ideas/${record.id}?pageNo=${getPageNo}`)
@@ -291,32 +329,6 @@ const Ideas = () => {
         setOpenDelete(!openDelete)
     }
 
-    const throttledDebouncedSearch = useCallback(
-        debounce((value) => {
-            const updatedFilter = {
-                ...filter,
-                project_id: projectDetailsReducer.id,
-                search: value,
-                page: 1,
-            };
-            ideaSearch(updatedFilter);
-        }, 500),
-        []
-    );
-
-    const handleSearchChange = (e) => {
-        const value = e.target.value;
-        setFilter( { ...filter, search: value });
-        throttledDebouncedSearch(value)
-    };
-
-    const clearSearchFilter = () => {
-        setFilter(prev => ({ ...prev, search: '' }));
-        setPageNo(1);
-        getAllIdea('', filter.search);
-    };
-
-
     const EmptyIdeaContent = [
         {
             title: "Create First Idea",
@@ -389,6 +401,7 @@ const Ideas = () => {
                         setIdeasList={setIdeasList}
                         ideasList={ideasList}
                         getAllIdea={getAllIdea}
+                        pageNo={pageNo}
                     />
                 }
 
@@ -399,25 +412,12 @@ const Ideas = () => {
                         </div>
                         <div className="w-full lg:w-auto flex sm:flex-nowrap flex-wrap gap-2 items-center">
                             <div className={"flex gap-2 items-center w-full lg:w-auto"}>
-                            <div className={"relative w-full"}>
-                                <Input
-                                    type="search"
-                                    placeholder="Search..."
-                                    className={"w-full pl-4 pr-14 text-sm font-normal h-9"}
-                                    name={"search"}
+                                <CommSearchBar
                                     value={filter.search}
-                                    onChange={handleSearchChange}
+                                    onChange={onChangeSearch}
+                                    onClear={clearSearchFilter}
+                                    placeholder="Search..."
                                 />
-                                {filter?.search?.trim() !== '' && (
-                                    <button
-                                        type="button"
-                                        className="absolute right-2 top-1/2 transform -translate-y-1/2 w-6 h-6 flex items-center justify-center text-gray-400 hover:text-gray-600"
-                                        onClick={clearSearchFilter}
-                                    >
-                                        <X className="w-4 h-4" />
-                                    </button>
-                                )}
-                            </div>
                             <Popover
                                 open={openFilter}
                                 onOpenChange={() => {
@@ -823,8 +823,8 @@ const Ideas = () => {
 
                 </Card>
                 {
-                    (load === "search" || load === "list") ? "" : !emptyContentBlock ? "" :
-                        <EmptyDataContent data={EmptyIdeaContent} onClose={() => emptyContent(false)} setSheetOpenCreate={() => setSheetOpenCreate(true)}/>
+                    (load === "search" || load === "list" || !emptyContentBlock) ? "" :
+                        <EmptyDataContent data={EmptyIdeaContent} onClose={() => emptyContent(false)} setSheetOpenCreate={openCreateIdea}/>
                 }
             </div>
         </Fragment>

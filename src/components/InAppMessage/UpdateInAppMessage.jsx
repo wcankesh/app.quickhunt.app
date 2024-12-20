@@ -1,8 +1,7 @@
 import React, {useEffect, useState, Fragment} from 'react';
 import {useLocation, useNavigate, useParams} from "react-router-dom";
 import {Button} from "../ui/button";
-import {ArrowLeft, ArrowRight, BarChart, Loader2, Plus, RotateCcw} from "lucide-react";
-import {useTheme} from "../theme-provider";
+import {BarChart, Loader2} from "lucide-react";
 import {baseUrl} from "../../utils/constent";
 import {Card} from "../ui/card";
 import {useSelector} from "react-redux";
@@ -136,7 +135,6 @@ const UpdateInAppMessage = () => {
     const getPageNo = UrlParams.get("pageNo") || 1;
     let apiSerVice = new ApiService();
     const {id, type} = useParams()
-    const {theme} = useTheme();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
 

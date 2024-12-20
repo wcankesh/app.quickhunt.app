@@ -1,20 +1,6 @@
-import React, {Fragment, useCallback, useEffect, useState} from 'react';
+import React, {Fragment, useCallback, useEffect, useRef, useState} from 'react';
 import {Button} from "../ui/button";
-import {
-    ArrowBigUp,
-    Check,
-    Circle,
-    CirclePlus,
-    CircleX,
-    Dot,
-    Ellipsis,
-    Loader2,
-    Mail,
-    MessageCircleMore,
-    Paperclip,
-    Trash2,
-    User, X
-} from "lucide-react";
+import {ArrowBigUp, Check, Circle, CirclePlus, CircleX, Dot, Ellipsis, Loader2, Mail, MessageCircleMore, Paperclip, Trash2, User, X} from "lucide-react";
 import {RadioGroup, RadioGroupItem} from "../ui/radio-group";
 import {Label} from "../ui/label";
 import {Input} from "../ui/input";
@@ -68,6 +54,8 @@ const initialStateUser = {
     user_ip_address : '',
 }
 
+const pathUrl = "https://code.quickhunt.app/public/storage/feature_idea/";
+
 const UpdateIdea = () => {
     const location = useLocation();
     const UrlParams = new URLSearchParams(location.search);
@@ -116,25 +104,36 @@ const UpdateIdea = () => {
     const [deleteId,setDeleteId]=useState(null);
 
     const openDialogs = (name, value) => {
-        setAddUserDialog(prev => ({...prev, [name]: value}))
+        setAddUserDialog(prev => ({...prev, [name]: value}));
+        handlePopoverOpenChange();
+    }
+
+    const handlePopoverOpenChange = (isOpen) => {
+        if (!isOpen) {
+            setGetAllUsersList([]);
+            setUsersDetails(initialStateUser);
+            setUserDetailError(initialUserError)
+            setFilter({ search: '', project_id: null });
+        }
+    };
+
+    const getIdeaVotes = async (name, value) => {
+        setIsLoading(true);
+        const payload = {
+            feature_idea_id: selectedIdea.id,
+            page: pageNo,
+            limit: perPageLimit
+        }
+        const data = await apiSerVice.getIdeaVote(payload)
+        if(data.status === 200) {
+            setIdeasVoteList(data.data)
+            setTotalRecord(data.total)
+            setAddUserDialog(prev => ({...prev, [name]: value}))
+            setIsLoading(false);
+        }
     }
 
     useEffect(() => {
-        const getIdeaVotes = async (name, value) => {
-            setIsLoading(true);
-            const payload = {
-                feature_idea_id: selectedIdea.id,
-                page: pageNo,
-                limit: perPageLimit
-            }
-            const data = await apiSerVice.getIdeaVote(payload)
-            if(data.status === 200) {
-                setIdeasVoteList(data.data)
-                setTotalRecord(data.total)
-                setAddUserDialog(prev => ({...prev, [name]: value}))
-                setIsLoading(false);
-            }
-        }
         if(addUserDialog.viewUpvote){
             getIdeaVotes()
         }
@@ -147,7 +146,6 @@ const UpdateIdea = () => {
             setIsLoading(true);
             setPageNo(newPage);
             setIsLoading(false);
-        } else {
         }
     };
 
@@ -242,6 +240,12 @@ const UpdateIdea = () => {
             clone.splice(index,1);
             setIdeasVoteList(clone);
             toast({description: data.message});
+            if (clone.length === 0 && pageNo > 1) {
+                setPageNo(pageNo - 1);
+                getIdeaVotes(pageNo - 1);
+            } else {
+                getIdeaVotes(pageNo);
+            }
         } else {
             toast({description: data.message, variant: "destructive",});
         }
@@ -274,7 +278,18 @@ const UpdateIdea = () => {
                 updatedVoteList.splice(existingUserIndex, 1);
             }
             setIdeasVoteList(updatedVoteList);
+            getIdeaVotes();
         }
+    };
+
+    const listRef = useRef(null);
+    const handleWheelScroll = (event) => {
+        if (listRef.current) {
+            listRef.current.scrollTop += event.deltaY;
+        }
+    };
+    const handleTouchScroll = (e) => {
+        e.stopPropagation();
     };
 
     const getSingleIdea = async () => {
@@ -431,12 +446,11 @@ const UpdateIdea = () => {
         const files = Array.from(event.target.files);
         if (selectedComment && selectedComment.id) {
             const clone = [...selectedComment.images, ...files];
-            let old = selectedComment.newImage && selectedComment.newImage.length ? [...selectedComment.newImage] : [];
-            const newImageClone = [...old, ...files];
+            // let old = selectedComment.images && selectedComment.images.length ? [...selectedComment.images] : [];
+            // const newImageClone = [...old, ...files];
             setSelectedComment({
                 ...selectedComment,
                 images: clone,
-                newImage: newImageClone
             });
         } else {
             setCommentFiles([...commentFiles, ...files]);
@@ -448,9 +462,9 @@ const UpdateIdea = () => {
         const files = event.target.files;
         if (selectedSubComment && selectedSubComment.id && selectedComment && selectedComment.id) {
             const clone = [...selectedSubComment.images, ...files,]
-            let old = selectedSubComment && selectedSubComment.newImage && selectedSubComment.newImage.length ? [...selectedSubComment.newImage] : [];
-            const newImageClone = [...old, ...files,];
-            let selectedSubCommentObj = {...selectedSubComment, images: clone, newImage: newImageClone}
+            // let old = selectedSubComment && selectedSubComment.images && selectedSubComment.images.length ? [...selectedSubComment.images] : [];
+            // const newImageClone = [...old, ...files,];
+            let selectedSubCommentObj = {...selectedSubComment, images: clone}
             setSelectedSubComment(selectedSubCommentObj);
             let index = ((selectedComment && selectedComment.reply) || []).findIndex((x) => x.id === selectedSubComment.id)
             if (index !== -1) {
@@ -521,6 +535,7 @@ const UpdateIdea = () => {
     }
 
     const onDeleteCommentImage = (index, isOld) => {
+        debugger
         if (isOld) {
             const cloneImages = [...selectedComment.images];
             const cloneDeletedImages = [...deletedCommentImage];
@@ -532,11 +547,11 @@ const UpdateIdea = () => {
             });
             setDeletedCommentImage(cloneDeletedImages);
         } else {
-            const cloneNewImages = [...selectedComment.newImage];
+            const cloneNewImages = [...selectedComment.images];
             cloneNewImages.splice(index, 1);
             setSelectedComment({
                 ...selectedComment,
-                newImage: cloneNewImages,
+                images: cloneNewImages,
             });
         }
     };
@@ -553,11 +568,11 @@ const UpdateIdea = () => {
             });
             setDeletedSubCommentImage(cloneDeletedImages);
         } else {
-            const cloneNewImages = [...selectedSubComment.newImage];
+            const cloneNewImages = [...selectedSubComment.images];
             cloneNewImages.splice(index, 1);
             setSelectedSubComment({
                 ...selectedSubComment,
-                newImage: cloneNewImages,
+                images: cloneNewImages,
             });
         }
     };
@@ -565,9 +580,9 @@ const UpdateIdea = () => {
     const onUpdateComment = async () => {
         setIsSaveUpdateComment(true)
         let formData = new FormData();
-        if (selectedComment && selectedComment.newImage && selectedComment.newImage.length) {
-            for (let i = 0; i < selectedComment.newImage.length; i++) {
-                formData.append(`images[${i}]`, selectedComment.newImage[i]);
+        if (selectedComment && selectedComment.images && selectedComment.images.length) {
+            for (let i = 0; i < selectedComment.images.length; i++) {
+                formData.append(`images[${i}]`, selectedComment.images[i]);
             }
         }
         for (let i = 0; i < deletedCommentImage.length; i++) {
@@ -578,7 +593,7 @@ const UpdateIdea = () => {
         const data = await apiSerVice.updateComment(formData)
         if (data.status === 200) {
             let updatedImages = Array.isArray(data.data.images) ? data.data.images : [];
-            let obj = { ...selectedComment, images: updatedImages, newImage: [] };
+            let obj = { ...selectedComment, images: updatedImages };
             // let obj = {...selectedComment, images: data.data.images, newImage: []} // old code line
             const cloneComment = [...selectedIdea.comments];
             cloneComment[selectedCommentIndex] = obj;
@@ -599,13 +614,13 @@ const UpdateIdea = () => {
     const onUpdateSubComment = async () => {
         setIsSaveUpdateSubComment(true)
         let formData = new FormData();
-        if (selectedSubComment && selectedSubComment.newImage && selectedSubComment.newImage.length) {
-            for (let i = 0; i < selectedSubComment.newImage.length; i++) {
-                formData.append(`images[]`, selectedSubComment.newImage[i]);
+        if (selectedSubComment && selectedSubComment.images && selectedSubComment.images.length) {
+            for (let i = 0; i < selectedSubComment.images.length; i++) {
+                formData.append(`images[${i}]`, selectedSubComment.images[i]);
             }
         }
         for (let i = 0; i < deletedSubCommentImage.length; i++) {
-            formData.append(`delete_image[]`, deletedSubCommentImage[i].replace('https://code.quickhunt.app/public/storage/feature_idea/', ''));
+            formData.append(`delete_image[${i}]`, deletedSubCommentImage[i].replace('https://code.quickhunt.app/public/storage/feature_idea/', ''));
         }
         formData.append('comment', selectedSubComment.comment);
         formData.append('id', selectedSubComment.id);
@@ -947,61 +962,21 @@ const UpdateIdea = () => {
                                 >
                                     <Mail size={18} className={"mr-2"} strokeWidth={2} />Email all upvoters
                                 </Button>
-                                <Popover>
+                                <Popover onOpenChange={handlePopoverOpenChange}>
                                     <PopoverTrigger asChild>
                                         <Button role="combobox" className={"font-medium"}><CirclePlus size={18} className={"mr-2"} strokeWidth={2} /> Add new upvoter</Button>
                                     </PopoverTrigger>
                                     <PopoverContent className="w-[200px] p-0">
-                                        {/*<Command>*/}
-                                        {/*    <CommandInput placeholder="Search users..." name={"search"} value={filter?.search} onValueChange={handleSearchChange}/>*/}
-                                        {/*    <CommandList className={"overflow-hidden"}>*/}
-                                        {/*    <div className={"overflow-y-auto max-h-[300px]"}>*/}
-                                        {/*        <CommandEmpty>No User found.</CommandEmpty>*/}
-                                        {/*            <CommandGroup className={"p-0"}>*/}
-                                        {/*                {getAllUsersList.length > 0 && (getAllUsersList || []).map((x, i) => {*/}
-                                        {/*                    return (*/}
-                                        {/*                        <Fragment key={i}>*/}
-                                        {/*                            <CommandItem value={x.customer_name}>*/}
-                                        {/*                                <span className={"flex justify-between items-center w-full text-sm font-medium cursor-pointer"}*/}
-                                        {/*                                    onClick={() => handleUserClick(x)}*/}
-                                        {/*                                >*/}
-                                        {/*                                    {x.customer_name}*/}
-                                        {/*                                </span>*/}
-                                        {/*                            </CommandItem>*/}
-                                        {/*                        </Fragment>*/}
-                                        {/*                    )*/}
-                                        {/*                })}*/}
-                                        {/*            </CommandGroup>*/}
-                                        {/*        <div className={"border-t"}>*/}
-                                        {/*            <Button variant="ghost" className={"w-full font-medium"} onClick={() => openDialogs("addUser", true)}><CirclePlus size={16} className={"mr-2"}/>Add a brand new user</Button>*/}
-                                        {/*        </div>*/}
-                                        {/*    </div>*/}
-                                        {/*    </CommandList>*/}
-                                        {/*</Command>*/}
                                         <Command>
-                                            <CommandInput
-                                                placeholder="Search users..."
-                                                name={"search"}
-                                                value={filter?.search}
-                                                onValueChange={handleSearchChange}
-                                            />
-                                            <CommandList className={"overflow-hidden"}>
-                                                <div className={"overflow-y-auto max-h-[300px]"}>
-                                                    {getAllUsersList.length > 0 &&
-                                                    (getAllUsersList.filter(x =>
-                                                        x.customer_name.toLowerCase().includes(filter?.search?.toLowerCase())
-                                                    ) || []).length === 0 && (
-                                                        <CommandEmpty>No User found.</CommandEmpty>
-                                                    )}
+                                            <CommandInput placeholder="Search users..." name={"search"} value={filter?.search} onValueChange={handleSearchChange}/>
+                                            <CommandList ref={listRef} onWheel={handleWheelScroll} onTouchMove={handleTouchScroll}>
+                                                <CommandEmpty>No User found.</CommandEmpty>
                                                     <CommandGroup className={"p-0"}>
-                                                        {getAllUsersList.filter(x =>
-                                                            x.customer_name.toLowerCase().includes(filter?.search?.toLowerCase())
-                                                        ).map((x, i) => {
+                                                        {getAllUsersList.length > 0 && (getAllUsersList || []).map((x, i) => {
                                                             return (
                                                                 <Fragment key={i}>
                                                                     <CommandItem value={x.customer_name}>
-                                                                        <span
-                                                                            className={"flex justify-between items-center w-full text-sm font-medium cursor-pointer"}
+                                                                        <span className={"flex justify-between items-center w-full text-sm font-medium cursor-pointer"}
                                                                             onClick={() => handleUserClick(x)}
                                                                         >
                                                                             {x.customer_name}
@@ -1011,19 +986,11 @@ const UpdateIdea = () => {
                                                             )
                                                         })}
                                                     </CommandGroup>
-                                                    <div className={"border-t"}>
-                                                        <Button
-                                                            variant="ghost"
-                                                            className={"w-full font-medium"}
-                                                            onClick={() => openDialogs("addUser", true)}
-                                                        >
-                                                            <CirclePlus size={16} className={"mr-2"} />Add a brand new user
-                                                        </Button>
-                                                    </div>
+                                                <div className={"border-t"}>
+                                                    <Button variant="ghost" className={"w-full font-medium"} onClick={() => openDialogs("addUser", true)}><CirclePlus size={16} className={"mr-2"}/>Add a brand new user</Button>
                                                 </div>
                                             </CommandList>
                                         </Command>
-
                                     </PopoverContent>
                                 </Popover>
                             </DialogFooter>
@@ -1832,7 +1799,7 @@ const UpdateIdea = () => {
                                                                                                                                 images={selectedSubComment?.images}
                                                                                                                                 onUpdateComment={onUpdateSubComment}
                                                                                                                                 onCancelComment={onCancelSubComment}
-                                                                                                                                onDeleteImage={(i) => onDeleteSubCommentImage(i, true)}
+                                                                                                                                onDeleteImage={(i) => onDeleteSubCommentImage(i)}
                                                                                                                                 onImageUpload={handleSubCommentUploadImg}
                                                                                                                                 onCommentChange={(e) => onChangeTextSubComment(e)}
                                                                                                                                 isSaving={isSaveUpdateSubComment}
@@ -1917,8 +1884,7 @@ const UpdateIdea = () => {
                                                                                                                     className="animate-spin"/> : "Reply"
                                                                                                         }
                                                                                                     </Button>
-                                                                                                    <UploadButton
-                                                                                                        onChange={handleSubCommentUploadImg}/>
+                                                                                                    <UploadButton onChange={handleSubCommentUploadImg}/>
                                                                                                     {/*<div className="p-2 max-w-sm relative w-[36px]">*/}
                                                                                                     {/*    <Input*/}
                                                                                                     {/*        id="commentFileInput"*/}

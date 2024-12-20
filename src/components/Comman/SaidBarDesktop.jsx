@@ -9,7 +9,6 @@ import Articles from "../HelpCenter/Articles/Articles";
 import {
     Activity,
     Bell,
-    CircleHelp,
     DatabaseBackup,
     FileSliders,
     House, Inbox,
@@ -57,6 +56,9 @@ const SaidBarDesktop = ({isMobile, setIsMobile}) => {
         navigate(`${baseUrl}${link}`);
         if(link !== "/inbox") {
             getInboxNotification();
+        }
+        if(isMobile) {
+            setIsMobile(false)
         }
     };
 

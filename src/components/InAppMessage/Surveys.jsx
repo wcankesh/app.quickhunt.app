@@ -112,40 +112,6 @@ const Surveys = ({inAppMsgSetting, setInAppMsgSetting, selectedStepIndex, setSel
         8: "Thanks for taking the survey!",
     }
 
-    // const handleSelectQuestionType = (value) => {
-    //     let clone = [...inAppMsgSetting.steps].filter((x) => x.is_active === 1);
-    //     const stepBoj = {
-    //         question_type: value,
-    //         text: question[value],
-    //         placeholder_text: value == 5 ? "Select one": "Enter text...",
-    //         start_number: "1",
-    //         end_number: "5",
-    //         start_label: "Not likely",
-    //         end_label: "Very likely",
-    //         is_answer_required: "",
-    //         // step: value === 8 ? 1000 : clone.length + 1,
-    //         options: value == 5 ? [
-    //             {id: "", title: "", is_active: 1}
-    //         ] : [],
-    //         reactions: value == 4 ? reactionPost : [],
-    //         is_active: 1,
-    //         step_id: ""
-    //     };
-    //     const index = clone.findIndex(item => item.question_type === 8);
-    //     if(index !== -1){
-    //         clone.splice(index, 0, stepBoj);
-    //     } else {
-    //         clone.push(stepBoj);
-    //     }
-    //     setSelectedStep(stepBoj);
-    //     setSelectedStepIndex(clone.length - 1);
-    //     setInAppMsgSetting(prevState => ({
-    //         ...prevState,
-    //         steps: clone
-    //     }));
-    // };
-
-
     const handleSelectQuestionType = (value) => {
         let clone = [...inAppMsgSetting.steps].filter((x) => x.is_active === 1);
         let existingQuestionType8 = clone.find((x) => x.question_type === 8);
@@ -188,8 +154,6 @@ const Surveys = ({inAppMsgSetting, setInAppMsgSetting, selectedStepIndex, setSel
             steps: clone
         }));
     };
-
-
 
     const onSelectStep = (stepBoj, i) => {
         setSelectedStep(stepBoj);
@@ -250,7 +214,6 @@ const Surveys = ({inAppMsgSetting, setInAppMsgSetting, selectedStepIndex, setSel
         setSelectedStep({ ...activeSteps[newSelectedIndex] });
         setSelectedStepIndex(newSelectedIndex);
     };
-
 
     return (
         <div className={"flex flex-col gap-4 py-8 bg-muted justify-start overflow-y-auto h-[calc(100%_-_94px)]"}>
