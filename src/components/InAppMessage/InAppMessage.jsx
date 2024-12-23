@@ -1,6 +1,6 @@
-import React, {useState, useEffect, Fragment, useRef, useCallback} from 'react';
+import React, {useState, useEffect, Fragment, useCallback} from 'react';
 import {Button} from "../ui/button";
-import {BarChart, BookCheck, ChevronLeft, Circle, ClipboardList, Copy, Ellipsis, Filter, Loader2, Plus, ScrollText, SquareMousePointer, X} from "lucide-react";
+import {BarChart, BookCheck, ChevronLeft, Circle, ClipboardList, Copy, Ellipsis, Filter, Plus, ScrollText, SquareMousePointer, X} from "lucide-react";
 import {Popover, PopoverContent, PopoverTrigger} from "../ui/popover";
 import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList} from "../ui/command";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "../ui/table";
@@ -10,8 +10,6 @@ import {Skeleton} from "../ui/skeleton";
 import {Badge} from "../ui/badge";
 import {useLocation, useNavigate} from "react-router-dom";
 import {baseUrl} from "../../utils/constent";
-import {Dialog} from "@radix-ui/react-dialog";
-import {DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "../ui/dialog";
 import {ApiService} from "../../utils/ApiService";
 import {useSelector} from "react-redux";
 import EmptyData from "../Comman/EmptyData";
@@ -28,6 +26,7 @@ import {RadioGroup, RadioGroupItem} from "../ui/radio-group";
 import {EmptyDataContent} from "../Comman/EmptyDataContent";
 import {debounce} from "lodash";
 import {CommSearchBar} from "../Comman/CommentEditor";
+import CopyCode from "../Comman/CopyCode";
 
 const perPageLimit = 10;
 
@@ -342,65 +341,14 @@ const InAppMessage = () => {
             {
                 openCopyCode &&
                 <Fragment>
-                    <Dialog open onOpenChange={() => getCodeCopy("")}>
-                        <DialogContent className="max-w-[350px] w-full sm:max-w-[580px] bg-white rounded-lg p-3 md:p-6">
-                            <DialogHeader className={"flex flex-row justify-between gap-2"}>
-                                <div className={"flex flex-col gap-2"}>
-                                    <DialogTitle className={`text-left font-medium ${theme === "dark" ? "text-card" : ""}`}>In App Message</DialogTitle>
-                                    <DialogDescription className={"text-left"}>Choose how you would like to embed your
-                                        message.</DialogDescription>
-                                </div>
-                                <X size={16} className={`${theme === "dark" ? "text-card" : ""} m-0 cursor-pointer`}
-                                   onClick={() => getCodeCopy("")}/>
-                            </DialogHeader>
-                            <div className={"space-y-2"}>
-                                <h4 className={`${theme === "dark" ? "text-muted-foreground" : "text-muted-foreground"} text-sm`}>
-                                    Place the code below before the closing body tag on your site.
-                                </h4>
-                                <div>
-                                    <div className={"relative px-6 rounded-md bg-black mb-2"}>
-                                        <div className={"relative"}>
-                                                <pre id="text"
-                                                     className={"py-4 whitespace-pre overflow-x-auto scrollbars-none text-[10px] text-text-invert text-white max-w-[230px] w-full md:max-w-[450px]"}>
-                                                      {codeString}
-                                                  </pre>
-
-                                            <Button
-                                                variant={"ghost hover:none"}
-                                                className={`${isCopyLoading === true ? "absolute top-0 right-0 px-0" : "absolute top-0 right-0 px-0"}`}
-                                                onClick={() => handleCopyCode(codeString)}
-                                            >
-                                                {isCopyLoading ? <Loader2 size={16} className={"animate-spin"}
-                                                                          color={"white"}/> :
-                                                    <Copy size={16} color={"white"}/>}
-                                            </Button>
-
-                                        </div>
-                                    </div>
-
-                                    <p className={`${theme === "dark" ? "text-muted-foreground" : "text-muted-foreground"} text-xs`}>Read
-                                        the {" "}
-                                        <Button variant={"ghost hover:none"}
-                                                className={"p-0 h-auto text-xs text-primary font-medium"}>
-                                            Setup Guide
-                                        </Button>
-                                        {" "}for more information or {" "}
-                                        <Button
-                                            variant={"ghost hover:none"}
-                                            className={"p-0 h-auto text-xs text-primary font-medium"}
-                                        >
-                                            download the HTML example.
-                                        </Button>
-                                    </p>
-                                </div>
-                            </div>
-                            <DialogFooter>
-                                <Button variant={"outline hover:none"}
-                                        className={`text-sm font-medium border ${theme === "dark" ? "text-card" : "text-card-foreground"}`}
-                                        onClick={() => getCodeCopy("")}>Cancel</Button>
-                            </DialogFooter>
-                        </DialogContent>
-                    </Dialog>
+                    <CopyCode
+                        open={openCopyCode}
+                        title={"In App Message"}
+                        description={"Choose how you would like to embed your message."}
+                        onClick={() => getCodeCopy("")}
+                        codeString={codeString}
+                        handleCopyCode={() => handleCopyCode(codeString)}
+                    />
                 </Fragment>
             }
 

@@ -487,16 +487,18 @@ const Category = () => {
                             </h5>
                             <X onClick={closeSheetCategory} size={18} className={"cursor-pointer m-0"} />
                         </SheetHeader>
-                        <CategoryForm
-                            selectedData={selectedCategory}
-                            setSelectedData={setSelectedCategory}
-                            formError={formError}
-                            setFormError={setFormError}
-                            handleImageUpload={handleImageUpload}
-                            handleSubmit={selectedCategory?.id ? updateCategory : addCategory}
-                            isLoading={categoryEdit}
-                            closeSheet={closeSheetCategory}
-                        />
+                        <div className={"h-[calc(100vh_-_120px)] lg:h-[calc(100vh_-_69px)] overflow-y-auto"}>
+                            <CategoryForm
+                                selectedData={selectedCategory}
+                                setSelectedData={setSelectedCategory}
+                                formError={formError}
+                                setFormError={setFormError}
+                                handleImageUpload={handleImageUpload}
+                                handleSubmit={selectedCategory?.id ? updateCategory : addCategory}
+                                isLoading={categoryEdit}
+                                closeSheet={closeSheetCategory}
+                            />
+                        </div>
                     </SheetContent>
                 </Sheet>
             )}
@@ -511,16 +513,18 @@ const Category = () => {
                             </h5>
                             <X onClick={closeSheetSubCategory} size={18} className={"cursor-pointer m-0"} />
                         </SheetHeader>
-                        <CategoryForm
-                            selectedData={selectedSubCategory}
-                            setSelectedData={setSelectedSubCategory}
-                            formError={formError}
-                            setFormError={setFormError}
-                            handleImageUpload={handleImageUploadSub}
-                            handleSubmit={selectedSubCategory?.id ? updateSubCategory : addSubCategory}
-                            isLoading={subCategoryEdit}
-                            closeSheet={closeSheetSubCategory}
-                        />
+                        <div className={"h-[calc(100vh_-_120px)] lg:h-[calc(100vh_-_69px)] overflow-y-auto"}>
+                            <CategoryForm
+                                selectedData={selectedSubCategory}
+                                setSelectedData={setSelectedSubCategory}
+                                formError={formError}
+                                setFormError={setFormError}
+                                handleImageUpload={handleImageUploadSub}
+                                handleSubmit={selectedSubCategory?.id ? updateSubCategory : addSubCategory}
+                                isLoading={subCategoryEdit}
+                                closeSheet={closeSheetSubCategory}
+                            />
+                        </div>
                     </SheetContent>
                 </Sheet>
             )}

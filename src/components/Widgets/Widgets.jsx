@@ -20,6 +20,7 @@ import moment from "moment";
 import Pagination from "../Comman/Pagination";
 import DeleteDialog from "../Comman/DeleteDialog";
 import {EmptyDataContent} from "../Comman/EmptyDataContent";
+import CopyCode from "../Comman/CopyCode";
 
 const perPageLimit = 10;
 
@@ -51,9 +52,14 @@ const Widgets = () => {
 
     const emptyContent = (status) => {setEmptyContentBlock(status);};
 
-    const openSheet = (id) => {
-        setSheetOpen(true);
-        setSelectedRecordAnalytics(id)
+    const openSheet = (id, type) => {
+        if(type === "delete") {
+            setDeleteRecord(id)
+            setOpenDelete(true)
+        } else {
+            setSheetOpen(true);
+            setSelectedRecordAnalytics(id)
+        }
     }
     const closeSheet = () => {
         setSheetOpen(false);
@@ -134,11 +140,6 @@ const Widgets = () => {
         }
     };
 
-    const openDeleteWidget = (id) => {
-        setDeleteRecord(id)
-        setOpenDelete(true)
-    }
-
     const getCodeCopy = (id, type) => {
         setOpenCopyCode(!openCopyCode)
         setSelectedId(id)
@@ -150,7 +151,6 @@ const Widgets = () => {
     const handlePaginationClick = async (newPage) => {
         if (newPage >= 1 && newPage <= totalPages) {
             setPageNo(newPage);
-            // await getWidgetsSetting(newPage, perPageLimit);
         }
     };
 
@@ -237,204 +237,20 @@ const Widgets = () => {
             {
                 openCopyCode &&
                 <Fragment>
-                    <Dialog open onOpenChange={() => getCodeCopy("")}>
-                        <DialogContent className="max-w-[350px] w-full sm:max-w-[580px] bg-white rounded-lg p-3 md:p-6">
-                            <DialogHeader className={"flex flex-row justify-between gap-2"}>
-                                <div className={"flex flex-col gap-2"}>
-                                    <DialogTitle className={`text-left font-medium ${theme === "dark" ? "text-card" : ""}`}>Embed
-                                        Widget</DialogTitle>
-                                    <DialogDescription className={"text-left"}>Choose how you would like to embed your
-                                        widget.</DialogDescription>
-                                </div>
-                                <X size={16} className={`${theme === "dark" ? "text-card" : ""} m-0 cursor-pointer`}
-                                   onClick={() => getCodeCopy("")}/>
-                            </DialogHeader>
-                            <Tabs defaultValue="script" className={""}>
-                                <TabsList className="grid grid-cols-4 w-full bg-white mb-2 h-auto sm:h-10">
-                                    <TabsTrigger value="script" className={"font-normal"}>Script</TabsTrigger>
-                                    <TabsTrigger className={"whitespace-normal sm:whitespace-nowrap font-normal"} value="embedlink">Embed Link</TabsTrigger>
-                                    <TabsTrigger value="iframe" className={"font-normal"}>iFrame</TabsTrigger>
-                                    <TabsTrigger className={"whitespace-normal sm:whitespace-nowrap font-normal"} value="callback">Callback function</TabsTrigger>
-                                </TabsList>
-                                <TabsContent value="script" className={"flex flex-col gap-2 m-0"}>
-                                    <h4 className={`${theme === "dark" ? "text-muted-foreground" : "text-muted-foreground"} text-sm`}>
-                                        Place the code below before the closing body tag on your site.
-                                    </h4>
-                                    <div>
-                                        <div className={"relative px-6 rounded-md bg-black mb-2"}>
-                                            <div className={"relative"}>
-                                                <pre id="text"
-                                                     className={"py-4 whitespace-pre overflow-x-auto scrollbars-none text-[10px] text-text-invert text-white max-w-[230px] w-full md:max-w-[450px]"}>
-                                                      {codeString}
-                                                  </pre>
-
-                                                <Button
-                                                    variant={"ghost hover:none"}
-                                                    className={`${isCopyLoading === true ? "absolute top-0 right-0 px-0" : "absolute top-0 right-0 px-0"}`}
-                                                    onClick={() => handleCopyCode(codeString)}
-                                                >
-                                                    {isCopyLoading ? <Loader2 size={16} className={"animate-spin"}
-                                                                              color={"white"}/> :
-                                                        <Copy size={16} color={"white"}/>}
-                                                </Button>
-
-                                            </div>
-                                        </div>
-
-                                        <p className={`${theme === "dark" ? "text-muted-foreground" : "text-muted-foreground"} text-xs`}>Read
-                                            the {" "}
-                                            <Button variant={"ghost hover:none"}
-                                                    className={"p-0 h-auto text-xs text-primary font-medium"}>
-                                                Setup Guide
-                                            </Button>
-                                            {" "}for more information or {" "}
-                                            <Button
-                                                variant={"ghost hover:none"}
-                                                className={"p-0 h-auto text-xs text-primary font-medium"}
-                                            >
-                                                download the HTML example.
-                                            </Button>
-                                        </p>
-                                    </div>
-                                </TabsContent>
-                                <TabsContent value="embedlink" className={"space-y-2 m-0"}>
-                                    <div className={"space-y-2"}>
-                                        <div
-                                            className={`${theme === "dark" ? "text-muted-foreground" : "text-muted-foreground"} text-sm`}>
-                                            Follow these simple steps to embed the widget on any {" "}
-                                            <Button
-                                                variant={"ghost hover:none"}
-                                                className={"p-0 h-auto text-xs text-primary font-medium"}
-                                            >
-                                                supported website.
-                                            </Button>
-                                        </div>
-                                        <div>
-                                            <p className={`text-xs ${theme === "dark" ? "text-muted-foreground" : "text-muted-foreground"} pb-1`}>1.
-                                                Copy the link below</p>
-                                            <p className={`text-xs ${theme === "dark" ? "text-muted-foreground" : "text-muted-foreground"} pb-1`}>2.
-                                                Paste the link on any site where you want the widget to show.</p>
-                                            <p className={`text-xs ${theme === "dark" ? "text-muted-foreground" : "text-muted-foreground"} pb-1`}>3.
-                                                That's it!</p>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <div className={"relative px-6 rounded-md bg-black mb-2"}>
-                                            <div className={"relative"}>
-                                                <pre id="text"
-                                                     className={"py-4 whitespace-pre overflow-x-auto scrollbars-none text-[10px] text-text-invert text-white max-w-[230px] w-full md:max-w-[450px]"}>
-                                                    {embedLink}
-                                                  </pre>
-
-                                                <Button
-                                                    variant={"ghost hover:none"}
-                                                    className={`${isCopyLoading === true ? "absolute top-0 right-0 px-0" : "absolute top-0 right-0 px-0"}`}
-                                                    onClick={() => handleCopyCode(embedLink)}
-                                                >
-                                                    {isCopyLoading ? <Loader2 size={16} className={"animate-spin"}
-                                                                              color={"white"}/> :
-                                                        <Copy size={16} color={"white"}/>}
-                                                </Button>
-
-                                            </div>
-                                        </div>
-                                        <p className={`text-xs ${theme === "dark" ? "text-muted-foreground" : "text-muted-foreground"}`}>Read
-                                            the {" "}
-                                            <Button
-                                                variant={"ghost hover:none"}
-                                                className={"p-0 h-auto text-xs text-primary font-medium"}
-                                            >
-                                                Setup Guide
-                                            </Button>
-                                            {" "}for more information.
-                                        </p>
-                                    </div>
-                                </TabsContent>
-                                <TabsContent value="iframe" className={"flex flex-col gap-2 m-0"}>
-                                    <div
-                                        className={`${theme === "dark" ? "text-muted-foreground" : "text-muted-foreground"} text-sm`}>
-                                        Place the code below before the closing body tag on your site.
-                                    </div>
-                                    <div>
-                                        <div className={"relative px-6 rounded-md bg-black"}>
-                                            <div className={"relative"}>
-                                                <pre id="text"
-                                                     className={"py-4 whitespace-pre overflow-x-auto scrollbars-none text-[10px] text-text-invert text-white max-w-[230px] w-full md:max-w-[450px]"}>
-                                                      {iFrame}
-                                                  </pre>
-
-                                                <Button
-                                                    variant={"ghost hover:none"}
-                                                    className={`${isCopyLoading === true ? "absolute top-0 right-0 px-0" : "absolute top-0 right-0 px-0"}`}
-                                                    onClick={() => handleCopyCode(iFrame)}
-                                                >
-                                                    {isCopyLoading ? <Loader2 size={16} className={"animate-spin"}
-                                                                              color={"white"}/> :
-                                                        <Copy size={16} color={"white"}/>}
-                                                </Button>
-
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <p className={`text-xs ${theme === "dark" ? "text-muted-foreground" : "text-muted-foreground"}`}>Read
-                                        the {" "}
-                                        <Button
-                                            variant={"ghost hover:none"}
-                                            className={"p-0 h-auto text-xs text-primary font-medium"}
-                                        >
-                                            Setup Guide
-                                        </Button>
-                                        for more information.
-                                    </p>
-                                </TabsContent>
-                                <TabsContent value="callback" className={"flex flex-col gap-2 m-0"}>
-                                    <h4 className={`${theme === "dark" ? "text-muted-foreground" : "text-muted-foreground"} text-sm`}>
-                                        Place the code below before the closing body tag on your site.
-                                    </h4>
-                                    <div>
-                                        <div className={"relative px-6 rounded-md bg-black mb-2"}>
-                                            <div className={"relative"}>
-                                                <pre id="text"
-                                                     className={"py-4 whitespace-pre overflow-x-auto scrollbars-none text-[10px] text-text-invert text-white max-w-[230px] w-full md:max-w-[450px]"}>
-                                                      {callback}
-                                                  </pre>
-                                                <Button
-                                                    variant={"ghost hover:none"}
-                                                    className={`absolute top-0 right-0 px-0`}
-                                                    onClick={() => handleCopyCode(callback)}
-                                                >
-                                                    {isCopyLoading ? <Loader2 size={16} className={"animate-spin"}
-                                                                              color={"white"}/> :
-                                                        <Copy size={16} color={"white"}/>}
-                                                </Button>
-
-                                            </div>
-                                        </div>
-
-                                        <p className={`${theme === "dark" ? "text-muted-foreground" : "text-muted-foreground"} text-xs`}>Read
-                                            the {" "}
-                                            <Button variant={"ghost hover:none"}
-                                                    className={"p-0 h-auto text-xs text-primary font-medium"}>
-                                                Setup Guide
-                                            </Button>
-                                            {" "}for more information or {" "}
-                                            <Button
-                                                variant={"ghost hover:none"}
-                                                className={"p-0 h-auto text-xs text-primary font-medium"}
-                                            >
-                                                download the HTML example.
-                                            </Button>
-                                        </p>
-                                    </div>
-                                </TabsContent>
-                            </Tabs>
-                            <DialogFooter>
-                                <Button variant={"outline hover:none"}
-                                        className={`text-sm font-medium border ${theme === "dark" ? "text-card" : "text-card-foreground"}`}
-                                        onClick={() => getCodeCopy("")}>Cancel</Button>
-                            </DialogFooter>
-                        </DialogContent>
-                    </Dialog>
+                    <CopyCode
+                        open={openCopyCode}
+                        onClick={() => getCodeCopy("")}
+                        title={"Embed Widget"}
+                        description={"Choose how you would like to embed your Widget."}
+                        iFrame={iFrame}
+                        codeString={codeString}
+                        callback={callback}
+                        handleCopyCode={() => handleCopyCode(codeString)}
+                        embedLink={embedLink}
+                        onOpenChange={() => getCodeCopy("")}
+                        isCopyLoading={isCopyLoading}
+                        isWidget={true}
+                    />
                 </Fragment>
             }
             <div className={"container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-3 md:px-4"}>
@@ -528,7 +344,7 @@ const Widgets = () => {
                                                                     className={"cursor-pointer"}
                                                                     onClick={() => handleCreateNew(x.id, x.type)}>Edit</DropdownMenuItem>
                                                                 <DropdownMenuItem className={"cursor-pointer"}
-                                                                                  onClick={() => openDeleteWidget(x.id)}>Delete</DropdownMenuItem>
+                                                                                  onClick={() => openSheet(x.id, "delete")}>Delete</DropdownMenuItem>
                                                             </DropdownMenuContent>
                                                         </DropdownMenu>
                                                     </TableCell>

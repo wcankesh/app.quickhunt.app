@@ -205,12 +205,20 @@ const UpdateIdea = () => {
         }
         const data = await apiSerVice.createUsers(payload)
         if(data.status === 200) {
-            setUsersDetails(initialStateUser);
-            toast({description: data.message,});
+            const newUser  = {
+                id: data.data.id,
+                name: data.data.customer_name,
+                customer_first_name: null,
+                email: data.data.customer_email_id,
+                user_photo: null,
+            };
+
+            // setUsersDetails(initialStateUser);
+            // toast({description: data.message,});
             // const updatedCustomerList = [data.data, ...ideasVoteList];
             // setIdeasVoteList(updatedCustomerList);
             const clone = [...ideasVoteList];
-            clone.unshift(data.data);
+            clone.unshift(newUser);
             setIdeasVoteList(clone);
             const upvoteResponse = await apiSerVice.userManualUpVote({
                 feature_idea_id: selectedIdea.id,
@@ -223,6 +231,7 @@ const UpdateIdea = () => {
             }
             setIsLoading(false);
             setUserDetailError(initialUserError);
+            // getIdeaVotes();
         } else {
             toast({description:data.message, variant: "destructive",})
         }
@@ -257,6 +266,12 @@ const UpdateIdea = () => {
         if (selectedUser) {
             const updatedVoteList = [...ideasVoteList];
             const existingUserIndex = updatedVoteList.findIndex((u) => u.name === selectedUser.customer_name);
+
+            if (existingUserIndex !== -1) {
+                toast({ description: "User  already exists in the upvote list.", variant: "destructive" });
+                return;
+            }
+
             if (existingUserIndex === -1) {
                 const newUserPayload = {
                     name: selectedUser.customer_name,
@@ -535,7 +550,6 @@ const UpdateIdea = () => {
     }
 
     const onDeleteCommentImage = (index, isOld) => {
-        debugger
         if (isOld) {
             const cloneImages = [...selectedComment.images];
             const cloneDeletedImages = [...deletedCommentImage];
@@ -922,7 +936,7 @@ const UpdateIdea = () => {
                                                         return(
                                                             <TableRow key={index} className={"font-normal"}>
                                                                 <TableCell className={`px-2 py-[10px] md:px-3 max-w-[140px] cursor-pointer truncate text-ellipsis overflow-hidden whitespace-nowrap`}>{x.name ? x.name : "-"}</TableCell>
-                                                                <TableCell className={`px-2 py-[10px] md:px-3 max-w-[140px] cursor-pointer truncate text-ellipsis overflow-hidden whitespace-nowrap`}>{x?.email}</TableCell>
+                                                                <TableCell className={`px-2 py-[10px] md:px-3 max-w-[140px] cursor-pointer truncate text-ellipsis overflow-hidden whitespace-nowrap`}>{x?.email ? x?.email : "-"}</TableCell>
                                                                 <TableCell className={`px-2 py-[10px] md:px-3 text-center`}>
                                                                     <Button onClick={() => onDeleteUser(x.id,index)} variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px]`}>
                                                                         <Trash2 size={16}/>

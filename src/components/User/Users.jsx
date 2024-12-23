@@ -210,6 +210,11 @@ const Users = () => {
         setFormError(initialStateError);
     };
 
+    const closeUserDetails = () => {
+        setDetailsSheetOpen(false)
+        navigate(`${baseUrl}/user?pageNo=${pageNo}`)
+    }
+
     const getAllUsers = async () => {
         setIsLoading(true);
         const payload = {
@@ -460,21 +465,21 @@ const Users = () => {
             </Sheet>}
 
             {isDetailsSheetOpen && (
-                <Sheet open={isDetailsSheetOpen} onOpenChange={setDetailsSheetOpen}>
+                <Sheet open={isDetailsSheetOpen} onOpenChange={isDetailsSheetOpen ? closeUserDetails : openUserDetails}>
                     <SheetContent className={"sm:max-w-[1018px] p-0"}>
                         <SheetHeader className={"px-3 py-4 lg:px-8 lg:py-[20px] flex flex-row justify-between items-center border-b"}>
                             <h2 className={"text-sm md:text-xl font-normal"}>User Details</h2>
-                            <X onClick={() => setDetailsSheetOpen(false)} size={18} className={"cursor-pointer m-0"} />
+                            <X onClick={closeUserDetails} size={18} className={"cursor-pointer m-0"} />
                         </SheetHeader>
                         <div className={"divide-y"}>
                             <div className={"px-2 py-[10px] md:px-3 flex flex-wrap justify-between gap-4"}>
                                 <div className={"flex items-center gap-4"}>
                                     <Avatar className={"w-[50px] h-[50px]"}>
-                                        <AvatarFallback className={"text-xl"}>{selectedCustomer?.customer_first_name && selectedCustomer?.customer_first_name.substring(0, 1).toUpperCase()}</AvatarFallback>
+                                        <AvatarFallback className={"text-xl"}>{selectedCustomer?.customer_name && selectedCustomer?.customer_name.substring(0, 1).toUpperCase()}</AvatarFallback>
                                     </Avatar>
                                     <div className={"space-y-1"}>
                                         <div className={"flex items-center gap-4"}>
-                                            <h1 className={"text-sm md:text-base"}>{selectedCustomer?.customer_first_name} {selectedCustomer?.customer_last_name}</h1>
+                                            <h1 className={"text-sm md:text-base"}>{selectedCustomer?.customer_name}</h1>
                                             <Badge>Admin/Member</Badge>
                                         </div>
                                         {
@@ -592,8 +597,8 @@ const Users = () => {
                                                                     <TableCell className={`px-2 py-[10px] md:px-3 cursor-pointer max-w-[170px] truncate text-ellipsis overflow-hidden whitespace-nowrap`} onClick={() => openUserDetails(x)}>{x.customer_name ? x.customer_name : "-"}</TableCell>
                                                                     <TableCell className={`px-2 py-[10px] md:px-3 max-w-[170px] truncate text-ellipsis overflow-hidden whitespace-nowrap`}>{x?.customer_email_id}</TableCell>
                                                                     <TableCell className={`px-2 py-[10px] md:px-3 text-center`}>{x?.last_activity ? moment(x?.last_activity).format('D MMM, YYYY') : "-"}</TableCell>
-                                                                    <TableCell className={`px-2 py-[10px] md:px-3 text-center`}>{x?.comments ? x?.comments : "-"}</TableCell>
-                                                                    <TableCell className={`px-2 py-[10px] md:px-3 text-center`}>{x?.posts ? x?.posts : "-"}</TableCell>
+                                                                    <TableCell className={`px-2 py-[10px] md:px-3 text-center`}>{x?.comments ? x?.comments : 0}</TableCell>
+                                                                    <TableCell className={`px-2 py-[10px] md:px-3 text-center`}>{x?.posts ? x?.posts : 0}</TableCell>
                                                                     <TableCell className={`px-2 py-[10px] md:px-3 text-center`}>
                                                                         <Button onClick={() => deleteCustomer(x.id,index)} variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px]`}>
                                                                             <Trash2 size={16}/>

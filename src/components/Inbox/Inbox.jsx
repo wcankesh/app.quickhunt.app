@@ -15,10 +15,17 @@ import Pagination from "../Comman/Pagination";
 
 const perPageLimit = 10;
 
-const UserActionsList = ({ userActions, sourceTitle, isLoading, selectedTab, isEyeTabActive}) => {
-    const filteredActions = isEyeTabActive
-        ? userActions.filter(action => action?.is_read === 0)
-        : userActions;
+const UserActionsList = ({ userActions, sourceTitle, isLoading, selectedTab, isEyeTabActive, onUnreadCheck}) => {
+
+    const filteredActions = userActions.filter(action => {
+        if (selectedTab === 1) {
+            return true;
+        }
+        return isEyeTabActive ? action?.is_read === 0 : action?.is_read === 1;
+    });
+
+    const hasUnreadActions = filteredActions.some(action => action?.is_read === 0);
+    onUnreadCheck(hasUnreadActions);
 
     if (isLoading || !filteredActions.length) {
         return (
@@ -101,14 +108,14 @@ const Inbox = () => {
     const [allRead, setAllRead] = useState(false);
     const [isEyeTabActive, setIsEyeTabActive] = useState(false);
     const [totalPages, setTotalPages] = useState(0);
-    const [isTooltipVisible, setIsTooltipVisible] = useState(false);
+    const [showMarkAllRead, setShowMarkAllRead ] = useState(false);
 
     useEffect(() => {
         if(projectDetailsReducer.id){
             getInboxNotification();
         }
         // navigate(`${baseUrl}/notifications?pageNo=${pageNo}`)
-    }, [projectDetailsReducer.id, pageNo, selectedTab])
+    }, [projectDetailsReducer.id, pageNo, selectedTab, isEyeTabActive])
 
     const getInboxNotification = async () => {
         setIsLoading(true);
@@ -116,18 +123,17 @@ const Inbox = () => {
             project_id: projectDetailsReducer.id,
             type: selectedTab,
             page: pageNo,
-            limit: perPageLimit
+            limit: perPageLimit,
+            is_unread: isEyeTabActive ? 1 : 0
         }
         const data = await apiService.inboxNotification(payload);
         if(data.status === 200) {
             setUserActions(Array.isArray(data.data) ? data.data : []);
-            // toast({description: data.message,});
             const totalPage = Math.ceil(data.total / perPageLimit);
             setTotalPages(totalPage)
             setIsLoading(false)
         } else {
             setIsLoading(false);
-            // toast({description:data.message, variant: "destructive",})
         }
     }
 
@@ -174,10 +180,8 @@ const Inbox = () => {
         { label: "Idea upvote", value: 6, icon: <Vote size={18} className={"mr-2"} />,},
     ];
 
-    const handleToolTipShow = () => {
-        setIsEyeTabActive(!isEyeTabActive);
-        setIsTooltipVisible(true);
-        setTimeout(() => setIsTooltipVisible(false), 2000);
+    const handleUnreadCheck = (hasUnread) => {
+        setShowMarkAllRead(hasUnread);
     };
 
     return (
@@ -189,20 +193,14 @@ const Inbox = () => {
                         <h5 className={"text-sm text-muted-foreground"}>Track announcement feedback and reactions, and stay updated on ideas, their comments, and upvotes.</h5>
                     </div>
                     <div className={"flex gap-3"}>
-                        {userActions.length > 0 && !allRead && !isEyeTabActive && (
+                        {showMarkAllRead && (
                             <Button variant={"outline"} className={"flex gap-2 items-center"} onClick={markAsAllRead}><Check size={18}/>Mark all as read</Button>
                         )}
                         <TooltipProvider>
-                            {/*<Tooltip open={isTooltipVisible}>*/}
                             <Tooltip>
-                                <TooltipTrigger asChild
-                                                // onMouseEnter={() => setIsTooltipVisible(true)}
-                                                // onMouseLeave={() => setIsTooltipVisible(false)}
-                                                // onClick={handleToolTipShow}
-                                >
-                                    {/*<Button variant="outline" size="icon" className={"h-9"}>*/}
-                                        <Button variant="outline" size="icon" onClick={() => setIsEyeTabActive(!isEyeTabActive)} className={"h-9"}>
-                                        { isEyeTabActive ? <EyeOff size={18} /> : <Eye size={18} />}
+                                <TooltipTrigger asChild>
+                                    <Button variant="outline" size="icon" onClick={() => setIsEyeTabActive(!isEyeTabActive)} className={"h-9"}>
+                                    { isEyeTabActive ? <EyeOff size={18} /> : <Eye size={18} />}
                                     </Button>
                                 </TooltipTrigger>
                                 <TooltipContent side={"bottom"}>
@@ -232,7 +230,7 @@ const Inbox = () => {
                                 (tabs || []).map((y, i) => (
                                     <TabsContent key={i} value={y.value} className={"mt-0"}>
                                         <div className={"grid grid-cols-1 overflow-auto whitespace-nowrap"}>
-                                            <UserActionsList userActions={userActions} sourceTitle={sourceTitle} isLoading={isLoading} selectedTab={selectedTab} isEyeTabActive={isEyeTabActive}/>
+                                            <UserActionsList onUnreadCheck={handleUnreadCheck} userActions={userActions} sourceTitle={sourceTitle} isLoading={isLoading} selectedTab={selectedTab} isEyeTabActive={isEyeTabActive}/>
                                         </div>
                                     </TabsContent>
                                 ))
