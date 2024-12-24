@@ -16,13 +16,18 @@ import Pagination from "../Comman/Pagination";
 const perPageLimit = 10;
 
 const UserActionsList = ({ userActions, sourceTitle, isLoading, selectedTab, isEyeTabActive, onUnreadCheck}) => {
+    // const navigate = useNavigate();
 
-    const filteredActions = userActions.filter(action => {
-        if (selectedTab === 1) {
-            return true;
-        }
-        return isEyeTabActive ? action?.is_read === 0 : action?.is_read === 1;
-    });
+    const filteredActions = isEyeTabActive
+        ? userActions.filter(action => action?.is_read === 0)
+        : userActions;
+
+    // const filteredActions = userActions.filter(action => {
+    //     if (selectedTab === 1) {
+    //         return true;
+    //     }
+    //     return isEyeTabActive ? action?.is_read === 0 : action?.is_read === 1;
+    // });
 
     const hasUnreadActions = filteredActions.some(action => action?.is_read === 0);
     onUnreadCheck(hasUnreadActions);
@@ -43,6 +48,14 @@ const UserActionsList = ({ userActions, sourceTitle, isLoading, selectedTab, isE
         );
     }
 
+    // const navigateAction = (id, source) => {
+    //     if (source === "feature_ideas") {
+    //         navigate(`/ideas/${id}`);
+    //     } else if (source === "post_feedbacks") {
+    //         navigate(`/announcements/${id}`);
+    //     }
+    // }
+
     return (
         <div className={"divide-y"}>
             {(filteredActions || []).map((action, index) => {
@@ -51,7 +64,8 @@ const UserActionsList = ({ userActions, sourceTitle, isLoading, selectedTab, isE
                         {sourceTitle.map((source, i) => {
                             if (action.source === source.value) {
                                 return (
-                                    <div onClick={""} className={`px-2 py-[10px] md:px-3 flex gap-4 cursor-pointer ${action?.is_read === 0 ? "bg-muted/[0.6] hover:bg-card" : "bg-card"}`} key={i}>
+                                    // <div onClick={() => navigateAction(action?.id, action.source)} className={`px-2 py-[10px] md:px-3 flex gap-4 cursor-pointer ${action?.is_read === 0 ? "bg-muted/[0.6] hover:bg-card" : "bg-card"}`} key={i}>
+                                    <div className={`px-2 py-[10px] md:px-3 flex gap-4 cursor-pointer ${action?.is_read === 0 ? "bg-muted/[0.6] hover:bg-card" : "bg-card"}`} key={i}>
                                         <div>
                                             <Avatar className={"w-[30px] h-[30px]"}>
                                                 <AvatarFallback className={"text-base"}>{action?.customer_first_name && action?.customer_first_name.substring(0, 1).toUpperCase()}</AvatarFallback>
@@ -193,6 +207,7 @@ const Inbox = () => {
                         <h5 className={"text-sm text-muted-foreground"}>Track announcement feedback and reactions, and stay updated on ideas, their comments, and upvotes.</h5>
                     </div>
                     <div className={"flex gap-3"}>
+                        {/*{userActions.length > 0 && !allRead && !isEyeTabActive && (*/}
                         {showMarkAllRead && (
                             <Button variant={"outline"} className={"flex gap-2 items-center"} onClick={markAsAllRead}><Check size={18}/>Mark all as read</Button>
                         )}
@@ -230,6 +245,7 @@ const Inbox = () => {
                                 (tabs || []).map((y, i) => (
                                     <TabsContent key={i} value={y.value} className={"mt-0"}>
                                         <div className={"grid grid-cols-1 overflow-auto whitespace-nowrap"}>
+                                            {/*<UserActionsList userActions={userActions} sourceTitle={sourceTitle} isLoading={isLoading} selectedTab={selectedTab} isEyeTabActive={isEyeTabActive}/>*/}
                                             <UserActionsList onUnreadCheck={handleUnreadCheck} userActions={userActions} sourceTitle={sourceTitle} isLoading={isLoading} selectedTab={selectedTab} isEyeTabActive={isEyeTabActive}/>
                                         </div>
                                     </TabsContent>
