@@ -178,9 +178,9 @@ const Inbox = () => {
     };
 
     const sourceTitle = [
-        {title: "Created a Idea", value: "feature_ideas"},
-        {title: "Commented on idea", value: "feature_idea_comments"},
-        {title: "Upvoted on idea", value: "feature_idea_votes"},
+        {title: "Created an Idea", value: "feature_ideas"},
+        {title: "Commented on Idea", value: "feature_idea_comments"},
+        {title: "Upvoted on Idea", value: "feature_idea_votes"},
         {title: "Feedback on post", value: "post_feedbacks"},
         {title: "Reaction on post", value: "post_reactions"},
     ]
