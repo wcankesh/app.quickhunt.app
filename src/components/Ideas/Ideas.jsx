@@ -637,7 +637,7 @@ const Ideas = () => {
                                                                 >
                                                                     <h3 className={"text-base font-normal max-w-[278px] truncate text-ellipsis overflow-hidden whitespace-nowrap"}>{x.title}</h3>
                                                                     <div className={"flex gap-2 items-center"}>
-                                                                        <h4 className={"text-xs font-normal text-muted-foreground"}>{x.name}</h4>
+                                                                        <h4 className={"text-xs font-normal text-muted-foreground"}>{x.name ? x.name : x?.user_name}</h4>
                                                                         <p className={"text-xs font-normal flex items-center text-muted-foreground"}>
                                                                             <Dot size={20} className={"fill-text-card-foreground stroke-text-card-foreground"}/>
                                                                             {moment(x.created_at).format('D MMM')}

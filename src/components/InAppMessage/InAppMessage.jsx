@@ -438,7 +438,7 @@ const InAppMessage = () => {
                                     {
                                         ["Title","State","Sender","Content type","Created at","", "Action"].map((x,i)=>{
                                             return(
-                                                <TableHead  className={`px-2 py-[10px] md:px-3 font-medium text-card-foreground ${i >= 5 ? 'text-center' : ''}`} key={i}>{x}</TableHead>
+                                                <TableHead  className={`px-2 py-[10px] md:px-3 font-medium text-card-foreground ${(i === 5 || i === 2) ? 'text-center' : ''}`} key={i}>{x}</TableHead>
                                             )
                                         })
                                     }
@@ -501,7 +501,7 @@ const InAppMessage = () => {
                                                                         </SelectContent>
                                                                     </Select>
                                                                 </TableCell>
-                                                                <TableCell className={`flex items-center mt-1 px-2 py-[10px] md:px-3 gap-2 ${sender ? sender : "justify-center"}`}>
+                                                                <TableCell className={`flex items-center mt-1 px-2 py-[10px] md:px-3 gap-2 justify-center`}>
                                                                     {sender ? (
                                                                         <>
                                                                             <Avatar className={"w-[20px] h-[20px]"}>

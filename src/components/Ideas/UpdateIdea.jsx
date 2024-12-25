@@ -1459,11 +1459,11 @@ const UpdateIdea = () => {
                                                             <Fragment>
                                                                 <UserAvatar
                                                                     userPhoto={selectedIdea?.user_photo}
-                                                                    userName={selectedIdea?.name}
+                                                                    userName={selectedIdea?.name ? selectedIdea?.name : selectedIdea?.user_name}
                                                                 />
                                                                 <div className={"flex items-center"}>
                                                                 <Fragment>
-                                                                    <h4 className={"text-sm font-normal"}>{selectedIdea?.name}</h4>
+                                                                    <h4 className={"text-sm font-normal"}>{selectedIdea?.name ? selectedIdea?.name : selectedIdea?.user_name}</h4>
                                                                     <p className={"text-sm font-normal flex items-center text-muted-foreground"}>
                                                                         <Dot size={20}
                                                                              className={"fill-text-card-foreground stroke-text-card-foreground"}/>
