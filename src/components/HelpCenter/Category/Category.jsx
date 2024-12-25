@@ -160,7 +160,7 @@ const Category = () => {
         formData.append('project_id', projectDetailsReducer.id);
         formData.append('title', selectedCategory.title);
         formData.append('description', selectedCategory.description);
-        formData.append(`image`, selectedCategory.image);
+        // formData.append(`image`, selectedCategory.image);
         
         const data = await apiService.createCategory(formData);
         if(data.status === 200) {
@@ -723,7 +723,7 @@ const Category = () => {
                 }
                 {
                     (isLoading || !emptyContentBlock) ? "" :
-                        <EmptyDataContent data={EmptyInCategoryContent} onClose={() => emptyContent(false)} setSheetOpenCreate={openSheetCategory}/>
+                        <EmptyDataContent data={EmptyInCategoryContent} onClose={() => emptyContent(false)} setSheetOpenCreate={() => openSheetCategory("", "")}/>
                 }
             </div>
         </Fragment>

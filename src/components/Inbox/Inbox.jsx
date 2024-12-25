@@ -5,18 +5,22 @@ import {Tabs, TabsContent, TabsList, TabsTrigger} from "../ui/tabs";
 import EmptyData from "../Comman/EmptyData";
 import {ApiService} from "../../utils/ApiService";
 import {useToast} from "../ui/use-toast";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import moment from "moment";
 import {Skeleton} from "../ui/skeleton";
 import {Avatar, AvatarFallback, AvatarImage} from "../ui/avatar";
 import {Card, CardContent} from "../ui/card";
 import {Tooltip, TooltipTrigger, TooltipProvider, TooltipContent} from "../ui/tooltip";
 import Pagination from "../Comman/Pagination";
+import {useNavigate} from "react-router";
+import {inboxMarkReadAction} from "../../redux/action/InboxMarkReadAction";
 
 const perPageLimit = 10;
 
-const UserActionsList = ({ userActions, sourceTitle, isLoading, selectedTab, isEyeTabActive, onUnreadCheck}) => {
-    // const navigate = useNavigate();
+const UserActionsList = ({ userActions, sourceTitle, isLoading, selectedTab, isEyeTabActive, onUnreadCheck, setUserActions, projectDetailsReducer}) => {
+    const navigate = useNavigate();
+    const apiService = new ApiService();
+    const dispatch = useDispatch();
 
     const filteredActions = isEyeTabActive
         ? userActions.filter(action => action?.is_read === 0)
@@ -48,13 +52,19 @@ const UserActionsList = ({ userActions, sourceTitle, isLoading, selectedTab, isE
         );
     }
 
-    // const navigateAction = (id, source) => {
-    //     if (source === "feature_ideas") {
-    //         navigate(`/ideas/${id}`);
-    //     } else if (source === "post_feedbacks") {
-    //         navigate(`/announcements/${id}`);
-    //     }
-    // }
+    const navigateAction = async (id, source) => {
+        if (source === "feature_ideas" || source === "feature_idea_comments" || source === "feature_idea_votes") {
+            navigate(`/ideas/${id}`);
+        } else if (source === "post_feedbacks" || source === "post_reactions") {
+            navigate(`/announcements/${id}`);
+        }
+        const response = await apiService.inboxMarkAllRead({ project_id: projectDetailsReducer.id, id });
+        if (response.status === 200) {
+            const update = (userActions || []).map(action => action.id === id ? { ...action, is_read: 1 } : action);
+            setUserActions(update);
+            dispatch(inboxMarkReadAction(update));
+        }
+    }
 
     return (
         <div className={"divide-y"}>
@@ -64,8 +74,7 @@ const UserActionsList = ({ userActions, sourceTitle, isLoading, selectedTab, isE
                         {sourceTitle.map((source, i) => {
                             if (action.source === source.value) {
                                 return (
-                                    // <div onClick={() => navigateAction(action?.id, action.source)} className={`px-2 py-[10px] md:px-3 flex gap-4 cursor-pointer ${action?.is_read === 0 ? "bg-muted/[0.6] hover:bg-card" : "bg-card"}`} key={i}>
-                                    <div className={`px-2 py-[10px] md:px-3 flex gap-4 cursor-pointer ${action?.is_read === 0 ? "bg-muted/[0.6] hover:bg-card" : "bg-card"}`} key={i}>
+                                    <div onClick={() => navigateAction(action?.id, action.source)} className={`px-2 py-[10px] md:px-3 flex gap-4 cursor-pointer ${action?.is_read === 0 ? "bg-muted/[0.6] hover:bg-card" : "bg-card"}`} key={i}>
                                         <div>
                                             <Avatar className={"w-[30px] h-[30px]"}>
                                                 <AvatarFallback className={"text-base"}>{action?.customer_first_name && action?.customer_first_name.substring(0, 1).toUpperCase()}</AvatarFallback>
@@ -93,7 +102,7 @@ const UserActionsList = ({ userActions, sourceTitle, isLoading, selectedTab, isE
                                             </div>
                                         </div>
                                         <span className={"text-sm text-muted-foreground"}>
-                                            {action?.created_at ? moment(action?.created_at).format('D MMM, YYYY') : "-"}
+                                            {action?.created_at ? moment(action?.created_at).format('D MMM, YYYY h:mm A') : "-"}
                                         </span>
                                         </div>
                                     </div>
@@ -112,7 +121,8 @@ const Inbox = () => {
     const apiService = new ApiService();
     const UrlParams = new URLSearchParams(location.search);
     const getPageNo = UrlParams.get("pageNo") || 1;
-    const {toast} = useToast()
+    const {toast} = useToast();
+    const dispatch = useDispatch();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
 
     const [userActions, setUserActions] = useState([]);
@@ -146,6 +156,7 @@ const Inbox = () => {
             const totalPage = Math.ceil(data.total / perPageLimit);
             setTotalPages(totalPage)
             setIsLoading(false)
+            dispatch(inboxMarkReadAction(data.data));
         } else {
             setIsLoading(false);
         }
@@ -155,8 +166,10 @@ const Inbox = () => {
         setIsLoading(true);
         const data = await apiService.inboxMarkAllRead({project_id: projectDetailsReducer.id});
         if(data.status === 200) {
-            setUserActions([]);
-            setAllRead(true);
+            const update = (userActions || []).map(action => ({ ...action, is_read: 1 }));
+            setUserActions(update);
+            // setAllRead(true);
+            dispatch(inboxMarkReadAction(update));
             toast({description: data.message,});
         } else {
             toast({description:data.message, variant: "destructive",})
@@ -166,7 +179,7 @@ const Inbox = () => {
 
     const onTabChange = (value) => {
         setSelectedTab(value);
-        setAllRead(false);
+        // setAllRead(false);
         setPageNo(1);
         setTotalPages(1);
     }
@@ -181,8 +194,8 @@ const Inbox = () => {
         {title: "Created an Idea", value: "feature_ideas"},
         {title: "Commented on Idea", value: "feature_idea_comments"},
         {title: "Upvoted on Idea", value: "feature_idea_votes"},
-        {title: "Feedback on post", value: "post_feedbacks"},
-        {title: "Reaction on post", value: "post_reactions"},
+        {title: "Feedback on Post", value: "post_feedbacks"},
+        {title: "Reaction on Post", value: "post_reactions"},
     ]
 
     const tabs = [
@@ -245,8 +258,7 @@ const Inbox = () => {
                                 (tabs || []).map((y, i) => (
                                     <TabsContent key={i} value={y.value} className={"mt-0"}>
                                         <div className={"grid grid-cols-1 overflow-auto whitespace-nowrap"}>
-                                            {/*<UserActionsList userActions={userActions} sourceTitle={sourceTitle} isLoading={isLoading} selectedTab={selectedTab} isEyeTabActive={isEyeTabActive}/>*/}
-                                            <UserActionsList onUnreadCheck={handleUnreadCheck} userActions={userActions} sourceTitle={sourceTitle} isLoading={isLoading} selectedTab={selectedTab} isEyeTabActive={isEyeTabActive}/>
+                                            <UserActionsList projectDetailsReducer={projectDetailsReducer} setUserActions={setUserActions} onUnreadCheck={handleUnreadCheck} userActions={userActions} sourceTitle={sourceTitle} isLoading={isLoading} selectedTab={selectedTab} isEyeTabActive={isEyeTabActive}/>
                                         </div>
                                     </TabsContent>
                                 ))
@@ -263,7 +275,7 @@ const Inbox = () => {
                                 stateLength={userActions?.length}
                             /> : ""
                     }
-                    {allRead && <div className="text-center text-muted-foreground text-lg font-semibold my-4">You're all caught up!</div>}
+                    {/*{allRead && <div className="text-center text-muted-foreground text-lg font-semibold my-4">You're all caught up!</div>}*/}
                 </Card>
             </div>
         </Fragment>

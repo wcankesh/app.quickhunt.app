@@ -218,7 +218,12 @@ const UpdateIdea = () => {
             // const updatedCustomerList = [data.data, ...ideasVoteList];
             // setIdeasVoteList(updatedCustomerList);
             const clone = [...ideasVoteList];
-            clone.unshift(newUser);
+            const filterEmail = clone.some((x) => x.email === newUser.email)
+            if(filterEmail) {
+                toast({description: "User with this email already exist.", variant: "destructive",})
+            } else {
+                clone.unshift(newUser);
+            }
             setIdeasVoteList(clone);
             const upvoteResponse = await apiSerVice.userManualUpVote({
                 feature_idea_id: selectedIdea.id,
@@ -894,7 +899,7 @@ const UpdateIdea = () => {
                                 <Table>
                                     <TableHeader className={`bg-muted`}>
                                         <TableRow>
-                                            {['Name', 'Email', ""].map((x, i) => {
+                                            {['Name', 'Email', "Action"].map((x, i) => {
                                                 const icons = [<User className="w-4 h-4" />, <Mail className="w-4 h-4" />];
                                                 return (
                                                     <TableHead
@@ -903,7 +908,7 @@ const UpdateIdea = () => {
                                                         }`}
                                                         key={i}
                                                     >
-                                                        <div className="flex items-center gap-2">
+                                                        <div className={`flex gap-2 items-center ${i === 2 ? "justify-center" : ""}`}>
                                                             {icons[i]}
                                                             {x}
                                                         </div>

@@ -92,7 +92,7 @@ const CategoryForm = ({ selectedData, setSelectedData, formError, setFormError, 
                     )}
                 </div>
             </div>
-            <div className={"flex gap-4 px-3 py-4 sm:py-6 sm:px-8"}>
+            <div className={"flex gap-4"}>
                 <Button
                     className={`border w-[115px] font-medium hover:bg-primary`}
                     onClick={handleSubmit}

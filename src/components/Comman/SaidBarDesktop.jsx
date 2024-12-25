@@ -4,7 +4,7 @@ import {Icon} from "../../utils/Icon";
 import {apiService, baseUrl} from "../../utils/constent";
 import {useNavigate, useLocation, useParams} from "react-router-dom";
 import {useTheme} from "../theme-provider";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import Articles from "../HelpCenter/Articles/Articles";
 import {
     Activity,
@@ -23,14 +23,17 @@ import {
     UsersRound, X
 } from "lucide-react";
 import {Sheet, SheetContent, SheetHeader, SheetOverlay, SheetTrigger} from "../ui/sheet";
+import {inboxMarkReadAction} from "../../redux/action/InboxMarkReadAction";
 
 const SaidBarDesktop = ({isMobile, setIsMobile}) => {
     const {theme} = useTheme()
     let navigate = useNavigate();
     let location = useLocation();
+    const dispatch = useDispatch();
     const {type, id} = useParams();
     const userDetailsReducer = useSelector(state => state.userDetailsReducer);
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
+    const inboxMarkRead = useSelector(state => state.inboxMarkRead);
 
     const [unreadCount, setUnreadCount] = useState(0);
 
@@ -38,7 +41,14 @@ const SaidBarDesktop = ({isMobile, setIsMobile}) => {
         if(projectDetailsReducer.id){
             getInboxNotification();
         }
-    }, [projectDetailsReducer.id, ])
+    }, [projectDetailsReducer.id,])
+
+    useEffect(() => {
+        if(inboxMarkRead){
+            const unreadNotifications = inboxMarkRead.filter(notification => notification?.is_read == 0);
+            setUnreadCount(unreadNotifications.length);
+        }
+    }, [inboxMarkRead])
 
     const getInboxNotification = async () => {
         const payload = {
@@ -47,8 +57,7 @@ const SaidBarDesktop = ({isMobile, setIsMobile}) => {
         }
         const data = await apiService.inboxNotification(payload);
         if(data.status === 200) {
-            const unreadNotifications = data.data.filter(notification => notification?.is_read === 0);
-            setUnreadCount(unreadNotifications.length);
+            dispatch(inboxMarkReadAction(data.data));
         }
     }
 
@@ -261,12 +270,6 @@ const SaidBarDesktop = ({isMobile, setIsMobile}) => {
                                                                     <div className={`font-normal text-left flex-1 text-sm ${y.selected ? "text-primary" : ""}`}>{y.title}</div>
                                                                     {y.title === 'Inbox' && unreadCount > 0 && (
                                                                         <span className="bg-red-500 rounded-full w-2 h-2 ml-2" />
-                                                                        // <span className={''}>
-                                                                        //     <span className="relative flex h-2 w-2">
-                                                                        //         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-300 opacity-75"/>
-                                                                        //         <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"/>
-                                                                        //     </span>
-                                                                        // </span>
                                                                     )}
                                                                 </Button>
                                                                 {y.title === 'Help Center' && isHelpCenterActive && y.subItems && renderSubItems(y.subItems)}
