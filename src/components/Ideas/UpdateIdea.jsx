@@ -234,12 +234,12 @@ const UpdateIdea = () => {
             } else {
                 toast({description:upvoteResponse.message, variant: "destructive",})
             }
-            setIsLoading(false);
             setUserDetailError(initialUserError);
             // getIdeaVotes();
         } else {
             toast({description:data.message, variant: "destructive",})
         }
+            setIsLoading(false);
         openDialogs("addUser", false);
     };
 

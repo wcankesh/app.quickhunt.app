@@ -17,6 +17,15 @@ import {inboxMarkReadAction} from "../../redux/action/InboxMarkReadAction";
 
 const perPageLimit = 10;
 
+const TabTitle = {
+    1: "all",
+    2: "post_feedbacks",
+    3: "post_reactions",
+    4: "feature_ideas",
+    5: "feature_idea_comments",
+    6: "feature_idea_votes",
+}
+
 const UserActionsList = ({ userActions, sourceTitle, isLoading, selectedTab, isEyeTabActive, onUnreadCheck, setUserActions, projectDetailsReducer}) => {
     const navigate = useNavigate();
     const apiService = new ApiService();
@@ -129,7 +138,6 @@ const Inbox = () => {
     const [pageNo, setPageNo] = useState(Number(getPageNo));
     const [isLoading, setIsLoading] = useState(true);
     const [selectedTab, setSelectedTab] = useState(1);
-    const [allRead, setAllRead] = useState(false);
     const [isEyeTabActive, setIsEyeTabActive] = useState(false);
     const [totalPages, setTotalPages] = useState(0);
     const [showMarkAllRead, setShowMarkAllRead ] = useState(false);
@@ -164,12 +172,13 @@ const Inbox = () => {
 
     const markAsAllRead = async () => {
         setIsLoading(true);
-        const data = await apiService.inboxMarkAllRead({project_id: projectDetailsReducer.id});
+        const data = await apiService.inboxMarkAllRead({project_id: projectDetailsReducer.id, type: selectedTab});
         if(data.status === 200) {
-            const update = (userActions || []).map(action => ({ ...action, is_read: 1 }));
-            setUserActions(update);
-            // setAllRead(true);
-            dispatch(inboxMarkReadAction(update));
+            const updatedActions = userActions.map((action) =>
+                action.source === TabTitle[selectedTab] ? { ...action, is_read: 1 } : action
+            );
+            setUserActions(updatedActions);
+            dispatch(inboxMarkReadAction(updatedActions));
             toast({description: data.message,});
         } else {
             toast({description:data.message, variant: "destructive",})
@@ -179,7 +188,6 @@ const Inbox = () => {
 
     const onTabChange = (value) => {
         setSelectedTab(value);
-        // setAllRead(false);
         setPageNo(1);
         setTotalPages(1);
     }
@@ -220,7 +228,6 @@ const Inbox = () => {
                         <h5 className={"text-sm text-muted-foreground"}>Track announcement feedback and reactions, and stay updated on ideas, their comments, and upvotes.</h5>
                     </div>
                     <div className={"flex gap-3"}>
-                        {/*{userActions.length > 0 && !allRead && !isEyeTabActive && (*/}
                         {showMarkAllRead && (
                             <Button variant={"outline"} className={"flex gap-2 items-center"} onClick={markAsAllRead}><Check size={18}/>Mark all as read</Button>
                         )}
@@ -275,7 +282,6 @@ const Inbox = () => {
                                 stateLength={userActions?.length}
                             /> : ""
                     }
-                    {/*{allRead && <div className="text-center text-muted-foreground text-lg font-semibold my-4">You're all caught up!</div>}*/}
                 </Card>
             </div>
         </Fragment>
