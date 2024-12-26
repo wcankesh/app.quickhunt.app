@@ -207,7 +207,7 @@ const Inbox = () => {
         {title: "Commented on Idea", value: "feature_idea_comments"},
         {title: "Upvoted on Idea", value: "feature_idea_votes"},
         {title: "Feedback on Post", value: "post_feedbacks"},
-        {title: "Reaction on Post", value: "post_reactions"},
+        {title: "Reacted on Post", value: "post_reactions"},
     ]
 
     const tabs = [
