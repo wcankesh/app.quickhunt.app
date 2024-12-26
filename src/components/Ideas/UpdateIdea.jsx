@@ -14,7 +14,7 @@ import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "../
 import {useTheme} from "../theme-provider";
 import {useToast} from "../ui/use-toast";
 import {ApiService} from "../../utils/ApiService";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import moment from "moment";
 import {DropdownMenu, DropdownMenuTrigger} from "@radix-ui/react-dropdown-menu";
 import {DropdownMenuContent, DropdownMenuItem} from "../ui/dropdown-menu";
@@ -29,6 +29,7 @@ import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandL
 import {debounce} from "lodash";
 import EmptyData from "../Comman/EmptyData";
 import Pagination from "../Comman/Pagination";
+import {inboxMarkReadAction} from "../../redux/action/InboxMarkReadAction";
 
 const perPageLimit = 10
 
@@ -64,8 +65,10 @@ const UpdateIdea = () => {
     let apiSerVice = new ApiService();
     const {toast} = useToast();
     const { id } = useParams();
+    const dispatch = useDispatch();
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
+    const inboxMarkReadReducer = useSelector(state => state.inboxMarkRead);
 
     const [pageNo, setPageNo] = useState(Number(getPageNo));
     const [totalRecord, setTotalRecord] = useState(0);
@@ -312,13 +315,30 @@ const UpdateIdea = () => {
         e.stopPropagation();
     };
 
+    console.log("selectedIdea", selectedIdea)
+
     const getSingleIdea = async () => {
         setIsLoading(true)
         const data = await apiSerVice.getSingleIdea(id);
         if (data.status === 200) {
             setIsLoading(false)
-            setSelectedIdea(data.data)
-            setOldSelectedIdea(data.data)
+            const ideaData = {...data.data, is_read: 1,
+                comments: data.data.comments.map(comment => ({
+                    ...comment,
+                    is_read: 1
+
+                }))}
+            setSelectedIdea(ideaData)
+            setOldSelectedIdea(ideaData)
+            const updateInbox = inboxMarkReadReducer.map(item => {
+                if (item.source === 'feature_idea_comments' && item.id === data.data.id) {
+                    return {...item, is_read: 1};
+                }
+                return item;
+            });
+
+            dispatch(inboxMarkReadAction(updateInbox));
+
         }
     }
 
@@ -1253,7 +1273,7 @@ const UpdateIdea = () => {
                                                                                                     className={"update-idea text-sm rounded-full border text-center"}>
                                                                                                     <UserAvatar
                                                                                                         userPhoto={x.user_photo}
-                                                                                                        userName={x.name}
+                                                                                                        userName={x?.name ? x?.name : x?.user_name}
                                                                                                         className="w-[20px] h-[20px]"
                                                                                                     />
                                                                                                 </div>
@@ -1286,11 +1306,11 @@ const UpdateIdea = () => {
                                                                                                     className={"update-idea text-sm rounded-full border text-center"}>
                                                                                                     <UserAvatar
                                                                                                         userPhoto={x.user_photo}
-                                                                                                        userName={x.name}
+                                                                                                        userName={x?.name ? x?.name : x?.user_name}
                                                                                                         className="w-[20px] h-[20px]"
                                                                                                     />
                                                                                                 </div>
-                                                                                                <h4 className={"text-sm font-normal"}>{x.name}</h4>
+                                                                                                <h4 className={"text-sm font-normal"}>{x?.name ? x?.name : x?.user_name}</h4>
                                                                                             </div>
                                                                                         )
                                                                                     })
@@ -1658,14 +1678,14 @@ const UpdateIdea = () => {
                                                                             <div className={"update-idea text-sm rounded-full border text-center"}>
                                                                                 <UserAvatar
                                                                                     userPhoto={x?.user_photo}
-                                                                                    userName={x?.name}
+                                                                                    userName={x?.name ? x?.name : x?.user_name}
                                                                                 />
                                                                             </div>
                                                                         </div>
                                                                         <div className={"w-full flex flex-col space-y-3"}>
                                                                             <div className={"flex gap-1 flex-wrap justify-between"}>
                                                                                 <div className={"flex items-start"}>
-                                                                                    <h4 className={"text-sm font-normal"}>{x?.name}</h4>
+                                                                                    <h4 className={"text-sm font-normal"}>{x?.name ? x?.name : x?.user_name}</h4>
                                                                                     <p className={"text-sm font-normal flex items-center text-muted-foreground"}>
                                                                                         <Dot size={20}
                                                                                              className={"fill-text-card-foreground stroke-text-card-foreground"}/>
@@ -1766,14 +1786,14 @@ const UpdateIdea = () => {
                                                                                                             <div>
                                                                                                                 <div
                                                                                                                     className={"update-idea text-sm rounded-full border text-center"}>
-                                                                                                                    <UserAvatar userPhoto={y.user_photo} userName={y?.name}/>
+                                                                                                                    <UserAvatar userPhoto={y.user_photo} userName={y?.name ? y?.name : y?.user_name}/>
                                                                                                                 </div>
                                                                                                             </div>
                                                                                                             <div
                                                                                                                 className={"w-full space-y-2"}>
                                                                                                                 <div className={"flex justify-between"}>
                                                                                                                     <div className={"flex items-start"}>
-                                                                                                                        <h4 className={"text-sm font-normal"}>{y.name}</h4>
+                                                                                                                        <h4 className={"text-sm font-normal"}>{y?.name ? y?.name : y?.user_name}</h4>
                                                                                                                         <p className={"text-sm font-normal flex items-center text-muted-foreground"}>
                                                                                                                             <Dot
                                                                                                                                 size={20}

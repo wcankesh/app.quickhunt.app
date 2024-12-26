@@ -164,6 +164,20 @@ const Ideas = () => {
     };
 
     const openDetailsSheet = (record) => {
+        setIdeasList(prevIdeas =>
+            prevIdeas.map(idea =>
+                idea.id === record.id
+                    ? {
+                        ...idea,
+                        is_read: 1,
+                        comments: idea.comments.map(comment => ({
+                            ...comment,
+                            is_read: 1
+                        }))
+                    }
+                    : idea
+            )
+        );
         navigate(`${baseUrl}/ideas/${record.id}?pageNo=${getPageNo}`)
     };
 

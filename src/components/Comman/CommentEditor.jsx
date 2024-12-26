@@ -101,9 +101,9 @@ export const CommentEditor = ({isEditMode, comment, images = [], onUpdateComment
     );
 };
 
-export const UserAvatar = ({ userPhoto, userName }) => {
+export const UserAvatar = ({ userPhoto, userName, className }) => {
     return (
-        <Avatar className={"w-[20px] h-[20px]"}>
+        <Avatar className={`w-[20px] h-[20px] ${className}`}>
                 <AvatarImage src={userPhoto} alt={userName && userName.substring(0, 1)} />
                 <AvatarFallback>{userName && userName.substring(0, 1).toUpperCase()}</AvatarFallback>
         </Avatar>

@@ -14,6 +14,7 @@ import {Tooltip, TooltipTrigger, TooltipProvider, TooltipContent} from "../ui/to
 import Pagination from "../Comman/Pagination";
 import {useNavigate} from "react-router";
 import {inboxMarkReadAction} from "../../redux/action/InboxMarkReadAction";
+import {UserAvatar} from "../Comman/CommentEditor";
 
 const perPageLimit = 10;
 
@@ -85,9 +86,11 @@ const UserActionsList = ({ userActions, sourceTitle, isLoading, selectedTab, isE
                                 return (
                                     <div onClick={() => navigateAction(action?.id, action.source)} className={`px-2 py-[10px] md:px-3 flex gap-4 cursor-pointer ${action?.is_read === 0 ? "bg-muted/[0.6] hover:bg-card" : "bg-card"}`} key={i}>
                                         <div>
-                                            <Avatar className={"w-[30px] h-[30px]"}>
-                                                <AvatarFallback className={"text-base"}>{action?.customer_first_name && action?.customer_first_name.substring(0, 1).toUpperCase()}</AvatarFallback>
-                                            </Avatar>
+                                            <UserAvatar
+                                                userPhoto={action?.user_photo}
+                                                userName={action?.customer_first_name && action?.customer_first_name.substring(0, 1).toUpperCase()}
+                                                className={"w-[30px] h-[30px]"}
+                                            />
                                         </div>
                                         <div className={"w-full flex flex-wrap justify-between gap-2"}>
                                         <div className={"flex gap-3"}>
@@ -172,10 +175,11 @@ const Inbox = () => {
 
     const markAsAllRead = async () => {
         setIsLoading(true);
+        debugger
         const data = await apiService.inboxMarkAllRead({project_id: projectDetailsReducer.id, type: selectedTab});
         if(data.status === 200) {
             const updatedActions = userActions.map((action) =>
-                action.source === TabTitle[selectedTab] ? { ...action, is_read: 1 } : action
+                action.source === TabTitle[selectedTab] ? { ...action, is_read: 1 } : selectedTab === 1 ? { ...action, is_read: 1 } : action
             );
             setUserActions(updatedActions);
             dispatch(inboxMarkReadAction(updatedActions));
