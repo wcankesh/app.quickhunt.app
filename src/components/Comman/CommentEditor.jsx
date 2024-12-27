@@ -33,7 +33,7 @@ export const CommentEditor = ({isEditMode, comment, images = [], onUpdateComment
                                                 />
                                                 <CircleX
                                                     size={20}
-                                                    className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
+                                                    className={`light:text-muted-foreground dark:text-card cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
                                                     onClick={() => onDeleteImage(index, !!img.name)}
                                                 />
                                             </div> :
@@ -45,7 +45,7 @@ export const CommentEditor = ({isEditMode, comment, images = [], onUpdateComment
                                                 />
                                                 <CircleX
                                                     size={20}
-                                                    className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
+                                                    className={`light:text-muted-foreground dark:text-card cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
                                                     onClick={() => onDeleteImage(index, !!img.name)}
                                                 />
                                             </div>
@@ -163,7 +163,7 @@ export const ImageGallery = ({ images, onDeleteImage }) => {
                             <img className="upload-img" src={image.name ? URL.createObjectURL(image) : image} alt="Uploaded"/>
                             <CircleX
                                 size={20}
-                                className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
+                                className={`light:text-muted-foreground dark:text-card cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
                                 onClick={() => onDeleteImage(index)}
                             />
                         </div>

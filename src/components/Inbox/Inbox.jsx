@@ -258,7 +258,7 @@ const Inbox = () => {
                                         <TabsTrigger
                                             key={i}
                                             value={tab.value}
-                                            className={`text-sm font-medium w-full team-tab-active team-tab-text-active dark:text-card-foreground`}
+                                            className={`text-sm font-medium w-full team-tab-active team-tab-text-active text-slate-900 dark:text-white`}
                                         >
                                             {tab.icon}{tab.label}
                                         </TabsTrigger>

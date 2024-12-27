@@ -980,7 +980,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                                                                     className={"update-idea text-sm rounded-full border text-center"}>
                                                                                                     <UserAvatar
                                                                                                         userPhoto={x.user_photo}
-                                                                                                        userName={x.name}
+                                                                                                        userName={x.name ? x.name : x?.user_name}
                                                                                                         className="w-[20px] h-[20px]"
                                                                                                     />
                                                                                                 </div>
@@ -1013,11 +1013,11 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                                                                     className={"update-idea text-sm rounded-full border text-center"}>
                                                                                                     <UserAvatar
                                                                                                         userPhoto={x.user_photo}
-                                                                                                        userName={x.name}
+                                                                                                        userName={x.name ? x.name : x?.user_name}
                                                                                                         className="w-[20px] h-[20px]"
                                                                                                     />
                                                                                                 </div>
-                                                                                                <h4 className={"text-sm font-normal"}>{x.name}</h4>
+                                                                                                <h4 className={"text-sm font-normal"}>{x.name ? x.name : x?.user_name}</h4>
                                                                                             </div>
                                                                                         )
                                                                                     })
@@ -1105,7 +1105,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                         <div className={"flex items-center gap-2"}>
                                                             <UserAvatar
                                                                 userPhoto={selectedIdea?.user_photo}
-                                                                userName={selectedIdea?.name}
+                                                                userName={selectedIdea?.name ? selectedIdea?.name : selectedIdea?.user_name}
                                                             />
                                                             <div className={"flex items-center"}>
                                                                 {
@@ -1113,7 +1113,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                                         <Skeleton className="w-[50px] h-[20px]" />
                                                                         :
                                                                         <Fragment>
-                                                                            <h4 className={"text-sm font-normal"}>{selectedIdea?.name}</h4>
+                                                                            <h4 className={"text-sm font-normal"}>{selectedIdea?.name ? selectedIdea?.name : selectedIdea?.user_name}</h4>
                                                                             <p className={"text-sm font-normal flex items-center text-muted-foreground"}>
                                                                                 <Dot size={20}
                                                                                      className={"fill-text-card-foreground stroke-text-card-foreground"}/>
@@ -1239,7 +1239,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                                                                                 alt=""/>
                                                                                                             <CircleX
                                                                                                                 size={20}
-                                                                                                                className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
+                                                                                                                className={`light:text-muted-foreground dark:text-card cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
                                                                                                                 onClick={() => onDeleteImageComment(i, false)}
                                                                                                             />
                                                                                                         </div> : x ?
@@ -1251,7 +1251,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                                                                                 alt={x}/>
                                                                                                             <CircleX
                                                                                                                 size={20}
-                                                                                                                className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
+                                                                                                                className={`light:text-muted-foreground dark:text-card cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
                                                                                                                 onClick={() => onDeleteImageComment(i, false)}
                                                                                                             />
                                                                                                         </div> : ''
@@ -1331,7 +1331,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                                                 <div>
                                                                                     <UserAvatar
                                                                                         userPhoto={x?.user_photo}
-                                                                                        userName={x?.name}
+                                                                                        userName={x.name ? x.name : x?.user_name}
                                                                                     />
                                                                                 </div>
                                                                                 <div
@@ -1339,7 +1339,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                                                     <div
                                                                                         className={"flex gap-1 flex-wrap justify-between"}>
                                                                                         <div className={"flex items-start"}>
-                                                                                            <h4 className={"text-sm font-normal"}>{x.name}</h4>
+                                                                                            <h4 className={"text-sm font-normal"}>{x.name ? x.name : x?.user_name}</h4>
                                                                                             <p className={"text-sm font-normal flex items-center text-muted-foreground"}>
                                                                                                 <Dot size={20}
                                                                                                      className={"fill-text-card-foreground stroke-text-card-foreground"}/>
@@ -1431,14 +1431,14 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                                                                                     <div>
                                                                                                                         <div
                                                                                                                             className={"update-idea text-sm rounded-full border text-center"}>
-                                                                                                                            <UserAvatar userName={selectedIdea?.name}/>
+                                                                                                                            <UserAvatar userName={selectedIdea?.name ? selectedIdea?.name : selectedIdea?.user_name}/>
                                                                                                                         </div>
                                                                                                                     </div>
                                                                                                                     <div
                                                                                                                         className={"w-full space-y-2"}>
                                                                                                                         <div className={"flex justify-between"}>
                                                                                                                             <div className={"flex items-start"}>
-                                                                                                                                <h4 className={"text-sm font-normal"}>{y.name}</h4>
+                                                                                                                                <h4 className={"text-sm font-normal"}>{y.name ? y.name : y?.user_name}</h4>
                                                                                                                                 <p className={"text-sm font-normal flex items-center text-muted-foreground"}>
                                                                                                                                     <Dot
                                                                                                                                         size={20}
@@ -1514,7 +1514,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                                                                                                                 src={z && z.name ? URL.createObjectURL(z) : z}/>
                                                                                                                                             <CircleX
                                                                                                                                                 size={20}
-                                                                                                                                                className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
+                                                                                                                                                className={`light:text-muted-foreground dark:text-card cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
                                                                                                                                                 onClick={() => onDeleteSubCommentImageOld(i, false)}
                                                                                                                                             />
                                                                                                                                         </div> : z ?
@@ -1526,7 +1526,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                                                                                                                 alt={z}/>
                                                                                                                                             <CircleX
                                                                                                                                                 size={20}
-                                                                                                                                                className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
+                                                                                                                                                className={`light:text-muted-foreground dark:text-card cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
                                                                                                                                                 onClick={() => onDeleteSubCommentImageOld(i, false)}
                                                                                                                                             />
                                                                                                                                         </div> : ''

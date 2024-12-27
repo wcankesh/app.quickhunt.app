@@ -534,7 +534,7 @@ const UpdateAnnouncement = () => {
                                                         />
                                                         <CircleX
                                                             size={20}
-                                                            className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-0 left-full transform -translate-x-1/2 -translate-y-1/2 z-10`}
+                                                            className={`light:text-muted-foreground dark:text-card cursor-pointer absolute top-0 left-full transform -translate-x-1/2 -translate-y-1/2 z-10`}
                                                             onClick={() => onDeleteImg('delete_image', selectedRecord?.image?.name ? "" : selectedRecord?.image?.replace("https://code.quickhunt.app/public/storage/post/", ""))}
                                                         />
                                                     </div>
@@ -543,7 +543,7 @@ const UpdateAnnouncement = () => {
                                                         <img className="upload-img h-full" src={selectedRecord?.image} alt="" />
                                                         <CircleX
                                                             size={20}
-                                                            className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-0 left-full transform -translate-x-1/2 -translate-y-1/2 z-10`}
+                                                            className={`light:text-muted-foreground dark:text-card cursor-pointer absolute top-0 left-full transform -translate-x-1/2 -translate-y-1/2 z-10`}
                                                             onClick={() => onDeleteImg('delete_image', selectedRecord?.image?.name ? "" : selectedRecord?.image?.replace("https://code.quickhunt.app/public/storage/post/", ""))}
                                                         />
                                                     </div>

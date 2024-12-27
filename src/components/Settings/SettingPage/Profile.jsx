@@ -289,7 +289,7 @@ const Profile = () => {
                                                 />
                                                 <CircleX
                                                     size={20}
-                                                    className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
+                                                    className={`light:text-muted-foreground dark:text-card cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
                                                     onClick={() => onDeleteImg('delete_image', userDetails && userDetails?.user_photo && userDetails.user_photo?.name ? "" : userDetails.user_photo.replace("https://code.quickhunt.app/public/storage/user/", ""))}
                                                 />
                                             </div> : userDetails.user_photo ?
@@ -300,7 +300,7 @@ const Profile = () => {
                                                         alt=""/>
                                                     <CircleX
                                                         size={20}
-                                                        className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
+                                                        className={`light:text-muted-foreground dark:text-card cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
                                                         onClick={() => onDeleteImg('delete_image', userDetails && userDetails?.user_photo && userDetails.user_photo?.name ? "" : userDetails.user_photo.replace("https://code.quickhunt.app/public/storage/user/", ""))}
                                                     />
                                                 </div>

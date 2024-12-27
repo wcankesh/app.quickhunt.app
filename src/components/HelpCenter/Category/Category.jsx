@@ -497,6 +497,8 @@ const Category = () => {
                                 handleSubmit={selectedCategory?.id ? updateCategory : addCategory}
                                 isLoading={categoryEdit}
                                 closeSheet={closeSheetCategory}
+                                saveTitle={"Save Category"}
+                                className={"w-[117px]"}
                             />
                         </div>
                     </SheetContent>
@@ -523,6 +525,8 @@ const Category = () => {
                                 handleSubmit={selectedSubCategory?.id ? updateSubCategory : addSubCategory}
                                 isLoading={subCategoryEdit}
                                 closeSheet={closeSheetSubCategory}
+                                saveTitle={"Save Sub Category"}
+                                className={"w-[145px]"}
                             />
                         </div>
                     </SheetContent>
@@ -644,7 +648,7 @@ const Category = () => {
                                                                     <Plus size={16} className={"mr-2"} /> Add Subcategory
                                                                 </Button>
                                                                 <DropdownMenu>
-                                                                    <DropdownMenuTrigger>
+                                                                    <DropdownMenuTrigger className={"text-card-foreground dark:text-card"}>
                                                                         <Ellipsis size={16} />
                                                                     </DropdownMenuTrigger>
                                                                     <DropdownMenuContent align={"end"}>

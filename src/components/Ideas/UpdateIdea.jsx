@@ -228,6 +228,10 @@ const UpdateIdea = () => {
                 clone.unshift(newUser);
             }
             setIdeasVoteList(clone);
+            setSelectedIdea(prev => ({
+                ...prev,
+                vote_list: clone
+            }));
             const upvoteResponse = await apiSerVice.userManualUpVote({
                 feature_idea_id: selectedIdea.id,
                 user_id: data.data.id,
@@ -257,6 +261,10 @@ const UpdateIdea = () => {
             clone.splice(index,1);
             setIdeasVoteList(clone);
             toast({description: data.message});
+            setSelectedIdea(prev => ({
+                ...prev,
+                vote_list: clone
+            }));
             if (clone.length === 0 && pageNo > 1) {
                 setPageNo(pageNo - 1);
                 getIdeaVotes(pageNo - 1);
@@ -315,8 +323,6 @@ const UpdateIdea = () => {
         e.stopPropagation();
     };
 
-    console.log("selectedIdea", selectedIdea)
-
     const getSingleIdea = async () => {
         setIsLoading(true)
         const data = await apiSerVice.getSingleIdea(id);
@@ -326,12 +332,11 @@ const UpdateIdea = () => {
                 comments: data.data.comments.map(comment => ({
                     ...comment,
                     is_read: 1
-
                 }))}
             setSelectedIdea(ideaData)
             setOldSelectedIdea(ideaData)
             const updateInbox = inboxMarkReadReducer.map(item => {
-                if (item.source === 'feature_idea_comments' && item.id === data.data.id) {
+                if ((item.source === 'feature_idea_comments' || item.source === 'feature_ideas' || item.source === 'feature_idea_votes') && item.id === data.data.id) {
                     return {...item, is_read: 1};
                 }
                 return item;
@@ -1589,7 +1594,7 @@ const UpdateIdea = () => {
                                                                                                         alt=""/>
                                                                                                     <CircleX
                                                                                                         size={20}
-                                                                                                        className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
+                                                                                                        className={`light:text-muted-foreground dark:text-card cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
                                                                                                         onClick={() => onDeleteImageComment(i, false)}
                                                                                                     />
                                                                                                 </div> : x ?
@@ -1601,7 +1606,7 @@ const UpdateIdea = () => {
                                                                                                         alt={x}/>
                                                                                                     <CircleX
                                                                                                         size={20}
-                                                                                                        className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
+                                                                                                        className={`light:text-muted-foreground dark:text-card cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
                                                                                                         onClick={() => onDeleteImageComment(i, false)}
                                                                                                     />
                                                                                                 </div> : ''
@@ -1632,7 +1637,7 @@ const UpdateIdea = () => {
                                                                     type="file"
                                                                     className="hidden"
                                                                     onChange={handleAddCommentImg}
-                                                                    accept={".jpg,.jpeg"}
+                                                                    accept={"image/*"}
                                                                 />
                                                                 <label htmlFor="commentFile"
                                                                        className="absolute inset-0 flex items-center justify-center bg-white border border-primary rounded cursor-pointer"
@@ -1882,7 +1887,7 @@ const UpdateIdea = () => {
                                                                                                                                         src={z && z.name ? URL.createObjectURL(z) : z}/>
                                                                                                                                     <CircleX
                                                                                                                                         size={20}
-                                                                                                                                        className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
+                                                                                                                                        className={`light:text-muted-foreground dark:text-card cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
                                                                                                                                         onClick={() => onDeleteSubCommentImageOld(i, false)}
                                                                                                                                     />
                                                                                                                                 </div> : z ?
@@ -1894,7 +1899,7 @@ const UpdateIdea = () => {
                                                                                                                                         alt={z}/>
                                                                                                                                     <CircleX
                                                                                                                                         size={20}
-                                                                                                                                        className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
+                                                                                                                                        className={`light:text-muted-foreground dark:text-card cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
                                                                                                                                         onClick={() => onDeleteSubCommentImageOld(i, false)}
                                                                                                                                     />
                                                                                                                                 </div> : ''
@@ -1930,7 +1935,7 @@ const UpdateIdea = () => {
                                                                                                     {/*        type="file"*/}
                                                                                                     {/*        className="hidden"*/}
                                                                                                     {/*        onChange={handleSubCommentUploadImg}*/}
-                                                                                                    {/*        accept={".jpg,.jpeg"}*/}
+                                                                                                    {/*        accept={"image/*"}*/}
                                                                                                     {/*    />*/}
                                                                                                     {/*    <label*/}
                                                                                                     {/*        htmlFor="commentFileInput"*/}

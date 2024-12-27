@@ -40,6 +40,7 @@ import {TabsContent, TabsList, TabsTrigger} from "../ui/tabs";
 import {Tabs} from "@radix-ui/react-tabs";
 import {Avatar, AvatarFallback, AvatarImage} from "../ui/avatar";
 import {Badge} from "../ui/badge";
+import {UserAvatar} from "../Comman/CommentEditor";
 
 const perPageLimit = 10;
 
@@ -406,17 +407,17 @@ const Users = () => {
             component: <Fragment>
                 <div className={'divide-y'}>
                 <div className={"flex justify-between items-center gap-2 px-2 py-[10px] md:px-3"}>
-                    <div className={"text-sm flex gap-2 items-center"}><Mail size={16} className={"stroke-muted-foreground"} /> Email</div>
+                    <div className={"text-sm flex gap-2 items-center"}><Mail size={16} className={"light:stroke-muted-foreground dark:stroke-card"} /> Email</div>
                     <h3 className={"text-sm"}>{selectedCustomer?.customer_name || "-"}</h3>
                 </div>
                 <div className={"flex justify-between items-center gap-2 px-2 py-[10px] md:px-3"}>
-                    <div className={"text-sm flex gap-2 items-center"}><Clock size={16} className={"stroke-muted-foreground"} /> Last action</div>
+                    <div className={"text-sm flex gap-2 items-center"}><Clock size={16} className={"light:stroke-muted-foreground dark:stroke-card"} /> Last action</div>
                     <span className={"text-sm"}>
                         {selectedCustomer?.last_activity ? moment.utc(selectedCustomer?.last_activity).local().format("MMMM D, YYYY") : "-"}
                     </span>
                 </div>
                     <div className={"flex justify-between items-center gap-2 px-2 py-[10px] md:px-3"}>
-                        <div className={"text-sm flex gap-2 items-center"}><MapPin size={16} className={"stroke-muted-foreground"} /> Location</div>
+                        <div className={"text-sm flex gap-2 items-center"}><MapPin size={16} className={"light:stroke-muted-foreground dark:stroke-card"} /> Location</div>
                         <span className={"text-sm"}>{selectedCustomer?.customer_country || "-"}</span>
                     </div>
                 </div>
@@ -474,9 +475,7 @@ const Users = () => {
                         <div className={"divide-y"}>
                             <div className={"px-2 py-[10px] md:px-3 flex flex-wrap justify-between gap-4"}>
                                 <div className={"flex items-center gap-4"}>
-                                    <Avatar className={"w-[50px] h-[50px]"}>
-                                        <AvatarFallback className={"text-xl"}>{selectedCustomer?.customer_name && selectedCustomer?.customer_name.substring(0, 1).toUpperCase()}</AvatarFallback>
-                                    </Avatar>
+                                    <UserAvatar className={`text-xl w-[50px] h-[50px]`} userPhoto={selectedCustomer.image} userName={selectedCustomer?.customer_name && selectedCustomer?.customer_name.substring(0, 1).toUpperCase()} />
                                     <div className={"space-y-1"}>
                                         <div className={"flex items-center gap-4"}>
                                             <h1 className={"text-sm md:text-base"}>{selectedCustomer?.customer_name}</h1>
@@ -484,7 +483,7 @@ const Users = () => {
                                         </div>
                                         {
                                             (selectedCustomer?.customer_country) ?
-                                                <span className={"flex items-center gap-2 text-sm"}><MapPin size={16} className={"stroke-muted-foreground"} />{selectedCustomer?.customer_country}</span>
+                                                <span className={"flex items-center gap-2 text-sm"}><MapPin size={16} className={"light:stroke-muted-foreground dark:stroke-card"} />{selectedCustomer?.customer_country}</span>
                                                 : ""
                                         }
                                     </div>
@@ -498,7 +497,7 @@ const Users = () => {
                                     <TabsTrigger
                                         key={i}
                                         value={tab.value}
-                                        className={`text-sm font-medium team-tab-active team-tab-text-active dark:text-card-foreground`}
+                                        className={`text-sm font-medium team-tab-active team-tab-text-active text-slate-900 dark:text-card`}
                                     >
                                         {tab.icon}{tab.label}
                                     </TabsTrigger>

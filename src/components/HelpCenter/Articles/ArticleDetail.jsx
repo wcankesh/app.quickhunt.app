@@ -138,7 +138,7 @@ const ArticleDetail = () => {
     const selectedCategory = articleList?.find((category) => category.id === Number(articlesDetails?.category_id));
     const subcategories = selectedCategory ? selectedCategory?.sub_categories : [];
 
-    const handlePublish = async () => {
+    const createArticle = async () => {
         let validationErrors = {};
         Object.keys(articlesDetails).forEach(name => {
             const error = formValidate(name, articlesDetails[name]);
@@ -245,6 +245,7 @@ const ArticleDetail = () => {
             };
         }
     }, [isLoading]);
+    // }, [isLoading, articlesDetails.description]);
 
     const editorConstants = {
         embed: Embed,
@@ -401,7 +402,7 @@ const ArticleDetail = () => {
                         </SelectContent>
                     </Select>
                     <Button variant={"ghost hover:bg-none"} className={"px-3 py-[6px] border font-normal h-auto"}><Play size={16} className={"mr-3"} /> Preview</Button>
-                    <Button className={"w-[81px] py-[7px] font-medium h-8 hover:bg-primary"} onClick={articlesDetails.id ? updateArticle : handlePublish}>
+                    <Button className={"w-[81px] py-[7px] font-medium h-8 hover:bg-primary"} onClick={articlesDetails.id ? updateArticle : createArticle}>
                         {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : (articlesDetails.id ? "Update" : "Create")}
                     </Button>
                 </div>

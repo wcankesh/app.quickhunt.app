@@ -6,7 +6,7 @@ import {CircleX, Loader2, Upload} from "lucide-react";
 import {Button} from "../ui/button";
 import {useTheme} from "../theme-provider";
 
-const CategoryForm = ({ selectedData, setSelectedData, formError, setFormError, handleImageUpload, handleSubmit, isLoading, closeSheet }) => {
+const CategoryForm = ({ selectedData, setSelectedData, formError, setFormError, handleImageUpload, handleSubmit, isLoading, closeSheet, saveTitle, className }) => {
     const {theme} = useTheme();
     const handleOnChange = (name, value) => {
         setSelectedData({ ...selectedData, [name]: value });
@@ -68,7 +68,7 @@ const CategoryForm = ({ selectedData, setSelectedData, formError, setFormError, 
                                 />
                                 <CircleX
                                     size={20}
-                                    className={`${theme === "dark" ? "text-card-foreground" : "text-muted-foreground"} cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
+                                    className={`light:text-muted-foreground dark:text-card cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
                                     onClick={handleDeleteImage}
                                 />
                             </div>
@@ -94,10 +94,10 @@ const CategoryForm = ({ selectedData, setSelectedData, formError, setFormError, 
             </div>
             <div className={"flex gap-4"}>
                 <Button
-                    className={`border w-[115px] font-medium hover:bg-primary`}
+                    className={`border ${className} font-medium hover:bg-primary`}
                     onClick={handleSubmit}
                 >
-                    {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save Category"}
+                    {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : saveTitle}
                 </Button>
 
                 <Button
