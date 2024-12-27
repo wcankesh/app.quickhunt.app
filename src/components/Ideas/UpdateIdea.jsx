@@ -108,6 +108,7 @@ const UpdateIdea = () => {
 
     const openDialogs = (name, value) => {
         setAddUserDialog(prev => ({...prev, [name]: value}));
+        setPageNo(1);
         handlePopoverOpenChange();
     }
 
@@ -144,7 +145,7 @@ const UpdateIdea = () => {
 
     const totalPages = Math.ceil(totalRecord / perPageLimit);
 
-    const handlePaginationClick = async (newPage) => {
+    const handlePaginationClick = (newPage) => {
         if (newPage >= 1 && newPage <= totalPages) {
             setIsLoading(true);
             setPageNo(newPage);
@@ -215,17 +216,11 @@ const UpdateIdea = () => {
                 email: data.data.customer_email_id,
                 user_photo: null,
             };
-
-            // setUsersDetails(initialStateUser);
-            // toast({description: data.message,});
-            // const updatedCustomerList = [data.data, ...ideasVoteList];
-            // setIdeasVoteList(updatedCustomerList);
             const clone = [...ideasVoteList];
             const filterEmail = clone.some((x) => x.email === newUser.email)
             if(filterEmail) {
                 toast({description: "User with this email already exist.", variant: "destructive",})
             } else {
-                clone.unshift(newUser);
             }
             setIdeasVoteList(clone);
             setSelectedIdea(prev => ({
@@ -238,6 +233,7 @@ const UpdateIdea = () => {
             });
             if(upvoteResponse.status === 200) {
                 toast({description: upvoteResponse.message,});
+                setPageNo(1);
             } else {
                 toast({description:upvoteResponse.message, variant: "destructive",})
             }
@@ -246,7 +242,7 @@ const UpdateIdea = () => {
         } else {
             toast({description:data.message, variant: "destructive",})
         }
-            setIsLoading(false);
+        setIsLoading(false);
         openDialogs("addUser", false);
     };
 
@@ -309,7 +305,7 @@ const UpdateIdea = () => {
                 updatedVoteList.splice(existingUserIndex, 1);
             }
             setIdeasVoteList(updatedVoteList);
-            getIdeaVotes();
+            setPageNo(1);
         }
     };
 

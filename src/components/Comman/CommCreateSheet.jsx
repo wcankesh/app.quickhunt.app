@@ -33,10 +33,10 @@ const CommCreateSheet = ({
         }
 
         setIdeaDetail({ ...ideaDetail, [name]: cleanedValue });
-        setFormError(formError => ({
-            ...formError,
-            [name]: formValidate(name, cleanedValue)
-        }));
+        // setFormError(formError => ({
+        //     ...formError,
+        //     [name]: formValidate(name, cleanedValue)
+        // }));
     };
 
     const onChangeBoard = (value) => {
