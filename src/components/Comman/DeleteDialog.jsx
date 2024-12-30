@@ -20,12 +20,14 @@ const DeleteDialog = ({
         <Fragment>
             <Dialog open={isOpen} onOpenChange={onOpenChange}>
                 <DialogContent className={"max-w-[350px] w-full sm:max-w-[525px] p-3 md:p-6 rounded-lg"}>
-                    <DialogHeader className={"flex flex-row justify-between gap-2"}>
+                    <DialogHeader className={"flex flex-row justify-between gap-2 space-y-0"}>
                         <div className={"flex flex-col gap-2"}>
                             <DialogTitle className={"text-start font-medium"}>{title}</DialogTitle>
                             <DialogDescription className={"text-start"}>{description}</DialogDescription>
                         </div>
+                        <div className={"w-[20px] h-[20px]"}>
                         <X size={16} className={"m-0 cursor-pointer"} onClick={() => onOpenChange(false)} />
+                        </div>
                     </DialogHeader>
                     <DialogFooter className={"flex-row justify-end space-x-2"}>
                         <Button

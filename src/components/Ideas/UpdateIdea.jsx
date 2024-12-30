@@ -108,8 +108,10 @@ const UpdateIdea = () => {
 
     const openDialogs = (name, value) => {
         setAddUserDialog(prev => ({...prev, [name]: value}));
-        setPageNo(1);
         handlePopoverOpenChange();
+        if (!value){
+            getSingleIdea();
+        }
     }
 
     const handlePopoverOpenChange = (isOpen) => {
@@ -145,7 +147,7 @@ const UpdateIdea = () => {
 
     const totalPages = Math.ceil(totalRecord / perPageLimit);
 
-    const handlePaginationClick = (newPage) => {
+    const handlePaginationClick = async (newPage) => {
         if (newPage >= 1 && newPage <= totalPages) {
             setIsLoading(true);
             setPageNo(newPage);
@@ -216,13 +218,20 @@ const UpdateIdea = () => {
                 email: data.data.customer_email_id,
                 user_photo: null,
             };
+
+            // setUsersDetails(initialStateUser);
+            // toast({description: data.message,});
+            // const updatedCustomerList = [data.data, ...ideasVoteList];
+            // setIdeasVoteList(updatedCustomerList);
             const clone = [...ideasVoteList];
             const filterEmail = clone.some((x) => x.email === newUser.email)
             if(filterEmail) {
                 toast({description: "User with this email already exist.", variant: "destructive",})
             } else {
+                // clone.unshift(newUser);
             }
             setIdeasVoteList(clone);
+            setPageNo(1);
             setSelectedIdea(prev => ({
                 ...prev,
                 vote_list: clone
@@ -233,16 +242,15 @@ const UpdateIdea = () => {
             });
             if(upvoteResponse.status === 200) {
                 toast({description: upvoteResponse.message,});
-                setPageNo(1);
             } else {
                 toast({description:upvoteResponse.message, variant: "destructive",})
             }
             setUserDetailError(initialUserError);
-            // getIdeaVotes();
+            getIdeaVotes();
         } else {
             toast({description:data.message, variant: "destructive",})
         }
-        setIsLoading(false);
+            setIsLoading(false);
         openDialogs("addUser", false);
     };
 
@@ -298,6 +306,7 @@ const UpdateIdea = () => {
                 });
                 if(upvoteResponse.status === 200) {
                     toast({description: upvoteResponse.message,});
+                    setPageNo(1);
                 } else {
                     toast({description:upvoteResponse.message, variant: "destructive",})
                 }
@@ -305,7 +314,7 @@ const UpdateIdea = () => {
                 updatedVoteList.splice(existingUserIndex, 1);
             }
             setIdeasVoteList(updatedVoteList);
-            setPageNo(1);
+            getIdeaVotes();
         }
     };
 

@@ -66,7 +66,7 @@ const UserActionsList = ({ userActions, sourceTitle, isLoading, selectedTab, isE
         if (source === "feature_ideas" || source === "feature_idea_comments" || source === "feature_idea_votes") {
             navigate(`/ideas/${id}`);
         } else if (source === "post_feedbacks" || source === "post_reactions") {
-            navigate(`/announcements/${id}`);
+            navigate(`/announcements/analytic-view?postId=${id}`);
         }
         const response = await apiService.inboxMarkAllRead({ project_id: projectDetailsReducer.id, id });
         if (response.status === 200) {
@@ -167,7 +167,6 @@ const Inbox = () => {
             const totalPage = Math.ceil(data.total / perPageLimit);
             setTotalPages(totalPage)
             setIsLoading(false)
-            dispatch(inboxMarkReadAction(data.data));
         } else {
             setIsLoading(false);
         }
@@ -175,7 +174,6 @@ const Inbox = () => {
 
     const markAsAllRead = async () => {
         setIsLoading(true);
-        debugger
         const data = await apiService.inboxMarkAllRead({project_id: projectDetailsReducer.id, type: selectedTab});
         if(data.status === 200) {
             const updatedActions = userActions.map((action) =>

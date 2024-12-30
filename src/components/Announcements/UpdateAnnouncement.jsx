@@ -555,7 +555,7 @@ const UpdateAnnouncement = () => {
                                                     id="pictureInput"
                                                     type="file"
                                                     className="hidden"
-                                                    accept={".jpg,.jpeg"}
+                                                    accept={"image/*"}
                                                     onChange={handleFileChange}
                                                 />
                                                 <label

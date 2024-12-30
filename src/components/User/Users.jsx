@@ -151,6 +151,7 @@ const Users = () => {
     const [selectedCustomer, setSelectedCustomer] = useState(null);
     const [isDetailsSheetOpen, setDetailsSheetOpen] = useState(false);
     const [selectedTab, setSelectedTab] = useState('details');
+    const [isAdmin, setIsAdmin] = useState(false);
 
     const emptyContent = (status) => {setEmptyContentBlock(status);};
 
@@ -227,6 +228,7 @@ const Users = () => {
         if (data.status === 200) {
             setCustomerList(data.data);
             setTotalRecord(data?.total);
+            setIsAdmin(data?.is_admin);
             if (!data.data || data.data.length === 0) {
                 emptyContent(true);
             } else {
@@ -408,7 +410,7 @@ const Users = () => {
                 <div className={'divide-y'}>
                 <div className={"flex justify-between items-center gap-2 px-2 py-[10px] md:px-3"}>
                     <div className={"text-sm flex gap-2 items-center"}><Mail size={16} className={"light:stroke-muted-foreground dark:stroke-card"} /> Email</div>
-                    <h3 className={"text-sm"}>{selectedCustomer?.customer_name || "-"}</h3>
+                    <h3 className={"text-sm"}>{selectedCustomer?.customer_email_id || "-"}</h3>
                 </div>
                 <div className={"flex justify-between items-center gap-2 px-2 py-[10px] md:px-3"}>
                     <div className={"text-sm flex gap-2 items-center"}><Clock size={16} className={"light:stroke-muted-foreground dark:stroke-card"} /> Last action</div>
@@ -431,6 +433,11 @@ const Users = () => {
         { label: "Idea upvote", value: 6, icon: <Vote size={18} className={"mr-2"} />},
     ];
 
+    const tableHeader = ["Name", "Email", "Last Activity", "Comments", "Post",]
+    if (isAdmin || isLoading) {
+        tableHeader.push("Action")
+    }
+    
     return (
         <Fragment>
 
@@ -475,11 +482,11 @@ const Users = () => {
                         <div className={"divide-y"}>
                             <div className={"px-2 py-[10px] md:px-3 flex flex-wrap justify-between gap-4"}>
                                 <div className={"flex items-center gap-4"}>
-                                    <UserAvatar className={`text-xl w-[50px] h-[50px]`} userPhoto={selectedCustomer.image} userName={selectedCustomer?.customer_name && selectedCustomer?.customer_name.substring(0, 1).toUpperCase()} />
+                                    <UserAvatar className={`text-xl w-[40px] h-[40px]`} userPhoto={selectedCustomer.image} userName={selectedCustomer?.customer_name && selectedCustomer?.customer_name.substring(0, 1).toUpperCase()} />
                                     <div className={"space-y-1"}>
                                         <div className={"flex items-center gap-4"}>
                                             <h1 className={"text-sm md:text-base"}>{selectedCustomer?.customer_name}</h1>
-                                            <Badge>Admin/Member</Badge>
+                                            {/*<Badge>Admin/Member</Badge>*/}
                                         </div>
                                         {
                                             (selectedCustomer?.customer_country) ?
@@ -488,7 +495,11 @@ const Users = () => {
                                         }
                                     </div>
                                 </div>
-                                <Button variant={"outline"} className={"gap-2"}><Settings size={18} />Manage Team Members</Button>
+                                {/*{*/}
+                                {/*    isAdmin && <Button variant={"outline"} className={"gap-2"} onClick={() => navigate(`${baseUrl}/settings/team`)}>*/}
+                                {/*        <Settings size={18} />Manage Team Members*/}
+                                {/*    </Button>*/}
+                                {/*}*/}
                             </div>
                             <Tabs defaultValue="details" onValueChange={(value) => setSelectedTab(value)}>
                                 <div className={"border-b p-3"}>
@@ -537,6 +548,7 @@ const Users = () => {
                     openDelete &&
                     <DeleteDialog
                         title={"You really want to delete this User?"}
+                        description={"Deleting this user will permanently delete all associated data, including announcements, feedback, reactions, ideas, comments, and upvotes."}
                         isOpen={openDelete}
                         onOpenChange={() => setOpenDelete(false)}
                         onDelete={handleDelete}
@@ -561,7 +573,7 @@ const Users = () => {
                                         <TableHeader>
                                             <TableRow>
                                                 {
-                                                    ["Name", "Email", "Last Activity", "Comments", "Post", "Action"].map((x,i)=>{
+                                                    tableHeader.map((x,i)=>{
                                                         return(
                                                             <TableHead className={`font-medium text-card-foreground px-2 py-[10px] md:px-3 ${i >= 2 ? "text-center" : ""} ${theme === "dark"? "" : "bg-muted"} `} key={x}>{x}</TableHead>
                                                         )
@@ -578,7 +590,7 @@ const Users = () => {
                                                             {
                                                                 [...Array(6)].map((_, i) => {
                                                                     return (
-                                                                        <TableCell key={i} className={`px-2 py-[10px] md:px-3 ${i === 0 ? "w-[234px]" : ""} ${i === 1 ? "w-[361px]" : ""} ${i === 2 ? "w-[191px]" : ""} ${i === 3 ? "w-[168px]" : ""} ${i === 4 ? "w-[93px]" : ""} ${i === 5 ? "w-[119px]" : ""}`}>
+                                                                        <TableCell key={i} className={`px-2 py-[10px] md:px-3 ${i === 0 ? "w-[234px]" : ""} ${i === 1 ? "w-[361px]" : ""} ${i === 2 ? "w-[191px]" : ""} ${i === 3 ? "w-[168px]" : ""} ${i === 4 ? "w-[93px]" : ""} ${isAdmin && (i === 5 ? "w-[119px]" : "")}`}>
                                                                             <Skeleton className={"rounded-md w-full h-8"}/>
                                                                         </TableCell>
                                                                     )
@@ -595,20 +607,22 @@ const Users = () => {
                                                                 <TableRow key={index} className={"font-normal"}>
                                                                     <TableCell className={`px-2 py-[10px] md:px-3 cursor-pointer max-w-[170px] truncate text-ellipsis overflow-hidden whitespace-nowrap`} onClick={() => openUserDetails(x)}>{x.customer_name ? x.customer_name : "-"}</TableCell>
                                                                     <TableCell className={`px-2 py-[10px] md:px-3 max-w-[170px] truncate text-ellipsis overflow-hidden whitespace-nowrap`}>{x?.customer_email_id}</TableCell>
-                                                                    <TableCell className={`px-2 py-[10px] md:px-3 text-center`}>{x?.last_activity ? moment(x?.last_activity).format('D MMM, YYYY') : "-"}</TableCell>
+                                                                    <TableCell className={`px-2 py-[10px] md:px-3 text-center`}>{x?.last_activity ? moment.utc(x?.last_activity).local().startOf("seconds").fromNow() : "-"}</TableCell>
                                                                     <TableCell className={`px-2 py-[10px] md:px-3 text-center`}>{x?.comments ? x?.comments : 0}</TableCell>
                                                                     <TableCell className={`px-2 py-[10px] md:px-3 text-center`}>{x?.posts ? x?.posts : 0}</TableCell>
-                                                                    <TableCell className={`px-2 py-[10px] md:px-3 text-center`}>
-                                                                        <Button onClick={() => deleteCustomer(x.id,index)} variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px]`}>
-                                                                            <Trash2 size={16}/>
-                                                                        </Button>
-                                                                    </TableCell>
+                                                                    {
+                                                                        isAdmin && <TableCell className={`px-2 py-[10px] md:px-3 text-center`}>
+                                                                            <Button onClick={() => deleteCustomer(x.id,index)} variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px]`}>
+                                                                                <Trash2 size={16}/>
+                                                                            </Button>
+                                                                        </TableCell>
+                                                                    }
                                                                 </TableRow>
                                                             )
                                                         })
                                                     }
                                                     </> : <TableRow>
-                                                    <TableCell colSpan={6}>
+                                                    <TableCell colSpan={isAdmin ? 6 : 5}>
                                                         <EmptyData/>
                                                     </TableCell>
                                                 </TableRow>

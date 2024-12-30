@@ -1283,7 +1283,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                                             type="file"
                                                                             className="hidden"
                                                                             onChange={handleAddCommentImg}
-                                                                            accept={".jpg,.jpeg"}
+                                                                            accept={"image/*"}
                                                                         />
                                                                         <label htmlFor="commentFile"
                                                                                className="absolute inset-0 flex items-center justify-center bg-white border border-primary rounded cursor-pointer"
@@ -1561,7 +1561,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                                                                                     type="file"
                                                                                                                     className="hidden"
                                                                                                                     onChange={handleSubCommentUploadImg}
-                                                                                                                    accept={".jpg,.jpeg"}
+                                                                                                                    accept={"image/*"}
                                                                                                                 />
                                                                                                                 <label
                                                                                                                     htmlFor="commentFileInput"

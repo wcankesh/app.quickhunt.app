@@ -79,7 +79,7 @@ const CategoryForm = ({ selectedData, setSelectedData, formError, setFormError, 
                                 id="pictureInput"
                                 type="file"
                                 className="hidden"
-                                accept={".jpg,.jpeg"}
+                                accept={"image/*"}
                                 onChange={handleImageUpload}
                             />
                             <label

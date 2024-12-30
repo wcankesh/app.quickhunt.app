@@ -53,7 +53,7 @@ const ImageUploader = ({
         //                     className="hidden"
         //                     multiple
         //                     onChange={handleUpload}
-        //                     accept=".jpg,.jpeg"
+        //                     accept="image/*"
         //                 />
         //                 <label
         //                     htmlFor="pictureInput"

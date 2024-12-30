@@ -160,7 +160,7 @@ const Category = () => {
         formData.append('project_id', projectDetailsReducer.id);
         formData.append('title', selectedCategory.title);
         formData.append('description', selectedCategory.description);
-        // formData.append(`image`, selectedCategory.image);
+        formData.append(`image`, selectedCategory.image);
         
         const data = await apiService.createCategory(formData);
         if(data.status === 200) {
@@ -194,7 +194,7 @@ const Category = () => {
         formData.append('category_id', subCategoryId);
         formData.append('title', selectedSubCategory.title);
         formData.append('description', selectedSubCategory.description);
-        // formData.append(`image`, selectedSubCategory.image);
+        formData.append(`image`, selectedSubCategory.image);
         
         const data = await apiService.createSubCategory(formData);
         if (data.status === 200) {
@@ -290,11 +290,11 @@ const Category = () => {
         formData.append('category_id', selectedSubCategory.category_id);
         formData.append('title', selectedSubCategory.title);
         formData.append('description', selectedSubCategory.description);
-        // if (selectedSubCategory?.image === "") {
-        //     formData.append("delete_image", selectedSubCategory.delete_image);
-        // }else {
-        //     formData.append(`image`, selectedSubCategory.image);
-        // }
+        if (selectedSubCategory?.image === "") {
+            formData.append("delete_image", selectedSubCategory.delete_image);
+        }else {
+            formData.append(`image`, selectedSubCategory.image);
+        }
         
         const data = await apiService.updateSubCategory(formData, selectedSubCategory.id)
         if (data.status === 200) {

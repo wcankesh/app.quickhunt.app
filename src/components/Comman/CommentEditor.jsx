@@ -9,8 +9,21 @@ import {Icon} from "../../utils/Icon";
 import {Label} from "../ui/label";
 
 export const CommentEditor = ({isEditMode, comment, images = [], onUpdateComment, onCancelComment, onDeleteImage, onImageClick, onImageUpload, onCommentChange, isSaving, idImageUpload = '',}) => {
-    const {theme} = useTheme();
     const imageArray = Array.isArray(images) ? images : [];
+    const renderCommentWithLinks = (text) => {
+        const urlRegex = /(https?:\/\/[^\s]+)/g;
+        const parts = text.split(urlRegex);
+        return parts.map((part, index) => {
+            if (urlRegex.test(part)) {
+                return (
+                    <a key={index} href={part} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">
+                        {part}
+                    </a>
+                );
+            }
+            return part;
+        });
+    };
     return (
         <div className="space-y-2">
             {isEditMode ? (
@@ -70,7 +83,7 @@ export const CommentEditor = ({isEditMode, comment, images = [], onUpdateComment
                             Cancel
                         </Button>
                         <div className="p-2 max-w-sm relative w-[36px]">
-                            <Input id={idImageUpload} type="file" className="hidden" onChange={onImageUpload} accept=".jpg,.jpeg"/>
+                            <Input id={idImageUpload} type="file" className="hidden" onChange={onImageUpload} accept="image/*"/>
                             <label
                                 // htmlFor="commentImageUpload"
                                 htmlFor={idImageUpload}
@@ -83,7 +96,7 @@ export const CommentEditor = ({isEditMode, comment, images = [], onUpdateComment
                 </div>
             ) : (
                 <div className="space-y-2">
-                    <p className="text-xs">{comment}</p>
+                    <p className="text-xs">{renderCommentWithLinks(comment)}</p>
                     <div className="flex gap-2 flex-wrap">
                         {imageArray.map((img, index) => (
                             <div
@@ -177,7 +190,7 @@ export const ImageGallery = ({ images, onDeleteImage }) => {
 export const UploadButton = ({ onChange, id = "fileInput", className = ""}) => {
     return (
         <div className={`p-2 max-w-sm relative w-[36px] ${className}`}>
-            <input id={id} type="file" className="hidden" onChange={onChange} accept={".jpg,.jpeg"}/>
+            <input id={id} type="file" className="hidden" onChange={onChange} accept={"image/*"}/>
             <label
                 htmlFor={id}
                 className={`absolute inset-0 flex items-center justify-center bg-white border border-primary rounded cursor-pointer`}>
