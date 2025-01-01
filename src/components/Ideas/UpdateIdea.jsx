@@ -55,8 +55,6 @@ const initialStateUser = {
     user_ip_address : '',
 }
 
-const pathUrl = "https://code.quickhunt.app/public/storage/feature_idea/";
-
 const UpdateIdea = () => {
     const location = useLocation();
     const UrlParams = new URLSearchParams(location.search);
@@ -86,6 +84,10 @@ const UpdateIdea = () => {
     const [subCommentText, setSubCommentText] = useState("")
     const [subCommentTextEditIdx, setSubCommentTextEditIdx] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
+    const [isLoadingVoteListPage, setIsLoadingVoteListPage] = useState(false);
+    const [isLoadingIdeaVoteList, setIsLoadingIdeaVoteList] = useState(false);
+    const [isLoadingAddUser, setIsLoadingAddUser] = useState(false);
+    const [isLoadingVoteDelete, setIsLoadingVoteDelete] = useState(false);
     const [isLoadingCreateIdea, setIsLoadingCreateIdea] = useState(false);
     const [isLoadingArchive, setIsLoadingArchive] = useState(false);
     const [isLoadingBug, setIsLoadingBug] = useState(false);
@@ -104,14 +106,13 @@ const UpdateIdea = () => {
     const [ideasVoteList, setIdeasVoteList] = useState([]);
     const [getAllUsersList, setGetAllUsersList] = useState([]);
     const [addUserDialog, setAddUserDialog] = useState({addUser: false, viewUpvote: false});
-    const [deleteId,setDeleteId]=useState(null);
 
     const openDialogs = (name, value) => {
         setAddUserDialog(prev => ({...prev, [name]: value}));
         handlePopoverOpenChange();
-        if (!value){
-            getSingleIdea();
-        }
+        // if (!value){
+        //     getSingleIdea();
+        // }
     }
 
     const handlePopoverOpenChange = (isOpen) => {
@@ -123,8 +124,8 @@ const UpdateIdea = () => {
         }
     };
 
-    const getIdeaVotes = async (name, value) => {
-        setIsLoading(true);
+    const getIdeaVotes = async (type = '',clone = []) => {
+        setIsLoadingIdeaVoteList(true);
         const payload = {
             feature_idea_id: selectedIdea.id,
             page: pageNo,
@@ -134,11 +135,16 @@ const UpdateIdea = () => {
         if(data.status === 200) {
             setIdeasVoteList(data.data)
             setTotalRecord(data.total)
-            setSelectedIdea({...selectedIdea, vote:data.total})
-            setAddUserDialog(prev => ({...prev, [name]: value}))
-            setIsLoading(false);
+            setSelectedIdea({...selectedIdea, vote: data.total, vote_list: type === 'delete' ? clone : type === 'add' ? [...data.data] : [...selectedIdea.vote_list]})
+            console.log(type === 'delete' ? 'clone' : 'selectedIdea.vote_list')
+            console.log(selectedIdea.vote_list)
+            console.log(clone)
+            // setSelectedIdea({...selectedIdea, vote: data.total})
+            setIsLoadingIdeaVoteList(false);
         }
     }
+
+    console.log("selectedIdea.vote_list", selectedIdea?.vote_list)
 
     useEffect(() => {
         if(addUserDialog.viewUpvote){
@@ -273,15 +279,13 @@ const UpdateIdea = () => {
             }));
             if (clone.length === 0 && pageNo > 1) {
                 setPageNo(pageNo - 1);
-                await getIdeaVotes(pageNo - 1);
             } else {
-                await getIdeaVotes(pageNo);
+                await getIdeaVotes('delete', clone);
             }
         } else {
             toast({description: data.message, variant: "destructive",});
         }
         setIsLoading(false);
-        setDeleteId(null);
     };
 
     const handleUserClick = async (user) => {
@@ -317,7 +321,7 @@ const UpdateIdea = () => {
                 updatedVoteList.splice(existingUserIndex, 1);
             }
             setIdeasVoteList(updatedVoteList);
-            getIdeaVotes();
+            getIdeaVotes('add');
         }
     };
 
@@ -952,7 +956,7 @@ const UpdateIdea = () => {
                                     </TableHeader>
                                     <TableBody className={"overflow-y-auto"}>
                                         {
-                                            isLoading ? (
+                                            isLoadingIdeaVoteList ? (
                                                 [...Array(10)].map((_, index) => {
                                                     return (
                                                         <TableRow key={index}>

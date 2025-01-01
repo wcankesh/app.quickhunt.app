@@ -39,6 +39,7 @@ const Project = () => {
     const apiService = new ApiService();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const allProjectReducer = useSelector(state => state.allProjectReducer);
+    const userDetailsReducer = useSelector(state => state.userDetailsReducer);
 
     const [createProjectDetails, setCreateProjectDetails] = useState(initialState);
     const [formError, setFormError] = useState(initialStateError);
@@ -381,10 +382,13 @@ const Project = () => {
                 </div>
             </CardContent>
             <CardFooter className={"p-4 sm:px-5 sm:py-4 flex flex-wrap justify-end sm:justify-end gap-4"}>
-                <Button
-                    variant={"outline hover:bg-transparent"} onClick={deleteAlert}
-                    className={`text-sm font-medium border w-[115px] text-destructive border-destructive capitalize`}
-                >{isDel ? <Loader2 className="h-4 w-4 animate-spin" /> : "Delete project"}</Button>
+                {
+                    (userDetailsReducer?.id == createProjectDetails?.user_id) &&
+                    <Button
+                        variant={"outline hover:bg-transparent"} onClick={deleteAlert}
+                        className={`text-sm font-medium border w-[115px] text-destructive border-destructive capitalize`}
+                    >{isDel ? <Loader2 className="h-4 w-4 animate-spin"/> : "Delete project"}</Button>
+                }
                 <Button
                     className={`w-[119px] text-sm font-medium hover:bg-primary capitalize`}
                     onClick={() => updateProjects('')}>{isSave ? <Loader2 className="h-4 w-4 animate-spin" /> : "Update project"}</Button>
