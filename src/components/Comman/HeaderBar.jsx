@@ -6,7 +6,7 @@ import {Input} from "../ui/input";
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger} from "../ui/dropdown-menu";
 import {useTheme} from "../theme-provider";
 import {baseUrl, getProjectDetails, logout, removeProjectDetails, setProjectDetails} from "../../utils/constent";
-import {useNavigate, useParams} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import {Icon} from "../../utils/Icon";
 import {Avatar, AvatarFallback, AvatarImage} from "../ui/avatar";
 import {ApiService} from "../../utils/ApiService";
@@ -19,7 +19,6 @@ import {projectDetailsAction} from "../../redux/action/ProjectDetailsAction";
 import {allProjectAction} from "../../redux/action/AllProjectAction";
 import {userDetailsAction} from "../../redux/action/UserDetailAction";
 import {allStatusAndTypesAction} from "../../redux/action/AllStatusAndTypesAction";
-import {useLocation} from "react-router";
 import DeleteDialog from "./DeleteDialog";
 
 const initialState = {
@@ -57,13 +56,9 @@ const initialStateErrorProject = {
 const HeaderBar = ({setIsMobile}) => {
     const {setTheme, theme, onProModal} = useTheme()
     let navigate = useNavigate();
-    let location = useLocation();
-    const {type, id} = useParams();
     const dispatch = useDispatch();
     const {toast} = useToast();
     let apiSerVice = new ApiService();
-    let url = location.pathname;
-    const newUrl = url.replace(/[0-9]/g, '');
     const userDetailsReducer = useSelector(state => state.userDetailsReducer);
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const allProjectReducer = useSelector(state => state.allProjectReducer);
@@ -72,10 +67,8 @@ const HeaderBar = ({setIsMobile}) => {
     const [createProjectDetails, setCreateProjectDetails] = useState(initialStateProject);
     const [formError, setFormError] = useState(initialStateErrorProject);
     const [projectList, setProjectList] = useState([]);
-    const [selectedUrl, setSelectedUrl] = useState(newUrl === "/" ? "/dashboard": newUrl);
     const [open, setOpen] = useState(false)
     const [isSheetOpen, setSheetOpen] = useState(false);
-    const [isSheetOpenMobileMenu, setSheetOpenMobileMenu] = useState(false);
     const [scrollingDown, setScrollingDown] = useState(false);
     const [isOpenDeleteAlert,setIsOpenDeleteAlert]=useState(false);
     const [isDeleteLoading, setDeleteIsLoading] = useState(false);
@@ -102,9 +95,6 @@ const HeaderBar = ({setIsMobile}) => {
         setCreateProjectDetails(initialStateProject)
         setFormError(initialStateErrorProject)
     };
-
-    const openMobileSheet = () => setSheetOpenMobileMenu(true);
-    const closeMobileSheet = () => setSheetOpenMobileMenu(false);
 
     useEffect(() => {
         setUserDetails(userDetailsReducer)
@@ -169,8 +159,6 @@ const HeaderBar = ({setIsMobile}) => {
     }
 
     const onRedirect = (link) => {
-        setSelectedUrl(link)
-        closeMobileSheet()
         navigate(`${baseUrl}${link}`);
     };
 
@@ -303,38 +291,6 @@ const HeaderBar = ({setIsMobile}) => {
         setIsOpenDeleteAlert(true);
     }
 
-    //old code
-    // const onDelete = async () => {
-    //     setDeleteIsLoading(true)
-    //     const data = await apiSerVice.deleteProjects(projectDetailsReducer.id)
-    //     if(data.status === 200){
-    //         const cloneProject = [...allProjectReducer.projectList]
-    //         const index = cloneProject.findIndex((x) => x.id === projectDetailsReducer.id)
-    //         if (index !== -1) {
-    //             cloneProject.splice(index, 1);
-    //             const nextProject = cloneProject[0] || null;
-    //
-    //             if (nextProject) {
-    //                 setProjectDetails(nextProject);
-    //                 dispatch(projectDetailsAction(nextProject));
-    //             } else {
-    //                 setProjectDetails(null);
-    //                 dispatch(projectDetailsAction(null));
-    //             }
-    //
-    //             dispatch(allProjectAction({ projectList: cloneProject })); // Update the project list in Redux
-    //         }
-    //         setDeleteIsLoading(false)
-    //         setIsOpenDeleteAlert(false)
-    //         toast({description: data.message})
-    //         setTimeout(() => {
-    //             history.push('/')
-    //         },2000)
-    //     } else {
-    //
-    //     }
-    // }
-
     const onDelete = async () => {
         setDeleteIsLoading(true);
         const data = await apiSerVice.deleteProjects(projectDetailsReducer.id);
@@ -364,6 +320,51 @@ const HeaderBar = ({setIsMobile}) => {
             toast({ variant: 'destructive', description: 'Failed to delete the project.' });
         }
     };
+
+    const dropDownItem = [
+        {
+            title: "Profile",
+            onClick: (() => navigate(`${baseUrl}/settings/profile`)),
+            icon: <User size={16} />,
+        },
+        {
+            title: "Billing",
+            onClick: (() => navigate(`${baseUrl}/pricing-plan`)),
+            icon: <CreditCard size={16} />,
+        },
+        {
+            title: "Projects",
+            onClick: openSheet,
+            icon: <FileText size={16} />,
+        },
+        {
+            title: "Logout",
+            onClick: onLogout,
+            icon: <LogOut size={16} />,
+        },
+    ]
+
+    const sheetCommInput = [
+        {
+            title: "Project Name",
+            placeholder: "Project Name",
+            className: `${theme === "dark" ? "" : "placeholder:text-muted-foreground/75"}`,
+            name: "project_name",
+        },
+        {
+            title: "Project Website",
+            placeholder: "https://yourcompany.com",
+            className: `${theme === "dark" ? "placeholder:text-card-foreground/80" : "placeholder:text-muted-foreground/75"}`,
+            name: "project_website",
+        },
+        {
+            title: "Project Domain",
+            placeholder: "Project Domain",
+            className: `${theme === "dark" ? "placeholder:text-muted-foreground/75 pr-[115px]" : "placeholder:text-muted-foreground/75 pr-[115px]"}`,
+            name: "domain",
+            span: "quickhunt.app",
+        },
+    ]
 
     return (
         <header className={`z-50 sticky top-0 bg-primary ${scrollingDown ? 'bg-background' : ''}`}>
@@ -408,7 +409,7 @@ const HeaderBar = ({setIsMobile}) => {
                                             aria-expanded={open}
                                             className="min-w-[150px] md:w-[222px] h-[36px] justify-between bg-card"
                                         >
-                                            {projectDetailsReducer.id ? projectDetailsReducer.project_name : "Select project"}
+                                            <span className={"max-w-[130px] truncate text-ellipsis overflow-hidden whitespace-nowrap"}>{projectDetailsReducer.id ? projectDetailsReducer.project_name : "Select project"}</span>
                                             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50"/>
                                         </Button>
                                     </PopoverTrigger>
@@ -421,20 +422,26 @@ const HeaderBar = ({setIsMobile}) => {
                                                     {(projectList || []).map((x, i) => (
                                                         <Fragment key={i}>
                                                             <CommandItem
-                                                                className={`${projectDetailsReducer.id === x.id ? `${theme === "dark" ? "text-card-foreground  hov-primary-dark" : "text-card hov-primary"} bg-primary` : 'bg-card'}`}
+                                                                className={`${projectDetailsReducer.id === x.id ? `${theme === "dark" ? "text-card-foreground  hov-primary-dark" : "text-card hov-primary"} bg-primary` : 'bg-card'} gap-0.5`}
                                                                 value={x.id}
-                                                                onSelect={() => {
-                                                                    onChangeProject(x.id);
-                                                                    setOpen(false)
-                                                                }}
+                                                                // onSelect={() => {
+                                                                //     onChangeProject(x.id);
+                                                                //     setOpen(false)
+                                                                // }}
                                                             >
-                                                                <span className={"flex justify-between items-center w-full text-sm font-medium cursor-pointer"}>
+                                                                <span
+                                                                    className={"w-full text-sm font-medium cursor-pointer max-w-[159px] truncate text-ellipsis overflow-hidden whitespace-nowrap"}
+                                                                    onClick={() => {
+                                                                        onChangeProject(x.id);
+                                                                        setOpen(false)
+                                                                    }}
+                                                                >
                                                                     {x.project_name}
+                                                                </span>
                                                                     {
                                                                         (userDetailsReducer?.id == x?.user_id) &&
                                                                     <Trash2 className={"cursor-pointer"} size={16} onClick={deleteAlert}/>
                                                                     }
-                                                                </span>
                                                             </CommandItem>
                                                         </Fragment>
                                                     ))}
@@ -464,14 +471,6 @@ const HeaderBar = ({setIsMobile}) => {
                                 <DropdownMenuTrigger asChild>
                                     <Button variant="secondary" size="icon" className="rounded-full w-[30px] h-[30px]">
                                         <Avatar className={"w-[30px] h-[30px]"}>
-                                            {/*{*/}
-                                            {/*    userDetails && userDetails.user_photo  ?*/}
-                                            {/*        <AvatarImage src={userDetails.user_photo}*/}
-                                            {/*                     alt={userDetails && userDetails?.user_first_name?.substring(0, 1)?.toUpperCase() && userDetails?.user_last_name?.substring(0, 1)?.toUpperCase()}*/}
-                                            {/*        />*/}
-                                            {/*        :*/}
-                                            {/*        <AvatarFallback>{userDetails?.user_first_name?.substring(0, 1)?.toUpperCase()}{userDetails?.user_last_name?.substring(0, 1)?.toUpperCase()}</AvatarFallback>*/}
-                                            {/*}*/}
                                             <AvatarImage src={userDetails.user_photo}
                                                          alt={userDetails && userDetails?.user_first_name?.substring(0, 1)?.toUpperCase() && userDetails?.user_last_name?.substring(0, 1)?.toUpperCase()}
                                             />
@@ -482,30 +481,17 @@ const HeaderBar = ({setIsMobile}) => {
                                 <DropdownMenuContent align="end" className={"w-56 rounded-md shadow"}>
                                     <DropdownMenuLabel className={"text-sm font-medium"}>My Account</DropdownMenuLabel>
                                     <DropdownMenuSeparator/>
-                                    <DropdownMenuItem
-                                        className={"text-sm font-normal flex gap-2 cursor-pointer"}
-                                        onClick={() => navigate(`${baseUrl}/settings/profile`)}
-                                    >
-                                        <span className={`${theme === "dark" ? "profile-menu-icon" : ""}`}><User size={16} /></span>
-                                        Profile
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem
-                                        className={"text-sm font-normal flex gap-2 cursor-pointer"}
-                                        onClick={() => navigate(`${baseUrl}/pricing-plan`)}
-                                    >
-                                        <span className={`${theme === "dark" ? "profile-menu-icon" : ""}`}><CreditCard size={16} /></span>
-                                        Billing
-                                    </DropdownMenuItem>
-                                    <DropdownMenuSeparator/>
-                                    <DropdownMenuItem className={"text-sm font-normal flex gap-2 cursor-pointer"} onClick={openSheet}>
-                                        <span className={`${theme === "dark" ? "profile-menu-icon" : ""}`}><FileText size={16} /></span>
-                                        Projects
-                                    </DropdownMenuItem>
-                                    <DropdownMenuSeparator/>
-                                    <DropdownMenuItem onClick={onLogout} className={"text-sm font-normal flex gap-2 cursor-pointer"}>
-                                        <span className={`${theme === "dark" ? "profile-menu-icon" : ""}`}><LogOut size={16} /></span>
-                                        Logout
-                                    </DropdownMenuItem>
+                                    {
+                                        dropDownItem.map((x) => (
+                                            <DropdownMenuItem
+                                                className={"text-sm font-normal flex gap-2 cursor-pointer"}
+                                                onClick={x.onClick}
+                                            >
+                                                <span className={`${theme === "dark" ? "profile-menu-icon" : ""}`}>{x.icon}</span>
+                                                {x.title}
+                                            </DropdownMenuItem>
+                                        ))
+                                    }
                                 </DropdownMenuContent>
                             </DropdownMenu>
                         </div>
@@ -515,54 +501,33 @@ const HeaderBar = ({setIsMobile}) => {
                         <Sheet open={isSheetOpen} onOpenChange={isSheetOpen ? closeSheet : openSheet}>
                             {/*<SheetOverlay className={"inset-0"} />*/}
                             <SheetContent className={"sm:max-w-[662px] p-0"}>
-                                <SheetHeader className={"px-4 py-3 md:py-5 lg:px-8 lg:py-[20px] border-b flex flex-row justify-between items-center"}>
+                                <SheetHeader className={"px-4 py-3 md:py-5 lg:px-8 lg:py-[20px] border-b flex flex-row justify-between items-center space-y-0"}>
                                     <SheetTitle className={"text-xl font-normal flex justify-between items-center"}>
                                         Create New Project
                                     </SheetTitle>
-                                    <X className={"cursor-pointer m-0"} onClick={closeSheet}/>
+                                    <span className={"max-w-[24px]"}><X className={"cursor-pointer m-0"} onClick={closeSheet}/></span>
                                 </SheetHeader>
                                 <div className="overflow-auto h-[calc(100vh_-_69px)]">
                                 <div className="space-y-6 px-4 py-3 md:py-5 lg:px-8 lg:py-[20px]">
-                                    <div className="space-y-1">
-                                        <Label htmlFor="name" className="text-right font-normal">Project Name</Label>
-                                        <Input
-                                            id="project_name"
-                                            placeholder="Project Name"
-                                            className={`${theme === "dark" ? "" : "placeholder:text-muted-foreground/75"}`}
-                                            value={createProjectDetails.project_name}
-                                            name="project_name"
-                                            onChange={onChangeText}
-                                        />
-                                        {
-                                            formError.project_name &&
-                                            <span className="text-destructive text-sm">{formError.project_name}</span>
-                                        }
-                                    </div>
-                                    <div className="space-y-1">
-                                        <Label htmlFor="website" className="text-right font-normal">Project Website</Label>
-                                        <Input
-                                            id="project_website"
-                                            placeholder="https://yourcompany.com"
-                                            className={`${theme === "dark" ? "placeholder:text-card-foreground/80" : "placeholder:text-muted-foreground/75"}`}
-                                            value={createProjectDetails.project_website}
-                                            name="project_website"
-                                            onChange={onChangeText}
-                                        />
-                                    </div>
-                                    <div className="space-y-1">
-                                        <Label htmlFor="domain" className="text-right font-normal">Project Domain</Label>
-                                        <div className={"relative"}>
-                                            <Input
-                                                id="domain"
-                                                placeholder="Project Domain"
-                                                className={`${theme === "dark" ? "placeholder:text-muted-foreground/75 pr-[115px]" : "placeholder:text-muted-foreground/75 pr-[115px]"}`}
-                                                value={createProjectDetails.domain}
-                                                name="domain"
-                                                onChange={onChangeText}
-                                            />
-                                            <span className={"absolute top-2 right-2 font-normal"}>quickhunt.app</span>
-                                        </div>
-                                    </div>
+                                    {
+                                        sheetCommInput.map((x) => (
+                                            <div className="space-y-1">
+                                                <Label htmlFor="name" className="text-right font-normal">{x.title}</Label>
+                                                <Input
+                                                    id={x.name}
+                                                    placeholder={x.placeholder}
+                                                    className={x.className}
+                                                    value={createProjectDetails[x.name]}
+                                                    name={x.name}
+                                                    onChange={onChangeText}
+                                                />
+                                                {
+                                                    formError[x.name] &&
+                                                    <span className="text-destructive text-sm">{formError[x.name]}</span>
+                                                }
+                                            </div>
+                                        ))
+                                    }
                                 <div className={"gap-4 flex sm:justify-start"}>
                                         <Button
                                             className={`bg-primary ${theme === "dark" ? "text-card-foreground" : "text-card"} hover:bg-primary w-[129px] font-medium`}

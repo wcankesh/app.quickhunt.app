@@ -53,7 +53,7 @@ const CommCreateSheet = ({
                 <SheetHeader className={"px-4 py-5 lg:px-8 lg:py-[20px] border-b"}>
                     <div className={"flex justify-between items-center w-full"}>
                         <h2 className={"text-xl font-normal capitalize"}>Tell us your Idea!</h2>
-                        <X size={18} onClick={onCancel} className={"cursor-pointer"} />
+                        <span className={"max-w-[24px]"}><X onClick={onCancel} className={"cursor-pointer"} /></span>
                     </div>
                 </SheetHeader>
                 <div className={"w-full overflow-y-auto h-[calc(100vh_-_69px)]"}>

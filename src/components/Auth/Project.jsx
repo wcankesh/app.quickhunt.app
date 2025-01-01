@@ -124,6 +124,28 @@ const Project = () => {
         }
     }
 
+    const sheetCommInput = [
+        {
+            title: "Project Name",
+            placeholder: "Project Name",
+            className: `${theme === "dark" ? "" : "placeholder:text-muted-foreground/75"}`,
+            name: "project_name",
+        },
+        {
+            title: "Project Website",
+            placeholder: "https://yourcompany.com",
+            className: `${theme === "dark" ? "placeholder:text-card-foreground/80" : "placeholder:text-muted-foreground/75"}`,
+            name: "project_website",
+        },
+        {
+            title: "Project Domain",
+            placeholder: "Project Domain",
+            className: `${theme === "dark" ? "placeholder:text-muted-foreground/75 pr-[115px]" : "placeholder:text-muted-foreground/75 pr-[115px]"}`,
+            name: "domain",
+            span: "quickhunt.app",
+        },
+    ]
+
     return (
         <div className="h-full">
             <div className="ltr">
@@ -169,48 +191,25 @@ const Project = () => {
                                                 <div className="grid gap-6">
 
                                                     <div className="grid gap-6">
-                                                        <div className="grid gap-2">
-                                                            <Label htmlFor="name">Project Name</Label>
-                                                            <Input
-                                                                id="project_name"
-                                                                placeholder="Project Name"
-                                                                className={`${theme === "dark" ? "" : "placeholder:text-muted-foreground/75"}`}
-                                                                value={createProjectDetails.project_name}
-                                                                name="project_name"
-                                                                onChange={onChangeText}
-                                                            />
-                                                            {
-                                                                formError.project_name &&
-                                                                <span className="text-destructive text-sm">{formError.project_name}</span>
-                                                            }
-                                                        </div>
-                                                        <div className="grid gap-2">
-                                                            <Label htmlFor="website">Project website</Label>
-                                                            <Input
-                                                                id="project_website"
-                                                                placeholder="https://yourcompany.com"
-                                                                className={`${theme === "dark" ? "placeholder:text-card-foreground/80" : "placeholder:text-muted-foreground/75"}`}
-                                                                value={createProjectDetails.project_website}
-                                                                name="project_website"
-                                                                onChange={onChangeText}
-                                                            />
-                                                        </div>
-                                                        <div className="grid gap-2">
-                                                            <Label htmlFor="domain">Project domain</Label>
-                                                            <div className={"relative"}>
-                                                                <Input
-                                                                    id="domain"
-                                                                    placeholder="projectname"
-                                                                    className={`${theme === "dark" ? "placeholder:text-muted-foreground/75 pr-[115px]" : "placeholder:text-muted-foreground/75 pr-[115px]"}`}
-                                                                    value={createProjectDetails.domain}
-                                                                    name="domain"
-                                                                    onChange={onChangeText}
-                                                                />
-                                                                <span className={"absolute top-2 right-2"}>
-                                                                    quickhunt.app
-                                                                </span>
-                                                            </div>
-                                                        </div>
+                                                        {
+                                                            sheetCommInput.map((x) => (
+                                                                <div className="grid gap-2">
+                                                                    <Label htmlFor="name" className="text-right font-normal">{x.title}</Label>
+                                                                    <Input
+                                                                        id={x.name}
+                                                                        placeholder={x.placeholder}
+                                                                        className={x.className}
+                                                                        value={createProjectDetails[x.name]}
+                                                                        name={x.name}
+                                                                        onChange={onChangeText}
+                                                                    />
+                                                                    {
+                                                                        formError[x.name] &&
+                                                                        <span className="text-destructive text-sm">{formError[x.name]}</span>
+                                                                    }
+                                                                </div>
+                                                            ))
+                                                        }
                                                         <Button
                                                             type="submit"
                                                             className={"w-full bg-primary hover:bg-primary font-medium"}

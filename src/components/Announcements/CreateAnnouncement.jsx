@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, Fragment} from 'react';
 import {Sheet, SheetContent, SheetHeader, SheetOverlay,} from "../ui/sheet";
 import {CalendarIcon, Check, Circle, Pin, X, Loader2, CircleX, Upload} from "lucide-react";
 import {Label} from "../ui/label";
@@ -10,12 +10,12 @@ import {ApiService} from "../../utils/ApiService";
 import {useSelector} from "react-redux";
 import {useTheme} from "../theme-provider";
 import {Popover, PopoverContent, PopoverTrigger} from "../ui/popover";
-import {cn} from "../../lib/utils";
 import {Calendar} from "../ui/calendar";
 import {toast} from "../ui/use-toast";
 import {Badge} from "../ui/badge";
 import ReactQuillEditor from "../Comman/ReactQuillEditor";
 import {Checkbox} from "../ui/checkbox";
+import {ImageUploader} from "../Comman/CommentEditor";
 
 const initialState = {
     post_description: '',
@@ -338,43 +338,58 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
         return publishDate && date < publishDate;
     };
 
+    const commInput = [
+        {
+            title: "Title",
+            name: "post_title",
+        },
+        {
+            title: "Permalink / Slug",
+            name: "post_slug_url",
+        },
+    ]
+
     return (
         <Sheet open={isOpen} onOpenChange={isOpen ? onClose : onOpen}>
             {/*<SheetOverlay className={"inset-0"}/>*/}
             <SheetContent className={"pt-6 p-0 lg:max-w-[663px] md:max-w-[720px] sm:max-w-[520px]"}>
                 <SheetHeader
-                    className={`px-3 py-4 lg:px-8 lg:py-[20px] flex flex-row justify-between items-center border-b`}>
-                    <h5 className={"text-sm md:text-xl font-normal"}>Create New Announcements</h5>
+                    className={`px-3 py-4 lg:px-8 lg:py-[20px] flex flex-row justify-between items-center border-b space-y-0`}>
+                    <h5 className={"text-lg md:text-xl font-normal"}>Create New Announcements</h5>
                     <div className={"flex items-center gap-6 m-0"}>
-                        <Button className={"h-5 w-5 p-0"}
+                        <Button className={"h-6 w-6 p-0"}
                                 onClick={() => commonToggle("post_pin_to_top", changeLogDetails.post_pin_to_top === 1 ? 0 : 1)}
                                 variant={"ghost hover:bg-none"}>{changeLogDetails.post_pin_to_top === 1 ?
                             <Pin size={15} className={`${theme === "dark" ? "fill-card-foreground" : "fill-card-foreground"}`}/> : <Pin size={15}/>}
                         </Button>
-                        <X onClick={onClose} size={18} className={"cursor-pointer"}/>
+                        <span className={"max-w-6"}><X onClick={onClose} className={"cursor-pointer"}/></span>
                     </div>
                 </SheetHeader>
                 <div className={"h-[calc(100vh_-_120px)] lg:h-[calc(100vh_-_69px)] overflow-y-auto"}>
                     <div className={"px-3 py-6 lg:px-8 border-b"}>
                         <div className={"flex flex-col gap-6"}>
-                            <div className="w-full flex flex-col gap-2">
-                                <Label htmlFor="title" className={"font-normal"}>Title</Label>
-                                <Input type="text" id="title" className={"h-9"} name={"post_title"}
-                                       value={changeLogDetails.post_title} onChange={onChangeText}/>
-                                {formError.post_title &&
-                                <span className="text-sm text-destructive">{formError.post_title}</span>}
-                            </div>
-                            <div className="w-full flex flex-col gap-2">
-                                <Label htmlFor="link" className={"font-normal"}>Permalink / Slug</Label>
-                                <Input type="text" className={"h-9"} id="link" name={"post_slug_url"}
-                                       value={changeLogDetails.post_slug_url} onChange={onChangeText}/>
-                                <p className={"text-sm font-normal text-muted-foreground break-words"}>This release will
-                                    be available at {projectDetailsReducer.domain ? <a
-                                        href={`https://${projectDetailsReducer.domain?.toLowerCase()}/announcements/${changeLogDetails.post_slug_url?.toLowerCase()}`}
-                                        target={"_blank"}
-                                        className={"text-primary max-w-[593px] w-full break-words text-sm"}>{`https://${projectDetailsReducer.domain?.toLowerCase()}/announcements/${changeLogDetails.post_slug_url?.toLowerCase()}`}</a> : ""}</p>
-                                {formError.post_slug_url && <span className="text-sm text-destructive">{formError.post_slug_url}</span>}
-                            </div>
+                            {
+                                commInput.map((x, i) => (
+                                    <Fragment>
+                                        <div className="w-full flex flex-col gap-2">
+                                            <Label htmlFor="title" className={"font-normal"}>{x.title}</Label>
+                                            <Input type="text" id={x.name} className={"h-9"} name={x.name}
+                                                   value={changeLogDetails[x.name]} onChange={onChangeText}/>
+                                            {
+                                                (x.name === "post_slug_url") &&
+                                                <p className={"text-sm font-normal text-muted-foreground break-words"}>This
+                                                    release will
+                                                    be available at {projectDetailsReducer.domain ? <a
+                                                        href={`https://${projectDetailsReducer.domain?.toLowerCase()}/announcements/${changeLogDetails.post_slug_url?.toLowerCase()}`}
+                                                        target={"_blank"}
+                                                        className={"text-primary max-w-[593px] w-full break-words text-sm"}>{`https://${projectDetailsReducer.domain?.toLowerCase()}/announcements/${changeLogDetails[x.name]?.toLowerCase()}`}</a> : ""}</p>
+                                            }
+                                            {formError[x.name] &&
+                                            <span className="text-sm text-destructive">{formError[x.name]}</span>}
+                                        </div>
+                                    </Fragment>
+                                ))
+                            }
                             <div className="w-full flex flex-col gap-2">
                                 <Label htmlFor="description" className={"font-normal"}>Description</Label>
                                 <ReactQuillEditor className={"min-h-[145px] h-full"} value={changeLogDetails.post_description} onChange={onChangeText}
@@ -459,8 +474,7 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
                                                                 )
                                                             })
                                                         }
-                                                        {(changeLogDetails.post_assign_to || []).length > 2 &&
-                                                        <div>...</div>}
+                                                        {(changeLogDetails.post_assign_to || []).length > 2}
                                                     </div>) : (<span className="text-muted-foreground">Select Assign To</span>)
                                             }
                                         </SelectValue>
@@ -555,49 +569,54 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
                         <div className={"space-y-1.5"}>
                             <Label className={"font-normal"}>Featured Image</Label>
                             <div className="w-[282px] h-[128px] flex gap-1">
-                                {
-                                    changeLogDetails?.image ?
-                                        <div>
-                                            {changeLogDetails && changeLogDetails.image && changeLogDetails.image.name ?
-                                                <div className={"w-[282px] h-[128px] relative border p-[5px]"}>
-                                                    <img
-                                                        className={"upload-img"}
-                                                        src={changeLogDetails && changeLogDetails.image && changeLogDetails.image.name ? URL.createObjectURL(changeLogDetails.image) : changeLogDetails.image}
-                                                        alt=""
-                                                    />
-                                                    <CircleX
-                                                        size={20}
-                                                        className={`light:text-muted-foreground dark:text-card cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
-                                                        onClick={() => onDeleteImg('delete_image', changeLogDetails && changeLogDetails?.image && changeLogDetails.image?.name ? "" : changeLogDetails.image.replace("https://code.quickhunt.app/public/storage/post/", ""))}
-                                                    />
-                                                </div> :
-                                                <div className={"w-[282px] h-[128px] relative border p-[5px]"}>
-                                                    <img className={"upload-img"} src={changeLogDetails.image}
-                                                         alt=""/>
-                                                    <CircleX
-                                                        size={20}
-                                                        className={`light:text-muted-foreground dark:text-card cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
-                                                        onClick={() => onDeleteImg('delete_image', changeLogDetails && changeLogDetails?.image && changeLogDetails.image?.name ? "" : changeLogDetails.image.replace("https://code.quickhunt.app/public/storage/post/", ""))}
-                                                    />
-                                                </div>
-                                            }
-                                        </div> :
-                                        <div>
-                                            <input
-                                                id="pictureInput"
-                                                type="file"
-                                                className="hidden"
-                                                accept={"image/*"}
-                                                onChange={handleFileChange}
-                                            />
-                                            <label
-                                                htmlFor="pictureInput"
-                                                className="border-dashed w-[282px] h-[128px] py-[52px] flex items-center justify-center bg-muted border border-muted-foreground rounded cursor-pointer"
-                                            >
-                                                <Upload className="h-4 w-4 text-muted-foreground" />
-                                            </label>
-                                        </div>
-                                }
+                                <ImageUploader
+                                    stateDetails={changeLogDetails}
+                                    onDeleteImg={onDeleteImg}
+                                    handleFileChange={handleFileChange}
+                                />
+                                {/*{*/}
+                                {/*    changeLogDetails?.image ?*/}
+                                {/*        <div>*/}
+                                {/*            {changeLogDetails && changeLogDetails.image && changeLogDetails.image.name ?*/}
+                                {/*                <div className={"w-[282px] h-[128px] relative border p-[5px]"}>*/}
+                                {/*                    <img*/}
+                                {/*                        className={"upload-img"}*/}
+                                {/*                        src={changeLogDetails && changeLogDetails.image && changeLogDetails.image.name ? URL.createObjectURL(changeLogDetails.image) : changeLogDetails.image}*/}
+                                {/*                        alt=""*/}
+                                {/*                    />*/}
+                                {/*                    <CircleX*/}
+                                {/*                        size={20}*/}
+                                {/*                        className={`light:text-muted-foreground dark:text-card cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}*/}
+                                {/*                        onClick={() => onDeleteImg('delete_image', changeLogDetails && changeLogDetails?.image && changeLogDetails.image?.name ? "" : changeLogDetails.image.replace("https://code.quickhunt.app/public/storage/post/", ""))}*/}
+                                {/*                    />*/}
+                                {/*                </div> :*/}
+                                {/*                <div className={"w-[282px] h-[128px] relative border p-[5px]"}>*/}
+                                {/*                    <img className={"upload-img"} src={changeLogDetails.image}*/}
+                                {/*                         alt=""/>*/}
+                                {/*                    <CircleX*/}
+                                {/*                        size={20}*/}
+                                {/*                        className={`light:text-muted-foreground dark:text-card cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}*/}
+                                {/*                        onClick={() => onDeleteImg('delete_image', changeLogDetails && changeLogDetails?.image && changeLogDetails.image?.name ? "" : changeLogDetails.image.replace("https://code.quickhunt.app/public/storage/post/", ""))}*/}
+                                {/*                    />*/}
+                                {/*                </div>*/}
+                                {/*            }*/}
+                                {/*        </div> :*/}
+                                {/*        <div>*/}
+                                {/*            <input*/}
+                                {/*                id="pictureInput"*/}
+                                {/*                type="file"*/}
+                                {/*                className="hidden"*/}
+                                {/*                accept={"image/*"}*/}
+                                {/*                onChange={handleFileChange}*/}
+                                {/*            />*/}
+                                {/*            <label*/}
+                                {/*                htmlFor="pictureInput"*/}
+                                {/*                className="border-dashed w-[282px] h-[128px] py-[52px] flex items-center justify-center bg-muted border border-muted-foreground rounded cursor-pointer"*/}
+                                {/*            >*/}
+                                {/*                <Upload className="h-4 w-4 text-muted-foreground" />*/}
+                                {/*            </label>*/}
+                                {/*        </div>*/}
+                                {/*}*/}
                             </div>
                             {formError.image && <div className={"text-xs text-destructive"}>{formError.image}</div>}
                         </div>

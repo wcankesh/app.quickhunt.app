@@ -194,7 +194,7 @@ const GeneralSettings = () => {
     return (
         <Card className={"divide-y"}>
             <CardHeader className={"gap-1 p-4 sm:px-5 sm:py-4"}>
-                <CardTitle className={"text-lg sm:text-2xl font-normal capitalize"}>General Setting</CardTitle>
+                <CardTitle className={"text-xl lg:text-2xl font-normal capitalize"}>General Setting</CardTitle>
                 <CardDescription className={"text-sm text-muted-foreground p-0"}>Give title to your Announcement, Roadmap, Ideas. Set header and global color.</CardDescription>
             </CardHeader>
             <CardContent className={"p-0 divide-y"}>

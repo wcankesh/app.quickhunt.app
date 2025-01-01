@@ -233,7 +233,7 @@ const Tags = () => {
             <Card>
                 <CardHeader className={"p-4 sm:px-5 sm:py-4 gap-1 border-b flex flex-row flex-wrap justify-between items-center gap-y-2"}>
                     <div>
-                        <CardTitle className={"text-lg sm:text-2xl font-normal"}>Tags</CardTitle>
+                        <CardTitle className={"text-xl lg:text-2xl font-normal"}>Tags</CardTitle>
                         <CardDescription className={"text-sm text-muted-foreground p-0"}>Create tags for users to assign when submitting ideas.</CardDescription>
                     </div>
                     <Button onClick={handleNewTopics} disabled={isEdit != null} className={"gap-2 font-medium hover:bg-primary m-0"}><Plus size={18} strokeWidth={3}/>New Tag</Button>

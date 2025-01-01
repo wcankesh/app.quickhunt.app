@@ -276,7 +276,7 @@ const Team = () => {
             <Card>
                 <CardHeader className={"flex flex-row flex-wrap md:flex-nowrap justify-between gap-2 items-center p-4 sm:px-5 sm:py-4"}>
                     <div>
-                        <CardTitle className={"text-lg sm:text-2xl font-normal capitalize"}>Invite Team</CardTitle>
+                        <CardTitle className={"text-xl lg:text-2xl font-normal capitalize"}>Invite Team</CardTitle>
                         <CardDescription className={"text-sm text-muted-foreground p-0"}>Add members to your project to collaborate on managing ideas.</CardDescription>
                     </div>
                     <Button className={"text-sm font-medium hover:bg-primary m-0"} onClick={openSheet}>Invite Team</Button>
@@ -471,7 +471,7 @@ const Team = () => {
                     {/*<SheetOverlay className={"inset-0"} />*/}
                     <SheetContent className={"sm:max-w-[662px] p-0"}>
                         <SheetHeader className={"px-4 py-3 md:py-5 lg:px-8 lg:py-[20px] border-b flex flex-row justify-between items-center"}>
-                            <SheetTitle className={"text-sm md:text-xl font-normal flex justify-between items-center"}>
+                            <SheetTitle className={"text-base md:text-xl font-normal flex justify-between items-center"}>
                                 Invite Users
                             </SheetTitle>
                             <X className={"cursor-pointer m-0"} onClick={closeSheet}/>
@@ -493,7 +493,7 @@ const Team = () => {
                                         // onBlur={onBlur}
                                     />
                                 </div>
-                                {formError.email && <p className="text-red-500 text-xs mt-1">{formError.email}</p>}
+                                {formError.email && <p className="text-destructive text-sm">{formError.email}</p>}
                             </div>
                         </div>
                         <div className={"flex px-3 py-4 sm:px-[32px] gap-[16px] sm:justify-start"}>

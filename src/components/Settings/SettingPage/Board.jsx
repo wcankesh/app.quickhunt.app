@@ -253,7 +253,7 @@ const Board = () => {
             <Card>
                 <CardHeader className={"flex flex-row flex-wrap md:flex-nowrap justify-between gap-x-6 items-center p-4 sm:px-5 sm:py-4 gap-y-2"}>
                     <div>
-                        <CardTitle className={"text-lg sm:text-2xl font-normal"}>Board</CardTitle>
+                        <CardTitle className={"text-xl lg:text-2xl font-normal"}>Board</CardTitle>
                         <CardDescription className={"text-sm text-muted-foreground p-0"}>Track ideas on your roadmap using boards.</CardDescription>
                     </div>
                     <Button

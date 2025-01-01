@@ -17,7 +17,7 @@ import {useSelector} from "react-redux";
 import moment from "moment";
 import ReactQuillEditor from "../Comman/ReactQuillEditor";
 import ImageUploader from "../Comman/ImageUploader";
-import {CommentEditor, SaveCancelButton, UserAvatar} from "../Comman/CommentEditor";
+import {CommentEditor, ImageGallery, SaveCancelButton, UserAvatar} from "../Comman/CommentEditor";
 import {Skeleton} from "../ui/skeleton";
 
 const initialStateError = {
@@ -176,7 +176,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                 if (ideaIndex !== -1) {
                     let cloneIdea = { ...cloneRoadmap[roadmapIndex].ideas[ideaIndex] };
                     const cloneComments = cloneIdea.comments ? [...cloneIdea.comments] : [];
-                    cloneComments.push(data.data);
+                    cloneComments.unshift(data.data);
                     cloneIdea = { ...cloneIdea, comments: cloneComments };
                     cloneRoadmap[roadmapIndex].ideas[ideaIndex] = cloneIdea;
                     setSelectedIdea(cloneIdea);
@@ -1197,23 +1197,6 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                             <div className="w-full flex flex-col gap-2">
                                                                 <Label htmlFor="message"
                                                                        className={"font-normal capitalize"}>Add comment</Label>
-                                                                {/*{*/}
-                                                                {/*    privateNote ?*/}
-                                                                {/*        <Card*/}
-                                                                {/*            className={`shadow-none ${theme === "dark" ? "" : "border-amber-300"}`}>*/}
-                                                                {/*            <div*/}
-                                                                {/*                className={`text-xs text-card-foreground font-normal py-1 px-3 ${theme === "dark" ? "" : "bg-orange-100"} rounded-tl-md rounded-tr-md`}>Add*/}
-                                                                {/*                a private note for your team*/}
-                                                                {/*            </div>*/}
-                                                                {/*            <Textarea*/}
-                                                                {/*                className={"rounded-tl-none rounded-tr-none"}*/}
-                                                                {/*                placeholder="Private Start writing..."*/}
-                                                                {/*                id="message"*/}
-                                                                {/*                value={commentText}*/}
-                                                                {/*                onChange={(e) => setCommentText(e.target.value)}*/}
-                                                                {/*            />*/}
-                                                                {/*        </Card>*/}
-                                                                {/*        :*/}
                                                                 <>
                                                                     <Textarea
                                                                         placeholder="Start writing..."
@@ -1221,48 +1204,52 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                                         value={commentText}
                                                                         onChange={(e) => setCommentText(e.target.value)}
                                                                     />
-                                                                    {
-                                                                        commentFiles && commentFiles.length ?
-                                                                            <div
-                                                                                className={"flex flex-wrap gap-3 mt-1"}>
-                                                                                {
-                                                                                    (commentFiles || []).map((x, i) => {
-                                                                                        return (
-                                                                                            <Fragment>
-                                                                                                {
-                                                                                                    x && x.name ?
-                                                                                                        <div
-                                                                                                            className={"w-[50px] h-[50px] md:w-[100px] md:h-[100px] relative border p-[3px]"}>
-                                                                                                            <img
-                                                                                                                className={"upload-img"}
-                                                                                                                src={x && x.name ? URL.createObjectURL(x) : x}
-                                                                                                                alt=""/>
-                                                                                                            <CircleX
-                                                                                                                size={20}
-                                                                                                                className={`light:text-muted-foreground dark:text-card cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
-                                                                                                                onClick={() => onDeleteImageComment(i, false)}
-                                                                                                            />
-                                                                                                        </div> : x ?
-                                                                                                        <div
-                                                                                                            className={"w-[50px] h-[50px] md:w-[100px] md:h-[100px] relative border p-[3px]"}>
-                                                                                                            <img
-                                                                                                                className={"upload-img"}
-                                                                                                                src={x}
-                                                                                                                alt={x}/>
-                                                                                                            <CircleX
-                                                                                                                size={20}
-                                                                                                                className={`light:text-muted-foreground dark:text-card cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
-                                                                                                                onClick={() => onDeleteImageComment(i, false)}
-                                                                                                            />
-                                                                                                        </div> : ''
-                                                                                                }
-                                                                                            </Fragment>
-                                                                                        )
-                                                                                    })
-                                                                                }
-                                                                            </div>
-                                                                            : ""
-                                                                    }
+                                                                    <ImageGallery
+                                                                        commentFiles={commentFiles}
+                                                                        onDeleteImageComment={onDeleteImageComment}
+                                                                    />
+                                                                    {/*{*/}
+                                                                    {/*    commentFiles && commentFiles.length ?*/}
+                                                                    {/*        <div*/}
+                                                                    {/*            className={"flex flex-wrap gap-3 mt-1"}>*/}
+                                                                    {/*            {*/}
+                                                                    {/*                (commentFiles || []).map((x, i) => {*/}
+                                                                    {/*                    return (*/}
+                                                                    {/*                        <Fragment>*/}
+                                                                    {/*                            {*/}
+                                                                    {/*                                x && x.name ?*/}
+                                                                    {/*                                    <div*/}
+                                                                    {/*                                        className={"w-[50px] h-[50px] md:w-[100px] md:h-[100px] relative border p-[3px]"}>*/}
+                                                                    {/*                                        <img*/}
+                                                                    {/*                                            className={"upload-img"}*/}
+                                                                    {/*                                            src={x && x.name ? URL.createObjectURL(x) : x}*/}
+                                                                    {/*                                            alt=""/>*/}
+                                                                    {/*                                        <CircleX*/}
+                                                                    {/*                                            size={20}*/}
+                                                                    {/*                                            className={`light:text-muted-foreground dark:text-card cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}*/}
+                                                                    {/*                                            onClick={() => onDeleteImageComment(i, false)}*/}
+                                                                    {/*                                        />*/}
+                                                                    {/*                                    </div> : x ?*/}
+                                                                    {/*                                    <div*/}
+                                                                    {/*                                        className={"w-[50px] h-[50px] md:w-[100px] md:h-[100px] relative border p-[3px]"}>*/}
+                                                                    {/*                                        <img*/}
+                                                                    {/*                                            className={"upload-img"}*/}
+                                                                    {/*                                            src={x}*/}
+                                                                    {/*                                            alt={x}/>*/}
+                                                                    {/*                                        <CircleX*/}
+                                                                    {/*                                            size={20}*/}
+                                                                    {/*                                            className={`light:text-muted-foreground dark:text-card cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}*/}
+                                                                    {/*                                            onClick={() => onDeleteImageComment(i, false)}*/}
+                                                                    {/*                                        />*/}
+                                                                    {/*                                    </div> : ''*/}
+                                                                    {/*                            }*/}
+                                                                    {/*                        </Fragment>*/}
+                                                                    {/*                    )*/}
+                                                                    {/*                })*/}
+                                                                    {/*            }*/}
+                                                                    {/*        </div>*/}
+                                                                    {/*        : ""*/}
+                                                                    {/*}*/}
                                                                 </>
                                                                 {/*}*/}
                                                             </div>

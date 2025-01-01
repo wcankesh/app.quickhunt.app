@@ -236,7 +236,7 @@ const Categories = () => {
             <Card>
                 <CardHeader className={"p-6 gap-1 border-b flex flex-row flex-wrap justify-between items-center p-4 sm:px-5 sm:py-4 gap-y-2"}>
                     <div>
-                        <CardTitle className={"text-lg sm:text-2xl font-normal"}>Categories</CardTitle>
+                        <CardTitle className={"text-xl lg:text-2xl font-normal"}>Categories</CardTitle>
                         <CardDescription className={"text-sm text-muted-foreground p-0 mt-1"}>Organize your changelog with categories.</CardDescription>
                     </div>
                     <Button disabled={isEdit != null} onClick={addNewTopic} className={"gap-2 font-medium hover:bg-primary m-0"}>

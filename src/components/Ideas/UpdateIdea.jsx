@@ -18,7 +18,7 @@ import {useDispatch, useSelector} from "react-redux";
 import moment from "moment";
 import {DropdownMenu, DropdownMenuTrigger} from "@radix-ui/react-dropdown-menu";
 import {DropdownMenuContent, DropdownMenuItem} from "../ui/dropdown-menu";
-import ReactQuillEditor from "../Comman/ReactQuillEditor";
+import ReactQuillEditor, {DisplayReactQuill} from "../Comman/ReactQuillEditor";
 import {useLocation, useParams} from "react-router-dom";
 import {cleanQuillHtml} from "../../utils/constent";
 import {Skeleton} from "../ui/skeleton";
@@ -134,6 +134,7 @@ const UpdateIdea = () => {
         if(data.status === 200) {
             setIdeasVoteList(data.data)
             setTotalRecord(data.total)
+            setSelectedIdea({...selectedIdea, vote:data.total})
             setAddUserDialog(prev => ({...prev, [name]: value}))
             setIsLoading(false);
         }
@@ -218,11 +219,6 @@ const UpdateIdea = () => {
                 email: data.data.customer_email_id,
                 user_photo: null,
             };
-
-            // setUsersDetails(initialStateUser);
-            // toast({description: data.message,});
-            // const updatedCustomerList = [data.data, ...ideasVoteList];
-            // setIdeasVoteList(updatedCustomerList);
             const clone = [...ideasVoteList];
             const filterEmail = clone.some((x) => x.email === newUser.email)
             if(filterEmail) {
@@ -255,6 +251,10 @@ const UpdateIdea = () => {
     };
 
     const onDeleteUser = async (id, index) => {
+        if (isLoading) {
+            return;
+        }
+        setIsLoading(true);
         const payload = {
             id: id,
             feature_idea_id: selectedIdea.id
@@ -265,19 +265,22 @@ const UpdateIdea = () => {
             clone.splice(index,1);
             setIdeasVoteList(clone);
             toast({description: data.message});
+            const filterData = (selectedIdea?.vote_list || []).filter((x) => x.id !== id)
             setSelectedIdea(prev => ({
                 ...prev,
-                vote_list: clone
+                vote_list: filterData,
+                vote: filterData.length
             }));
             if (clone.length === 0 && pageNo > 1) {
                 setPageNo(pageNo - 1);
-                getIdeaVotes(pageNo - 1);
+                await getIdeaVotes(pageNo - 1);
             } else {
-                getIdeaVotes(pageNo);
+                await getIdeaVotes(pageNo);
             }
         } else {
             toast({description: data.message, variant: "destructive",});
         }
+        setIsLoading(false);
         setDeleteId(null);
     };
 
@@ -383,7 +386,7 @@ const UpdateIdea = () => {
                     if (type === 1) {
                         vote_list.push(data.data)
                     } else {
-                        let voteIndex = vote_list.findIndex((x) => x.name === data.data.name);
+                        let voteIndex = vote_list.findIndex((x) => (x.name || x?.user_name) === (data.data.name || data.data?.user_name));
                         if (voteIndex !== -1) {
                             vote_list.splice(voteIndex, 1)
                         }
@@ -1425,13 +1428,14 @@ const UpdateIdea = () => {
                                                     <div className={"flex items-center gap-2"}>
                                                         <h2 className={"text-xl font-normal"}>{selectedIdea?.title}</h2>
                                                     </div>
-                                                    {
-                                                        cleanQuillHtml(selectedIdea?.description) ?
-                                                            <div
-                                                                className={`description-container text-sm ${theme === "dark" ? "" : "text-muted-foreground" }`}
-                                                                dangerouslySetInnerHTML={{ __html: selectedIdea?.description }}
-                                                            /> : null
-                                                    }
+                                                    {/*{*/}
+                                                    {/*    cleanQuillHtml(selectedIdea?.description) ?*/}
+                                                    {/*        <div*/}
+                                                    {/*            className={`description-container text-sm ${theme === "dark" ? "" : "text-muted-foreground" }`}*/}
+                                                    {/*            dangerouslySetInnerHTML={{ __html: selectedIdea?.description }}*/}
+                                                    {/*        /> : null*/}
+                                                    {/*}*/}
+                                                    <DisplayReactQuill value={selectedIdea.description} />
                                                 </div>
                                         }
                                         {

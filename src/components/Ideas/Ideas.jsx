@@ -26,6 +26,7 @@ import {RadioGroup, RadioGroupItem} from "../ui/radio-group";
 import {debounce} from "lodash";
 import {EmptyDataContent} from "../Comman/EmptyDataContent";
 import {CommSearchBar} from "../Comman/CommentEditor";
+import {DisplayReactQuill} from "../Comman/ReactQuillEditor";
 
 const filterByStatus = [
     {name: "Archived", value: "archive",},
@@ -733,7 +734,7 @@ const Ideas = () => {
                                                                                         }
                                                                                         className="w-[10px] h-[10px]"
                                                                                     />
-                                                                                    {allStatusAndTypes.roadmap_status.find((status) => status.id === x.roadmap_id)?.title ?? "No status"}
+                                                                                    <span className={"max-w-[100px] truncate text-ellipsis overflow-hidden whitespace-nowrap"}>{allStatusAndTypes.roadmap_status.find((status) => status.id === x.roadmap_id)?.title ?? "No status"}</span>
                                                                                 </div> : (
                                                                                     <span className="text-gray-500">No status</span>
                                                                                 )}
@@ -811,7 +812,7 @@ const Ideas = () => {
                                                             </div>
                                                             <div className={"description-container text-sm text-muted-foreground"}>
                                                                 {
-                                                                    cleanQuillHtml(x?.description) ? <ReadMoreText html={x.description} maxLength={300}/> : null
+                                                                    <DisplayReactQuill value={x.description} /> ? <ReadMoreText html={x.description} maxLength={300}/> : null
                                                                 }
                                                             </div>
                                                         </div>

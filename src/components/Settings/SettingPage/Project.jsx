@@ -232,7 +232,7 @@ const Project = () => {
             }
 
             <CardHeader className={"p-6 gap-1 border-b p-4 sm:px-5 sm:py-4"}>
-                <CardTitle className={"text-lg sm:text-2xl font-normal capitalize"}>Project Setting</CardTitle>
+                <CardTitle className={"text-xl lg:text-2xl font-normal capitalize"}>Project Setting</CardTitle>
                 <CardDescription className={"text-sm text-muted-foreground p-0"}>Configure and manage your project settings.</CardDescription>
             </CardHeader>
             <CardContent className={"p-4 sm:px-5 sm:py-4 border-b space-y-4"}>

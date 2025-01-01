@@ -1,11 +1,12 @@
 import React, {useState, useEffect} from 'react';
 import {ApiService} from "../../utils/ApiService";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {useToast} from "../ui/use-toast";
 import {useTheme} from "../theme-provider";
 import {baseUrl} from "../../utils/constent";
 import {useNavigate} from "react-router";
 import CommCreateSheet from "../Comman/CommCreateSheet";
+import {inboxMarkReadAction} from "../../redux/action/InboxMarkReadAction";
 
 const initialState = {
     title: "",
@@ -26,9 +27,11 @@ const CreateIdea = ({isOpen, onOpen, onClose, closeCreateIdea, setIdeasList, ide
     const {theme} = useTheme()
     const navigate = useNavigate();
     let apiSerVice = new ApiService();
-    const { toast } = useToast()
+    const { toast } = useToast();
+    const dispatch = useDispatch();
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
+    const inboxMarkReadReducer = useSelector(state => state.inboxMarkRead);
 
     const [ideaDetail, setIdeaDetail] = useState(initialState);
     const [formError, setFormError] = useState(initialStateError);
@@ -85,14 +88,20 @@ const CreateIdea = ({isOpen, onOpen, onClose, closeCreateIdea, setIdeasList, ide
         const data = await apiSerVice.createIdea(formData)
         if(data.status === 200){
             const clone = [...ideasList];
-            const newArray = [data.data].concat(clone)
-            setIdeasList(newArray);
+            clone.push(data.data)
+            // const newArray = [data.data].concat(clone)
+            // setIdeasList(newArray);
+            setIdeasList(clone);
             setIsLoading(false)
             setIdeaDetail(initialState)
+            const cloneInbox = [...inboxMarkReadReducer];
+            cloneInbox.push({...data.data, is_read: 1})
+            dispatch(inboxMarkReadAction(cloneInbox));
             await getAllIdea()
             closeCreateIdea()
             navigate(`${baseUrl}/ideas?pageNo=${pageNo}`);
             toast({description: data.message})
+
         } else {
             setIsLoading(false)
             toast({description: data.message, variant: "destructive" })

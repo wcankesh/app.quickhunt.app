@@ -88,7 +88,7 @@ const Domain = () => {
     return (
         <Card className={"divide-y"}>
             <CardHeader className={"p-4 sm:px-5 sm:py-4 gap-1"}>
-                <CardTitle className={"text-lg sm:text-2xl font-normal capitalize"}>Domain Setting</CardTitle>
+                <CardTitle className={"text-xl lg:text-2xl font-normal capitalize"}>Domain Setting</CardTitle>
                 <CardDescription className={"text-sm text-muted-foreground p-0"}>Customize your project page with a personalized domain.</CardDescription>
             </CardHeader>
             <CardContent className={"p-4 sm:px-5 sm:py-4 flex flex-col gap-3"}>

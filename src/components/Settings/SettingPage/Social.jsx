@@ -161,7 +161,7 @@ const Social = () => {
     return (
         <Card className={"divide-y"}>
             <CardHeader className={"p-4 sm:px-5 sm:py-4"}>
-                <CardTitle className={"text-lg sm:text-2xl font-normal capitalize"}>Social links</CardTitle>
+                <CardTitle className={"text-xl lg:text-2xl font-normal capitalize"}>Social links</CardTitle>
                 <CardDescription className={"text-sm text-muted-foreground p-0"}>Add your social media profiles below.</CardDescription>
             </CardHeader>
             <CardContent className={"p-0"}>

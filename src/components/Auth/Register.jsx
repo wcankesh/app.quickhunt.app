@@ -131,6 +131,46 @@ const Register = () => {
 
     const plugin = React.useRef(Autoplay({delay: 2000, stopOnInteraction: true}))
 
+    const inputFields = [
+        {
+            title: "First Name",
+            placeholder: "John",
+            name: "user_first_name",
+            error: formError.user_first_name,
+            isGrouped: true,
+        },
+        {
+            title: "Last Name",
+            placeholder: "Doe",
+            name: "user_last_name",
+            error: formError.user_last_name,
+            isGrouped: true,
+        },
+        {
+            title: "Email",
+            placeholder: "JohnDoe@gmail.com",
+            name: "user_email_id",
+            error: formError.user_email_id,
+            type: "email"
+        },
+        {
+            title: "Password",
+            placeholder: "Password",
+            name: "user_password",
+            error: formError.user_password,
+            type: passwordVisibility.user_password ? "text" : "password",
+            toggleVisibility: () => togglePasswordVisibility('user_password')
+        },
+        {
+            title: "Confirm Password",
+            placeholder: "Confirm Password",
+            name: "user_confirm_password",
+            error: formError.user_confirm_password,
+            type: passwordVisibility.user_confirm_password ? "text" : "password",
+            toggleVisibility: () => togglePasswordVisibility('user_confirm_password')
+        }
+    ];
+
     const togglePasswordVisibility = (fieldName) => {
         setPasswordVisibility({
             ...passwordVisibility,
@@ -205,6 +245,56 @@ const Register = () => {
                                             {/*{theme === "dark" ? Icon.whiteLogo : Icon.blackLogo}*/}
                                             <h1 className="text-2xl md:text-3xl font-normal flex-initial w-auto">Create Your Account</h1>
                                         </div>
+                                            {/*    <div className="grid gap-6">*/}
+                                            {/*        {inputFields.map((field, index) => (*/}
+                                            {/*            <div key={index} className="grid gap-2">*/}
+                                            {/*                <Label htmlFor={field.name} className={"font-normal"}>{field.title}</Label>*/}
+                                            {/*                <div className={"relative"}>*/}
+                                            {/*                    <Input*/}
+                                            {/*                        id={field.name}*/}
+                                            {/*                        type={field.type || "text"}*/}
+                                            {/*                        placeholder={field.placeholder}*/}
+                                            {/*                        value={companyDetails[field.name]}*/}
+                                            {/*                        name={field.name}*/}
+                                            {/*                        onChange={onChange}*/}
+                                            {/*                        onBlur={onBlur}*/}
+                                            {/*                    />*/}
+                                            {/*                    {field.toggleVisibility && (*/}
+                                            {/*                        <Button*/}
+                                            {/*                            variant={"ghost hover:none"}*/}
+                                            {/*                            onClick={field.toggleVisibility}*/}
+                                            {/*                            className={"absolute top-0 right-0"}*/}
+                                            {/*                        >*/}
+                                            {/*                            {field.type === "text" ? <Eye size={16} /> : <EyeOff size={16} />}*/}
+                                            {/*                        </Button>*/}
+                                            {/*                    )}*/}
+                                            {/*                </div>*/}
+                                            {/*                {field.error && <span className="text-destructive text-sm">{field.error}</span>}*/}
+                                            {/*            </div>*/}
+                                            {/*        ))}*/}
+                                            {/*        <Button*/}
+                                            {/*            type="submit"*/}
+                                            {/*            className={"w-full bg-primary hover:bg-primary font-medium"}*/}
+                                            {/*            onClick={onRegister}*/}
+                                            {/*        >*/}
+                                            {/*            {isLoading ? <Loader2 className={"mr-2 h-4 w-4 animate-spin"} /> : ""}*/}
+                                            {/*            Continue Registration*/}
+                                            {/*        </Button>*/}
+                                            {/*        <WithGoogle title={"Signup With Google"} />*/}
+                                            {/*        <div className="text-center text-xs md:text-sm">*/}
+                                            {/*            <p className={"text-sm text-muted-foreground"}>*/}
+                                            {/*                Already have an account?{" "}*/}
+                                            {/*                <Button*/}
+                                            {/*                    variant={"link"}*/}
+                                            {/*                    className="p-0 h-auto hover:no-underline font-medium"*/}
+                                            {/*                    onClick={() => onRedirect('login')}*/}
+                                            {/*                >*/}
+                                            {/*                    Login*/}
+                                            {/*                </Button>*/}
+                                            {/*            </p>*/}
+                                            {/*        </div>*/}
+                                            {/*    </div>*/}
+                                            {/*</div>*/}
                                         <div className="grid gap-6">
                                             <div className="grid md:grid-flow-col gap-4">
                                                 <div className="grid gap-2 content-start">

@@ -1,5 +1,5 @@
 import React, {Fragment} from 'react';
-import {CircleX, Loader2, Paperclip, Pencil, Pin, Trash2, X} from "lucide-react";
+import {CircleX, Loader2, Paperclip, Pencil, Pin, Trash2, Upload, X} from "lucide-react";
 import {Input} from "../ui/input";
 import {Button} from "../ui/button";
 import {Textarea} from "../ui/textarea";
@@ -164,23 +164,87 @@ export const SaveCancelButton = ({onClickSave, load, onClickCancel}) => {
     )
 }
 
-export const ImageGallery = ({ images, onDeleteImage }) => {
-    const {theme} = useTheme();
-    if (!images || !images.length) return null;
+export const ImageUploader = ({ stateDetails, onDeleteImg, handleFileChange }) => {
+    const hasImage = stateDetails?.image;
+
+    const handleDelete = () => {
+        const imageName = hasImage && stateDetails.image.name ? "" : stateDetails.image.replace("https://code.quickhunt.app/public/storage/post/", "");
+        onDeleteImg('delete_image', imageName);
+    };
+
     return (
-        <div className="flex flex-wrap gap-3 mt-1">
-            {images.map((image, index) => (
+        <div>
+            {hasImage ? (
+                <div className={"w-[282px] h-[128px] relative border p-[5px]"}>
+                    <img
+                        className={"upload-img"}
+                        src={hasImage && stateDetails.image.name ? URL.createObjectURL(stateDetails.image) : stateDetails.image}
+                        alt=""
+                    />
+                    <CircleX
+                        size={20}
+                        className={`light:text-muted-foreground dark:text-card cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
+                        onClick={handleDelete}
+                    />
+                </div>
+            ) : (
+                <div>
+                    <input
+                        id="pictureInput"
+                        type="file"
+                        className="hidden"
+                        accept={"image/*"}
+                        onChange={handleFileChange}
+                    />
+                    <label
+                        htmlFor="pictureInput"
+                        className="border-dashed w-[282px] h-[128px] py-[52px] flex items-center justify-center bg-muted border border-muted-foreground rounded cursor-pointer"
+                    >
+                        <Upload className="h-4 w-4 text-muted-foreground" />
+                    </label>
+                </div>
+            )}
+        </div>
+    );
+}
+
+
+export const ImageGallery = ({ commentFiles, onDeleteImageComment }) => {
+    if (!commentFiles || commentFiles.length === 0) {
+        return null;
+    }
+
+    return (
+        <div className={"flex flex-wrap gap-3 mt-1"}>
+            {commentFiles.map((file, index) => (
                 <Fragment key={index}>
-                    {image && (
-                        <div className="w-[50px] h-[50px] md:w-[100px] md:h-[100px] relative border p-[3px]">
-                            <img className="upload-img" src={image.name ? URL.createObjectURL(image) : image} alt="Uploaded"/>
+                    {file && file.name ? (
+                        <div className={"w-[50px] h-[50px] md:w-[100px] md:h-[100px] relative border p-[3px]"}>
+                            <img
+                                className={"upload-img"}
+                                src={URL.createObjectURL(file)}
+                                alt={file.name}
+                            />
                             <CircleX
                                 size={20}
                                 className={`light:text-muted-foreground dark:text-card cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
-                                onClick={() => onDeleteImage(index)}
+                                onClick={() => onDeleteImageComment(index, false)}
                             />
                         </div>
-                    )}
+                    ) : file ? (
+                        <div className={"w-[50px] h-[50px] md:w-[100px] md:h-[100px] relative border p-[3px]"}>
+                            <img
+                                className={"upload-img"}
+                                src={file}
+                                alt={file}
+                            />
+                            <CircleX
+                                size={20}
+                                className={`light:text-muted-foreground dark:text-card cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
+                                onClick={() => onDeleteImageComment(index, false)}
+                            />
+                        </div>
+                    ) : null}
                 </Fragment>
             ))}
         </div>

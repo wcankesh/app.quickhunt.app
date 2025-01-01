@@ -336,7 +336,7 @@ const Statuses = () => {
             <Card>
                 <CardHeader className="flex flex-row flex-wrap gap-y-2 justify-between items-center border-b p-4 sm:px-5 sm:py-4">
                     <div>
-                        <CardTitle className="text-lg sm:text-2xl font-normal">Statuses</CardTitle>
+                        <CardTitle className="text-xl lg:text-2xl font-normal">Statuses</CardTitle>
                         <CardDescription className="text-sm text-muted-foreground p-0">
                             Track ideas on your roadmap with statuses.
                         </CardDescription>

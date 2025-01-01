@@ -415,7 +415,7 @@ const Users = () => {
                 <div className={"flex justify-between items-center gap-2 px-2 py-[10px] md:px-3"}>
                     <div className={"text-sm flex gap-2 items-center"}><Clock size={16} className={"light:stroke-muted-foreground dark:stroke-card"} /> Last action</div>
                     <span className={"text-sm"}>
-                        {selectedCustomer?.last_activity ? moment.utc(selectedCustomer?.last_activity).local().format("MMMM D, YYYY") : "-"}
+                        {selectedCustomer?.last_activity ? moment.utc(selectedCustomer?.last_activity).local().startOf("seconds").fromNow() : "-"}
                     </span>
                 </div>
                     <div className={"flex justify-between items-center gap-2 px-2 py-[10px] md:px-3"}>
@@ -444,9 +444,9 @@ const Users = () => {
             {isSheetOpen && <Sheet open={isSheetOpen} onOpenChange={isSheetOpen ? closeSheet : openSheet}>
                 {/*<SheetOverlay className={"inset-0"}/>*/}
                 <SheetContent className={"sm:max-w-[662px] p-0"}>
-                    <SheetHeader className={"px-3 py-4 lg:px-8 lg:py-[20px] flex flex-row justify-between items-center border-b"}>
-                        <h2 className={"text-sm md:text-xl font-normal"}>Add New User</h2>
-                        <X onClick={closeSheet} size={18} className={"cursor-pointer m-0"}/>
+                    <SheetHeader className={"px-3 py-4 lg:px-8 lg:py-[20px] flex flex-row justify-between items-center border-b space-y-0"}>
+                        <h2 className={"text-lg md:text-xl font-normal"}>Add New User</h2>
+                        <span className={"max-w-[24px]"}><X onClick={closeSheet} className={"cursor-pointer m-0"}/></span>
                     </SheetHeader>
                     <div className={"sm:px-8 sm:py-6 px-3 py-4 border-b"}>
                         <div className="grid w-full gap-2">
@@ -475,9 +475,9 @@ const Users = () => {
             {isDetailsSheetOpen && (
                 <Sheet open={isDetailsSheetOpen} onOpenChange={isDetailsSheetOpen ? closeUserDetails : openUserDetails}>
                     <SheetContent className={"sm:max-w-[1018px] p-0"}>
-                        <SheetHeader className={"px-3 py-4 lg:px-8 lg:py-[20px] flex flex-row justify-between items-center border-b"}>
-                            <h2 className={"text-sm md:text-xl font-normal"}>User Details</h2>
-                            <X onClick={closeUserDetails} size={18} className={"cursor-pointer m-0"} />
+                        <SheetHeader className={"px-3 py-4 lg:px-8 lg:py-[20px] flex flex-row justify-between items-center border-b space-y-0"}>
+                            <h2 className={"text-lg md:text-xl font-normal"}>User Details</h2>
+                            <span className={"max-w-[24px]"}><X onClick={closeUserDetails} className={"cursor-pointer m-0"} /></span>
                         </SheetHeader>
                         <div className={"divide-y"}>
                             <div className={"px-2 py-[10px] md:px-3 flex flex-wrap justify-between gap-4"}>

@@ -16,7 +16,7 @@ const ImportExport = () => {
     return (
         <Card className={"divide-y"}>
             <CardHeader className={"p-4 sm:px-5 sm:py-4"}>
-                <CardTitle className={"text-lg sm:text-2xl font-normal capitalize"}>Import / Export</CardTitle>
+                <CardTitle className={"text-xl lg:text-2xl font-normal capitalize"}>Import / Export</CardTitle>
                 <CardDescription className={"text-sm text-muted-foreground p-0"}>Quickly import or export your data as needed.</CardDescription>
             </CardHeader>
             <CardContent className={"p-4 sm:px-5 sm:py-4 space-y-3"}>

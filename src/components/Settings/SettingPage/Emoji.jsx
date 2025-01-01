@@ -203,7 +203,7 @@ const Emoji = () => {
             <Card>
                 <CardHeader className={"p-4 sm:px-5 sm:py-4 gap-1 border-b flex flex-row justify-between items-center flex-wrap gap-y-2"}>
                     <div>
-                        <CardTitle className={"text-lg sm:text-2xl font-normal"}>Emoji</CardTitle>
+                        <CardTitle className={"text-xl lg:text-2xl font-normal"}>Emoji</CardTitle>
                         <CardDescription className={"text-sm text-muted-foreground p-0"}>Enhance and organize your changelog with emojis.</CardDescription>
                     </div>
                     <Button onClick={newEmoji} disabled={editIndex != null} className={"gap-2 font-medium hover:bg-primary m-0"}><Plus strokeWidth={3} size={18}/> New Emoji</Button>

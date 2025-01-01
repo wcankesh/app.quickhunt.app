@@ -481,11 +481,11 @@ const Category = () => {
                 <Sheet open={isSheetOpen} onOpenChange={isSheetOpen ? closeSheetCategory : openSheetCategory}>
                     {/*<SheetOverlay className={"inset-0"} />*/}
                     <SheetContent className={"sm:max-w-[662px] p-0"}>
-                        <SheetHeader className={"px-3 py-4 lg:px-8 lg:py-[20px] flex flex-row justify-between items-center border-b"}>
-                            <h5 className={"text-sm md:text-xl font-normal"}>
+                        <SheetHeader className={"px-3 py-4 lg:px-8 lg:py-[20px] flex flex-row justify-between items-center border-b space-y-0"}>
+                            <h2 className={"text-lg md:text-xl font-normal"}>
                                 { selectedCategory?.id ? "Update Category" : "Create Category"}
-                            </h5>
-                            <X onClick={closeSheetCategory} size={18} className={"cursor-pointer m-0"} />
+                            </h2>
+                            <span className={"max-w-[24px]"}><X onClick={closeSheetCategory} className={"cursor-pointer m-0"} /></span>
                         </SheetHeader>
                         <div className={"h-[calc(100vh_-_120px)] lg:h-[calc(100vh_-_69px)] overflow-y-auto"}>
                             <CategoryForm
@@ -509,11 +509,11 @@ const Category = () => {
                 <Sheet open={isSheetOpenSub} onOpenChange={isSheetOpenSub ? closeSheetSubCategory : openSheetSubCategory}>
                     {/*<SheetOverlay className={"inset-0"} />*/}
                     <SheetContent className={"sm:max-w-[662px] p-0"}>
-                        <SheetHeader className={"px-3 py-4 lg:px-8 lg:py-[20px] flex flex-row justify-between items-center border-b"}>
-                            <h5 className={"text-sm md:text-xl font-normal"}>
+                        <SheetHeader className={"px-3 py-4 lg:px-8 lg:py-[20px] flex flex-row justify-between items-center border-b space-y-0"}>
+                            <h5 className={"text-lg md:text-xl font-normal"}>
                                 { selectedSubCategory?.id ? "Update Sub Category" : "Create Sub Category"}
                             </h5>
-                            <X onClick={closeSheetSubCategory} size={18} className={"cursor-pointer m-0"} />
+                            <span className={"max-w-[24px]"}><X onClick={closeSheetSubCategory} className={"cursor-pointer m-0"} /></span>
                         </SheetHeader>
                         <div className={"h-[calc(100vh_-_120px)] lg:h-[calc(100vh_-_69px)] overflow-y-auto"}>
                             <CategoryForm

@@ -1,4 +1,4 @@
-import React, {Fragment} from 'react';
+import React, {Fragment, useState, useEffect} from 'react';
 import {baseUrl} from "../../utils/constent";
 import {Card, CardContent} from "../ui/card";
 import embed_img from "../../img/embed_widget.png";
@@ -8,9 +8,18 @@ import sidebar_img from "../../img/sidebar_widget.png";
 import {useNavigate} from "react-router-dom";
 import {Button} from "../ui/button";
 import {ArrowLeft} from "lucide-react";
+import {Skeleton} from "../ui/skeleton";
 
 const WidgetsTypes = () => {
     const navigate = useNavigate();
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            setIsLoading(false);
+        }, 1500);
+        return () => clearTimeout(timeout);
+    }, []);
 
     const handleCreateClick = (type) => {
         navigate(`${baseUrl}/widget/${type}/new`);
@@ -59,11 +68,25 @@ const WidgetsTypes = () => {
                                 return(
                                     <Card key={i} className={"cursor-pointer flex flex-col h-full"} onClick={() => handleCreateClick(x.type)}>
                                         <div className={"border-b p-3 md:p-4 flex flex-col flex-1"}>
-                                            <h2 className={"text-base font-normal mb-2"}>{x.title}</h2>
-                                            <p className={"text-sm font-normal text-muted-foreground"}>{x.description}</p>
+                                            {isLoading ? (
+                                                <div className="space-y-2">
+                                                    <Skeleton className="h-4" />
+                                                    <Skeleton className="h-4" />
+                                                    <Skeleton className="h-4" />
+                                                </div>
+                                            ) : (
+                                                <>
+                                                    <h2 className="text-base font-normal mb-2">{x.title}</h2>
+                                                    <p className="text-sm font-normal text-muted-foreground">{x.description}</p>
+                                                </>
+                                            )}
                                         </div>
                                         <CardContent className={"p-3 md:p-4 bg-muted/50"}>
-                                            <img className={"max-w-[706px] w-full"} src={x.img} alt=''/>
+                                            {isLoading ? (
+                                                <Skeleton className="h-[224px] bg-muted-foreground/[0.2]" />
+                                            ) : (
+                                                <img className="max-w-[706px] w-full" src={x.img} alt="" />
+                                            )}
                                         </CardContent>
                                     </Card>
                                 )

@@ -266,9 +266,9 @@ const Labels = () => {
                 />
             }
 
-            <CardHeader className="flex flex-row justify-between items-center border-b sm:px-5 sm:py-4 flex-wrap md:flex-nowrap gap-y-2">
+            <CardHeader className="flex flex-row justify-between items-center border-b p-4 sm:px-5 sm:py-4 flex-wrap md:flex-nowrap gap-y-2">
                 <div>
-                    <CardTitle className="text-lg sm:text-2xl font-normal">Labels</CardTitle>
+                    <CardTitle className="text-xl lg:text-2xl font-normal">Labels</CardTitle>
                     <CardDescription className="text-sm text-muted-foreground p-0">
                         Organize your changelog efficiently with labels.
                     </CardDescription>

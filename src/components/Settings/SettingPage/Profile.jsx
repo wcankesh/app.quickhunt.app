@@ -271,7 +271,7 @@ const Profile = () => {
         <div className={"flex flex-col gap-6"}>
             <Card>
                 <CardHeader className={"gap-1 border-b p-4 sm:px-5 sm:py-4"}>
-                    <CardTitle className={"font-normal text-lg sm:text-2xl capitalize"}>Edit Profile</CardTitle>
+                    <CardTitle className={"font-normal text-xl lg:text-2xl capitalize"}>Edit Profile</CardTitle>
                     <CardDescription className={" text-sm text-muted-foreground p-0"}>Manage your account settings.</CardDescription>
                 </CardHeader>
                 <CardContent className={"py-4 px-4 sm:px-5 sm:py-4 border-b"}>

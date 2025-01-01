@@ -5,12 +5,13 @@ import {Button} from "../ui/button";
 import {ChevronLeft, ChevronRight, X} from "lucide-react";
 import {ApiService} from "../../utils/ApiService";
 import {Skeleton} from "../ui/skeleton";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import ReadMoreText from "../Comman/ReadMoreText";
 import {useLocation} from "react-router";
 import moment from "moment";
 import {Card, CardContent} from "../ui/card";
 import CommonBreadCrumb from "../Comman/CommonBreadCrumb";
+import {inboxMarkReadAction} from "../../redux/action/InboxMarkReadAction";
 
 const perPageLimit = 10;
 
@@ -20,7 +21,9 @@ const AnalyticsViews = () => {
     const postId = urlParams.get("postId");
     const getPageNo = urlParams.get("pageNo") || 1;
     const apiService = new ApiService();
+    const dispatch = useDispatch();
     const allEmoji = useSelector(state => state.allStatusAndTypes.emoji);
+    const inboxMarkReadReducer = useSelector(state => state.inboxMarkRead);
 
     const [analyticsObj, setAnalyticsObj] = useState({})
     const [feedbackList, setFeedbackList] = useState([])
@@ -54,6 +57,14 @@ const AnalyticsViews = () => {
                         category_id: data.data?.category_id,
                         labels: data.data?.labels || [],
                     });
+                    const updateInbox = inboxMarkReadReducer.map(item => {
+                        if ((item.source === 'post_feedbacks' || item.source === 'post_reactions') && item.id === data.data.id) {
+                            return {...item, is_read: 1};
+                        }
+                        return item;
+                    });
+
+                    dispatch(inboxMarkReadAction(updateInbox));
                 }
             }
             getSinglePosts()
