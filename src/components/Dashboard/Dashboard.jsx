@@ -14,6 +14,7 @@ import {Button} from "../ui/button";
 import {useNavigate} from "react-router-dom";
 import {baseUrl} from "../../utils/constent";
 import {Badge} from "../ui/badge";
+import {UserAvatar} from "../Comman/CommentEditor";
 
 const chartConfig = {
     totalView: {
@@ -271,13 +272,7 @@ export function Dashboard() {
                                                                 }}
                                                             >
                                                                 <div className={"update-idea text-sm rounded-full border text-center"}>
-                                                                    <Avatar className={"w-[20px] h-[20px]"}>
-                                                                        {x.user_photo ? (
-                                                                            <AvatarImage src={x.user_photo} alt=""/>
-                                                                        ) : (
-                                                                            <AvatarFallback>{x.customer_name && x.customer_name.substring(0, 1).toUpperCase()}</AvatarFallback>
-                                                                        )}
-                                                                    </Avatar>
+                                                                    <UserAvatar userPhoto={x.user_photo} userName={x.customer_name && x.customer_name.substring(0, 1).toUpperCase()} />
                                                                 </div>
                                                                 <div className={"flex items-center flex-wrap gap-1 md:gap-2"}>
                                                                 <h4 className="text-sm font-medium">{x.customer_name}</h4>
@@ -338,9 +333,7 @@ export function Dashboard() {
                                                     <Fragment key={i}>
                                                         <CardContent className={"py-2.5 px-6 border-b last:border-b-0"}>
                                                             <div className={"flex gap-4"}>
-                                                                <Avatar className={"rounded-none w-[35px] h-[35px]"}>
-                                                                    <AvatarImage src={emoji.emoji_url}/>
-                                                                </Avatar>
+                                                                <UserAvatar className={`rounded-none w-[35px] h-[35px]`} userPhoto={emoji.emoji_url} />
                                                                 <div className={"flex flex-col gap-1"}>
                                                                     <div className="flex gap-1 items-center">
                                                                         <h4

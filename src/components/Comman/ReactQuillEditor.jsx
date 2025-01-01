@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useId} from 'react';
+import React, {useEffect, useRef, useId, useState} from 'react';
 import ReactQuill from "react-quill";
 import {cn} from "../../lib/utils";
 import {cleanQuillHtml} from "../../utils/constent";
@@ -59,6 +59,71 @@ const ReactQuillEditor = ({name, value, onChange, className, hideToolBar}) => {
 
 export default ReactQuillEditor;
 
+// this works for row also
+// export const DisplayReactQuill = ({ value, fontFamily = 'inherit', truncateLength = 100 }) => {
+//     const quillRef = useRef(null);
+//     const uniqueId = useId();
+//     const [isExpanded, setIsExpanded] = useState(false);
+//     const [truncatedValue, setTruncatedValue] = useState('');
+//
+//     const newValue = cleanQuillHtml(value);
+//
+//     useEffect(() => {
+//         // Truncate the content if needed
+//         if (!isExpanded && newValue && newValue.length > truncateLength) {
+//             setTruncatedValue(newValue.slice(0, truncateLength) + '...');
+//         } else {
+//             setTruncatedValue(newValue);
+//         }
+//     }, [newValue, isExpanded, truncateLength]);
+//
+//     useEffect(() => {
+//         if (quillRef.current) {
+//             const editor = quillRef.current.getEditor();
+//             const editorContainer = editor.root;
+//             editorContainer.style.fontFamily = fontFamily;
+//         }
+//     }, [fontFamily]);
+//
+//     return (
+//         <>
+//             <style>
+//                 {`
+//                     .custom-react-quill .ql-editor { font-family: inherit; padding: 0px; }
+//                     .custom-react-quill .ql-container.ql-snow, .ql-container.ql-snow {border: none; border-top: none!important}
+//                 `}
+//             </style>
+//             {newValue ? (
+//                 <div>
+//                     <ReactQuill
+//                         ref={quillRef}
+//                         id={uniqueId}
+//                         className="custom-react-quill"
+//                         value={isExpanded ? newValue : truncatedValue}
+//                         readOnly
+//                         modules={{ toolbar: false }}
+//                     />
+//                     {newValue.length > truncateLength && (
+//                         <button
+//                             style={{
+//                                 marginTop: '10px',
+//                                 background: 'none',
+//                                 border: 'none',
+//                                 color: 'blue',
+//                                 textDecoration: 'underline',
+//                                 cursor: 'pointer'
+//                             }}
+//                             onClick={() => setIsExpanded(!isExpanded)}
+//                         >
+//                             {isExpanded ? 'Read Less' : 'Read More'}
+//                         </button>
+//                     )}
+//                 </div>
+//             ) : null}
+//         </>
+//     );
+// };
+
 export const DisplayReactQuill = ({value, fontFamily = 'inherit'}) => {
     const quillRef = useRef(null);
     const uniqueId = useId();
@@ -77,7 +142,7 @@ export const DisplayReactQuill = ({value, fontFamily = 'inherit'}) => {
             <style>
                 {`
                     .custom-react-quill .ql-editor { font-family: inherit; padding: 0px; }
-                    .custom-react-quill .ql-container.ql-snow, .ql-container.ql-snow {border: none; border-top: none!important}                    
+                    .custom-react-quill .ql-container.ql-snow, .ql-container.ql-snow {border: none; border-top: none!important}
                 `}
             </style>
             {

@@ -7,12 +7,13 @@ import {ApiService} from "../../../utils/ApiService";
 import {useToast} from "../../ui/use-toast";
 import {useSelector} from "react-redux";
 import {Button} from "../../ui/button";
-import {Loader2} from "lucide-react";
+import {Eye, EyeOff, Loader2} from "lucide-react";
 import ColorInput from "../../Comman/ColorPicker";
 import {Checkbox} from "../../ui/checkbox";
 import {Select, SelectValue} from "@radix-ui/react-select";
 import {SelectContent, SelectItem, SelectTrigger} from "../../ui/select";
 import {timeZoneJson} from "../../../utils/constent";
+import {useTheme} from "../../theme-provider";
 
 const initialState = {
     announcement_title: "",
@@ -29,11 +30,14 @@ const initialState = {
     is_idea: 1,
     is_reaction: 1,
     is_roadmap: 1,
+    private_mode: 0,
+    password: '',
     roadmap_title: "",
     timezone: "Asia/Kolkata",
 }
 
 const GeneralSettings = () => {
+    const {theme} = useTheme();
     let apiSerVice = new ApiService();
     const {toast} = useToast();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
@@ -41,6 +45,12 @@ const GeneralSettings = () => {
 
     let [generalSettingData, setGeneralSettingData] = useState(initialState);
     const [isSave, setIsSave] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+    const [formError, setFormError] = useState(initialState);
+
+    const togglePasswordVisibility = () => {
+        setShowPassword(!showPassword);
+    }
 
     useEffect(() => {
         const getPortalSetting = async () => {
@@ -56,14 +66,43 @@ const GeneralSettings = () => {
         }
     }, [projectDetailsReducer.id])
 
+    const formValidate = (name, value) => {
+        switch (name) {
+            case "password":
+                if (value?.trim() === "") return "Password is required";
+                if (
+                    !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(value)
+                )
+                    return "Password must be at least 8 characters with one uppercase letter, one lowercase letter, one number, and one special character";
+                return "";
+            default:
+                return "";
+        }
+    };
+
     const onChange = (name, value) => {
         setGeneralSettingData({
             ...generalSettingData,
             [name]: value
         });
+        setFormError({
+            ...formError,
+            [name]: formValidate(name, value)
+        });
     };
 
     const onUpdatePortal = async () => {
+        let validationErrors = {};
+        Object.keys(generalSettingData).forEach(name => {
+            const error = formValidate(name, generalSettingData[name]);
+            if (error && error.length > 0) {
+                validationErrors[name] = error;
+            }
+        });
+        if (Object.keys(validationErrors).length > 0) {
+            setFormError(validationErrors);
+            return;
+        }
         setIsSave(true)
         const payload = {
             ...generalSettingData,
@@ -187,9 +226,19 @@ const GeneralSettings = () => {
                     label: "Show Branding",
                     name: "is_branding",
                 },
+                {
+                    field: "switch",
+                    label: "Make Organization Private",
+                    name: "private_mode",
+                },
+              {
+                    field: "password",
+                    label: "Password",
+                    name: "password",
+                },
             ],
         },
-    ]
+    ];
 
     return (
         <Card className={"divide-y"}>
@@ -218,9 +267,12 @@ const GeneralSettings = () => {
                                         (generalSettingData?.[x.nameSwitch] === undefined || generalSettingData?.[x.nameSwitch] === 1) ?
                                             <Fragment>
                                                 <div className={"space-y-3"}>
-                                                    <div className={`${(x.title === "Header Color" || x.title === "Global Color") ? "grid grid-cols-2 gap-4" : "space-y-3 w-full md:w-1/2"}`}>
+                                                    <div className={`${(x.title === "Header Color" || x.title === "Global Color" || x.title === "Branding") ? "grid grid-cols-2 gap-4" : "space-y-3 w-full md:w-1/2"}`}>
                                                         {
                                                             x.input.map((y, inputIndex) => {
+                                                                if (y.field === 'password' && generalSettingData?.private_mode !== 1) {
+                                                                    return null;
+                                                                }
                                                                 return (
                                                                     <Fragment>
                                                                         {
@@ -272,15 +324,42 @@ const GeneralSettings = () => {
                                                                                             </Select>
                                                                                         </div>
                                                                                         : y.field === "switch" ?
-                                                                                        <div className="announce-create-switch flex gap-4">
-                                                                                            <Switch
-                                                                                                className="w-[38px] h-[20px]"
-                                                                                                checked={generalSettingData?.[y.name] === 1}
-                                                                                                disabled={userDetailsReducer.plan === 0}
-                                                                                                onCheckedChange={(checked) => onChange(y.name, checked ? 1 : 0)}
-                                                                                            />
-                                                                                            <p className="text-sm text-muted-foreground font-normal">{y.label}</p>
-                                                                                        </div>
+                                                                                            <Fragment>
+                                                                                                <div className="space-y-3">
+                                                                                                <div className="announce-create-switch flex gap-4">
+                                                                                                    <Switch
+                                                                                                        className="w-[38px] h-[20px]"
+                                                                                                        checked={generalSettingData?.[y.name] === 1}
+                                                                                                        disabled={y.name === "private_mode" ? "" : userDetailsReducer.plan === 0}
+                                                                                                        onCheckedChange={(checked) => onChange(y.name, checked ? 1 : 0)}
+                                                                                                    />
+                                                                                                    <p className="text-sm text-muted-foreground font-normal">{y.label}</p>
+                                                                                                </div>
+                                                                                                    {y.name === "private_mode" && generalSettingData?.private_mode === 1 && (
+                                                                                                        <div>
+                                                                                                            <Label className="text-sm font-normal">Password</Label>
+                                                                                                            <div className={"relative"}>
+                                                                                                            <Input
+                                                                                                                type={showPassword ? "text" : "password"}
+                                                                                                                value={generalSettingData?.password || ""}
+                                                                                                                onChange={(e) => onChange("password", e.target.value)}
+                                                                                                            />
+                                                                                                            <Button
+                                                                                                                className={"absolute top-0 right-0"}
+                                                                                                                variant={"ghost hover:none"}
+                                                                                                                onClick={togglePasswordVisibility}
+                                                                                                            >
+                                                                                                                {generalSettingData?.password ? <Eye size={16} stroke={`${theme === "dark" ? "white" : "black"}`}/> : <EyeOff size={16} stroke={`${theme === "dark" ? "white" : "black"}`}/>}
+                                                                                                            </Button>
+                                                                                                                {
+                                                                                                                    formError.password &&
+                                                                                                                    <span className="text-destructive text-sm">{formError.password}</span>
+                                                                                                                }
+                                                                                                            </div>
+                                                                                                        </div>
+                                                                                                    )}
+                                                                                                </div>
+                                                                                            </Fragment>
                                                                                         : ""
                                                                         }
                                                                     </Fragment>

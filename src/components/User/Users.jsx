@@ -22,7 +22,7 @@ import {Card, CardContent} from "../ui/card";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "../ui/table";
 import {useTheme} from "../theme-provider";
 import {ApiService} from "../../utils/ApiService";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {useToast} from "../ui/use-toast";
 import {Skeleton} from "../ui/skeleton";
 import EmptyData from "../Comman/EmptyData";
@@ -41,6 +41,7 @@ import {Tabs} from "@radix-ui/react-tabs";
 import {Avatar, AvatarFallback, AvatarImage} from "../ui/avatar";
 import {Badge} from "../ui/badge";
 import {UserAvatar} from "../Comman/CommentEditor";
+import {inboxMarkReadAction} from "../../redux/action/InboxMarkReadAction";
 
 const perPageLimit = 10;
 
@@ -59,7 +60,11 @@ const initialStateError = {
     customer_email_id: "",
 }
 
-const UserActionsList = ({ userActions, sourceTitle, isLoadingUserDetail, selectedTab, pageNoAction, totalPagesAction, handlePaginationClickAction }) => {
+const UserActionsList = ({ userActions, setCustomerList, sourceTitle, isLoadingUserDetail, selectedTab, pageNoAction, totalPagesAction, handlePaginationClickAction, projectDetailsReducer }) => {
+    const navigate = useNavigate();
+    const apiService = new ApiService();
+    const dispatch = useDispatch();
+
     if (isLoadingUserDetail || !userActions.length) {
         return (
             <div className="divide-y h-[calc(100vh_-_204px)]">
@@ -76,6 +81,20 @@ const UserActionsList = ({ userActions, sourceTitle, isLoadingUserDetail, select
         );
     }
 
+    const navigateAction = async (id, source) => {
+        if (source === "feature_ideas" || source === "feature_idea_comments" || source === "feature_idea_votes") {
+            navigate(`/ideas/${id}`);
+        } else if (source === "post_feedbacks" || source === "post_reactions") {
+            navigate(`/announcements/analytic-view?postId=${id}`);
+        }
+        const response = await apiService.inboxMarkAllRead({ project_id: projectDetailsReducer.id, id });
+        if (response.status === 200) {
+            const update = (userActions || []).map(action => action.id === id ? { ...action, is_read: 1 } : action);
+            setCustomerList(update);
+            dispatch(inboxMarkReadAction(update));
+        }
+    }
+
     return (
         <div className={"divide-y"}>
             {(userActions || []).map((action, index) => {
@@ -84,7 +103,7 @@ const UserActionsList = ({ userActions, sourceTitle, isLoadingUserDetail, select
                         {sourceTitle.map((source, i) => {
                             if (action.source === source.value) {
                                 return (
-                                    <div className={"px-2 py-[10px] md:px-3 flex flex-wrap justify-between gap-2"} key={i}>
+                                    <div onClick={() => navigateAction(action?.id, action.source)} className={"px-2 py-[10px] md:px-3 flex flex-wrap justify-between gap-2 cursor-pointer"} key={i}>
                                         <div className={"space-y-3"}>
                                             <h2 className={"font-medium"}>{source.title}</h2>
                                             {source.value === "post_reactions" ? (
@@ -495,11 +514,11 @@ const Users = () => {
                                         }
                                     </div>
                                 </div>
-                                {/*{*/}
-                                {/*    isAdmin && <Button variant={"outline"} className={"gap-2"} onClick={() => navigate(`${baseUrl}/settings/team`)}>*/}
-                                {/*        <Settings size={18} />Manage Team Members*/}
-                                {/*    </Button>*/}
-                                {/*}*/}
+                                {
+                                    isAdmin && <Button variant={"outline"} className={"gap-2"} onClick={() => navigate(`${baseUrl}/settings/team`)}>
+                                        <Settings size={18} />Manage Team Members
+                                    </Button>
+                                }
                             </div>
                             <Tabs defaultValue="details" onValueChange={(value) => setSelectedTab(value)}>
                                 <div className={"border-b p-3"}>
@@ -522,6 +541,7 @@ const Users = () => {
                                                 {
                                                     y.value === "details" ? y.component :
                                                         <UserActionsList
+                                                            setCustomerList={setCustomerList}
                                                             userActions={userActions}
                                                             sourceTitle={sourceTitle}
                                                             isLoadingUserDetail={isLoadingUserDetail}
