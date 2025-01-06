@@ -28,20 +28,28 @@ const Setup = () => {
 
     const [invitationDetail, setInvitationDetail] = useState(initialState)
     const [isLoading, setIsLoading] = useState(true)
+    const [isTokenDeleted, setIsTokenDeleted] = useState(false);
 
     useEffect(() => {
+        debugger
         getInvitationDetail()
     }, [])
 
     const getInvitationDetail = async () => {
-        const data = await apiSerVice.getInvitationDetail(token)
-        if(data.status === 200){
-            setInvitationDetail({...data.data[0]})
-            setIsLoading(false)
+        debugger
+        const data = await apiSerVice.getInvitationDetail(token);
+        if (data.status === 200) {
+            if (data.data && Object.keys(data.data).length > 0) {
+                setInvitationDetail({...data.data[0]});
+                setIsLoading(false);
+            } else {
+                setIsTokenDeleted(true);
+                setIsLoading(false);
+            }
         } else {
-            setIsLoading(false)
+            setIsLoading(false);
         }
-    }
+    };
 
     const joinInvite = async (type) =>{
         const payload = {
@@ -63,60 +71,73 @@ const Setup = () => {
             <div className={"max-w-[575px] w-full m-auto"}>
                 <div className={"flex items-center justify-center"}>{Icon.blackLogo}</div>
                 <h1 className="scroll-m-20 text-2xl md:text-3xl font-medium text-center lg:text-3xl mb-3.5 mt-6">
-                    You have 1 invite
+                    {isTokenDeleted ? "Token is deleted" : "You have 1 invite"}
                 </h1>
-                <div className={"mb-2.5"}>
+                {isTokenDeleted ? (
                     <p className="text-sm text-center text-muted-foreground">
-                        People have been waiting for you, you must be popular
+                        The token is invalid or has been deleted.
                     </p>
-                </div>
-                <div className={"mt-2.5"}>
-                    {
-                        isLoading ? <Card>
-                            <CardContent className={"p-3 md:p-6 flex justify-between items-center flex-wrap gap-2"}>
-                                <div className={"flex gap-3 items-center"}>
-                                    <div>
-                                        <Skeleton className="w-[50px] h-[50px] rounded-full" />
+                ) : (
+                    <div className={"mt-2.5"}>
+                        {isLoading ? (
+                            <Card>
+                                <CardContent className={"p-3 md:p-6 flex justify-between items-center flex-wrap gap-2"}>
+                                    <div className={"flex gap-3 items-center"}>
+                                        <div>
+                                            <Skeleton className="w-[50px] h-[50px] rounded-full" />
+                                        </div>
+                                        <div>
+                                            <Skeleton className="w-56 h-[10px] rounded-full mb-2" />
+                                            <Skeleton className="w-56 h-[10px] rounded-full" />
+                                        </div>
                                     </div>
-                                  <div>
-                                      <Skeleton className="w-56 h-[10px] rounded-full mb-2" />
-                                      <Skeleton className="w-56 h-[10px] rounded-full" />
-                                  </div>
-                                </div>
-                                <div className={"flex gap-2"}>
-                                    <Skeleton className="w-[70px] h-[30px] " />
-                                    <Skeleton className="w-[70px] h-[30px]" />
-                                </div>
-
-                            </CardContent>
-                        </Card> : <Card>
-                            <CardContent className={"p-3 md:p-6 flex justify-between items-center flex-wrap gap-2"}>
-                                <div className={"flex gap-3 items-center"}>
-                                    <div>
-                                        <Avatar className={"w-[50px] h-[50px]"}>
-                                            <AvatarFallback className={"bg-primary/10 border-primary border text-sm text-primary font-medium"}>{invitationDetail && invitationDetail.project_name && invitationDetail.project_name.substring(0,1).toUpperCase() }</AvatarFallback>
-                                        </Avatar>
+                                    <div className={"flex gap-2"}>
+                                        <Skeleton className="w-[70px] h-[30px]" />
+                                        <Skeleton className="w-[70px] h-[30px]" />
                                     </div>
-                                    <div>
-                                        <h3 className={"text-sm font-normal mb-1"}>{invitationDetail.project_name}</h3>
-                                        <p className={"text-xs pb-1"}>{invitationDetail.domain}</p>
-                                        <p className={"text-xs text-muted-foreground"}>Invited by {invitationDetail.user_first_name} {invitationDetail.user_last_name ? invitationDetail.user_last_name : ''}. {invitationDetail?.status === 1 ? "Expired in 7days": ""} </p>
+                                </CardContent>
+                            </Card>
+                        ) : (
+                            <Card>
+                                <CardContent className={"p-3 md:p-6 flex justify-between items-center flex-wrap gap-2"}>
+                                    <div className={"flex gap-3 items-center"}>
+                                        <div>
+                                            <Avatar className={"w-[50px] h-[50px]"}>
+                                                <AvatarFallback
+                                                    className={"bg-primary/10 border-primary border text-sm text-primary font-medium"}>
+                                                    {invitationDetail?.project_name?.substring(0, 1).toUpperCase()}
+                                                </AvatarFallback>
+                                            </Avatar>
+                                        </div>
+                                        <div>
+                                            <h3 className={"text-sm font-normal mb-1"}>
+                                                {invitationDetail.project_name}
+                                            </h3>
+                                            <p className={"text-xs pb-1"}>{invitationDetail.domain}</p>
+                                            <p className={"text-xs text-muted-foreground"}>
+                                                Invited by {invitationDetail.user_first_name}{" "}
+                                                {invitationDetail.user_last_name || ""}.{" "}
+                                                {invitationDetail?.status === 1 ? "Expired in 7 days" : ""}
+                                            </p>
+                                        </div>
                                     </div>
-                                </div>
-                                {
-                                    invitationDetail?.status === 1 ?  <div className={"flex gap-2"}>
-                                        <Button onClick={() =>joinInvite(2)}>Accept</Button>
-                                        <Button variant={"outline"} onClick={() =>joinInvite(3)}>Reject</Button>
-                                    </div> :   <div className={"flex gap-2"}>
-                                        <Button disabled>{invitationDetail?.status === 2 ? "Accepted" : "Rejected"}</Button>
-                                    </div>
-                                }
-
-                            </CardContent>
-                        </Card>
-                    }
-
-                </div>
+                                    {invitationDetail?.status === 1 ? (
+                                        <div className={"flex gap-2"}>
+                                            <Button onClick={() => joinInvite(2)}>Accept</Button>
+                                            <Button variant={"outline"} onClick={() => joinInvite(3)}>Reject</Button>
+                                        </div>
+                                    ) : (
+                                        <div className={"flex gap-2"}>
+                                            <Button disabled>
+                                                {invitationDetail?.status === 2 ? "Accepted" : "Rejected"}
+                                            </Button>
+                                        </div>
+                                    )}
+                                </CardContent>
+                            </Card>
+                        )}
+                    </div>
+                )}
             </div>
         </div>
     );
