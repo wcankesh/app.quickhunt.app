@@ -1,6 +1,7 @@
 import React, {Fragment, useEffect, useState} from 'react';
 import {Card, CardContent, CardHeader} from "../../ui/card";
 import {Skeleton} from "../../ui/skeleton";
+import {Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogPortal, DialogTrigger, DialogClose, DialogOverlay} from "../../ui/dialog";
 import {ApiService} from "../../../utils/ApiService";
 import {useSelector} from "react-redux";
 import moment from "moment";
@@ -13,6 +14,11 @@ import {Avatar, AvatarFallback} from "../../ui/avatar";
 import EmptyData from "../../Comman/EmptyData";
 import CommonBreadCrumb from "../../Comman/CommonBreadCrumb";
 import {chartLoading} from "../../Comman/CommSkel";
+import {Button} from "../../ui/button";
+import {Label} from "../../ui/label";
+import {Input} from "../../ui/input";
+import {Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious} from "../../ui/carousel";
+import Autoplay from "embla-carousel-autoplay";
 
 const chartConfig = {
     view: {
@@ -93,6 +99,8 @@ const PostAnalyticsView = () => {
     const links = [
         { label: 'In App Message', path: `/app-message` }
     ];
+
+    const plugin = React.useRef(Autoplay({delay: 2000, stopOnInteraction: true}))
 
     return (
         <Fragment>
@@ -256,7 +264,7 @@ const PostAnalyticsView = () => {
                                         {
                                             ["Name", "Reply", "Reaction", "Image View", "When they replied"].map((x, i) => {
                                                 return (
-                                                    <TableHead className={`px-2 py-[10px] md:px-3 font-medium text-card-foreground`} key={i}>
+                                                    <TableHead className={`px-2 py-[10px] md:px-3 font-medium text-card-foreground ${i >= 2 ? "text-center" : ""}`} key={i}>
                                                         {x}
                                                     </TableHead>
                                                 );
@@ -271,7 +279,7 @@ const PostAnalyticsView = () => {
                                                     return (
                                                         <TableRow key={index}>
                                                             {
-                                                                [...Array(4)].map((_, i) => {
+                                                                [...Array(5)].map((_, i) => {
                                                                     return (
                                                                         <TableCell key={i}
                                                                                    className={"max-w-[373px] px-2 py-[10px] md:px-3"}>
@@ -299,27 +307,85 @@ const PostAnalyticsView = () => {
                                                                             <p className={"font-normal"}>{x?.name? x?.name : x.email}</p>
                                                                         </>
                                                                     </TableCell>
-                                                                    <TableCell className={`px-2 py-[10px] md:px-3 font-normal`}>{x?.response ||  "-" }</TableCell>
-                                                                    <TableCell className={`px-2 py-[10px] md:px-3 font-normal`}>{x.emoji_url ? <img key={i} className={"h-6 w-6 cursor-pointer"} src={x.emoji_url}/> : "-" }</TableCell>
+                                                                    <TableCell className={`px-2 py-[10px] md:px-3 font-normal max-w-[270px] truncate text-ellipsis overflow-hidden whitespace-nowrap`}>{x?.response ||  "-" }</TableCell>
                                                                     <TableCell className={`px-2 py-[10px] md:px-3 font-normal`}>
-                                                                        {Array.isArray(x.files) && x.files.length > 0 ? (
-                                                                            x.files.map((fileUrl, index) => (
-                                                                                <div key={index} onClick={() => handleImageClick(fileUrl)} className="inline-block mr-2">
-                                                                                    <img
-                                                                                        className={"h-6 w-6 cursor-pointer"}
-                                                                                        src={fileUrl}
-                                                                                        alt={`file-${index}`}/>
-                                                                                </div>
-                                                                            ))
-                                                                        ) : "-"}
+                                                                        <div className={"flex justify-center items-center"}>
+                                                                            {x.emoji_url ? <img key={i} className={"h-6 w-6 cursor-pointer"} src={x.emoji_url}/> : "-" }
+                                                                        </div>
                                                                     </TableCell>
-                                                                    <TableCell className={`px-2 py-[10px] md:px-3 font-normal`}>{moment(x.created_at).format("ll")}</TableCell>
+                                                                    <TableCell className={`px-2 py-[10px] md:px-3 font-normal`}>
+                                                                        <div className={"flex justify-center flex-wrap gap-1"}>
+                                                                            {Array.isArray(x.files) && x.files.length > 0 ? (
+                                                                                x.files.length > 1 ? (
+                                                                                    <>
+                                                                                        {/* Show the first image and a button to open the dialog */}
+                                                                                        <div onClick={() => handleImageClick(x.files[0])} className="inline-block">
+                                                                                            <img
+                                                                                                className={"h-6 w-6 cursor-pointer"}
+                                                                                                src={x.files[0]}
+                                                                                                alt={`file-0`}
+                                                                                            />
+                                                                                        </div>
+                                                                                        <Dialog>
+                                                                                            <DialogTrigger asChild>
+                                                                                                <Button variant="outline hover:none" className={"rounded-md border h-6 w-6 p-1"}>
+                                                                                                    +{x.files.length - 1}
+                                                                                                </Button>
+                                                                                            </DialogTrigger>
+                                                                                            <DialogContent className="border-b p-0 max-h-[80vh] max-w-[706px] flex flex-col gap-0">
+                                                                                                <DialogHeader className={'p-3 sticky top-0 left-0 bg-white z-10 rounded-tl-md rounded-tr-md border-b'}>
+                                                                                                    <DialogTitle>Additional Images</DialogTitle>
+                                                                                                    <DialogDescription>
+                                                                                                        Click on an image to view it.
+                                                                                                    </DialogDescription>
+                                                                                                </DialogHeader>
+                                                                                                <div className="flex-grow justify-center flex overflow-y-auto p-3">
+                                                                                                    <Carousel plugins={[plugin.current]} className={"w-4/5"} onMouseEnter={plugin.current.stop} onMouseLeave={plugin.current.reset}>
+                                                                                                        <CarouselContent>
+                                                                                                            {x.files.map((src, index) => (
+                                                                                                                <CarouselItem key={index} className={"max-w-[706px] w-full shrink-0 grow pl-4"}>
+                                                                                                                    <div className={"h-[500px] flex items-center justify-center overflow-hidden"}>
+                                                                                                                    <img onClick={(img) => handleImageClick(img)} className={"w-full h-full object-contain cursor-pointer"} src={src} alt={`Carousel image ${index + 1}`} />
+                                                                                                                    </div>
+                                                                                                                </CarouselItem>
+                                                                                                            ))}
+                                                                                                        </CarouselContent>
+                                                                                                        <CarouselPrevious className={"left-[-37px] md:-left-12"} />
+                                                                                                        <CarouselNext className={"right-[-37px] md:-right-12"} />
+                                                                                                    </Carousel>
+                                                                                                </div>
+                                                                                                <DialogFooter className={'border-t p-3 fixed bottom-0 left-0 right-0 bg-white z-10 rounded-bl-md rounded-br-md'}>
+                                                                                                    <DialogClose asChild>
+                                                                                                        <Button className={"text-xs md:text-sm font-medium"}>Close</Button>
+                                                                                                    </DialogClose>
+                                                                                                </DialogFooter>
+                                                                                            </DialogContent>
+                                                                                        </Dialog>
+                                                                                    </>
+                                                                                ) : (
+                                                                                    // If there are 2 or fewer images, display them directly
+                                                                                    x.files.map((fileUrl, index) => (
+                                                                                        <div key={index} onClick={() => handleImageClick(fileUrl)} className="inline-block">
+                                                                                            <img
+                                                                                                className={"h-6 w-6 cursor-pointer"}
+                                                                                                src={fileUrl}
+                                                                                                alt={`file-${index}`}
+                                                                                            />
+                                                                                        </div>
+                                                                                    ))
+                                                                                )
+                                                                            ) : (
+                                                                                "-"
+                                                                            )}
+                                                                        </div>
+                                                                    </TableCell>
+                                                                    <TableCell className={`px-2 py-[10px] md:px-3 font-normal text-center`}>{moment(x.created_at).format("ll")}</TableCell>
                                                                 </TableRow>
                                                             )
                                                         })
                                                     }
                                                 </Fragment> : <TableRow>
-                                                    <TableCell colSpan={4}>
+                                                    <TableCell colSpan={5}>
                                                         <EmptyData/>
                                                     </TableCell>
                                                 </TableRow>

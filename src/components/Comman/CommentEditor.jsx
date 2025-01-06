@@ -46,7 +46,7 @@ export const CommentEditor = ({isEditMode, comment, images = [], onUpdateComment
                                                 />
                                                 <CircleX
                                                     size={20}
-                                                    className={`light:text-muted-foreground dark:text-card cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
+                                                    className={`stroke-gray-500 dark:stroke-white cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
                                                     onClick={() => onDeleteImage(index, !!img.name)}
                                                 />
                                             </div> :
@@ -58,7 +58,7 @@ export const CommentEditor = ({isEditMode, comment, images = [], onUpdateComment
                                                 />
                                                 <CircleX
                                                     size={20}
-                                                    className={`light:text-muted-foreground dark:text-card cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
+                                                    className={`stroke-gray-500 dark:stroke-white cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
                                                     onClick={() => onDeleteImage(index, !!img.name)}
                                                 />
                                             </div>
@@ -116,7 +116,7 @@ export const CommentEditor = ({isEditMode, comment, images = [], onUpdateComment
 
 export const UserAvatar = ({ userPhoto, userName, className }) => {
     return (
-        <Avatar className={`w-[20px] h-[20px] ${className}`}>
+        <Avatar className={`w-[24px] h-[24px] ${className}`}>
                 <AvatarImage src={userPhoto} alt={userName && userName.substring(0, 1)} />
                 <AvatarFallback className={'border'}>{userName && userName.substring(0, 1).toUpperCase()}</AvatarFallback>
         </Avatar>
@@ -183,7 +183,7 @@ export const ImageUploader = ({ stateDetails, onDeleteImg, handleFileChange }) =
                     />
                     <CircleX
                         size={20}
-                        className={`light:text-muted-foreground dark:text-card cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
+                        className={`stroke-gray-500 dark:stroke-white cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
                         onClick={handleDelete}
                     />
                 </div>
@@ -227,7 +227,7 @@ export const ImageGallery = ({ commentFiles, onDeleteImageComment }) => {
                             />
                             <CircleX
                                 size={20}
-                                className={`light:text-muted-foreground dark:text-card cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
+                                className={`stroke-gray-500 dark:stroke-white cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
                                 onClick={() => onDeleteImageComment(index, false)}
                             />
                         </div>
@@ -240,7 +240,7 @@ export const ImageGallery = ({ commentFiles, onDeleteImageComment }) => {
                             />
                             <CircleX
                                 size={20}
-                                className={`light:text-muted-foreground dark:text-card cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
+                                className={`stroke-gray-500 dark:stroke-white cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
                                 onClick={() => onDeleteImageComment(index, false)}
                             />
                         </div>

@@ -271,7 +271,7 @@ export function Dashboard() {
                                                                     }
                                                                 }}
                                                             >
-                                                                <div className={"update-idea text-sm rounded-full border text-center"}>
+                                                                <div className={"update-idea text-sm rounded-full text-center"}>
                                                                     <UserAvatar userPhoto={x.user_photo} userName={x.customer_name && x.customer_name.substring(0, 1).toUpperCase()} />
                                                                 </div>
                                                                 <div className={"flex items-center flex-wrap gap-1 md:gap-2"}>

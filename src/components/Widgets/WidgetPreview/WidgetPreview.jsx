@@ -111,7 +111,7 @@ const WidgetPreview = ({widgetsSetting, type, toggle,onToggle }) => {
 
             {
                 type === "embed" &&
-                <div className={"p-[64px] h-full "}>
+                <div className={"p-4 md:p-[64px] h-full "}>
                     <div className={"QH-widget-embed-admin border rounded-lg"}>
                         <div className={"QH-embed-admin"}>
                             {renderContent()}

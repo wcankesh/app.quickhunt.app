@@ -452,7 +452,7 @@ const Users = () => {
         { label: "Idea upvote", value: 6, icon: <Vote size={18} className={"mr-2"} />},
     ];
 
-    const tableHeader = ["Name", "Email", "Last Activity", "Comments", "Post",]
+    const tableHeader = ["Name", "Email", "Last Activity", "Comments", "Ideas",]
     if (isAdmin || isLoading) {
         tableHeader.push("Action")
     }

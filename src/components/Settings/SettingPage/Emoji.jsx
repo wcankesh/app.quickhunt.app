@@ -213,9 +213,9 @@ const Emoji = () => {
                         <TableHeader className={`dark:bg-transparent bg-muted`}>
                             <TableRow>
                                 {
-                                    ["Emoji","", "Action"].map((x,i)=>{
+                                    ["Emoji", "Action"].map((x,i)=>{
                                         return(
-                                            <TableHead className={`px-2 py-[10px] md:px-3 text-sm font-normal text-card-foreground dark:text-muted-foreground w-1/2 ${i == 0 ? "w-2/5" : i == 1 ? "w-2/5" : ""}`} key={x}>{x}</TableHead>
+                                            <TableHead className={`px-2 py-[10px] md:px-3 text-sm font-normal text-card-foreground dark:text-muted-foreground w-1/2 ${i == 0 ? "w-2/5" : i == 1 ? "w-2/5 text-end" : ""}`} key={x}>{x}</TableHead>
                                         )
                                     })
                                 }
@@ -256,9 +256,8 @@ const Emoji = () => {
                                                                          </PopoverContent>
                                                                      </Popover>
                                                                  </TableCell>
-                                                                 <TableCell/>
                                                                 <TableCell className={`px-[12px] py-[10px] align-top ${theme === "dark" ? "" : "text-muted-foreground"}`}>
-                                                                    <div className={"flex items-center gap-2"}>
+                                                                    <div className={"flex justify-end items-center gap-2"}>
                                                                         <Fragment>
                                                                             {
                                                                                 x.id ? <Button
@@ -289,10 +288,9 @@ const Emoji = () => {
                                                             :
                                                             <Fragment>
                                                                  <TableCell className={"px-2 py-[10px] md:px-3"}>
-                                                                     <img className={"h-[30px] w-[30px] m-[5px]"} alt={"not-found"} src={x.emoji_url}/>
+                                                                     <img className={"h-[30px] w-[30px]"} alt={"not-found"} src={x.emoji_url}/>
                                                                  </TableCell>
-                                                                 <TableCell/>
-                                                                <TableCell className={`flex gap-2 px-3 py-[10px] ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                                                <TableCell className={`flex justify-end gap-2 px-3 py-[10px] ${theme === "dark" ? "" : "text-muted-foreground"}`}>
                                                                     <Fragment>
                                                                         <Button
                                                                             variant="outline hover:bg-transparent"

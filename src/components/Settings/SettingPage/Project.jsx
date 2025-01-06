@@ -257,7 +257,7 @@ const Project = () => {
                                                         />
                                                         <CircleX
                                                             size={20}
-                                                            className={`light:text-muted-foreground dark:text-card cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
+                                                            className={`stroke-gray-500 dark:stroke-white cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
                                                             onClick={() => onDeleteImgLogo('delete_logo', createProjectDetails && createProjectDetails?.project_logo && createProjectDetails.project_logo?.name ? "" : createProjectDetails.project_logo.replace("https://code.quickhunt.app/public/storage/project/", ""))}
                                                         />
                                                     </div> : createProjectDetails.project_logo ?
@@ -269,7 +269,7 @@ const Project = () => {
                                                                 alt=""/>
                                                             <CircleX
                                                                 size={20}
-                                                                className={`light:text-muted-foreground dark:text-card cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
+                                                                className={`stroke-gray-500 dark:stroke-white cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
                                                                 onClick={() => onDeleteImgLogo('delete_logo', createProjectDetails && createProjectDetails?.project_logo && createProjectDetails.project_logo?.name ? "" : createProjectDetails.project_logo.replace("https://code.quickhunt.app/public/storage/project/", ""))}
                                                             />
                                                         </div>
@@ -318,7 +318,7 @@ const Project = () => {
                                                 />
                                                 <CircleX
                                                     size={20}
-                                                    className={`light:text-muted-foreground dark:text-card cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
+                                                    className={`stroke-gray-500 dark:stroke-white cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
                                                     onClick={() => onDeleteImgFav('delete_favicon', createProjectDetails && createProjectDetails?.project_favicon && createProjectDetails.project_favicon?.name ? "" : createProjectDetails.project_favicon.replace("https://code.quickhunt.app/public/storage/project/", ""))}
                                                 />
                                             </div> : createProjectDetails.project_favicon ?
@@ -330,7 +330,7 @@ const Project = () => {
                                                         alt=""/>
                                                     <CircleX
                                                         size={20}
-                                                        className={`light:text-muted-foreground dark:text-card cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
+                                                        className={`stroke-gray-500 dark:stroke-white cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
                                                         onClick={() => onDeleteImgFav('delete_favicon', createProjectDetails && createProjectDetails?.project_favicon && createProjectDetails.project_favicon?.name ? "" : createProjectDetails.project_favicon.replace("https://code.quickhunt.app/public/storage/project/", ""))}
                                                     />
                                                 </div>

@@ -501,7 +501,7 @@ const InAppMessage = () => {
                                                                         </SelectContent>
                                                                     </Select>
                                                                 </TableCell>
-                                                                <TableCell className={`flex items-center mt-1 px-2 py-[10px] md:px-3 gap-2 justify-center`}>
+                                                                <TableCell className={`flex items-center px-2 py-[10px] md:px-3 gap-2 justify-center`}>
                                                                     {sender ? (
                                                                         <>
                                                                             <Avatar className={"w-[20px] h-[20px]"}>

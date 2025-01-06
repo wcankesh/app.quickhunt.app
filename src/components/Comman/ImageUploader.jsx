@@ -76,7 +76,7 @@ const ImageUploader = ({
                     />
                     <CircleX
                         size={20}
-                        className="light:text-muted-foreground dark:text-card cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10"
+                        className="stroke-gray-500 dark:stroke-white cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10"
                         onClick={onDelete}
                     />
                 </div>

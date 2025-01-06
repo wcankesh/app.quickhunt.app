@@ -61,7 +61,7 @@ const CommCreateSheet = ({
                         <div className={"px-4 py-3 lg:py-6 lg:px-8 flex flex-col gap-6 border-b"}>
                             <div className="space-y-2">
                                 <Label htmlFor="title" className={"font-normal"}>Title</Label>
-                                <Input type="text" id="title" value={ideaDetail.title} name={"title"} onChange={onChangeText} />
+                                <Input type="text" id="title" value={ideaDetail.title} placeholder={"Enter your Idea"} name={"title"} onChange={onChangeText} />
                                 {formError.title && <span className="text-red-500 text-sm">{formError.title}</span>}
                             </div>
                             <div className="space-y-2">

@@ -73,7 +73,6 @@ const Articles = () => {
 
     // const getAllArticles = async (search, category_id, sub_category_id) => {
     const getAllArticles = async (search) => {
-        setIsLoading(true)
         const data = await apiService.getAllArticles({
             project_id: projectDetailsReducer.id,
             search: search,
@@ -104,13 +103,14 @@ const Articles = () => {
         });
         if (data.status === 200) {
             setArticleList(data.data);
+            setIsLoading(false)
             if (!data.data || data.data.length === 0) {
                 emptyContent(true);
             } else {
+                setIsLoading(false)
                 emptyContent(false);
             }
         }
-        setIsLoading(false)
     };
 
     const throttledDebouncedSearch = useCallback(
@@ -202,7 +202,6 @@ const Articles = () => {
 
     const handlePaginationClick = async (newPage) => {
         if (newPage >= 1 && newPage <= totalPages) {
-            setIsLoading(true);
             setPageNo(newPage);
             setIsLoading(false);
         }

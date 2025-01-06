@@ -20,7 +20,6 @@ import {DropdownMenu, DropdownMenuTrigger} from "@radix-ui/react-dropdown-menu";
 import {DropdownMenuContent, DropdownMenuItem} from "../ui/dropdown-menu";
 import ReactQuillEditor, {DisplayReactQuill} from "../Comman/ReactQuillEditor";
 import {useLocation, useParams} from "react-router-dom";
-import {cleanQuillHtml} from "../../utils/constent";
 import {Skeleton} from "../ui/skeleton";
 import CommonBreadCrumb from "../Comman/CommonBreadCrumb";
 import ImageUploader from "../Comman/ImageUploader";
@@ -135,16 +134,11 @@ const UpdateIdea = () => {
         if(data.status === 200) {
             setIdeasVoteList(data.data)
             setTotalRecord(data.total)
-            setSelectedIdea({...selectedIdea, vote: data.total, vote_list: type === 'delete' ? clone : type === 'add' ? [...data.data] : [...selectedIdea.vote_list]})
-            console.log(type === 'delete' ? 'clone' : 'selectedIdea.vote_list')
-            console.log(selectedIdea.vote_list)
-            console.log(clone)
+            setSelectedIdea({...selectedIdea, vote: data.total, vote_list: type === 'delete' ? pageNo === 1 ? clone : selectedIdea.vote_list : type === 'add' ? [...data.data] : [...selectedIdea.vote_list]})
             // setSelectedIdea({...selectedIdea, vote: data.total})
             setIsLoadingIdeaVoteList(false);
         }
     }
-
-    console.log("selectedIdea.vote_list", selectedIdea?.vote_list)
 
     useEffect(() => {
         if(addUserDialog.viewUpvote){
@@ -272,11 +266,13 @@ const UpdateIdea = () => {
             setIdeasVoteList(clone);
             toast({description: data.message});
             const filterData = (selectedIdea?.vote_list || []).filter((x) => x.id !== id)
+
             setSelectedIdea(prev => ({
                 ...prev,
-                vote_list: filterData,
-                vote: filterData.length
+                vote_list: pageNo === 1 ? filterData : prev.vote_list, // Update vote_list only if page is 1
+                vote: filterData.length // Always update the vote count
             }));
+
             if (clone.length === 0 && pageNo > 1) {
                 setPageNo(pageNo - 1);
             } else {
@@ -1205,22 +1201,26 @@ const UpdateIdea = () => {
                                     <Label className={"font-normal"}>Choose Topics for this Idea (optional)</Label>
                                     <Select onValueChange={handleChangeTopic} value={selectedIdea.topic.map(x => x.id)}>
                                         <SelectTrigger className="bg-card">
-                                            <SelectValue className={"text-muted-foreground text-sm"} placeholder="Assign to">
+                                            <SelectValue className={"text-muted-foreground text-sm"}>
                                                 <div className={"flex gap-[2px]"}>
-                                                    {/*{(selectedIdea.topic || []).slice(0, 2).map((x, index) => {*/}
-                                                    {(selectedIdea.topic || []).map((x, index) => {
-                                                        const findObj = (topicLists || []).find((y) => y.id === x?.id);
-                                                        return (
-                                                            <div key={index}
-                                                                 className={`text-xs flex gap-[2px] ${theme === "dark" ? "text-card" : ""} bg-slate-300 items-center rounded py-0 px-2`}>
+                                                    {
+                                                        (selectedIdea.topic || []).length === 0 ? (
+                                                            <span className={"text-muted-foreground"}>Select topic</span>
+                                                        ) : (
+                                                            (selectedIdea.topic || []).map((x, index) => {
+                                                                const findObj = (topicLists || []).find((y) => y.id === x?.id);
+                                                                return (
+                                                                    <div key={index}
+                                                                         className={`text-xs flex gap-[2px] ${theme === "dark" ? "text-card" : ""} bg-slate-300 items-center rounded py-0 px-2`}>
                                                                 <span className={"max-w-[85px] truncate text-ellipsis overflow-hidden whitespace-nowrap"}>
                                                                     {findObj?.title}
                                                                 </span>
-                                                            </div>
-                                                        );
-                                                    })}
+                                                                    </div>
+                                                                );
+                                                            })
+                                                        )
+                                                    }
                                                     {(selectedIdea.topic || []).length > 2}
-                                                    {/*{(selectedIdea.topic || []).length > 2 && (<div className="text-xs flex items-center">...</div>)}*/}
                                                 </div>
                                             </SelectValue>
                                         </SelectTrigger>
@@ -1287,7 +1287,7 @@ const UpdateIdea = () => {
                                                                                             <div
                                                                                                 className={"relative"}>
                                                                                                 <div
-                                                                                                    className={"update-idea text-sm rounded-full border text-center"}>
+                                                                                                    className={"update-idea text-sm rounded-full text-center"}>
                                                                                                     <UserAvatar
                                                                                                         userPhoto={x.user_photo}
                                                                                                         userName={x?.name ? x?.name : x?.user_name}
@@ -1298,7 +1298,7 @@ const UpdateIdea = () => {
                                                                                             {
                                                                                                 (selectedIdea?.vote_list.length > 1) &&
                                                                                                 <div
-                                                                                                    className={"update-idea text-sm rounded-full border text-center ml-[-5px]"}>
+                                                                                                    className={"update-idea text-sm rounded-full text-center ml-[-5px]"}>
                                                                                                     <Avatar><AvatarFallback>+{selectedIdea?.vote_list.length - 1}</AvatarFallback></Avatar>
                                                                                                 </div>
                                                                                             }
@@ -1320,7 +1320,7 @@ const UpdateIdea = () => {
                                                                                         return (
                                                                                             <div className={"flex gap-2"} key={i}>
                                                                                                 <div
-                                                                                                    className={"update-idea text-sm rounded-full border text-center"}>
+                                                                                                    className={"update-idea text-sm rounded-full text-center"}>
                                                                                                     <UserAvatar
                                                                                                         userPhoto={x.user_photo}
                                                                                                         userName={x?.name ? x?.name : x?.user_name}
@@ -1607,7 +1607,7 @@ const UpdateIdea = () => {
                                                                                                         alt=""/>
                                                                                                     <CircleX
                                                                                                         size={20}
-                                                                                                        className={`light:text-muted-foreground dark:text-card cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
+                                                                                                        className={`stroke-gray-500 dark:stroke-white cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
                                                                                                         onClick={() => onDeleteImageComment(i, false)}
                                                                                                     />
                                                                                                 </div> : x ?
@@ -1619,7 +1619,7 @@ const UpdateIdea = () => {
                                                                                                         alt={x}/>
                                                                                                     <CircleX
                                                                                                         size={20}
-                                                                                                        className={`light:text-muted-foreground dark:text-card cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
+                                                                                                        className={`stroke-gray-500 dark:stroke-white cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
                                                                                                         onClick={() => onDeleteImageComment(i, false)}
                                                                                                     />
                                                                                                 </div> : ''
@@ -1693,7 +1693,7 @@ const UpdateIdea = () => {
                                                                 <Fragment>
                                                                     <div className={"flex gap-2 p-4 lg:px-8 border-b last:border-b-0"}>
                                                                         <div>
-                                                                            <div className={"update-idea text-sm rounded-full border text-center"}>
+                                                                            <div className={"update-idea text-sm rounded-full text-center"}>
                                                                                 <UserAvatar
                                                                                     userPhoto={x?.user_photo}
                                                                                     userName={x?.name ? x?.name : x?.user_name}
@@ -1803,7 +1803,7 @@ const UpdateIdea = () => {
                                                                                                             className={"flex gap-2"}>
                                                                                                             <div>
                                                                                                                 <div
-                                                                                                                    className={"update-idea text-sm rounded-full border text-center"}>
+                                                                                                                    className={"update-idea text-sm rounded-full text-center"}>
                                                                                                                     <UserAvatar userPhoto={y.user_photo} userName={y?.name ? y?.name : y?.user_name}/>
                                                                                                                 </div>
                                                                                                             </div>
@@ -1900,7 +1900,7 @@ const UpdateIdea = () => {
                                                                                                                                         src={z && z.name ? URL.createObjectURL(z) : z}/>
                                                                                                                                     <CircleX
                                                                                                                                         size={20}
-                                                                                                                                        className={`light:text-muted-foreground dark:text-card cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
+                                                                                                                                        className={`stroke-gray-500 dark:stroke-white cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
                                                                                                                                         onClick={() => onDeleteSubCommentImageOld(i, false)}
                                                                                                                                     />
                                                                                                                                 </div> : z ?
@@ -1912,7 +1912,7 @@ const UpdateIdea = () => {
                                                                                                                                         alt={z}/>
                                                                                                                                     <CircleX
                                                                                                                                         size={20}
-                                                                                                                                        className={`light:text-muted-foreground dark:text-card cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
+                                                                                                                                        className={`stroke-gray-500 dark:stroke-white cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
                                                                                                                                         onClick={() => onDeleteSubCommentImageOld(i, false)}
                                                                                                                                     />
                                                                                                                                 </div> : ''

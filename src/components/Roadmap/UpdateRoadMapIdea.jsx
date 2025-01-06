@@ -329,7 +329,6 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
         event.target.value = ""; // Clear input value to allow re-uploads
     };
 
-
     const onChangeStatus = async (name, value) => {
         setIsLoadingSidebar(name);
         setSelectedIdea({...selectedIdea, [name]: value})
@@ -502,7 +501,6 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
         }
     };
 
-
     const onUpdateComment = async () => {
         setIsSaveUpdateComment(true)
         let formData = new FormData();
@@ -594,6 +592,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
     }
 
     const deleteComment = async (id, indexs) => {
+        debugger
         const data = await apiSerVice.deleteComment({id: id})
         if (data.status === 200) {
             let cloneRoadmap = [...roadmapList.columns];
@@ -634,7 +633,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                     cloneComments[index]["reply"] = cloneSubComment;
                     cloneIdea = {...cloneIdea, comments: cloneComments};
                     cloneIdeas[ideaIndex] = cloneIdea;
-                    setSelectedIdea(cloneIdea)
+                    setSelectedIdea(cloneIdea);
                     cloneRoadmap[roadmapIndex] = {...cloneRoadmap[roadmapIndex], ideas: cloneIdeas, cards: cloneIdeas}
                 }
             }
@@ -977,7 +976,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                                                             <div
                                                                                                 className={"relative"}>
                                                                                                 <div
-                                                                                                    className={"update-idea text-sm rounded-full border text-center"}>
+                                                                                                    className={"update-idea text-sm rounded-full text-center"}>
                                                                                                     <UserAvatar
                                                                                                         userPhoto={x.user_photo}
                                                                                                         userName={x.name ? x.name : x?.user_name}
@@ -1010,7 +1009,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                                                         return (
                                                                                             <div className={"flex gap-2"} key={i}>
                                                                                                 <div
-                                                                                                    className={"update-idea text-sm rounded-full border text-center"}>
+                                                                                                    className={"update-idea text-sm rounded-full text-center"}>
                                                                                                     <UserAvatar
                                                                                                         userPhoto={x.user_photo}
                                                                                                         userName={x.name ? x.name : x?.user_name}
@@ -1417,7 +1416,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                                                                                     className={"flex gap-2"}>
                                                                                                                     <div>
                                                                                                                         <div
-                                                                                                                            className={"update-idea text-sm rounded-full border text-center"}>
+                                                                                                                            className={"update-idea text-sm rounded-full text-center"}>
                                                                                                                             <UserAvatar userName={selectedIdea?.name ? selectedIdea?.name : selectedIdea?.user_name}/>
                                                                                                                         </div>
                                                                                                                     </div>
@@ -1501,7 +1500,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                                                                                                                 src={z && z.name ? URL.createObjectURL(z) : z}/>
                                                                                                                                             <CircleX
                                                                                                                                                 size={20}
-                                                                                                                                                className={`light:text-muted-foreground dark:text-card cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
+                                                                                                                                                className={`stroke-gray-500 dark:stroke-white cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
                                                                                                                                                 onClick={() => onDeleteSubCommentImageOld(i, false)}
                                                                                                                                             />
                                                                                                                                         </div> : z ?
@@ -1513,7 +1512,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                                                                                                                 alt={z}/>
                                                                                                                                             <CircleX
                                                                                                                                                 size={20}
-                                                                                                                                                className={`light:text-muted-foreground dark:text-card cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
+                                                                                                                                                className={`stroke-gray-500 dark:stroke-white cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
                                                                                                                                                 onClick={() => onDeleteSubCommentImageOld(i, false)}
                                                                                                                                             />
                                                                                                                                         </div> : ''

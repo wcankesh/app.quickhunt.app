@@ -85,24 +85,24 @@ const GeneralSettings = () => {
             ...generalSettingData,
             [name]: value
         });
-        setFormError({
-            ...formError,
-            [name]: formValidate(name, value)
-        });
+        // setFormError({
+        //     ...formError,
+        //     [name]: formValidate(name, value)
+        // });
     };
 
     const onUpdatePortal = async () => {
-        let validationErrors = {};
-        Object.keys(generalSettingData).forEach(name => {
-            const error = formValidate(name, generalSettingData[name]);
-            if (error && error.length > 0) {
-                validationErrors[name] = error;
-            }
-        });
-        if (Object.keys(validationErrors).length > 0) {
-            setFormError(validationErrors);
-            return;
-        }
+        // let validationErrors = {};
+        // Object.keys(generalSettingData).forEach(name => {
+        //     const error = formValidate(name, generalSettingData[name]);
+        //     if (error && error.length > 0) {
+        //         validationErrors[name] = error;
+        //     }
+        // });
+        // if (Object.keys(validationErrors).length > 0) {
+        //     setFormError(validationErrors);
+        //     return;
+        // }
         setIsSave(true)
         const payload = {
             ...generalSettingData,
@@ -226,18 +226,23 @@ const GeneralSettings = () => {
                     label: "Show Branding",
                     name: "is_branding",
                 },
+            ],
+        },
+        {
+            title: "Organization",
+            input: [
                 {
                     field: "switch",
-                    label: "Make Organization Private",
+                    label: "Enable the option and set a password to make your organization private.",
                     name: "private_mode",
                 },
-              {
+                {
                     field: "password",
                     label: "Password",
                     name: "password",
                 },
-            ],
-        },
+            ]
+        }
     ];
 
     return (
@@ -267,12 +272,15 @@ const GeneralSettings = () => {
                                         (generalSettingData?.[x.nameSwitch] === undefined || generalSettingData?.[x.nameSwitch] === 1) ?
                                             <Fragment>
                                                 <div className={"space-y-3"}>
-                                                    <div className={`${(x.title === "Header Color" || x.title === "Global Color" || x.title === "Branding") ? "grid grid-cols-2 gap-4" : "space-y-3 w-full md:w-1/2"}`}>
+                                                    <div className={`${
+                                                        x.title === "Header Color" || x.title === "Global Color"
+                                                            ? "grid grid-cols-2 gap-4"
+                                                            : x.title === "Organization"
+                                                            ? "flex gap-4 w-full"
+                                                            : "space-y-3 w-full md:w-1/2"
+                                                    }`}>
                                                         {
                                                             x.input.map((y, inputIndex) => {
-                                                                if (y.field === 'password' && generalSettingData?.private_mode !== 1) {
-                                                                    return null;
-                                                                }
                                                                 return (
                                                                     <Fragment>
                                                                         {
@@ -336,12 +344,13 @@ const GeneralSettings = () => {
                                                                                                     <p className="text-sm text-muted-foreground font-normal">{y.label}</p>
                                                                                                 </div>
                                                                                                     {y.name === "private_mode" && generalSettingData?.private_mode === 1 && (
-                                                                                                        <div>
+                                                                                                        <div className={"w-3/4"}>
                                                                                                             <Label className="text-sm font-normal">Password</Label>
                                                                                                             <div className={"relative"}>
                                                                                                             <Input
                                                                                                                 type={showPassword ? "text" : "password"}
                                                                                                                 value={generalSettingData?.password || ""}
+                                                                                                                placeholder="Enter your password"
                                                                                                                 onChange={(e) => onChange("password", e.target.value)}
                                                                                                             />
                                                                                                             <Button
@@ -351,10 +360,10 @@ const GeneralSettings = () => {
                                                                                                             >
                                                                                                                 {generalSettingData?.password ? <Eye size={16} stroke={`${theme === "dark" ? "white" : "black"}`}/> : <EyeOff size={16} stroke={`${theme === "dark" ? "white" : "black"}`}/>}
                                                                                                             </Button>
-                                                                                                                {
-                                                                                                                    formError.password &&
-                                                                                                                    <span className="text-destructive text-sm">{formError.password}</span>
-                                                                                                                }
+                                                                                                                {/*{*/}
+                                                                                                                {/*    formError.password &&*/}
+                                                                                                                {/*    <span className="text-destructive text-sm">{formError.password}</span>*/}
+                                                                                                                {/*}*/}
                                                                                                             </div>
                                                                                                         </div>
                                                                                                     )}

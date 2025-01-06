@@ -373,7 +373,7 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
                                     <Fragment>
                                         <div className="w-full flex flex-col gap-2">
                                             <Label htmlFor="title" className={"font-normal"}>{x.title}</Label>
-                                            <Input type="text" id={x.name} className={"h-9"} name={x.name}
+                                            <Input type="text" id={x.name} className={"h-9"} name={x.name} placeholder={`${x.name === "post_title" ? "Enter your title..." : "Enter your slug url..."}`}
                                                    value={changeLogDetails[x.name]} onChange={onChangeText}/>
                                             {
                                                 (x.name === "post_slug_url") &&

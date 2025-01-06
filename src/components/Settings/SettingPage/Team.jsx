@@ -8,7 +8,7 @@ import {Avatar, AvatarFallback, AvatarImage} from "../../ui/avatar";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "../../ui/table";
 import {Ellipsis, Loader2, Trash2, X} from "lucide-react";
 import {useTheme} from "../../theme-provider";
-import {Sheet,SheetContent, SheetHeader, SheetOverlay, SheetTitle} from "../../ui/sheet";
+import {Sheet,SheetContent, SheetHeader, SheetTitle} from "../../ui/sheet";
 import {ApiService} from "../../../utils/ApiService";
 import {useSelector} from "react-redux";
 import {Badge} from "../../ui/badge";

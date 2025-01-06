@@ -95,9 +95,9 @@ const UserActionsList = ({ userActions, sourceTitle, isLoading, selectedTab, isE
                                         <div className={"w-full flex flex-wrap justify-between gap-2"}>
                                         <div className={"flex gap-3"}>
                                             <div className={"space-y-3"}>
-                                                <div className={"flex flex-wrap gap-4"}>
-                                                    <h2 className={"font-medium"}>{action?.customer_first_name} {action?.customer_last_name}</h2>
-                                                    <p className={"font-normal flex gap-2 items-center"}><MessageCircleMore size={15} /><span className={"text-muted-foreground"}>{source.title}</span></p>
+                                                <div className={`${action?.is_read === 0 ? "font-medium" : "font-normal"} flex flex-wrap gap-4`}>
+                                                    <h2>{action?.customer_first_name} {action?.customer_last_name}</h2>
+                                                    <p className={`flex gap-2 items-center`}><MessageCircleMore size={15} /><span className={`text-muted-foreground`}>{source.title}</span></p>
                                                 </div>
                                                 <div>
                                                     {source.value === "post_reactions" ? (
@@ -275,7 +275,7 @@ const Inbox = () => {
                         </Tabs>
                     </CardContent>
                     {
-                        (selectedTab !== 1 && userActions?.length > 0) ?
+                        (!isLoading && selectedTab !== 1 && userActions?.length > 0) ?
                             <Pagination
                                 pageNo={pageNo}
                                 totalPages={totalPages}

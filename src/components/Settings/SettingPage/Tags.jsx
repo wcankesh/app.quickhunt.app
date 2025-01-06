@@ -282,7 +282,7 @@ const Tags = () => {
                                                                                     </div> : ""
                                                                             }
                                                                         </TableCell>
-                                                                        <TableCell/>
+                                                                        <TableCell className={"px-[12px] py-[10px]"}/>
                                                                         <TableCell className={`px-2 py-[10px] md:px-3 font-normal align-top text-xs ${theme === "dark" ? "" : "text-muted-foreground"}`}>
                                                                             <div className={"flex gap-2 items-center"}>
                                                                                 <Fragment>

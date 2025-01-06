@@ -249,7 +249,7 @@ const BannerAnalyticsView = () => {
                                         {
                                             ["Name", "Reaction", "Collected Email", "When they replied"].map((x, i) => {
                                                 return (
-                                                    <TableHead className={`px-2 py-[10px] md:px-3 font-medium text-card-foreground`} key={i}>
+                                                    <TableHead className={`px-2 py-[10px] md:px-3 font-medium text-card-foreground ${i >= 1 ? "text-center" : ""}`} key={i}>
                                                         {x}
                                                     </TableHead>
                                                 );
@@ -290,9 +290,13 @@ const BannerAnalyticsView = () => {
                                                                             <p className={"font-normal"}>{x?.name? x?.name : x.email}</p>
                                                                         </>
                                                                     </TableCell>
-                                                                    <TableCell className={`px-2 py-[10px] md:px-3 font-normal`}>{x.emoji_url ? <img key={i} className={"h-6 w-6 cursor-pointer"} src={x.emoji_url}/> : "-"}</TableCell>
-                                                                    <TableCell className={`px-2 py-[10px] md:px-3 font-normal`}>{x.submit_mail || "-"}</TableCell>
-                                                                    <TableCell className={`px-2 py-[10px] md:px-3 font-normal`}>{moment(x.created_at).format("ll")}</TableCell>
+                                                                    <TableCell className={`px-2 py-[10px] md:px-3 font-normal`}>
+                                                                        <div className={"flex justify-center items-center"}>
+                                                                            {x.emoji_url ? <img key={i} className={"h-6 w-6 cursor-pointer"} src={x.emoji_url}/> : "-"}
+                                                                        </div>
+                                                                    </TableCell>
+                                                                    <TableCell className={`px-2 py-[10px] md:px-3 font-normal text-center`}>{x.submit_mail || "-"}</TableCell>
+                                                                    <TableCell className={`px-2 py-[10px] md:px-3 font-normal text-center`}>{moment(x.created_at).format("ll")}</TableCell>
                                                                 </TableRow>
                                                             )
                                                         })

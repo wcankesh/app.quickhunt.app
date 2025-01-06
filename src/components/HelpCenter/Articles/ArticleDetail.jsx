@@ -63,15 +63,17 @@ const ArticleDetail = () => {
     const [articlesDetails, setArticlesDetails] = useState(initialState);
     const [formError, setFormError] = useState(initialStateError);
     const [articleList, setArticleList] = useState([]);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [load, setLoad] = useState('');
     const [isLoading, setIsLoading] = useState(true);
+    const [isLoadBreadCrumb, setIsLoadBreadCrumb] = useState(true);
 
     useEffect(() => {
         if(id !== "new" && projectDetailsReducer.id){
             getSingleArticle();
         }
             getAllCategory();
-    }, [projectDetailsReducer.id])
+    }, [id, projectDetailsReducer.id])
 
     const getAllCategory = async () => {
         // setIsLoading(true);
@@ -85,7 +87,6 @@ const ArticleDetail = () => {
     };
 
     const getSingleArticle = async () => {
-        // setIsLoading(true);
         const data = await apiService.getSingleArticle(id);
         if (data.status === 200) {
             setArticlesDetails({
@@ -99,6 +100,7 @@ const ArticleDetail = () => {
             });
         }
         setIsLoading(false)
+        setIsLoadBreadCrumb(false)
     };
 
     const handleOnChange = (name, value) => {
@@ -138,7 +140,7 @@ const ArticleDetail = () => {
     const selectedCategory = articleList?.find((category) => category.id === Number(articlesDetails?.category_id));
     const subcategories = selectedCategory ? selectedCategory?.sub_categories : [];
 
-    const createArticle = async () => {
+    const createArticle = async (loader) => {
         let validationErrors = {};
         Object.keys(articlesDetails).forEach(name => {
             const error = formValidate(name, articlesDetails[name]);
@@ -150,7 +152,7 @@ const ArticleDetail = () => {
             setFormError(validationErrors);
             return;
         }
-        setLoading(true);
+        setLoad(loader);
         const selectedCategory = articleList.find(item => item.id === articlesDetails.category_id);
         let selectedSubCategory = null;
         if (selectedCategory && selectedCategory.sub_categories.length > 0) {
@@ -173,11 +175,11 @@ const ArticleDetail = () => {
         } else {
             toast({description: data.message, variant: "destructive",})
         }
-        setLoading(false)
+        setLoad('');
     };
 
-    const updateArticle = async () => {
-        setLoading(true);
+    const updateArticle = async (loader) => {
+        setLoad(loader);
         const selectedCategory = articleList.find(item => item.id === Number(articlesDetails.category_id));
         let selectedSubCategory = null;
         if (selectedCategory && selectedCategory.sub_categories.length > 0) {
@@ -198,7 +200,7 @@ const ArticleDetail = () => {
         } else {
             toast({description: data.message, variant: "destructive",});
         }
-        setLoading(false)
+        setLoad('');
     }
 
     const handleSave = React.useCallback(async () => {
@@ -244,8 +246,8 @@ const ArticleDetail = () => {
                 }
             };
         }
-    }, [isLoading]);
-    // }, [isLoading, articlesDetails.description]);
+    // }, [isLoading]);
+    }, [isLoading, articlesDetails.description]);
 
     const editorConstants = {
         embed: Embed,
@@ -380,7 +382,7 @@ const ArticleDetail = () => {
             <div className={"p-4 md:py-6 md:px-4 border-b flex items-center justify-between flex-wrap gap-2"}>
                 <CommonBreadCrumb
                     links={links}
-                    currentPage={(isLoading || loading) && id !== "new" ? null : articlesDetails?.title}
+                    currentPage={(isLoading || isLoadBreadCrumb) && id !== "new" ? null : articlesDetails?.title}
                     truncateLimit={30}
                 />
                 <div className={"flex gap-4 items-center"}>
@@ -402,20 +404,21 @@ const ArticleDetail = () => {
                         </SelectContent>
                     </Select>
                     <Button variant={"ghost hover:bg-none"} className={"px-3 py-[6px] border font-normal h-auto"}><Play size={16} className={"mr-3"} /> Preview</Button>
-                    <Button className={"w-[81px] py-[7px] font-medium h-8 hover:bg-primary"} onClick={articlesDetails.id ? updateArticle : createArticle}>
-                        {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : (articlesDetails.id ? "Update" : "Create")}
+                    <Button className={"w-[81px] py-[7px] font-medium h-8 hover:bg-primary"} onClick={() => articlesDetails.id ? updateArticle('update') : createArticle('create')}>
+                        {load ? <Loader2 className="h-4 w-4 animate-spin" /> : (articlesDetails.id ? "Update" : "Create")}
                     </Button>
                 </div>
             </div>
-            <div className={"flex h-[calc(100%_-_83px)] overflow-y-auto"}>
+            <div className={"flex flex-col md:flex-row h-[calc(100%_-_83px)] overflow-y-auto"}>
                 <div className={"max-w-[407px] w-full border-r h-full overflow-y-auto"}>
                     {renderSidebarItems()}
                 </div>
-                <div className={"hidden md:block bg-muted w-full h-full px-16 flex flex-col gap-4 py-8 justify-start overflow-y-auto h-[calc(100%_-_94px)]"}>
+                {/*<div className={"hidden md:block bg-muted w-full h-full px-16 flex flex-col gap-4 py-8 justify-start overflow-y-auto h-[calc(100%_-_94px)]"}>*/}
+                <div className={"bg-muted w-full h-full p-4 md:px-16 md:py-8 flex flex-col md:gap-4 justify-start overflow-y-auto h-[calc(100vh_-_402px)] md:h-[calc(100vh_-_140px)]"}>
                     {
                         (isLoading && id !== "new") ? <div className={"flex flex-col gap-4"}>
                             {
-                                Array.from(Array(28)).map((_, r) => {
+                                Array.from(Array(25)).map((_, r) => {
                                     return (
                                         <div key={r}>
                                             <Skeleton className="h-[10px] rounded-full bg-muted-foreground/20"/>
@@ -424,8 +427,8 @@ const ArticleDetail = () => {
                                 })
                             }
                         </div> : <Card className={`rounded-[10px] p-0 h-full overflow-auto`} >
-                            <CardHeader className={"pt-0"}>
-                                <div className={"pl-14 pt-6 m-0 w-full"}><div id="editorjs"/></div>
+                            <CardHeader className={"p-3 md:pt-0"}>
+                                <div className={"md:pl-14 md:pt-6 m-0 w-full"}><div id="editorjs"/></div>
                             </CardHeader>
                         </Card>
                     }
