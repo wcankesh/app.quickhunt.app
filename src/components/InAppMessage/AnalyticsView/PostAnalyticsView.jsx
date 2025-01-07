@@ -1,7 +1,7 @@
 import React, {Fragment, useEffect, useState} from 'react';
 import {Card, CardContent, CardHeader} from "../../ui/card";
 import {Skeleton} from "../../ui/skeleton";
-import {Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogPortal, DialogTrigger, DialogClose, DialogOverlay} from "../../ui/dialog";
+import {Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose} from "../../ui/dialog";
 import {ApiService} from "../../../utils/ApiService";
 import {useSelector} from "react-redux";
 import moment from "moment";
@@ -15,20 +15,12 @@ import EmptyData from "../../Comman/EmptyData";
 import CommonBreadCrumb from "../../Comman/CommonBreadCrumb";
 import {chartLoading} from "../../Comman/CommSkel";
 import {Button} from "../../ui/button";
-import {Label} from "../../ui/label";
-import {Input} from "../../ui/input";
 import {Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious} from "../../ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
 
 const chartConfig = {
-    view: {
-        label: "View",
-        color: "#7c3bed80",
-    },
-    response: {
-        label: "Response",
-        color: "#7c3aed",
-    },
+    view: {label: "View", color: "#7c3bed80",},
+    response: {label: "Response", color: "#7c3aed",},
 }
 
 const PostAnalyticsView = () => {
@@ -57,17 +49,17 @@ const PostAnalyticsView = () => {
                 ...data.data,
             }
             const combinedData = {};
-            data.analytics.charts.forEach(({ x, y }) => {
+            data.analytics?.charts.forEach(({ x, y }) => {
                 if (!combinedData[x]) {
-                    combinedData[x] = { view: 0, response: 0, x }; // Initialize object
+                    combinedData[x] = { view: 0, response: 0, x };
                 }
-                combinedData[x].view = parseFloat(y); // Add 'view' from charts
+                combinedData[x].view = parseFloat(y);
             });
-            data.analytics.response_charts.forEach(({ x, y }) => {
+            data.analytics?.response_charts.forEach(({ x, y }) => {
                 if (!combinedData[x]) {
-                    combinedData[x] = { view: 0, response: 0, x }; // Initialize object
+                    combinedData[x] = { view: 0, response: 0, x };
                 }
-                combinedData[x].response = parseFloat(y); // Add 'response' from response_charts
+                combinedData[x].response = parseFloat(y);
             });
             const result = Object.values(combinedData).sort((a, b) => new Date(a.x) - new Date(b.x))
             setAnalytics({chart:result, analytics: data.analytics.analytics, open_count: data.analytics.open_count, response_count: data.analytics.response_count, responses: data.analytics.responses, response_percentage: data.analytics.response_percentage})
@@ -345,7 +337,7 @@ const PostAnalyticsView = () => {
                                                                                                             {x.files.map((src, index) => (
                                                                                                                 <CarouselItem key={index} className={"max-w-[706px] w-full shrink-0 grow pl-4"}>
                                                                                                                     <div className={"h-[500px] flex items-center justify-center overflow-hidden"}>
-                                                                                                                    <img onClick={(img) => handleImageClick(img)} className={"w-full h-full object-contain cursor-pointer"} src={src} alt={`Carousel image ${index + 1}`} />
+                                                                                                                    <img onClick={() => handleImageClick(src)} className={"w-full h-full object-contain cursor-pointer"} src={src} alt={`Carousel image ${index + 1}`} />
                                                                                                                     </div>
                                                                                                                 </CarouselItem>
                                                                                                             ))}

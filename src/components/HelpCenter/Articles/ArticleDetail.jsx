@@ -414,7 +414,7 @@ const ArticleDetail = () => {
                     {renderSidebarItems()}
                 </div>
                 {/*<div className={"hidden md:block bg-muted w-full h-full px-16 flex flex-col gap-4 py-8 justify-start overflow-y-auto h-[calc(100%_-_94px)]"}>*/}
-                <div className={"bg-muted w-full h-full p-4 md:px-16 md:py-8 flex flex-col md:gap-4 justify-start overflow-y-auto h-[calc(100vh_-_402px)] md:h-[calc(100vh_-_140px)]"}>
+                <div className={"bg-muted w-full p-4 md:px-16 md:py-8 flex flex-col md:gap-4 justify-start overflow-y-auto h-[calc(100vh_-_402px)] md:h-[calc(100vh_-_140px)]"}>
                     {
                         (isLoading && id !== "new") ? <div className={"flex flex-col gap-4"}>
                             {

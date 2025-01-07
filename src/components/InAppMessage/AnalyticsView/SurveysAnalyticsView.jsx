@@ -16,26 +16,12 @@ import {chartLoading} from "../../Comman/CommSkel";
 import {cleanQuillHtml} from "../../../utils/constent";
 import ReadMoreText from "../../Comman/ReadMoreText";
 
-const chartConfig = {
-    y: {
-        label: "View",
-        color: "#7c3aed",
-    },
-}
+const chartConfig = {y: {label: "View", color: "#7c3aed"}}
 
 const chartConfigNPS ={
-    detractor: {
-        label: "Detractor",
-        color: "#e87e6d",
-    },
-    passives: {
-        label: "Passives",
-        color: "#f0ca00",
-    },
-    promoter: {
-        label: "Promoter",
-        color: "#55c99b",
-    },
+    detractor: {label: "Detractor", color: "#e87e6d",},
+    passives: {label: "Passives", color: "#f0ca00",},
+    promoter: {label: "Promoter", color: "#55c99b",},
 }
 
 const SurveysAnalyticsView = () => {
@@ -100,24 +86,7 @@ const SurveysAnalyticsView = () => {
         },
     ]
 
-    const reportAnalysis = [
-        {
-            title: "Sent",
-            // count: views && views[0] && views[0].totalView ? views[0].totalView : 0,
-        },
-        {
-            title: "Number of responses",
-            // count: views && views[0] && views[0].uniqueView ? views[0].uniqueView : 0,
-        },
-        {
-            title: "NPS Score",
-            // count: views && views[0] && views[0].uniqueView ? views[0].uniqueView : 0,
-        },
-    ]
-
-    const links = [
-        { label: 'In App Message', path: `/app-message` }
-    ];
+    const links = [{ label: 'In App Message', path: `/app-message` }];
 
     return (
         <Fragment>
@@ -583,7 +552,6 @@ const SurveysAnalyticsView = () => {
                                                                                             </>
                                                                                         </TableCell>
                                                                                         <TableCell className={`px-2 py-[10px] md:px-3 font-normal max-w-[270px]`}>
-                                                                                            {/*{x?.response}*/}
                                                                                             {
                                                                                                 cleanQuillHtml(x?.response) ? <ReadMoreText html={x.response} maxLength={300}/> : null
                                                                                             }

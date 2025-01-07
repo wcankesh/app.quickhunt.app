@@ -248,8 +248,9 @@ export function Dashboard() {
                     <div className={"flex flex-wrap gap-4 lg:gap-8 md:flex-nowrap"}>
                         <Card className={"lg:basis-2/3 basis-full min-w-[270px] shadow border flex flex-col"}>
                             <CardHeader className={"p-6 py-3 border-b"}>
-                                <CardTitle className={"text-base font-medium"}>Comments
-                                    ({isLoading ? 0 : chartList.feedbacks.length})</CardTitle>
+                                <CardTitle className={"text-base font-medium"}>
+                                    Top {isLoading ? 0 : chartList.feedbacks.length} Comments
+                                </CardTitle>
                             </CardHeader>
                             <div className={"max-h-[300px] overflow-y-auto flex-1"}>
                                 {
@@ -318,8 +319,8 @@ export function Dashboard() {
                         </Card>
                         <Card className={"lg:basis-1/3 basis-full min-w-[270px] shadow border flex flex-col"}>
                             <CardHeader className={"p-6 py-3 border-b"}>
-                                <CardTitle className={"text-base font-medium"}>Reaction
-                                    ({isLoading ? 0 : chartList.reactions.length})</CardTitle>
+                                <CardTitle className={"text-base font-medium"}>
+                                    Top {isLoading ? 0 : chartList.reactions.length} Reaction</CardTitle>
                             </CardHeader>
                             <div className={"max-h-[300px] overflow-y-auto flex-1"}>
                                 {

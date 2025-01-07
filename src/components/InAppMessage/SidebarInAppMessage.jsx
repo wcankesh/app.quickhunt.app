@@ -807,9 +807,6 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                                         />
                                     </PopoverContent>
                                 </Popover>
-                                {/*{*/}
-                                {/*    formError.end_at && <span className="text-red-500 text-sm">{formError.end_at}</span>*/}
-                                {/*}*/}
                             </div>
                             <div className={"flex flex-col w-full"}>
                                 <div className="custom-time-picker ">

@@ -13,17 +13,65 @@ import {Avatar, AvatarFallback} from "../../ui/avatar";
 import EmptyData from "../../Comman/EmptyData";
 import CommonBreadCrumb from "../../Comman/CommonBreadCrumb";
 import {chartLoading} from "../../Comman/CommSkel";
+import {UserAvatar} from "../../Comman/CommentEditor";
 
 const chartConfig = {
-    view: {
-        label: "View",
-        color: "#7c3bed80",
-    },
-    response: {
-        label: "Response",
-        color: "#7c3aed",
-    },
+    view: {label: "View", color: "#7c3bed80",},
+    response: {label: "Response", color: "#7c3aed",},
 }
+
+const CommonTable = ({ columns, data, isLoading, skeletonRows = 10, skeletonColumns = 4 }) => {
+    return (
+        <Table>
+            <TableHeader>
+                <TableRow>
+                    {columns.map((col, index) => (
+                        <TableHead
+                            key={index}
+                            className={`px-2 py-[10px] md:px-3 font-medium text-card-foreground ${col.align ? `text-${col.align}` : ""}`}
+                        >
+                            {col.label}
+                        </TableHead>
+                    ))}
+                </TableRow>
+            </TableHeader>
+            <TableBody>
+                {isLoading
+                    ? Array.from({ length: skeletonRows }).map((_, rowIndex) => (
+                        <TableRow key={rowIndex}>
+                            {Array.from({ length: skeletonColumns }).map((_, colIndex) => (
+                                <TableCell key={colIndex} className="px-2 py-[10px] md:px-3">
+                                    <Skeleton className="rounded-md w-full h-7" />
+                                </TableCell>
+                            ))}
+                        </TableRow>
+                    ))
+                    : data.length > 0
+                        ? data.map((row, rowIndex) => (
+                            <TableRow key={rowIndex}>
+                                {columns.map((col, colIndex) => (
+                                    <TableCell
+                                        key={colIndex}
+                                        className={`px-2 py-[10px] md:px-3 ${
+                                            col.align ? `text-${col.align}` : ""
+                                        }`}
+                                    >
+                                        {col.render ? col.render(row) : row[col.dataKey] || "-"}
+                                    </TableCell>
+                                ))}
+                            </TableRow>
+                        ))
+                        : (
+                            <TableRow>
+                                <TableCell colSpan={columns.length}>
+                                    <EmptyData />
+                                </TableCell>
+                            </TableRow>
+                        )}
+            </TableBody>
+        </Table>
+    );
+};
 
 const BannerAnalyticsView = () => {
     const {theme} = useTheme();
@@ -34,6 +82,29 @@ const BannerAnalyticsView = () => {
     const [inAppMsgSetting, setInAppMsgSetting] = useState({});
     const [analytics, setAnalytics] = useState({})
     const [isLoading, setIsLoading] = useState(false);
+
+    const openedColumns = [
+        { label: "Name", dataKey: "name", render: (row) => (
+                <div className="flex items-center gap-2">
+                    <UserAvatar className="w-[20px] h-[20px]" userName={row?.name ? row?.name?.substring(0, 1) : row?.email?.substring(0, 1)} />
+                    <p className="font-normal">{row.name || row.email}</p>
+                </div>
+            ) },
+        { label: "When it was opened", dataKey: "created_at", render: (row) => moment(row.created_at).format("ll") },
+    ];
+
+    const repliedColumns = [
+        { label: "Name", dataKey: "name", render: (row) => (
+                <div className="flex items-center gap-2">
+                    <UserAvatar className="w-[20px] h-[20px]" userName={row?.name ? row?.name?.substring(0, 1) : row?.email?.substring(0, 1)} />
+                    <p className="font-normal">{row.name || row.email}</p>
+                </div>
+            ) },
+        { label: "Reaction", dataKey: "emoji_url", align: "center", render: (row) =>
+                row.emoji_url ? <img className="h-6 w-6 cursor-pointer" src={row.emoji_url} alt="reaction" /> : "-" },
+        { label: "Collected Email", dataKey: "submit_mail", align: "center" },
+        { label: "When they replied", dataKey: "created_at", align: "center", render: (row) => moment(row.created_at).format("ll") },
+    ];
 
     useEffect(() => {
         if (id !== "new" && projectDetailsReducer.id) {
@@ -90,9 +161,7 @@ const BannerAnalyticsView = () => {
         },
     ]
 
-    const links = [
-        { label: 'In App Message', path: `/app-message` }
-    ];
+    const links = [{ label: 'In App Message', path: `/app-message` }];
 
     return (
         <Fragment>
@@ -179,136 +248,25 @@ const BannerAnalyticsView = () => {
                     <Card>
                         <CardHeader className={"p-4 border-b text-base font-medium"}>Customers who opened</CardHeader>
                         <CardContent className={"p-0 overflow-auto"}>
-                            <Table>
-                                <TableHeader className={`${theme === "dark" ? "" : "bg-muted"}`}>
-                                    <TableRow>
-                                        {
-                                            ["Name", "When it was opened"].map((x, i) => {
-                                                return (
-                                                    <TableHead className={`px-2 py-[10px] md:px-3 font-medium text-card-foreground`} key={i}>
-                                                        {x}
-                                                    </TableHead>
-                                                );
-                                            })
-                                        }
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {
-                                        isLoading ? (
-                                            [...Array(10)].map((x, index) => {
-                                                return (
-                                                    <TableRow key={index}>
-                                                        {
-                                                            [...Array(2)].map((_, i) => {
-                                                                return (
-                                                                    <TableCell key={i} className={"max-w-[373px] px-2 py-[10px] md:px-3"}>
-                                                                        <Skeleton className={"rounded-md w-full h-7"}/>
-                                                                    </TableCell>
-                                                                )
-                                                            })
-                                                        }
-                                                    </TableRow>
-                                                )
-                                            })) :
-                                            (analytics?.analytics || []).length >  0 ?
-                                                <Fragment>
-                                                    {
-                                                        (analytics?.analytics || []).map((x,i)=> {
-                                                            return (
-                                                                <TableRow key={x.id}>
-                                                                    <TableCell className={`flex items-center px-2 py-[10px] md:px-3 gap-2`}>
-                                                                        <>
-                                                                            <Avatar className={"w-[20px] h-[20px]"}>
-                                                                                <AvatarFallback>{x?.name? x?.name?.substring(0, 1) : x?.email?.substring(0, 1)}</AvatarFallback>
-                                                                            </Avatar>
-                                                                            <p className={"font-normal"}>{x?.name? x?.name : x.email}</p>
-                                                                        </>
-                                                                    </TableCell>
-                                                                    <TableCell className={`px-2 py-[10px] md:px-3 font-normal`}>{moment(x.created_at).format("ll")}</TableCell>
-                                                                </TableRow>
-                                                            )
-                                                        })
-                                                    }
-                                                </Fragment> : <TableRow>
-                                                    <TableCell colSpan={2}>
-                                                        <EmptyData/>
-                                                    </TableCell>
-                                                </TableRow>
-                                    }
-                                </TableBody>
-                            </Table>
+                            <CommonTable
+                                columns={openedColumns}
+                                data={analytics.analytics || []}
+                                isLoading={isLoading}
+                                skeletonRows={10}
+                                skeletonColumns={2}
+                            />
                         </CardContent>
                     </Card>
                     <Card>
                         <CardHeader className={"p-4 border-b text-base font-medium"}>Customers who replied</CardHeader>
                         <CardContent className={"p-0 overflow-auto"}>
-                            <Table>
-                                <TableHeader className={`${theme === "dark" ? "" : "bg-muted"}`}>
-                                    <TableRow>
-                                        {
-                                            ["Name", "Reaction", "Collected Email", "When they replied"].map((x, i) => {
-                                                return (
-                                                    <TableHead className={`px-2 py-[10px] md:px-3 font-medium text-card-foreground ${i >= 1 ? "text-center" : ""}`} key={i}>
-                                                        {x}
-                                                    </TableHead>
-                                                );
-                                            })
-                                        }
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {
-                                        isLoading ? (
-                                            [...Array(10)].map((x, index) => {
-                                                return (
-                                                    <TableRow key={index}>
-                                                        {
-                                                            [...Array(4)].map((_, i) => {
-                                                                return (
-                                                                    <TableCell key={i}
-                                                                               className={"max-w-[373px] px-2 py-[10px] md:px-3"}>
-                                                                        <Skeleton className={"rounded-md w-full h-7"}/>
-                                                                    </TableCell>
-                                                                )
-                                                            })
-                                                        }
-                                                    </TableRow>
-                                                )
-                                            })) :
-                                            (analytics?.responses || []).length >  0 ?
-                                                <Fragment>
-                                                    {
-                                                        (analytics?.responses || []).map((x,i)=> {
-                                                            return (
-                                                                <TableRow key={x.id}>
-                                                                    <TableCell className={`flex items-center px-2 py-[10px] md:px-3 gap-2`}>
-                                                                        <>
-                                                                            <Avatar className={"w-[20px] h-[20px]"}>
-                                                                                <AvatarFallback>{x?.name? x?.name?.substring(0, 1) : x?.email?.substring(0, 1)}</AvatarFallback>
-                                                                            </Avatar>
-                                                                            <p className={"font-normal"}>{x?.name? x?.name : x.email}</p>
-                                                                        </>
-                                                                    </TableCell>
-                                                                    <TableCell className={`px-2 py-[10px] md:px-3 font-normal`}>
-                                                                        <div className={"flex justify-center items-center"}>
-                                                                            {x.emoji_url ? <img key={i} className={"h-6 w-6 cursor-pointer"} src={x.emoji_url}/> : "-"}
-                                                                        </div>
-                                                                    </TableCell>
-                                                                    <TableCell className={`px-2 py-[10px] md:px-3 font-normal text-center`}>{x.submit_mail || "-"}</TableCell>
-                                                                    <TableCell className={`px-2 py-[10px] md:px-3 font-normal text-center`}>{moment(x.created_at).format("ll")}</TableCell>
-                                                                </TableRow>
-                                                            )
-                                                        })
-                                                    }
-                                                </Fragment> : <TableRow>
-                                                    <TableCell colSpan={4}>
-                                                        <EmptyData/>
-                                                    </TableCell>
-                                                </TableRow>
-                                    }
-                                </TableBody>
-                            </Table>
+                            <CommonTable
+                                columns={repliedColumns}
+                                data={analytics.responses || []}
+                                isLoading={isLoading}
+                                skeletonRows={10}
+                                skeletonColumns={4}
+                            />
                         </CardContent>
                     </Card>
                 </div>

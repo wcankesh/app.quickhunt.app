@@ -1,23 +1,6 @@
 import React, {Fragment, useEffect, useState} from 'react';
 import {Button} from "../ui/button";
-import {
-    ChevronUp,
-    Clock,
-    GalleryVerticalEnd,
-    Info,
-    Lightbulb,
-    Loader2,
-    Mail,
-    MapPin,
-    MessageSquare,
-    MessagesSquare,
-    Plus,
-    Settings,
-    Trash2,
-    Vote,
-    X,
-    Zap
-} from "lucide-react";
+import {Clock, GalleryVerticalEnd, Info, Lightbulb, Loader2, Mail, MapPin, MessageSquare, MessagesSquare, Plus, Settings, Trash2, Vote, X, Zap} from "lucide-react";
 import {Card, CardContent} from "../ui/card";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "../ui/table";
 import {useTheme} from "../theme-provider";
@@ -505,7 +488,6 @@ const Users = () => {
                                     <div className={"space-y-1"}>
                                         <div className={"flex items-center gap-4"}>
                                             <h1 className={"text-sm md:text-base"}>{selectedCustomer?.customer_name}</h1>
-                                            {/*<Badge>Admin/Member</Badge>*/}
                                         </div>
                                         {
                                             (selectedCustomer?.customer_country) ?

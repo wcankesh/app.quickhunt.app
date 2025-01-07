@@ -114,11 +114,21 @@ export const CommentEditor = ({isEditMode, comment, images = [], onUpdateComment
     );
 };
 
-export const UserAvatar = ({ userPhoto, userName, className }) => {
+export const UserAvatar = ({ userPhoto, userName, className, style, initialStyle, avatarFallbackInlineStyle }) => {
+    const initials = userName
+        ? userName
+            .split(" ")
+            .slice(0, 2)
+            .map(word => word[0]?.toUpperCase())
+            .join("")
+        : "";
     return (
-        <Avatar className={`w-[24px] h-[24px] ${className}`}>
-                <AvatarImage src={userPhoto} alt={userName && userName.substring(0, 1)} />
-                <AvatarFallback className={'border'}>{userName && userName.substring(0, 1).toUpperCase()}</AvatarFallback>
+        <Avatar className={`w-[24px] h-[24px] ${className} ${style}`}>
+            {userPhoto ? (
+                <AvatarImage src={userPhoto} alt={initials || "User"} />
+            ) : (
+                <AvatarFallback style={avatarFallbackInlineStyle} className={`${initialStyle} border`}>{initials || "U"}</AvatarFallback>
+            )}
         </Avatar>
     );
 };

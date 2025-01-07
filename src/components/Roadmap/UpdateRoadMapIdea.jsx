@@ -592,7 +592,6 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
     }
 
     const deleteComment = async (id, indexs) => {
-        debugger
         const data = await apiSerVice.deleteComment({id: id})
         if (data.status === 200) {
             let cloneRoadmap = [...roadmapList.columns];

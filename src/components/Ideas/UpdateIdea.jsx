@@ -1088,10 +1088,6 @@ const UpdateIdea = () => {
                             <Label htmlFor="picture" className={"font-normal capitalize"}>Featured image</Label>
                             <div className="w-[282px] h-[128px] flex gap-1">
                                 <ImageUploader
-                                    // selectedImage={selectedIdea}
-                                    // onChangeStatus={onChangeStatus}
-                                    // handleUpload={handleFeatureImgUpload}
-
                                     image={selectedIdea?.cover_image}
                                     onDelete={() => onChangeStatus('delete_cover_image', selectedIdea && selectedIdea?.cover_image && selectedIdea.cover_image?.name ? "" : [selectedIdea.cover_image.replace("https://code.quickhunt.app/public/storage/feature_idea/", "")])}
                                     onUpload={handleFeatureImgUpload}
@@ -1297,8 +1293,7 @@ const UpdateIdea = () => {
                                                                                             </div>
                                                                                             {
                                                                                                 (selectedIdea?.vote_list.length > 1) &&
-                                                                                                <div
-                                                                                                    className={"update-idea text-sm rounded-full text-center ml-[-5px]"}>
+                                                                                                <div className={"update-idea text-sm rounded-full text-center ml-[-5px]"}>
                                                                                                     <Avatar><AvatarFallback>+{selectedIdea?.vote_list.length - 1}</AvatarFallback></Avatar>
                                                                                                 </div>
                                                                                             }
@@ -1555,10 +1550,6 @@ const UpdateIdea = () => {
                                             <Label htmlFor="picture" className={"font-normal capitalize"}>Featured image</Label>
                                             <div className="w-[282px] h-[128px] flex gap-1">
                                                 <ImageUploader
-                                                    // selectedImage={selectedIdea}
-                                                    // onChangeStatus={onChangeStatus}
-                                                    // handleUpload={handleFeatureImgUpload}
-
                                                     image={selectedIdea?.cover_image}
                                                     onDelete={() => onChangeStatus('delete_cover_image', selectedIdea && selectedIdea?.cover_image && selectedIdea.cover_image?.name ? "" : [selectedIdea.cover_image.replace("https://code.quickhunt.app/public/storage/feature_idea/", "")])}
                                                     onUpload={handleFeatureImgUpload}

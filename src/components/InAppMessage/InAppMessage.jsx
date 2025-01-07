@@ -45,27 +45,10 @@ const status2 = [
 ];
 
 const contentType = [
-    {
-        label: "Post",
-        value: 1,
-        icon:<ScrollText size={16}/>,
-    },
-    {
-        label: "Banner",
-        value: 2,
-        icon:<ClipboardList size={16}/>,
-
-    },
-    {
-        label: "Survey",
-        value: 3,
-        icon:<BookCheck size={16}/>,
-    },
-    {
-        label: "Checklist",
-        value: 4,
-        icon:<SquareMousePointer size={16}/>,
-    }
+    {label: "Post", value: 1, icon:<ScrollText size={16}/>,},
+    {label: "Banner", value: 2, icon:<ClipboardList size={16}/>,},
+    {label: "Survey", value: 3, icon:<BookCheck size={16}/>,},
+    {label: "Checklist", value: 4, icon:<SquareMousePointer size={16}/>,}
 ];
 
 const typeNames = {
@@ -501,7 +484,8 @@ const InAppMessage = () => {
                                                                         </SelectContent>
                                                                     </Select>
                                                                 </TableCell>
-                                                                <TableCell className={`flex items-center px-2 py-[10px] md:px-3 gap-2 justify-center`}>
+                                                                <TableCell className={`px-2 py-[10px] md:px-3`}>
+                                                                    <div className={"flex items-center gap-2 justify-center"}>
                                                                     {sender ? (
                                                                         <>
                                                                             <Avatar className={"w-[20px] h-[20px]"}>
@@ -516,6 +500,7 @@ const InAppMessage = () => {
                                                                     ) : (
                                                                         <p className={"font-normal"}>-</p>
                                                                     )}
+                                                                    </div>
                                                                 </TableCell>
                                                                 <TableCell className={`px-2 py-[10px] md:px-3 font-normal`}>
                                                                     <div className={"flex items-center gap-1"}>{typeIcon[x.type]}{typeNames[x.type] || "-"}</div>
@@ -523,12 +508,13 @@ const InAppMessage = () => {
                                                                 <TableCell className={`px-2 py-[10px] md:px-3 font-normal`}>
                                                                     {x?.created_at ? moment.utc(x.created_at).local().startOf('seconds').fromNow() : "-"}
                                                                 </TableCell>
-                                                                <TableCell className={"px-2 py-[10px] md:px-3"}>
+                                                                <TableCell className={"px-2 py-[10px] md:px-3 text-center"}>
                                                                     <Button
                                                                         className={"py-[6px] px-3 h-auto text-xs font-medium hover:bg-primary"}
                                                                         onClick={() => getCodeCopy(x.uuid)}>Get code</Button>
                                                                 </TableCell>
-                                                                <TableCell className={`px-2 py-[10px] md:px-3 text-center flex justify-between`}>
+                                                                <TableCell className={`px-2 py-[10px] md:px-3 text-center`}>
+                                                                    <div className={"flex justify-between"}>
                                                                     <div className={"cursor-pointer"} onClick={() => navigate(`${baseUrl}/app-message/${x.type}/analytic/${x.id}`)}>
                                                                         <BarChart size={18}/>
                                                                     </div>
@@ -541,6 +527,7 @@ const InAppMessage = () => {
                                                                             <DropdownMenuItem className={"cursor-pointer"} onClick={()=>openDeletePost(x.id)}>Delete</DropdownMenuItem>
                                                                         </DropdownMenuContent>
                                                                     </DropdownMenu>
+                                                                    </div>
                                                                 </TableCell>
                                                             </TableRow>
                                                         )

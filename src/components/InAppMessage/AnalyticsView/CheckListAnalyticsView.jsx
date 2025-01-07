@@ -15,14 +15,8 @@ import CommonBreadCrumb from "../../Comman/CommonBreadCrumb";
 import {chartLoading} from "../../Comman/CommSkel";
 
 const chartConfig = {
-    view: {
-        label: "View",
-        color: "#7c3bed80",
-    },
-    response: {
-        label: "Response",
-        color: "#7c3aed",
-    },
+    view: {label: "View", color: "#7c3bed80",},
+    response: {label: "Response", color: "#7c3aed",},
 }
 
 const CheckListAnalyticsView = () => {
