@@ -8,7 +8,7 @@ import {useToast} from "../ui/use-toast";
 import {useDispatch, useSelector} from "react-redux";
 import moment from "moment";
 import {Skeleton} from "../ui/skeleton";
-import {Avatar, AvatarFallback, AvatarImage} from "../ui/avatar";
+import {Avatar, AvatarImage} from "../ui/avatar";
 import {Card, CardContent} from "../ui/card";
 import {Tooltip, TooltipTrigger, TooltipProvider, TooltipContent} from "../ui/tooltip";
 import Pagination from "../Comman/Pagination";
@@ -43,8 +43,8 @@ const UserActionsList = ({ userActions, sourceTitle, isLoading, selectedTab, isE
     //     return isEyeTabActive ? action?.is_read === 0 : action?.is_read === 1;
     // });
 
-    const hasUnreadActions = filteredActions.some(action => action?.is_read === 0);
-    onUnreadCheck(hasUnreadActions);
+    // const hasUnreadActions = filteredActions.some(action => action?.is_read === 0);
+    // onUnreadCheck(hasUnreadActions);
 
     if (isLoading || !filteredActions.length) {
         return (
@@ -84,7 +84,7 @@ const UserActionsList = ({ userActions, sourceTitle, isLoading, selectedTab, isE
                         {sourceTitle.map((source, i) => {
                             if (action.source === source.value) {
                                 return (
-                                    <div onClick={() => navigateAction(action?.id, action.source)} className={`px-2 py-[10px] md:px-3 flex gap-4 cursor-pointer ${action?.is_read === 0 ? "bg-muted/[0.6] hover:bg-card" : "bg-card"}`} key={i}>
+                                    <div onClick={() => navigateAction(action?.id, action.source)} className={`px-2 py-[10px] md:px-3 flex gap-4 cursor-pointer last:rounded-b-lg ${action?.is_read === 0 ? "bg-muted/[0.6] hover:bg-card" : "bg-card"}`} key={i}>
                                         <div>
                                             <UserAvatar
                                                 userPhoto={action?.user_photo}
@@ -95,7 +95,7 @@ const UserActionsList = ({ userActions, sourceTitle, isLoading, selectedTab, isE
                                         <div className={"w-full flex flex-wrap justify-between gap-2"}>
                                         <div className={"flex gap-3"}>
                                             <div className={"space-y-3"}>
-                                                <div className={`${action?.is_read === 0 ? "font-medium" : "font-normal"} flex flex-wrap gap-4`}>
+                                                <div className={`${action?.is_read === 0 ? "font-medium" : "font-normal"} flex flex-wrap gap-2 md:gap-4`}>
                                                     <h2>{action?.customer_first_name} {action?.customer_last_name}</h2>
                                                     <p className={`flex gap-2 items-center`}><MessageCircleMore size={15} /><span className={`text-muted-foreground`}>{source.title}</span></p>
                                                 </div>
@@ -151,6 +151,14 @@ const Inbox = () => {
         }
         // navigate(`${baseUrl}/notifications?pageNo=${pageNo}`)
     }, [projectDetailsReducer.id, pageNo, selectedTab, isEyeTabActive])
+
+    useEffect(() => {
+        const filteredActions = isEyeTabActive
+            ? userActions.filter(action => action?.is_read === 0)
+            : userActions;
+        const hasUnread = filteredActions.some(action => action?.is_read === 0);
+        setShowMarkAllRead(hasUnread);
+    }, [userActions, isEyeTabActive]);
 
     const getInboxNotification = async () => {
         setIsLoading(true);
@@ -217,10 +225,6 @@ const Inbox = () => {
         { label: "Idea upvote", value: 6, icon: <Vote size={18} className={"mr-2"} />,},
     ];
 
-    const handleUnreadCheck = (hasUnread) => {
-        setShowMarkAllRead(hasUnread);
-    };
-
     return (
         <Fragment>
             <div className={"container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-3 md:px-4"}>
@@ -251,7 +255,7 @@ const Inbox = () => {
                     <CardContent className={"p-0"}>
                         <Tabs defaultValue={1} onValueChange={onTabChange}>
                             <div className={"border-b flex bg-background"}>
-                                <TabsList className="w-full h-auto overflow-x-auto whitespace-nowrap justify-start">
+                                <TabsList className="w-full h-auto overflow-x-auto whitespace-nowrap justify-start last:rounded-t-lg">
                                     {(tabs || []).map((tab, i) => (
                                         <TabsTrigger
                                             key={i}
@@ -267,7 +271,7 @@ const Inbox = () => {
                                 (tabs || []).map((y, i) => (
                                     <TabsContent key={i} value={y.value} className={"mt-0"}>
                                         <div className={"grid grid-cols-1 overflow-auto whitespace-nowrap"}>
-                                            <UserActionsList projectDetailsReducer={projectDetailsReducer} setUserActions={setUserActions} onUnreadCheck={handleUnreadCheck} userActions={userActions} sourceTitle={sourceTitle} isLoading={isLoading} selectedTab={selectedTab} isEyeTabActive={isEyeTabActive}/>
+                                            <UserActionsList projectDetailsReducer={projectDetailsReducer} setUserActions={setUserActions} userActions={userActions} sourceTitle={sourceTitle} isLoading={isLoading} selectedTab={selectedTab} isEyeTabActive={isEyeTabActive}/>
                                         </div>
                                     </TabsContent>
                                 ))

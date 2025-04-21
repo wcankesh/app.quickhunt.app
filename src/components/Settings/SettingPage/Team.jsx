@@ -54,8 +54,8 @@ const Team = () => {
 
     const getMember = async () => {
         setIsLoading(true)
-        const data = await apiService.getMember({project_id: projectDetailsReducer.id})
-        if (data.status === 200) {
+        const data = await apiService.getMember(projectDetailsReducer.id)
+        if (data.success) {
             setMemberList(data.data);
             setIsAdmin(data.is_admin)
             setIsLoading(false);
@@ -66,8 +66,8 @@ const Team = () => {
 
     const getInvitations = async (loading) => {
         setIsLoading(loading);
-        const data = await apiService.getInvitation({project_id: projectDetailsReducer.id})
-        if (data.status === 200) {
+        const data = await apiService.getInvitation(projectDetailsReducer.id)
+        if (data.success) {
             setInvitationList(data.data)
             setIsLoading(false);
         } else {
@@ -76,19 +76,19 @@ const Team = () => {
     }
 
     const openSheet = () => {
-        let length = memberList?.length;
-        if(userDetailsReducer.plan === 0){
-            if(length < 1){
-                setSheetOpen(true)
-                onProModal(false)
-            }  else{
-                onProModal(true)
-            }
-        } else if(userDetailsReducer.plan === 1){
-            setSheetOpen(true)
-            onProModal(false)
-        }
-
+        // let length = memberList?.length;
+        // if(userDetailsReducer.plan === 0){
+        //     if(length < 1){
+        //         setSheetOpen(true)
+        //         onProModal(false)
+        //     }  else{
+        //         onProModal(true)
+        //     }
+        // } else if(userDetailsReducer.plan === 1){
+        //     setSheetOpen(true)
+        //     onProModal(false)
+        // }
+        setSheetOpen(true)
     };
 
     const closeSheet = () => {
@@ -127,12 +127,12 @@ const Team = () => {
         }
         setIsSave(true)
         const payload = {
-            project_id: projectDetailsReducer.id,
+            projectId: projectDetailsReducer.id,
             email: inviteTeamDetails.email,
             type: '1'
         }
         const data = await apiService.inviteUser(payload)
-        if (data.status === 200) {
+        if (data.success) {
             setInviteTeamDetails(initialState)
             setIsSave(false);
             toast({
@@ -143,7 +143,7 @@ const Team = () => {
         } else {
             setIsSave(false);
             toast({
-                description: data.message,
+                description: data?.error,
                 variant: "destructive"
             })
 
@@ -158,13 +158,13 @@ const Team = () => {
 
     const onResendUser = async (x) => {
         const payload = {
-            project_id: x.project_id,
+            projectId: x.projectId,
             email: x.member_email,
             type: '2',
             id: x.id
         }
         const data = await apiService.inviteUser(payload)
-        if (data.status === 200) {
+        if (data.success) {
             getInvitations(true)
             // const updatedExpirationDate = moment().add(7, 'days').toISOString();
             // const updatedCreatedAt = moment().toISOString();
@@ -207,13 +207,13 @@ const Team = () => {
     const onDelete = async () => {
         setIsLoadingDelete(true);
         const payload = {
-            project_id: deleteObj.project_id,
+            projectId: deleteObj.projectId,
             email: deleteObj.member_email,
             type: '3',
             id: deleteObj.id
         }
         const data = await apiService.inviteUser(payload)
-        if (data.status === 200) {
+        if (data.success) {
             const clone = [...invitationList];
             const index = clone.findIndex((y) => y.id === deleteObj.id)
             if (index !== -1) {
@@ -235,7 +235,7 @@ const Team = () => {
 
     const removeMember = async (id) => {
         const data = await apiService.removeMember({id: id})
-        if (data.status === 200) {
+        if (data.success) {
             const clone = [...memberList];
             const index = clone.findIndex((x) => x.id === id)
             if (index !== -1) {
@@ -249,7 +249,7 @@ const Team = () => {
         } else {
             toast({
                 variant: "destructive",
-                description: data.message,
+                description: data?.error.message,
             });
         }
     }
@@ -327,25 +327,25 @@ const Team = () => {
                                                 )
                                                 : memberList?.length > 0 ? <>
                                                     {
-                                                        (memberList || []).map((x) => {
+                                                        (memberList || []).map((x, i) => {
                                                             return (
-                                                                <TableRow key={x.id}>
+                                                                <TableRow key={i}>
                                                                     <TableCell className={"py-[10px] px-[12px]"}>
                                                                         <div className={"flex gap-2 items-center"}>
                                                                             <Avatar className={"w-[30px] h-[30px]"}>
                                                                                 {
-                                                                                    x.user_photo ?
-                                                                                        <AvatarImage src={x.user_photo}
-                                                                                                     alt={x && x?.user_first_name?.substring(0, 1)?.toUpperCase() && x?.user_last_name?.substring(0, 1)?.toUpperCase()}
+                                                                                    x?.user?.profileImage ?
+                                                                                        <AvatarImage src={x?.user?.profileImage}
+                                                                                                     alt={x && x?.user?.firstName?.substring(0, 1)?.toUpperCase() && x?.user?.lastName?.substring(0, 1)?.toUpperCase()}
                                                                                         />
                                                                                         :
                                                                                         <AvatarFallback
-                                                                                            className={"bg-primary/10 border-primary border text-sm text-primary font-medium"}>{x?.user_first_name?.substring(0, 1)?.toUpperCase()}{x?.user_last_name?.substring(0, 1)?.toUpperCase()}</AvatarFallback>
+                                                                                            className={"bg-primary/10 border-primary border text-sm text-primary font-medium"}>{x?.user?.firstName?.substring(0, 1)?.toUpperCase()}{x?.user?.lastName?.substring(0, 1)?.toUpperCase()}</AvatarFallback>
                                                                                 }
                                                                             </Avatar>
                                                                             <div>
-                                                                                <h3 className={"text-sm font-normal"}>{x.user_first_name} {x.user_last_name}</h3>
-                                                                                <p className={"text-xs font-normal text-muted-foreground"}>{x.user_email_id}</p>
+                                                                                <h3 className={"text-sm font-normal"}>{x?.user?.firstName} {x?.user?.lastName}</h3>
+                                                                                <p className={"text-xs font-normal text-muted-foreground"}>{x?.user?.email}</p>
                                                                             </div>
                                                                         </div>
                                                                     </TableCell>
@@ -420,12 +420,12 @@ const Team = () => {
                                         : invitationList?.length > 0 ? <>
                                                 {(invitationList || []).map((x, i) => (
                                                     <TableRow key={i}>
-                                                        <TableCell className="font-normal py-[10px] px-[12px]">{x?.member_email}</TableCell>
+                                                        <TableCell className="font-normal py-[10px] px-[12px]">{x?.email}</TableCell>
                                                         <TableCell className={"py-[10px] px-[12px]"}>
-                                                            {moment().startOf('day').isSameOrAfter(moment(x?.expire_at).startOf('day')) ? (
+                                                            {moment().startOf('day').isSameOrAfter(moment(x?.expireAt).startOf('day')) ? (
                                                                 <span>Expired</span>
                                                             ) : (
-                                                                <span>Expires in {moment(x?.expire_at).diff(moment().startOf('day'), 'days')} days</span>
+                                                                <span>Expires in {moment(x?.expireAt).diff(moment().startOf('day'), 'days')} days</span>
                                                             )}
                                                         </TableCell>
                                                         {/*<TableCell className={"py-[10px] px-[12px]"}>*/}
@@ -434,10 +434,10 @@ const Team = () => {
                                                         {/*<TableCell className={"py-[10px] px-[12px]"}>Invited about {moment.utc(x.created_at).local().startOf('seconds').fromNow()}</TableCell>*/}
                                                         <TableCell className={"py-[10px] px-[12px]"}>
                                                             Invited about{" "}
-                                                            {x.updated_at && x.updated_at !== x.created_at ? (
+                                                            {x.updated_at && x.updated_at !== x.createdAt ? (
                                                                 <>{moment.utc(x.updated_at).local().startOf("seconds").fromNow()}</>
                                                             ) : (
-                                                                <>{moment.utc(x.created_at).local().startOf("seconds").fromNow()}</>
+                                                                <>{moment.utc(x.createdAt).local().startOf("seconds").fromNow()}</>
                                                             )}
                                                         </TableCell>
                                                         <TableCell className="py-[10px] px-[12px] text-right">

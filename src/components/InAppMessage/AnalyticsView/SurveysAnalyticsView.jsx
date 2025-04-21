@@ -5,18 +5,17 @@ import {ApiService} from "../../../utils/ApiService";
 import {useSelector} from "react-redux";
 import moment from "moment";
 import {useParams} from "react-router-dom";
-import {Bar, BarChart, CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis,} from 'recharts';
+import {Bar, BarChart, CartesianGrid, XAxis, YAxis,} from 'recharts';
 import {ChartContainer, ChartTooltip, ChartTooltipContent} from "../../ui/chart";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "../../ui/table";
 import {useTheme} from "../../theme-provider";
 import {Avatar, AvatarFallback} from "../../ui/avatar";
 import EmptyData from "../../Comman/EmptyData";
-import CommonBreadCrumb from "../../Comman/CommonBreadCrumb";
 import {chartLoading} from "../../Comman/CommSkel";
 import {cleanQuillHtml} from "../../../utils/constent";
 import ReadMoreText from "../../Comman/ReadMoreText";
-
-const chartConfig = {y: {label: "View", color: "#7c3aed"}}
+import {AnalyticsLayout, AnalyticsLineChart, CommonTable, UserCell} from "./CommonAnalyticsView/CommonUse";
+import {AnalyticsSummary} from "./CommonAnalyticsView/CommonUse";
 
 const chartConfigNPS ={
     detractor: {label: "Detractor", color: "#e87e6d",},
@@ -88,150 +87,61 @@ const SurveysAnalyticsView = () => {
 
     const links = [{ label: 'In App Message', path: `/app-message` }];
 
+    const openedColumns = [
+        {
+            label: "Name",
+            render: (row) => (
+                <div className="flex items-center gap-2">
+                    <Avatar className="w-[20px] h-[20px]">
+                        <AvatarFallback>{row?.name ? row?.name.substring(0, 1) : row?.email.substring(0, 1)}</AvatarFallback>
+                    </Avatar>
+                    <p className="font-normal">{row.name || row.email}</p>
+                </div>
+            ),
+        },
+        { label: "When it was opened", render: (row) => moment(row.created_at).format("ll") },
+    ];
+
+    const getRepliedColumns = (steps) => {
+        const baseColumns = [
+            { label: "Name", render: (row) => <UserCell name={row.name} email={row.email} /> },
+        ];
+
+        const stepColumns = (steps || [])
+            .filter((_, index) => index !== 7)
+            .map((step) => ({
+                label: step.text,
+                className: "max-w-[140px] truncate text-ellipsis overflow-hidden whitespace-nowrap",
+                render: (row) => {
+                    const matchedResponse = row.response?.find((r) => r.step_id === step.step_id) || { response: "-" };
+                    return cleanQuillHtml(matchedResponse.response) ? (
+                        <ReadMoreText html={matchedResponse.response} maxLength={30} />
+                    ) : "-";
+                },
+            }));
+
+        return [
+            ...baseColumns,
+            ...stepColumns,
+            { label: "Date Responded", render: (row) => moment(row.created_at).format("ll") },
+        ];
+    };
+
     return (
         <Fragment>
-            <div className={"container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-3 md:px-4"}>
-                <div className={"pb-6"}>
-                    <CommonBreadCrumb
-                        links={links}
-                        currentPage={inAppMsgSetting?.title}
-                        truncateLimit={30}
-                    />
-                </div>
-                <div className={"flex flex-col gap-4"}>
-                    <Card>
-                        <CardContent className={"p-0"}>
-                            <div className={"grid md:grid-cols-3 sm:grid-cols-1"}>
-                                {
-                                    (analyticsViews || []).map((x, i) => {
-                                        return (
-                                            <Fragment key={i}>
-                                                {isLoading ? <div className={"space-y-[14px] w-full p-4 border-b md:border-r md:border-0 last:border-b-0 last:border-r-0"}>
-                                                    <Skeleton className="h-4"/>
-                                                    <Skeleton className="h-4"/></div> : (
-                                                    <div className={`p-4 border-b md:border-r md:border-0 last:border-b-0 last:border-r-0`}>
-                                                        <h3 className={"text-base font-medium"}>{x.title}</h3>
-                                                        <div className={"flex gap-1"}>
-                                                            <h3 className={`text-2xl font-medium`}>{x.count}</h3>
-                                                        </div>
-                                                    </div>
-                                                )}
-                                            </Fragment>
-                                        )
-                                    })
-                                }
-                            </div>
-                        </CardContent>
-                    </Card>
-                    <Card>
-                        <CardHeader className={"p-4 border-b text-base font-medium"}>How did that change over time?</CardHeader>
-                        {
-                            isLoading ? chartLoading(15, "p-2") : <CardContent className={"p-4 pl-0"}>
-                                {
-                                    analytics?.charts?.length > 0 ? <ChartContainer config={chartConfig} className="aspect-auto h-[250px] w-full">
-                                            <ResponsiveContainer width="100%" height="100%">
-                                                <LineChart
-                                                    accessibilityLayer
-                                                    data={analytics?.charts || []}
-
-                                                >
-                                                    <CartesianGrid vertical={false} />
-                                                    <XAxis
-                                                        dataKey="x"
-                                                        tickLine={false}
-                                                        axisLine={false}
-                                                        tickMargin={8}
-                                                        tickFormatter={(value) => {
-                                                            const date = new Date(value)
-                                                            return date.toLocaleDateString("en-US", {
-                                                                month: "short",
-                                                                day: "numeric",
-                                                            })
-                                                        }}
-                                                    />
-                                                    <Tooltip
-                                                        cursor={false}
-                                                        content={<ChartTooltipContent hideLabel />}
-                                                    />
-                                                    <YAxis tickLine={false} axisLine={false}/>
-                                                    <Line
-                                                        dataKey="y"
-                                                        type="monotone"
-                                                        stroke="var(--color-y)"
-                                                        strokeWidth={2}
-                                                    />
-                                                </LineChart>
-                                            </ResponsiveContainer>
-                                        </ChartContainer>
-                                        : <EmptyData />
-                                }
-                            </CardContent>
-                        }
-                    </Card>
+            <AnalyticsLayout links={links} currentPage={inAppMsgSetting?.title}>
+                <AnalyticsSummary analyticsViews={analyticsViews} isLoading={isLoading} />
+                <AnalyticsLineChart
+                    title="How did that change over time?"
+                    data={analytics?.charts}
+                    isLoading={isLoading}
+                    chartConfig={{ y: { label: "View", color: "#7c3aed" } }}
+                    dataKeys={["y"]}
+                />
                     <Card>
                         <CardHeader className={"p-4 border-b text-base font-medium"}>Customers who opened</CardHeader>
                         <CardContent className={"p-0 overflow-auto"}>
-                            <Table>
-                                <TableHeader className={`${theme === "dark" ? "" : "bg-muted"}`}>
-                                    <TableRow>
-                                        {
-                                            ["Name", "When it was opened"].map((x, i) => {
-                                                return (
-                                                    <TableHead className={`px-2 py-[10px] md:px-3 font-medium text-card-foreground`} key={i}>
-                                                        {x}
-                                                    </TableHead>
-                                                );
-                                            })
-                                        }
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {
-                                        isLoading ? (
-                                                [...Array(10)].map((x, index) => {
-                                                    return (
-                                                        <TableRow key={index}>
-                                                            {
-                                                                [...Array(2)].map((_, i) => {
-                                                                    return (
-                                                                        <TableCell key={i} className={"max-w-[373px] px-2 py-[10px] md:px-3"}>
-                                                                            <Skeleton className={"rounded-md w-full h-7"}/>
-                                                                        </TableCell>
-                                                                    )
-                                                                })
-                                                            }
-                                                        </TableRow>
-                                                    )
-                                                })
-                                            )
-                                            :
-                                            (analytics?.analytics || []).length >  0 ?
-                                                <Fragment>
-                                                    {
-                                                        (analytics?.analytics || []).map((x,i)=> {
-                                                            return (
-                                                                <TableRow key={x.id}>
-                                                                    <TableCell className={`flex items-center px-2 py-[10px] md:px-3 gap-2`}>
-                                                                        <>
-                                                                            <Avatar className={"w-[20px] h-[20px]"}>
-                                                                                <AvatarFallback>{x?.name? x?.name?.substring(0, 1) : x?.email?.substring(0, 1)}</AvatarFallback>
-                                                                            </Avatar>
-                                                                            <p className={"font-normal"}>{x?.name? x?.name : x.email}</p>
-                                                                        </>
-                                                                    </TableCell>
-                                                                    <TableCell className={`px-2 py-[10px] md:px-3 font-normal`}>{moment(x.created_at).format("ll")}</TableCell>
-                                                                </TableRow>
-                                                            )
-                                                        })
-                                                    }
-                                                </Fragment> : <TableRow>
-                                                    <TableCell colSpan={2}>
-                                                        <EmptyData/>
-                                                    </TableCell>
-                                                </TableRow>
-                                    }
-                                </TableBody>
-                            </Table>
+                            <CommonTable columns={openedColumns} data={analytics.analytics || []} isLoading={isLoading} theme={theme} skeletonColumns={2} />
                         </CardContent>
                     </Card>
                     <Card>
@@ -328,6 +238,13 @@ const SurveysAnalyticsView = () => {
                                     }
                                 </TableBody>
                             </Table>
+                            {/*<CommonTable*/}
+                            {/*    columns={getRepliedColumns(inAppMsgSetting?.steps)}*/}
+                            {/*    data={analytics.responses || []}*/}
+                            {/*    isLoading={isLoading}*/}
+                            {/*    theme={theme}*/}
+                            {/*    skeletonColumns={(inAppMsgSetting?.steps?.length || 1) + 2}*/}
+                            {/*/>*/}
                         </CardContent>
                     </Card>
                     <div className={"flex flex-col gap-4"}>
@@ -499,10 +416,10 @@ const SurveysAnalyticsView = () => {
                         </div>
                         <div className={"flex flex-col gap-4"}>
                             {
-                                analyticsResponse.map((x) => {
+                                analyticsResponse.map((x, i) => {
                                     return(
                                         x.question_type === 6 || x.question_type === 7 ?
-                                            <Card>
+                                            <Card key={i}>
                                                 {x.text && <CardHeader className={"p-4 border-b text-base font-medium"}>{x.text}</CardHeader>}
                                             <CardContent className={"p-0 overflow-auto"}>
                                                     <Table>
@@ -542,7 +459,7 @@ const SurveysAnalyticsView = () => {
                                                                         {
                                                                             (x?.report || []).map((x,i)=> {
                                                                                 return (
-                                                                                    <TableRow key={x.id}>
+                                                                                    <TableRow key={i}>
                                                                                         <TableCell className={`flex items-center px-2 py-[10px] md:px-3 gap-2`}>
                                                                                             <>
                                                                                                 <Avatar className={"w-[20px] h-[20px]"}>
@@ -576,8 +493,7 @@ const SurveysAnalyticsView = () => {
                             }
                         </div>
                     </div>
-                </div>
-            </div>
+            </AnalyticsLayout>
         </Fragment>
     );
 };

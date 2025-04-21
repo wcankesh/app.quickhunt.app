@@ -42,12 +42,13 @@ const Social = () => {
 
     const onChange = (e) => {
         const { name, value } = e.target;
+        const newValue = value.trim() === "" ? null : value;
         setSocialLink((prevState) => ({
             ...prevState,
-            [name]: value
+            [name]: newValue
         }));
 
-        const error = formValidate(name, value);
+        const error = formValidate(name, newValue);
         setFormError((prevError) => ({
             ...prevError,
             [name]: error
@@ -132,7 +133,7 @@ const Social = () => {
         }
         setIsSave(true)
         const payload = {
-            project_id: projectDetailsReducer.id,
+            projectId: projectDetailsReducer.id,
             facebook: socialLink.facebook,
             twitter: socialLink.twitter,
             linkedin: socialLink.linkedin,
@@ -141,18 +142,16 @@ const Social = () => {
             github: socialLink.github,
         };
         const data = await apiService.updateSocialSetting(payload);
-        if(data.status === 200){
+        if(data.success){
             setIsSave(false)
-            toast({
-                description:data.message,
-            });
-            delete payload.project_id;
+            toast({description: data.message,});
+            delete payload.projectId;
             dispatch(allStatusAndTypesAction({...allStatusAndTypes, social: payload}));
 
         } else {
             setIsSave(false);
             toast({
-                description:data.message,
+                description:data?.error.message,
                 variant: "destructive"
             })
         }

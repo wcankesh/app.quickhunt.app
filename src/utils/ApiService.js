@@ -1,7 +1,8 @@
 import axios from "axios";
 import {logout, removeProjectDetails, token, baseUrl} from "./constent";
 import qs from 'qs';
-const baseUrlApi = 'https://code.quickhunt.app/public/api';
+const baseUrlApi = 'http://192.168.1.36:3001';
+// const baseUrlApi = 'https://code.quickhunt.app/public/api';
 let instance = axios.create();
 instance.interceptors.request.use(function (config) {
     if(config?.headers?.Authorization){
@@ -94,6 +95,32 @@ export class ApiService{
         return resData || response
     }
 
+    async patchData(url, data, isFormData) {
+        const config = {
+            headers: {
+                "Content-Type": isFormData ? 'multipart/form-data' : "application/json",
+                "Accept": "*/*"
+            }
+        }
+        let resData = '';
+        let response = '';
+        await instance.patch(url, data, config).then((res) => {
+            if(res.data.status === 200){
+                response = res.data;
+            }else{
+                response = res.data
+            }
+        }).catch((e) => {
+            if(e.response.status === 401){
+                logout();
+                removeProjectDetails()
+                window.location.replace(`${baseUrl}/login`)
+            }
+            resData = e.response.data;
+        })
+        return resData || response
+    }
+
     async deleteData(url){
         const config = {
             headers:{
@@ -144,19 +171,25 @@ export class ApiService{
 
     /* ---------- Auth Folder api and Settings Profile api ---------- */
     async adminSignup (payload){
-        return await this.postDataAuth(`${baseUrlApi}/users`,payload)
+        return await this.postData(`${baseUrlApi}/auth/register`,payload)
     }
     async login (payload){
-        return await this.postDataAuth(`${baseUrlApi}/login`,payload)
+        return await this.postData(`${baseUrlApi}/auth/login`,payload)
     }
     async logout (payload){
         return await this.postData(`${baseUrlApi}/logout`,payload)
     }
+    // async getLoginUserDetails (token = {}){
+    //     return await this.getData(`${baseUrlApi}/user`, token)
+    // }
     async getLoginUserDetails (token = {}){
-        return await this.getData(`${baseUrlApi}/user`, token)
+        return await this.getData(`${baseUrlApi}/auth/user`, token)
     }
-    async updateLoginUserDetails (payload, id){
-        return await this.postData(`${baseUrlApi}/users/${id}?_method=PUT`, payload, true)
+    // async updateLoginUserDetails (payload, id){
+    //     return await this.postData(`${baseUrlApi}/users/${id}?_method=PUT`, payload, true)
+    // }
+    async updateLoginUserDetails (payload){
+        return await this.patchData(`${baseUrlApi}/auth/updateUser`, payload, true)
     }
     async changePassword (payload){
         return await this.postData(`${baseUrlApi}/change-password`,payload)
@@ -176,7 +209,7 @@ export class ApiService{
 
     /* --------------------------------- On Boarding ----------------------------------- */
     async onBoardingFlow (payload, token = {}) {
-        return await this.postData(`${baseUrlApi}/on-bord`, payload, false, token)
+        return await this.postData(`${baseUrlApi}/auth/onBoard`, payload, false, token)
     }
     async onBoardingFlowComplete () {
         return await this.getData(`${baseUrlApi}/on-bord/complete`)
@@ -184,7 +217,7 @@ export class ApiService{
 
     /* ---------- Announcement api ---------- */
     async getAllPosts (payload){
-        return await this.getData(`${baseUrlApi}/posts?${qs.stringify(payload)}`)
+        return await this.getData(`${baseUrlApi}/post/get-all-post?${qs.stringify(payload)}`)
     }
     async getSinglePosts (id){
         return await this.getData(`${baseUrlApi}/posts/${id}`)
@@ -213,27 +246,27 @@ export class ApiService{
 
     /* ---------- Settings Labels api ---------- */
     async getAllLabels (id){
-        return await this.getData(`${baseUrlApi}/labels?project_id=${id}`)
+        return await this.getData(`${baseUrlApi}/label/labels?projectId=${id}`)
     }
     async createLabels (payload){
-        return await this.postData(`${baseUrlApi}/labels`,payload)
+        return await this.postData(`${baseUrlApi}/label/labels`,payload)
     }
     async updateLabels (payload, id){
-        return await this.putData(`${baseUrlApi}/labels/${id}`,payload)
+        return await this.patchData(`${baseUrlApi}/label/labels/${id}`,payload)
     }
     async deleteLabels (id){
-        return await this.deleteData(`${baseUrlApi}/labels/${id}`)
+        return await this.deleteData(`${baseUrlApi}/label/labels/${id}`)
     }
 
     /* ---------- Settings Project api ---------- */
     async getAllProjects (){
-        return await this.getData(`${baseUrlApi}/projects`)
+        return await this.getData(`${baseUrlApi}/project/getAll`)
     }
     async getSingleProjects (id){
         return await this.getData(`${baseUrlApi}/projects/${id}`)
     }
     async createProjects (payload, token = {}){
-        return await this.postData(`${baseUrlApi}/projects`,payload,false, token)
+        return await this.postData(`${baseUrlApi}/project/create`,payload,false, token)
     }
     async updateProjects (payload, id){
         return await this.postData(`${baseUrlApi}/projects/${id}?_method=PUT`,payload, true)
@@ -251,17 +284,26 @@ export class ApiService{
     }
 
     /* ---------- Users api ---------- */
+    // async getAllUsers (id){
+    //     return await this.getData(`${baseUrlApi}/customers?${qs.stringify(id)}`)
+    // }
     async getAllUsers (id){
-        return await this.getData(`${baseUrlApi}/customers?${qs.stringify(id)}`)
+        return await this.getData(`${baseUrlApi}/customerAuth/getAll?${qs.stringify(id)}`)
     }
     async getSingleUser (id){
         return await this.getData(`${baseUrlApi}/customers/${id}?is_history=1`)
     }
+    // async createUsers (payload){
+    //     return await this.postData(`${baseUrlApi}/customers`,payload)
+    // }
     async createUsers (payload){
-        return await this.postData(`${baseUrlApi}/customers`,payload)
+        return await this.postData(`${baseUrlApi}/customerAuth/store`,payload)
     }
+    // async userManualUpVote (payload){
+    //     return await this.postData(`${baseUrlApi}/customer/vote`,payload)
+    // }
     async userManualUpVote (payload){
-        return await this.postData(`${baseUrlApi}/customer/vote`,payload)
+        return await this.postData(`${baseUrlApi}/customerAuth/vote`,payload)
     }
     async userAction (payload){
         return await this.postData(`${baseUrlApi}/customer-actions`,payload)
@@ -287,30 +329,53 @@ export class ApiService{
         return await this.putData(`${baseUrlApi}/roadmap-status/${id}`,payload)
     }
 
+    /* ---------- Settings Status api ---------- */
+
+    async createSettingsStatus (payload){
+        return await this.postData(`${baseUrlApi}/roadMapStatus/roadmapStatuses`,payload)
+    }
+    async updateSettingsStatus (payload, id){
+        return await this.patchData(`${baseUrlApi}/roadMapStatus/roadmapStatuses/${id}`,payload)
+    }
+    async onDeleteSettingsStatus (id){
+        return await this.deleteData(`${baseUrlApi}/roadMapStatus/roadmapStatuses/${id}`)
+    }
+    async roadmapSettingsStatusRank (payload){
+        return await this.patchData(`${baseUrlApi}/roadMapStatus/updateRank`,payload)
+    }
+
     /* ---------- Ideas api ---------- */
     async getAllIdea (payload){
-        return await this.getData(`${baseUrlApi}/feature-idea?${qs.stringify(payload)}`)
+        return await this.getData(`${baseUrlApi}/idea/getAll?${qs.stringify(payload)}`)
     }
     async ideaSearch (payload){
         return await this.postData(`${baseUrlApi}/idea/search`,payload, )
     }
+    // async getIdeaVote (payload){
+    //     return await this.postData(`${baseUrlApi}/idea/votes`,payload, )
+    // }
     async getIdeaVote (payload){
-        return await this.postData(`${baseUrlApi}/idea/votes`,payload, )
+        return await this.postData(`${baseUrlApi}/vote/get-votes`,payload, )
     }
+    // async removeUserVote (payload){
+    //     return await this.postData(`${baseUrlApi}/idea/remove-vote`,payload, )
+    // }
     async removeUserVote (payload){
-        return await this.postData(`${baseUrlApi}/idea/remove-vote`,payload, )
+        return await this.postData(`${baseUrlApi}/vote/remove-vote`,payload, )
     }
     async getSingleIdea (id){
-        return await this.getData(`${baseUrlApi}/feature-idea/${id}`)
-        // return await this.getData(`${baseUrlApi}/v1/feature-idea/${id}`)
+        return await this.getData(`${baseUrlApi}/idea/getOne/${id}`)
     }
 
     /* ---------- Common Roadmap api and Ideas common api and Settings Statuses api ---------- */
     async giveVote (payload){
-        return await this.postData(`${baseUrlApi}/v1/vote`,payload)
+        return await this.postData(`${baseUrlApi}/vote/give-vote`,payload)
     }
+    // async updateIdea (payload, id){
+    //     return await this.postData(`${baseUrlApi}/feature-idea/${id}?_method=put`,payload, true)
+    // }
     async updateIdea (payload, id){
-        return await this.postData(`${baseUrlApi}/feature-idea/${id}?_method=put`,payload, true)
+        return await this.putData(`${baseUrlApi}/idea/update/${id}?_method=put`,payload, true)
     }
     async onDeleteIdea (id){
         return await this.deleteData(`${baseUrlApi}/feature-idea/${id}`)
@@ -319,10 +384,13 @@ export class ApiService{
         return await this.postData(`${baseUrlApi}/feature-idea/rank`, payload)
     }
     async createIdea (payload){
-        return await this.postData(`${baseUrlApi}/feature-idea`,payload, true)
+        return await this.postData(`${baseUrlApi}/idea/create`,payload, true)
     }
+    // async createComment (payload){
+    //     return await this.postData(`${baseUrlApi}/v1/comment`,payload, true)
+    // }
     async createComment (payload){
-        return await this.postData(`${baseUrlApi}/v1/comment`,payload, true)
+        return await this.postData(`${baseUrlApi}/comment/add`,payload, true)
     }
     async updateComment (payload){
         return await this.postData(`${baseUrlApi}/v1/edit-comment`,payload, true)
@@ -378,46 +446,82 @@ export class ApiService{
     }
 
     /* ---------- Help Center Category api ans Settings Categories api ---------- */
+    // async createCategory (payload){
+    //     return await this.postData(`${baseUrlApi}/help/category`, payload, true)
+    // }
     async createCategory (payload){
-        return await this.postData(`${baseUrlApi}/help/category`, payload, true)
+        return await this.postData(`${baseUrlApi}/articleCategory/categories`, payload, true)
     }
+    // async createSubCategory (payload){
+    //     return await this.postData(`${baseUrlApi}/help/sub-category`, payload, true)
+    // }
     async createSubCategory (payload){
-        return await this.postData(`${baseUrlApi}/help/sub-category`, payload, true)
+        return await this.postData(`${baseUrlApi}/articleSubCategory/subCategories`, payload, true)
     }
+    // async getAllCategory (payload){
+    //     return await this.postData(`${baseUrlApi}/help/categories?${qs.stringify(payload)}`,)
+    // }
     async getAllCategory (payload){
-        return await this.postData(`${baseUrlApi}/help/categories?${qs.stringify(payload)}`,)
+        return await this.getData(`${baseUrlApi}/articleCategory/categories?${qs.stringify(payload)}`,)
     }
     async getAllSubCategory (id){
         return await this.getData(`${baseUrlApi}/help/sub-categories?project_id=${id}`,)
     }
+    // async updateCategory (payload, id){
+    //     return await this.postData(`${baseUrlApi}/help/category/${id}`,payload, true)
+    // }
     async updateCategory (payload, id){
-        return await this.postData(`${baseUrlApi}/help/category/${id}`,payload, true)
+        return await this.patchData(`${baseUrlApi}/articleCategory/categories/${id}`,payload, true)
     }
+    // async updateSubCategory (payload, id){
+    //     return await this.postData(`${baseUrlApi}/help/sub-category/${id}`,payload, true)
+    // }
     async updateSubCategory (payload, id){
-        return await this.postData(`${baseUrlApi}/help/sub-category/${id}`,payload, true)
+        return await this.patchData(`${baseUrlApi}/articleSubCategory/subCategories/${id}`,payload, true)
     }
+    // async deleteCategories (id){
+    //     return await this.deleteData(`${baseUrlApi}/help/category/${id}`)
+    // }
     async deleteCategories (id){
-        return await this.deleteData(`${baseUrlApi}/help/category/${id}`)
+        return await this.deleteData(`${baseUrlApi}/articleCategory/categories/${id}`)
     }
+    // async deleteSubCategories (id){
+    //     return await this.deleteData(`${baseUrlApi}/help/sub-category/${id}`)
+    // }
     async deleteSubCategories (id){
-        return await this.deleteData(`${baseUrlApi}/help/sub-category/${id}`)
+        return await this.deleteData(`${baseUrlApi}/articleSubCategory/subCategories/${id}`)
     }
 
     /* ---------- Help Center Articles api ---------- */
+    // async getAllArticles (payload){
+    //     return await this.postData(`${baseUrlApi}/help/articles?${qs.stringify(payload)}`,)
+    // }
     async getAllArticles (payload){
-        return await this.postData(`${baseUrlApi}/help/articles?${qs.stringify(payload)}`,)
+        return await this.getData(`${baseUrlApi}/artical/articles?${qs.stringify(payload)}`,)
     }
+    // async createArticles (payload){
+    //     return await this.postData(`${baseUrlApi}/help/article`, payload, true)
+    // }
     async createArticles (payload){
-        return await this.postData(`${baseUrlApi}/help/article`, payload, true)
+        return await this.postData(`${baseUrlApi}/artical/articles`, payload)
     }
+    // async getSingleArticle (id){
+    //     return await this.getData(`${baseUrlApi}/help/article/${id}`)
+    // }
     async getSingleArticle (id){
-        return await this.getData(`${baseUrlApi}/help/article/${id}`)
+        return await this.getData(`${baseUrlApi}/artical/articles/${id}`)
     }
+    // async updateArticle (payload, id){
+    //     return await this.postData(`${baseUrlApi}/help/article/${id}`,payload, true)
+    // }
     async updateArticle (payload, id){
-        return await this.postData(`${baseUrlApi}/help/article/${id}`,payload, true)
+        return await this.patchData(`${baseUrlApi}/artical/articles/${id}`, payload)
     }
+    // async deleteArticles (id){
+    //     return await this.deleteData(`${baseUrlApi}/help/article/${id}`)
+    // }
     async deleteArticles (id){
-        return await this.deleteData(`${baseUrlApi}/help/article/${id}`)
+        return await this.deleteData(`${baseUrlApi}/artical/articles/${id}`)
     }
     async articleSearch (payload){
         return await this.postData(`${baseUrlApi}/help/article`, payload)
@@ -442,27 +546,27 @@ export class ApiService{
 
     /* ---------- Settings Board api ---------- */
     async createCategorySettings (payload){
-        return await this.postData(`${baseUrlApi}/category`, payload)
+        return await this.postData(`${baseUrlApi}/category/categories`, payload)
     }
     async deleteCategorySettings (id){
-        return await this.deleteData(`${baseUrlApi}/category/${id}`)
+        return await this.deleteData(`${baseUrlApi}/category/categories/${id}`)
     }
     async updateCategorySettings (payload, id){
-        return await this.putData(`${baseUrlApi}/category/${id}`,payload)
+        return await this.patchData(`${baseUrlApi}/category/categories/${id}`,payload)
     }
 
     /* ---------- Settings Board api ---------- */
     async getAllBoards (payload){
-        return await this.getData(`${baseUrlApi}/board?${qs.stringify(payload)}`)
+        return await this.getData(`${baseUrlApi}/board/boards?${qs.stringify(payload)}`)
     }
     async createBoard (payload){
-        return await this.postData(`${baseUrlApi}/board`,payload)
+        return await this.postData(`${baseUrlApi}/board/boards`,payload)
     }
     async deleteBoard (id){
-        return await this.deleteData(`${baseUrlApi}/board/${id}`)
+        return await this.deleteData(`${baseUrlApi}/board/boards/${id}`)
     }
     async updateBoard (payload, id){
-        return await this.putData(`${baseUrlApi}/board/${id}`, payload)
+        return await this.patchData(`${baseUrlApi}/board/boards/${id}`, payload)
     }
 
     /* ---------- Settings Domain api and GeneralSettings api ---------- */
@@ -475,43 +579,52 @@ export class ApiService{
 
     /* ---------- Settings Emoji api ---------- */
     async createEmoji (payload){
-        return await this.postData(`${baseUrlApi}/emoji`, payload)
+        return await this.postData(`${baseUrlApi}/emoji/emojis`, payload)
     }
     async getAllEmoji (id){
-        return await this.getData(`${baseUrlApi}/emoji?project_id=${id}`)
+        return await this.getData(`${baseUrlApi}/emoji/emojis?projectId=${id}`)
     }
     async deleteEmoji (id){
-        return await this.deleteData(`${baseUrlApi}/emoji/${id}`)
+        return await this.deleteData(`${baseUrlApi}/emoji/emojis/${id}`)
     }
     async updateEmoji (payload, id){
-        return await this.putData(`${baseUrlApi}/emoji/${id}`,payload)
+        return await this.patchData(`${baseUrlApi}/emoji/emojis/${id}`,payload)
     }
 
     /* ---------- Settings Social api ---------- */
     async updateSocialSetting (payload){
-        return await this.postData(`${baseUrlApi}/social-setting`, payload)
+        return await this.postData(`${baseUrlApi}/social/socials`, payload)
     }
 
     /* ---------- Settings Tags api ---------- */
     async createTopics (payload){
-        return await this.postData(`${baseUrlApi}/topic`, payload)
+        return await this.postData(`${baseUrlApi}/tag/tags`, payload)
     }
     async updateTopics (payload, id){
-        return await this.putData(`${baseUrlApi}/topic/${id}`, payload)
+        return await this.patchData(`${baseUrlApi}/tag/tags/${id}`, payload)
     }
     async deleteTopics (id){
-        return await this.deleteData(`${baseUrlApi}/topic/${id}`)
+        return await this.deleteData(`${baseUrlApi}/tag/tags/${id}`)
     }
 
     /* ---------- Settings Team api ---------- */
-    async getMember (payload){
-        return await this.postData(`${baseUrlApi}/member`, payload)
+    // async getMember (payload){
+    //     return await this.postData(`${baseUrlApi}/member`, payload)
+    // }
+    async getMember (id){
+        return await this.getData(`${baseUrlApi}/team/getTeam/${id}`)
     }
-    async getInvitation (payload){
-        return await this.getData(`${baseUrlApi}/invitation?${qs.stringify(payload)}`)
+    // async getInvitation (payload){
+    //     return await this.getData(`${baseUrlApi}/invitation?${qs.stringify(payload)}`)
+    // }
+    async getInvitation (id){
+        return await this.getData(`${baseUrlApi}/invitedUser/getAllInvitedUsers/${id}`)
     }
+    // async inviteUser (payload){
+    //     return await this.postData(`${baseUrlApi}/invite`, payload)
+    // }
     async inviteUser (payload){
-        return await this.postData(`${baseUrlApi}/invite`, payload)
+        return await this.postData(`${baseUrlApi}/invitedUser/inviteMember`, payload)
     }
     async removeMember (payload){
         return await this.postData(`${baseUrlApi}/remove-member`,payload, )
@@ -524,7 +637,10 @@ export class ApiService{
 
     /* ---------- HeaderBar Api ---------- */
     async getAllStatusAndTypes (id){
-        return await this.getData(`${baseUrlApi}/all?project_id=${id}`)
+        return await this.getData(`${baseUrlApi}/project/allDetail/${id}`)
+    }
+    async getAllProject (){
+        return await this.getData(`${baseUrlApi}/project/getAll`)
     }
 
     /* ---------- Pricing Plan Api ---------- */

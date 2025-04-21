@@ -9,6 +9,22 @@ import {useNavigate} from "react-router";
 
 export const EmptyDataContent = ({data, onClose, onClick, setSheetOpenCreate}) => {
     const navigate = useNavigate();
+
+    const btnFunctionality = (record) => {
+        if (record.redirect) {
+            window.open(record.redirect, "_blank");
+        }
+        if (record.openSheet) {
+            setSheetOpenCreate(true);
+        }
+        if (record.navigateTo) {
+            navigate(record.navigateTo);
+        }
+        if (onClick) {
+            onClick();
+        }
+    }
+
     return (
         <Card className={"p-4 space-y-2"}>
             <div className={"text-end"}>
@@ -22,38 +38,25 @@ export const EmptyDataContent = ({data, onClose, onClick, setSheetOpenCreate}) =
                     </DropdownMenuContent>
                 </DropdownMenu>
             </div>
-        <div className={"grid grid-cols-2 gap-4"}>
+        <div className={"grid grid-cols-1 md:grid-cols-2 gap-4"}>
             {
                 (data || []).map((x, i) => {
                     return (
                         <Card key={i}>
-                            <CardContent className={"p-4 space-y-2"}>
+                            <CardContent className={"p-2 md:p-4 space-y-2"}>
                                 <div>
                                     <div className={"font-medium"}>{x.title}</div>
                                     <div className={"text-sm text-muted-foreground"}>{x.description}</div>
                                 </div>
-                                <div className={"flex gap-2"}>
+                                <div className={"flex flex-wrap gap-1 md:gap-2"}>
                                     {
                                         (x.btnText || []).map((y, j) => {
                                             return (
                                                 <Button
                                                     variant={"link"}
                                                     key={j}
-                                                    className={"font-medium p-0"}
-                                                    onClick={() => {
-                                                        if (y.redirect) {
-                                                            window.open(y.redirect, "_blank");
-                                                        }
-                                                        if (y.openSheet) {
-                                                            setSheetOpenCreate(true);
-                                                        }
-                                                        if (y.navigateTo) {
-                                                            navigate(y.navigateTo);
-                                                        }
-                                                        if (onClick) {
-                                                            onClick();
-                                                        }
-                                                    }}
+                                                    className={"font-medium p-0 text-wrap"}
+                                                    onClick={() => btnFunctionality(y)}
                                                 >
                                                     {y.icon}{y.title}
                                                 </Button>

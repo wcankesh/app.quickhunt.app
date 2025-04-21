@@ -1,13 +1,14 @@
 import React, {useState, useEffect} from 'react';
-import {Card, CardContent} from "../ui/card";
+import {Card, CardContent, CardHeader, CardTitle, CardFooter, CardDescription} from "../ui/card";
 import {Button} from "../ui/button";
 import {useToast} from "../ui/use-toast";
 import {ApiService} from "../../utils/ApiService";
 import {Icon} from "../../utils/Icon";
-import {Avatar, AvatarFallback} from "../ui/avatar";
+import {Avatar, AvatarFallback, AvatarImage} from "../ui/avatar";
 import {Skeleton} from "../ui/skeleton";
 import {baseUrl} from "../../utils/constent";
 import {useNavigate} from "react-router-dom";
+import {User} from "lucide-react";
 
 const initialState= {
     domain: '',
@@ -31,12 +32,10 @@ const Setup = () => {
     const [isTokenDeleted, setIsTokenDeleted] = useState(false);
 
     useEffect(() => {
-        debugger
         getInvitationDetail()
     }, [])
 
     const getInvitationDetail = async () => {
-        debugger
         const data = await apiSerVice.getInvitationDetail(token);
         if (data.status === 200) {
             if (data.data && Object.keys(data.data).length > 0) {
@@ -70,13 +69,19 @@ const Setup = () => {
         <div className={"w-full flex flex-col items-center justify-center p-4 md:px-4 md:py-0 h-[100vh]"}>
             <div className={"max-w-[575px] w-full m-auto"}>
                 <div className={"flex items-center justify-center"}>{Icon.blackLogo}</div>
-                <h1 className="scroll-m-20 text-2xl md:text-3xl font-medium text-center lg:text-3xl mb-3.5 mt-6">
-                    {isTokenDeleted ? "Token is deleted" : "You have 1 invite"}
-                </h1>
+                {
+                    !isTokenDeleted &&
+                        <h1 className="scroll-m-20 text-2xl md:text-3xl font-medium text-center lg:text-3xl mb-3.5 mt-6">
+                            You have 1 invite
+                        </h1>
+                }
                 {isTokenDeleted ? (
-                    <p className="text-sm text-center text-muted-foreground">
-                        The token is invalid or has been deleted.
-                    </p>
+                    <Card className={"mt-6"}>
+                        <CardHeader className={"flex flex-row items-center gap-4"}>
+                            <Avatar><AvatarFallback><User/></AvatarFallback></Avatar>
+                            <p>This invitation has been revoked by admin.</p>
+                        </CardHeader>
+                    </Card>
                 ) : (
                     <div className={"mt-2.5"}>
                         {isLoading ? (

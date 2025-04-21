@@ -23,34 +23,34 @@ import DeleteDialog from "./DeleteDialog";
 
 const initialState = {
     id: "",
-    user_browser: null,
-    user_created_date: "",
-    user_email_id: "",
-    user_first_name: "",
-    user_ip_address: null,
-    user_job_title: "",
-    user_last_name: "",
-    user_photo: "",
-    user_status: "",
-    user_updated_date: "",
+    browser: null,
+    createdAt: "",
+    email: "",
+    firstName: "",
+    ipAddress: null,
+    jobTitle: "",
+    lastName: "",
+    profileImage: "",
+    status: "",
+    updatedAt: "",
 }
 
 const initialStateProject = {
-    project_name: '',
-    project_website: "",
-    project_language_id: '3',
-    project_timezone_id: '90',
-    project_logo: '',
-    project_favicon: '',
-    project_api_key: '',
-    project_status: '',
-    project_browser: '',
-    project_ip_address: '',
+    name: '',
+    website: "",
+    languageId: '3',
+    timezoneId: '90',
+    logo: '',
+    favicon: '',
+    apiKey: '',
+    status: '',
+    browser: '',
+    ipAddress: '',
     domain: ''
 }
 
 const initialStateErrorProject = {
-    project_name: '',
+    name: '',
 }
 
 const HeaderBar = ({setIsMobile}) => {
@@ -114,7 +114,7 @@ const HeaderBar = ({setIsMobile}) => {
     const getAllStatusAndTypes = async () => {
         if(projectDetailsReducer.id){
             const data = await apiSerVice.getAllStatusAndTypes(projectDetailsReducer.id)
-            if(data.status === 200){
+            if(data.success){
                 dispatch(allStatusAndTypesAction({...data.data}));
             }
         }
@@ -129,7 +129,7 @@ const HeaderBar = ({setIsMobile}) => {
 
     const getAllProjects = async () => {
         const data = await apiSerVice.getAllProjects()
-        if (data.status === 200) {
+        if (data.success) {
             if(data && data.data && data.data.length > 0){
                 const array = [];
                 let responseObj = data.data[0];
@@ -143,7 +143,7 @@ const HeaderBar = ({setIsMobile}) => {
                 (data.data || []).map((x) => {
                     let obj = {
                         ...x,
-                        Title: x.project_name,
+                        Title: x.name,
                         Link: 'onProject',
                         icon: '',
                         selected: false
@@ -178,7 +178,7 @@ const HeaderBar = ({setIsMobile}) => {
 
     const onChangeText = (event) => {
         const { name, value } = event.target;
-        if(name === "project_name" || name === 'domain'){
+        if(name === "name" || name === 'domain'){
             const cleanDomain = (name) => name.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
             const sanitizedProjectName = cleanDomain(value);
             setCreateProjectDetails({
@@ -200,7 +200,7 @@ const HeaderBar = ({setIsMobile}) => {
 
     const formValidate = (name, value) => {
         switch (name) {
-            case "project_name":
+            case "name":
                 if (!value || value.trim() === "") {
                     return "Project name is required";
                 } else {
@@ -228,7 +228,7 @@ const HeaderBar = ({setIsMobile}) => {
         }
 
         const cleanDomain = (name) => name.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-        const sanitizedProjectName = cleanDomain(createProjectDetails.project_name);
+        const sanitizedProjectName = cleanDomain(createProjectDetails.name);
         const domain = `${cleanDomain(createProjectDetails.domain || sanitizedProjectName)}.quickhunt.app`;
 
         const payload = {
@@ -241,7 +241,7 @@ const HeaderBar = ({setIsMobile}) => {
             const clone = [...projectList];
             let obj = {
                 ...data.data,
-                Title: data.data.project_name,
+                Title: data.data.name,
                 Link: 'onProject',
                 icon: '',
                 selected: false
@@ -349,13 +349,13 @@ const HeaderBar = ({setIsMobile}) => {
             title: "Project Name",
             placeholder: "Project Name",
             className: `${theme === "dark" ? "" : "placeholder:text-muted-foreground/75"}`,
-            name: "project_name",
+            name: "name",
         },
         {
             title: "Project Website",
             placeholder: "https://yourcompany.com",
             className: `${theme === "dark" ? "placeholder:text-card-foreground/80" : "placeholder:text-muted-foreground/75"}`,
-            name: "project_website",
+            name: "website",
         },
         {
             title: "Project Domain",
@@ -409,7 +409,7 @@ const HeaderBar = ({setIsMobile}) => {
                                             aria-expanded={open}
                                             className="min-w-[150px] md:w-[222px] h-[36px] justify-between bg-card"
                                         >
-                                            <span className={"max-w-[130px] truncate text-ellipsis overflow-hidden whitespace-nowrap"}>{projectDetailsReducer.id ? projectDetailsReducer.project_name : "Select project"}</span>
+                                            <span className={"max-w-[130px] truncate text-ellipsis overflow-hidden whitespace-nowrap"}>{projectDetailsReducer.id ? projectDetailsReducer.name : "Select project"}</span>
                                             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50"/>
                                         </Button>
                                     </PopoverTrigger>
@@ -436,7 +436,7 @@ const HeaderBar = ({setIsMobile}) => {
                                                                         setOpen(false)
                                                                     }}
                                                                 >
-                                                                    {x.project_name}
+                                                                    {x.name}
                                                                 </span>
                                                                     {
                                                                         (userDetailsReducer?.id == x?.user_id) &&
@@ -471,10 +471,10 @@ const HeaderBar = ({setIsMobile}) => {
                                 <DropdownMenuTrigger asChild>
                                     <Button variant="secondary" size="icon" className="rounded-full w-[30px] h-[30px]">
                                         <Avatar className={"w-[30px] h-[30px]"}>
-                                            <AvatarImage src={userDetails.user_photo}
-                                                         alt={userDetails && userDetails?.user_first_name?.substring(0, 1)?.toUpperCase() && userDetails?.user_last_name?.substring(0, 1)?.toUpperCase()}
+                                            <AvatarImage src={userDetails.profileImage}
+                                                         alt={userDetails && userDetails?.firstName?.substring(0, 1)?.toUpperCase() && userDetails?.lastName?.substring(0, 1)?.toUpperCase()}
                                             />
-                                            <AvatarFallback>{userDetails?.user_first_name?.substring(0, 1)?.toUpperCase()}{userDetails?.user_last_name?.substring(0, 1)?.toUpperCase()}</AvatarFallback>
+                                            <AvatarFallback>{userDetails?.firstName?.substring(0, 1)?.toUpperCase()}{userDetails?.lastName?.substring(0, 1)?.toUpperCase()}</AvatarFallback>
                                         </Avatar>
                                     </Button>
                                 </DropdownMenuTrigger>
@@ -482,8 +482,8 @@ const HeaderBar = ({setIsMobile}) => {
                                     <DropdownMenuLabel className={"text-sm font-medium"}>My Account</DropdownMenuLabel>
                                     <DropdownMenuSeparator/>
                                     {
-                                        dropDownItem.map((x) => (
-                                            <DropdownMenuItem
+                                        dropDownItem.map((x, i) => (
+                                            <DropdownMenuItem key={i}
                                                 className={"text-sm font-normal flex gap-2 cursor-pointer"}
                                                 onClick={x.onClick}
                                             >
@@ -510,8 +510,8 @@ const HeaderBar = ({setIsMobile}) => {
                                 <div className="overflow-auto h-[calc(100vh_-_69px)]">
                                 <div className="space-y-6 px-4 py-3 md:py-5 lg:px-8 lg:py-[20px]">
                                     {
-                                        sheetCommInput.map((x) => (
-                                            <div className="space-y-1">
+                                        sheetCommInput.map((x, i) => (
+                                            <div className="space-y-1" key={i}>
                                                 <Label htmlFor="name" className="text-right font-normal">{x.title}</Label>
                                                 <Input
                                                     id={x.name}

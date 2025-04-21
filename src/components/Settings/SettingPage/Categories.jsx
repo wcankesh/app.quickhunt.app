@@ -14,7 +14,7 @@ import EmptyData from "../../Comman/EmptyData";
 import DeleteDialog from "../../Comman/DeleteDialog";
 
 const initialState = {
-    name: "",
+    title: "",
     description: ""
 }
 
@@ -85,15 +85,15 @@ const Categories = () => {
         }
         setIsSave(true);
         const payload = {
-            project_id: projectDetailsReducer.id,
-            name: newCategory.name,
+            projectId: projectDetailsReducer.id,
+            title: newCategory.title,
             description: newCategory.description
         }
 
         const clone = [...categoriesList];
         const data = await apiService.createCategorySettings(payload)
 
-        if(data.status === 200){
+        if(data.success){
             clone.push(data.data);
             clone.splice(index,1);
             dispatch(allStatusAndTypesAction({...allStatusAndTypes, categories: clone}))
@@ -104,7 +104,7 @@ const Categories = () => {
             });
         } else {
             toast({
-                description:data.message,
+                description:data?.error.message,
                 variant: "destructive"
             })
         }
@@ -116,7 +116,7 @@ const Categories = () => {
         const data = await apiService.deleteCategorySettings(deleteId);
         const clone = [...categoriesList];
         const deleteToIndex = clone.findIndex((x)=> x.id == deleteId);
-        if(data.status === 200) {
+        if(data.success) {
             clone.splice(deleteToIndex,1);
             // setCategoriesList(clone);
             dispatch(allStatusAndTypesAction({...allStatusAndTypes, categories: clone}));
@@ -127,7 +127,7 @@ const Categories = () => {
         }
         else{
             toast({
-                description:data.message,
+                description:data?.error.message,
                 variant: "destructive"
             });
         }
@@ -181,18 +181,18 @@ const Categories = () => {
         const clone = [...categoriesList];
         const topicToSave = clone[index];
 
-        if (!topicToSave.name || topicToSave.name.trim() === "") {
+        if (!topicToSave.title || topicToSave.title.trim() === "") {
             setFormError({...formError, name: "Label name is required."});
             return;
         }
         setIsSave(true);
         const payload = {
-            name: topicToSave.name,
+            title: topicToSave.title,
             description:topicToSave.description,
-            project_id: projectDetailsReducer.id,
+            projectId: projectDetailsReducer.id,
         }
         const data = await apiService.updateCategorySettings(payload, topicToSave.id);
-        if(data.status === 200){
+        if(data.success){
             const clone = [...categoriesList];
             const index = clone.findIndex((x) => x.id === topicToSave.id)
             if(index !== -1){
@@ -208,7 +208,7 @@ const Categories = () => {
         } else {
             setIsSave(false);
             toast({
-                description:data.message,
+                description:data?.error.message,
                 variant: "destructive"
             });
         }
@@ -273,16 +273,16 @@ const Categories = () => {
                                                                                     placeholder={"Enter Category Name"}
                                                                                     className={"bg-card h-9"}
                                                                                     type="title"
-                                                                                    value={x.name}
-                                                                                    name={"name"}
+                                                                                    value={x.title}
+                                                                                    name={"title"}
                                                                                     onBlur={onBlur}
                                                                                     onChange={(e) => handleInputChange(e, i)}
                                                                                 />
                                                                                 {
-                                                                                    formError.name ?
+                                                                                    formError.title ?
                                                                                         <div className="grid gap-2 mt-[4px]">
-                                                                                            {formError.name && <span
-                                                                                                className="text-red-500 text-sm">{formError.name}</span>}
+                                                                                            {formError.title && <span
+                                                                                                className="text-red-500 text-sm">{formError.title}</span>}
                                                                                         </div> : ""
                                                                                 }
                                                                             </TableCell>
@@ -319,7 +319,7 @@ const Categories = () => {
                                                                         :
                                                                         <Fragment>
                                                                             <TableCell className={`px-2 py-[10px] md:px-3 font-normal text-xs max-w-[140px] truncate text-ellipsis overflow-hidden whitespace-nowrap ${theme === "dark" ? "" : "text-muted-foreground"}`}>
-                                                                                {x.name}
+                                                                                {x.title}
                                                                             </TableCell>
                                                                             <TableCell className={`px-2 py-[10px] md:px-3 font-normal text-xs ${theme === "dark" ? "" : "text-muted-foreground"}`}>{moment.utc(x.updated_at).local().startOf('seconds').fromNow()}</TableCell>
                                                                             <TableCell className={`px-2 py-[10px] md:px-3  ${theme === "dark" ? "" : "text-muted-foreground"}} `}>

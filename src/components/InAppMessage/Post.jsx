@@ -58,7 +58,7 @@ const Post = ({inAppMsgSetting, setInAppMsgSetting, isLoading}) => {
             inlineToolbar: true,
             config: {
                 endpoints: {
-                    byFile: 'https://code.quickhunt.app/public/api/upload', // Your file upload endpoint
+                    byFile: 'http://192.168.1.36:3001/upload', // Your file upload endpoint
                     byUrl: 'https://code.quickhunt.app/public/storage/post', // Your endpoint that provides image by URL
                 },
                 field: 'image',
@@ -139,13 +139,13 @@ const Post = ({inAppMsgSetting, setInAppMsgSetting, isLoading}) => {
     }, [isLoading]);
 
     return (
-        <div className={`px-16 flex flex-col gap-4 py-8 bg-muted justify-start overflow-y-auto h-[calc(100%_-_94px)]`}>
+        <div className={`p-4 md:px-16 md:py-8 flex flex-col gap-4 bg-muted justify-start overflow-y-auto h-[calc(100%_-_94px)]`}>
             <Card className={`rounded-[10px] p-0`} >
                 <CardHeader className={"flex px-4 pt-4 pb-0 flex-row justify-end"}>
                     <Button className={`h-4 w-4 p-0 ${theme === "dark" ? "" : "text-muted-foreground"}`}
                             variant={"ghost hover:none"}><X size={16} stroke={inAppMsgSetting?.btn_color} className={"h-5 w-5"}/></Button>
                 </CardHeader>
-                <CardHeader className={"pt-0"}>
+                <CardHeader className={"p-4 pt-0"}>
                     {
                         (inAppMsgSetting.show_sender === 1 && inAppMsgSetting.from) ? <div className={"pt-0 flex flex-row gap-2"}>
                             <Avatar className={"w-[32px] h-[32px]"}>
@@ -167,11 +167,11 @@ const Post = ({inAppMsgSetting, setInAppMsgSetting, isLoading}) => {
                             </div>
                         </div> : ""
                     }
-                    <div className={"pl-14 pt-6 m-0 w-full"}>{isLoading ? "" :  <div id="editorjs"></div>}</div>
+                    <div className={"pl-4 pt-4 md:pl-14 md:pt-6 m-0 w-full"}>{isLoading ? "" :  <div id="editorjs"></div>}</div>
                     {/*<div className={"pl-14 pt-6 m-0 w-full"}><EditorComponent  /></div>*/}
                 </CardHeader>
                 {
-                    inAppMsgSetting.reply_type === 1 ? <CardContent className={`py-5 pl-8 pr-5 rounded-b-lg flex flex-row justify-between`} style={{background: inAppMsgSetting.bg_color}}>
+                    inAppMsgSetting.reply_type === 1 ? <CardContent className={`p-4 md:py-5 md:pl-8 md:pr-5 rounded-b-lg flex flex-row justify-between`} style={{background: inAppMsgSetting.bg_color}}>
                         <div className={""}>
                             <div className={"flex flex-row gap-3 items-center text-xs"}>
                                 <MessageCircleMore size={20} stroke={inAppMsgSetting?.icon_color} />

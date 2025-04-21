@@ -14,7 +14,7 @@ const Editor = ({blocks, onChange}) => {
             inlineToolbar : true,
             config: {
                 endpoints: {
-                    byFile: 'https://code.quickhunt.app/public/api/upload', // Your file upload endpoint
+                    byFile: 'http://192.168.1.36:3001/upload', // Your file upload endpoint
                     byUrl: 'https://code.quickhunt.app/public/storage/post', // Your endpoint that provides image by URL
                 },
                 field: 'image',

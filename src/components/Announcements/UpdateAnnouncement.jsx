@@ -7,7 +7,6 @@ import {Badge} from "../ui/badge";
 import {BarChart, CalendarIcon, Check, Circle, CircleX, Loader2, Pin, Upload} from "lucide-react";
 import {Popover, PopoverContent, PopoverTrigger} from "../ui/popover";
 import {Button} from "../ui/button";
-import {cn} from "../../lib/utils";
 import moment from "moment";
 import {Calendar} from "../ui/calendar";
 import {useLocation, useNavigate, useParams} from "react-router-dom";
@@ -390,16 +389,17 @@ const UpdateAnnouncement = () => {
                                 <div className={"w-full space-y-1.5"}>
                                     <Label className={"font-normal"}>Label</Label>
                                     <Select value={[]} onValueChange={onChangeLabel}>
+                                    {/*<Select value={selectedRecord?.labels?.length > 0 ? selectedRecord.labels[0] : undefined} onValueChange={onChangeLabel}>*/}
                                         <SelectTrigger className="h-9">
                                             <SelectValue className={"text-muted-foreground text-sm"}>
                                                 {
                                                     selectedRecord?.labels?.length > 0 ? (
                                                     <div className={"flex gap-[2px]"}>
                                                         {
-                                                            (selectedRecord.labels || []).map((x) => {
+                                                            (selectedRecord.labels || []).map((x, i) => {
                                                                 const findObj = labelList.find((y) => y.id == x);
                                                                 return (
-                                                                    <Badge
+                                                                    <Badge key={i}
                                                                         variant={"outline"}
                                                                         style={{
                                                                             color: findObj?.label_color_code,
@@ -448,6 +448,7 @@ const UpdateAnnouncement = () => {
                                 <div className={"w-full space-y-1.5"}>
                                     <Label className={"font-normal"}>Assign to</Label>
                                     <Select onValueChange={handleValueChange} value={[]}>
+                                    {/*<Select onValueChange={handleValueChange} value={selectedRecord?.post_assign_to?.length > 0 ? selectedRecord.post_assign_to[0] : undefined}>*/}
                                         <SelectTrigger className={"h-9"}>
                                             <SelectValue className={"text-muted-foreground text-sm"}>
                                                 {

@@ -205,7 +205,7 @@ const SaidBarDesktop = ({isMobile, setIsMobile}) => {
             title: 'Settings',
             link: '/settings/profile',
             icon: <Settings size={15} />,
-            selected: window.location.pathname === `${baseUrl}/settings/team` ? false : isActive(`${baseUrl}/settings/profile`, `${baseUrl}/settings/${type}`),
+            selected: window.location.pathname === `${baseUrl}/settings/team` ? false : window.location.pathname?.includes('settings'),
             isDisplay: true,
         }
     ];

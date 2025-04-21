@@ -4,10 +4,9 @@ import moment from "moment";
 import {ApiService} from "../../utils/ApiService";
 import {useSelector} from "react-redux";
 import EmptyData from "../Comman/EmptyData";
-import {chartLoading, CommSkel} from "../Comman/CommSkel";
+import {chartLoading, commonLoad} from "../Comman/CommSkel";
 import {Bar, BarChart, CartesianGrid, XAxis, YAxis} from "recharts"
-import {ChartContainer, ChartTooltip, ChartTooltipContent,} from "../ui/chart"
-import {Avatar, AvatarFallback, AvatarImage} from "../ui/avatar";
+import {ChartContainer, ChartTooltip, ChartTooltipContent,} from "../ui/chart";
 import ReadMoreText from "../Comman/ReadMoreText";
 import {DateRangePicker, formatDate, getPresetRange, PRESETS} from "../ui/date-range-picker";
 import {Button} from "../ui/button";
@@ -221,7 +220,7 @@ export function Dashboard() {
                                     <Fragment key={i}>
                                         {
                                             isLoading ? <Card><CardContent
-                                                    className={"p-0"}> {CommSkel.commonParagraphThree} </CardContent></Card> :
+                                                    className={"p-0"}> {commonLoad.commonParagraphThree} </CardContent></Card> :
                                                 <Card
                                                     className={"rounded-lg border bg-card text-card-foreground shadow-sm"}
                                                     x-chunk={"dashboard-05-chunk-0"} key={i}>
@@ -255,7 +254,7 @@ export function Dashboard() {
                             <div className={"max-h-[300px] overflow-y-auto flex-1"}>
                                 {
                                     isLoading ? (
-                                        <CardContent className={"p-0"}>{CommSkel.dashboardComments}</CardContent>
+                                        <CardContent className={"p-0"}>{commonLoad.dashboardComments}</CardContent>
                                     ) : (
                                         (chartList.feedbacks && chartList.feedbacks.length > 0) ? (
                                             (chartList.feedbacks || []).map((x, i) => (
@@ -287,7 +286,7 @@ export function Dashboard() {
                                                                 {x.type === 1 ? "Announcement" : "Idea"}
                                                             </Badge>
                                                         </div>
-                                                        <p className="text-xs font-normal text-foreground cursor-pointer">
+                                                        <div className="text-xs font-normal text-foreground cursor-pointer">
                                                             <ReadMoreText
                                                                 html={x.comment}
                                                                 maxLength={100}
@@ -299,7 +298,7 @@ export function Dashboard() {
                                                                     }
                                                                 }}
                                                             />
-                                                        </p>
+                                                        </div>
                                                     </CardContent>
                                                 </Fragment>
                                             ))
@@ -325,7 +324,7 @@ export function Dashboard() {
                             <div className={"max-h-[300px] overflow-y-auto flex-1"}>
                                 {
                                     isLoading ? (
-                                        <CardContent className={"p-0"}>{CommSkel.commonParagraphTwoAvatar}</CardContent>
+                                        <CardContent className={"p-0"}>{commonLoad.commonParagraphTwoAvatar}</CardContent>
                                     ) : (
                                         (chartList.reactions && chartList.reactions.length > 0) ? (
                                             (chartList.reactions || []).map((x, i) => {

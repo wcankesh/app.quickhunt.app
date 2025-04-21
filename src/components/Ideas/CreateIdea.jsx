@@ -11,16 +11,16 @@ import {inboxMarkReadAction} from "../../redux/action/InboxMarkReadAction";
 const initialState = {
     title: "",
     images: [],
-    topic: [],
-    project_id: "",
+    topicId: [],
+    projectId: "",
     description: "",
-    board: ""
+    boardId: ""
 }
 
 const initialStateError = {
     title: "",
     description: "",
-    board: ""
+    boardId: ""
 }
 
 const CreateIdea = ({isOpen, onOpen, onClose, closeCreateIdea, setIdeasList, ideasList, getAllIdea, pageNo}) => {
@@ -41,19 +41,19 @@ const CreateIdea = ({isOpen, onOpen, onClose, closeCreateIdea, setIdeasList, ide
     useEffect(() => {
         if(projectDetailsReducer.id){
             setTopicLists(allStatusAndTypes.topics)
-            setIdeaDetail({...initialState, board: allStatusAndTypes?.boards[0]?.id})
+            setIdeaDetail({...initialState, boardId: allStatusAndTypes?.boards[0]?.id})
         }
     }, [projectDetailsReducer.id, allStatusAndTypes]);
 
     const handleChange = (id) => {
-        const clone = [...ideaDetail.topic];
+        const clone = [...ideaDetail.topicId];
         const index = clone.indexOf(id);
         if (index > -1) {
             clone.splice(index, 1);
         } else {
             clone.push(id);
         }
-        setIdeaDetail({ ...ideaDetail, topic: clone });
+        setIdeaDetail({ ...ideaDetail, topicId: clone });
     };
 
     const convertToSlug = (Text) => {
@@ -79,14 +79,17 @@ const CreateIdea = ({isOpen, onOpen, onClose, closeCreateIdea, setIdeasList, ide
         setIsLoading(true)
         let formData = new FormData();
         formData.append('title', ideaDetail.title);
-        // formData.append('slug_url', ideaDetail.title ? ideaDetail.title.replace(/ /g,"-").replace(/\?/g, "-") :"");
-        formData.append('slug_url', convertToSlug(ideaDetail?.title || ''));
+        // formData.append('slugUrl', ideaDetail.title ? ideaDetail.title.replace(/ /g,"-").replace(/\?/g, "-") :"");
+        formData.append('slugUrl', convertToSlug(ideaDetail?.title || ''));
         formData.append('description', ideaDetail.description);
-        formData.append('project_id', projectDetailsReducer.id);
-        formData.append('board', ideaDetail.board);
-        formData.append('topic', ideaDetail.topic.join());
+        formData.append('projectId', projectDetailsReducer.id);
+        formData.append('boardId', ideaDetail.boardId);
+        // formData.append('topicId', ideaDetail.topicId.join());
+        ideaDetail.topicId.forEach(id => {
+            formData.append('topicId[]', id);
+        });
         const data = await apiSerVice.createIdea(formData)
-        if(data.status === 200){
+        if(data.success){
             const clone = [...ideasList];
             clone.push(data.data)
             // const newArray = [data.data].concat(clone)
@@ -95,7 +98,7 @@ const CreateIdea = ({isOpen, onOpen, onClose, closeCreateIdea, setIdeasList, ide
             setIsLoading(false)
             setIdeaDetail(initialState)
             const cloneInbox = [...inboxMarkReadReducer];
-            cloneInbox.push({...data.data, is_read: 1})
+            cloneInbox.push({...data.data, isRead: 1})
             dispatch(inboxMarkReadAction(cloneInbox));
             await getAllIdea()
             closeCreateIdea()
@@ -104,7 +107,7 @@ const CreateIdea = ({isOpen, onOpen, onClose, closeCreateIdea, setIdeasList, ide
 
         } else {
             setIsLoading(false)
-            toast({description: data.message, variant: "destructive" })
+            toast({description: data.error, variant: "destructive" })
         }
     }
 
@@ -117,7 +120,7 @@ const CreateIdea = ({isOpen, onOpen, onClose, closeCreateIdea, setIdeasList, ide
                     return "";
                 }
 
-            case "board":
+            case "boardId":
                 if (!value || value.toString().trim() === "") {
                     return "Board is required";
                 } else {

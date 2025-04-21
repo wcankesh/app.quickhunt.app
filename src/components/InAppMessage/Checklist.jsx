@@ -11,7 +11,7 @@ import {useSelector} from "react-redux";
 import Editor from "../Comman/Editor";
 import {Collapsible, CollapsibleContent, CollapsibleTrigger,} from "../ui/collapsible"
 
-const checklists = ({inAppMsgSetting, setInAppMsgSetting, isLoading, selectedStep, setSelectedStep, setSelectedStepIndex, selectedStepIndex}) => {
+const checklists = ({inAppMsgSetting, setInAppMsgSetting, selectedStep, setSelectedStep, setSelectedStepIndex, selectedStepIndex}) => {
     const {theme} = useTheme();
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
@@ -94,7 +94,7 @@ const checklists = ({inAppMsgSetting, setInAppMsgSetting, isLoading, selectedSte
     };
 
     return (
-        <div className={`py-16 bg-muted overflow-y-auto h-[calc(100%_-_94px)]`}>
+        <div className={`py-16 px-[5px] md:px-0 bg-muted overflow-y-auto h-[calc(100%_-_94px)]`}>
             <div className={"flex justify-center"}>
                 <div className={`max-w-[450px] mx-auto w-full rounded-[10px] pt-4 pb-6`} style={{backgroundColor:inAppMsgSetting.bg_color}}>
                     <div className={"flex justify-between items-center px-4 gap-2"}>
@@ -145,7 +145,7 @@ const checklists = ({inAppMsgSetting, setInAppMsgSetting, isLoading, selectedSte
                             {
                                 (inAppMsgSetting?.checklists || []).filter((x) =>x.is_active === 1).map((x, i) => {
                                     return (
-                                        <Collapsible open={i == selectedStepIndex}  className={`p-4 text-sm w-full border rounded-md ${i == selectedStepIndex ? "border border-solid border-[#7C3AED]" : ""}`}>
+                                        <Collapsible key={i} open={i == selectedStepIndex}  className={`p-4 text-sm w-full border rounded-md ${i == selectedStepIndex ? "border border-solid border-[#7C3AED]" : ""}`}>
                                             <CollapsibleTrigger asChild>
                                                 <div className="flex items-center space-x-2 w-full"  >
                                                     <Checkbox className={"w-6 h-6"}/>

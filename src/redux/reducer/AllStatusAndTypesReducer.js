@@ -4,7 +4,7 @@ const initialState = {
     categories: [],
     labels: [],
     members: [],
-    roadmap_status: [],
+    roadmapStatus: [],
     topics: [],
     projectList: [],
     emoji:[],

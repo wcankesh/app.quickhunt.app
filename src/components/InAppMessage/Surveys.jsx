@@ -216,19 +216,19 @@ const Surveys = ({inAppMsgSetting, setInAppMsgSetting, selectedStepIndex, setSel
     };
 
     return (
-        <div className={"flex flex-col gap-4 py-8 bg-muted justify-start overflow-y-auto h-[calc(100%_-_94px)]"}>
+        <div className={"flex flex-col gap-4 py-8 px-[5px] md:px-0 bg-muted justify-start overflow-y-auto h-[calc(100%_-_94px)]"}>
             {
                 inAppMsgSetting.steps.filter((x) => x.is_active === 1).map((x, i) => {
                     return(
                         // <div className={`flex flex-col mx-auto gap-8 w-full max-w-[550px]`} key={i}>
-                        <div className={`flex items-center mx-auto gap-8 w-full max-w-[623px] w-full`} key={i}>
+                        <div className={`flex items-center mx-auto gap-2 md:gap-8 w-full max-w-[623px] w-full`} key={i}>
                             <div className={"flex gap-1"}><span>Step</span> <span>{x.step}</span></div>
-                            <div onClick={(e) => onSelectStep(x, i)} className={"relative rounded-[10px] pt-8 p-6 cursor-pointer w-full"} style={{backgroundColor: selectedStep.step === x.step ? inAppMsgSetting.bg_color : "#fff", color: selectedStep.step === x.step ?inAppMsgSetting.text_color : "#000"}}>
+                            <div onClick={(e) => onSelectStep(x, i)} className={"relative rounded-[10px] p-4 md:pt-8 md:p-6 cursor-pointer w-full"} style={{backgroundColor: selectedStep.step === x.step ? inAppMsgSetting.bg_color : "#fff", color: selectedStep.step === x.step ?inAppMsgSetting.text_color : "#000"}}>
                                 <div className={"absolute top-[8px] right-[8px]"}>
                                 {
                                     inAppMsgSetting.is_close_button ? <X size={16} stroke={inAppMsgSetting?.btn_color}/> : ""
                                 }</div>
-                                <div className={"flex gap-3"}>
+                                <div className={"flex gap-1 md:gap-3"}>
                                     {
                                         (inAppMsgSetting.from) ?
                                             <div className={"flex-none pt-2 flex-1 w-8"}>
@@ -265,7 +265,7 @@ const Surveys = ({inAppMsgSetting, setInAppMsgSetting, selectedStepIndex, setSel
                                         }
                                         {
                                             x?.question_type === 1 && <Fragment>
-                                                <div className={"flex gap-3 px-[30px] pt-[18px]"}>
+                                                <div className={"flex flex-wrap gap-3 px-3 pt-3 md:px-[30px] md:pt-[18px]"}>
                                                     {
                                                         renderNumber(x).map(num => (
                                                             <Button key={num} variant={"outline"}

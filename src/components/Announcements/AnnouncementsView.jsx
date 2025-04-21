@@ -11,7 +11,7 @@ import moment from "moment";
 import {toast} from "../ui/use-toast";
 import ReadMoreText from "../Comman/ReadMoreText";
 import {Toaster} from "../ui/toaster";
-import {CommSkel} from "../Comman/CommSkel";
+import {commonLoad} from "../Comman/CommSkel";
 import {Dialog,DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "../ui/dialog";
 
 const status = [
@@ -95,7 +95,7 @@ const AnnouncementsView = ({data,isLoading,setSelectedRecord,handleDelete,setAna
                 </Fragment>
             }
             {
-                isLoading ? <Card><CardContent className={"p-0"}>{CommSkel.commonParagraphFourIdea}</CardContent></Card> :
+                isLoading ? <Card><CardContent className={"p-0"}>{commonLoad.commonParagraphFourIdea}</CardContent></Card> :
                     <div className={"flex flex-col px-3 lg:px-[33px] pt-[9px] pb-0"}>
                         {
                             (announcementList || []).map((x,index)=>{

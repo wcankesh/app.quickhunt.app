@@ -24,21 +24,21 @@ const initialStateError = {
     sendInvite: '',
 }
 const initialStateProject = {
-    project_name: '',
-    project_website: "",
-    project_language_id: '3',
-    project_timezone_id: '90',
-    project_logo: '',
-    project_favicon: '',
-    project_api_key: '',
-    project_status: '',
-    project_browser: '',
-    project_ip_address: '',
-    domain: ''
+    name: '',
+    website: "",
+    domain: '',
+    // project_language_id: '3',
+    // project_timezone_id: '90',
+    // project_logo: '',
+    // project_favicon: '',
+    // project_api_key: '',
+    // project_status: '',
+    // project_browser: '',
+    // project_ip_address: '',
 }
 
 const initialStateErrorProject = {
-    project_name: '',
+    name: '',
 }
 
 const Step3 = ({setStep}) => {
@@ -62,7 +62,7 @@ const Step3 = ({setStep}) => {
 
     const onChangeText = (event) => {
         const { name, value } = event.target;
-        if(name === "project_name" || name === 'domain'){
+        if(name === "name" || name === 'domain'){
             const cleanDomain = (name) => name.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
             const sanitizedProjectName = cleanDomain(value);
             setCreateProjectDetails({
@@ -84,7 +84,7 @@ const Step3 = ({setStep}) => {
 
     const formValidate = (name, value) => {
         switch (name) {
-            case "project_name":
+            case "name":
                 if (!value || value.trim() === "") {
                     return "Project name is required";
                 } else {
@@ -110,36 +110,42 @@ const Step3 = ({setStep}) => {
             setIsCreateLoading(false);
             return;
         }
+        debugger
         const cleanDomain = (name) => name.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-        const sanitizedProjectName = cleanDomain(createProjectDetails.project_name);
+        const sanitizedProjectName = cleanDomain(createProjectDetails.name);
         const domain = `${cleanDomain(createProjectDetails.domain || sanitizedProjectName)}.quickhunt.app`;
 
         const payload = {
             ...createProjectDetails,
+            onBoardComplete: 1,
             domain
         };
         const token = localStorage.getItem('token-verify-onboard') || null
 
         const data = await apiService.createProjects(payload, {Authorization: `Bearer ${token}`})
-        if (data.status === 200) {
+        console.log("data before", data)
+        if (data.success) {
             let obj = {
                 ...data.data,
-                Title: data.data.project_name,
+                Title: data.data.name,
                 Link: 'onProject',
                 icon: '',
-                selected: false
+                selected: false,
+                onBoardComplete: 1
             };
+            console.log("data after", data.data)
             setProjectDetails(obj);
             dispatch(projectDetailsAction(obj))
             toast({description: data.message})
             setCreateProjectDetails(initialStateProject)
             setIsCreateLoading(false);
-            onBoardingFlowComplete();
+            setStep(4);
+            // onBoardingFlowComplete();
             localStorage.setItem("token", token);
             localStorage.removeItem('token-verify-onboard')
         } else {
             setIsCreateLoading(false);
-            toast({variant: "destructive" ,description: data.message})
+            toast({variant: "destructive" ,description: data.error.message})
         }
 
         setStep(stepCount)
@@ -158,26 +164,26 @@ const Step3 = ({setStep}) => {
                     <div className="space-y-1">
                         <Label htmlFor="name" className="text-right font-normal">Project Name</Label>
                         <Input
-                            id="project_name"
+                            id="name"
                             placeholder="Project Name"
                             className={`${theme === "dark" ? "" : "placeholder:text-muted-foreground/75"}`}
-                            value={createProjectDetails.project_name}
-                            name="project_name"
+                            value={createProjectDetails.name}
+                            name="name"
                             onChange={onChangeText}
                         />
                         {
-                            formError.project_name &&
-                            <span className="text-destructive text-sm">{formError.project_name}</span>
+                            formError.name &&
+                            <span className="text-destructive text-sm">{formError.name}</span>
                         }
                     </div>
                     <div className="space-y-1">
                         <Label htmlFor="website" className="text-right font-normal">Project URL</Label>
                         <Input
-                            id="project_website"
+                            id="website"
                             placeholder="https://yourcompany.com"
                             className={`${theme === "dark" ? "placeholder:text-card-foreground/80" : "placeholder:text-muted-foreground/75"}`}
-                            value={createProjectDetails.project_website}
-                            name="project_website"
+                            value={createProjectDetails.website}
+                            name="website"
                             onChange={onChangeText}
                         />
                     </div>

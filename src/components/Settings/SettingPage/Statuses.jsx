@@ -16,7 +16,7 @@ import DeleteDialog from "../../Comman/DeleteDialog";
 
 const initialStatus = {
     title: '',
-    color_code: '',
+    colorCode: '',
 };
 
 const initialDnDState = {
@@ -45,13 +45,13 @@ const Statuses = () => {
     const [isDeleteLoading,setIsDeleteLoading]=useState(false);
 
     useEffect(() => {
-        if(allStatusAndTypes.roadmap_status){
+        if(allStatusAndTypes.roadmapStatus){
             getAllRoadmapStatus();
         }
-    }, [allStatusAndTypes.roadmap_status]);
+    }, [allStatusAndTypes.roadmapStatus]);
 
     const getAllRoadmapStatus = () => {
-        setStatusList(allStatusAndTypes.roadmap_status);
+        setStatusList(allStatusAndTypes.roadmapStatus);
     }
 
     const handleInputChange = (event, index) => {
@@ -89,13 +89,13 @@ const Statuses = () => {
 
     const onChangeColorColor = (newColor, index) => {
         const updatedColors = [...statusList];
-        updatedColors[index] = { ...updatedColors[index], color_code: newColor.clr };
+        updatedColors[index] = { ...updatedColors[index], colorCode: newColor.clr };
         setStatusList(updatedColors);
     };
 
     const handleShowInput = () => {
         const clone = [...statusList];
-        clone.push({title: '', color_code: randomColor(),});
+        clone.push({title: '', colorCode: randomColor(),});
         setIsEdit(clone.length - 1);
         setStatusList(clone);
         setLabelError(initialStatus);
@@ -116,16 +116,16 @@ const Statuses = () => {
 
         setIsSave(true)
         const payload = {
-            project_id: `${projectDetailsReducer.id}`,
+            projectId: `${projectDetailsReducer.id}`,
             title: newStatus.title,
-            color_code: newStatus.color_code,
+            colorCode: newStatus.colorCode,
         }
-        const data = await apiService.createRoadmapStatus(payload)
-        if (data.status === 200) {
+        const data = await apiService.createSettingsStatus(payload)
+        if (data.success) {
             let clone = [...statusList];
             clone[index] = {...data.data};
             setStatusList(clone);
-            dispatch(allStatusAndTypesAction({...allStatusAndTypes, roadmap_status: clone}))
+            dispatch(allStatusAndTypesAction({...allStatusAndTypes, roadmapStatus: clone}))
             setIsSave(false);
             setIsEdit(null);
 
@@ -135,7 +135,7 @@ const Statuses = () => {
         } else {
             setIsSave(false)
             toast({
-                description:data.message,
+                description:data?.message,
                 variant: "destructive",
             })
         }
@@ -159,18 +159,18 @@ const Statuses = () => {
 
         setIsSave(true)
         const payload = {
-            project_id: `${projectDetailsReducer.id}`,
+            projectId: `${projectDetailsReducer.id}`,
             title: labelToSave.title,
-            color_code: labelToSave.color_code,
+            colorCode: labelToSave.colorCode,
         }
-        const data = await apiService.updateRoadmapStatus(payload, labelToSave.id)
-        if (data.status === 200) {
+        const data = await apiService.updateSettingsStatus(payload, labelToSave.id)
+        if (data.success) {
             let clone = [...statusList];
             let index = clone.findIndex((x) => x.id === labelToSave.id);
             if (index !== -1) {
                 clone[index] = data.data;
                 setStatusList(clone)
-                dispatch(allStatusAndTypesAction({...allStatusAndTypes, roadmap_status: clone}))
+                dispatch(allStatusAndTypesAction({...allStatusAndTypes, roadmapStatus: clone}))
             }
             setIsSave(false)
             toast({
@@ -179,7 +179,7 @@ const Statuses = () => {
         } else {
             setIsSave(false)
             toast({
-                description:data.message,
+                description:data?.error.message,
                 variant: "destructive"
             })
         }
@@ -193,7 +193,7 @@ const Statuses = () => {
         setDeleteId(id);
         setDeleteIndex(index);
         setOpenDelete(true);
-        setStatusList(allStatusAndTypes.roadmap_status);
+        setStatusList(allStatusAndTypes.roadmapStatus);
         setIsEdit(null);
     };
 
@@ -205,7 +205,7 @@ const Statuses = () => {
             setIsEdit(index)
             setStatusList(clone)
         }else if (isEdit !== index){
-            setStatusList(allStatusAndTypes?.roadmap_status);
+            setStatusList(allStatusAndTypes?.roadmapStatus);
             setIsEdit(index);
         }
         else {
@@ -215,7 +215,7 @@ const Statuses = () => {
 
     const onEditCancel = () => {
         setIsEdit(null)
-        setStatusList(allStatusAndTypes.roadmap_status)
+        setStatusList(allStatusAndTypes.roadmapStatus)
     }
 
     const onDragStart = (event) => {
@@ -257,28 +257,29 @@ const Statuses = () => {
         const clone = [];
         const rank = [];
         dragAndDrop.updatedOrder.map((x, i) => {
+            console.log("x", x.id)
             clone.push({...x, rank: i, })
             rank.push({rank:i, id:x.id})
         });
         const payload = {
-            rank:rank
+            ranks:rank
         }
         setStatusList(clone);
-        dispatch(allStatusAndTypesAction({...allStatusAndTypes, roadmap_status: clone}));
+        dispatch(allStatusAndTypesAction({...allStatusAndTypes, roadmapStatus: clone}));
         setDragAndDrop({
             ...dragAndDrop,
             draggedFrom: null,
             draggedTo: null,
             isDragging: false
         });
-        const data = await apiService.roadmapStatusRank(payload)
-        if (data.status === 200) {
+        const data = await apiService.roadmapSettingsStatusRank(payload)
+        if (data.success) {
             toast({
                 description:data.message
             })
         } else {
             toast({
-                description:data.message,
+                description:data?.error.message,
                 variant: "destructive"
             })
         }
@@ -295,12 +296,12 @@ const Statuses = () => {
     const deleteParticularRow = async () => {
         if (deleteId) {
             setIsDeleteLoading(true);
-            const data = await apiService.deleteRoadmapStatus(deleteId)
-            if (data.status === 200) {
+            const data = await apiService.onDeleteSettingsStatus(deleteId)
+            if (data.success) {
                 const clone = [...statusList];
                 clone.splice(deleteIndex, 1)
                 setStatusList(clone)
-                dispatch(allStatusAndTypesAction({...allStatusAndTypes, roadmap_status: clone}))
+                dispatch(allStatusAndTypesAction({...allStatusAndTypes, roadmapStatus: clone}))
                 toast({
                     description:data.message
                 })
@@ -311,7 +312,7 @@ const Statuses = () => {
                 });
             } else {
                 toast({
-                    description:data.message,
+                    description:data?.error.message,
                     variant: "destructive"
                 });
             }
@@ -408,7 +409,7 @@ const Statuses = () => {
                                                     <TableCell
                                                         className={`font-normal text-xs px-[12px] py-[10px] align-top ${theme === "dark" ? "" : "text-muted-foreground"}`}>
                                                         <div className={"flex items-center"}>
-                                                            <ColorInput name={"clr"} value={x.color_code} onChange={(color) => onChangeColorColor(color, i)}/>
+                                                            <ColorInput name={"clr"} value={x.colorCode} onChange={(color) => onChangeColorColor(color, i)}/>
                                                         </div>
                                                     </TableCell>
                                                     <TableCell className={`px-[12px] py-[10px] align-top ${theme === "dark" ? "" : "text-muted-foreground"}`}>
@@ -446,8 +447,8 @@ const Statuses = () => {
                                                     <TableCell
                                                         className={`font-normal text-xs px-[12px] py-[10px] ${theme === "dark" ? "" : "text-muted-foreground"}`}>
                                                         <div className={"flex items-center gap-1"}>
-                                                            <Square size={16} strokeWidth={1} fill={x.color_code} stroke={x.color_code}/>
-                                                            <p>{x.color_code}</p>
+                                                            <Square size={16} strokeWidth={1} fill={x.colorCode} stroke={x.colorCode}/>
+                                                            <p>{x.colorCode}</p>
                                                         </div>
                                                     </TableCell>
                                                     <TableCell className={`flex gap-2 px-[12px] py-[10px] ${theme === "dark" ? "" : "text-muted-foreground"} `}>

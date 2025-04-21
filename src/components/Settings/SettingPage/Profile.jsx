@@ -8,50 +8,48 @@ import {useSelector,useDispatch} from "react-redux";
 import {ApiService} from "../../../utils/ApiService";
 import {userDetailsAction} from "../../../redux/action/UserDetailAction";
 import {toast} from "../../ui/use-toast";
-import {useTheme} from "../../theme-provider";
 
 const initialState = {
     id: "",
     user_browser: null,
     user_created_date: "",
-    user_email_id: "",
-    user_first_name: "",
+    email: "",
+    firstName: "",
     user_ip_address: null,
     user_job_title: "",
-    user_last_name: "",
-    user_photo: "",
+    lastName: "",
+    image: "",
     user_status: "",
     user_updated_date: "",
 }
 
 const initialStateError ={
-    user_first_name:'',
-    user_last_name:''
+    firstName:'',
+    lastName:''
 }
 const initialStateErrorPassWord ={
-    current_password:'',
+    currentPassword:'',
     password:'',
-    confirm_password:'',
+    passwordConfirmation:'',
 }
 const initialStatePassWord ={
-    current_password:'',
+    currentPassword:'',
     password:'',
-    confirm_password:'',
+    passwordConfirmation:'',
 }
 
 const Profile = () => {
     const dispatch = useDispatch();
     const apiSerVice = new ApiService();
-    const {theme} = useTheme();
     const userDetailsReducer = useSelector(state => state.userDetailsReducer);
 
     const [userDetails, setUserDetails] = useState(initialState);
     const [formError, setFormError] = useState(initialStateError);
     const [formErrorPassword, setFormErrorPassword] = useState(initialStateErrorPassWord);
     const [passwordVisibility, setPasswordVisibility] = useState({
-        user_current_password: false,
-        user_password: false,
-        user_confirm_password: false
+        userCurrentPassword: false,
+        userPassword: false,
+        userConfirmPassword: false
     });
     const [password, setPassword] = useState(initialStatePassWord);
     const [isLoading, setIsLoading] = useState(false);
@@ -95,27 +93,19 @@ const Profile = () => {
 
     const formValidate = (name, value) => {
         switch (name) {
-            case "user_first_name":
+            case "firstName":
                 if (!value || value.trim() === "") {
                     return "First name is required";
                 } else {
                     return "";
                 }
-            case "user_last_name":
+            case "lastName":
                 if (!value || value.trim() === "") {
                     return "Last name is required";
                 } else {
                     return "";
                 }
-            // case "user_email_id":
-            //     if (!value || value.trim() === "") {
-            //         return "Email is required";
-            //     } else if (!value.match(/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/)) {
-            //         return "Enter a valid email address";
-            //     } else {
-            //         return "";
-            //     }
-            case "user_email_id":
+            case "email":
                 if (!value || value.trim() === "") {
                     return "Email is required";
                 }
@@ -127,7 +117,7 @@ const Profile = () => {
                 else {
                     return "";
                 }
-            case "current_password":
+            case "currentPassword":
                 if (!value || value.trim() === "") {
                     return "Current password is required";
                 } else {
@@ -145,7 +135,7 @@ const Profile = () => {
                 } else {
                     return "";
                 }
-            case "confirm_password":
+            case "passwordConfirmation":
                 if (!value || value.trim() === "") {
                     return "Confirm password is required";
                 } else if (value !== password.password) {
@@ -153,8 +143,8 @@ const Profile = () => {
                 } else {
                     return "";
                 }
-            case "user_photo":
-                if (value && value.size > 5 * 1024 * 1024) { // 5 MB
+            case "image":
+                if (value && value.size > 5 * 1024 * 1024) {
                     return "Image size must be less than 5 MB.";
                 } else {
                     return "";
@@ -173,19 +163,19 @@ const Profile = () => {
         const selectedFile = file.target.files[0];
         setUserDetails({
             ...userDetails,
-            user_photo: selectedFile
+            image: selectedFile
         });
         setFormError(formError => ({
             ...formError,
-            'user_photo': formValidate('user_photo', selectedFile)
+            'image': formValidate('image', selectedFile)
         }));
     };
 
     const onDeleteImg = async (name, value) => {
-        if(userDetails && userDetails?.user_photo && userDetails.user_photo?.name){
-            setUserDetails({...userDetails, user_photo: ""})
+        if(userDetails && userDetails?.image && userDetails.image?.name){
+            setUserDetails({...userDetails, image: ""})
         } else {
-            setUserDetails({...userDetails, [name]: value, user_photo: ""})
+            setUserDetails({...userDetails, [name]: value, image: ""})
         }
     }
 
@@ -204,15 +194,15 @@ const Profile = () => {
         setIsLoading(true)
         let formData = new FormData();
         const obj = {
-            user_first_name: userDetails.user_first_name,
-            user_last_name: userDetails.user_last_name,
-            user_email_id: userDetails.user_email_id,
-            user_photo: userDetails.user_photo,
-            user_job_title: userDetails.user_job_title,
-            delete_image: userDetails?.delete_image || '',
+            firstName: userDetails.firstName,
+            lastName: userDetails.lastName,
+            // email: userDetails.email,
+            image: userDetails.image,
+            // user_job_title: userDetails.user_job_title,
+            deleteImage: userDetails?.deleteImage || '',
         }
         Object.keys(obj).map((x) => {
-            if(x === "delete_image" && obj?.user_photo?.name){
+            if(x === "deleteImage" && obj?.image?.name){
 
             }  else {
                 formData.append(x,obj[x]);
@@ -220,18 +210,13 @@ const Profile = () => {
         })
 
         const data = await apiSerVice.updateLoginUserDetails(formData, userDetailsReducer.id);
-        if(data.status === 200){
+        if(data.success){
             dispatch(userDetailsAction({...data.data}));
             setIsLoading(false);
-            toast({
-                description: data.message,
-            });
+            toast({description: data.message,});
         } else {
             setIsLoading(false);
-            toast({
-                description: data.message,
-                variant:"destructive"
-            });
+            toast({description: data.error, variant:"destructive"});
         }
     }
 
@@ -248,22 +233,18 @@ const Profile = () => {
             return;
         }
         setIsLoadingPass(true)
-        const payload = {
-            ...password
-        }
-        const data = await apiSerVice.changePassword(payload);
-        if(data.status === 200){
+        let formData = new FormData();
+        formData.append('currentPassword', password.currentPassword);
+        formData.append('password', password.password);
+        formData.append('passwordConfirmation', password.passwordConfirmation);
+        const data = await apiSerVice.updateLoginUserDetails(formData);
+        if(data.success){
             setIsLoadingPass(false)
             setPassword(initialStatePassWord);
-            toast({
-                description: data.message,
-            })
+            toast({description: data.message,})
         }else {
             setIsLoadingPass(false);
-            toast({
-                description: data.message,
-                variant:"destructive"
-            });
+            toast({description: data.error, variant:"destructive"});
         }
     }
 
@@ -278,30 +259,30 @@ const Profile = () => {
                     <div className={"flex gap-4 flex-wrap lg:flex-nowrap md:flex-nowrap sm:flex-wrap"}>
                         <div className="flex flex-col justify-center mt-2 relative">
                             {
-                                userDetails?.user_photo ?
+                                userDetails?.image ?
                                     <div>
-                                        {userDetails && userDetails.user_photo && userDetails.user_photo.name ?
+                                        {userDetails && userDetails.image && userDetails.image.name ?
                                             <div className={"w-[80px] h-[80px] sm:w-[132px] sm:h-[128px] relative border"}>
                                                 <img
                                                     className="h-full w-full rounded-md object-cover"
-                                                    src={userDetails && userDetails.user_photo && userDetails.user_photo.name ? URL.createObjectURL(userDetails.user_photo) : userDetails.user_photo}
+                                                    src={userDetails && userDetails.image && userDetails.image.name ? URL.createObjectURL(userDetails.image) : userDetails.image}
                                                     alt=""
                                                 />
                                                 <CircleX
                                                     size={20}
                                                     className={`stroke-gray-500 dark:stroke-white cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
-                                                    onClick={() => onDeleteImg('delete_image', userDetails && userDetails?.user_photo && userDetails.user_photo?.name ? "" : userDetails.user_photo.replace("https://code.quickhunt.app/public/storage/user/", ""))}
+                                                    onClick={() => onDeleteImg('deleteImage', userDetails && userDetails?.image && userDetails.image?.name ? "" : userDetails.image.replace("https://code.quickhunt.app/public/storage/user/", ""))}
                                                 />
-                                            </div> : userDetails.user_photo ?
+                                            </div> : userDetails.image ?
                                                 <div className={"w-[80px] h-[80px] sm:w-[132px] sm:h-[128px] relative border"}>
                                                     <img
                                                         className="h-full w-full rounded-md object-cover"
-                                                        src={userDetails.user_photo}
+                                                        src={userDetails.image}
                                                         alt=""/>
                                                     <CircleX
                                                         size={20}
                                                         className={`stroke-gray-500 dark:stroke-white cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
-                                                        onClick={() => onDeleteImg('delete_image', userDetails && userDetails?.user_photo && userDetails.user_photo?.name ? "" : userDetails.user_photo.replace("https://code.quickhunt.app/public/storage/user/", ""))}
+                                                        onClick={() => onDeleteImg('deleteImage', userDetails && userDetails?.image && userDetails.image?.name ? "" : userDetails.image.replace("https://code.quickhunt.app/public/storage/user/", ""))}
                                                     />
                                                 </div>
                                                 : ''}
@@ -322,44 +303,44 @@ const Profile = () => {
                                         </label>
                                     </div>
                             }
-                                        {formError.user_photo && <div className={"text-xs text-destructive"}>{formError.user_photo}</div>}
+                                        {formError.image && <div className={"text-xs text-destructive"}>{formError.image}</div>}
                         </div>
 
                         <div className={"flex flex-col gap-4 w-full sm:w-full"}>
                             <div className={"flex gap-4 flex-wrap sm:flex-nowrap"}>
                                 <div className={"basis-full space-y-0.5"}>
-                                    <Label htmlFor="user_first_name" className={"font-normal"}>First Name</Label>
+                                    <Label htmlFor="firstName" className={"font-normal"}>First Name</Label>
                                     <Input
-                                        id="user_first_name"
+                                        id="firstName"
                                         placeholder="First Name"
-                                        value={userDetails.user_first_name}
-                                        name={'user_first_name'}
+                                        value={userDetails.firstName}
+                                        name={'firstName'}
                                         onChange={onChange}
                                         onBlur={onBlur}
                                         className={"bg-card"}
                                     />
                                     <div className="grid gap-2">
                                         {
-                                            formError.user_first_name &&
-                                            <span className="text-destructive text-sm">{formError.user_first_name}</span>
+                                            formError.firstName &&
+                                            <span className="text-destructive text-sm">{formError.firstName}</span>
                                         }
                                     </div>
                                 </div>
                                 <div className={"basis-full space-y-0.5"}>
-                                    <Label htmlFor="user_last_name" className={"font-normal"}>Last Name</Label>
+                                    <Label htmlFor="lastName" className={"font-normal"}>Last Name</Label>
                                     <Input
-                                        id="user_last_name"
+                                        id="lastName"
                                         placeholder="Last Name"
-                                        value={userDetails.user_last_name}
-                                        name={'user_last_name'}
+                                        value={userDetails.lastName}
+                                        name={'lastName'}
                                         onChange={onChange}
                                         onBlur={onBlur}
                                         className={"bg-card"}
                                     />
                                     <div className="grid gap-2">
                                         {
-                                            formError.user_last_name &&
-                                            <span className="text-destructive text-sm">{formError.user_last_name}</span>
+                                            formError.lastName &&
+                                            <span className="text-destructive text-sm">{formError.lastName}</span>
                                         }
                                     </div>
                                 </div>
@@ -371,8 +352,8 @@ const Profile = () => {
                                         id="email"
                                         type="email"
                                         placeholder="youremail@gmail.com"
-                                        value={userDetails.user_email_id}
-                                        name={'user_email_id'}
+                                        value={userDetails.email}
+                                        name={'email'}
                                         onChange={onChange}
                                         className={"bg-card"}
                                         disabled
@@ -397,25 +378,25 @@ const Profile = () => {
                 <CardContent className={"py-4 px-4 sm:px-5 sm:py-4"}>
                     <div className={"flex flex-col gap-4"}>
                         <div className={"space-y-1"}>
-                        <Label htmlFor="current_password" className={"font-normal"}>Current password</Label>
+                        <Label htmlFor="currentPassword" className={"font-normal"}>Current password</Label>
                         <div className={"relative"}>
                             <Input
-                                id="current_password"
-                                type={passwordVisibility.user_current_password ? "text" : "password"}
+                                id="currentPassword"
+                                type={passwordVisibility.userCurrentPassword ? "text" : "password"}
                                 placeholder={"Current Password"}
-                                value={password.current_password}
-                                name="current_password"
+                                value={password.currentPassword}
+                                name="currentPassword"
                                 onChange={onChangePassword}
                                 onBlur={onBlurPassWord}
                                 className={"bg-card"}
                             />
-                            <Button variant={"ghost hover:none"} onClick={() => togglePasswordVisibility('user_current_password')}
+                            <Button variant={"ghost hover:none"} onClick={() => togglePasswordVisibility('userCurrentPassword')}
                                     className={"absolute top-0 right-0"}>
-                                {passwordVisibility.user_current_password ? <Eye className={"w-[16px] h-[16px]"}/> : <EyeOff className={"w-[16px] h-[16px]"}/>}
+                                {passwordVisibility.userCurrentPassword ? <Eye className={"w-[16px] h-[16px]"}/> : <EyeOff className={"w-[16px] h-[16px]"}/>}
                             </Button>
                             {
-                                formErrorPassword.current_password &&
-                                <span className="text-destructive text-sm">{formErrorPassword.current_password}</span>
+                                formErrorPassword.currentPassword &&
+                                <span className="text-destructive text-sm">{formErrorPassword.currentPassword}</span>
                             }
                         </div>
                         </div>
@@ -425,7 +406,7 @@ const Profile = () => {
                         <div className={"relative"}>
                             <Input
                                 id="password"
-                                type={passwordVisibility.user_password ? "text" : "password"}
+                                type={passwordVisibility.userPassword ? "text" : "password"}
                                 placeholder={"Password"}
                                 value={password.password}
                                 name="password"
@@ -433,9 +414,9 @@ const Profile = () => {
                                 onBlur={onBlurPassWord}
                                 className={"bg-card"}
                             />
-                            <Button variant={"ghost hover:none"} onClick={() => togglePasswordVisibility('user_password')}
+                            <Button variant={"ghost hover:none"} onClick={() => togglePasswordVisibility('userPassword')}
                                     className={"absolute top-0 right-0"}>
-                                {passwordVisibility.user_password ? <Eye className={"w-[16px] h-[16px]"}/> : <EyeOff className={"w-[16px] h-[16px]"}/>}
+                                {passwordVisibility.userPassword ? <Eye className={"w-[16px] h-[16px]"}/> : <EyeOff className={"w-[16px] h-[16px]"}/>}
                             </Button>
                             {
                                 formErrorPassword.password &&
@@ -449,21 +430,21 @@ const Profile = () => {
                         <div className={"relative"}>
                             <Input
                                 id="password_confirm"
-                                type={passwordVisibility.user_confirm_password ? "text" : "password"}
+                                type={passwordVisibility.userConfirmPassword ? "text" : "password"}
                                 placeholder={"Confirm Password"}
-                                value={password.confirm_password}
-                                name="confirm_password"
+                                value={password.passwordConfirmation}
+                                name="passwordConfirmation"
                                 onChange={onChangePassword}
                                 onBlur={onBlurPassWord}
                                 className={"bg-card"}
                             />
-                            <Button variant={"ghost hover:none"} onClick={() => togglePasswordVisibility('user_confirm_password')}
+                            <Button variant={"ghost hover:none"} onClick={() => togglePasswordVisibility('userConfirmPassword')}
                                     className={"absolute top-0 right-0"}>
-                                {passwordVisibility.user_confirm_password ? <Eye className={"w-[16px] h-[16px]"}/> : <EyeOff className={"w-[16px] h-[16px]"}/>}
+                                {passwordVisibility.userConfirmPassword ? <Eye className={"w-[16px] h-[16px]"}/> : <EyeOff className={"w-[16px] h-[16px]"}/>}
                             </Button>
                             {
-                                formErrorPassword.confirm_password &&
-                                <span className="text-destructive text-sm">{formErrorPassword.confirm_password}</span>
+                                formErrorPassword.passwordConfirmation &&
+                                <span className="text-destructive text-sm">{formErrorPassword.passwordConfirmation}</span>
                             }
                         </div>
                         </div>

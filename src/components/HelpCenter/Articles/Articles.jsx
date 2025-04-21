@@ -22,6 +22,7 @@ import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandL
 import {debounce} from 'lodash';
 import {EmptyDataContent} from "../../Comman/EmptyDataContent";
 import {CommSearchBar} from "../../Comman/CommentEditor";
+import {EmptyInArticlesContent} from "../../Comman/EmptyContentForModule";
 
 const status = [
     {name: "Publish", value: 1, fillColor: "#389E0D", strokeColor: "#389E0D",},
@@ -41,8 +42,8 @@ const Articles = () => {
 
     const [filter, setFilter] = useState({
         search: "",
-        category_id: "",
-        sub_category_id: ""
+        categoryId: "",
+        subcategoryId: ""
     });
     const [articles, setArticles] = useState([]);
     const [articleList, setArticleList] = useState([]);
@@ -55,37 +56,36 @@ const Articles = () => {
     const [openFilter, setOpenFilter] = useState(false);
 
     const [selectedCategory, setSelectedCategory] = useState(null);
-    const [selectedCategoryId, setSelectedCategoryId] = useState(null);
     const [selectedSubCategory, setSelectedSubCategory] = useState(null);
-    const [selectedSubCategoryId, setSelectedSubCategoryId] = useState(null);
     const [emptyContentBlock, setEmptyContentBlock] = useState(true);
 
     const emptyContent = (status) => {setEmptyContentBlock(status);};
 
     useEffect(() => {
         if (projectDetailsReducer.id) {
-            // getAllArticles(filter.search, filter.category_id, filter.sub_category_id);
             getAllArticles(filter.search);
             getAllCategory();
         }
         navigate(`${baseUrl}/help/article?pageNo=${pageNo}`);
     }, [projectDetailsReducer.id, pageNo])
 
-    // const getAllArticles = async (search, category_id, sub_category_id) => {
-    const getAllArticles = async (search) => {
-        const data = await apiService.getAllArticles({
-            project_id: projectDetailsReducer.id,
-            search: search,
-            // category_id: category_id,
-            // sub_category_id: sub_category_id,
+    const getAllArticles = async (search, categoryId, subCategoryId) => {
+        const params = {
+            projectId: projectDetailsReducer.id,
             page: pageNo,
             limit: perPageLimit
-        });
-        if (data.status === 200) {
-            setArticles(data.data);
-            setTotalRecord(data.total);
+        };
+
+        if (search !== undefined && search !== "") params.search = search;
+        if (categoryId !== undefined && categoryId !== "") params.categoryId = categoryId;
+        if (subCategoryId !== undefined && subCategoryId !== "") params.subCategoryId = subCategoryId;
+
+        const data = await apiService.getAllArticles(params);
+        if (data.success) {
+            setArticles(data?.data?.formattedData);
+            setTotalRecord(data.data.total);
             setIsLoading(false)
-            if (!data.data || data.data.length === 0) {
+            if (!data?.data?.formattedData || data?.data?.formattedData.length === 0) {
                 emptyContent(true);
             } else {
                 emptyContent(false);
@@ -99,12 +99,12 @@ const Articles = () => {
     const getAllCategory = async () => {
         // setIsLoading(true);
         const data = await apiService.getAllCategory({
-            project_id: projectDetailsReducer.id,
+            projectId: projectDetailsReducer.id,
         });
-        if (data.status === 200) {
+        if (data.success) {
             setArticleList(data.data);
             setIsLoading(false)
-            if (!data.data || data.data.length === 0) {
+            if (!data.data.rows || data.data.rows.length === 0) {
                 emptyContent(true);
             } else {
                 setIsLoading(false)
@@ -115,9 +115,9 @@ const Articles = () => {
 
     const throttledDebouncedSearch = useCallback(
         debounce((value) => {
-            getAllArticles(value, filter.category_id, filter.sub_category_id);
+            getAllArticles(value, filter.categoryId, filter.subcategoryId);
         }, 500),
-        [projectDetailsReducer.id]
+        [projectDetailsReducer.id, filter.categoryId, filter.subcategoryId]
     );
 
     const onChangeSearch = (e) => {
@@ -127,39 +127,47 @@ const Articles = () => {
     };
 
     const filterData = (name, value) => {
-        setFilter(prevFilter => ({
-            ...prevFilter,
-            [name]: value
-        }));
+        let updatedFilter = { ...filter };
 
-        let category_id = '';
-        let sub_category_id = '';
-
-        if (name === "category_id") {
-            category_id = value;
-            setSelectedCategory({ id: value, title: articleList.find(x => x.id === value)?.title || 'Unknown' });
-        } else if (name === 'sub_category_id') {
-            sub_category_id = value;
-            const subCategory = articleList.flatMap(x => x.sub_categories).find(y => y.id === value);
-            setSelectedSubCategory({ id: value, title: subCategory?.title || 'Unknown' });
+        if (name === "categoryId") {
+            updatedFilter.categoryId = value;
+            const category = articleList.rows.find(x => x.id === value);
+            setSelectedCategory(category ? { id: value, title: category.title } : null);
+        } else if (name === "subcategoryId") {
+            updatedFilter.subcategoryId = value;
+            const subCategory = articleList.rows
+                .flatMap(x => x.subCategories)
+                .find(y => y.id === value);
+            setSelectedSubCategory(subCategory ? { id: value, title: subCategory.title } : null);
         }
 
-        setOpenFilter(false)
+        setFilter(updatedFilter);
+        setOpenFilter(false);
         setPageNo(1);
-        getAllArticles(filter.search, category_id, sub_category_id);
+        getAllArticles(updatedFilter.search, updatedFilter.categoryId, updatedFilter.subcategoryId);
     };
 
     const clearSearchFilter = () => {
         setFilter(prev => ({ ...prev, search: '' }));
         setPageNo(1);
-        getAllArticles('', filter.category_id, filter.sub_category_id);
+        getAllArticles('', filter.categoryId, filter.subcategoryId);
     };
 
-    const clearFilter = (key, setSelected) => {
-        setSelected(null);
-        setFilter(prev => ({ ...prev, [key]: null }));
+    const clearCategoryFilter = () => {
+        setSelectedCategory(null);
+        setFilter(prev => ({
+            ...prev,
+            categoryId: "",
+        }));
         setPageNo(1);
-        getAllArticles(filter.search, key === "category_id" ? null : filter.category_id, key === "sub_category_id" ? null : filter.sub_category_id);
+        getAllArticles(filter.search, "", filter.subcategoryId);
+    };
+
+    const clearSubCategoryFilter = () => {
+        setSelectedSubCategory(null);
+        setFilter(prev => ({ ...prev, subcategoryId: "" }));
+        setPageNo(1);
+        getAllArticles(filter.search, filter.categoryId, "");
     };
 
     const handleCreateClick = () => {
@@ -179,8 +187,9 @@ const Articles = () => {
         setIsLoadingDelete(true)
         const data = await apiService.deleteArticles(idToDelete)
         const clone = [...articles];
+        debugger
         const index = clone.findIndex((x) => x.id == idToDelete)
-        if (data.status === 200) {
+        if (data.success) {
             if (index !== -1) {
                 clone.splice(index, 1)
                 setArticles(clone);
@@ -192,7 +201,7 @@ const Articles = () => {
             }
             toast({description: data.message,})
         } else {
-            toast({description: data.message, variant: "destructive"})
+            toast({description: data.error, variant: "destructive"})
         }
         setIsLoadingDelete(false)
         setOpenDelete(false);
@@ -210,34 +219,19 @@ const Articles = () => {
     const handleStatus = async (object, value) => {
         setArticles(articles.map(x => x.id === object.id ? {
             ...x,
-            is_active: value,
+            isActive: value,
         } : x));
         const payload = {
             ...object,
-            is_active: value,
+            isActive: value,
         }
         const data = await apiService.updateArticle(payload, object.id);
-        if (data.status === 200) {
-            toast({
-                description: data.message,
-            });
+        if (data.success) {
+            toast({description: data.message,});
         } else {
-            toast({
-                description: data.message,
-                variant: "destructive",
-            });
+            toast({description: data.error, variant: "destructive",});
         }
     };
-
-    const EmptyInArticlesContent = [
-        {
-            title: "Start Adding Helpful Articles",
-            description: `No articles yet? Begin by creating informative articles that address common customer questions, reduce support queries, and empower users to find answers quickly.`,
-            btnText: [
-                {title: "Create First Article", openSheet: true, icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
-            ],
-        },
-    ];
 
     return (
         <div className={"container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-3 md:px-4"}>
@@ -253,7 +247,6 @@ const Articles = () => {
                     deleteRecord={idToDelete}
                 />
             }
-
             <div className={"flex items-center justify-between flex-wrap gap-2"}>
                 <div className={"flex flex-col flex-1 gap-y-0.5"}>
                     <h1 className="text-2xl font-normal flex-initial w-auto">All Articles ({totalRecord})</h1>
@@ -266,6 +259,7 @@ const Articles = () => {
                             onChange={onChangeSearch}
                             onClear={clearSearchFilter}
                             placeholder="Search..."
+                            inputClassName={"min-w-[224px] pr-[34px]"}
                         />
                         <div className={"flex items-center"}>
                             <DropdownMenu open={openFilter} onOpenChange={setOpenFilter}>
@@ -284,20 +278,19 @@ const Articles = () => {
                                                     <CommandList>
                                                         <CommandEmpty>No data found.</CommandEmpty>
                                                         <CommandGroup>
-                                                            {(articleList || []).map((x) => (
+                                                            {(articleList || [])?.rows?.map((x, l) => (
                                                                 <CommandItem
-                                                                    key={x.id}
+                                                                    key={l}
                                                                     value={x.id}
                                                                 >
                                                                     <Fragment key={x.id}>
                                                                         <span onClick={() => {
-                                                                            setSelectedCategoryId(x.id);
-                                                                            filterData("category_id", x.id);
+                                                                            filterData("categoryId", x.id);
                                                                             setOpenFilter(false);
                                                                         }}
                                                                             className={"flex-1 w-full text-sm font-normal cursor-pointer flex gap-2 items-center"}
                                                                         >
-                                                                            {selectedCategoryId === x.id ? <Check size={18} /> : <div className={"h-[18px] w-[18px]"}/>}
+                                                                            {filter.categoryId === x.id ? <Check size={18} /> : <div className={"h-[18px] w-[18px]"}/>}
                                                                             <span className={"max-w-[140px] truncate text-ellipsis overflow-hidden whitespace-nowrap"}>{x.title}</span>
                                                                         </span>
                                                                     </Fragment>
@@ -318,14 +311,13 @@ const Articles = () => {
                                                     <CommandList>
                                                         <CommandEmpty>No data found.</CommandEmpty>
                                                         <CommandGroup>
-                                                            {(articleList || []).map((x) => (
-                                                                x.sub_categories.map((y) => (
+                                                            {(articleList || [])?.rows?.map((x) => (
+                                                                x.subCategories.map((y, u) => (
                                                                     <CommandItem
-                                                                        key={y.id}
+                                                                        key={u}
                                                                         value={y.id}
                                                                         onSelect={() => {
-                                                                            setSelectedSubCategoryId(y.id);
-                                                                            filterData("sub_category_id", y.id);
+                                                                            filterData("subcategoryId", y.id);
                                                                             setOpenFilter(false);
                                                                         }}
                                                                     >
@@ -333,7 +325,7 @@ const Articles = () => {
                                                                             <span
                                                                                 className={"flex-1 w-full text-sm font-normal cursor-pointer flex gap-2 items-center"}
                                                                             >
-                                                                                {selectedSubCategoryId === y.id ? <Check size={18} /> : <div className={"h-[18px] w-[18px]"}/>}
+                                                                                {filter.subcategoryId === y.id ? <Check size={18} /> : <div className={"h-[18px] w-[18px]"}/>}
                                                                                 <span className={"max-w-[140px] truncate text-ellipsis overflow-hidden whitespace-nowrap"}>{y.title}</span>
                                                                             </span>
                                                                         </Fragment>
@@ -355,30 +347,34 @@ const Articles = () => {
                     </Button>
                 </div>
             </div>
-            <div className="mt-4 flex gap-4">
-                {selectedCategory && (
-                    <Badge key={`selected-${selectedCategory.id}`} variant="outline" className="rounded p-0 font-medium">
-                        <span className="px-3 py-1.5 border-r">{selectedCategory.title}</span>
-                        <span
-                            className="w-7 h-7 flex items-center justify-center cursor-pointer"
-                            onClick={() => clearFilter("category_id", setSelectedCategory)}
-                        >
+            {
+                ( selectedCategory || selectedSubCategory ) && (
+                    <div className="mt-4 flex gap-4">
+                        {selectedCategory && (
+                            <Badge key={`selected-${selectedCategory.id}`} variant="outline" className="rounded p-0 font-medium">
+                                <span className="px-3 py-1.5 border-r">{selectedCategory.title}</span>
+                                <span
+                                    className="w-7 h-7 flex items-center justify-center cursor-pointer"
+                                    onClick={clearCategoryFilter}
+                                >
                         <X className='w-4 h-4'/>
                     </span>
-                    </Badge>
-                )}
-                {selectedSubCategory && (
-                    <Badge key={`selected-${selectedSubCategory.id}`} variant="outline" className="rounded p-0 font-medium">
-                        <span className="px-3 py-1.5 border-r">{selectedSubCategory.title}</span>
-                        <span
-                            className="w-7 h-7 flex items-center justify-center cursor-pointer"
-                            onClick={() => clearFilter("sub_category_id", setSelectedSubCategory)}
-                        >
+                            </Badge>
+                        )}
+                        {selectedSubCategory && (
+                            <Badge key={`selected-${selectedSubCategory.id}`} variant="outline" className="rounded p-0 font-medium">
+                                <span className="px-3 py-1.5 border-r">{selectedSubCategory.title}</span>
+                                <span
+                                    className="w-7 h-7 flex items-center justify-center cursor-pointer"
+                                    onClick={clearSubCategoryFilter}
+                                >
                         <X className='w-4 h-4'/>
                     </span>
-                    </Badge>
-                )}
-            </div>
+                            </Badge>
+                        )}
+                    </div>
+                )
+            }
             <div className={"my-6"}>
                 <Card className={""}>
                     <CardContent className={"p-0 overflow-auto"}>
@@ -399,7 +395,7 @@ const Articles = () => {
                                                     {
                                                         [...Array(6)].map((_, i) => {
                                                             return (
-                                                                <TableCell
+                                                                <TableCell key={i}
                                                                     className={"max-w-[373px] px-2 py-[10px] md:px-3"}>
                                                                     <Skeleton className={"rounded-md  w-full h-7"}/>
                                                                 </TableCell>
@@ -409,19 +405,19 @@ const Articles = () => {
                                                 </TableRow>
                                             )
                                         })
-                                    ) : articles.length > 0 ? <Fragment>
+                                    ) : articles?.length > 0 ? <Fragment>
                                         {
-                                            articles.map((x, index) => (<>
+                                            (articles || [])?.map((x, index) => (<>
                                                 <TableRow key={index}>
                                                     <TableCell onClick={() => onEdit(x.id)}
                                                         className={"px-2 py-[10px] md:px-3 font-normal cursor-pointer max-w-[270px] truncate text-ellipsis overflow-hidden whitespace-nowrap"}>{x.title}</TableCell>
                                                     <TableCell
-                                                        className={"px-2 py-[10px] md:px-3 font-normal max-w-[270px] truncate text-ellipsis overflow-hidden whitespace-nowrap"}>{x?.category_title} / {x?.sub_category_title}</TableCell>
+                                                        className={"px-2 py-[10px] md:px-3 font-normal max-w-[270px] truncate text-ellipsis overflow-hidden whitespace-nowrap"}>{x?.categoryTitle} / {x?.subCategoryTitle}</TableCell>
                                                     <TableCell className={"px-2 py-[10px] md:px-3 font-normal"}>
-                                                        <Select value={x.is_active}  onValueChange={(value) => handleStatus(x, value)}>
+                                                        <Select value={x.isActive}  onValueChange={(value) => handleStatus(x, value)}>
                                                             <SelectTrigger className="w-[137px] h-7">
                                                                 <SelectValue
-                                                                    placeholder={x.is_active ? status.find(s => s.value == x.is_active)?.name : "Publish"}/>
+                                                                    placeholder={x.isActive ? status.find(s => s.value == x.isActive)?.name : "Publish"}/>
                                                             </SelectTrigger>
                                                             <SelectContent>
                                                                 <SelectGroup>
@@ -447,9 +443,9 @@ const Articles = () => {
                                                             </SelectContent>
                                                         </Select>
                                                     </TableCell>
-                                                    <TableCell className={"px-2 py-[10px] md:px-3 font-normal"}>{x.view}</TableCell>
+                                                    <TableCell className={"px-2 py-[10px] md:px-3 font-normal"}>{x.view ? x.view : 0}</TableCell>
                                                     <TableCell className={"px-2 py-[10px] md:px-3 font-normal max-w-[140px] truncate text-ellipsis overflow-hidden whitespace-nowrap"}>
-                                                        {x?.updated_at ? moment.utc(x?.updated_at).local().startOf('seconds').fromNow() : "-"}
+                                                        {x?.updatedAt ? moment.utc(x?.updatedAt).local().startOf('seconds').fromNow() : "-"}
                                                     </TableCell>
                                                     <TableCell className={"px-2 py-[10px] md:px-3 font-normal"}>
                                                         <DropdownMenu>
@@ -477,19 +473,19 @@ const Articles = () => {
                         </Table>
                     </CardContent>
                     {
-                        articles.length > 0 ?
+                        articles?.length > 0 ?
                             <Pagination
                                 pageNo={pageNo}
                                 totalPages={totalPages}
                                 isLoading={isLoading}
                                 handlePaginationClick={handlePaginationClick}
-                                stateLength={articles.length}
+                                stateLength={articles?.length}
                             /> : ""
                     }
                 </Card>
             </div>
             {
-                (isLoading || !emptyContentBlock) ? "" :
+                (isLoading || !emptyContentBlock || filter) ? "" :
                     <EmptyDataContent data={EmptyInArticlesContent} onClose={() => emptyContent(false)} setSheetOpenCreate={handleCreateClick}/>
             }
         </div>

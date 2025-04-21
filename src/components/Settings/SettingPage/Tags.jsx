@@ -83,13 +83,13 @@ const Tags = () => {
 
         setIsSave(true)
         const payload = {
-            project_id: `${projectDetailsReducer.id}`,
+            projectId: `${projectDetailsReducer.id}`,
             title: newTag.title,
         }
         const data = await apiService.createTopics(payload);
         const clone = [...topicLists];
 
-        if(data.status === 200){
+        if(data.success){
             clone.push(data.data);
             clone.splice(index,1);
             dispatch(allStatusAndTypesAction({...allStatusAndTypes, topics: clone}))
@@ -120,10 +120,10 @@ const Tags = () => {
         setIsSave(true);
         const payload = {
             title: topicToSave.title,
-            project_id: projectDetailsReducer.id
+            projectId: projectDetailsReducer.id
         }
         const data = await apiService.updateTopics(payload, topicToSave.id);
-        if(data.status === 200){
+        if(data.success){
             const clone = [...topicLists];
             const index = clone.findIndex((x) => x.id === topicToSave.id)
             if(index !== -1){
@@ -148,7 +148,7 @@ const Tags = () => {
     const onDelete = async ()=> {
         setIsLoadingDelete(true);
         const data = await apiService.deleteTopics(deleteId);
-        if(data.status === 200){
+        if(data.success){
             const clone = [...topicLists];
             const index = clone.findIndex((x) => x.id === deleteId)
             if(index !== -1){

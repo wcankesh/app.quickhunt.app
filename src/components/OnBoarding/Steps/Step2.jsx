@@ -9,8 +9,8 @@ import {useSelector} from "react-redux";
 import {Loader2} from "lucide-react";
 
 const initialState = {
-    want_to: '',
-    know_from: '',
+    wantTo: '',
+    knowFrom: '',
 }
 
 const create = [
@@ -50,11 +50,11 @@ const Step2 = ({setStep}) => {
         setIsLoading(true);
         const token = localStorage.getItem('token-verify-onboard') || null
         const payload = {
-            want_to: selectedCreate,
-            know_from: selectedKnowAbout,
+            wantTo: selectedCreate,
+            knowFrom: selectedKnowAbout,
         }
         const data = await apiService.onBoardingFlow(payload, {Authorization: `Bearer ${token}`});
-        if(data.status === 200) {
+        if(data.success) {
             setUserDetail(data.data)
             setStep(3);
             setIsLoading(false);

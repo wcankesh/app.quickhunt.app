@@ -16,7 +16,7 @@ export const CommentEditor = ({isEditMode, comment, images = [], onUpdateComment
         return parts.map((part, index) => {
             if (urlRegex.test(part)) {
                 return (
-                    <a key={index} href={part} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">
+                    <a key={index} href={part} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline break-all">
                         {part}
                     </a>
                 );
@@ -124,11 +124,11 @@ export const UserAvatar = ({ userPhoto, userName, className, style, initialStyle
         : "";
     return (
         <Avatar className={`w-[24px] h-[24px] ${className} ${style}`}>
-            {userPhoto ? (
+            {/*{userPhoto ? (*/}
                 <AvatarImage src={userPhoto} alt={initials || "User"} />
-            ) : (
+            {/*) : (*/}
                 <AvatarFallback style={avatarFallbackInlineStyle} className={`${initialStyle} border`}>{initials || "U"}</AvatarFallback>
-            )}
+            {/*)}*/}
         </Avatar>
     );
 };
@@ -330,12 +330,12 @@ export const FileUpload = ({ label, id, file, onDelete, onChange, error }) => (
     </div>
 );
 
-export const CommSearchBar = ({ value, onChange, onClear, placeholder = "Search...", className = "" }) => (
+export const CommSearchBar = ({ value, onChange, onClear, placeholder = "Search...", className = "", inputClassName = "" }) => (
     <div className={`relative w-full ${className}`}>
         <Input
             type="search" value={value}
             placeholder={placeholder}
-            className={"w-full pl-4 pr-14 text-sm font-normal h-9"}
+            className={`w-full pl-4 pr-14 text-sm font-normal h-9 ${inputClassName}`}
             name={"search"}
             onChange={onChange}
         />

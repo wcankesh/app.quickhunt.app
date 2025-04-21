@@ -9,7 +9,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {useToast} from "../ui/use-toast";
 import {Skeleton} from "../ui/skeleton";
 import EmptyData from "../Comman/EmptyData";
-import {Sheet, SheetContent, SheetHeader} from "../ui/sheet";
+import {Sheet, SheetContent, SheetHeader, SheetTitle} from "../ui/sheet";
 import {Label} from "../ui/label";
 import {Input} from "../ui/input";
 import {Switch} from "../ui/switch";
@@ -22,25 +22,25 @@ import moment from "moment";
 import {TabsContent, TabsList, TabsTrigger} from "../ui/tabs";
 import {Tabs} from "@radix-ui/react-tabs";
 import {Avatar, AvatarFallback, AvatarImage} from "../ui/avatar";
-import {Badge} from "../ui/badge";
 import {UserAvatar} from "../Comman/CommentEditor";
 import {inboxMarkReadAction} from "../../redux/action/InboxMarkReadAction";
+import {EmptyUserContent} from "../Comman/EmptyContentForModule";
 
 const perPageLimit = 10;
 
 const initialState = {
-    project_id: '',
-    customer_name: '',
-    customer_email_id: '',
-    customer_email_notification: false,
+    projectId: '',
+    name: '',
+    email: '',
+    emailNotification: false,
     customer_first_seen: '',
     customer_last_seen: '',
     user_browser: '',
     user_ip_address : '',
 }
 const initialStateError = {
-    customer_name: "",
-    customer_email_id: "",
+    name: "",
+    email: "",
 }
 
 const UserActionsList = ({ userActions, setCustomerList, sourceTitle, isLoadingUserDetail, selectedTab, pageNoAction, totalPagesAction, handlePaginationClickAction, projectDetailsReducer }) => {
@@ -70,7 +70,7 @@ const UserActionsList = ({ userActions, setCustomerList, sourceTitle, isLoadingU
         } else if (source === "post_feedbacks" || source === "post_reactions") {
             navigate(`/announcements/analytic-view?postId=${id}`);
         }
-        const response = await apiService.inboxMarkAllRead({ project_id: projectDetailsReducer.id, id });
+        const response = await apiService.inboxMarkAllRead({ projectId: projectDetailsReducer.id, id });
         if (response.status === 200) {
             const update = (userActions || []).map(action => action.id === id ? { ...action, is_read: 1 } : action);
             setCustomerList(update);
@@ -185,13 +185,13 @@ const Users = () => {
 
     const formValidate = (name, value) => {
         switch (name) {
-            case "customer_name":
+            case "name":
                 if (!value || value.trim() === "") {
                     return "User name is required.";
                 } else {
                     return "";
                 }
-            case "customer_email_id":
+            case "email":
                 if (!value || value.trim() === "") {
                     return "User e-mail is required.";
                 } else if (!value.match(/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/)) {
@@ -222,15 +222,15 @@ const Users = () => {
     const getAllUsers = async () => {
         setIsLoading(true);
         const payload = {
-            project_id: projectDetailsReducer.id,
+            projectId: projectDetailsReducer.id,
             page: pageNo,
             limit: perPageLimit
         }
         const data = await apiService.getAllUsers(payload);
-        if (data.status === 200) {
+        if (data.success) {
             setCustomerList(data.data);
-            setTotalRecord(data?.total);
-            setIsAdmin(data?.is_admin);
+            setTotalRecord(data?.data.total);
+            setIsAdmin(data?.isAdmin);
             if (!data.data || data.data.length === 0) {
                 emptyContent(true);
             } else {
@@ -252,7 +252,7 @@ const Users = () => {
         const data = await apiService.deleteUsers(deleteId);
         const clone = [...customerList];
         const indexToDelete = clone.findIndex((x)=> x.id == deleteId);
-        if(data.status === 200) {
+        if(data.success) {
             clone.splice(indexToDelete,1);
             setCustomerList(clone);
             if (clone.length === 0 && pageNo > 1) {
@@ -287,12 +287,12 @@ const Users = () => {
         setIsSave(true);
         const payload = {
             ...customerDetails,
-            project_id: projectDetailsReducer.id,
+            projectId: projectDetailsReducer.id,
             customer_first_seen: new Date(),
             customer_last_seen: new Date(),
         }
         const data = await apiService.createUsers(payload)
-        if(data.status === 200) {
+        if(data.success) {
             setIsSave(false);
             setCustomerDetails(initialState);
             toast({description: data.message,});
@@ -316,7 +316,7 @@ const Users = () => {
             limit: perPageLimit
         }
         const data = await apiService.userAction(payload);
-        if(data.status === 200) {
+        if(data.success) {
             setUserActions(Array.isArray(data.data) ? data.data : []);
             setTotalRecordAction(data.total)
             // toast({description: data.message,});
@@ -350,51 +350,6 @@ const Users = () => {
         }
     };
 
-    const EmptyUserContent = [
-        {
-            title: "Start Adding Users",
-            description: `Manually add user details to build your base, track interactions, and personalize engagement to foster loyalty.`,
-            btnText: [
-                {title: "Add User", openSheet: true, icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
-            ],
-        },
-        {
-            title: "Create Ideas",
-            description: `Encourage user engagement by capturing and sharing ideas that resonate with your audience, turning visitors into active users.`,
-            btnText: [
-                {title: "Create Ideas", openSheet: true, navigateTo: `${baseUrl}/ideas?opensheet=open`, icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
-            ],
-        },
-        {
-            title: "Create Roadmap",
-            description: `Showcase your product’s journey with a roadmap, keeping users informed about upcoming features and updates to build trust and attract users.`,
-            btnText: [
-                {title: "Create Roadmap", navigateTo: `${baseUrl}/roadmap`, icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
-            ],
-        },
-        {
-            title: "Create Announcement",
-            description: `Share key updates, new features, and milestones through announcements to keep users engaged and excited about your product.`,
-            btnText: [
-                {title: "Create Announcement", openSheet: true, navigateTo: `${baseUrl}/announcements?opensheet=open`, icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
-            ],
-        },
-        {
-            title: "Create Widget",
-            description: `Add a widget to your website to display ideas, roadmaps, or updates, making it easy for users to interact and connect with your product.`,
-            btnText: [
-                {title: "Create Widget", navigateTo: `${baseUrl}/widget/type`, icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
-            ],
-        },
-        {
-            title: "Create Knowledge Base",
-            description: `Offer valuable resources and answers to build confidence in your product and convert visitors into loyal users.`,
-            btnText: [
-                {title: "Create Knowledge Base", navigateTo: `${baseUrl}/app-message/type`, icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
-            ],
-        },
-    ];
-
     const sourceTitle = [
         {title: "Created a Idea", value: "feature_ideas"},
         {title: "Commented on idea", value: "feature_idea_comments"},
@@ -412,17 +367,17 @@ const Users = () => {
                 <div className={'divide-y'}>
                 <div className={"flex justify-between items-center gap-2 px-2 py-[10px] md:px-3"}>
                     <div className={"text-sm flex gap-2 items-center"}><Mail size={16} className={"light:stroke-muted-foreground dark:stroke-card"} /> Email</div>
-                    <h3 className={"text-sm"}>{selectedCustomer?.customer_email_id || "-"}</h3>
+                    <h3 className={"text-sm"}>{selectedCustomer?.email || "-"}</h3>
                 </div>
                 <div className={"flex justify-between items-center gap-2 px-2 py-[10px] md:px-3"}>
                     <div className={"text-sm flex gap-2 items-center"}><Clock size={16} className={"light:stroke-muted-foreground dark:stroke-card"} /> Last action</div>
                     <span className={"text-sm"}>
-                        {selectedCustomer?.last_activity ? moment.utc(selectedCustomer?.last_activity).local().startOf("seconds").fromNow() : "-"}
+                        {selectedCustomer?.lastActivity ? moment.utc(selectedCustomer?.lastActivity).local().startOf("seconds").fromNow() : "-"}
                     </span>
                 </div>
                     <div className={"flex justify-between items-center gap-2 px-2 py-[10px] md:px-3"}>
                         <div className={"text-sm flex gap-2 items-center"}><MapPin size={16} className={"light:stroke-muted-foreground dark:stroke-card"} /> Location</div>
-                        <span className={"text-sm"}>{selectedCustomer?.customer_country || "-"}</span>
+                        <span className={"text-sm"}>{selectedCustomer?.country || "-"}</span>
                     </div>
                 </div>
             </Fragment>
@@ -447,24 +402,24 @@ const Users = () => {
                 {/*<SheetOverlay className={"inset-0"}/>*/}
                 <SheetContent className={"sm:max-w-[662px] p-0"}>
                     <SheetHeader className={"px-3 py-4 lg:px-8 lg:py-[20px] flex flex-row justify-between items-center border-b space-y-0"}>
-                        <h2 className={"text-lg md:text-xl font-normal"}>Add New User</h2>
+                        <SheetTitle className={"text-lg md:text-xl font-normal"}>Add New User</SheetTitle>
                         <span className={"max-w-[24px]"}><X onClick={closeSheet} className={"cursor-pointer m-0"}/></span>
                     </SheetHeader>
                     <div className={"sm:px-8 sm:py-6 px-3 py-4 border-b"}>
                         <div className="grid w-full gap-2">
                             <Label htmlFor="name" className={"font-normal"}>Name</Label>
-                            <Input value={customerDetails.customer_name} name="customer_name" onChange={onChangeText} type="text" id="name" className={"h-9"} placeholder={"Enter the full name of user..."}/>
-                            {formError.customer_name && <span className="text-sm text-red-500">{formError.customer_name}</span>}
+                            <Input value={customerDetails.name} name="name" onChange={onChangeText} type="text" id="name" className={"h-9"} placeholder={"Enter the full name of user..."}/>
+                            {formError.name && <span className="text-sm text-red-500">{formError.name}</span>}
                         </div>
 
                         <div className="grid w-full gap-2 mt-6">
                             <Label htmlFor="email" className={"font-normal"}>E-mail</Label>
-                            <Input value={customerDetails.customer_email_id} name="customer_email_id" onChange={onChangeText} onBlur={onBlur} type="email" id="email" className={"h-9"} placeholder={"Enter the email of user"}/>
-                            {formError.customer_email_id && <span className="text-sm text-red-500">{formError.customer_email_id}</span>}
+                            <Input value={customerDetails.email} name="email" onChange={onChangeText} onBlur={onBlur} type="email" id="email" className={"h-9"} placeholder={"Enter the email of user"}/>
+                            {formError.email && <span className="text-sm text-red-500">{formError.email}</span>}
                         </div>
 
                         <div className={"announce-create-switch mt-6 flex items-center"}>
-                            <Switch className={"w-[38px] h-[20px]"} id={"switch"} checked={customerDetails.customer_email_notification == 1} onCheckedChange={(checked) => onChangeText({target: {name: "customer_email_notification", value:checked}})} htmlFor={"switch"} />
+                            <Switch className={"w-[38px] h-[20px]"} id={"switch"} checked={customerDetails.emailNotification == 1} onCheckedChange={(checked) => onChangeText({target: {name: "emailNotification", value:checked}})} htmlFor={"switch"} />
                             <Label htmlFor={"switch"} className={"ml-2.5 text-sm font-normal"}>Receive Notifications</Label>
                         </div>
                     </div>
@@ -478,20 +433,20 @@ const Users = () => {
                 <Sheet open={isDetailsSheetOpen} onOpenChange={isDetailsSheetOpen ? closeUserDetails : openUserDetails}>
                     <SheetContent className={"sm:max-w-[1018px] p-0"}>
                         <SheetHeader className={"px-3 py-4 lg:px-8 lg:py-[20px] flex flex-row justify-between items-center border-b space-y-0"}>
-                            <h2 className={"text-lg md:text-xl font-normal"}>User Details</h2>
+                            <SheetTitle className={"text-lg md:text-xl font-normal"}>User Details</SheetTitle>
                             <span className={"max-w-[24px]"}><X onClick={closeUserDetails} className={"cursor-pointer m-0"} /></span>
                         </SheetHeader>
                         <div className={"divide-y"}>
                             <div className={"px-2 py-[10px] md:px-3 flex flex-wrap justify-between gap-4"}>
                                 <div className={"flex items-center gap-4"}>
-                                    <UserAvatar className={`text-xl w-[40px] h-[40px]`} userPhoto={selectedCustomer.image} userName={selectedCustomer?.customer_name && selectedCustomer?.customer_name.substring(0, 1).toUpperCase()} />
+                                    <UserAvatar className={`text-xl w-[40px] h-[40px]`} userPhoto={selectedCustomer.image} userName={selectedCustomer?.name && selectedCustomer?.name.substring(0, 1).toUpperCase()} />
                                     <div className={"space-y-1"}>
                                         <div className={"flex items-center gap-4"}>
-                                            <h1 className={"text-sm md:text-base"}>{selectedCustomer?.customer_name}</h1>
+                                            <h1 className={"text-sm md:text-base"}>{selectedCustomer?.name}</h1>
                                         </div>
                                         {
-                                            (selectedCustomer?.customer_country) ?
-                                                <span className={"flex items-center gap-2 text-sm"}><MapPin size={16} className={"light:stroke-muted-foreground dark:stroke-card"} />{selectedCustomer?.customer_country}</span>
+                                            (selectedCustomer?.country) ?
+                                                <span className={"flex items-center gap-2 text-sm"}><MapPin size={16} className={"light:stroke-muted-foreground dark:stroke-card"} />{selectedCustomer?.country}</span>
                                                 : ""
                                         }
                                     </div>
@@ -602,14 +557,14 @@ const Users = () => {
                                                     )
                                                 })
                                                 )
-                                                 : customerList.length > 0 ? <>
+                                                 : customerList?.customers?.length > 0 ? <>
                                                     {
-                                                        (customerList || []).map((x,index)=>{
+                                                        (customerList || [])?.customers?.map((x,index)=>{
                                                             return(
                                                                 <TableRow key={index} className={"font-normal"}>
-                                                                    <TableCell className={`px-2 py-[10px] md:px-3 cursor-pointer max-w-[170px] truncate text-ellipsis overflow-hidden whitespace-nowrap`} onClick={() => openUserDetails(x)}>{x.customer_name ? x.customer_name : "-"}</TableCell>
-                                                                    <TableCell className={`px-2 py-[10px] md:px-3 max-w-[170px] truncate text-ellipsis overflow-hidden whitespace-nowrap`}>{x?.customer_email_id}</TableCell>
-                                                                    <TableCell className={`px-2 py-[10px] md:px-3 text-center`}>{x?.last_activity ? moment.utc(x?.last_activity).local().startOf("seconds").fromNow() : "-"}</TableCell>
+                                                                    <TableCell className={`px-2 py-[10px] md:px-3 cursor-pointer max-w-[170px] truncate text-ellipsis overflow-hidden whitespace-nowrap`} onClick={() => openUserDetails(x)}>{x.name ? x.name : "-"}</TableCell>
+                                                                    <TableCell className={`px-2 py-[10px] md:px-3 max-w-[170px] truncate text-ellipsis overflow-hidden whitespace-nowrap`}>{x?.email}</TableCell>
+                                                                    <TableCell className={`px-2 py-[10px] md:px-3 text-center`}>{x?.lastActivity ? moment.utc(x?.lastActivity).local().startOf("seconds").fromNow() : "-"}</TableCell>
                                                                     <TableCell className={`px-2 py-[10px] md:px-3 text-center`}>{x?.comments ? x?.comments : 0}</TableCell>
                                                                     <TableCell className={`px-2 py-[10px] md:px-3 text-center`}>{x?.posts ? x?.posts : 0}</TableCell>
                                                                     {
@@ -634,13 +589,13 @@ const Users = () => {
                                 </div>
                             </CardContent>
                             {
-                                customerList.length > 0 ?
+                                customerList?.customers?.length > 0 ?
                                     <Pagination
                                         pageNo={pageNo}
                                         totalPages={totalPages}
                                         isLoading={isLoading}
                                         handlePaginationClick={handlePaginationClick}
-                                        stateLength={customerList.length}
+                                        stateLength={customerList?.customers?.length}
                                     /> : ""
                             }
                         </Card>

@@ -59,7 +59,7 @@ const Pagination = ({
                             className="h-[30px] text-center border rounded p-1"
                             placeholder="0"
                             min={1}
-                            max={totalPages}
+                            max={totalPages.toString()}
                             disabled={isLoading}
                         />
                         <Button
@@ -78,9 +78,7 @@ const Pagination = ({
                             onClick={() => handlePaginationClick(totalPages)}
                             disabled={pageNo === totalPages || isLoading || stateLength <= 0}
                         >
-                            <ChevronsRight
-                                className={pageNo === totalPages || isLoading || stateLength <= 0 ? 'stroke-muted-foreground' : 'stroke-primary'}
-                            />
+                            <ChevronsRight className={pageNo === totalPages || isLoading || stateLength <= 0 ? 'stroke-muted-foreground' : 'stroke-primary'}/>
                         </Button>
                     </div>
                 </div>

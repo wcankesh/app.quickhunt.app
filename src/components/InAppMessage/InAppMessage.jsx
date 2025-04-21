@@ -27,6 +27,7 @@ import {EmptyDataContent} from "../Comman/EmptyDataContent";
 import {debounce} from "lodash";
 import {CommSearchBar} from "../Comman/CommentEditor";
 import CopyCode from "../Comman/CopyCode";
+import {EmptyInAppContent} from "../Comman/EmptyContentForModule";
 
 const perPageLimit = 10;
 
@@ -247,51 +248,6 @@ const InAppMessage = () => {
             console.error('Failed to copy text: ', err);
         });
     };
-
-    const EmptyInAppContent = [
-        {
-            title: "Create Welcome Message",
-            description: `Use in-app messages, such as posts or banners, to greet new users and introduce them to your app.`,
-            btnText: [
-                {title: "Create Welcome Message", navigateTo: "type", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
-            ],
-        },
-        {
-            title: "Create Onboarding Flow",
-            description: `Guide users through the onboarding process with a checklist and in-app messages to ensure they get the most out of your app.`,
-            btnText: [
-                {title: "Create Checklist", navigateTo: "4/new", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
-            ],
-        },
-        {
-            title: "Share Ideas",
-            description: `Share your product ideas directly with users using in-app messages through posts or banners to gather feedback and keep them engaged.`,
-            btnText: [
-                {title: "Share Ideas", navigateTo: `${baseUrl}/ideas`, icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
-            ],
-        },
-        {
-            title: "Display Announcements",
-            description: `Keep users updated with in-app messages about new features, product updates, and improvements through posts or banners.`,
-            btnText: [
-                {title: "Display Announcement", navigateTo: `${baseUrl}/announcements`, icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
-            ],
-        },
-        {
-            title: "Get Feedback",
-            description: `Use in-app surveys to collect feedback directly within the app, helping you improve the user experience and gather insights.`,
-            btnText: [
-                {title: "Collect Feedback", navigateTo: "3/new", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
-            ],
-        },
-        {
-            title: "Redirect to Knowledge Base",
-            description: `Promote new feature articles through in-app messages, directing users to relevant resources in your knowledge base for more information.`,
-            btnText: [
-                {title: "Create In-App Message", navigateTo: "type", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
-            ],
-        },
-    ];
 
     const codeString = `
 <script>

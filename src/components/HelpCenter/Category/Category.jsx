@@ -21,13 +21,14 @@ import {debounce} from "lodash";
 import {EmptyDataContent} from "../../Comman/EmptyDataContent";
 import CategoryForm from "../../Comman/CategoryForm";
 import {CommSearchBar} from "../../Comman/CommentEditor";
+import {EmptyInCategoryContent} from "../../Comman/EmptyContentForModule";
 
 const initialState = {
     title: "",
     description: "",
     createdAt: moment().fromNow(),
     image: "",
-    delete_image: ""
+    deleteImage: ""
 };
 
 const initialStateError = {
@@ -63,14 +64,14 @@ const Category = () => {
     const [idToDelete, setIdToDelete] = useState(null);
     const [subIdToDelete, setSubIdToDelete] = useState(null);
     const [isLoadingDelete, setIsLoadingDelete] = useState(false);
-    const [filter, setFilter] = useState({search: "", category_id: "", sub_category_id: ""});
+    const [filter, setFilter] = useState({search: "", categoryId: "", subCategoryId: ""});
     const [emptyContentBlock, setEmptyContentBlock] = useState(true);
 
     const emptyContent = (status) => {setEmptyContentBlock(status);};
 
     useEffect(() => {
         if(projectDetailsReducer.id){
-            // getAllCategory(filter.search, filter.category_id, filter.sub_category_id);
+            // getAllCategory(filter.search, filter.categoryId, filter.subCategoryId);
             getAllCategory(filter.search);
         }
         navigate(`${baseUrl}/help/category?pageNo=${pageNo}`);
@@ -78,17 +79,17 @@ const Category = () => {
 
     const getAllCategory = async (search) => {
         const data = await apiService.getAllCategory({
-            project_id: projectDetailsReducer.id,
+            projectId: projectDetailsReducer.id,
             search: search,
             page: pageNo,
             limit: perPageLimit,
 
         });
-        if (data.status === 200) {
+        if (data.success) {
             setCategoryList(data.data);
-            setTotalRecord(data.total);
+            setTotalRecord(data.data.total);
             setIsLoading(false)
-            if (!data.data || data.data.length === 0) {
+            if (!data.data.rows || data.data.rows.length === 0) {
                 emptyContent(true);
             } else {
                 emptyContent(false);
@@ -101,7 +102,7 @@ const Category = () => {
 
     const throttledDebouncedSearch = useCallback(
         debounce((value) => {
-            getAllCategory(value, filter.category_id, filter.sub_category_id);
+            getAllCategory(value, filter.categoryId, filter.subCategoryId);
         }, 500),
         [projectDetailsReducer.id]
     );
@@ -157,20 +158,20 @@ const Category = () => {
         }
         setCategoryEdit(true)
         let formData = new FormData();
-        formData.append('project_id', projectDetailsReducer.id);
+        formData.append('projectId', projectDetailsReducer.id);
         formData.append('title', selectedCategory.title);
         formData.append('description', selectedCategory.description);
         formData.append(`image`, selectedCategory.image);
         
         const data = await apiService.createCategory(formData);
-        if(data.status === 200) {
+        if(data.success) {
             setSelectedCategory(initialState);
-            let clone = [...categoryList];
+            let clone = [...categoryList.rows];
             clone.unshift(data.data);
             setCategoryList(clone);
             toast({description: data.message,});
         } else {
-            toast({description: data.message, variant: "destructive",})
+            toast({description: data?.error.message, variant: "destructive",})
         }
         setCategoryEdit(false)
         closeSheetCategory();
@@ -190,32 +191,32 @@ const Category = () => {
         }
         setSubCategoryEdit(true)
         let formData = new FormData();
-        formData.append('project_id', projectDetailsReducer.id);
-        formData.append('category_id', subCategoryId);
+        formData.append('projectId', projectDetailsReducer.id);
+        formData.append('categoryId', subCategoryId);
         formData.append('title', selectedSubCategory.title);
         formData.append('description', selectedSubCategory.description);
         formData.append(`image`, selectedSubCategory.image);
-        
         const data = await apiService.createSubCategory(formData);
-        if (data.status === 200) {
-            let clone = [...categoryList];
-            const index = clone.findIndex((x) => x.id == subCategoryId)
-            if(index !== -1){
-                let cloneSub = clone[index].sub_categories || [];
-                const subIndex = cloneSub.findIndex((x) => x.id === subCategoryId);
-                if(subIndex !== -1){
-                    cloneSub[subIndex] = data.data
-                } else {
-                    cloneSub.push(data.data)
-                }
-                clone[index].sub_categories = cloneSub;
-                setCategoryList(clone)
+        if (data.success) {
+            let clone = [...categoryList.rows];
+            const index = clone.findIndex((x) => x.id === subCategoryId);
+            if (index !== -1) {
+                const updatedSubCategories = [
+                    ...(clone[index].subCategories || []),
+                    data.data
+                ];
+                clone[index] = {
+                    ...clone[index],
+                    subCategories: updatedSubCategories
+                };
+                setCategoryList({ ...categoryList, rows: clone });
             }
+
             setSelectedSubCategory(initialState)
             toast({description: data.message});
             closeSheetSubCategory()
         } else {
-            toast({description: data.message, variant: "destructive",});
+            toast({description: data?.error, variant: "destructive",});
         }
         setSubCategoryEdit(false);
     };
@@ -233,34 +234,34 @@ const Category = () => {
             setFormError(validationErrors);
             return;
         }
-        if (name === "delete_image") {
+        if (name === "deleteImage") {
             setSelectedCategory({...selectedCategory, image: ""})
         } else {
             setSelectedCategory({...selectedCategory, [name]: value})
         }
         setCategoryEdit(true)
         let formData = new FormData();
-        formData.append('project_id', projectDetailsReducer.id);
+        formData.append('projectId', projectDetailsReducer.id);
         formData.append('title', selectedCategory.title);
         formData.append('description', selectedCategory.description);
 
 
         if (selectedCategory?.image === "") {
-            formData.append("delete_image", selectedCategory.delete_image);
+            formData.append("deleteImage", selectedCategory.deleteImage);
         }else {
             formData.append(`image`, selectedCategory.image);
         }
         
         const data = await apiService.updateCategory(formData, selectedCategory.id)
-        if (data.status === 200) {
-            let clone = [...categoryList];
+        if (data.success) {
+            let clone = [...categoryList.rows];
             const index = clone.findIndex((x) => x.id === selectedCategory.id)
             if(index !== -1){
-                clone[index] = {...data.data, sub_categories: clone[index].sub_categories || []};
-                setCategoryList(clone);
+                clone[index] = {...data.data, subCategories: clone[index].subCategories || []};
+                setCategoryList({ rows: clone, total: categoryList.total });
                 toast({description: data.message,});
             } else {
-                toast({description: data.message, variant: "destructive",});
+                toast({description: data.error, variant: "destructive",});
             }
         }
         setCategoryEdit(false);
@@ -279,36 +280,36 @@ const Category = () => {
             setFormError(validationErrors);
             return;
         }
-        if (name === "delete_image") {
+        if (name === "deleteImage") {
             setSelectedSubCategory({...selectedSubCategory, image: ""})
         } else {
             setSelectedSubCategory({...selectedSubCategory, [name]: value})
         }
         setSubCategoryEdit(true)
         let formData = new FormData();
-        formData.append('project_id', projectDetailsReducer.id);
-        formData.append('category_id', selectedSubCategory.category_id);
+        formData.append('projectId', projectDetailsReducer.id);
+        formData.append('categoryId', selectedSubCategory.categoryId);
         formData.append('title', selectedSubCategory.title);
         formData.append('description', selectedSubCategory.description);
         if (selectedSubCategory?.image === "") {
-            formData.append("delete_image", selectedSubCategory.delete_image);
+            formData.append("deleteImage", selectedSubCategory.deleteImage);
         }else {
             formData.append(`image`, selectedSubCategory.image);
         }
         
         const data = await apiService.updateSubCategory(formData, selectedSubCategory.id)
-        if (data.status === 200) {
-            let clone = [...categoryList];
-            const index = clone.findIndex((x) => x.id == selectedSubCategory.category_id);
+        if (data.success) {
+            let clone = [...categoryList.rows];
+            const index = clone.findIndex((x) => x.id == selectedSubCategory.categoryId);
             if(index !== -1){
-                const subIndex = clone[index].sub_categories.findIndex(sub => sub.id === selectedSubCategory.id);
+                const subIndex = clone[index].subCategories.findIndex(sub => sub.id === selectedSubCategory.id);
                 if (subIndex !== -1) {
-                    clone[index].sub_categories[subIndex] = data.data;
-                    setCategoryList(clone);
+                    clone[index].subCategories[subIndex] = data.data;
+                    setCategoryList({ rows: clone, total: categoryList.total });
                 }
                 toast({description: data.message});
             } else {
-                toast({description: data.message, variant: "destructive",});
+                toast({description: data.error, variant: "destructive",});
             }
         }
         setSubCategoryEdit(false);
@@ -318,7 +319,7 @@ const Category = () => {
     const openSheetCategory = (id, data) => {
         const updatedData = {
             ...data,
-            delete_image: data?.image
+            deleteImage: data?.image
                 ? data.image.replace("https://code.quickhunt.app/public/storage/post/", "")
                 : ""
         };
@@ -330,14 +331,14 @@ const Category = () => {
     const openSheetSubCategory = (id, data) => {
         const updatedData = {
             ...data,
-            delete_image: data?.image
+            deleteImage: data?.image
                 ? data.image.replace("https://code.quickhunt.app/public/storage/post/", "")
                 : ""
         };
         setSelectedSubCategory(id ? updatedData : initialState);
         navigate(`${baseUrl}/help/category`)
         setSheetOpenSub(true);
-        setSubCategoryId(data.category_id)
+        setSubCategoryId(data.categoryId)
     };
 
     const closeSheetCategory = () => {
@@ -411,9 +412,9 @@ const Category = () => {
         setIsLoadingDelete(true)
         
         const data = await apiService.deleteCategories(idToDelete)
-        const clone = [...categoryList];
+        const clone = [...categoryList.rows];
         const index = clone.findIndex((x) => x.id == idToDelete)
-        if (data.status === 200) {
+        if (data.success) {
             if (index !== -1) {
                 clone.splice(index, 1)
                 setCategoryList(clone);
@@ -435,19 +436,19 @@ const Category = () => {
         setIsLoadingDelete(true)
         
         const data = await apiService.deleteSubCategories(subIdToDelete)
-        if (data.status === 200) {
-            const clone = [...categoryList];
+        if (data.success) {
+            const clone = [...categoryList.rows];
             clone.forEach(category => {
-                const subIndex = category.sub_categories?.findIndex(sub => sub.id === subIdToDelete);
+                const subIndex = category.subCategories?.findIndex(sub => sub.id === subIdToDelete);
                 if (subIndex !== -1) {
-                    category.sub_categories.splice(subIndex, 1);
+                    category.subCategories.splice(subIndex, 1);
                 }
             });
-            setCategoryList(clone);
+            setCategoryList({ ...categoryList, rows: clone });
             getAllCategory()
             toast({description: data.message,})
         } else {
-            toast({description: data.message, variant: "destructive"})
+            toast({description: data.error, variant: "destructive"})
         }
         setIsLoadingDelete(false)
         setOpenSubDelete(false);
@@ -463,16 +464,6 @@ const Category = () => {
             setIsLoading(false);
         }
     };
-
-    const EmptyInCategoryContent = [
-        {
-            title: "Build a Structured Knowledge Base",
-            description: `Create categories and sub-categories to better organize your content, helping users navigate your articles with ease.`,
-            btnText: [
-                {title: "Create Categories", openSheet: true, icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
-            ],
-        },
-    ];
 
     return (
         <Fragment>
@@ -624,8 +615,8 @@ const Category = () => {
                         </Card>
                     </div>
                 ) : (
-                    categoryList?.length > 0 ? (
-                        categoryList.map((x, i) => (
+                    categoryList?.rows?.length > 0 ? (
+                        categoryList?.rows?.map((x, i) => (
                             <div key={i} className={"my-6"}>
                                 <Card>
                                     <CardContent className={"p-0"}>
@@ -642,7 +633,7 @@ const Category = () => {
                                                             <div className={"space-x-4"}>
                                                                 <Button
                                                                     variant={"ghost hover:bg-none"}
-                                                                    onClick={() => openSheetSubCategory("", { ...initialState, category_id: x.id })}
+                                                                    onClick={() => openSheetSubCategory("", { ...initialState, categoryId: x.id })}
                                                                     className={"border border-primary h-8 font-normal text-primary"}
                                                                 >
                                                                     <Plus size={16} className={"mr-2"} /> Add Subcategory
@@ -661,18 +652,18 @@ const Category = () => {
                                                     </TableRow>
                                                 </TableHeader>
                                                 <TableBody>
-                                                    {x.sub_categories?.length > 0 ? (
-                                                        x.sub_categories.map((y, j) => (
+                                                    {x.subCategories?.length > 0 ? (
+                                                        x.subCategories.map((y, j) => (
                                                             <TableRow key={j}>
                                                                 {/*<TableCell className={`cursor-pointer inline-flex gap-2 md:gap-1 flex-wrap items-center px-2 py-[10px] md:px-3 max-w-[270px] cursor-pointer truncate text-ellipsis overflow-hidden whitespace-nowrap`}>*/}
-                                                                <TableCell className={`px-2 py-[10px] md:px-3 max-w-[270px] cursor-pointer truncate text-ellipsis overflow-hidden whitespace-nowrap`} onClick={() => openSheetSubCategory(y.id, { ...y, category_id: x.id })}>
+                                                                <TableCell className={`px-2 py-[10px] md:px-3 max-w-[270px] cursor-pointer truncate text-ellipsis overflow-hidden whitespace-nowrap`} onClick={() => openSheetSubCategory(y.id, { ...y, categoryId: x.id })}>
                                                                     {y.title}
                                                                 </TableCell>
                                                                 <TableCell className={"px-2 py-[10px] md:px-3 w-[300px] text-end"}>
-                                                                    {y.article_count ? y.article_count : "0"}
+                                                                    {y?.articleCount ? y?.articleCount : "0"}
                                                                 </TableCell>
                                                                 <TableCell className={"px-2 py-[10px] md:px-3 w-[300px] text-end"}>
-                                                                    {y.updated_at ? moment.utc(y.updated_at).local().startOf('seconds').fromNow() : "-"}
+                                                                    {y?.updatedAt ? moment.utc(y?.updatedAt).local().startOf('seconds').fromNow() : "-"}
                                                                 </TableCell>
                                                                 <TableCell className={"px-2 py-[10px] md:px-3 w-[300px] text-center"}>
                                                                     <DropdownMenu>
@@ -680,7 +671,7 @@ const Category = () => {
                                                                             <Ellipsis className={`font-normal`} size={18} />
                                                                         </DropdownMenuTrigger>
                                                                         <DropdownMenuContent align={"end"}>
-                                                                            <DropdownMenuItem className={"cursor-pointer"} onClick={() => openSheetSubCategory(y.id, { ...y, category_id: x.id })}>Edit</DropdownMenuItem>
+                                                                            <DropdownMenuItem className={"cursor-pointer"} onClick={() => openSheetSubCategory(y.id, { ...y, categoryId: x.id })}>Edit</DropdownMenuItem>
                                                                             <DropdownMenuItem className={"cursor-pointer"} onClick={() => deleteSubRow(y.id)}>Delete</DropdownMenuItem>
                                                                         </DropdownMenuContent>
                                                                     </DropdownMenu>
@@ -708,17 +699,17 @@ const Category = () => {
                     )
                 )}
                 {
-                    categoryList.length > 0 ?
+                    categoryList?.rows?.length > 0 ?
                         <div className={`mt-6 ${isLoading ? "hidden" : ""}`}>
                             <Card>
                                 {
-                                    categoryList.length > 0 ?
+                                    categoryList?.rows?.length > 0 ?
                                         <Pagination
                                             pageNo={pageNo}
                                             totalPages={totalPages}
                                             isLoading={isLoading}
                                             handlePaginationClick={handlePaginationClick}
-                                            stateLength={categoryList.length}
+                                            stateLength={categoryList?.rows?.length}
                                         /> : ""
                                 }
                             </Card>

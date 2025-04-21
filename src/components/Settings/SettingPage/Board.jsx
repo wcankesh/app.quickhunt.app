@@ -107,10 +107,10 @@ const Board = () => {
         setIsSave(true);
         const payload = {
             title: boardToSave.title,
-            project_id: projectDetailsReducer.id
+            projectId: projectDetailsReducer.id
         }
         const data = await apiService.updateBoard(payload, boardToSave.id);
-        if(data.status === 200){
+        if(data.success){
             const clone = [...boardList];
             const index = clone.findIndex((x) => x.id === boardToSave.id)
             if(index !== -1){
@@ -126,7 +126,7 @@ const Board = () => {
         } else {
             setIsSave(false);
             toast({
-                description:data.message,
+                description:data?.error.message,
                 variant: "destructive"
             });
         }
@@ -147,13 +147,13 @@ const Board = () => {
 
         setIsSave(true)
         const payload = {
-            project_id: `${projectDetailsReducer.id}`,
+            projectId: `${projectDetailsReducer.id}`,
             title: newStatus.title,
         }
         const data = await apiService.createBoard(payload);
         const clone = [...boardList];
 
-        if(data.status === 200){
+        if(data.success){
             clone.push(data.data);
             clone.splice(index,1);
             dispatch(allStatusAndTypesAction({...allStatusAndTypes, boards: clone}))
@@ -176,7 +176,7 @@ const Board = () => {
     const onDelete = async ()=> {
         setIsLoadingDelete(true);
         const data = await apiService.deleteBoard(deleteId);
-        if(data.status === 200){
+        if(data.success){
             const clone = [...boardList];
             const index = clone.findIndex((x) => x.id === deleteId);
             if(index !== -1){

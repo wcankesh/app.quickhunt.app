@@ -318,7 +318,7 @@ em {color: var(--muted-foreground) !important;}
   overflow: hidden;
   padding: 0 20px;
   pointer-events: all;
-  position: absolute;
+  /*position: absolute;*/
   top: 0;
   -webkit-transition: opacity .3s ease-in-out;
   transition: opacity .3s ease-in-out;

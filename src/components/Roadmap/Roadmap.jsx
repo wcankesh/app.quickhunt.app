@@ -9,9 +9,10 @@ import Board, {moveCard} from '@asseinfo/react-kanban'
 import "@asseinfo/react-kanban/dist/styles.css";
 import CreateRoadmapIdea from "./CreateRoadmapIdea";
 import {useToast} from "../ui/use-toast";
-import {CommSkel} from "../Comman/CommSkel";
+import {commonLoad} from "../Comman/CommSkel";
 import {EmptyDataContent} from "../Comman/EmptyDataContent";
 import {baseUrl} from "../../utils/constent";
+import {EmptyRoadmapContent} from "../Comman/EmptyContentForModule";
 
 const loading = {
     columns: Array.from({ length: 5 }, (_, index) => ({
@@ -159,57 +160,10 @@ const Roadmap = () => {
         openSheet("create");
     }
 
-    const EmptyRoadmapContent = [
-        {
-            title: "Create First Roadmap",
-            description: `Don’t keep users guessing! Start your roadmap to outline future plans and showcase it on your website for everyone to see.`,
-            btnText: [
-                {title: "Create Roadmap", openSheet: true, icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
-            ],
-        },
-        {
-            title: "Create Roadmap Statuses",
-            description: `Define statuses like "Planned," "In Progress," and "Completed" to keep users informed about the progress of your roadmap items.`,
-            btnText: [
-                {title: "Create Statuses", navigateTo: `${baseUrl}/settings/statuses`, icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
-            ],
-        },
-        {
-            title: "Turn Ideas into a Roadmap",
-            description: `Easily transform shared ideas into actionable roadmap items to plan and showcase your product's future.`,
-            btnText: [
-                {title: "Move Ideas to Roadmap", navigateTo: `${baseUrl}/ideas`, icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
-            ],
-        },
-        {
-            title: "Create Widget",
-            description: `Add a widget to display your Roadmap on your website with options like embed, popover, modal, or sidebar.`,
-            btnText: [
-                {title: "Create Widget", navigateTo: `${baseUrl}/widget/type`, icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
-            ],
-        },
-        {
-            title: "Create Announcement",
-            description: `Share updates or milestones from your roadmap with users to keep them engaged and in the loop.`,
-            btnText: [
-                {title: "Create Announcement", navigateTo: `${baseUrl}/announcements?opensheet=open`, icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
-            ],
-        },
-        {
-            title: "Explore Examples",
-            description: `Discover how platforms like Utterbond, Webform, and Rivyo effectively manage their roadmaps.`,
-            btnText: [
-                {title: "Utterbond", redirect: "https://utterbond.quickhunt.app/roadmap"},
-                {title: "Webform", redirect: "https://webform.quickhunt.app/roadmap"},
-                {title: "Rivyo", redirect: "https://rivyo.quickhunt.app/roadmap"},
-            ],
-        },
-    ];
-
     return (
         <div
             // className={"roadmap-container height-inherit h-svh overflow-y-auto container-secondary xl:max-w-[1605px] lg:max-w-[1230px] md:max-w-[960px] max-w-[639px]"}>
-            className={"roadmap-container height-inherit h-svh max-w-[100%] pl-8 p-r"}>
+            className={`roadmap-container height-inherit h-svh max-w-[100%] pl-8 p-r ${emptyContentBlock ? "overflow-y-auto" : ""}`}>
             {isSheetOpen.open && isSheetOpen.type === "update" && (
             <UpdateRoadMapIdea
                 isOpen={isSheetOpen.open}
@@ -251,7 +205,7 @@ const Roadmap = () => {
                             renderCard={(y) => {
                                 return (
                                     <Card  className={"mb-3"}>
-                                        {CommSkel.commonParagraphThreeIcon}
+                                        {commonLoad.commonParagraphThreeIcon}
                                     </Card>
                                 )
                             }}
@@ -259,9 +213,9 @@ const Roadmap = () => {
                             renderColumnHeader={({ id}) => {
                                 return (
                                     <React.Fragment>
-                                        {CommSkel.commonParagraphOne}
+                                        {commonLoad.commonParagraphOne}
                                         <div className={"add-idea"}>
-                                            {CommSkel.commonParagraphOne}
+                                            {commonLoad.commonParagraphOne}
                                         </div>
                                     </React.Fragment>
                                 )
@@ -320,7 +274,7 @@ const Roadmap = () => {
                                 )
                             }}
 
-                            renderColumnHeader={({title, color_code, id, cards}) => {
+                            renderColumnHeader={({title, colorCode, id, cards}) => {
 
                                 const column = roadmapList?.columns?.find(col => col.id === id);
                                 const cardCount = column ? column?.cards?.length : 0;
@@ -330,7 +284,7 @@ const Roadmap = () => {
                                         <div className={"flex justify-between items-center gap-2 border-b pb-4"}>
                                         <CardTitle
                                             className={"flex items-center gap-2 text-sm font-medium px-[7px]"}>
-                                            <Circle fill={color_code} stroke={color_code}
+                                            <Circle fill={colorCode} stroke={colorCode}
                                                     className={"w-[10px] h-[10px]"}/>
                                             {title} ({cardCount})
                                         </CardTitle>

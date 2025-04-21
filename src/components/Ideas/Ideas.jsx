@@ -8,11 +8,11 @@ import {Checkbox} from "../ui/checkbox";
 import {ApiService} from "../../utils/ApiService";
 import {useNavigate} from "react-router";
 import {useSelector} from "react-redux";
-import {baseUrl, cleanQuillHtml} from "../../utils/constent";
+import {baseUrl} from "../../utils/constent";
 import moment from "moment";
 import {useToast} from "../ui/use-toast";
 import ReadMoreText from "../Comman/ReadMoreText";
-import {CommSkel} from "../Comman/CommSkel";
+import {commonLoad} from "../Comman/CommSkel";
 import EmptyData from "../Comman/EmptyData";
 import CreateIdea from "./CreateIdea";
 import {DropdownMenu, DropdownMenuTrigger} from "@radix-ui/react-dropdown-menu";
@@ -27,6 +27,7 @@ import {debounce} from "lodash";
 import {EmptyDataContent} from "../Comman/EmptyDataContent";
 import {CommSearchBar} from "../Comman/CommentEditor";
 import {DisplayReactQuill} from "../Comman/ReactQuillEditor";
+import {EmptyIdeaContent} from "../Comman/EmptyContentForModule";
 
 const filterByStatus = [
     {name: "Archived", value: "archive",},
@@ -59,7 +60,7 @@ const Ideas = () => {
     const [ideasList, setIdeasList] = useState([]);
     const [topicLists, setTopicLists] = useState([]);
     const [roadmapStatus, setRoadmapStatus] = useState([]);
-    const [filter, setFilter] = useState({...initialStateFilter, project_id: projectDetailsReducer.id});
+    const [filter, setFilter] = useState({...initialStateFilter, projectId: projectDetailsReducer.id});
     const [openFilter, setOpenFilter] = useState('');
     const [openFilterType, setOpenFilterType] = useState('');
     const [pageNo, setPageNo] = useState(Number(getPageNo));
@@ -88,15 +89,15 @@ const Ideas = () => {
 
     useEffect(() => {
         if (filter?.topic?.length || filter?.roadmap?.length || filter?.bug || filter?.archive /*|| filter.no_status*/ || filter?.all || filter?.search) {
-            let payload = {...filter, project_id: projectDetailsReducer.id, page: pageNo, limit: perPageLimit}
+            let payload = {...filter, projectId: projectDetailsReducer.id, page: pageNo, limit: perPageLimit}
             ideaSearch(payload)
         } else {
             if(projectDetailsReducer.id){
                 getAllIdea()
             }
         }
-        setTopicLists(allStatusAndTypes.topics)
-        setRoadmapStatus(allStatusAndTypes.roadmap_status)
+        setTopicLists( allStatusAndTypes.topics)
+        setRoadmapStatus(allStatusAndTypes.roadmapStatus)
         if(getNavOpenSheet) {
             navigate(`${baseUrl}/ideas?opensheet=${getNavOpenSheet}&pageNo=${pageNo}`);
         } else {
@@ -107,15 +108,15 @@ const Ideas = () => {
     const getAllIdea = async () => {
         setLoad('list');
         const data = await apiSerVice.getAllIdea({
-            project_id: projectDetailsReducer.id,
+            projectId: projectDetailsReducer.id,
             page: pageNo,
             limit: perPageLimit
         })
-        if (data.status === 200) {
-            setIdeasList(data.data)
-            setTotalRecord(data.total)
+        if (data.success) {
+            setIdeasList(data?.data?.ideas)
+            setTotalRecord(data.data.total)
             setLoad('')
-            if (!data.data || data.data.length === 0) {
+            if (!data.data.ideas || data.data.ideas.length === 0) {
                 emptyContent(true);
             } else {
                 emptyContent(false);
@@ -143,7 +144,7 @@ const Ideas = () => {
         debounce((value) => {
             const updatedFilter = {
                 ...filter,
-                project_id: projectDetailsReducer.id,
+                projectId: projectDetailsReducer.id,
                 search: value,
                 page: 1,
             };
@@ -170,22 +171,23 @@ const Ideas = () => {
                 idea.id === record.id
                     ? {
                         ...idea,
-                        is_read: 1,
+                        isRead: 1,
                         comments: idea.comments.map(comment => ({
                             ...comment,
-                            is_read: 1
+                            isRead: 1
                         }))
                     }
                     : idea
             )
         );
-        navigate(`${baseUrl}/ideas/${record.id}?pageNo=${getPageNo}`)
+        navigate(`${baseUrl}/ideas/${record.id}`)
+        // navigate(`${baseUrl}/ideas/${record.id}?pageNo=${getPageNo}`)
     };
 
     const handleChange = (e) => {
         let payload = {
             ...filter,
-            project_id: projectDetailsReducer.id,
+            projectId: projectDetailsReducer.id,
             page: 1,
             limit: perPageLimit,
         };
@@ -235,42 +237,31 @@ const Ideas = () => {
     };
 
     const giveVote = async (record, type) => {
-        if (record.is_edit !== 1) {
-            if (record.user_vote === type) {
+        if (record.createdBy !== 1) {
+            if (record.userVote === (type == 1)) {
             } else {
                 const payload = {
-                    feature_idea_id: record.id,
+                    ideaId: record.id,
                     type: type
-                }
+                };
                 const data = await apiSerVice.giveVote(payload);
-                if (data.status === 200) {
+                if (data.success) {
                     const clone = [...ideasList];
-                    const index = clone.findIndex((x) => x.id === record.id)
+                    const index = clone.findIndex((x) => x.id === record.id);
                     if (index !== -1) {
                         let newVoteCount = clone[index].vote;
-                        newVoteCount = type === 1 ? newVoteCount + 1 : newVoteCount >= 1 ? newVoteCount - 1 : 0;
+                        newVoteCount = type == 1 ? newVoteCount + 1 : newVoteCount >= 1 ? newVoteCount - 1 : 0;
                         clone[index].vote = newVoteCount;
-                        clone[index].user_vote = type;
-                        let vote_list = [...clone[index].vote_list];
-                        if (type === 1) {
-                            vote_list.push(data.data)
-                            clone[index].vote_list = vote_list;
-                        } else {
-                            let voteIndex = vote_list.findIndex((x) => x.name === data.data.name);
-                            if (voteIndex !== -1) {
-                                vote_list.splice(voteIndex, 1)
-                                clone[index].vote_list = vote_list;
-                            }
-                        }
+                        clone[index].userVote = type == 1;
                         setIdeasList(clone);
+                        toast({ description: data.message });
                     }
-                    toast({description: data.message})
                 } else {
-                    toast({variant: "destructive", description: data.message})
+                    toast({ variant: "destructive", description: data.error });
                 }
             }
         } else {
-            toast({variant: "destructive", description: "You can't vote your own ideas"})
+            toast({ variant: "destructive", description: "You can't vote on admin-created ideas" });
         }
     }
 
@@ -287,27 +278,27 @@ const Ideas = () => {
 
     const handleStatusUpdate = async (name, value, index, record) => {
         const formData = new FormData();
-        if (name === "roadmap_id" && value === null) {
+        if (name === "roadmapStatusId" && value === null) {
             value = "";
         }
         formData.append(name, value);
         const data = await apiSerVice.updateIdea(formData, record?.id);
-        if (data.status === 200) {
+        if (data.success) {
             const clone = [...ideasList];
-            if (name === "is_archive" || name === "is_active") {
+            if (name == "isArchive" || name == "isActive") {
                 clone[index][name] = value;
                 const removeStatus =
-                    (filter.bug == 1 && clone[index].is_active == 1) ||
-                    (filter.archive == 1 && clone[index].is_archive == 0);
+                    (filter.bug == 1 && clone[index].isActive == 1) ||
+                    (filter.archive == 1 && clone[index]?.isArchive == 0);
                 if (removeStatus) {
                     clone.splice(index, 1);
                     setTotalRecord(clone.length)
                 }
-            } else if (name === "roadmap_id") {
-                clone[index].roadmap_id = value;
+            } else if (name === "roadmapStatusId") {
+                clone[index].roadmapStatusId = value;
             }
             setIdeasList(clone);
-            // let payload = {...filter, project_id: projectDetailsReducer.id, page: pageNo, limit: perPageLimit}
+            // let payload = {...filter, projectId: projectDetailsReducer.id, page: pageNo, limit: perPageLimit}
             // ideaSearch(payload)
             toast({description: data.message});
         } else {
@@ -319,7 +310,7 @@ const Ideas = () => {
         if (id) {
             setDeleteIsLoading(true)
             const data = await apiSerVice.onDeleteIdea(id);
-            if (data.status === 200) {
+            if (data.success) {
                 const filteredIdeas = ideasList.filter((idea) => idea.id !== id);
                 setIdeasList(filteredIdeas);
                 setTotalRecord(Number(totalRecord) - 1)
@@ -343,53 +334,6 @@ const Ideas = () => {
         setDeleteRecord(record.id)
         setOpenDelete(!openDelete)
     }
-
-    const EmptyIdeaContent = [
-        {
-            title: "Create First Idea",
-            description: `It's time to start the conversation! Create your first idea and get feedback from your team or community.`,
-            btnText: [
-                {title: "Create Ideas", openSheet: true, icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
-            ],
-        },
-        {
-            title: "Create Tags",
-            description: `Organize your ideas with customizable tags like "High Priority" or "Internal Idea" for better management.`,
-            btnText: [
-                {title: "Create Tags", navigateTo: `${baseUrl}/settings/tags`, icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
-            ],
-        },
-        {
-            title: "Create Board",
-            description: `Visually manage your ideas with boards like "Feature Request" or "Bug Reports" to track progress and prioritize tasks.`,
-            btnText: [
-                {title: "Create Board", navigateTo: `${baseUrl}/settings/board`, icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
-            ],
-        },
-        {
-            title: "Create Widget",
-            description: `Add a widget to display your ideas on your website with options like embed, popover, modal, or sidebar.`,
-            btnText: [
-                {title: "Create Widget", navigateTo: `${baseUrl}/widget/type`, icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
-            ],
-        },
-        {
-            title: "Create Feedback",
-            description: `Share your ideas via in-app messages and let users upvote and comment to refine and improve your suggestions.`,
-            btnText: [
-                {title: "Create In-App Message", navigateTo: `${baseUrl}/app-message/type`, icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
-            ],
-        },
-        {
-            title: "Explore Examples",
-            description: `See how platforms like Utterbond, Webform, and Rivyo manage customer feedback efficiently and effortlessly.`,
-            btnText: [
-                {title: "Utterbond", redirect: `https://utterbond.quickhunt.app/ideas`},
-                {title: "Webform", redirect: `https://webform.quickhunt.app/ideas`},
-                {title: "Rivyo", redirect: `https://rivyo.quickhunt.app/ideas`},
-            ],
-        },
-    ];
 
     return (
         <Fragment>
@@ -510,7 +454,7 @@ const Ideas = () => {
                                                                     }}
                                                                     className={"flex-1 w-full text-sm font-normal cursor-pointer flex gap-2 items-center capitalize"}
                                                                 >
-                                                                    <span className={"w-2.5 h-2.5 rounded-full"} style={{backgroundColor: x.color_code}}/>
+                                                                    <span className={"w-2.5 h-2.5 rounded-full"} style={{backgroundColor: x.colorCode}}/>
                                                                     {x.title}
                                                                 </span>
                                                             </CommandItem>
@@ -570,11 +514,11 @@ const Ideas = () => {
                                 </PopoverContent>
                             </Popover>
                             </div>
-                            <Button className={"gap-2 font-medium hover:bg-primary"} onClick={openCreateIdea}><Plus size={20} strokeWidth={3}/>Create Idea</Button>
+                            <Button className={"gap-2 font-medium hover:bg-primary"} onClick={openCreateIdea}><Plus size={20} strokeWidth={3}/><span className={"text-xs md:text-sm font-medium"}>Create Idea</span></Button>
                         </div>
                     </div>
                     {
-                        (filter?.topic?.length > 0 || filter?.roadmap?.length > 0 || filter?.archive === 1 || filter?.bug === 1) && <div className="flex flex-wrap gap-2 my-6">
+                        (filter?.topic?.length > 0 || filter?.roadmap?.length > 0 || filter?.archive == 1 || filter?.bug == 1) && <div className="flex flex-wrap gap-2 my-6">
                             {
                                 (filter.topic || []).map((data,index) =>{
                                     const findTopic = (topicLists || []).find((topic) => topic.id === data);
@@ -593,7 +537,7 @@ const Ideas = () => {
                                     return(
                                         <Badge key={`selected-${findRoadmap.id}`} variant="outline" className="rounded p-0 font-medium">
                                             <span className="px-3 py-1.5 border-r flex gap-2 items-center">
-                                                <span className={"w-2.5 h-2.5  rounded-full"} style={{backgroundColor: findRoadmap.color_code}}/>
+                                                <span className={"w-2.5 h-2.5  rounded-full"} style={{backgroundColor: findRoadmap.colorCode}}/>
                                                 {findRoadmap.title}
                                             </span>
                                             <span className="w-7 h-7 flex items-center justify-center cursor-pointer" onClick={() => handleChange({name: "roadmap" , value: data})}>
@@ -626,7 +570,7 @@ const Ideas = () => {
 
                 <Card className={"my-6"}>
                     {
-                        (load === 'search' || load === 'list') ? (CommSkel.commonParagraphFourIdea) : ideasList.length > 0 ?
+                        (load === 'search' || load === 'list') ? (commonLoad.commonParagraphFourIdea) : ideasList.length > 0 ?
                             <CardContent className={"p-0 divide-y"}>
                                 {
                                     (ideasList || []).map((x, i) => {
@@ -650,12 +594,12 @@ const Ideas = () => {
                                                                     className={"flex flex-wrap items-center gap-1 cursor-pointer xl:gap-3"}
                                                                     onClick={() => openDetailsSheet(x)}
                                                                 >
-                                                                    <h3 className={"text-base font-normal max-w-[278px] truncate text-ellipsis overflow-hidden whitespace-nowrap"}>{x.title}</h3>
+                                                                    <h3 className={"text-base font-normal max-w-[278px] truncate text-ellipsis overflow-hidden whitespace-nowrap text-wrap sm:text-nowrap"}>{x.title}</h3>
                                                                     <div className={"flex gap-2 items-center"}>
-                                                                        <h4 className={"text-xs font-normal text-muted-foreground"}>{x.name ? x.name : x?.user_name}</h4>
+                                                                        <h4 className={"text-xs font-normal text-muted-foreground"}>{x.name ? x.name : x?.userName}</h4>
                                                                         <p className={"text-xs font-normal flex items-center text-muted-foreground"}>
                                                                             <Dot size={20} className={"fill-text-card-foreground stroke-text-card-foreground"}/>
-                                                                            {moment(x.created_at).format('D MMM')}
+                                                                            {moment(x.createdAt).format('D MMM')}
                                                                         </p>
                                                                     </div>
                                                                     <div
@@ -664,13 +608,13 @@ const Ideas = () => {
                                                                     >
                                                                         <span><MessageCircleMore size={16} className={"stroke-primary"}/></span>
                                                                         <p className={"text-base font-normal"}>
-                                                                            {x && x.comments && x.comments.length ? x.comments.length : 0}
+                                                                            {x?.commentCount}
                                                                         </p>
                                                                     </div>
                                                                 </div>
                                                                 <div className={"flex flex-wrap gap-2 items-center"}>
                                                                     {
-                                                                        (x && x?.topic && x?.topic?.length) ? (
+                                                                        (x && x?.tags && x?.tags?.length) ? (
                                                                             <Popover>
                                                                                 <PopoverTrigger asChild>
                                                                                     <Button variant={"ghost hove:none"} className={"p-0 h-[24px]"}>
@@ -678,7 +622,7 @@ const Ideas = () => {
                                                                                                 <div className={"text-sm text-center"}>
                                                                                                     <div className={`flex flex-wrap gap-2`}>
                                                                                                         {
-                                                                                                            x?.topic?.slice(0, 1).map((topic, i) => (
+                                                                                                            x?.tags?.slice(0, 1).map((topic, i) => (
                                                                                                                 <div className={"text-sm font-normal"} key={i}>
                                                                                                                     {topic?.title}
                                                                                                                 </div>
@@ -687,11 +631,11 @@ const Ideas = () => {
                                                                                                     </div>
                                                                                                 </div>
                                                                                             {
-                                                                                                (x?.topic?.length > 1) &&
+                                                                                                (x?.tags?.length > 1) &&
                                                                                                 <div
                                                                                                     className={"update-idea text-sm rounded-full border text-center"}>
                                                                                                     <Avatar>
-                                                                                                        <AvatarFallback>+{x?.topic?.length - 1}</AvatarFallback>
+                                                                                                        <AvatarFallback>+{x?.tags?.length - 1}</AvatarFallback>
                                                                                                     </Avatar>
                                                                                                 </div>
                                                                                             }
@@ -701,12 +645,12 @@ const Ideas = () => {
                                                                                 <PopoverContent className="p-0" align={"start"}>
                                                                                     <div className={""}>
                                                                                         <div className={"py-3 px-4"}>
-                                                                                            <h4 className="font-normal leading-none text-sm">{`Topics (${x?.topic?.length})`}</h4>
+                                                                                            <h4 className="font-normal leading-none text-sm">{`Topics (${x?.tags?.length})`}</h4>
                                                                                         </div>
                                                                                         <div className="border-t px-4 py-3 space-y-2">
-                                                                                            {x.topic && x.topic.length > 0 && (
+                                                                                            {x.tags && x.tags.length > 0 && (
                                                                                                 <div className="space-y-2">
-                                                                                                    {x.topic.map((y, i) => (
+                                                                                                    {x.tags.map((y, i) => (
                                                                                                         <div className="text-sm font-normal" key={i}>
                                                                                                             {y?.title}
                                                                                                         </div>
@@ -720,21 +664,21 @@ const Ideas = () => {
                                                                         ) : ""
                                                                     }
                                                                     <Select
-                                                                        onValueChange={(value) => handleStatusUpdate("roadmap_id", value, i, x)}
-                                                                        value={x.roadmap_id !== "" ? x.roadmap_id : null}>
+                                                                        onValueChange={(value) => handleStatusUpdate("roadmapStatusId", value, i, x)}
+                                                                        value={x.roadmapStatusId !== "" ? x.roadmapStatusId : null}>
                                                                         <SelectTrigger className="md:w-[200px] w-[170px] h-8 bg-card">
                                                                             <SelectValue>
-                                                                                {x.roadmap_id ?  <div className="flex items-center gap-2">
+                                                                                {x.roadmapStatusId ?  <div className="flex items-center gap-2">
                                                                                     <Circle
                                                                                         fill={
-                                                                                            allStatusAndTypes.roadmap_status.find((status) => status.id === x.roadmap_id)?.color_code
+                                                                                            allStatusAndTypes.roadmapStatus.find((status) => status.id === x.roadmapStatusId)?.colorCode
                                                                                         }
                                                                                         stroke={
-                                                                                            allStatusAndTypes.roadmap_status.find((status) => status.id === x.roadmap_id)?.color_code
+                                                                                            allStatusAndTypes.roadmapStatus.find((status) => status.id === x.roadmapStatusId)?.colorCode
                                                                                         }
                                                                                         className="w-[10px] h-[10px]"
                                                                                     />
-                                                                                    <span className={"max-w-[100px] truncate text-ellipsis overflow-hidden whitespace-nowrap"}>{allStatusAndTypes.roadmap_status.find((status) => status.id === x.roadmap_id)?.title ?? "No status"}</span>
+                                                                                    <span className={"max-w-[100px] truncate text-ellipsis overflow-hidden whitespace-nowrap"}>{allStatusAndTypes.roadmapStatus.find((status) => status.id === x.roadmapStatusId)?.title ?? "No status"}</span>
                                                                                 </div> : (
                                                                                     <span className="text-gray-500">No status</span>
                                                                                 )}
@@ -746,15 +690,15 @@ const Ideas = () => {
                                                                                     <div className={"flex items-center gap-2"}>No status</div>
                                                                                 </SelectItem>
                                                                                 {
-                                                                                    (allStatusAndTypes.roadmap_status || []).map((x, i) => {
+                                                                                    (allStatusAndTypes.roadmapStatus || []).map((x, i) => {
                                                                                         return (
                                                                                             <SelectItem key={i}
                                                                                                         value={x.id}>
                                                                                                 <div
                                                                                                     className={"flex capitalize items-center gap-2 truncate text-ellipsis overflow-hidden whitespace-nowrap"}>
                                                                                                     <Circle
-                                                                                                        fill={x.color_code}
-                                                                                                        stroke={x.color_code}
+                                                                                                        fill={x.colorCode}
+                                                                                                        stroke={x.colorCode}
                                                                                                         className={` w-[10px] h-[10px]`}/>
                                                                                                     {x.title || "No status"}
                                                                                                 </div>
@@ -766,7 +710,7 @@ const Ideas = () => {
                                                                         </SelectContent>
                                                                     </Select>
                                                                     {
-                                                                        x.is_active == 0 &&
+                                                                        x.isActive == 0 &&
                                                                         <Badge
                                                                             variant={"outline"}
                                                                             className={`border border-red-500 text-red-500 bg-red-100 `}
@@ -775,7 +719,7 @@ const Ideas = () => {
                                                                         </Badge>
                                                                     }
                                                                     {
-                                                                        x.is_archive == 1 &&
+                                                                        x?.isArchive == 1 &&
                                                                         <Badge
                                                                             variant={"outline"}
                                                                             className={`border border-green-500 text-green-500 bg-green-100
@@ -784,7 +728,7 @@ const Ideas = () => {
                                                                             Archive
                                                                         </Badge>
                                                                     }
-                                                                    {x.pin_to_top === 1 && <Pin size={16} className={`fill-card-foreground`}/>}
+                                                                    {x.pinToTop === 1 && <Pin size={16} className={`fill-card-foreground`}/>}
                                                                     <DropdownMenu>
                                                                         <DropdownMenuTrigger>
                                                                             <Ellipsis size={16}/>
@@ -795,13 +739,13 @@ const Ideas = () => {
                                                                                 onClick={() => openDetailsSheet(x)}>Edit</DropdownMenuItem>
                                                                             <DropdownMenuItem
                                                                                 className={"cursor-pointer"}
-                                                                                onClick={() => handleStatusUpdate("is_archive", x.is_archive == 1 ? 0 : 1, i, x)}>
-                                                                                {x?.is_archive === 1 ? "Unarchive" : "Archive"}
+                                                                                onClick={() => handleStatusUpdate("isArchive", x?.isArchive == 1 ? 0 : 1, i, x)}>
+                                                                                {x?.isArchive == 1 ? "Unarchive" : "Archive"}
                                                                             </DropdownMenuItem>
                                                                             <DropdownMenuItem
                                                                                 className={"cursor-pointer capitalize"}
-                                                                                onClick={() => handleStatusUpdate("is_active", x.is_active === 1 ? 0 : 1, i, x)}>
-                                                                                {x.is_active === 0 ? "Convert to Idea" : "Mark as bug"}
+                                                                                onClick={() => handleStatusUpdate("isActive", x.isActive == 1 ? 0 : 1, i, x)}>
+                                                                                {x.isActive == 0 ? "Convert to Idea" : "Mark as bug"}
                                                                             </DropdownMenuItem>
                                                                             <DropdownMenuItem
                                                                                 className={"cursor-pointer"}

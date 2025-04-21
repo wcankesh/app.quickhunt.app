@@ -5,22 +5,13 @@ import {ApiService} from "../../../utils/ApiService";
 import {useSelector} from "react-redux";
 import moment from "moment";
 import {useParams} from "react-router-dom";
-import {LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer} from 'recharts';
-import {ChartContainer, ChartTooltipContent} from "../../ui/chart";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "../../ui/table";
-import {useTheme} from "../../theme-provider";
-import {Avatar, AvatarFallback} from "../../ui/avatar";
 import EmptyData from "../../Comman/EmptyData";
-import CommonBreadCrumb from "../../Comman/CommonBreadCrumb";
-import {chartLoading} from "../../Comman/CommSkel";
 import {UserAvatar} from "../../Comman/CommentEditor";
+import {AnalyticsLayout, AnalyticsLineChart} from "./CommonAnalyticsView/CommonUse";
+import {AnalyticsSummary} from "./CommonAnalyticsView/CommonUse";
 
-const chartConfig = {
-    view: {label: "View", color: "#7c3bed80",},
-    response: {label: "Response", color: "#7c3aed",},
-}
-
-const CommonTable = ({ columns, data, isLoading, skeletonRows = 10, skeletonColumns = 4 }) => {
+const CommonBannerTable = ({ columns, data, isLoading, skeletonRows = 10, skeletonColumns = 4 }) => {
     return (
         <Table>
             <TableHeader>
@@ -74,7 +65,6 @@ const CommonTable = ({ columns, data, isLoading, skeletonRows = 10, skeletonColu
 };
 
 const BannerAnalyticsView = () => {
-    const {theme} = useTheme();
     const {id, type} = useParams();
     const apiService = new ApiService();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
@@ -155,7 +145,6 @@ const BannerAnalyticsView = () => {
         },
         {
             title: "Completion Rate",
-            // count: `${analytics?.response_percentage?.toFixed(2) || 0}%`,
             count: `${((analytics?.response_percentage|| 0) / 100).toFixed(2)}%`,
             show: inAppMsgSetting?.reply_type === 1,
         },
@@ -165,90 +154,19 @@ const BannerAnalyticsView = () => {
 
     return (
         <Fragment>
-            <div className={"container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-3 md:px-4"}>
-                <div className={"pb-6"}>
-                    <CommonBreadCrumb
-                        links={links}
-                        currentPage={inAppMsgSetting?.title}
-                        truncateLimit={30}
-                    />
-                </div>
-                <div className={"flex flex-col gap-4"}>
-                    <Card>
-                        <CardContent className={"p-0"}>
-                            <div className={"grid md:grid-cols-3 sm:grid-cols-1"}>
-                                {analyticsViews.map((x, i) => (
-                                    <Fragment key={i}>
-                                        {isLoading ? <div className={"space-y-[14px] w-full p-4 border-b md:border-r md:border-0 last:border-b-0 last:border-r-0"}>
-                                            <Skeleton className="h-4"/>
-                                            <Skeleton className="h-4"/></div> : (
-                                            <div className={`p-4 border-b md:border-r md:border-0 last:border-b-0 last:border-r-0`}>
-                                                <h3 className={"text-base font-medium"}>{x.title}</h3>
-                                                <div className={"flex gap-1"}>
-                                                    <h3 className={`text-2xl font-medium`}>{x.count}</h3>
-                                                </div>
-                                            </div>
-                                        )}
-                                    </Fragment>
-                                ))}
-                            </div>
-                        </CardContent>
-                    </Card>
-                    <Card>
-                        <CardHeader className={"p-4 border-b text-base font-medium"}>How did that change over time?</CardHeader>
-                        {
-                            isLoading ? chartLoading(15, "p-2") :
-                            <CardContent className={"p-4 pl-0"}>
-                                {
-                                    analytics?.chart?.length > 0 ? <ChartContainer config={chartConfig} className="aspect-auto h-[250px] w-full">
-                                            <ResponsiveContainer width="100%" height="100%">
-                                                <LineChart
-                                                    accessibilityLayer
-                                                    data={analytics.chart}
-                                                >
-                                                    <CartesianGrid vertical={false} />
-                                                    <XAxis
-                                                        dataKey="x"
-                                                        tickLine={false}
-                                                        axisLine={false}
-                                                        tickMargin={8}
-                                                        tickFormatter={(value) => {
-                                                            const date = new Date(value)
-                                                            return date.toLocaleDateString("en-US", {
-                                                                month: "short",
-                                                                day: "numeric",
-                                                            })
-                                                        }}
-                                                    />
-                                                    <Tooltip
-                                                        cursor={false}
-                                                        content={<ChartTooltipContent hideLabel />}
-                                                    />
-                                                    <YAxis tickLine={false} axisLine={false}/>
-                                                    <Line
-                                                        dataKey="view"
-                                                        type="monotone"
-                                                        stroke="var(--color-view)"
-                                                        strokeWidth={2}
-                                                    />
-                                                    <Line
-                                                        dataKey="response"
-                                                        type="monotone"
-                                                        stroke="var(--color-response)"
-                                                        strokeWidth={2}
-                                                    />
-                                                </LineChart>
-                                            </ResponsiveContainer>
-                                        </ChartContainer>
-                                        : <EmptyData />
-                                }
-                            </CardContent>
-                        }
-                    </Card>
+            <AnalyticsLayout links={links} currentPage={inAppMsgSetting?.title}>
+                <AnalyticsSummary analyticsViews={analyticsViews} isLoading={isLoading} />
+                <AnalyticsLineChart
+                    title="How did that change over time?"
+                    data={analytics?.chart}
+                    isLoading={isLoading}
+                    chartConfig={{ view: { label: "View", color: "#7c3bed80" }, response: { label: "Response", color: "#7c3aed" } }}
+                    dataKeys={["view", "response"]}
+                />
                     <Card>
                         <CardHeader className={"p-4 border-b text-base font-medium"}>Customers who opened</CardHeader>
                         <CardContent className={"p-0 overflow-auto"}>
-                            <CommonTable
+                            <CommonBannerTable
                                 columns={openedColumns}
                                 data={analytics.analytics || []}
                                 isLoading={isLoading}
@@ -260,7 +178,7 @@ const BannerAnalyticsView = () => {
                     <Card>
                         <CardHeader className={"p-4 border-b text-base font-medium"}>Customers who replied</CardHeader>
                         <CardContent className={"p-0 overflow-auto"}>
-                            <CommonTable
+                            <CommonBannerTable
                                 columns={repliedColumns}
                                 data={analytics.responses || []}
                                 isLoading={isLoading}
@@ -269,8 +187,7 @@ const BannerAnalyticsView = () => {
                             />
                         </CardContent>
                     </Card>
-                </div>
-            </div>
+            </AnalyticsLayout>
         </Fragment>
     );
 };

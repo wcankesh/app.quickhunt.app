@@ -205,7 +205,8 @@ const AnalyticsViews = () => {
                     </Card>
                     <Card>
                         <CardContent className={"p-4"}>
-                            <div className={"flex flex-col gap-4"}>
+                            {/*<div className={"flex flex-col gap-4"}>*/}
+                            <div className={"space-y-4"}>
                                 <h5 className={"text-base font-medium leading-5"}>Feedback</h5>
                                 {
                                     isLoadingFeedBack ?
@@ -232,21 +233,19 @@ const AnalyticsViews = () => {
                                                         {
                                                             (feedbackList || []).map((x) => {
                                                                 return (
-                                                                    <div key={x.id}
-                                                                         className={"flex flex-col py-4 first:pt-0 border-b"}>
-                                                                        <div className={"flex flex-row gap-4"}>
+                                                                    <div key={x.id} className={"py-4 first:pt-0 border-b"}>
+                                                                        {/*<div className={"flex flex-row gap-4"}>*/}
                                                                             <div className={"flex flex-col gap-1"}>
-                                                                                <div
-                                                                                    className={"flex flex-row gap-4 items-center"}>
+                                                                                <div className={"flex gap-4 items-center"}>
                                                                                     <h5 className={"text-sm font-medium"}>{x?.customer_name}</h5>
                                                                                     <p className={"text-muted-foreground text-[10px] font-normal"}>{x?.customer_email_id}</p>
                                                                                 </div>
-                                                                                <p className={"text-muted-foreground text-xs font-normal"}>
+                                                                                <div className={"text-muted-foreground text-xs font-normal"}>
                                                                                     <ReadMoreText className={"text-xs"}
                                                                                                   html={x.feedback}/>
-                                                                                </p>
+                                                                                </div>
                                                                             </div>
-                                                                        </div>
+                                                                        {/*</div>*/}
                                                                     </div>
                                                                 )
                                                             })

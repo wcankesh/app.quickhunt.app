@@ -1,7 +1,7 @@
 import React, {Fragment} from "react";
 import {Skeleton} from "../ui/skeleton";
 
-export const CommSkel = {
+export const commonLoad = {
     commonParagraphColumnFour: <div className={"grid grid-cols-4 gap-4"}>
         {
             Array.from(Array(4)).map((_, r) => {
@@ -180,13 +180,13 @@ export const CommSkel = {
     </div>,
 }
 
-export const commonParagraph = (count) => {
+export const commonParagraph = (count, className) => {
     return <div className={"grid gap-2"}>
         {
             Array.from(Array(count)).map((_, r) => {
                 return (
                     <Fragment key={r}>
-                        <Skeleton className="h-9 max-w-[100%]" />
+                        <Skeleton className={`h-9 max-w-[100%] ${className}`} />
                     </Fragment>
                 )
             })

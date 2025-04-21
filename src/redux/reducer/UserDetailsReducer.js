@@ -2,16 +2,16 @@ import { SET_USER_DETAILS, } from '../constent';
 
 const initialState = {
     id: "",
-    user_browser: null,
-    user_created_date: "",
-    user_email_id: "",
-    user_first_name: "",
-    user_ip_address: null,
-    user_job_title: "",
-    user_last_name: "",
-    user_photo: "",
-    user_status: "",
-    user_updated_date: "",
+    browser: null,
+    createdAt: "",
+    email: "",
+    firstName: "",
+    ipAddress: null,
+    jobTitle: "",
+    lastName: "",
+    profileImage: "",
+    status: "",
+    updatedAt: "",
 }
 export default function userDetailsReducer(state = initialState, action) {
     switch (action.type) {

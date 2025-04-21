@@ -68,14 +68,14 @@ const Emoji = () => {
         setIsSave(true);
         const payload ={
             emoji:selectedEmoji.emoji,
-            emoji_url:selectedEmoji.imageUrl,
-            project_id:projectDetailsReducer.id
+            emojiUrl:selectedEmoji.imageUrl,
+            projectId:projectDetailsReducer.id
         }
         const data = await apiService.createEmoji(payload);
-        if (data.status === 200){
+        if (data.success){
             const clone = [...emojiList];
-            clone.push({emoji:selectedEmoji.emoji,emoji_url:selectedEmoji.imageUrl,id:data.data});
-            clone.splice(index,1);
+            clone.push({id: data.data.id,emoji: selectedEmoji.emoji, emojiUrl: selectedEmoji.imageUrl, });
+            clone.splice(index, 1);
             setEmojiList(clone);
             dispatch(allStatusAndTypesAction({...allStatusAndTypes, emoji: clone}))
             toast({
@@ -86,7 +86,7 @@ const Emoji = () => {
         else{
             setIsSave(false);
             toast({
-                description: data.message,
+                description: data?.error?.message,
                 variant: "destructive"
             });
         }
@@ -101,15 +101,15 @@ const Emoji = () => {
 
         setIsSave(true);
         const payload ={
-            project_id:projectDetailsReducer.id,
+            projectId:projectDetailsReducer.id,
             emoji:selectedEmoji.emoji,
-            emoji_url:selectedEmoji.imageUrl ? selectedEmoji.imageUrl : emojiToSave.emoji_url
+            emojiUrl:selectedEmoji.imageUrl ? selectedEmoji.imageUrl : emojiToSave.emojiUrl
         }
         const data = await apiService.updateEmoji(payload,emojiToSave.id);
-        if(data.status === 400) {
+        if(data.success) {
             setIsSave(false);
             const clone = [...emojiList];
-            clone[index] = {project_id:projectDetailsReducer.id, emoji:selectedEmoji.emoji, emoji_url:payload.emoji_url,id:emojiToSave.id};
+            clone[index] = {projectId:projectDetailsReducer.id, emoji:selectedEmoji.emoji, emojiUrl:payload.emojiUrl,id:emojiToSave.id};
             setEmojiList(clone);
             dispatch(allStatusAndTypesAction({...allStatusAndTypes, emoji: clone}))
             setEditIndex(null);
@@ -122,7 +122,7 @@ const Emoji = () => {
         }
         else{
             toast({
-                description:data.message,
+                description:data?.error?.message,
                 variant: "destructive"
             });
             setIsEdit(false);
@@ -160,7 +160,7 @@ const Emoji = () => {
         const data = await apiService.deleteEmoji(deleteId);
         const clone = [...emojiList];
         const deleteToIndex = clone.findIndex((x)=> x.id == deleteId);
-        if (data.status === 200) {
+        if (data.success) {
             clone.splice(deleteToIndex, 1);
             setEmojiList(clone);
             setDeleteId(null);
@@ -172,7 +172,7 @@ const Emoji = () => {
             setOpenDelete(false);
         } else {
             toast({
-                description:data.message,
+                description:data?.error?.message,
                 variant: "destructive"
             });
             setIsDeleteLoading(false);
@@ -226,6 +226,7 @@ const Emoji = () => {
                                  emojiList.length > 0 ? <>
                                     {
                                         (emojiList || []).map((x, i) => {
+                                            console.log(x)
                                             return (
                                                 <TableRow key={i}>
                                                     {
@@ -235,10 +236,10 @@ const Emoji = () => {
                                                                      <Popover>
                                                                          <PopoverTrigger asChild>
                                                                              <div className={""}>
-                                                                                 {selectedEmoji.emoji_url ?
+                                                                                 {selectedEmoji.emojiUrl ?
                                                                                      <div
                                                                                          className={"border border-input w-full p-1 rounded-md bg-background cursor-pointer"}>
-                                                                                         <img className={"cursor-pointer h-[25px] w-[25px]"} alt={"not-found"} src={selectedEmoji?.emoji_url}/>
+                                                                                         <img className={"cursor-pointer h-[25px] w-[25px]"} alt={"not-found"} src={selectedEmoji?.emojiUrl}/>
                                                                                      </div>
                                                                                      : selectedEmoji?.imageUrl ? <div className={"border border-input w-full p-1 rounded-md bg-background cursor-pointer"}>
                                                                                                                     <img className={"cursor-pointer h-[25px] w-[25px]"} alt={"not-found"} src={selectedEmoji?.imageUrl}/>
@@ -288,7 +289,7 @@ const Emoji = () => {
                                                             :
                                                             <Fragment>
                                                                  <TableCell className={"px-2 py-[10px] md:px-3"}>
-                                                                     <img className={"h-[30px] w-[30px]"} alt={"not-found"} src={x.emoji_url}/>
+                                                                     <img className={"h-[30px] w-[30px]"} alt={"not-found"} src={x.emojiUrl}/>
                                                                  </TableCell>
                                                                 <TableCell className={`flex justify-end gap-2 px-3 py-[10px] ${theme === "dark" ? "" : "text-muted-foreground"}`}>
                                                                     <Fragment>

@@ -24,6 +24,7 @@ import InlineCode from "@editorjs/inline-code";
 import EditorJS from "@editorjs/editorjs";
 import CommonBreadCrumb from "../../Comman/CommonBreadCrumb";
 import {Skeleton} from "../../ui/skeleton";
+import CommonEditor from "../../Comman/CommonEditor";
 
     const statusOptions = [
         { name: "Publish", value: 1, fillColor: "#389E0D", strokeColor: "#389E0D" },
@@ -33,23 +34,23 @@ import {Skeleton} from "../../ui/skeleton";
     const initialState =
         {
             title: 'New Article',
-            category_id: null,
+            categoryId: null,
             category_title: "",
-            sub_category_id: null,
+            subcategoryId: null,
             sub_category_title: "",
             description: "",
-            is_active: 1,
+            isActive: 1,
         }
 
     const initialStateError =
     {
         title: '',
-        category_id: null,
+        categoryId: null,
         category_title: "",
-        sub_category_id: null,
+        subcategoryId: null,
         sub_category_title: "",
         description: "",
-        is_active: 1,
+        isActive: 1,
     }
 
 const ArticleDetail = () => {
@@ -78,25 +79,25 @@ const ArticleDetail = () => {
     const getAllCategory = async () => {
         // setIsLoading(true);
         const data = await apiService.getAllCategory({
-            project_id: projectDetailsReducer.id,
+            projectId: projectDetailsReducer.id,
         });
-        if (data.status === 200) {
-            setArticleList(data.data);
+        if (data.success) {
+            setArticleList(data.data?.rows);
         }
         setIsLoading(false)
     };
 
     const getSingleArticle = async () => {
         const data = await apiService.getSingleArticle(id);
-        if (data.status === 200) {
+        if (data.success) {
             setArticlesDetails({
                 ...initialState,
                 id: data.data.id,
                 title: data.data.title,
-                category_id: data.data.category_id,
-                sub_category_id: data.data.sub_category_id,
+                categoryId: data.data.categoryId,
+                subcategoryId: data.data.subcategoryId,
                 description: data.data.description,
-                is_active: data.data.is_active,
+                isActive: data.data.isActive,
             });
         }
         setIsLoading(false)
@@ -119,13 +120,13 @@ const ArticleDetail = () => {
                 } else {
                     return "";
                 }
-            case "category_id":
+            case "categoryId":
                 if (!value || value?.toString()?.trim() === "") {
                     return "Select a Category";
                 } else {
                     return "";
                 }
-            case "sub_category_id":
+            case "subcategoryId":
                 if (!value || value?.toString()?.trim() === "") {
                     return "Select a Sub Category";
                 } else {
@@ -137,8 +138,8 @@ const ArticleDetail = () => {
         }
     };
 
-    const selectedCategory = articleList?.find((category) => category.id === Number(articlesDetails?.category_id));
-    const subcategories = selectedCategory ? selectedCategory?.sub_categories : [];
+    const selectedCategory = articleList?.find((category) => category.id === Number(articlesDetails?.categoryId));
+    const subcategories = selectedCategory ? selectedCategory?.subCategories : [];
 
     const createArticle = async (loader) => {
         let validationErrors = {};
@@ -153,52 +154,55 @@ const ArticleDetail = () => {
             return;
         }
         setLoad(loader);
-        const selectedCategory = articleList.find(item => item.id === articlesDetails.category_id);
+        const selectedCategory = articleList.find(item => item.id === articlesDetails.categoryId);
         let selectedSubCategory = null;
-        if (selectedCategory && selectedCategory.sub_categories.length > 0) {
-            selectedSubCategory = selectedCategory.sub_categories.find(sub => sub.id === articlesDetails.sub_category_id);
+        if (selectedCategory && selectedCategory.subCategories.length > 0) {
+            selectedSubCategory = selectedCategory.subCategories.find(sub => sub.id === articlesDetails.subcategoryId);
         }
 
-        let formData = new FormData();
-        formData.append('project_id', projectDetailsReducer.id);
-        formData.append('category_id', articlesDetails.category_id);
-        formData.append('sub_category_id', selectedSubCategory ? selectedSubCategory.id : null);
-        formData.append('title', articlesDetails.title);
-        formData.append('description', articlesDetails.description);
-        formData.append(`images`, articlesDetails.image);
-        formData.append('is_active', articlesDetails.is_active);
-        const data = await apiService.createArticles(formData);
-        if(data.status === 200) {
+        const payload = {
+            projectId: projectDetailsReducer.id,
+            categoryId: articlesDetails.categoryId,
+            subcategoryId: selectedSubCategory ? selectedSubCategory.id : null,
+            title: articlesDetails.title,
+            description: articlesDetails.description,
+            // images: articlesDetails.image,
+            isActive: articlesDetails.isActive,
+        }
+        const data = await apiService.createArticles(payload);
+        if(data.success) {
             setArticlesDetails(initialState);
             navigate(`${baseUrl}/help/article`);
             toast({description: data.message,});
         } else {
-            toast({description: data.message, variant: "destructive",})
+            toast({description: data.error, variant: "destructive",})
         }
         setLoad('');
     };
 
     const updateArticle = async (loader) => {
         setLoad(loader);
-        const selectedCategory = articleList.find(item => item.id === Number(articlesDetails.category_id));
+        const selectedCategory = articleList.find(item => item.id === Number(articlesDetails.categoryId));
         let selectedSubCategory = null;
-        if (selectedCategory && selectedCategory.sub_categories.length > 0) {
-            selectedSubCategory = selectedCategory.sub_categories.find(sub => sub.id === Number(articlesDetails.sub_category_id));
+        if (selectedCategory && selectedCategory.subCategories.length > 0) {
+            selectedSubCategory = selectedCategory.subCategories.find(sub => sub.id === Number(articlesDetails.subcategoryId));
         }
-        let formData = new FormData();
-        formData.append('project_id', projectDetailsReducer.id);
-        formData.append('category_id', articlesDetails.category_id);
-        formData.append('sub_category_id', selectedSubCategory ? selectedSubCategory.id : null);
-        formData.append('title', articlesDetails.title);
-        formData.append('description', articlesDetails.description);
-        formData.append(`images`, articlesDetails.image);
-        formData.append('is_active', articlesDetails.is_active);
-        const data = await apiService.updateArticle(formData, articlesDetails.id)
-        if (data.status === 200) {
+
+        const payload = {
+            projectId: projectDetailsReducer.id,
+            categoryId: articlesDetails.categoryId,
+            subcategoryId: selectedSubCategory ? selectedSubCategory.id : null,
+            title: articlesDetails.title,
+            description: articlesDetails.description,
+            // images: articlesDetails.image,
+            isActive: articlesDetails.isActive,
+        }
+        const data = await apiService.updateArticle(payload, articlesDetails.id)
+        if (data.success) {
             setArticleList(articleList)
             toast({description: data.message,});
         } else {
-            toast({description: data.message, variant: "destructive",});
+            toast({description: data.error, variant: "destructive",});
         }
         setLoad('');
     }
@@ -273,7 +277,7 @@ const ArticleDetail = () => {
 
             config: {
                 endpoints: {
-                    byFile: 'https://code.quickhunt.app/public/api/upload', // Your file upload endpoint
+                    byFile: 'http://192.168.1.36:3001/artical/upload-image', // Your file upload endpoint
                     byUrl: 'https://code.quickhunt.app/public/storage/post', // Your endpoint that provides image by URL
                 },
                 field: 'image',
@@ -318,20 +322,20 @@ const ArticleDetail = () => {
                     </div>
                     <div className={"space-y-2"}>
                         <Label className={"text-sm font-normal"}>Select Category</Label>
-                        <Select value={articlesDetails.category_id} onValueChange={(value) => handleOnChange('category_id', value)}>
+                        <Select value={articlesDetails.categoryId} onValueChange={(value) => handleOnChange('categoryId', value)}>
                             <SelectTrigger className="h-auto">
-                                {/*{articlesDetails.category_id ? (*/}
+                                {/*{articlesDetails.categoryId ? (*/}
                                         <SelectValue>
-                                            {articleList.find(item => item.id === articlesDetails.category_id)?.title || <span className="text-muted-foreground">Select Category</span>}
+                                            {articleList?.find(item => item.id === articlesDetails.categoryId)?.title || <span className="text-muted-foreground">Select Category</span>}
                                         </SelectValue>
                                 {/*) : (<span className="text-muted-foreground">Select Category</span>)}*/}
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectGroup>
                                     {
-                                        articleList.length > 0 ?
-                                            articleList.map((item) => (
-                                                <SelectItem key={item.id} value={item.id} className={"cursor-pointer"}>
+                                        articleList?.length > 0 ?
+                                            articleList?.map((item, i) => (
+                                                <SelectItem key={i} value={item.id} className={"cursor-pointer"}>
                                                     {item.title}
                                                 </SelectItem>
                                             )) : (
@@ -340,23 +344,23 @@ const ArticleDetail = () => {
                                 </SelectGroup>
                             </SelectContent>
                         </Select>
-                        {formError.category_id && <span className="text-red-500 text-sm">{formError.category_id}</span>}
+                        {formError.categoryId && <span className="text-red-500 text-sm">{formError.categoryId}</span>}
                     </div>
                     <div className={"space-y-2"}>
                         <Label className={"text-sm font-normal"}>Select Sub Category</Label>
-                        <Select value={articlesDetails.sub_category_id} onValueChange={(value) => handleOnChange('sub_category_id', value)}>
+                        <Select value={articlesDetails.subcategoryId} onValueChange={(value) => handleOnChange('subcategoryId', value)}>
                             <SelectTrigger className="h-auto">
-                                {/*{articlesDetails.sub_category_id ? (*/}
+                                {/*{articlesDetails.subcategoryId ? (*/}
                                     <SelectValue>
-                                        {subcategories.find(item => item.id === articlesDetails.sub_category_id)?.title || <span className="text-muted-foreground">Select Sub Category</span>}
+                                        {subcategories.find(item => item.id === articlesDetails.subcategoryId)?.title || <span className="text-muted-foreground">Select Sub Category</span>}
                                     </SelectValue>
                                 {/*) : (<span className="text-muted-foreground">Select Category</span>)}*/}
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectGroup>
                                     {subcategories.length > 0 ? (
-                                        subcategories.map((subCategory) => (
-                                            <SelectItem key={subCategory.id} value={subCategory.id} className={"cursor-pointer"}>
+                                        subcategories.map((subCategory, i) => (
+                                            <SelectItem key={i} value={subCategory.id} className={"cursor-pointer"}>
                                                 {subCategory.title}
                                             </SelectItem>
                                         ))
@@ -366,7 +370,7 @@ const ArticleDetail = () => {
                                 </SelectGroup>
                             </SelectContent>
                         </Select>
-                        {formError.sub_category_id && <span className="text-red-500 text-sm">{formError.sub_category_id}</span>}
+                        {formError.subcategoryId && <span className="text-red-500 text-sm">{formError.subcategoryId}</span>}
                     </div>
                 </div>
             </div>
@@ -386,14 +390,14 @@ const ArticleDetail = () => {
                     truncateLimit={30}
                 />
                 <div className={"flex gap-4 items-center"}>
-                    <Select value={articlesDetails.is_active} onValueChange={(value) => handleOnChange('is_active', Number(value))}>
+                    <Select value={articlesDetails.isActive} onValueChange={(value) => handleOnChange('isActive', Number(value))}>
                         <SelectTrigger className={"w-[120px] h-auto py-[6px]"}>
-                            <SelectValue placeholder={articlesDetails.is_active ? statusOptions.find(s => s.value == articlesDetails.is_active)?.name : "Publish"} />
+                            <SelectValue placeholder={articlesDetails.isActive ? statusOptions.find(s => s.value == articlesDetails.isActive)?.name : "Publish"} />
                         </SelectTrigger>
                         <SelectContent>
                             <SelectGroup>
-                                {statusOptions.map((x) => (
-                                    <SelectItem key={x.value} value={x.value}>
+                                {statusOptions.map((x, i) => (
+                                    <SelectItem key={i} value={x.value}>
                                         <div className={"flex items-center gap-2"}>
                                             <Circle fill={x.fillColor} stroke={x.strokeColor} className={`font-normal w-2 h-2`} />
                                             {x.name}
@@ -409,12 +413,13 @@ const ArticleDetail = () => {
                     </Button>
                 </div>
             </div>
-            <div className={"flex flex-col md:flex-row h-[calc(100%_-_83px)] overflow-y-auto"}>
+            <div className={"flex flex-wrap md:flex-nowrap h-[calc(100%_-_83px)] overflow-y-auto"}>
                 <div className={"max-w-[407px] w-full border-r h-full overflow-y-auto"}>
                     {renderSidebarItems()}
                 </div>
                 {/*<div className={"hidden md:block bg-muted w-full h-full px-16 flex flex-col gap-4 py-8 justify-start overflow-y-auto h-[calc(100%_-_94px)]"}>*/}
                 <div className={"bg-muted w-full p-4 md:px-16 md:py-8 flex flex-col md:gap-4 justify-start overflow-y-auto h-[calc(100vh_-_402px)] md:h-[calc(100vh_-_140px)]"}>
+                {/*<div className={"bg-muted w-full p-4 md:px-16 md:py-8 flex flex-col md:gap-4 justify-start overflow-y-auto h-[calc(100%_-_94px)]"}>*/}
                     {
                         (isLoading && id !== "new") ? <div className={"flex flex-col gap-4"}>
                             {
@@ -428,6 +433,7 @@ const ArticleDetail = () => {
                             }
                         </div> : <Card className={`rounded-[10px] p-0 h-full overflow-auto`} >
                             <CardHeader className={"p-3 md:pt-0"}>
+                                {/*<div className={"md:pl-14 md:pt-6 m-0 w-full"}><CommonEditor setArticlesDetails={setArticlesDetails} value={articlesDetails.description} /></div>*/}
                                 <div className={"md:pl-14 md:pt-6 m-0 w-full"}><div id="editorjs"/></div>
                             </CardHeader>
                         </Card>

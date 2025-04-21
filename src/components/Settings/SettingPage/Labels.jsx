@@ -15,8 +15,8 @@ import randomColor from 'randomcolor';
 import DeleteDialog from "../../Comman/DeleteDialog";
 
 const initialNewLabel = {
-    label_name: '',
-    label_color_code:"",
+    name: '',
+    colorCode:"",
 };
 
 const Labels = () => {
@@ -48,13 +48,13 @@ const Labels = () => {
 
     const onChangeColorColor = (newColor, index) => {
         const updatedColors = [...labelList];
-        updatedColors[index] = { ...updatedColors[index], label_color_code: newColor.clr };
+        updatedColors[index] = { ...updatedColors[index], colorCode: newColor.clr };
         setLabelList(updatedColors);
     };
 
     const handleShowInput = () => {
         const clone = [...labelList];
-        clone.push({label_name: '', label_color_code: randomColor(),});
+        clone.push({name: '', colorCode: randomColor(),});
         setIsEdit(clone.length - 1);
         setLabelList(clone)
         setLabelError(initialNewLabel);
@@ -85,16 +85,16 @@ const Labels = () => {
         }
         setIsSave(true);
         const payload = {
-            project_id: `${projectDetailsReducer.id}`,
-            label_name: record.label_name,
-            label_color_code: record.label_color_code,
-            label_sort_order_id: record.label_sort_order_id || "1",
-            user_browser: record.user_browser || '',
-            user_ip_address: record.user_ip_address || '',
+            projectId: `${projectDetailsReducer.id}`,
+            name: record.name,
+            colorCode: record.colorCode,
+            // label_sort_order_id: record.label_sort_order_id || "1",
+            // user_browser: record.user_browser || '',
+            // user_ip_address: record.user_ip_address || '',
         }
 
         const data = await apiService.createLabels(payload)
-        if (data.status === 200) {
+        if (data.success) {
             let clone = [...labelList];
             clone.push(data.data);
             clone.splice(index, 1);
@@ -107,7 +107,7 @@ const Labels = () => {
         } else {
             setIsSave(false);
             toast({
-                description:(data.message),
+                description:(data?.error?.message),
                 variant: "destructive"
             })
         }
@@ -124,7 +124,7 @@ const Labels = () => {
 
     const validation = (name, value) => {
         switch (name) {
-            case "label_name":
+            case "name":
                 if (!value || value.trim() === "") {
                     return "Label name is required.";
                 }
@@ -144,14 +144,14 @@ const Labels = () => {
         const updatedColors = [...labelList];
         const labelToSave = updatedColors[index];
 
-        if (!labelToSave.label_name || labelToSave.label_name.trim() === "") {
+        if (!labelToSave.name || labelToSave.name.trim() === "") {
             setLabelError({
                 ...labelError,
-                label_name: "Label name is required."
+                name: "Label name is required."
             });
             return;
         }
-        if(labelToSave?.label_name?.length > 255){
+        if(labelToSave?.name?.length > 255){
             toast({
                 description: 'Label name must not exceed 255 characters.',
                 variant: "destructive"
@@ -161,15 +161,16 @@ const Labels = () => {
         setIsSave(true);
 
         const payload = {
-            project_id: `${projectDetailsReducer.id}`,
-            label_name: labelToSave.label_name,
-            label_color_code: labelToSave.label_color_code,
-            label_sort_order_id: labelToSave.label_sort_order_id || '',
-            user_browser: labelToSave.user_browser || '',
-            user_ip_address: labelToSave.user_ip_address || '',
+            projectId: `${projectDetailsReducer.id}`,
+            name: labelToSave.name,
+            colorCode: labelToSave.colorCode,
+            // label_sort_order_id: labelToSave.label_sort_order_id || '',
+            // user_browser: labelToSave.user_browser || '',
+            // user_ip_address: labelToSave.user_ip_address || '',
         }
         const data = await apiService.updateLabels(payload, labelToSave.id)
-        if (data.status === 200) {
+
+        if (data.success) {
             let clone = [...labelList];
             let index = clone.findIndex((x) => x.id === labelToSave.id);
             if (index !== -1) {
@@ -184,13 +185,13 @@ const Labels = () => {
         } else {
             setIsSave(false);
             toast({
-                description:data.message,
+                description:data?.message,
                 variant: "destructive"
             })
         }
         setLabelError({
             ...labelError,
-            label_name: ""
+            name: ""
         });
         updatedColors[index] = { ...labelToSave };
         setIsEdit(null);
@@ -209,7 +210,7 @@ const Labels = () => {
         const indexToDelete = clone.findIndex((x)=>x.id == deleteId);
         if (deleteId) {
             const data = await apiService.deleteLabels(deleteId)
-            if (data.status === 200) {
+            if (data.success) {
                 clone.splice(indexToDelete,1);
                 setLabelList(clone);
                 dispatch(allStatusAndTypesAction({...allStatusAndTypes, labels: clone}));
@@ -311,27 +312,27 @@ const Labels = () => {
                                                                     <Input
                                                                         className={"bg-card h-9 "}
                                                                         type="text"
-                                                                        value={x.label_name}
-                                                                        name={"label_name"}
+                                                                        value={x.name}
+                                                                        name={"name"}
                                                                         onBlur={onBlur}
                                                                         onChange={(e) => handleInputChange(e, i)}
                                                                         placeholder={"Enter Label Name"}
                                                                     />
                                                                     {
-                                                                        labelError.label_name ? <div className="grid gap-2 mt-[4px]">
-                                                                            {labelError.label_name && <span
-                                                                                className="text-destructive text-sm">{labelError.label_name}</span>}
+                                                                        labelError.name ? <div className="grid gap-2 mt-[4px]">
+                                                                            {labelError.name && <span
+                                                                                className="text-destructive text-sm">{labelError.name}</span>}
                                                                         </div> : ""
                                                                     }
                                                                 </TableCell>
 
                                                                 <TableCell className={"px-[12px] py-[10px] align-top"}>
                                                                     <div className={"flex items-center"}>
-                                                                        <ColorInput name={"clr"} value={x.label_color_code} onChange={(color) => onChangeColorColor(color, i)}/>
+                                                                        <ColorInput name={"clr"} value={x.colorCode} onChange={(color) => onChangeColorColor(color, i)}/>
                                                                     </div>
                                                                 </TableCell>
 
-                                                                <TableCell className={`flex gap-2 px-[12px] py-[10px] ${labelError?.label_name ? "" : ""} ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                                                <TableCell className={`flex gap-2 px-[12px] py-[10px] ${labelError?.name ? "" : ""} ${theme === "dark" ? "" : "text-muted-foreground"}`}>
                                                                     <Fragment>
                                                                         {
                                                                             x.id ? <Button
@@ -360,14 +361,14 @@ const Labels = () => {
                                                             </Fragment>
                                                             :
                                                             <Fragment>
-                                                                <TableCell className={`px-2 py-[10px] md:px-3 font-normal text-xs max-w-[140px] truncate text-ellipsis overflow-hidden whitespace-nowrap ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.label_name}</TableCell>
+                                                                <TableCell className={`px-2 py-[10px] md:px-3 font-normal text-xs max-w-[140px] truncate text-ellipsis overflow-hidden whitespace-nowrap ${theme === "dark" ? "" : "text-muted-foreground"}`}>{x.name}</TableCell>
                                                                 <TableCell className={`px-2 py-[10px] md:px-3 font-normal text-xs ${theme === "dark" ? "" : "text-muted-foreground"}`}>
                                                                     <div
                                                                         className={"flex items-center gap-1"}>
                                                                         <Square size={16} strokeWidth={1}
-                                                                                fill={x.label_color_code}
-                                                                                stroke={x.label_color_code}/>
-                                                                        <p>{x.label_color_code}</p>
+                                                                                fill={x.colorCode}
+                                                                                stroke={x.colorCode}/>
+                                                                        <p>{x.colorCode}</p>
                                                                     </div>
                                                                 </TableCell>
 

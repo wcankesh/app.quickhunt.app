@@ -151,7 +151,7 @@ const UpdateInAppMessage = () => {
                     {
                         [...Array(14)].map((_, i) => {
                             return (
-                                <div className={"px-2 py-[10px] md:px-3"}>
+                                <div key={i} className={"px-2 py-[10px] md:px-3"}>
                                     <Skeleton className={"rounded-md w-full h-4"}/>
                                 </div>
                             )})}
@@ -162,7 +162,7 @@ const UpdateInAppMessage = () => {
                         {
                             [...Array(14)].map((_, i) => {
                                 return (
-                                    <div className={"px-2 py-[10px] md:px-3"}>
+                                    <div key={i} className={"px-2 py-[10px] md:px-3"}>
                                         <Skeleton className={"rounded-md w-full h-4"}/>
                                     </div>
                                 )})}
@@ -173,7 +173,7 @@ const UpdateInAppMessage = () => {
                         {
                             [...Array(14)].map((_, i) => {
                                 return (
-                                    <div className={"px-2 py-[10px] md:px-3"}>
+                                    <div key={i} className={"px-2 py-[10px] md:px-3"}>
                                         <Skeleton className={"rounded-md w-full h-4"}/>
                                     </div>
                                 )})}
@@ -184,7 +184,7 @@ const UpdateInAppMessage = () => {
                         {
                             [...Array(14)].map((_, i) => {
                                 return (
-                                    <div className={"px-2 py-[10px] md:px-3"}>
+                                    <div key={i} className={"px-2 py-[10px] md:px-3"}>
                                         <Skeleton className={"rounded-md w-full h-4"}/>
                                     </div>
                                 )})}
@@ -356,11 +356,12 @@ const UpdateInAppMessage = () => {
                     <Button variant={"ghost hover-none"} className={"font-medium border border-primary text-primary"} onClick={handleCancel}>Cancel</Button>
                 </div>
             </div>
-            <div className={"flex h-[calc(100%_-_85px)] overflow-y-auto"}>
-                <div className={"max-w-[407px] w-full border-r h-full overflow-y-auto"}>
+            <div className={"flex flex-wrap md:flex-nowrap h-[calc(100%_-_85px)] overflow-y-auto"}>
+                <div className={"w-full md:max-w-[407px] w-full border-r h-auto md:h-full overflow-y-auto"}>
                     <SidebarInAppMessage id={id} type={type} inAppMsgSetting={inAppMsgSetting} setInAppMsgSetting={setInAppMsgSetting} selectedStepIndex={selectedStepIndex} setSelectedStepIndex={setSelectedStepIndex} selectedStep={selectedStep} setSelectedStep={setSelectedStep}/>
                 </div>
-                <div className={"bg-muted w-full h-full hidden md:block overflow-y-auto"}>
+                {/*<div className={"bg-muted w-full h-full hidden md:block overflow-y-auto"}>*/}
+                <div className={"bg-muted w-full h-[100vh] md:h-full overflow-y-auto"}>
                     <Card className={`my-6 mx-4 rounded-md px-4 pt-6 pb-8 h-[calc(100%_-_48px)] `}>
                         <Card className={`rounded-md border-b h-full ${isLoading ? "overflow-hidden" : ''}`}>
                             <div className={"p-4 flex gap-2 border-b"}>

@@ -375,8 +375,8 @@ const ImportIdea = () => {
                                                                                             <div
                                                                                                 className={"flex items-center gap-2"}>
                                                                                                 <Circle
-                                                                                                    fill={y.color_code}
-                                                                                                    stroke={y.color_code}
+                                                                                                    fill={y.colorCode}
+                                                                                                    stroke={y.colorCode}
                                                                                                     className={` w-[10px] h-[10px]`}/>
                                                                                                 {y.title || "No status"}
                                                                                             </div>

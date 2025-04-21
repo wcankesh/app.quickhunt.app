@@ -5,7 +5,7 @@ import {ArrowBigUp, Check, Circle, CircleX, Dot, Loader2, MessageCircleMore, Pap
 import {RadioGroup, RadioGroupItem} from "../ui/radio-group";
 import {Label} from "../ui/label";
 import {Input} from "../ui/input";
-import {Avatar, AvatarFallback, AvatarImage} from "../ui/avatar";
+import {Avatar, AvatarFallback} from "../ui/avatar";
 import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "../ui/select";
 import {Popover, PopoverTrigger, PopoverContent} from "../ui/popover";
 import {Textarea} from "../ui/textarea";
@@ -294,7 +294,6 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
         const { files } = event.target;
 
         if (selectedSubComment && selectedSubComment.id && selectedComment && selectedComment.id) {
-            // Clone and update images for selectedSubComment
             const cloneImages = [...selectedSubComment.images, files[0]];
             const oldImages = selectedSubComment?.newImage?.length
                 ? [...selectedSubComment.newImage]
@@ -309,7 +308,6 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
 
             setSelectedSubComment(updatedSubComment);
 
-            // Update the selectedComment's reply array
             const replyIndex = (selectedComment.reply || []).findIndex(
                 (reply) => reply.id === selectedSubComment.id
             );
@@ -322,11 +320,10 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                 });
             }
         } else {
-            // Handle cases where subComment is not linked to a selectedComment
             setSubCommentFiles([...subCommentFiles, files[0]]);
         }
 
-        event.target.value = ""; // Clear input value to allow re-uploads
+        event.target.value = "";
     };
 
     const onChangeStatus = async (name, value) => {
@@ -466,24 +463,20 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
     const onDeleteSubCommentImage = (index) => {
         const cloneImages = [...selectedSubComment.images];
 
-        // Check if the image is from the server or is a File object
         const isServerImage = typeof cloneImages[index] === "string" &&
             cloneImages[index].startsWith('https://code.quickhunt.app/public/');
 
         if (isServerImage) {
-            // Handle old (server-side) images
             const cloneDeletedImages = [...deletedSubCommentImage];
             cloneDeletedImages.push(
                 cloneImages[index].replace('https://code.quickhunt.app/public/storage/feature_idea/', '')
             );
-            cloneImages.splice(index, 1); // Remove the image from the cloneImages array
+            cloneImages.splice(index, 1);
             setDeletedSubCommentImage(cloneDeletedImages);
         } else {
-            // Handle new (File object) images
-            cloneImages.splice(index, 1); // Remove the image from cloneImages
+            cloneImages.splice(index, 1);
         }
 
-        // If there are new images, update them too
         if (selectedSubComment && selectedSubComment.newImage && selectedSubComment.newImage.length) {
             const cloneNewImage = [...selectedSubComment.newImage];
             cloneNewImage.splice(index, 1);
@@ -493,7 +486,6 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                 images: cloneImages,
             });
         } else {
-            // Only update images
             setSelectedSubComment({
                 ...selectedSubComment,
                 images: cloneImages,
@@ -1144,8 +1136,8 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                                                         <SelectItem key={i} value={x.id}>
                                                                                             <div
                                                                                                 className={"flex items-center gap-2"}>
-                                                                                                <Circle fill={x.color_code}
-                                                                                                        stroke={x.color_code}
+                                                                                                <Circle fill={x.colorCode}
+                                                                                                        stroke={x.colorCode}
                                                                                                         className={` w-[10px] h-[10px]`}/>
                                                                                                 {x.title ? x.title : "No status"}
                                                                                             </div>

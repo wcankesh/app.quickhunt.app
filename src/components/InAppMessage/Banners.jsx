@@ -66,7 +66,7 @@ const Banners = ({inAppMsgSetting, setInAppMsgSetting, isLoading}) => {
     }
 
     return (
-        <div className={"relative bg-muted px-16 flex flex-col gap-4 py-8 bg-muted justify-start overflow-y-auto h-[calc(100%_-_94px)]"}>
+        <div className={"relative bg-muted px-[5px] md:px-16 flex flex-col gap-4 py-8 bg-muted justify-start overflow-y-auto h-[calc(100%_-_94px)]"}>
             <div className={`absolute w-full flex flex-row items-center justify-between gap-3 px-6 py-[18px] ${inAppMsgSetting.position === "bottom" ? "bottom-0" : "top-0"} left-0`}
                  style={{backgroundColor: inAppMsgSetting.bg_color}}>
                 <div className={`flex flex-row items-center gap-3 w-full ${inAppMsgSetting.alignment === "left" ? "justify-start" : inAppMsgSetting.alignment === "right" ? "justify-end" : inAppMsgSetting.alignment === "center" ? "justify-center" : "justify-start"}`}>

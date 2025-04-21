@@ -81,7 +81,7 @@ const RoadmapWidgetPreview = ({widgetsSetting}) => {
                                         <div key={`roadmap_${data.id}`} className="shrink-0 ">
                                             <Card className={`py-3 px-2 shadow-inner ${cardClass}`}>
                                                 <h4 className={"text-sm text-slate-700 font-medium flex gap-2 items-center"}>
-                                                    <span className={"w-2.5 h-2.5 rounded-full"} style={{backgroundColor: data.color_code}}/>{data.title} ({data.ideas.length})</h4>
+                                                    <span className={"w-2.5 h-2.5 rounded-full"} style={{backgroundColor: data.colorCode}}/>{data.title} ({data.ideas.length})</h4>
                                                 <div className={"flex gap-2 flex-col mt-4"}>
                                                     {
                                                         data.ideas.length ? <Fragment>

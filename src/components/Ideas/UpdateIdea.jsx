@@ -35,23 +35,23 @@ const perPageLimit = 10
 const initialStateError = {
     title: "",
     description: "",
-    board: "",
+    boardId: "",
 }
 
 const initialUserError = {
-    customer_email_id: "",
-    customer_name: "",
+    email: "",
+    name: "",
 }
 
 const initialStateUser = {
-    project_id: '',
-    customer_name: '',
-    customer_email_id: '',
-    customer_email_notification: false,
-    customer_first_seen: '',
-    customer_last_seen: '',
-    user_browser: '',
-    user_ip_address : '',
+    projectId: '',
+    name: '',
+    email: '',
+    emailNotification: false,
+    firstSeen: '',
+    lastSeen: '',
+    browser: '',
+    ipAddress : '',
 }
 
 const UpdateIdea = () => {
@@ -100,7 +100,7 @@ const UpdateIdea = () => {
     const [isSaveUpdateComment, setIsSaveUpdateComment] = useState(false);
     const [isSaveUpdateSubComment, setIsSaveUpdateSubComment] = useState(false);
     const [isSaveSubComment, setIsSaveSubComment] = useState(false);
-    const [filter, setFilter] = useState({search: "", project_id: projectDetailsReducer.id});
+    const [filter, setFilter] = useState({search: "", projectId: projectDetailsReducer.id});
     const [usersDetails, setUsersDetails] = useState(initialStateUser);
     const [ideasVoteList, setIdeasVoteList] = useState([]);
     const [getAllUsersList, setGetAllUsersList] = useState([]);
@@ -119,22 +119,22 @@ const UpdateIdea = () => {
             setGetAllUsersList([]);
             setUsersDetails(initialStateUser);
             setUserDetailError(initialUserError)
-            setFilter({ search: '', project_id: null });
+            setFilter({ search: '', projectId: null });
         }
     };
 
     const getIdeaVotes = async (type = '',clone = []) => {
         setIsLoadingIdeaVoteList(true);
         const payload = {
-            feature_idea_id: selectedIdea.id,
+            ideaId: selectedIdea.id,
             page: pageNo,
             limit: perPageLimit
         }
         const data = await apiSerVice.getIdeaVote(payload)
-        if(data.status === 200) {
+        if(data.success) {
             setIdeasVoteList(data.data)
-            setTotalRecord(data.total)
-            setSelectedIdea({...selectedIdea, vote: data.total, vote_list: type === 'delete' ? pageNo === 1 ? clone : selectedIdea.vote_list : type === 'add' ? [...data.data] : [...selectedIdea.vote_list]})
+            setTotalRecord(data.data.total)
+            setSelectedIdea({...selectedIdea, vote: data.total, voteLists: type === 'delete' ? pageNo === 1 ? clone : selectedIdea.voteLists : type === 'add' ? [...data.data] : [...selectedIdea.voteLists]})
             // setSelectedIdea({...selectedIdea, vote: data.total})
             setIsLoadingIdeaVoteList(false);
         }
@@ -159,25 +159,25 @@ const UpdateIdea = () => {
     useEffect(() => {
         if (projectDetailsReducer.id) {
             setTopicLists(allStatusAndTypes.topics)
-            setRoadmapStatus(allStatusAndTypes.roadmap_status)
+            setRoadmapStatus(allStatusAndTypes.roadmapStatus)
             getSingleIdea()
         }
     }, [projectDetailsReducer.id, allStatusAndTypes, getPageNo]);
 
-    const getAllUsers = async (value,project_id) => {
+    const getAllUsers = async (value,projectId) => {
         const payload = {
-            project_id: project_id,
+            projectId: projectId,
             search: value,
         }
         const data = await apiSerVice.getAllUsers(payload);
-        if (data.status === 200) {
+        if (data.success) {
             setGetAllUsersList(data.data)
         }
     };
 
     const throttledDebouncedSearch = useCallback(
-        debounce((value, project_id) => {
-            getAllUsers(value, project_id);
+        debounce((value, projectId) => {
+            getAllUsers(value, projectId);
         }, 500),
         []
     );
@@ -186,7 +186,7 @@ const UpdateIdea = () => {
         setFilter((prevFilter) => ({
             ...prevFilter,
             search: value,
-            project_id: projectDetailsReducer.id,
+            projectId: projectDetailsReducer.id,
         }));
         throttledDebouncedSearch(value, projectDetailsReducer.id);
     };
@@ -194,7 +194,7 @@ const UpdateIdea = () => {
     const addUser = async () => {
         let validationErrors = {};
         Object.keys(usersDetails).forEach(name => {
-            const error = formValidate(name, usersDetails[name]);
+            const error = formValidate(name, usersDetails[name], "addUser");
             if (error && error.length > 0) {
                 validationErrors[name] = error;
             }
@@ -206,20 +206,21 @@ const UpdateIdea = () => {
         setIsLoading(true);
         const payload = {
             ...usersDetails,
-            project_id: projectDetailsReducer.id,
-            customer_first_seen: new Date(),
-            customer_last_seen: new Date(),
+            projectId: projectDetailsReducer.id,
+            firstSeen: new Date(),
+            lastSeen: new Date(),
         }
         const data = await apiSerVice.createUsers(payload)
-        if(data.status === 200) {
+        if(data.success) {
             const newUser  = {
                 id: data.data.id,
-                name: data.data.customer_name,
-                customer_first_name: null,
-                email: data.data.customer_email_id,
-                user_photo: null,
+                name: data.data.name,
+                // customer_first_name: null,
+                email: data.data.email,
+                profileimage: null,
             };
-            const clone = [...ideasVoteList];
+            // const clone = [...ideasVoteList];
+            const clone = Array.isArray(ideasVoteList) ? [...ideasVoteList] : [];
             const filterEmail = clone.some((x) => x.email === newUser.email)
             if(filterEmail) {
                 toast({description: "User with this email already exist.", variant: "destructive",})
@@ -230,13 +231,13 @@ const UpdateIdea = () => {
             setPageNo(1);
             setSelectedIdea(prev => ({
                 ...prev,
-                vote_list: clone
+                voteLists: clone
             }));
             const upvoteResponse = await apiSerVice.userManualUpVote({
-                feature_idea_id: selectedIdea.id,
-                user_id: data.data.id,
+                ideaId: selectedIdea.id,
+                userId: data.data.id,
             });
-            if(upvoteResponse.status === 200) {
+            if(upvoteResponse.success) {
                 toast({description: upvoteResponse.message,});
             } else {
                 toast({description:upvoteResponse.message, variant: "destructive",})
@@ -244,7 +245,7 @@ const UpdateIdea = () => {
             setUserDetailError(initialUserError);
             getIdeaVotes();
         } else {
-            toast({description:data.message, variant: "destructive",})
+            toast({description:data.error.message, variant: "destructive",})
         }
             setIsLoading(false);
         openDialogs("addUser", false);
@@ -257,20 +258,20 @@ const UpdateIdea = () => {
         setIsLoading(true);
         const payload = {
             id: id,
-            feature_idea_id: selectedIdea.id
+            ideaId: selectedIdea.id
         }
         const data = await apiSerVice.removeUserVote(payload)
-        let clone = [...ideasVoteList];
-        if(data.status === 200) {
+        let clone = Array.isArray(ideasVoteList) ? [...ideasVoteList] : [];
+        if(data.success) {
             clone.splice(index,1);
             setIdeasVoteList(clone);
             toast({description: data.message});
-            const filterData = (selectedIdea?.vote_list || []).filter((x) => x.id !== id)
+            const filterData = (selectedIdea?.voteLists || []).filter((x) => x.id !== id)
 
             setSelectedIdea(prev => ({
                 ...prev,
-                vote_list: pageNo === 1 ? filterData : prev.vote_list, // Update vote_list only if page is 1
-                vote: filterData.length // Always update the vote count
+                voteLists: pageNo === 1 ? filterData : prev.voteLists,
+                vote: filterData.length
             }));
 
             if (clone.length === 0 && pageNo > 1) {
@@ -285,10 +286,10 @@ const UpdateIdea = () => {
     };
 
     const handleUserClick = async (user) => {
-        const selectedUser = getAllUsersList.find((u) => u.customer_name === user.customer_name);
+        const selectedUser = getAllUsersList.find((u) => u.name === user.name);
         if (selectedUser) {
             const updatedVoteList = [...ideasVoteList];
-            const existingUserIndex = updatedVoteList.findIndex((u) => u.name === selectedUser.customer_name);
+            const existingUserIndex = updatedVoteList.findIndex((u) => u.name === selectedUser.name);
 
             if (existingUserIndex !== -1) {
                 toast({ description: "User  already exists in the upvote list.", variant: "destructive" });
@@ -297,15 +298,15 @@ const UpdateIdea = () => {
 
             if (existingUserIndex === -1) {
                 const newUserPayload = {
-                    name: selectedUser.customer_name,
+                    name: selectedUser.name,
                     id: '',
-                    user_photo: '',
-                    email: selectedUser.customer_email_id,
+                    profileimage: '',
+                    email: selectedUser.email,
                 };
                 updatedVoteList.push(newUserPayload);
                 const upvoteResponse = await apiSerVice.userManualUpVote({
-                    feature_idea_id: selectedIdea.id,
-                    user_id: selectedUser.id,
+                    ideaId: selectedIdea.id,
+                    userId: selectedUser.id,
                 });
                 if(upvoteResponse.status === 200) {
                     toast({description: upvoteResponse.message,});
@@ -334,18 +335,18 @@ const UpdateIdea = () => {
     const getSingleIdea = async () => {
         setIsLoading(true)
         const data = await apiSerVice.getSingleIdea(id);
-        if (data.status === 200) {
+        if (data.success) {
             setIsLoading(false)
-            const ideaData = {...data.data, is_read: 1,
+            const ideaData = {...data.data, isRead: 1,
                 comments: data.data.comments.map(comment => ({
                     ...comment,
-                    is_read: 1
+                    isRead: 1
                 }))}
             setSelectedIdea(ideaData)
             setOldSelectedIdea(ideaData)
             const updateInbox = inboxMarkReadReducer.map(item => {
                 if ((item.source === 'feature_idea_comments' || item.source === 'feature_ideas' || item.source === 'feature_idea_votes') && item.id === data.data.id) {
-                    return {...item, is_read: 1};
+                    return {...item, isRead: 1};
                 }
                 return item;
             });
@@ -356,7 +357,7 @@ const UpdateIdea = () => {
     }
 
     const handleChangeTopic = (id) => {
-        const clone = [...selectedIdea.topic];
+        const clone = [...selectedIdea.tags];
         const index = clone.findIndex(item => item.id === id);
         if (index !== -1) {
             clone.splice(index, 1);
@@ -366,39 +367,45 @@ const UpdateIdea = () => {
                 clone.push(topicToAdd);
             }
         }
-        setSelectedIdea({...selectedIdea, topic: clone});
+        setSelectedIdea({...selectedIdea, tags: clone});
     };
 
     const giveVote = async (type) => {
-        if (selectedIdea.is_edit !== 1) {
-            if (selectedIdea.user_vote === type) {
+        if (selectedIdea.createdBy !== 1) {
+            if (selectedIdea.userVote === (type == 1)) {
+
             } else {
                 const payload = {
-                    feature_idea_id: selectedIdea.id,
+                    ideaId: selectedIdea.id,
                     type: type
-                }
+                };
                 const data = await apiSerVice.giveVote(payload);
-                if (data.status === 200) {
-                    const clone = {...selectedIdea};
+                if (data.success) {
+                    const clone = { ...selectedIdea };
                     let newVoteCount = clone.vote;
-                    newVoteCount = type === 1 ? newVoteCount + 1 : newVoteCount >= 1 ? newVoteCount - 1 : 0;
-                    let vote_list = [...clone.vote_list];
-                    if (type === 1) {
-                        vote_list.push(data.data)
+                    newVoteCount = type == 1 ? newVoteCount + 1 : newVoteCount >= 1 ? newVoteCount - 1 : 0;
+                    let voteLists = [...clone.voteLists];
+                    if (type == 1) {
+                        voteLists.push(data.data);
                     } else {
-                        let voteIndex = vote_list.findIndex((x) => (x.name || x?.user_name) === (data.data.name || data.data?.user_name));
+                        const voteIndex = voteLists.findIndex((x) => (x.name || x?.firstname) == (data.data.name || data.data?.firstname));
                         if (voteIndex !== -1) {
-                            vote_list.splice(voteIndex, 1)
+                            voteLists.splice(voteIndex, 1);
                         }
                     }
-                    setSelectedIdea({...clone, vote:newVoteCount, user_vote: type, vote_list: vote_list});
-                    toast({description: data.message})
+                    setSelectedIdea({
+                        ...clone,
+                        vote: newVoteCount,
+                        userVote: type === 1,
+                        voteLists: voteLists
+                    });
+                    toast({ description: data.message });
                 } else {
-                    toast({variant: "destructive", description: data.message})
+                    toast({ variant: "destructive", description: data.error });
                 }
             }
         } else {
-            toast({variant: "destructive", description: "You can't vote your own ideas"})
+            toast({ variant: "destructive", description: "You can't vote on admin-created ideas" });
         }
     }
 
@@ -420,10 +427,10 @@ const UpdateIdea = () => {
             formData.append(`images[]`, commentFiles[i]);
         }
         formData.append('comment', commentText);
-        formData.append('feature_idea_id', selectedIdea.id);
-        formData.append('reply_id', '');
+        formData.append('ideaId', selectedIdea.id);
+        formData.append('parentId', '');
         const data = await apiSerVice.createComment(formData)
-        if (data.status === 200) {
+        if (data.success) {
             const clone = selectedIdea && selectedIdea.comments ? [...selectedIdea.comments] : [];
             clone.unshift(data.data)
             let obj = {...selectedIdea, comments: clone}
@@ -459,10 +466,10 @@ const UpdateIdea = () => {
             formData.append(`images[]`, subCommentFiles[i]);
         }
         formData.append('comment', subCommentText);
-        formData.append('feature_idea_id', selectedIdea.id);
-        formData.append('reply_id', record.id);
+        formData.append('ideaId', selectedIdea.id);
+        formData.append('parentId', record.id);
         const data = await apiSerVice.createComment(formData)
-        if (data.status === 200) {
+        if (data.success) {
             const clone = [...selectedIdea.comments];
             clone[index].reply.push(data.data)
             let obj = {...selectedIdea, comments: clone};
@@ -479,11 +486,11 @@ const UpdateIdea = () => {
 
     const handleFeatureImgUpload = async (event) => {
         const file = event.target?.files[0];
-        setSelectedIdea({...selectedIdea, cover_image: file})
+        setSelectedIdea({...selectedIdea, coverImage: file})
         let formData = new FormData();
-        formData.append("cover_image", file);
+        formData.append("coverImage", file);
         const data = await apiSerVice.updateIdea(formData, selectedIdea.id)
-        if (data.status === 200) {
+        if (data.success) {
             setSelectedIdea({...data.data})
             // setIdeasList(clone);
             setIsLoading(false)
@@ -531,29 +538,29 @@ const UpdateIdea = () => {
     }
 
     const onChangeStatus = async (name, value) => {
-        if (name === "is_active") {
+        if (name === "isActive") {
             setIsLoadingBug(true)
-        } else if (name === "is_archive") {
+        } else if (name === "isArchive") {
             setIsLoadingArchive(true)
         }
-        if (name === "delete_cover_image") {
-            setSelectedIdea({...selectedIdea, cover_image: ""})
+        if (name === "removeCoverImage") {
+            setSelectedIdea({...selectedIdea, coverImage: ""})
         } else {
             setSelectedIdea({...selectedIdea, [name]: value})
         }
         let formData = new FormData();
-        if (name === "roadmap_id" && value === null) {
+        if (name === "roadmapStatusId" && value === null) {
             value = "";
         }
         formData.append(name, value);
         const data = await apiSerVice.updateIdea(formData, selectedIdea.id)
-        if (data.status === 200) {
-            setSelectedIdea({
-                ...data.data,
-                roadmap_color: data.data.roadmap_color,
-                roadmap_id: data.data.roadmap_id,
-                roadmap_title: data.data.roadmap_title
-            })
+        if (data.success) {
+            // setSelectedIdea({
+            //     ...data.data,
+            //     colorCode: data.data.colorCode,
+            //     roadmapStatusId: data.data.roadmapStatusId,
+            //     title: data.data.title
+            // })
             setIsLoading(false)
             setIsLoadingBug(false)
             setIsLoadingArchive(false)
@@ -572,6 +579,8 @@ const UpdateIdea = () => {
         setSelectedCommentIndex(index)
         // setSubCommentTextEditIdx(null);
         setIsEditComment(true)
+
+        setDeletedCommentImage([]);
     }
 
     const onCancelComment = () => {
@@ -591,7 +600,13 @@ const UpdateIdea = () => {
         if (isOld) {
             const cloneImages = [...selectedComment.images];
             const cloneDeletedImages = [...deletedCommentImage];
-            cloneDeletedImages.push(cloneImages[index].replace('https://code.quickhunt.app/public/storage/feature_idea/', ''));
+
+            const imageToDelete = cloneImages[index];
+            if (typeof imageToDelete === 'string') {
+                cloneDeletedImages.push(imageToDelete.replace('https://code.quickhunt.app/public/storage/feature_idea/', ''));
+            } else if (imageToDelete instanceof File) {
+            }
+
             cloneImages.splice(index, 1);
             setSelectedComment({
                 ...selectedComment,
@@ -637,13 +652,33 @@ const UpdateIdea = () => {
                 formData.append(`images[${i}]`, selectedComment.images[i]);
             }
         }
-        for (let i = 0; i < deletedCommentImage.length; i++) {
-            formData.append(`delete_image[${i}]`, deletedCommentImage[i].replace('https://code.quickhunt.app/public/storage/feature_idea/', ''));
+        // for (let i = 0; i < deletedCommentImage.length; i++) {
+        //     formData.append(`delete_image[${i}]`, deletedCommentImage[i].replace('https://code.quickhunt.app/public/storage/feature_idea/', ''));
+        // }
+        // Filter deletedCommentImage to only include images not present in current selectedComment.images
+        const currentImageFilenames = selectedComment.images.map(img => {
+            if (typeof img === 'string') {
+                return img.replace('https://code.quickhunt.app/public/storage/feature_idea/', '');
+            } else if (img instanceof File) {
+                return img.name; // Use the filename of the File object
+            }
+            return ''; // Default case
+        });
+
+        // Filter deletedCommentImage to only include images not in currentImageFilenames
+        const validDeletedImages = deletedCommentImage.filter(deletedImg => {
+            return !currentImageFilenames.includes(deletedImg);
+        });
+
+        // Append only valid deletions
+        for (let i = 0; i < validDeletedImages.length; i++) {
+            formData.append(`delete_image[${i}]`, validDeletedImages[i]);
         }
+
         formData.append('comment', selectedComment.comment);
         formData.append('id', selectedComment.id);
         const data = await apiSerVice.updateComment(formData)
-        if (data.status === 200) {
+        if (data.success) {
             let updatedImages = Array.isArray(data.data.images) ? data.data.images : [];
             let obj = { ...selectedComment, images: updatedImages };
             // let obj = {...selectedComment, images: data.data.images, newImage: []} // old code line
@@ -677,7 +712,7 @@ const UpdateIdea = () => {
         formData.append('comment', selectedSubComment.comment);
         formData.append('id', selectedSubComment.id);
         const data = await apiSerVice.updateComment(formData)
-        if (data.status === 200) {
+        if (data.success) {
 
             const commentIndex = ((selectedIdea.comments) || []).findIndex((x) => x.id === selectedComment.id);
             if (commentIndex !== -1) {
@@ -701,7 +736,7 @@ const UpdateIdea = () => {
 
     const deleteComment = async (id, indexs) => {
         const data = await apiSerVice.deleteComment({id: id})
-        if (data.status === 200) {
+        if (data.success) {
             const cloneComment = [...selectedIdea.comments];
             cloneComment.splice(indexs, 1);
             let selectedIdeaObj = {...selectedIdea, comments: cloneComment};
@@ -715,7 +750,7 @@ const UpdateIdea = () => {
 
     const deleteSubComment = async (id, record, index, subIndex) => {
         const data = await apiSerVice.deleteComment({id: id})
-        if (data.status === 200) {
+        if (data.success) {
             const cloneComment = [...selectedIdea.comments];
             cloneComment[index].reply.splice(subIndex, 1);
             let selectedIdeaObj = {...selectedIdea, comments: cloneComment};
@@ -734,7 +769,7 @@ const UpdateIdea = () => {
         setSelectedSubCommentIndex(subIndex)
     }
 
-    const formValidate = (name, value) => {
+    const formValidate = (name, value, type) => {
         switch (name) {
             case "title":
                 if (!value || value.trim() === "") {
@@ -742,22 +777,25 @@ const UpdateIdea = () => {
                 } else {
                     return "";
                 }
-            case "board":
+            case "boardId":
                 if (!value || value?.toString()?.trim() === "") {
                     return "Board is required";
                 } else {
                     return "";
                 }
-            case "customer_name":
-                if (!value || value.trim() === "") {
-                    return "User name is required";
-                } else {
-                    return "";
+            case "name":
+                if (type === 'addUser') {
+                    if (!value || value.trim() === "") {
+                        return "User name is required";
+                    }
                 }
-            case "customer_email_id":
-                if (value.trim() === "") return "User email is required";
-                if (!/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(value))
-                    return "Enter a valid email address";
+                return "";
+            case "email":
+                if (type === 'addUser') {
+                    if (value.trim() === "") return "User email is required";
+                    if (!/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(value))
+                        return "Enter a valid email address";
+                }
                 return "";
             default: {
                 return "";
@@ -778,7 +816,28 @@ const UpdateIdea = () => {
         }));
     }
 
+    const formValidateCr = (name, value) => {
+        switch (name) {
+            case "title":
+                if (!value || value.trim() === "") {
+                    return "Title is required";
+                } else {
+                    return "";
+                }
+            case "boardId":
+                if (!value || value?.toString()?.trim() === "") {
+                    return "Board is required";
+                } else {
+                    return "";
+                }
+            default: {
+                return "";
+            }
+        }
+    };
+
     const onCreateIdea = async () => {
+        console.log(selectedIdea)
         let validationErrors = {};
         Object.keys(selectedIdea).forEach(name => {
             const error = formValidate(name, selectedIdea[name]);
@@ -794,15 +853,18 @@ const UpdateIdea = () => {
         let formData = new FormData();
         let topics = [];
 
-        (selectedIdea.topic || []).map((x) => {
-            topics.push(x.id)
+        (selectedIdea.tags || []).map((x) => {
+                topics.push(x.id)
         })
         formData.append('title', selectedIdea.title);
-        formData.append('board', selectedIdea.board);
-        formData.append('slug_url', selectedIdea.title ? selectedIdea.title.replace(/ /g, "-").replace(/\?/g, "-") : "");
+        formData.append('boardId', selectedIdea.boardId);
+        formData.append('slugUrl', selectedIdea.title ? selectedIdea.title.replace(/ /g, "-").replace(/\?/g, "-") : "");
         // formData.append('description', selectedIdea.description?.trim() === '' ? "" : selectedIdea.description);
         formData.append('description', selectedIdea.description ? selectedIdea.description : "");
-        formData.append('topic', topics.join(","));
+        // formData.append('tags', topics.join(","));
+        topics.forEach(id => {
+            formData.append('topicId[]', id);
+        });
 
         // Handle image resizing/compression here
         if (selectedIdea.image) {
@@ -811,9 +873,9 @@ const UpdateIdea = () => {
         }
 
         const data = await apiSerVice.updateIdea(formData, selectedIdea.id)
-        if (data.status === 200) {
-            setSelectedIdea({...data.data})
-            setOldSelectedIdea({...data.data})
+        if (data.success) {
+            // setSelectedIdea({...selectedIdea})
+            setOldSelectedIdea({...selectedIdea})
             setIsEditIdea(false)
             toast({description: data.message})
         } else {
@@ -861,6 +923,10 @@ const UpdateIdea = () => {
         setSelectedIdea(oldSelectedIdea);
         setFormError(initialStateError);
         setIsEditIdea(false);
+
+        setSelectedComment(null);
+        setDeletedCommentImage([]);
+        setCommentFiles([]);
     }
 
     const onDeleteImageComment = (index) => {
@@ -898,13 +964,13 @@ const UpdateIdea = () => {
                         <div className="space-y-2">
                             <div className="space-y-1">
                                 <Label htmlFor="name" className="font-normal">Email</Label>
-                                <Input id="name" value={usersDetails.customer_email_id} name="customer_email_id" onChange={onChangeText} placeholder="Enter upvoter email" className="col-span-3" />
-                                {userDetailError.customer_email_id && <span className="text-red-500 text-sm">{userDetailError.customer_email_id}</span>}
+                                <Input id="name" value={usersDetails.email} name="email" onChange={onChangeText} placeholder="Enter upvoter email" className="col-span-3" />
+                                {userDetailError.email && <span className="text-red-500 text-sm">{userDetailError.email}</span>}
                             </div>
                             <div className="space-y-1">
                                 <Label htmlFor="username" className="font-normal">Name</Label>
-                                <Input id="username" value={usersDetails.customer_name} name="customer_name" onChange={onChangeText} placeholder="Enter upvoter name" className="col-span-3" />
-                                {userDetailError.customer_name && <span className="text-red-500 text-sm">{userDetailError.customer_name}</span>}
+                                <Input id="username" value={usersDetails.name} name="name" onChange={onChangeText} placeholder="Enter upvoter name" className="col-span-3" />
+                                {userDetailError.name && <span className="text-red-500 text-sm">{userDetailError.name}</span>}
                             </div>
                         </div>
                         <DialogFooter>
@@ -959,7 +1025,7 @@ const UpdateIdea = () => {
                                                             {
                                                                 [...Array(3)].map((_, i) => {
                                                                     return (
-                                                                        <TableCell className={"px-2 py-[10px] md:px-3"}>
+                                                                        <TableCell key={i} className={"px-2 py-[10px] md:px-3"}>
                                                                             <Skeleton className={"rounded-md w-full h-7"}/>
                                                                         </TableCell>
                                                                     )
@@ -968,9 +1034,9 @@ const UpdateIdea = () => {
                                                         </TableRow>
                                                     )
                                                 })
-                                            ) : (ideasVoteList?.length > 0) ? <>
+                                            ) : (ideasVoteList?.data?.length > 0) ? <>
                                                 {
-                                                    (ideasVoteList || []).map((x,index)=>{
+                                                    (ideasVoteList || []).data.map((x,index)=>{
                                                         return(
                                                             <TableRow key={index} className={"font-normal"}>
                                                                 <TableCell className={`px-2 py-[10px] md:px-3 max-w-[140px] cursor-pointer truncate text-ellipsis overflow-hidden whitespace-nowrap`}>{x.name ? x.name : "-"}</TableCell>
@@ -993,13 +1059,13 @@ const UpdateIdea = () => {
                                     </TableBody>
                                 </Table>
                                 {
-                                    ideasVoteList?.length > 0 ?
+                                    ideasVoteList?.data?.length > 0 ?
                                         <Pagination
                                             pageNo={pageNo}
                                             totalPages={totalPages}
                                             isLoading={isLoading}
                                             handlePaginationClick={handlePaginationClick}
-                                            stateLength={ideasVoteList?.length}
+                                            stateLength={ideasVoteList?.data?.length}
                                         /> : ""
                                 }
                             </div>
@@ -1008,7 +1074,7 @@ const UpdateIdea = () => {
                                     variant={"outline hover:none"}
                                     className={"font-medium border bg-muted-foreground/5"}
                                     onClick={() => {
-                                        const recipients = selectedIdea?.vote_list?.map((x) => x.email).join(",");
+                                        const recipients = selectedIdea?.voteLists?.map((x) => x.email).join(",");
                                         window.location.href = `mailto:${recipients}`;
                                     }}
                                 >
@@ -1027,11 +1093,11 @@ const UpdateIdea = () => {
                                                         {getAllUsersList.length > 0 && (getAllUsersList || []).map((x, i) => {
                                                             return (
                                                                 <Fragment key={i}>
-                                                                    <CommandItem value={x.customer_name}>
+                                                                    <CommandItem value={x.name}>
                                                                         <span className={"flex justify-between items-center w-full text-sm font-medium cursor-pointer"}
                                                                             onClick={() => handleUserClick(x)}
                                                                         >
-                                                                            {x.customer_name}
+                                                                            {x.name}
                                                                         </span>
                                                                     </CommandItem>
                                                                 </Fragment>
@@ -1065,8 +1131,8 @@ const UpdateIdea = () => {
                         </div>
                         <div className={"flex flex-col "}>
                             <RadioGroup
-                                onValueChange={(value) => onChangeStatus('roadmap_id', value)}
-                                value={selectedIdea?.roadmap_id}
+                                onValueChange={(value) => onChangeStatus('roadmapStatusId', value)}
+                                value={selectedIdea?.roadmapStatusId}
                             >
                                 {
                                     (roadmapStatus || []).map((x, i) => {
@@ -1088,8 +1154,8 @@ const UpdateIdea = () => {
                             <Label htmlFor="picture" className={"font-normal capitalize"}>Featured image</Label>
                             <div className="w-[282px] h-[128px] flex gap-1">
                                 <ImageUploader
-                                    image={selectedIdea?.cover_image}
-                                    onDelete={() => onChangeStatus('delete_cover_image', selectedIdea && selectedIdea?.cover_image && selectedIdea.cover_image?.name ? "" : [selectedIdea.cover_image.replace("https://code.quickhunt.app/public/storage/feature_idea/", "")])}
+                                    image={selectedIdea?.coverImage}
+                                    onDelete={() => onChangeStatus('removeCoverImage', selectedIdea && selectedIdea?.coverImage && selectedIdea.coverImage?.name ? "" : [selectedIdea.coverImage.replace("https://code.quickhunt.app/public/storage/feature_idea/", "")])}
                                     onUpload={handleFeatureImgUpload}
                                     altText="Cover Image"
                                 />
@@ -1107,13 +1173,13 @@ const UpdateIdea = () => {
                                 variant={"outline"}
                                 className={`hover:bg-muted w-[125px] ${theme === "dark" ? "" : "border-muted-foreground text-muted-foreground"} capitalize text-sm font-medium`}
                                 onClick={() => onChangeStatus(
-                                    "is_active",
-                                    selectedIdea?.is_active === 1 ? 0 : 1
+                                    "isActive",
+                                    selectedIdea?.isActive === 1 ? 0 : 1
                                 )}
                             >
                                 {
                                     isLoadingBug ? <Loader2
-                                        className="h-4 w-4 animate-spin"/> : (selectedIdea?.is_active === 0 ? "Convert to Idea" : "Mark as bug")
+                                        className="h-4 w-4 animate-spin"/> : (selectedIdea?.isActive === 0 ? "Convert to Idea" : "Mark as bug")
                                 }
                             </Button>
                         </div>
@@ -1128,13 +1194,13 @@ const UpdateIdea = () => {
                                 variant={"outline"}
                                 className={`w-[89px] hover:bg-muted ${theme === "dark" ? "" : "border-muted-foreground text-muted-foreground"} text-sm font-medium`}
                                 onClick={() => onChangeStatus(
-                                    "is_archive",
-                                    selectedIdea?.is_archive === 1 ? 0 : 1
+                                    "isArchive",
+                                    selectedIdea?.isArchive === 1 ? 0 : 1
                                 )}
                             >
                                 {
                                     isLoadingArchive ? <Loader2
-                                        className="h-4 w-4 animate-spin"/> : (selectedIdea?.is_archive === 1 ? "Unarchive" : "Archive")
+                                        className="h-4 w-4 animate-spin"/> : (selectedIdea?.isArchive === 1 ? "Unarchive" : "Archive")
                                 }
                             </Button>
                         </div>
@@ -1166,11 +1232,11 @@ const UpdateIdea = () => {
                                         <Select
                                             onValueChange={(value) => onChangeText({
                                                 target: {
-                                                    name: "board",
+                                                    name: "boardId",
                                                     value
                                                 }
                                             })}
-                                            value={selectedIdea.board}>
+                                            value={selectedIdea.boardId}>
                                             <SelectTrigger className="bg-card">
                                                 <SelectValue/>
                                             </SelectTrigger>
@@ -1190,20 +1256,20 @@ const UpdateIdea = () => {
                                                 </SelectGroup>
                                             </SelectContent>
                                         </Select>
-                                        {formError.board && <span className="text-red-500 text-sm">{formError.board}</span>}
+                                        {formError.boardId && <span className="text-red-500 text-sm">{formError.boardId}</span>}
                                     </div>
                                 </div>
                                 <div className={"px-4 py-3 lg:py-6 lg:px-8 border-b space-y-2"}>
                                     <Label className={"font-normal"}>Choose Topics for this Idea (optional)</Label>
-                                    <Select onValueChange={handleChangeTopic} value={selectedIdea.topic.map(x => x.id)}>
+                                    <Select onValueChange={handleChangeTopic} value={selectedIdea.tags.map(x => x.id)}>
                                         <SelectTrigger className="bg-card">
                                             <SelectValue className={"text-muted-foreground text-sm"}>
                                                 <div className={"flex gap-[2px]"}>
                                                     {
-                                                        (selectedIdea.topic || []).length === 0 ? (
-                                                            <span className={"text-muted-foreground"}>Select topic</span>
+                                                        (selectedIdea.tags || []).length === 0 ? (
+                                                            <span className={"text-muted-foreground"}>Select tags</span>
                                                         ) : (
-                                                            (selectedIdea.topic || []).map((x, index) => {
+                                                            (selectedIdea.tags || []).map((x, index) => {
                                                                 const findObj = (topicLists || []).find((y) => y.id === x?.id);
                                                                 return (
                                                                     <div key={index}
@@ -1216,7 +1282,7 @@ const UpdateIdea = () => {
                                                             })
                                                         )
                                                     }
-                                                    {(selectedIdea.topic || []).length > 2}
+                                                    {(selectedIdea.tags || []).length > 2}
                                                 </div>
                                             </SelectValue>
                                         </SelectTrigger>
@@ -1229,7 +1295,7 @@ const UpdateIdea = () => {
                                                                 <div className={"flex gap-2"}>
                                                                     <div onClick={() => handleChangeTopic(x.id)}
                                                                          className="checkbox-icon">
-                                                                        {(selectedIdea.topic.map((x) => x.id) || []).includes(x.id) ?
+                                                                        {(selectedIdea.tags.map((x) => x.id) || []).includes(x.id) ?
                                                                             <Check size={18}/> : <div className={"h-[18px] w-[18px]"}/>}
                                                                     </div>
                                                                     <span>{x.title ? x.title : ""}</span>
@@ -1270,31 +1336,28 @@ const UpdateIdea = () => {
                                                         </Button>
                                                         <p className={"text-xl font-normal"}>{selectedIdea?.vote}</p>
                                                         {
-                                                            selectedIdea && selectedIdea?.vote_list && selectedIdea?.vote_list.length ?
+                                                            selectedIdea && selectedIdea?.voteLists && selectedIdea?.voteLists.length ?
                                                                 <Popover>
                                                                     <PopoverTrigger asChild>
-                                                                        <Button variant={"ghost hover-none"}
-                                                                                className={"rounded-full p-0 h-[24px]"}>
+                                                                        <Button variant={"ghost hover-none"} className={"rounded-full p-0 h-[24px]"}>
                                                                             {
-                                                                                (selectedIdea?.vote_list.slice(0, 1) || []).map((x, i) => {
+                                                                                (selectedIdea?.voteLists.slice(0, 1) || []).map((x, i) => {
                                                                                     return (
-                                                                                        <div className={"flex"}
-                                                                                             key={i}>
-                                                                                            <div
-                                                                                                className={"relative"}>
-                                                                                                <div
-                                                                                                    className={"update-idea text-sm rounded-full text-center"}>
+                                                                                        <div className={"flex"} key={i}>
+                                                                                            <div className={"relative"}>
+                                                                                                <div className={"update-idea text-sm rounded-full text-center"}>
                                                                                                     <UserAvatar
-                                                                                                        userPhoto={x.user_photo}
-                                                                                                        userName={x?.name ? x?.name : x?.user_name}
+                                                                                                        userPhoto={x?.userphoto}
+                                                                                                        userName={x?.name ? x?.name : x?.username}
                                                                                                         className="w-[20px] h-[20px]"
+                                                                                                        initialStyle={"text-sm"}
                                                                                                     />
                                                                                                 </div>
                                                                                             </div>
                                                                                             {
-                                                                                                (selectedIdea?.vote_list.length > 1) &&
+                                                                                                (selectedIdea?.voteLists.length > 1) &&
                                                                                                 <div className={"update-idea text-sm rounded-full text-center ml-[-5px]"}>
-                                                                                                    <Avatar><AvatarFallback>+{selectedIdea?.vote_list.length - 1}</AvatarFallback></Avatar>
+                                                                                                    <Avatar><AvatarFallback>+{selectedIdea?.voteLists.length - 1}</AvatarFallback></Avatar>
                                                                                                 </div>
                                                                                             }
                                                                                         </div>
@@ -1306,23 +1369,24 @@ const UpdateIdea = () => {
                                                                     <PopoverContent className="p-0" align={"start"}>
                                                                         <div>
                                                                             <div className={" flex gap-2 justify-between items-center py-3 px-4"}>
-                                                                                <h4 className="font-normal text-sm">{`Voters (${selectedIdea?.vote_list.length})`}</h4>
+                                                                                <h4 className="font-normal text-sm">{`Voters (${selectedIdea?.voteLists.length})`}</h4>
                                                                                 <Button variant={"link"} className={"h-auto p-0 text-card-foreground font-normal text-sm"} onClick={() => openDialogs("viewUpvote", true)}>View upvoters</Button>
                                                                             </div>
                                                                             <div className="border-t px-4 py-3 space-y-2 max-h-[300px] overflow-y-auto">
                                                                                 {
-                                                                                    (selectedIdea?.vote_list || []).map((x, i) => {
+                                                                                    (selectedIdea?.voteLists || []).map((x, i) => {
                                                                                         return (
                                                                                             <div className={"flex gap-2"} key={i}>
                                                                                                 <div
                                                                                                     className={"update-idea text-sm rounded-full text-center"}>
                                                                                                     <UserAvatar
-                                                                                                        userPhoto={x.user_photo}
-                                                                                                        userName={x?.name ? x?.name : x?.user_name}
+                                                                                                        userPhoto={x?.userphoto}
+                                                                                                        userName={x?.name ? x?.name : x?.username}
                                                                                                         className="w-[20px] h-[20px]"
+                                                                                                        initialStyle={"text-sm"}
                                                                                                     />
                                                                                                 </div>
-                                                                                                <h4 className={"text-sm font-normal"}>{x?.name ? x?.name : x?.user_name}</h4>
+                                                                                                <h4 className={"text-sm font-normal"}>{x?.name ? x?.name : x?.username}</h4>
                                                                                             </div>
                                                                                         )
                                                                                     })
@@ -1341,7 +1405,7 @@ const UpdateIdea = () => {
                                                     isLoading ?
                                                         <div className={"flex gap-2"}>
                                                             {
-                                                                selectedIdea?.is_edit === 1 ?
+                                                                selectedIdea?.createdBy === 1 ?
                                                                     <Skeleton
                                                                         className="w-[30px] h-[30px] rounded-full"/>
                                                                     : ""
@@ -1352,10 +1416,10 @@ const UpdateIdea = () => {
                                                         <Fragment>
                                                             <div className={"hidden md:block"}>
                                                                 <ActionButtons
-                                                                    isEditable={selectedIdea?.is_edit === 1}
+                                                                    isEditable={selectedIdea?.createdBy == 1}
                                                                     onEdit={() => setIsEditIdea(true)}
-                                                                    onPinChange={(newPinState) => onChangeStatus("pin_to_top", newPinState ? 1 : 0)}
-                                                                    isPinned={selectedIdea?.pin_to_top === 1}
+                                                                    onPinChange={(newPinState) => onChangeStatus("pinToTop", newPinState ? 1 : 0)}
+                                                                    isPinned={selectedIdea?.pinToTop == 1}
                                                                 />
                                                             </div>
 
@@ -1368,22 +1432,22 @@ const UpdateIdea = () => {
                                                                         <DropdownMenuItem className={"cursor-pointer"}
                                                                                           onClick={() => setIsEditIdea(true)}>Edit</DropdownMenuItem>
                                                                         <DropdownMenuItem className={"cursor-pointer"}
-                                                                                          onClick={() => onChangeStatus("pin_to_top", selectedIdea?.pin_to_top === 0 ? 1 : 0)}>
-                                                                            {selectedIdea?.pin_to_top == 0 ? "Pinned" : "Unpinned"}
+                                                                                          onClick={() => onChangeStatus("pinToTop", selectedIdea?.pinToTop === 0 ? 1 : 0)}>
+                                                                            {selectedIdea?.pinToTop == 0 ? "Pinned" : "Unpinned"}
                                                                         </DropdownMenuItem>
                                                                         <DropdownMenuItem className={"cursor-pointer capitalize"}
                                                                                           onClick={() => onChangeStatus(
-                                                                                              "is_active",
-                                                                                              selectedIdea?.is_active === 1 ? 0 : 1
+                                                                                              "isActive",
+                                                                                              selectedIdea?.isActive === 1 ? 0 : 1
                                                                                           )}>
-                                                                            {selectedIdea?.is_active === 0 ? "Convert to Idea" : "Mark as bug"}
+                                                                            {selectedIdea?.isActive === 0 ? "Convert to Idea" : "Mark as bug"}
                                                                         </DropdownMenuItem>
                                                                         <DropdownMenuItem className={"cursor-pointer"}
                                                                                           onClick={() => onChangeStatus(
-                                                                                              "is_archive",
-                                                                                              selectedIdea?.is_archive === 1 ? 0 : 1
+                                                                                              "isArchive",
+                                                                                              selectedIdea?.isArchive === 1 ? 0 : 1
                                                                                           )}>
-                                                                            {selectedIdea?.is_archive === 1 ? "Unarchive" : "Archive"}
+                                                                            {selectedIdea?.isArchive === 1 ? "Unarchive" : "Archive"}
                                                                         </DropdownMenuItem>
                                                                     </DropdownMenuContent>
                                                                 </DropdownMenu>
@@ -1394,17 +1458,17 @@ const UpdateIdea = () => {
                                                                     onChangeStatus={(statusKey, statusValue) => onChangeStatus(statusKey, statusValue)}
                                                                     statusButtons={[
                                                                         {
-                                                                            statusKey: "is_active",
-                                                                            statusValue: selectedIdea?.is_active === 1 ? 0 : 1,
+                                                                            statusKey: "isActive",
+                                                                            statusValue: selectedIdea?.isActive === 1 ? 0 : 1,
                                                                             isLoading: isLoadingBug,
-                                                                            label: selectedIdea?.is_active === 0 ? "Convert to Idea" : "Mark as Bug",
+                                                                            label: selectedIdea?.isActive === 0 ? "Convert to Idea" : "Mark as Bug",
                                                                             width: "w-[110px]"
                                                                         },
                                                                         {
-                                                                            statusKey: "is_archive",
-                                                                            statusValue: selectedIdea?.is_archive === 1 ? 0 : 1,
+                                                                            statusKey: "isArchive",
+                                                                            statusValue: selectedIdea?.isArchive === 1 ? 0 : 1,
                                                                             isLoading: isLoadingArchive,
-                                                                            label: selectedIdea?.is_archive === 1 ? "Unarchive" : "Archive",
+                                                                            label: selectedIdea?.isArchive === 1 ? "Unarchive" : "Archive",
                                                                             width: "w-[80px]"
                                                                         }
                                                                     ]}
@@ -1490,17 +1554,17 @@ const UpdateIdea = () => {
                                                             </Fragment>
                                                         ) : (
                                                             <Fragment>
-                                                                <UserAvatar
-                                                                    userPhoto={selectedIdea?.user_photo}
-                                                                    userName={selectedIdea?.name ? selectedIdea?.name : selectedIdea?.user_name}
+                                                                <UserAvatar initialStyle={"text-sm"}
+                                                                    userPhoto={selectedIdea?.profileImage}
+                                                                    userName={selectedIdea?.ideaUser?.firstName + ' ' + selectedIdea?.ideaUser?.lastName}
                                                                 />
                                                                 <div className={"flex items-center"}>
                                                                 <Fragment>
-                                                                    <h4 className={"text-sm font-normal"}>{selectedIdea?.name ? selectedIdea?.name : selectedIdea?.user_name}</h4>
+                                                                    <h4 className={"text-sm font-normal"}>{selectedIdea?.ideaUser?.firstName + ' ' + selectedIdea?.ideaUser?.lastName}</h4>
                                                                     <p className={"text-sm font-normal flex items-center text-muted-foreground"}>
                                                                         <Dot size={20}
                                                                              className={"fill-text-card-foreground stroke-text-card-foreground"}/>
-                                                                        {moment(selectedIdea?.created_at).format('D MMM')}
+                                                                        {moment(selectedIdea?.createdAt).format('D MMM')}
                                                                     </p>
                                                                 </Fragment>
                                                                 </div>
@@ -1511,8 +1575,8 @@ const UpdateIdea = () => {
                                                 {
                                                     isLoading ? <Skeleton className={"w-[224px] h-[24px] px-3 py-1"} /> :
                                                         <Select
-                                                            onValueChange={(value) => onChangeStatus('roadmap_id', value)}
-                                                            value={selectedIdea?.roadmap_id}
+                                                            onValueChange={(value) => onChangeStatus('roadmapStatusId', value)}
+                                                            value={selectedIdea?.roadmapStatusId}
                                                         >
                                                             <SelectTrigger className="w-[224px] h-[24px] px-3 py-1">
                                                                 <SelectValue/>
@@ -1530,8 +1594,8 @@ const UpdateIdea = () => {
                                                                                 <SelectItem key={i} value={x.id}>
                                                                                     <div
                                                                                         className={"flex items-center gap-2"}>
-                                                                                        <Circle fill={x.color_code}
-                                                                                                stroke={x.color_code}
+                                                                                        <Circle fill={x.colorCode}
+                                                                                                stroke={x.colorCode}
                                                                                                 className={` w-[10px] h-[10px]`}/>
                                                                                         {x.title ? x.title : "No status"}
                                                                                     </div>
@@ -1550,8 +1614,8 @@ const UpdateIdea = () => {
                                             <Label htmlFor="picture" className={"font-normal capitalize"}>Featured image</Label>
                                             <div className="w-[282px] h-[128px] flex gap-1">
                                                 <ImageUploader
-                                                    image={selectedIdea?.cover_image}
-                                                    onDelete={() => onChangeStatus('delete_cover_image', selectedIdea && selectedIdea?.cover_image && selectedIdea.cover_image?.name ? "" : [selectedIdea.cover_image.replace("https://code.quickhunt.app/public/storage/feature_idea/", "")])}
+                                                    image={selectedIdea?.coverImage}
+                                                    onDelete={() => onChangeStatus('removeCoverImage', selectedIdea && selectedIdea?.coverImage && selectedIdea.coverImage?.name ? "" : [selectedIdea.coverImage.replace("https://code.quickhunt.app/public/storage/feature_idea/", "")])}
                                                     onUpload={handleFeatureImgUpload}
                                                     altText="Cover Image"
                                                 />
@@ -1686,8 +1750,8 @@ const UpdateIdea = () => {
                                                                         <div>
                                                                             <div className={"update-idea text-sm rounded-full text-center"}>
                                                                                 <UserAvatar
-                                                                                    userPhoto={x?.user_photo}
-                                                                                    userName={x?.name ? x?.name : x?.user_name}
+                                                                                    userPhoto={x?.profileImage}
+                                                                                    userName={x?.name ? x?.name : x?.username}
                                                                                 />
                                                                             </div>
                                                                         </div>
@@ -1698,15 +1762,15 @@ const UpdateIdea = () => {
                                                                                     <p className={"text-sm font-normal flex items-center text-muted-foreground"}>
                                                                                         <Dot size={20}
                                                                                              className={"fill-text-card-foreground stroke-text-card-foreground"}/>
-                                                                                        {moment.utc(x?.created_at).local().startOf('seconds').fromNow()}
+                                                                                        {moment.utc(x?.createdAt).local().startOf('seconds').fromNow()}
                                                                                     </p>
                                                                                 </div>
                                                                                 <div className={"flex gap-2"}>
                                                                                     {
                                                                                         selectedCommentIndex === i && isEditComment ? "" :
-                                                                                            x?.is_edit === 1 ?
+                                                                                            x?.createdBy === 1 ?
                                                                                                 <ActionButtons
-                                                                                                    isEditable={x?.is_edit === 1}
+                                                                                                    isEditable={x?.createdBy === 1}
                                                                                                     onEdit={() => onEditComment(x, i)}
                                                                                                     onDelete={() => deleteComment(x.id, i)}
                                                                                                 />
@@ -1777,7 +1841,7 @@ const UpdateIdea = () => {
                                                                                                             className={"stroke-primary w-[16px] h-[16px]"}/>
                                                                                                     </span>
                                                                                             <p className={"text-base font-normal"}>
-                                                                                                {x.reply.length}
+                                                                                                {x?.reply?.length}
                                                                                             </p>
                                                                                         </div>
                                                                                     </div>
@@ -1795,7 +1859,7 @@ const UpdateIdea = () => {
                                                                                                             <div>
                                                                                                                 <div
                                                                                                                     className={"update-idea text-sm rounded-full text-center"}>
-                                                                                                                    <UserAvatar userPhoto={y.user_photo} userName={y?.name ? y?.name : y?.user_name}/>
+                                                                                                                    <UserAvatar userPhoto={y.profileimage} userName={y?.firstname}/>
                                                                                                                 </div>
                                                                                                             </div>
                                                                                                             <div
@@ -1807,14 +1871,14 @@ const UpdateIdea = () => {
                                                                                                                             <Dot
                                                                                                                                 size={20}
                                                                                                                                 className={"fill-text-card-foreground stroke-text-card-foreground"}/>
-                                                                                                                            {moment.utc(x.created_at).local().startOf('seconds').fromNow()}
+                                                                                                                            {moment.utc(x.createdAt).local().startOf('seconds').fromNow()}
                                                                                                                         </p>
                                                                                                                     </div>
                                                                                                                     {
                                                                                                                         selectedCommentIndex === i && selectedSubCommentIndex === j ? "" :
-                                                                                                                            y.is_edit === 1 ?
+                                                                                                                            y.createdBy === 1 ?
                                                                                                                                 <ActionButtons
-                                                                                                                                    isEditable={y?.is_edit === 1}
+                                                                                                                                    isEditable={y?.createdBy === 1}
                                                                                                                                     onEdit={() => onEditSubComment(x, y, i, j)}
                                                                                                                                     onDelete={() => deleteSubComment(y.id, x, i, j)}
                                                                                                                                 />

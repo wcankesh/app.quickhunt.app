@@ -2,7 +2,6 @@ import React, {useState, useEffect} from 'react';
 import {ApiService} from "../../utils/ApiService";
 import {useSelector} from "react-redux";
 import {useToast} from "../ui/use-toast";
-import {useTheme} from "../theme-provider";
 import CommCreateSheet from "../Comman/CommCreateSheet";
 
 const initialState = {
@@ -18,11 +17,9 @@ const initialStateError = {
     title: "",
     description: "",
     board: ""
-
 }
 
 const CreateRoadmapIdea = ({isOpen, onOpen, onClose, closeCreateIdea, selectedRoadmap, roadmapList, setRoadmapList,}) => {
-    const {theme} = useTheme()
     let apiSerVice = new ApiService();
     const { toast } = useToast()
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
@@ -31,7 +28,6 @@ const CreateRoadmapIdea = ({isOpen, onOpen, onClose, closeCreateIdea, selectedRo
     const [ideaDetail, setIdeaDetail] = useState(initialState);
     const [formError, setFormError] = useState(initialStateError);
     const [topicLists, setTopicLists] = useState([]);
-    const [selectedValues, setSelectedValues] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {

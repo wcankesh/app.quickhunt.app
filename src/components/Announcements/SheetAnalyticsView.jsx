@@ -190,10 +190,10 @@ const SheetAnalyticsView = ({onClose, analyticsObj, setAnalyticsObj}) => {
                                                                             <h5 className={"text-sm font-semibold capitalize"}>{x?.customer_name}</h5>
                                                                             <p className={"text-muted-foreground text-[10px] font-medium"}>{x?.customer_email_id}</p>
                                                                         </div>
-                                                                        <p className={"text-muted-foreground text-xs font-medium"}>
+                                                                        <div className={"text-muted-foreground text-xs font-medium"}>
                                                                             <ReadMoreText className={"text-xs"}
                                                                                           html={x.feedback}/>
-                                                                        </p>
+                                                                        </div>
                                                                     </div>
                                                                 </div>
                                                             </div>

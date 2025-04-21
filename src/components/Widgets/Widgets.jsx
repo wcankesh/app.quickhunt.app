@@ -1,13 +1,11 @@
 import React, {Fragment, useEffect, useState} from 'react';
 import {Button} from "../ui/button";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow,} from "../ui/table";
-import {BarChart, Copy, Ellipsis, Loader2, Plus, X} from "lucide-react";
+import {BarChart, Ellipsis, Plus} from "lucide-react";
 import {useTheme} from "../theme-provider";
 import {useSelector} from "react-redux";
-import {Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "../ui/dialog";
 import {DropdownMenu, DropdownMenuTrigger} from "@radix-ui/react-dropdown-menu";
 import {DropdownMenuContent, DropdownMenuItem} from "../ui/dropdown-menu";
-import {Tabs, TabsContent, TabsList, TabsTrigger,} from "../ui/tabs";
 import {Card, CardContent} from "../ui/card";
 import {useNavigate} from "react-router-dom";
 import {baseUrl} from "../../utils/constent";
@@ -21,6 +19,7 @@ import Pagination from "../Comman/Pagination";
 import DeleteDialog from "../Comman/DeleteDialog";
 import {EmptyDataContent} from "../Comman/EmptyDataContent";
 import CopyCode from "../Comman/CopyCode";
+import {EmptyInWidgetContent} from "../Comman/EmptyContentForModule";
 
 const perPageLimit = 10;
 
@@ -163,51 +162,6 @@ const Widgets = () => {
             console.error('Failed to copy text: ', err);
         });
     };
-
-    const EmptyInWidgetContent = [
-        {
-            title: "Embed Widget",
-            description: `Easily embed a widget on your website to display key information or engage users without disrupting the browsing experience.`,
-            btnText: [
-                {title: "Create Embed Widget", navigateTo: "embed/new", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
-            ],
-        },
-        {
-            title: "Popover Widget",
-            description: `Use a popover widget to show important updates or offers in a small, non-intrusive popup that appears on the screen.`,
-            btnText: [
-                {title: "Create Popover Widget", navigateTo: "popover/new", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
-            ],
-        },
-        {
-            title: "Modal Widget",
-            description: `Create a modal widget to display more detailed information or prompts in a full-screen overlay, ensuring user attention.`,
-            btnText: [
-                {title: "Create Modal Widget", navigateTo: "modal/new", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
-            ],
-        },
-        {
-            title: "Sidebar Widget",
-            description: `Add a sidebar widget to your website to showcase updates, product features, or quick links, offering easy access without overwhelming the page.`,
-            btnText: [
-                {title: "Create Sidebar Widget", navigateTo: "sidebar/new", icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
-            ],
-        },
-        {
-            title: "General Settings",
-            description: `Customize the appearance and behavior of your widgets to match your website design and provide a seamless user experience.`,
-            btnText: [
-                {title: "Manage General Settings", navigateTo: `${baseUrl}/settings/general-settings`, icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
-            ],
-        },
-        {
-            title: "Social Links",
-            description: `Integrate social media links directly into your widget to encourage user engagement and promote your online presence.`,
-            btnText: [
-                {title: "Add Social Links", navigateTo: `${baseUrl}/settings/social`, icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
-            ],
-        },
-    ];
 
     const codeString = selectedType === "embed" ? `
     <div class="quickhunt-widget-embed" Quickhunt_Widget_Key=${selectedId} widget-width="740px" widget-height="460px"></div>

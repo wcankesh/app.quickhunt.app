@@ -55,7 +55,7 @@ const WithGoogle = ({title}) => {
         }
         setIsLoading(true);
         const data = await apiSerVice.login(payload)
-        if (data.access_token) {
+        if (data.token) {
             toast({description: data.message})
             const urlParams = new URLSearchParams(window.location.search);
             const token = urlParams.get('token');
@@ -64,7 +64,7 @@ const WithGoogle = ({title}) => {
             } else {
                 urlParams.delete('token')
                 if(data?.onboarding == 0){
-                    const datas = await apiService.getLoginUserDetails({Authorization: `Bearer ${data.access_token}`})
+                    const datas = await apiService.getLoginUserDetails({Authorization: `Bearer ${data.token}`})
                     if(datas.status === 200){
                         dispatch(userDetailsAction({...datas.data}))
                         setIsLoading(false)
@@ -72,9 +72,9 @@ const WithGoogle = ({title}) => {
                         setIsLoading(false)
                     }
                     navigate(`${baseUrl}/on-boarding`);
-                    localStorage.setItem("token-verify-onboard", data.access_token);
+                    localStorage.setItem("token-verify-onboard", data.token);
                 } else {
-                    localStorage.setItem("token", data.access_token);
+                    localStorage.setItem("token", data.token);
                     navigate(`${baseUrl}/dashboard`);
                 }
             }
