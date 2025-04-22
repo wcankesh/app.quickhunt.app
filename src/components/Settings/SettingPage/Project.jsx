@@ -3,7 +3,6 @@ import {Card, CardContent, CardHeader, CardTitle, CardFooter, CardDescription} f
 import {Label} from "../../ui/label";
 import {Button} from "../../ui/button";
 import {Icon} from "../../../utils/Icon";
-import {useTheme} from "../../theme-provider";
 import {Input} from "../../ui/input";
 import {useDispatch,useSelector,} from "react-redux";
 import {ApiService} from "../../../utils/ApiService";
@@ -15,26 +14,25 @@ import {CircleX, Loader2} from "lucide-react";
 import DeleteDialog from "../../Comman/DeleteDialog";
 
 const initialState = {
-    project_name: '',
-    project_website: "",
-    project_language_id: '',
-    project_timezone_id: '',
-    project_logo: '',
-    project_favicon: '',
-    project_api_key: '',
-    project_status: '',
-    project_browser: '',
-    project_ip_address: ''
+    name: '',
+    website: "",
+    languageId: 0,
+    timezoneId: '',
+    logo: '',
+    favicon: '',
+    apiKey: '',
+    status: '',
+    browser: '',
+    ipAddress: ''
 }
 const initialStateError = {
-    project_name: '',
-    project_website: "",
-    project_logo: '',
-    project_favicon: '',
+    name: '',
+    website: "",
+    logo: '',
+    favicon: '',
 }
 
 const Project = () => {
-    const {theme} = useTheme();
     const dispatch = useDispatch();
     const apiService = new ApiService();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
@@ -56,7 +54,7 @@ const Project = () => {
 
     const getSingleProjects = async () => {
         const data = await apiService.getSingleProjects(projectDetailsReducer.id)
-        if(data.status === 200) {
+        if(data.success) {
             setCreateProjectDetails({...data.data});
         } else {
 
@@ -65,25 +63,25 @@ const Project = () => {
 
     const formValidate = (name, value) => {
         switch (name) {
-            case "project_name":
+            case "name":
                 if (!value || value.trim() === "") {
                     return "Project name is required";
                 } else {
                     return "";
                 }
-            case "project_website":
+            case "website":
                 if (value && !value.match(/^https:\/\/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-z]{2,63}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)$/)) {
                     return "Project website is invalid";
                 } else {
                     return "";
                 }
-            case "project_logo":
+            case "logo":
                 if (value && value.size > 5 * 1024 * 1024) { // 5 MB
                     return "Image size must be less than 5 MB.";
                 } else {
                     return "";
                 }
-            case "project_favicon":
+            case "favicon":
                 if (value && value.size > 5 * 1024 * 1024) { // 5 MB
                     return "Image size must be less than 5 MB.";
                 } else {
@@ -107,11 +105,11 @@ const Project = () => {
         const selectedFile = file.target.files[0];
         setCreateProjectDetails({
             ...createProjectDetails,
-            project_logo: selectedFile
+            logo: selectedFile
         });
         setFormError(formError => ({
             ...formError,
-            'project_logo': formValidate('project_logo', selectedFile)
+            'logo': formValidate('logo', selectedFile)
         }));
     };
 
@@ -119,27 +117,27 @@ const Project = () => {
         const selectedFile = file.target.files[0];
         setCreateProjectDetails({
             ...createProjectDetails,
-            project_favicon: selectedFile
+            favicon: selectedFile
         });
         setFormError(formError => ({
             ...formError,
-            'project_favicon': formValidate('project_favicon', selectedFile)
+            'favicon': formValidate('favicon', selectedFile)
         }));
     };
 
     const onDeleteImgLogo = async (name, value) => {
-        if(createProjectDetails && createProjectDetails?.project_logo && createProjectDetails.project_logo?.name){
-            setCreateProjectDetails({...createProjectDetails, project_logo: ""})
+        if(createProjectDetails && createProjectDetails?.logo && createProjectDetails.logo?.name){
+            setCreateProjectDetails({...createProjectDetails, logo: ""})
         } else {
-            setCreateProjectDetails({...createProjectDetails, [name]: value, project_logo: ""})
+            setCreateProjectDetails({...createProjectDetails, [name]: value, logo: ""})
         }
     }
 
     const onDeleteImgFav = async (name, value) => {
-        if(createProjectDetails && createProjectDetails?.project_favicon && createProjectDetails.project_favicon?.name){
-            setCreateProjectDetails({...createProjectDetails, project_favicon: ""})
+        if(createProjectDetails && createProjectDetails?.favicon && createProjectDetails.favicon?.name){
+            setCreateProjectDetails({...createProjectDetails, favicon: ""})
         } else {
-            setCreateProjectDetails({...createProjectDetails, [name]: value, project_favicon: ""})
+            setCreateProjectDetails({...createProjectDetails, [name]: value, favicon: ""})
         }
     }
 
@@ -160,7 +158,7 @@ const Project = () => {
         let formData = new FormData()
         Object.keys(payload).forEach((key) => {
             // formData.append(key, payload[key] || '')
-            if((key === "delete_logo" && createProjectDetails?.project_logo?.name) || (key === "delete_favicon" && createProjectDetails?.project_favicon?.name)){
+            if((key === "deleteLogo" && createProjectDetails?.logo?.name) || (key === "deleteFavicon" && createProjectDetails?.favicon?.name)){
             }  else {
                 formData.append(key,createProjectDetails[key] || '');
             }
@@ -168,19 +166,14 @@ const Project = () => {
 
         setIsSave(true)
         const data = await apiService.updateProjects(formData, projectDetailsReducer.id)
-        if(data.status === 200){
+        if(data.success){
             setProjectDetails(data.data);
             dispatch(projectDetailsAction(data.data))
             setIsSave(false)
-            toast({
-                description: data.message
-            })
+            toast({description: data.message})
         } else {
             setIsSave(false);
-            toast({
-                description: data.message,
-                variant: "destructive"
-            })
+            toast({description: data?.error?.message, variant: "destructive"})
         }
     }
 
@@ -197,7 +190,7 @@ const Project = () => {
     const onDelete = async () => {
         setIsLoadingDelete(true);
         const data = await apiService.deleteProjects(projectDetailsReducer.id)
-        if(data.status === 200){
+        if(data.success){
             const cloneProject = [...allProjectReducer.projectList]
             const index = cloneProject.findIndex((x) => x.id === projectDetailsReducer.id)
             if(index !== -1){
@@ -207,9 +200,7 @@ const Project = () => {
                 dispatch(allProjectAction({projectList: cloneProject}))
             }
             setIsDel(false);
-            toast({
-                title:"Project delete successfully"
-            })
+            toast({title:"Project delete successfully"})
             setTimeout(() => {
                 history.push('/')
             },2000)
@@ -245,32 +236,32 @@ const Project = () => {
                             <div className="w-[50px] h-[50px] relative">
                                 <div className="flex gap-2 basis-1/2 items-center justify-center">
                                     {
-                                        createProjectDetails?.project_logo ?
+                                        createProjectDetails?.logo ?
                                             <div>
-                                                {createProjectDetails && createProjectDetails.project_logo && createProjectDetails.project_logo.name ?
+                                                {createProjectDetails && createProjectDetails.logo && createProjectDetails.logo.name ?
                                                     <div className={"h-[50px] w-[50px] relative border rounded-lg"}>
                                                         <img
                                                             // className={"upload-img"}
                                                             className="h-full w-full rounded-md object-cover"
-                                                            src={createProjectDetails && createProjectDetails.project_logo && createProjectDetails.project_logo.name ? URL.createObjectURL(createProjectDetails.project_logo) : createProjectDetails.project_logo}
+                                                            src={createProjectDetails && createProjectDetails.logo && createProjectDetails.logo.name ? URL.createObjectURL(createProjectDetails.logo) : createProjectDetails.logo}
                                                             alt=""
                                                         />
                                                         <CircleX
                                                             size={20}
                                                             className={`stroke-gray-500 dark:stroke-white cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
-                                                            onClick={() => onDeleteImgLogo('delete_logo', createProjectDetails && createProjectDetails?.project_logo && createProjectDetails.project_logo?.name ? "" : createProjectDetails.project_logo.replace("https://code.quickhunt.app/public/storage/project/", ""))}
+                                                            onClick={() => onDeleteImgLogo('deleteLogo', createProjectDetails && createProjectDetails?.logo && createProjectDetails.logo?.name ? "" : createProjectDetails.logo.replace("https://code.quickhunt.app/public/storage/project/", ""))}
                                                         />
-                                                    </div> : createProjectDetails.project_logo ?
+                                                    </div> : createProjectDetails.logo ?
                                                         <div className={"h-[50px] w-[50px] relative border rounded-lg"}>
                                                             <img
                                                                 // className={"upload-img"}
                                                                 className="h-full w-full rounded-md object-cover"
-                                                                src={createProjectDetails.project_logo}
+                                                                src={createProjectDetails.logo}
                                                                 alt=""/>
                                                             <CircleX
                                                                 size={20}
                                                                 className={`stroke-gray-500 dark:stroke-white cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
-                                                                onClick={() => onDeleteImgLogo('delete_logo', createProjectDetails && createProjectDetails?.project_logo && createProjectDetails.project_logo?.name ? "" : createProjectDetails.project_logo.replace("https://code.quickhunt.app/public/storage/project/", ""))}
+                                                                onClick={() => onDeleteImgLogo('deleteLogo', createProjectDetails && createProjectDetails?.logo && createProjectDetails.logo?.name ? "" : createProjectDetails.logo.replace("https://code.quickhunt.app/public/storage/project/", ""))}
                                                             />
                                                         </div>
                                                         : ''}
@@ -278,14 +269,14 @@ const Project = () => {
                                             <div>
 
                                                 <input
-                                                    id="project_logo"
+                                                    id="logo"
                                                     type="file"
                                                     className="hidden"
                                                     accept="image/*"
                                                     onChange={handleFileChange}
                                                 />
                                                 <label
-                                                    htmlFor="project_logo"
+                                                    htmlFor="logo"
                                                     // className="border-dashed w-[80px] h-[80px] sm:w-[132px] sm:h-[128px] py-[52px] flex items-center justify-center bg-muted border border-muted-foreground rounded cursor-pointer"
                                                     className="flex w-[50px] bg-muted h-[50px] py-0 justify-center items-center flex-shrink-0 rounded cursor-pointer"
                                                 >
@@ -301,37 +292,37 @@ const Project = () => {
                                 <p className={"text-xs font-normal text-muted-foreground"}>50px By 50px</p>
                             </div>
                             </div>
-                            {formError.project_logo && <div className={"text-xs text-destructive"}>{formError.project_logo}</div>}
+                            {formError.logo && <div className={"text-xs text-destructive"}>{formError.logo}</div>}
                         </div>
                         <div className={"space-y-2"}>
                         <div className={"flex gap-2"}>
                             {
-                                createProjectDetails?.project_favicon ?
+                                createProjectDetails?.favicon ?
                                     <div>
-                                        {createProjectDetails && createProjectDetails.project_favicon && createProjectDetails.project_favicon.name ?
+                                        {createProjectDetails && createProjectDetails.favicon && createProjectDetails.favicon.name ?
                                             <div className={"h-[50px] w-[50px] relative border rounded-lg"}>
                                                 <img
                                                     // className={"upload-img"}
                                                     className="h-full w-full rounded-md object-cover"
-                                                    src={createProjectDetails && createProjectDetails.project_favicon && createProjectDetails.project_favicon.name ? URL.createObjectURL(createProjectDetails.project_favicon) : createProjectDetails.project_favicon}
+                                                    src={createProjectDetails && createProjectDetails.favicon && createProjectDetails.favicon.name ? URL.createObjectURL(createProjectDetails.favicon) : createProjectDetails.favicon}
                                                     alt=""
                                                 />
                                                 <CircleX
                                                     size={20}
                                                     className={`stroke-gray-500 dark:stroke-white cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
-                                                    onClick={() => onDeleteImgFav('delete_favicon', createProjectDetails && createProjectDetails?.project_favicon && createProjectDetails.project_favicon?.name ? "" : createProjectDetails.project_favicon.replace("https://code.quickhunt.app/public/storage/project/", ""))}
+                                                    onClick={() => onDeleteImgFav('deleteFavicon', createProjectDetails && createProjectDetails?.favicon && createProjectDetails.favicon?.name ? "" : createProjectDetails.favicon.replace("https://code.quickhunt.app/public/storage/project/", ""))}
                                                 />
-                                            </div> : createProjectDetails.project_favicon ?
+                                            </div> : createProjectDetails.favicon ?
                                                 <div className={"h-[50px] w-[50px] relative border rounded-lg"}>
                                                     <img
                                                         // className={"upload-img"}
                                                         className="h-full w-full rounded-md object-cover"
-                                                        src={createProjectDetails.project_favicon}
+                                                        src={createProjectDetails.favicon}
                                                         alt=""/>
                                                     <CircleX
                                                         size={20}
                                                         className={`stroke-gray-500 dark:stroke-white cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
-                                                        onClick={() => onDeleteImgFav('delete_favicon', createProjectDetails && createProjectDetails?.project_favicon && createProjectDetails.project_favicon?.name ? "" : createProjectDetails.project_favicon.replace("https://code.quickhunt.app/public/storage/project/", ""))}
+                                                        onClick={() => onDeleteImgFav('deleteFavicon', createProjectDetails && createProjectDetails?.favicon && createProjectDetails.favicon?.name ? "" : createProjectDetails.favicon.replace("https://code.quickhunt.app/public/storage/project/", ""))}
                                                     />
                                                 </div>
                                                 : ''}
@@ -339,14 +330,14 @@ const Project = () => {
                                     <div>
 
                                         <input
-                                            id="project_favicon"
+                                            id="favicon"
                                             type="file"
                                             className="hidden"
                                             accept="image/*"
                                             onChange={handleFileChangeFav}
                                         />
                                         <label
-                                            htmlFor="project_favicon"
+                                            htmlFor="favicon"
                                             className="flex w-[50px] bg-muted h-[50px] py-0 justify-center items-center flex-shrink-0 rounded cursor-pointer"
                                         >
                                             <span className="text-center text-muted-foreground font-medium text-[14px]">{Icon.editImgLogo}</span>
@@ -358,7 +349,7 @@ const Project = () => {
                                 <p className={"text-xs font-normal text-muted-foreground"}>64px By 64px</p>
                             </div>
                         </div>
-                            {formError.project_favicon && <div className={"text-xs text-destructive"}>{formError.project_favicon}</div>}
+                            {formError.favicon && <div className={"text-xs text-destructive"}>{formError.favicon}</div>}
                         </div>
                     </div>
                 </div>
@@ -366,17 +357,17 @@ const Project = () => {
             <CardContent className={"p-4 sm:px-5 sm:py-4 border-b"}>
                 <div className={"flex flex-wrap sm:flex-nowrap gap-4 w-full"}>
                     <div className="basis-full sm:basis-1/2 space-y-1">
-                        <Label htmlFor="project_name" className={"font-normal capitalize"}>Project Name</Label>
-                        <Input type="text" onChange={onChangeText} name={"project_name"} value={createProjectDetails.project_name} id="project_name" placeholder="Project Name" />
+                        <Label htmlFor="name" className={"font-normal capitalize"}>Project Name</Label>
+                        <Input type="text" onChange={onChangeText} name={"name"} value={createProjectDetails.name} id="name" placeholder="Project Name" />
                         {
-                            formError.project_name &&  <p className="text-red-500 text-xs mt-1" >{formError.project_name}</p>
+                            formError.name &&  <p className="text-red-500 text-xs mt-1" >{formError.name}</p>
                         }
                     </div>
                     <div className="basis-full sm:basis-1/2 space-y-1">
-                        <Label htmlFor="project_website" className={"font-normal capitalize"}>Project website</Label>
-                        <Input type="text" name={"project_website"} onChange={onChangeText} value={createProjectDetails.project_website} id="project_website" placeholder="https://yourcompany.com" />
+                        <Label htmlFor="website" className={"font-normal capitalize"}>Project website</Label>
+                        <Input type="text" name={"website"} onChange={onChangeText} value={createProjectDetails.website} id="website" placeholder="https://yourcompany.com" />
                         {
-                            formError.project_website &&  <p className="text-destructive text-xs mt-1" >{formError.project_website}</p>
+                            formError.website &&  <p className="text-destructive text-xs mt-1" >{formError.website}</p>
                         }
                     </div>
                 </div>

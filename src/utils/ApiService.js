@@ -189,7 +189,7 @@ export class ApiService{
     //     return await this.postData(`${baseUrlApi}/users/${id}?_method=PUT`, payload, true)
     // }
     async updateLoginUserDetails (payload){
-        return await this.patchData(`${baseUrlApi}/auth/updateUser`, payload, true)
+        return await this.patchData(`${baseUrlApi}/auth/update-user`, payload, true)
     }
     async changePassword (payload){
         return await this.postData(`${baseUrlApi}/change-password`,payload)
@@ -201,10 +201,10 @@ export class ApiService{
         return await this.postData(`${baseUrlApi}/reset-password`,payload)
     }
     async getInvitationDetail (token){
-        return await this.getData(`${baseUrlApi}/invitation-detail?token=${token}`,)
+        return await this.getData(`${baseUrlApi}/invitedUser/get-invitation-detail?token=${token}`,)
     }
     async join (payload){
-        return await this.postData(`${baseUrlApi}/join`,payload)
+        return await this.postData(`${baseUrlApi}/invitedUser/accept-Reject`,payload)
     }
 
     /* --------------------------------- On Boarding ----------------------------------- */
@@ -220,10 +220,10 @@ export class ApiService{
         return await this.getData(`${baseUrlApi}/post/get-all-post?${qs.stringify(payload)}`)
     }
     async getSinglePosts (id){
-        return await this.getData(`${baseUrlApi}/posts/${id}`)
+        return await this.getData(`${baseUrlApi}/post/get-one-post?id=${id}`)
     }
     async createPosts (payload){
-        return await this.postData(`${baseUrlApi}/posts`,payload, true)
+        return await this.postData(`${baseUrlApi}/post/create-post`,payload, true)
     }
     async deletePostsImage (payload){
         return await this.postData(`${baseUrlApi}/remove-image`,payload,)
@@ -232,44 +232,44 @@ export class ApiService{
         return await this.postData(`${baseUrlApi}/search`,payload)
     }
     async updatePosts (payload, id){
-        return await this.postData(`${baseUrlApi}/posts/${id}?_method=put`,payload, true)
+        return await this.patchData(`${baseUrlApi}/post/update-Post?id=${id}?_method=put`,payload, true)
     }
-    async deletePosts (id, pageNo){
-        return await this.deleteData(`${baseUrlApi}/posts/${id}/${pageNo}`)
+    async deletePosts (id){
+        return await this.deleteData(`${baseUrlApi}/post/delete-post?id=${id}`)
     }
-    async getFeedback (payload){
-        return await this.postData(`${baseUrlApi}/get-feedback`, payload)
+    async getFeedback (id){
+        return await this.postData(`${baseUrlApi}/post-feedback/get-feedback?id=${id}`)
     }
-    async getReaction (payload){
-        return await this.getData(`${baseUrlApi}/get-reaction?${qs.stringify(payload)}`)
+    async getReaction (id){
+        return await this.getData(`${baseUrlApi}/post-reaction/get-reaction?id=${id}`)
     }
 
     /* ---------- Settings Labels api ---------- */
     async getAllLabels (id){
-        return await this.getData(`${baseUrlApi}/label/labels?projectId=${id}`)
+        return await this.getData(`${baseUrlApi}/label/get-all-labels?id=${id}`)
     }
     async createLabels (payload){
         return await this.postData(`${baseUrlApi}/label/labels`,payload)
     }
     async updateLabels (payload, id){
-        return await this.patchData(`${baseUrlApi}/label/labels/${id}`,payload)
+        return await this.putData(`${baseUrlApi}/label/update-labels?id=${id}`,payload)
     }
     async deleteLabels (id){
-        return await this.deleteData(`${baseUrlApi}/label/labels/${id}`)
+        return await this.deleteData(`${baseUrlApi}/label/delete-labels?id=${id}`)
     }
 
     /* ---------- Settings Project api ---------- */
     async getAllProjects (){
-        return await this.getData(`${baseUrlApi}/project/getAll`)
+        return await this.getData(`${baseUrlApi}/project/get-all`)
     }
     async getSingleProjects (id){
-        return await this.getData(`${baseUrlApi}/projects/${id}`)
+        return await this.getData(`${baseUrlApi}/project/get-single-project?id=${id}`)
     }
     async createProjects (payload, token = {}){
         return await this.postData(`${baseUrlApi}/project/create`,payload,false, token)
     }
     async updateProjects (payload, id){
-        return await this.postData(`${baseUrlApi}/projects/${id}?_method=PUT`,payload, true)
+        return await this.putData(`${baseUrlApi}/project/update-project?id=${id}`,payload, true)
     }
     async deleteProjects (id){
         return await this.deleteData(`${baseUrlApi}/projects/${id}`)
@@ -284,35 +284,26 @@ export class ApiService{
     }
 
     /* ---------- Users api ---------- */
-    // async getAllUsers (id){
-    //     return await this.getData(`${baseUrlApi}/customers?${qs.stringify(id)}`)
-    // }
     async getAllUsers (id){
-        return await this.getData(`${baseUrlApi}/customerAuth/getAll?${qs.stringify(id)}`)
+        return await this.getData(`${baseUrlApi}/customerAuth/getAll?projectId=${qs.stringify(id)}`)
     }
     async getSingleUser (id){
         return await this.getData(`${baseUrlApi}/customers/${id}?is_history=1`)
     }
-    // async createUsers (payload){
-    //     return await this.postData(`${baseUrlApi}/customers`,payload)
-    // }
     async createUsers (payload){
         return await this.postData(`${baseUrlApi}/customerAuth/store`,payload)
     }
-    // async userManualUpVote (payload){
-    //     return await this.postData(`${baseUrlApi}/customer/vote`,payload)
-    // }
     async userManualUpVote (payload){
         return await this.postData(`${baseUrlApi}/customerAuth/vote`,payload)
     }
     async userAction (payload){
-        return await this.postData(`${baseUrlApi}/customer-actions`,payload)
+        return await this.postData(`${baseUrlApi}/customerAuth/vote`,payload)
     }
     async updateUsers (payload, id){
         return await this.putData(`${baseUrlApi}/customers/${id}`,payload)
     }
     async deleteUsers (id){
-        return await this.deleteData(`${baseUrlApi}/customers/${id}`)
+        return await this.deleteData(`${baseUrlApi}/customerAuth/delete/${id}`)
     }
 
     /* ---------- Roadmap api ---------- */
@@ -332,21 +323,21 @@ export class ApiService{
     /* ---------- Settings Status api ---------- */
 
     async createSettingsStatus (payload){
-        return await this.postData(`${baseUrlApi}/roadMapStatus/roadmapStatuses`,payload)
+        return await this.postData(`${baseUrlApi}/road-map-status/roadmap-statuses`,payload)
     }
     async updateSettingsStatus (payload, id){
-        return await this.patchData(`${baseUrlApi}/roadMapStatus/roadmapStatuses/${id}`,payload)
+        return await this.putData(`${baseUrlApi}/road-map-status/update-roadmap-statuses?id=${id}`,payload)
     }
     async onDeleteSettingsStatus (id){
-        return await this.deleteData(`${baseUrlApi}/roadMapStatus/roadmapStatuses/${id}`)
+        return await this.deleteData(`${baseUrlApi}/road-map-status/delete-roadmap-statuses?id=${id}`)
     }
     async roadmapSettingsStatusRank (payload){
-        return await this.patchData(`${baseUrlApi}/roadMapStatus/updateRank`,payload)
+        return await this.patchData(`${baseUrlApi}/road-map-status/update-rank`,payload)
     }
 
     /* ---------- Ideas api ---------- */
     async getAllIdea (payload){
-        return await this.getData(`${baseUrlApi}/idea/getAll?${qs.stringify(payload)}`)
+        return await this.getData(`${baseUrlApi}/idea/getAll?projectId=${qs.stringify(payload)}`)
     }
     async ideaSearch (payload){
         return await this.postData(`${baseUrlApi}/idea/search`,payload, )
@@ -371,14 +362,11 @@ export class ApiService{
     async giveVote (payload){
         return await this.postData(`${baseUrlApi}/vote/give-vote`,payload)
     }
-    // async updateIdea (payload, id){
-    //     return await this.postData(`${baseUrlApi}/feature-idea/${id}?_method=put`,payload, true)
-    // }
     async updateIdea (payload, id){
         return await this.putData(`${baseUrlApi}/idea/update/${id}?_method=put`,payload, true)
     }
     async onDeleteIdea (id){
-        return await this.deleteData(`${baseUrlApi}/feature-idea/${id}`)
+        return await this.deleteData(`${baseUrlApi}/idea/delete/${id}`)
     }
     async setRoadmapRank (payload){
         return await this.postData(`${baseUrlApi}/feature-idea/rank`, payload)
@@ -392,11 +380,11 @@ export class ApiService{
     async createComment (payload){
         return await this.postData(`${baseUrlApi}/comment/add`,payload, true)
     }
-    async updateComment (payload){
-        return await this.postData(`${baseUrlApi}/v1/edit-comment`,payload, true)
+    async updateComment (id){
+        return await this.postData(`${baseUrlApi}/comment/update/${id}`, true)
     }
-    async deleteComment (payload){
-        return await this.postData(`${baseUrlApi}/v1/delete-comment`,payload, )
+    async deleteComment (id){
+        return await this.postData(`${baseUrlApi}/comment/delete/${id}` )
     }
     async roadmapStatusRank (payload){
         return await this.postData(`${baseUrlApi}/roadmap-status/rank`,payload)
@@ -446,82 +434,46 @@ export class ApiService{
     }
 
     /* ---------- Help Center Category api ans Settings Categories api ---------- */
-    // async createCategory (payload){
-    //     return await this.postData(`${baseUrlApi}/help/category`, payload, true)
-    // }
     async createCategory (payload){
-        return await this.postData(`${baseUrlApi}/articleCategory/categories`, payload, true)
+        return await this.postData(`${baseUrlApi}/article-category/categories`, payload, true)
     }
-    // async createSubCategory (payload){
-    //     return await this.postData(`${baseUrlApi}/help/sub-category`, payload, true)
-    // }
     async createSubCategory (payload){
-        return await this.postData(`${baseUrlApi}/articleSubCategory/subCategories`, payload, true)
+        return await this.postData(`${baseUrlApi}/article-subCategory/subCategories`, payload, true)
     }
-    // async getAllCategory (payload){
-    //     return await this.postData(`${baseUrlApi}/help/categories?${qs.stringify(payload)}`,)
-    // }
     async getAllCategory (payload){
-        return await this.getData(`${baseUrlApi}/articleCategory/categories?${qs.stringify(payload)}`,)
+        return await this.getData(`${baseUrlApi}/article-category/get-all-categories?projectId=${qs.stringify(payload)}`,)
     }
     async getAllSubCategory (id){
-        return await this.getData(`${baseUrlApi}/help/sub-categories?project_id=${id}`,)
+        return await this.getData(`${baseUrlApi}/article-subCategory/get-all-subCategories?id=${id}`,)
     }
-    // async updateCategory (payload, id){
-    //     return await this.postData(`${baseUrlApi}/help/category/${id}`,payload, true)
-    // }
     async updateCategory (payload, id){
-        return await this.patchData(`${baseUrlApi}/articleCategory/categories/${id}`,payload, true)
+        return await this.putData(`${baseUrlApi}/article-category/update-categories?id=${id}`,payload, true)
     }
-    // async updateSubCategory (payload, id){
-    //     return await this.postData(`${baseUrlApi}/help/sub-category/${id}`,payload, true)
-    // }
     async updateSubCategory (payload, id){
-        return await this.patchData(`${baseUrlApi}/articleSubCategory/subCategories/${id}`,payload, true)
+        return await this.putData(`${baseUrlApi}/article-subCategory/update-subCategories?id=${id}`,payload, true)
     }
-    // async deleteCategories (id){
-    //     return await this.deleteData(`${baseUrlApi}/help/category/${id}`)
-    // }
     async deleteCategories (id){
-        return await this.deleteData(`${baseUrlApi}/articleCategory/categories/${id}`)
+        return await this.deleteData(`${baseUrlApi}/article-category/delete-categories?id=${id}`)
     }
-    // async deleteSubCategories (id){
-    //     return await this.deleteData(`${baseUrlApi}/help/sub-category/${id}`)
-    // }
     async deleteSubCategories (id){
-        return await this.deleteData(`${baseUrlApi}/articleSubCategory/subCategories/${id}`)
+        return await this.deleteData(`${baseUrlApi}/article-subCategory/delete-subCategories?id=${id}`)
     }
 
     /* ---------- Help Center Articles api ---------- */
-    // async getAllArticles (payload){
-    //     return await this.postData(`${baseUrlApi}/help/articles?${qs.stringify(payload)}`,)
-    // }
     async getAllArticles (payload){
-        return await this.getData(`${baseUrlApi}/artical/articles?${qs.stringify(payload)}`,)
+        return await this.getData(`${baseUrlApi}/artical/get-all-articles?projectId=${qs.stringify(payload)}`,)
     }
-    // async createArticles (payload){
-    //     return await this.postData(`${baseUrlApi}/help/article`, payload, true)
-    // }
     async createArticles (payload){
         return await this.postData(`${baseUrlApi}/artical/articles`, payload)
     }
-    // async getSingleArticle (id){
-    //     return await this.getData(`${baseUrlApi}/help/article/${id}`)
-    // }
     async getSingleArticle (id){
-        return await this.getData(`${baseUrlApi}/artical/articles/${id}`)
+        return await this.getData(`${baseUrlApi}/artical/get-single-articles?id=${id}`)
     }
-    // async updateArticle (payload, id){
-    //     return await this.postData(`${baseUrlApi}/help/article/${id}`,payload, true)
-    // }
     async updateArticle (payload, id){
-        return await this.patchData(`${baseUrlApi}/artical/articles/${id}`, payload)
+        return await this.putData(`${baseUrlApi}/artical/update-articles?id=${id}`, payload)
     }
-    // async deleteArticles (id){
-    //     return await this.deleteData(`${baseUrlApi}/help/article/${id}`)
-    // }
     async deleteArticles (id){
-        return await this.deleteData(`${baseUrlApi}/artical/articles/${id}`)
+        return await this.deleteData(`${baseUrlApi}/artical/delete-articles?id=${id}`)
     }
     async articleSearch (payload){
         return await this.postData(`${baseUrlApi}/help/article`, payload)
@@ -549,24 +501,24 @@ export class ApiService{
         return await this.postData(`${baseUrlApi}/category/categories`, payload)
     }
     async deleteCategorySettings (id){
-        return await this.deleteData(`${baseUrlApi}/category/categories/${id}`)
+        return await this.deleteData(`${baseUrlApi}/category/delete-categories?id=${id}`)
     }
     async updateCategorySettings (payload, id){
-        return await this.patchData(`${baseUrlApi}/category/categories/${id}`,payload)
+        return await this.putData(`${baseUrlApi}/category/update-categories?id=${id}`,payload)
     }
 
     /* ---------- Settings Board api ---------- */
-    async getAllBoards (payload){
-        return await this.getData(`${baseUrlApi}/board/boards?${qs.stringify(payload)}`)
+    async getAllBoards (id){
+        return await this.getData(`${baseUrlApi}/board/get-all-boards?id=${id}`)
     }
     async createBoard (payload){
         return await this.postData(`${baseUrlApi}/board/boards`,payload)
     }
     async deleteBoard (id){
-        return await this.deleteData(`${baseUrlApi}/board/boards/${id}`)
+        return await this.deleteData(`${baseUrlApi}/board/delete-boards?id=${id}`)
     }
     async updateBoard (payload, id){
-        return await this.patchData(`${baseUrlApi}/board/boards/${id}`, payload)
+        return await this.putData(`${baseUrlApi}/board/update-boards?id=${id}`, payload)
     }
 
     /* ---------- Settings Domain api and GeneralSettings api ---------- */
@@ -582,13 +534,13 @@ export class ApiService{
         return await this.postData(`${baseUrlApi}/emoji/emojis`, payload)
     }
     async getAllEmoji (id){
-        return await this.getData(`${baseUrlApi}/emoji/emojis?projectId=${id}`)
+        return await this.getData(`${baseUrlApi}/emoji/get-all-emojis?id=${id}`)
     }
     async deleteEmoji (id){
-        return await this.deleteData(`${baseUrlApi}/emoji/emojis/${id}`)
+        return await this.deleteData(`${baseUrlApi}/emoji/delete-emojis?id=${id}`)
     }
     async updateEmoji (payload, id){
-        return await this.patchData(`${baseUrlApi}/emoji/emojis/${id}`,payload)
+        return await this.putData(`${baseUrlApi}/emoji/update-emojis?id=${id}`,payload)
     }
 
     /* ---------- Settings Social api ---------- */
@@ -601,33 +553,24 @@ export class ApiService{
         return await this.postData(`${baseUrlApi}/tag/tags`, payload)
     }
     async updateTopics (payload, id){
-        return await this.patchData(`${baseUrlApi}/tag/tags/${id}`, payload)
+        return await this.putData(`${baseUrlApi}/tag/update-tags?id=${id}`, payload)
     }
     async deleteTopics (id){
-        return await this.deleteData(`${baseUrlApi}/tag/tags/${id}`)
+        return await this.deleteData(`${baseUrlApi}/tag/delete-tags?id=${id}`)
     }
 
     /* ---------- Settings Team api ---------- */
-    // async getMember (payload){
-    //     return await this.postData(`${baseUrlApi}/member`, payload)
-    // }
-    async getMember (id){
-        return await this.getData(`${baseUrlApi}/team/getTeam/${id}`)
+    async getAllMember (id){
+        return await this.getData(`${baseUrlApi}/team/get-team?id=${id}`)
     }
-    // async getInvitation (payload){
-    //     return await this.getData(`${baseUrlApi}/invitation?${qs.stringify(payload)}`)
-    // }
     async getInvitation (id){
-        return await this.getData(`${baseUrlApi}/invitedUser/getAllInvitedUsers/${id}`)
+        return await this.getData(`${baseUrlApi}/invitedUser/get-all-invitedUsers?id=${id}`)
     }
-    // async inviteUser (payload){
-    //     return await this.postData(`${baseUrlApi}/invite`, payload)
-    // }
     async inviteUser (payload){
-        return await this.postData(`${baseUrlApi}/invitedUser/inviteMember`, payload)
+        return await this.postData(`${baseUrlApi}/invitedUser/invite-member`, payload)
     }
-    async removeMember (payload){
-        return await this.postData(`${baseUrlApi}/remove-member`,payload, )
+    async removeMember (id){
+        return await this.deleteData(`${baseUrlApi}/invitedUser/revoke-invitation?id=${id}` )
     }
 
     /* ---------- Import Export api ---------- */
@@ -637,11 +580,11 @@ export class ApiService{
 
     /* ---------- HeaderBar Api ---------- */
     async getAllStatusAndTypes (id){
-        return await this.getData(`${baseUrlApi}/project/allDetail/${id}`)
+        return await this.getData(`${baseUrlApi}/project/all-Detail?id=${id}`)
     }
-    async getAllProject (){
-        return await this.getData(`${baseUrlApi}/project/getAll`)
-    }
+    // async getAllProjects (){
+    //     return await this.getData(`${baseUrlApi}/project/getAll`)
+    // }
 
     /* ---------- Pricing Plan Api ---------- */
     async cancelPlan (){

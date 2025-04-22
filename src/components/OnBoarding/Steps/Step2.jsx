@@ -54,10 +54,10 @@ const Step2 = ({setStep}) => {
             knowFrom: selectedKnowAbout,
         }
         const data = await apiService.onBoardingFlow(payload, {Authorization: `Bearer ${token}`});
+            setIsLoading(false);
         if(data.success) {
             setUserDetail(data.data)
             setStep(3);
-            setIsLoading(false);
         }
     }
 
@@ -88,6 +88,7 @@ const Step2 = ({setStep}) => {
     useEffect(() => {
         setUserDetail(userDetailsReducer)
     },[userDetailsReducer])
+
     return (
         <Fragment>
             <div className={"flex flex-col justify-center gap-6"}>
@@ -97,7 +98,7 @@ const Step2 = ({setStep}) => {
                 </div>
                 <div className={`space-y-3`}>
                     <div className={"space-y-2"}>
-                        <Label className={"text-sm font-normal mb-2"}>Hey {userDetail?.user_first_name} {userDetail?.user_last_name}, What can we help you create today?</Label>
+                        <Label className={"text-sm font-normal mb-2"}>Hey <span className={"font-semibold capitalize"}>{userDetail?.firstName} {userDetail?.lastName}</span>, What can we help you create today?</Label>
                         <Select onValueChange={handleCreateChange}>
                             <SelectTrigger className="h-auto placeholder:text-muted">
                                 <SelectValue placeholder="Ex. Announcement(changelog)"/>

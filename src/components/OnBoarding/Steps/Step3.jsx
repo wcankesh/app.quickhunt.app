@@ -2,7 +2,6 @@ import React, {Fragment, useState} from 'react';
 import { Label } from "../../ui/label";
 import { Button } from "../../ui/button";
 import {apiService, baseUrl, setProjectDetails} from "../../../utils/constent";
-import { useNavigate } from "react-router-dom";
 import {Input} from "../../ui/input";
 import {projectDetailsAction} from "../../../redux/action/ProjectDetailsAction";
 import {useDispatch} from "react-redux";
@@ -10,19 +9,6 @@ import {useToast} from "../../ui/use-toast";
 import {useTheme} from "../../theme-provider";
 import {Loader2} from "lucide-react";
 
-const initialState = {
-    projectName: '',
-    projectUrl: '',
-    projectDomain: '',
-    sendInvite: '',
-}
-
-const initialStateError = {
-    projectName: '',
-    projectUrl: '',
-    projectDomain: '',
-    sendInvite: '',
-}
 const initialStateProject = {
     name: '',
     website: "",
@@ -43,22 +29,12 @@ const initialStateErrorProject = {
 
 const Step3 = ({setStep}) => {
     const {theme} = useTheme()
-    let navigate = useNavigate();
     const dispatch = useDispatch();
     const {toast} = useToast();
 
-    const [projectDetail, setProjectDetail] = useState();
-    const [projectDetailError, setProjectDetailError] = useState();
     const [createProjectDetails, setCreateProjectDetails] = useState(initialStateProject);
     const [formError, setFormError] = useState(initialStateErrorProject);
     const [isCreateLoading, setIsCreateLoading] = useState(false);
-
-    const onBoardingFlowComplete = async () => {
-        const data = await apiService.onBoardingFlowComplete();
-        if(data.status === 200) {
-            setStep(4);
-        }
-    }
 
     const onChangeText = (event) => {
         const { name, value } = event.target;
@@ -110,7 +86,6 @@ const Step3 = ({setStep}) => {
             setIsCreateLoading(false);
             return;
         }
-        debugger
         const cleanDomain = (name) => name.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
         const sanitizedProjectName = cleanDomain(createProjectDetails.name);
         const domain = `${cleanDomain(createProjectDetails.domain || sanitizedProjectName)}.quickhunt.app`;
@@ -123,7 +98,6 @@ const Step3 = ({setStep}) => {
         const token = localStorage.getItem('token-verify-onboard') || null
 
         const data = await apiService.createProjects(payload, {Authorization: `Bearer ${token}`})
-        console.log("data before", data)
         if (data.success) {
             let obj = {
                 ...data.data,
@@ -133,23 +107,18 @@ const Step3 = ({setStep}) => {
                 selected: false,
                 onBoardComplete: 1
             };
-            console.log("data after", data.data)
             setProjectDetails(obj);
             dispatch(projectDetailsAction(obj))
             toast({description: data.message})
             setCreateProjectDetails(initialStateProject)
             setIsCreateLoading(false);
             setStep(4);
-            // onBoardingFlowComplete();
             localStorage.setItem("token", token);
             localStorage.removeItem('token-verify-onboard')
         } else {
             setIsCreateLoading(false);
             toast({variant: "destructive" ,description: data.error.message})
         }
-
-        setStep(stepCount)
-        // navigate(`${baseUrl}/dashboard`)
     }
 
     return (

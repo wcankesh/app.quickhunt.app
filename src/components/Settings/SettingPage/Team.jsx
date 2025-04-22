@@ -47,14 +47,14 @@ const Team = () => {
 
     useEffect(() => {
         if(projectDetailsReducer.id){
-            getMember()
+            getAllMember()
             getInvitations(true)
         }
     }, [projectDetailsReducer.id]);
 
-    const getMember = async () => {
+    const getAllMember = async () => {
         setIsLoading(true)
-        const data = await apiService.getMember(projectDetailsReducer.id)
+        const data = await apiService.getAllMember(projectDetailsReducer.id)
         if (data.success) {
             setMemberList(data.data);
             setIsAdmin(data.is_admin)

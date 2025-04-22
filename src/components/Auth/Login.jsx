@@ -25,11 +25,19 @@ const Login = () => {
     const [formError, setFormError] = useState(initialState);
     const [isLoading, setIsLoading] = useState(false);
     const dispatch = useDispatch();
+
     const onChange = (event) => {
-        setCompanyDetails({...companyDetails, [event.target.name]: event.target.value});
-        setFormError(formError => ({
-            ...formError,
-            [event.target.name]: ""
+        const { name, value } = event.target;
+        setCompanyDetails(prev => ({
+            ...prev,
+            [name]: value
+        }));
+        setFormError(prevErrors => ({
+            ...prevErrors,
+            [name]: validateField(name, value, {
+                ...companyDetails,
+                [name]: value,
+            }),
         }));
     };
 
@@ -37,7 +45,10 @@ const Login = () => {
         const {name, value} = event.target;
         setFormError({
             ...formError,
-            [name]: validateField(name, value)
+            [name]: validateField(name, value, {
+                ...companyDetails,
+                [name]: value,
+            }),
         });
     };
 
@@ -53,13 +64,7 @@ const Login = () => {
     };
 
     const onLogin = async () => {
-        let validationErrors = {};
-        Object.keys(companyDetails).forEach(name => {
-            const error = validateForm(name, companyDetails[name]);
-            if (error && error.length > 0) {
-                validationErrors[name] = error;
-            }
-        });
+        const validationErrors = validateForm(companyDetails);
         if (Object.keys(validationErrors).length > 0) {
             setFormError(validationErrors);
             return;
@@ -68,7 +73,7 @@ const Login = () => {
         const payload = {
             email: companyDetails.email,
             password: companyDetails.password,
-            // login_type: "1"
+            loginType: "1"
         }
         const data = await apiSerVice.login(payload)
         if (data.data.token) {
@@ -79,23 +84,20 @@ const Login = () => {
                 navigate(`${baseUrl}/setup?token=${token}`);
             } else {
                 urlParams.delete('token')
-                // if(data?.data?.onboarding == 0){
-                //     const datas = await apiService.getLoginUserDetails({Authorization: `Bearer ${data.data.token}`})
-                //     if(datas.success){
-                //         dispatch(userDetailsAction({...datas.data}))
-                //         setIsLoading(false)
-                //     } else {
-                //         setIsLoading(false)
-                //     }
-                //     navigate(`${baseUrl}/on-boarding`);
-                //     localStorage.setItem("token-verify-onboard", data.token);
-                // } else {
-                //     localStorage.setItem("token", data?.data?.token);
-                //     navigate(`${baseUrl}/dashboard`);
-                // }
-
-                localStorage.setItem("token", data?.data?.token);
-                navigate(`${baseUrl}/dashboard`);
+                if(data?.data?.onboarding == 0){
+                    const datas = await apiService.getLoginUserDetails({Authorization: `Bearer ${data.data.token}`})
+                    if(datas.success){
+                        dispatch(userDetailsAction({...datas.data}))
+                        setIsLoading(false)
+                    } else {
+                        setIsLoading(false)
+                    }
+                    navigate(`${baseUrl}/on-boarding`);
+                    localStorage.setItem("token-verify-onboard", data.data.token);
+                } else {
+                    localStorage.setItem("token", data?.data?.token);
+                    navigate(`${baseUrl}/dashboard`);
+                }
             }
             setIsLoading(false)
         } else {

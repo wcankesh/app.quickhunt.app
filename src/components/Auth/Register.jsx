@@ -16,8 +16,8 @@ const initialState = {
     lastName: '',
     email: '',
     password: '',
-    user_confirm_password: '',
-    user_status: '1'
+    confirmPassword: '',
+    userStatus: '1'
 }
 
 const Register = () => {
@@ -31,14 +31,28 @@ const Register = () => {
     const [isLoading, setIsLoading] = useState(false);
 
     const onChange = (event) => {
-        setCompanyDetails({...companyDetails, [event.target.name]: event.target.value});
+        const { name, value } = event.target;
+        setCompanyDetails(prev => ({
+            ...prev,
+            [name]: value
+        }));
+        setFormError(prevErrors => ({
+            ...prevErrors,
+            [name]: validateField(name, value, {
+                ...companyDetails,
+                [name]: value,
+            }),
+        }));
     };
 
     const onBlur = (event) => {
         const {name, value} = event.target;
         setFormError({
             ...formError,
-            [name]: validateField(name, value)
+            [name]: validateField(name, value, {
+                ...companyDetails,
+                [name]: value,
+            }),
         });
     };
 
@@ -54,13 +68,7 @@ const Register = () => {
     };
 
     const onRegister = async () => {
-        let validationErrors = {};
-        Object.keys(companyDetails).forEach(name => {
-            const error = validateForm(name, companyDetails[name]);
-            if (error && error.length > 0) {
-                validationErrors[name] = error;
-            }
-        });
+        const validationErrors = validateForm(companyDetails);
         if (Object.keys(validationErrors).length > 0) {
             setFormError(validationErrors);
             return;
@@ -84,7 +92,7 @@ const Register = () => {
             setIsLoading(false)
         } else {
             setIsLoading(false)
-            toast({variant: "destructive" ,description: data.message,})
+            toast({variant: "destructive" ,description: data.error.message,})
         }
     }
 
@@ -138,13 +146,13 @@ const Register = () => {
                         />
                         <FormInput
                             label="Confirm Password"
-                            name="user_confirm_password"
+                            name="confirmPassword"
                             type="password"
                             placeholder="Confirm Password"
-                            value={companyDetails.user_confirm_password}
+                            value={companyDetails.confirmPassword}
                             onChange={onChange}
                             // onBlur={onBlur}
-                            error={formError.user_confirm_password}
+                            error={formError.confirmPassword}
                             showToggle
                             onKeyDown={(e) => onKeyFire(e, onRegister)}
                         />

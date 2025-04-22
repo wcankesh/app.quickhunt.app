@@ -102,39 +102,53 @@ export const getDateFormat = (date) => {
 
 // formValidation
 export const validateField = (name, value, additionalData = {}) => {
+    // Helper to generate a user-friendly label
+    const getLabel = (fieldName) => {
+        return fieldName
+            .replace(/([A-Z])/g, ' $1')       // insert space before capital letters
+            .replace(/_/g, ' ')               // replace underscores with space
+            .replace(/^./, str => str.toUpperCase()); // capitalize first letter
+    };
+
     switch (name) {
-        case 'user_email_id':
         case 'email':
             if (!value || value.trim() === '') return 'Email is required';
-            if (!/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(value))
+            if (!/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,})+$/.test(value))
                 return 'Enter a valid email address';
             return '';
-        case 'user_password':
+
+        case 'password':
             if (!value || value.trim() === '') return 'Password is required';
-            if (additionalData.requireStrongPassword &&
-                !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(value))
+            if (
+                additionalData.requireStrongPassword &&
+                !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(value)
+            ) {
                 return 'Password must be at least 8 characters with one uppercase letter, one lowercase letter, one number, and one special character';
+            }
             return '';
-        case 'user_confirm_password':
+
+        case 'confirmPassword':
             if (!value || value.trim() === '') return 'Confirm password is required';
-            if (value !== additionalData.user_password) return 'Passwords do not match';
+            if (value !== additionalData.confirmPassword) return 'Passwords do not match';
             return '';
-        case 'user_first_name':
-        case 'user_last_name':
-            return value.trim() === '' ? `${name.split('_')[1].replace(/^\w/, c => c.toUpperCase())} is required` : '';
+
+        case 'firstName':
+        case 'lastName':
         default:
-            return '';
+            const label = getLabel(name);
+            return value.trim() === '' ? `${label} is required` : '';
     }
 };
 
-export const validateForm = (fields, data) => {
+export const validateForm = (fields) => {
     const errors = {};
     Object.keys(fields).forEach((name) => {
-        const error = validateField(name, fields[name], data);
+        const error = validateField(name, fields[name], fields);
         if (error) errors[name] = error;
     });
     return errors;
 };
+
 
 export const onKeyFire = (event, onCallback) => {
     if (event.key === "Enter") {
