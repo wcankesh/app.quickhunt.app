@@ -10,21 +10,28 @@ import {Popover, PopoverContent, PopoverTrigger} from "../ui/popover";
 import moment from "moment";
 import {Calendar} from "../ui/calendar";
 import {useSelector} from "react-redux";
-import {baseUrl} from "../../utils/constent";
+import {apiService, baseUrl} from "../../utils/constent";
 import {addDays} from "date-fns";
-import {ApiService} from "../../utils/ApiService";
 import {useToast} from "../ui/use-toast";
 import {useNavigate} from "react-router-dom";
 import {Checkbox} from "../ui/checkbox";
 
 const initialStateError = {
-    start_at: undefined,
-    end_at: undefined,
+    startAt: undefined,
+    endAt: undefined,
     from: "",
 }
 
-const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, selectedStepIndex, setSelectedStepIndex, selectedStep, setSelectedStep}) => {
-    let apiSerVice = new ApiService();
+const SidebarInAppMessage = ({
+                                 type,
+                                 inAppMsgSetting,
+                                 setInAppMsgSetting,
+                                 id,
+                                 selectedStepIndex,
+                                 setSelectedStepIndex,
+                                 selectedStep,
+                                 setSelectedStep
+                             }) => {
     const {toast} = useToast();
     const navigate = useNavigate();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
@@ -36,7 +43,7 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
 
     const onChange = (name, value) => {
         const update = {...inAppMsgSetting, [name]: value}
-        if(name === "show_sender" && value === 0) {
+        if (name === "showSender" && value === true) {
             update.from = "";
         }
         setInAppMsgSetting(update);
@@ -56,7 +63,7 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
 
     const addOption = () => {
         const clone = [...selectedStep.options];
-        clone.push({id: "", title: "", is_active: 1})
+        clone.push({id: "", title: "", isActive: true})
         const obj = {...selectedStep, options: clone,}
         setSelectedStep(obj);
         updateStepRecord(obj)
@@ -65,7 +72,7 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
     const removeOption = (record, index) => {
         const clone = [...selectedStep.options];
         if (record.id) {
-            clone[index] = {...record, is_active: 0}
+            clone[index] = {...record, isActive: false}
         } else {
             clone.splice(index, 1)
         }
@@ -100,7 +107,7 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
             [type]: newDate,
         };
 
-        if (type === "start_at") {
+        if (type === "startAt") {
             updatedSetting = {
                 ...updatedSetting,
                 status: isFutureDate ? 2 : 1
@@ -118,19 +125,16 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
         const trimmedValue = typeof value === "string" ? value.trim() : String(value || "").trim();
         switch (name) {
             case "from":
-                if (inAppMsgSetting.show_sender === 1 && !value) {
+                if (inAppMsgSetting.showSender&& !value) {
                     return "Sender is required.";
                 }
-                else {
-                    return ""
-                }
                 return "";
-            case "start_at":
+            case "startAt":
                 if (!trimmedValue) {
                     return "Start Date is required.";
                 }
                 return "";
-            // case "start_time":
+            // case "startTime":
             //     if (!trimmedValue) {
             //         return "Start Time is required.";
             //     }
@@ -139,7 +143,7 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
             //         return "Start Time must be in HH:mm format.";
             //     }
             //     return "";
-            // case "end_time":
+            // case "endTime":
             //     if (!trimmedValue) {
             //         return "End Time is required.";
             //     }
@@ -163,7 +167,7 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
             }
         });
 
-        // if (inAppMsgSetting.show_sender === 1 && !inAppMsgSetting.from) {
+        // if (inAppMsgSetting.showSender && !inAppMsgSetting.from) {
         //     validationErrors["from"] = "Please select a member.";
         // }
 
@@ -173,30 +177,29 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
         }
 
         setIsLoading(true)
-        const startAt = inAppMsgSetting?.start_at
-            ? moment(inAppMsgSetting.start_at).format('YYYY-MM-DD HH:mm:ss')
+        const startAt = inAppMsgSetting?.startAt
+            ? moment(inAppMsgSetting.startAt).format('YYYY-MM-DD HH:mm:ss')
             : null;
 
-        const endAt = inAppMsgSetting?.end_at && moment(inAppMsgSetting.end_at).isValid()
-            ? moment(inAppMsgSetting.end_at).format('YYYY-MM-DD HH:mm:ss')
+        const endAt = inAppMsgSetting?.endAt && moment(inAppMsgSetting.endAt).isValid()
+            ? moment(inAppMsgSetting.endAt).format('YYYY-MM-DD HH:mm:ss')
             : null;
         const payload = {
             ...inAppMsgSetting,
-            start_at: startAt,
-            end_at: endAt,
-            project_id: projectDetailsReducer.id,
+            startAt: startAt,
+            endAt: endAt,
+            projectId: projectDetailsReducer.id,
             type: type
         }
-        const data = await apiSerVice.createInAppMessage(payload);
-        if (data.status === 200) {
-            setIsLoading(false);
+        const data = await apiService.createInAppMessage(payload);
+        setIsLoading(false);
+        if (data.success) {
             toast({description: data.message})
             if (id === "new") {
                 navigate(`${baseUrl}/app-message`)
             }
         } else {
-            toast({variant: "destructive", description: data.message})
-            setIsLoading(false);
+            toast({variant: "destructive", description: data.error.message})
         }
     }
 
@@ -210,7 +213,7 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
             }
         });
 
-        // f (inAppMsgSetting.show_sender === 1 && !inAppMsgSetting.from) {
+        // f (inAppMsgSetting.showSender && !inAppMsgSetting.from) {
         //     validationErrors["from"] = "Please select a member.";
         // }i
 
@@ -219,33 +222,32 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
             return;
         }
 
-        if(inAppMsgSetting.type == "3"){
-            if(inAppMsgSetting.steps.filter((x) => x.is_active === 1 && x.question_type !== 8).length <= 0){
+        if (inAppMsgSetting.type == "3") {
+            if (inAppMsgSetting.steps.filter((x) => x.isActive && x.questionType !== 8).length <= 0) {
                 toast({variant: "destructive", description: "Add minimum 1 step"})
                 return
             }
         }
-        const startAt = inAppMsgSetting?.start_at
-            ? moment(inAppMsgSetting.start_at).format('YYYY-MM-DD HH:mm:ss')
+        const startAt = inAppMsgSetting?.startAt
+            ? moment(inAppMsgSetting.startAt).format('YYYY-MM-DD HH:mm:ss')
             : null;
 
-        const endAt = inAppMsgSetting?.end_at && moment(inAppMsgSetting.end_at).isValid()
-            ? moment(inAppMsgSetting.end_at).format('YYYY-MM-DD HH:mm:ss')
+        const endAt = inAppMsgSetting?.endAt && moment(inAppMsgSetting.endAt).isValid()
+            ? moment(inAppMsgSetting.endAt).format('YYYY-MM-DD HH:mm:ss')
             : null;
         setIsLoading(true)
         const payload = {
             ...inAppMsgSetting,
-            start_at: startAt,
-            end_at: endAt,
+            startAt: startAt,
+            endAt: endAt,
             type: type,
         }
-        const data = await apiSerVice.updateInAppMessage(payload, inAppMsgSetting.id)
-        if (data.status === 200) {
-            setIsLoading(false)
+        const data = await apiService.updateInAppMessage(payload, inAppMsgSetting.id)
+        setIsLoading(false)
+        if (data.success) {
             toast({description: data.message})
         } else {
-            toast({variant: "destructive", description: data.message})
-            setIsLoading(false)
+            toast({variant: "destructive", description: data.error.message})
         }
     }
 
@@ -273,7 +275,7 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
     };
 
     const onChangeChecklist = (name, value) => {
-        const obj = {...selectedStep, [name]: value, }
+        const obj = {...selectedStep, [name]: value,}
         setSelectedStep(obj);
         let clone = [...inAppMsgSetting.checklists];
         clone[selectedStepIndex] = obj;
@@ -292,7 +294,7 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
         }
     }
 
-    const publishDate = inAppMsgSetting?.start_at ? new Date(inAppMsgSetting?.start_at) : null;
+    const publishDate = inAppMsgSetting?.startAt ? new Date(inAppMsgSetting?.startAt) : null;
     const isDateDisabled = (date) => {
         return publishDate && date < publishDate;
     };
@@ -302,26 +304,25 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
             <div className={"border-b"}>
                 <h5 className={"text-base font-normal border-b px-4 py-3"}>Content</h5>
                 <div className={"px-4 py-3 space-y-4"}>
-                    
+
                     <div className="grid w-full items-center gap-1.5">
                         <Label htmlFor="title" className={"font-normal"}>Title</Label>
                         <Input className={"h-9"} id="title" placeholder="Title" value={inAppMsgSetting.title}
                                onChange={(e) => onChange("title", e.target.value)}/>
                     </div>
-                    
+
                     <div className="grid w-full items-center gap-1.5">
                         <div className="flex items-center gap-2">
-                            <Checkbox id="show_sender"
-                                      checked={inAppMsgSetting.show_sender === 1}
-                                      onCheckedChange={(checked) => onChange("show_sender", checked ? 1 : 0)}
+                            <Checkbox id="showSender"
+                                      checked={inAppMsgSetting.showSender}
+                                      onCheckedChange={(checked) => onChange("showSender", checked)}
                             />
-                            <Label htmlFor="show_sender" className={"font-normal cursor-pointer"}>Show sender</Label>
+                            <Label htmlFor="showSender" className={"font-normal cursor-pointer"}>Show sender</Label>
                         </div>
                     </div>
 
                     {
-                        inAppMsgSetting.show_sender === 1 &&
-                        // <div className="grid w-full max-w-sm items-center gap-1.5">
+                        inAppMsgSetting.showSender &&
                         <div className="grid w-full items-center gap-1.5">
                             <Label className={"font-normal"}>From</Label>
                             <Select
@@ -334,13 +335,13 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                                         <SelectValue>
                                             {
                                                 allStatusAndTypes.members.find(
-                                                    (x) => Number(x.user_id) === Number(inAppMsgSetting.from)
-                                                )?.user_first_name
+                                                    (x) => Number(x.userId) === Number(inAppMsgSetting.from)
+                                                )?.firstName
                                             }{" "}
                                             {
                                                 allStatusAndTypes.members.find(
-                                                    (x) => Number(x.user_id) === Number(inAppMsgSetting.from)
-                                                )?.user_last_name
+                                                    (x) => Number(x.userId) === Number(inAppMsgSetting.from)
+                                                )?.lastName
                                             }
                                         </SelectValue>
                                     ) : (
@@ -350,15 +351,15 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                                 <SelectContent>
                                     <SelectGroup>
                                         {allStatusAndTypes.members.map((x) => (
-                                            <SelectItem key={Number(x.user_id)} value={Number(x.user_id)}>
-                                                {x.user_first_name} {x.user_last_name}
+                                            <SelectItem key={Number(x.userId)} value={Number(x.userId)}>
+                                                {x.firstName} {x.lastName}
                                             </SelectItem>
                                         ))}
                                     </SelectGroup>
                                 </SelectContent>
                             </Select>
 
-                            {(inAppMsgSetting.show_sender === 1 && formError?.from) && (
+                            {(inAppMsgSetting.showSender && formError?.from) && (
                                 <p className="text-red-500 text-sm mt-1">{formError.from}</p>
                             )}
                         </div>
@@ -366,12 +367,11 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                     {
                         type === "1" &&
                         <Fragment>
-                            
                             <div className="grid w-full items-center gap-1.5">
                                 <Label className={"font-normal"}>Reply type</Label>
                                 <Select
-                                    onValueChange={(value) => onChange("reply_type", value)}
-                                    value={inAppMsgSetting.reply_type}
+                                    onValueChange={(value) => onChange("replyType", value)}
+                                    value={inAppMsgSetting.replyType}
                                 >
                                     <SelectTrigger>
                                         <SelectValue placeholder={"Select reply type"}/>
@@ -387,11 +387,10 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                     }
                     {
                         type === "2" &&
-                        // <div className="grid w-full max-w-sm items-center gap-1.5">
                         <div className="grid w-full items-center gap-1.5">
                             <Label className={"font-normal"}>Action</Label>
-                            <Select value={inAppMsgSetting?.action_type}
-                                    onValueChange={(value) => onChange("action_type",value)}>
+                            <Select value={Number(inAppMsgSetting?.actionType)}
+                                    onValueChange={(value) => onChange("actionType", value)}>
                                 <SelectTrigger className="w-full h-9">
                                     <SelectValue placeholder=""/>
                                 </SelectTrigger>
@@ -406,87 +405,90 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                     }
                     {
                         type === "4" &&
-                            <Fragment>
-                                
-                                <div className="grid w-full items-center gap-1.5">
-                                    <Label className={"font-normal"}>Action</Label>
-                                    <Select value={selectedStep?.action_type}
-                                            onValueChange={(value) => onChangeChecklist("action_type",value)}>
-                                        <SelectTrigger className="w-full h-9">
-                                            <SelectValue placeholder=""/>
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value={0}>None</SelectItem>
-                                            <SelectItem value={1}>Open URL</SelectItem>
-                                        </SelectContent>
-                                    </Select>
+                        <Fragment>
+                            <div className="grid w-full items-center gap-1.5">
+                                <Label className={"font-normal"}>Action</Label>
+                                <Select value={Number(selectedStep?.actionType)}
+                                        onValueChange={(value) => onChangeChecklist("actionType", value)}>
+                                    <SelectTrigger className="w-full h-9">
+                                        <SelectValue placeholder=""/>
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value={0}>None</SelectItem>
+                                        <SelectItem value={1}>Open URL</SelectItem>
+                                    </SelectContent>
+                                </Select>
 
-                                </div>
-                                {
-                                    selectedStep?.action_type === 1 &&
-                                    <Fragment>
-                                        
-                                        <div className="grid w-full items-center gap-1.5">
-                                            <Label htmlFor="action_text" className={"font-normal"}>Action Text</Label>
-                                            <Input className={"h-9"} id="action_text" placeholder="Enter action text" value={selectedStep?.action_text}
-                                                   onChange={(e) => onChangeChecklist("action_text", e.target.value)}/>
+                            </div>
+                            {
+                                selectedStep?.actionType === 1 &&
+                                <Fragment>
+                                    <div className="grid w-full items-center gap-1.5">
+                                        <Label htmlFor="actionText" className={"font-normal"}>Action Text</Label>
+                                        <Input className={"h-9"} id="actionText" placeholder="Enter action text"
+                                               value={selectedStep?.actionText}
+                                               onChange={(e) => onChangeChecklist("actionText", e.target.value)}/>
+                                    </div>
+
+                                    <div className="grid w-full items-center gap-1.5">
+                                        <Label htmlFor="actionUrl" className={"font-normal"}>Action URL</Label>
+                                        <Input className={"h-9"} id="actionUrl" placeholder="Enter URL address"
+                                               value={selectedStep?.actionUrl}
+                                               onChange={(e) => onChangeChecklist("actionUrl", e.target.value)}/>
+                                    </div>
+
+                                    <div className="grid w-full items-center gap-1.5">
+                                        <div className="flex items-center gap-2">
+                                            <Checkbox id="isRedirect"
+                                                      checked={selectedStep.isRedirect === 1}
+                                                      onCheckedChange={(checked) => onChangeChecklist("isRedirect", checked ? 1 : 0)}
+                                            />
+                                            <Label htmlFor="isRedirect" className={"font-normal cursor-pointer"}>Open
+                                                URL in a new tab</Label>
                                         </div>
-                                        
-                                        <div className="grid w-full items-center gap-1.5">
-                                            <Label htmlFor="action_url" className={"font-normal"}>Action URL</Label>
-                                            <Input className={"h-9"} id="action_url" placeholder="Enter URL address" value={selectedStep?.action_url}
-                                                   onChange={(e) => onChangeChecklist("action_url", e.target.value)}/>
-                                        </div>
-                                        
-                                        <div className="grid w-full items-center gap-1.5">
-                                            <div className="flex items-center gap-2">
-                                                <Checkbox id="is_redirect"
-                                                          checked={selectedStep.is_redirect === 1}
-                                                          onCheckedChange={(checked) => onChangeChecklist("is_redirect", checked ? 1 : 0)}
-                                                />
-                                                <Label htmlFor="is_redirect" className={"font-normal cursor-pointer"}>Open URL in a new tab</Label>
-                                            </div>
-                                        </div>
-                                    </Fragment>
-                                }
-                            </Fragment>
+                                    </div>
+                                </Fragment>
+                            }
+                        </Fragment>
                     }
                     {
-                        (type === "2" && inAppMsgSetting.action_type == 1) && <Fragment>
-                            
+                        (type === "2" && inAppMsgSetting.actionType == 1) && <Fragment>
                             <div className="grid w-full items-center gap-1.5">
-                                <Label htmlFor="action_text" className={"font-normal"}>Action Text</Label>
-                                <Input className={"h-9"} id="action_text" placeholder="Enter action text" value={inAppMsgSetting.action_text}
-                                       onChange={(e) => onChange("action_text", e.target.value)}/>
+                                <Label htmlFor="actionText" className={"font-normal"}>Action Text</Label>
+                                <Input className={"h-9"} id="actionText" placeholder="Enter action text"
+                                       value={inAppMsgSetting.actionText}
+                                       onChange={(e) => onChange("actionText", e.target.value)}/>
                             </div>
-                            
+
                             <div className="grid w-full items-center gap-1.5">
-                                <Label htmlFor="action_url" className={"font-normal"}>Action URL</Label>
-                                <Input className={"h-9"} id="action_url" placeholder="Enter URL address" value={inAppMsgSetting.action_url}
-                                       onChange={(e) => onChange("action_url", e.target.value)}/>
+                                <Label htmlFor="actionUrl" className={"font-normal"}>Action URL</Label>
+                                <Input className={"h-9"} id="actionUrl" placeholder="Enter URL address"
+                                       value={inAppMsgSetting.actionUrl}
+                                       onChange={(e) => onChange("actionUrl", e.target.value)}/>
                             </div>
-                            
+
                             <div className="grid w-full items-center gap-1.5">
                                 <div className="flex items-center gap-2">
-                                    <Checkbox id="is_redirect"
-                                              checked={inAppMsgSetting.is_redirect === 1}
-                                              onCheckedChange={(checked) => onChange("is_redirect", checked ? 1 : 0)}
+                                    <Checkbox id="isRedirect"
+                                              checked={inAppMsgSetting.isRedirect === 1}
+                                              onCheckedChange={(checked) => onChange("isRedirect", checked ? 1 : 0)}
                                     />
-                                    <Label htmlFor="is_redirect" className={"font-normal cursor-pointer"}>Open URL in a new tab</Label>
+                                    <Label htmlFor="isRedirect" className={"font-normal cursor-pointer"}>Open URL in a
+                                        new tab</Label>
                                 </div>
                             </div>
                         </Fragment>
                     }
                     {
-                        type === "2" && inAppMsgSetting.action_type != 0 &&
-                        // <div className="grid w-full max-w-sm items-center gap-1.5">
+                        type === "2" && inAppMsgSetting.actionType != 0 &&
                         <div className="grid w-full items-center gap-1.5">
                             <div className="flex items-center gap-2">
-                                <Checkbox id="is_banner_close_button"
-                                          checked={inAppMsgSetting.is_banner_close_button === 1}
-                                          onCheckedChange={(checked) => onChange("is_banner_close_button", checked ? 1 : 0)}
+                                <Checkbox id="isBannerCloseButton"
+                                          checked={inAppMsgSetting.isBannerCloseButton === 1}
+                                          onCheckedChange={(checked) => onChange("isBannerCloseButton", checked ? 1 : 0)}
                                 />
-                                <Label htmlFor="is_banner_close_button" className={"font-normal cursor-pointer"}>Dismiss the banner on click</Label>
+                                <Label htmlFor="isBannerCloseButton" className={"font-normal cursor-pointer"}>Dismiss
+                                    the banner on click</Label>
                             </div>
                         </div>
                     }
@@ -494,19 +496,18 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
             </div>
 
             {
-                (selectedStep?.question_type !== 3 && selectedStep?.question_type !== 4 && selectedStep?.question_type !== 8) &&  <Fragment>
+                (selectedStep?.questionType !== 3 && selectedStep?.questionType !== 4 && selectedStep?.questionType !== 8) &&
+                <Fragment>
                     {
                         type === "3" &&
                         <div className={"border-b px-4 py-6 space-y-4"}>
                             <h5 className={"text-base font-normal"}>Question Setting</h5>
                             {
-                                selectedStep?.question_type === 5 &&
-                                // <div className="grid w-full max-w-sm items-center gap-1.5">
+                                selectedStep?.questionType === 5 &&
                                 <div className="grid w-full items-center gap-1.5">
                                     <Label className={"font-normal text-sm"}>Answer Options</Label>
                                     <div>
                                         <div className={"space-y-[6px]"}>
-
                                             {(selectedStep?.options || []).map((option, index) => (
                                                 <div key={index} className="relative mt-2">
                                                     <Input
@@ -534,77 +535,68 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
 
                                 </div>
                             }
-                            {(selectedStep?.question_type === 5 || selectedStep?.question_type === 6 || selectedStep?.question_type === 7) && (
-                                // <div className="grid w-full max-w-sm items-center gap-1.5 mt-2">
+                            {(selectedStep?.questionType === 5 || selectedStep?.questionType === 6 || selectedStep?.questionType === 7) && (
                                 <div className="grid w-full items-center gap-1.5 mt-2">
-                                    <Label className="font-normal text-sm" htmlFor="placeholder_text">Placeholder text</Label>
+                                    <Label className="font-normal text-sm" htmlFor="placeholderText">Placeholder
+                                        text</Label>
                                     <Input
-                                        value={inAppMsgSetting?.steps[selectedStepIndex]?.placeholder_text || ''}
-                                        onChange={(e) => onChangeQuestion("placeholder_text", e.target.value, selectedStep?.question_type)}
+                                        value={inAppMsgSetting?.steps[selectedStepIndex]?.placeholderText || ''}
+                                        onChange={(e) => onChangeQuestion("placeholderText", e.target.value, selectedStep?.questionType)}
                                         type="text"
                                         className="h-9"
-                                        id="placeholder_text"
+                                        id="placeholderText"
                                         placeholder="Select One..."
                                     />
                                 </div>
                             )}
                             {
-                                (selectedStep?.question_type === 1 || selectedStep?.question_type === 2) &&
+                                (selectedStep?.questionType === 1 || selectedStep?.questionType === 2) &&
                                 <div className={"space-y-3"}>
                                     {
-                                        selectedStep?.question_type === 2 &&
+                                        selectedStep?.questionType === 2 &&
                                         <div className={"flex gap-4"}>
-                                            
                                             <div className="grid w-full items-center gap-1.5">
-                                                <Label className={"font-normal text-sm"} htmlFor="start_number">Start Number</Label>
-                                                <Input value={inAppMsgSetting?.steps?.[selectedStepIndex]?.start_number || ''} name={"start_number"}
-                                                       type="number" id="start_number" min={0}
-                                                       onChange={(e) => onChangeQuestion("start_number", e.target.value)}
-                                                       placeholder="1" className={"h-8"}/>
+                                                <Label className={"font-normal text-sm"} htmlFor="startNumber">Start
+                                                    Number</Label>
+                                                <Input
+                                                    value={inAppMsgSetting?.steps?.[selectedStepIndex]?.startNumber || ''}
+                                                    name={"startNumber"}
+                                                    type="number" id="startNumber" min={0}
+                                                    onChange={(e) => onChangeQuestion("startNumber", e.target.value)}
+                                                    placeholder="1" className={"h-8"}/>
                                             </div>
-                                            
+
                                             <div className="grid w-full items-center gap-1.5">
-                                                <Label className={"font-normal text-sm"} htmlFor="end_number">End Number</Label>
-                                                <Input value={inAppMsgSetting?.steps?.[selectedStepIndex]?.end_number || ''} name={"end_number"}
-                                                       onChange={(e) => onChangeQuestion("end_number", e.target.value)}
-                                                       type="number" id="end_number" min={0}
-                                                       placeholder="10" className={"h-8"}/>
+                                                <Label className={"font-normal text-sm"} htmlFor="endNumber">End
+                                                    Number</Label>
+                                                <Input
+                                                    value={inAppMsgSetting?.steps?.[selectedStepIndex]?.endNumber || ''}
+                                                    name={"endNumber"}
+                                                    onChange={(e) => onChangeQuestion("endNumber", e.target.value)}
+                                                    type="number" id="endNumber" min={0}
+                                                    placeholder="10" className={"h-8"}/>
                                             </div>
                                         </div>
                                     }
 
-                                    
                                     <div className="grid w-full items-center gap-1.5">
-                                        <Label className={"font-normal text-sm"} htmlFor="start_label">Start label</Label>
-                                        <Input value={inAppMsgSetting?.steps?.[selectedStepIndex]?.start_label || ''}
-                                               onChange={(e) => onChangeQuestion("start_label", e.target.value)} type="text"
-                                               id="start_label" placeholder="Very Bad" className={"h-8"}/>
-                                    </div>
-                                    
-                                    <div className="grid w-full items-center gap-1.5">
-                                        <Label className={"font-normal text-sm"} htmlFor="end_label">End label</Label>
-                                        <Input value={inAppMsgSetting?.steps?.[selectedStepIndex]?.end_label || ''}
-                                               onChange={(e) => onChangeQuestion("end_label", e.target.value)} type="text"
-                                               id="end_label" placeholder="Very Good" className={"h-8"}/>
+                                        <Label className={"font-normal text-sm"} htmlFor="startLabel">Start
+                                            label</Label>
+                                        <Input value={inAppMsgSetting?.steps?.[selectedStepIndex]?.startLabel || ''}
+                                               onChange={(e) => onChangeQuestion("startLabel", e.target.value)}
+                                               type="text"
+                                               id="startLabel" placeholder="Very Bad" className={"h-8"}/>
                                     </div>
 
+                                    <div className="grid w-full items-center gap-1.5">
+                                        <Label className={"font-normal text-sm"} htmlFor="endLabel">End label</Label>
+                                        <Input value={inAppMsgSetting?.steps?.[selectedStepIndex]?.endLabel || ''}
+                                               onChange={(e) => onChangeQuestion("endLabel", e.target.value)}
+                                               type="text"
+                                               id="endLabel" placeholder="Very Good" className={"h-8"}/>
+                                    </div>
                                 </div>
                             }
-                            
-                            {/*    <div className={"flex gap-2 items-center"}>*/}
-                            {/*        <Checkbox*/}
-                            {/*            id={"is_answer_required"}*/}
-                            {/*            checked={selectedStep?.is_answer_required === 1}*/}
-                            {/*            onCheckedChange={(checked) => onChange("is_answer_required", checked ? 1 : 0)}*/}
-                            {/*        />*/}
-                            {/*        <Checkbox id="is_answer_required"*/}
-                            {/*                  checked={inAppMsgSetting.is_answer_required === 1}*/}
-                            {/*                  onCheckedChange={(checked) => onChange("is_answer_required", checked ? 1 : 0)}*/}
-                            {/*        />*/}
-                            {/*        <label htmlFor="is_answer_required" className="text-sm">Make answer required</label>*/}
-                            {/*    </div>*/}
-                            {/*</div>*/}
-
                         </div>
                     }
                 </Fragment>
@@ -613,12 +605,11 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                 <h5 className={"text-base font-normal"}>Style</h5>
                 {
                     type === "2" && <Fragment>
-                        
                         <div className="grid w-full items-center gap-1.5">
                             <Label className={"font-normal"}>Banner position</Label>
                             <Select
                                 value={inAppMsgSetting.position}
-                                onValueChange={(value) => onChange("position",value, )}
+                                onValueChange={(value) => onChange("position", value,)}
                             >
                                 <SelectTrigger className="w-full h-9">
                                     <SelectValue placeholder={"Select position"}/>
@@ -629,12 +620,12 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                                 </SelectContent>
                             </Select>
                         </div>
-                        
+
                         <div className="grid w-full items-center gap-1.5">
                             <Label className={"font-normal"}>Alignment</Label>
                             <Select
                                 value={inAppMsgSetting.alignment}
-                                onValueChange={(value) => onChange("alignment",value, )}
+                                onValueChange={(value) => onChange("alignment", value,)}
                             >
                                 <SelectTrigger className="w-full h-9">
                                     <SelectValue placeholder={"Select alignment"}/>
@@ -649,71 +640,65 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                     </Fragment>
                 }
 
-                {(inAppMsgSetting.reply_type === 1 || inAppMsgSetting.reply_type === 2) && (
-                    // <div className="grid w-full max-w-sm items-center gap-1.5">
+                {(inAppMsgSetting.replyType === 1 || inAppMsgSetting.replyType === 2) && (
                     <div className="grid w-full items-center gap-1.5">
                         <Label className={"font-normal"}>Background Color</Label>
                         <div className={"w-full text-sm"}>
                             <ColorInput
-                                style={{ width: '100%', height: "36px" }}
-                                value={inAppMsgSetting.bg_color}
-                                onChange={(value) => onChange("bg_color", value.clr)}
+                                style={{width: '100%', height: "36px"}}
+                                value={inAppMsgSetting.bgColor}
+                                onChange={(value) => onChange("bgColor", value.clr)}
                             />
                         </div>
                     </div>
                 )}
 
                 {
-                    (type === "4" || type === "3" || type === "2")  &&
+                    (type === "4" || type === "3" || type === "2") &&
                     <div className="grid w-full items-center gap-1.5">
-                    
                         <Label className={"font-normal"}>Text Color</Label>
                         <div className={"w-full text-sm widget-color-picker space-y-2"}>
                             <ColorInput
-                                value={inAppMsgSetting.text_color}
-                                onChange={(value) => onChange("text_color", value.clr)}
+                                value={inAppMsgSetting.textColor}
+                                onChange={(value) => onChange("textColor", value.clr)}
                             />
                         </div>
                     </div>
                 }
 
                 {
-                    ((type === "1" && inAppMsgSetting?.reply_type == 1) || (type === "4" && inAppMsgSetting?.checklists[selectedStepIndex]?.action_type == 1)) &&
-                    // <div className="grid w-full max-w-sm items-center gap-1.5">
+                    ((type === "1" && inAppMsgSetting?.replyType == 1) || (type === "4" && inAppMsgSetting?.checklists[selectedStepIndex]?.actionType == 1)) &&
                     <div className="grid w-full items-center gap-1.5">
                         <Label className={"font-normal"}>{type === "4" ? "Button Text Color" : "Text Color"}</Label>
                         <div className={"w-full text-sm widget-color-picker space-y-2"}>
                             <ColorInput
-                                value={type === "4" ? inAppMsgSetting.btn_text_color : inAppMsgSetting.text_color}
-                                onChange={(value) => onChange(type === "4" ? "btn_text_color" : "text_color", value.clr)}
+                                value={type === "4" ? inAppMsgSetting.btnTextColor : inAppMsgSetting.textColor}
+                                onChange={(value) => onChange(type === "4" ? "btnTextColor" : "textColor", value.clr)}
                             />
                         </div>
                     </div>
                 }
 
-                {(type === "1" &&  inAppMsgSetting.reply_type === 1) &&
-                // <div className="grid w-full max-w-sm items-center gap-1.5">
+                {(type === "1" && inAppMsgSetting.replyType === 1) &&
                 <div className="grid w-full items-center gap-1.5">
                     <Label className={"font-normal "}>Icon Color </Label>
                     <div className={"w-full text-sm widget-color-picker space-y-2"}>
                         <ColorInput
-                            value={inAppMsgSetting.icon_color}
-                            onChange={(value) => onChange("icon_color", value.clr)}
+                            value={inAppMsgSetting.iconColor}
+                            onChange={(value) => onChange("iconColor", value.clr)}
                         />
                     </div>
                 </div>}
 
                 {
-                    ((type === "1") ||
-                        (type === "4" && inAppMsgSetting?.checklists[selectedStepIndex]?.action_type == 1)) &&
-                    // <div className="grid w-full max-w-sm items-center gap-1.5">
+                    ((type === "1") || (type === "4" && inAppMsgSetting?.checklists[selectedStepIndex]?.actionType == 1)) &&
                     <div className="grid w-full items-center gap-1.5">
                         <Label
                             className={"font-normal"}>{type === "4" ? "Button Background Color" : "Close Button Color"} </Label>
                         <div className={"w-full text-sm widget-color-picker space-y-2"}>
                             <ColorInput
-                                value={inAppMsgSetting.btn_color}
-                                onChange={(value) => onChange("btn_color", value.clr)}
+                                value={inAppMsgSetting.btnColor}
+                                onChange={(value) => onChange("btnColor", value.clr)}
                             />
                         </div>
                     </div>
@@ -721,29 +706,22 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
 
                 {
                     (type === "2" || type === "3") &&
-                    // <div className="grid w-full max-w-sm items-center gap-1.5">
                     <div className="grid w-full items-center gap-1.5">
                         <div className="flex items-center gap-2">
-                            <Checkbox id="is_close_button" checked={inAppMsgSetting.is_close_button === 1} onCheckedChange={(checked) => onChange("is_close_button", checked ? 1 : 0)}/>
-                            <Label htmlFor="is_close_button" className={"font-normal cursor-pointer"}>Show dismiss button</Label>
+                            <Checkbox id="isCloseButton" checked={inAppMsgSetting.isCloseButton}
+                                      onCheckedChange={(checked) => onChange("isCloseButton", checked)}/>
+                            <Label htmlFor="isCloseButton" className={"font-normal cursor-pointer"}>Show dismiss
+                                button</Label>
                         </div>
                     </div>
                 }
-                {/*<div className="flex items-center gap-2">*/}
-                {/*    <Checkbox id="is_open"*/}
-                {/*              checked={inAppMsgSetting.is_open === 1}*/}
-                {/*              onCheckedChange={(checked) => onChange("is_open", checked ? 1 : 0)}*/}
-                {/*    />*/}
-                {/*    <Label htmlFor="show_sender" className={"font-normal cursor-pointer"}>Show Popover</Label>*/}
-                {/*</div>*/}
             </div>
 
             <div className={"border-b px-4 py-6 space-y-4"}>
                 <h5 className={"text-base font-normal"}>Trigger Setting</h5>
-                
                 <div className="grid w-full items-center gap-1.5">
                     <Label className={"font-normal"}>Add delay</Label>
-                    <Select value={inAppMsgSetting.delay} onValueChange={(value) => onChange("delay",value, )}>
+                    <Select value={inAppMsgSetting.delay} onValueChange={(value) => onChange("delay", value,)}>
                         <SelectTrigger className="w-full h-9">
                             <SelectValue defaultValue={1}/>
                         </SelectTrigger>
@@ -756,20 +734,20 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                         </SelectContent>
                     </Select>
                 </div>
-                
+
                 <div className="grid w-full items-center gap-1.5">
                     <Label className={"font-normal"}>Start sending</Label>
                     <div className={"flex gap-4"}>
                         <Popover>
                             <PopoverTrigger asChild>
                                 <Button
-                                    id="start_at"
+                                    id="startAt"
                                     variant={"outline"}
                                     className={`w-1/2 h-9 hover:bg-card bg-card justify-start text-left font-normal ${!date && "text-muted-foreground"}`}
                                 >
                                     <CalendarIcon className="mr-2 h-4 w-4"/>
                                     <Fragment>
-                                        {(id === 'new' && inAppMsgSetting?.start_at === '') ? 'Select date' : `${inAppMsgSetting?.start_at ? moment(inAppMsgSetting?.start_at).format('D MMM, YYYY') : "Select a date"}`}
+                                        {(id === 'new' && inAppMsgSetting?.startAt === '') ? 'Select date' : `${inAppMsgSetting?.startAt ? moment(inAppMsgSetting?.startAt).format('D MMM, YYYY') : "Select a date"}`}
                                     </Fragment>
                                 </Button>
                             </PopoverTrigger>
@@ -777,16 +755,15 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                                 <Calendar
                                     mode="single"
                                     captionLayout="dropdown"
-                                    selected={inAppMsgSetting?.start_at ? new Date(inAppMsgSetting?.start_at) : new Date()}
-                                    onSelect={(date) => handleDateChange(date, "start_at")}
+                                    selected={inAppMsgSetting?.startAt ? new Date(inAppMsgSetting?.startAt) : new Date()}
+                                    onSelect={(date) => handleDateChange(date, "startAt")}
                                     startMonth={new Date(2024, 0)}
                                     endMonth={new Date(2050, 12)}
                                     defaultMonth={
-                                        inAppMsgSetting?.start_at
-                                            ? new Date(inAppMsgSetting?.start_at)
+                                        inAppMsgSetting?.startAt
+                                            ? new Date(inAppMsgSetting?.startAt)
                                             : publishDate || new Date()
                                     }
-
                                 />
                             </PopoverContent>
                         </Popover>
@@ -794,13 +771,13 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                             <Input
                                 className={"h-9"}
                                 type={"time"}
-                                value={moment(inAppMsgSetting.start_at).format("HH:mm")}
-                                onChange={(e) => handleTimeChange(e.target.value, 'start_at')}
+                                value={moment(inAppMsgSetting.startAt).format("HH:mm")}
+                                onChange={(e) => handleTimeChange(e.target.value, 'startAt')}
                             />
                         </div>
                     </div>
                 </div>
-                
+
                 <div className="grid w-full items-center gap-1.5">
                     <Label className={"font-normal"} htmlFor="email">Stop sending</Label>
                     <div className={"flex flex-col gap-1"}>
@@ -809,13 +786,13 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                                 <Popover>
                                     <PopoverTrigger asChild>
                                         <Button
-                                            id="end_at"
+                                            id="endAt"
                                             variant={"outline"}
                                             className={`h-9 justify-start hover:bg-card bg-card text-left font-normal ${!date && "text-muted-foreground"}`}
                                         >
                                             <CalendarIcon className="mr-2 h-4 w-4"/>
                                             <Fragment>
-                                                {(id === 'new' && inAppMsgSetting?.end_at === '') ? 'Select date' : `${inAppMsgSetting?.end_at ? moment(inAppMsgSetting?.end_at).format('D MMM, YYYY') : "Select a date"}`}
+                                                {(id === 'new' && inAppMsgSetting?.endAt === '') ? 'Select date' : `${inAppMsgSetting?.endAt ? moment(inAppMsgSetting?.endAt).format('D MMM, YYYY') : "Select a date"}`}
                                             </Fragment>
                                         </Button>
                                     </PopoverTrigger>
@@ -823,18 +800,14 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                                         <Calendar
                                             mode="single"
                                             captionLayout="dropdown"
-                                            // selected={inAppMsgSetting?.end_at ? new Date(inAppMsgSetting?.end_at) : new Date()}
-                                            selected={inAppMsgSetting?.end_at ? new Date(inAppMsgSetting?.end_at) : null}
-                                            onSelect={(date) => handleDateChange(date, "end_at")}
-                                            // startMonth={new Date(2024, 0)}
-                                            // endMonth={new Date(2050, 12)}
-
+                                            selected={inAppMsgSetting?.endAt ? new Date(inAppMsgSetting?.endAt) : null}
+                                            onSelect={(date) => handleDateChange(date, "endAt")}
                                             endMonth={new Date(2050, 12)}
                                             startMonth={publishDate || new Date()}
                                             disabled={isDateDisabled}
                                             defaultMonth={
-                                                inAppMsgSetting?.end_at
-                                                    ? new Date(inAppMsgSetting?.end_at)
+                                                inAppMsgSetting?.endAt
+                                                    ? new Date(inAppMsgSetting?.endAt)
                                                     : publishDate || new Date()
                                             }
                                         />
@@ -846,8 +819,8 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                                     <Input
                                         className={"h-9"}
                                         type={"time"}
-                                        value={moment(inAppMsgSetting.end_at).format("HH:mm")}
-                                        onChange={(e) => handleTimeChange(e.target.value, 'end_at')}
+                                        value={moment(inAppMsgSetting.endAt).format("HH:mm")}
+                                        onChange={(e) => handleTimeChange(e.target.value, 'endAt')}
                                     />
                                 </div>
                             </div>
@@ -856,10 +829,12 @@ const SidebarInAppMessage = ({type, inAppMsgSetting, setInAppMsgSetting, id, sel
                 </div>
             </div>
             <div className={"px-4 py-6 flex justify-between gap-2"}>
-                <Button className={`w-[111px] font-medium hover:bg-primary`} onClick={id === "new" ? createMessage : onUpdateMessage}>
+                <Button className={`w-[111px] font-medium hover:bg-primary`}
+                        onClick={id === "new" ? createMessage : onUpdateMessage}>
                     {isLoading ? <Loader2 className={"h-4 w-4 animate-spin"}/> : "Save Changes"}
                 </Button>
-                <Button variant={"ghost hover-none"} className={"font-medium border border-primary text-primary"} onClick={handleCancel}>Cancel</Button>
+                <Button variant={"ghost hover-none"} className={"font-medium border border-primary text-primary"}
+                        onClick={handleCancel}>Cancel</Button>
             </div>
         </Fragment>
     );

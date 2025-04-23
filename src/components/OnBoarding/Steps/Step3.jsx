@@ -1,7 +1,7 @@
 import React, {Fragment, useState} from 'react';
 import { Label } from "../../ui/label";
 import { Button } from "../../ui/button";
-import {apiService, baseUrl, setProjectDetails} from "../../../utils/constent";
+import {apiService, setProjectDetails} from "../../../utils/constent";
 import {Input} from "../../ui/input";
 import {projectDetailsAction} from "../../../redux/action/ProjectDetailsAction";
 import {useDispatch} from "react-redux";
@@ -125,7 +125,6 @@ const Step3 = ({setStep}) => {
         <Fragment>
             <div className={"flex flex-col justify-center gap-6"}>
                 <div>
-                    {/*<h2 className={"font-semibold text-2xl text-primary"}>Let’s Create Your first Project</h2>*/}
                     <h2 className={"font-semibold text-2xl text-primary"}>Let’s Get Started!</h2>
                     <p className={"text-sm"}>Get started by creating your first project and streamline feedback management effortlessly.</p>
                 </div>

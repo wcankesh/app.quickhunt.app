@@ -11,7 +11,7 @@ import {UserAvatar} from "../../Comman/CommentEditor";
 import {AnalyticsLayout, AnalyticsLineChart} from "./CommonAnalyticsView/CommonUse";
 import {AnalyticsSummary} from "./CommonAnalyticsView/CommonUse";
 
-const CommonBannerTable = ({ columns, data, isLoading, skeletonRows = 10, skeletonColumns = 4 }) => {
+const CommonBannerTable = ({columns, data, isLoading, skeletonRows = 10, skeletonColumns = 4}) => {
     return (
         <Table>
             <TableHeader>
@@ -28,11 +28,11 @@ const CommonBannerTable = ({ columns, data, isLoading, skeletonRows = 10, skelet
             </TableHeader>
             <TableBody>
                 {isLoading
-                    ? Array.from({ length: skeletonRows }).map((_, rowIndex) => (
+                    ? Array.from({length: skeletonRows}).map((_, rowIndex) => (
                         <TableRow key={rowIndex}>
-                            {Array.from({ length: skeletonColumns }).map((_, colIndex) => (
+                            {Array.from({length: skeletonColumns}).map((_, colIndex) => (
                                 <TableCell key={colIndex} className="px-2 py-[10px] md:px-3">
-                                    <Skeleton className="rounded-md w-full h-7" />
+                                    <Skeleton className="rounded-md w-full h-7"/>
                                 </TableCell>
                             ))}
                         </TableRow>
@@ -55,7 +55,7 @@ const CommonBannerTable = ({ columns, data, isLoading, skeletonRows = 10, skelet
                         : (
                             <TableRow>
                                 <TableCell colSpan={columns.length}>
-                                    <EmptyData />
+                                    <EmptyData/>
                                 </TableCell>
                             </TableRow>
                         )}
@@ -74,26 +74,39 @@ const BannerAnalyticsView = () => {
     const [isLoading, setIsLoading] = useState(false);
 
     const openedColumns = [
-        { label: "Name", dataKey: "name", render: (row) => (
+        {
+            label: "Name", dataKey: "name", render: (row) => (
                 <div className="flex items-center gap-2">
-                    <UserAvatar className="w-[20px] h-[20px]" userName={row?.name ? row?.name?.substring(0, 1) : row?.email?.substring(0, 1)} />
+                    <UserAvatar className="w-[20px] h-[20px]"
+                                userName={row?.name ? row?.name?.substring(0, 1) : row?.email?.substring(0, 1)}/>
                     <p className="font-normal">{row.name || row.email}</p>
                 </div>
-            ) },
-        { label: "When it was opened", dataKey: "created_at", render: (row) => moment(row.created_at).format("ll") },
+            )
+        },
+        {label: "When it was opened", dataKey: "createdAt", render: (row) => moment(row.createdAt).format("ll")},
     ];
 
     const repliedColumns = [
-        { label: "Name", dataKey: "name", render: (row) => (
+        {
+            label: "Name", dataKey: "name", render: (row) => (
                 <div className="flex items-center gap-2">
-                    <UserAvatar className="w-[20px] h-[20px]" userName={row?.name ? row?.name?.substring(0, 1) : row?.email?.substring(0, 1)} />
+                    <UserAvatar className="w-[20px] h-[20px]"
+                                userName={row?.name ? row?.name?.substring(0, 1) : row?.email?.substring(0, 1)}/>
                     <p className="font-normal">{row.name || row.email}</p>
                 </div>
-            ) },
-        { label: "Reaction", dataKey: "emoji_url", align: "center", render: (row) =>
-                row.emoji_url ? <img className="h-6 w-6 cursor-pointer" src={row.emoji_url} alt="reaction" /> : "-" },
-        { label: "Collected Email", dataKey: "submit_mail", align: "center" },
-        { label: "When they replied", dataKey: "created_at", align: "center", render: (row) => moment(row.created_at).format("ll") },
+            )
+        },
+        {
+            label: "Reaction", dataKey: "emojiUrl", align: "center", render: (row) =>
+                row.emojiUrl ? <img className="h-6 w-6 cursor-pointer" src={row.emojiUrl} alt="reaction"/> : "-"
+        },
+        {label: "Collected Email", dataKey: "submitMail", align: "center"},
+        {
+            label: "When they replied",
+            dataKey: "createdAt",
+            align: "center",
+            render: (row) => moment(row.createdAt).format("ll")
+        },
     ];
 
     useEffect(() => {
@@ -104,31 +117,36 @@ const BannerAnalyticsView = () => {
 
     const getSingleInAppMessages = async () => {
         setIsLoading(true)
-            const data = await apiService.getSingleInAppMessage(id)
-        if (data.status === 200) {
+        const data = await apiService.getSingleInAppMessage(id)
+        setIsLoading(false);
+        if (data.success) {
             const payload = {
-                ...data.data,
-                body_text: type === "1" ? JSON.parse(data.data.body_text) : data.data.body_text,
+                ...data.data.data,
+                bodyText: type === "1" ? JSON.parse(data.data.data.bodyText) : data.data.data.bodyText,
             }
             const combinedData = {};
-            data.analytics.charts.forEach(({ x, y }) => {
+            data.data.analytics?.charts.forEach(({x, y}) => {
                 if (!combinedData[x]) {
-                    combinedData[x] = { view: 0, response: 0, x };
+                    combinedData[x] = {view: 0, response: 0, x};
                 }
                 combinedData[x].view = parseFloat(y);
             });
-            data.analytics.response_charts.forEach(({ x, y }) => {
+            data.data.analytics?.responseCharts.forEach(({x, y}) => {
                 if (!combinedData[x]) {
-                    combinedData[x] = { view: 0, response: 0, x };
+                    combinedData[x] = {view: 0, response: 0, x};
                 }
                 combinedData[x].response = parseFloat(y);
             });
             const result = Object.values(combinedData).sort((a, b) => new Date(a.x) - new Date(b.x))
-            setAnalytics({chart:result, analytics: data.analytics.analytics, open_count: data.analytics.open_count, response_count: data.analytics.response_count, responses: data.analytics.responses, response_percentage: data.analytics.response_percentage})
+            setAnalytics({
+                chart: result,
+                analytics: data.data.analytics.analytics,
+                openCount: data.data.analytics.openCount,
+                responseCount: data.data.analytics.responseCount,
+                responses: data.data.analytics.responses,
+                responsePercentage: data.data.analytics.responsePercentage
+            })
             setInAppMsgSetting(payload);
-            setIsLoading(false);
-        } else {
-            setIsLoading(false);
         }
     }
 
@@ -136,57 +154,60 @@ const BannerAnalyticsView = () => {
         {
             title: "Total View",
             show: true,
-            count: analytics?.open_count || 0,
+            count: analytics?.openCount || 0,
         },
         {
             title: "Total Response",
-            show: inAppMsgSetting?.reply_type === 1,
-            count: analytics?.response_count || 0,
+            show: inAppMsgSetting?.replyType === 1,
+            count: analytics?.responseCount || 0,
         },
         {
             title: "Completion Rate",
-            count: `${((analytics?.response_percentage|| 0) / 100).toFixed(2)}%`,
-            show: inAppMsgSetting?.reply_type === 1,
+            count: `${((analytics?.responsePercentage || 0) / 100).toFixed(2)}%`,
+            show: inAppMsgSetting?.replyType === 1,
         },
     ]
 
-    const links = [{ label: 'In App Message', path: `/app-message` }];
+    const links = [{label: 'In App Message', path: `/app-message`}];
 
     return (
         <Fragment>
             <AnalyticsLayout links={links} currentPage={inAppMsgSetting?.title}>
-                <AnalyticsSummary analyticsViews={analyticsViews} isLoading={isLoading} />
+                <AnalyticsSummary analyticsViews={analyticsViews} isLoading={isLoading}/>
                 <AnalyticsLineChart
                     title="How did that change over time?"
                     data={analytics?.chart}
                     isLoading={isLoading}
-                    chartConfig={{ view: { label: "View", color: "#7c3bed80" }, response: { label: "Response", color: "#7c3aed" } }}
+                    chartConfig={{
+                        view: {label: "View", color: "#7c3bed80"},
+                        response: {label: "Response", color: "#7c3aed"}
+                    }}
                     dataKeys={["view", "response"]}
                 />
-                    <Card>
-                        <CardHeader className={"p-4 border-b text-base font-medium"}>Customers who opened</CardHeader>
-                        <CardContent className={"p-0 overflow-auto"}>
-                            <CommonBannerTable
-                                columns={openedColumns}
-                                data={analytics.analytics || []}
-                                isLoading={isLoading}
-                                skeletonRows={10}
-                                skeletonColumns={2}
-                            />
-                        </CardContent>
-                    </Card>
-                    <Card>
-                        <CardHeader className={"p-4 border-b text-base font-medium"}>Customers who replied</CardHeader>
-                        <CardContent className={"p-0 overflow-auto"}>
-                            <CommonBannerTable
-                                columns={repliedColumns}
-                                data={analytics.responses || []}
-                                isLoading={isLoading}
-                                skeletonRows={10}
-                                skeletonColumns={4}
-                            />
-                        </CardContent>
-                    </Card>
+                <Card>
+                    <CardHeader className={"p-4 border-b text-base font-medium"}>Customers who opened</CardHeader>
+                    <CardContent className={"p-0 overflow-auto"}>
+                        <CommonBannerTable
+                            columns={openedColumns}
+                            data={analytics.analytics || []}
+                            isLoading={isLoading}
+                            skeletonRows={10}
+                            skeletonColumns={2}
+                        />
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardHeader className={"p-4 border-b text-base font-medium"}>Customers who replied</CardHeader>
+                    <CardContent className={"p-0 overflow-auto"}>
+                        <CommonBannerTable
+                            columns={repliedColumns}
+                            data={analytics.responses || []}
+                            isLoading={isLoading}
+                            skeletonRows={10}
+                            skeletonColumns={4}
+                        />
+                    </CardContent>
+                </Card>
             </AnalyticsLayout>
         </Fragment>
     );

@@ -18,14 +18,14 @@ import {SelectContent, SelectItem, SelectTrigger} from "../ui/select";
 const Surveys = ({inAppMsgSetting, setInAppMsgSetting, selectedStepIndex, setSelectedStepIndex, setSelectedStep, selectedStep, isLoading}) => {
     const {theme} = useTheme();
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
-    const userDetailsReducer = allStatusAndTypes.members.find((x) => x.user_id == inAppMsgSetting.from);
+    const userDetailsReducer = allStatusAndTypes.members.find((x) => x.userId == inAppMsgSetting.from);
 
     const [starRating, setStarRating] = useState(0);
     const [hoverRating, setHoverRating] = useState(0);
 
     const renderNumber = (x) => {
         const numbers = [];
-        for (let i = Number(x?.question_type === 1 ? "0" : x?.start_number); i <= Number(x?.question_type === 1 ? "10" : x?.end_number); i++) {
+        for (let i = Number(x?.questionType === 1 ? "0" : x?.startNumber); i <= Number(x?.questionType === 1 ? "10" : x?.endNumber); i++) {
             numbers.push(i);
         }
         return numbers
@@ -62,32 +62,32 @@ const Surveys = ({inAppMsgSetting, setInAppMsgSetting, selectedStepIndex, setSel
         {
             "id": "",
             "emoji": "😣",
-            "emoji_url": "https://cdn.jsdelivr.net/npm/emoji-datasource-apple@15.1.2/img/apple/64/1f623.png",
-            is_active: 1,
+            "emojiUrl": "https://cdn.jsdelivr.net/npm/emoji-datasource-apple@15.1.2/img/apple/64/1f623.png",
+            isActive: true,
         },
         {
             "id": "",
             "emoji": "😔",
-            "emoji_url": "https://cdn.jsdelivr.net/npm/emoji-datasource-apple@15.1.2/img/apple/64/1f614.png",
-            is_active: 1
+            "emojiUrl": "https://cdn.jsdelivr.net/npm/emoji-datasource-apple@15.1.2/img/apple/64/1f614.png",
+            isActive: true
         },
         {
             "id": "",
             "emoji": "😑",
-            "emoji_url": "https://cdn.jsdelivr.net/npm/emoji-datasource-apple@15.1.2/img/apple/64/1f610.png",
-            is_active: 1
+            "emojiUrl": "https://cdn.jsdelivr.net/npm/emoji-datasource-apple@15.1.2/img/apple/64/1f610.png",
+            isActive: true
         },
         {
             "id": "",
             "emoji": "🙂",
-            "emoji_url": "https://cdn.jsdelivr.net/npm/emoji-datasource-apple@15.1.2/img/apple/64/1f642.png",
-            is_active: 1
+            "emojiUrl": "https://cdn.jsdelivr.net/npm/emoji-datasource-apple@15.1.2/img/apple/64/1f642.png",
+            isActive: true
         },
         {
             "id": "",
             "emoji": "😍️",
-            "emoji_url": "https://cdn.jsdelivr.net/npm/emoji-datasource-apple@15.1.2/img/apple/64/1f60d.png",
-            is_active: 1
+            "emojiUrl": "https://cdn.jsdelivr.net/npm/emoji-datasource-apple@15.1.2/img/apple/64/1f60d.png",
+            isActive: true
         }
     ];
     const questionTypeOptions = [
@@ -98,7 +98,7 @@ const Surveys = ({inAppMsgSetting, setInAppMsgSetting, selectedStepIndex, setSel
         {label: "Drop Down / List", value: 5, disabled: false},
         {label: "Short text entry", value: 6, disabled: false},
         {label: "Long text entry", value: 7, disabled: false},
-        {label: "Thank you", value: 8, disabled: inAppMsgSetting.steps.filter((x) =>  x.question_type === 8).length > 0},
+        {label: "Thank you", value: 8, disabled: inAppMsgSetting.steps?.filter((x) =>  x.questionType === 8).length > 0},
     ];
 
     const question = {
@@ -113,28 +113,28 @@ const Surveys = ({inAppMsgSetting, setInAppMsgSetting, selectedStepIndex, setSel
     }
 
     const handleSelectQuestionType = (value) => {
-        let clone = [...inAppMsgSetting.steps].filter((x) => x.is_active === 1);
-        let existingQuestionType8 = clone.find((x) => x.question_type === 8);
+        let clone = [...inAppMsgSetting.steps].filter((x) => x.isActive);
+        let existingQuestionType8 = clone.find((x) => x.questionType === 8);
         if (existingQuestionType8) {
-            clone = clone.filter((x) => x.question_type !== 8);
+            clone = clone.filter((x) => x.questionType !== 8);
         }
         const nextStepNumber = clone.length > 0 ? Math.max(...clone.map((step) => step.step)) + 1 : 1;
         const stepBoj = {
-            question_type: value,
+            questionType: value,
             text: question[value],
-            placeholder_text: value == 5 ? "Select one" : "Enter text...",
-            start_number: "1",
-            end_number: "5",
-            start_label: "Not likely",
-            end_label: "Very likely",
-            is_answer_required: "",
+            placeholderText: value == 5 ? "Select one" : "Enter text...",
+            startNumber: "1",
+            endNumber: "5",
+            startLabel: "Not likely",
+            endLabel: "Very likely",
+            isAnswerRequired: "",
             step: nextStepNumber,
             options: value == 5
-                ? [{ id: "", title: "", is_active: 1 }]
+                ? [{ id: "", title: "", isActive: true }]
                 : [],
             reactions: value == 4 ? reactionPost : [],
-            is_active: 1,
-            step_id: ""
+            isActive: true,
+            stepId: ""
         };
         if (value !== 8) {
             clone.push(stepBoj);
@@ -148,7 +148,6 @@ const Surveys = ({inAppMsgSetting, setInAppMsgSetting, selectedStepIndex, setSel
             clone.push(type8StepObj);
         }
         setSelectedStep(stepBoj);
-        // setSelectedStepIndex(clone.length - 1);
         setInAppMsgSetting((prevState) => ({
             ...prevState,
             steps: clone
@@ -163,10 +162,10 @@ const Surveys = ({inAppMsgSetting, setInAppMsgSetting, selectedStepIndex, setSel
     const handleEmojiSelect = (event) => {
         const clone = [...selectedStep.reactions];
         const obj = {
-            "id": "",
-            "emoji": event.emoji,
-            "emoji_url": event.imageUrl,
-            is_active: 1,
+            id: "",
+            emoji: event.emoji,
+            emojiUrl: event.imageUrl,
+            isActive: true,
         }
         clone.push(obj)
         const objData = {...selectedStep,  reactions: clone}
@@ -177,7 +176,7 @@ const Surveys = ({inAppMsgSetting, setInAppMsgSetting, selectedStepIndex, setSel
     const onDeleteReaction = (record, index) => {
         let clone = [...selectedStep.reactions];
         if (record.id) {
-            clone[index] = {...record, is_active: 0}
+            clone[index] = {...record, isActive: false}
         } else {
             clone.splice(index, 1)
         }
@@ -188,20 +187,20 @@ const Surveys = ({inAppMsgSetting, setInAppMsgSetting, selectedStepIndex, setSel
 
     const onDeleteStep = (record, index) => {
         let clone = [...inAppMsgSetting.steps];
-        if (record.step_id) {
-            const indexFind = clone.findIndex((x) => x.step_id === record.step_id);
-            clone[indexFind] = { ...record, is_active: 0 };
+        if (record.stepId) {
+            const indexFind = clone.findIndex((x) => x.stepId === record.stepId);
+            clone[indexFind] = { ...record, isActive: false };
         } else {
             clone.splice(index, 1);
         }
-        let activeSteps = clone.filter((x) => x.is_active === 1);
+        let activeSteps = clone.filter((x) => x.isActive);
         activeSteps = activeSteps
-            .filter((x) => x.question_type !== 8)
+            .filter((x) => x.questionType !== 8)
             .map((step, idx) => ({
                 ...step,
                 step: idx + 1,
             }));
-        const questionType8Step = clone.find((x) => x.question_type === 8 && x.is_active === 1);
+        const questionType8Step = clone.find((x) => x.questionType === 8 && x.isActive);
         if (questionType8Step) {
             questionType8Step.step = activeSteps.length + 1;
             activeSteps.push(questionType8Step);
@@ -218,34 +217,29 @@ const Surveys = ({inAppMsgSetting, setInAppMsgSetting, selectedStepIndex, setSel
     return (
         <div className={"flex flex-col gap-4 py-8 px-[5px] md:px-0 bg-muted justify-start overflow-y-auto h-[calc(100%_-_94px)]"}>
             {
-                inAppMsgSetting.steps.filter((x) => x.is_active === 1).map((x, i) => {
+                inAppMsgSetting.steps.filter((x) => x.isActive).map((x, i) => {
+
                     return(
-                        // <div className={`flex flex-col mx-auto gap-8 w-full max-w-[550px]`} key={i}>
                         <div className={`flex items-center mx-auto gap-2 md:gap-8 w-full max-w-[623px] w-full`} key={i}>
                             <div className={"flex gap-1"}><span>Step</span> <span>{x.step}</span></div>
-                            <div onClick={(e) => onSelectStep(x, i)} className={"relative rounded-[10px] p-4 md:pt-8 md:p-6 cursor-pointer w-full"} style={{backgroundColor: selectedStep.step === x.step ? inAppMsgSetting.bg_color : "#fff", color: selectedStep.step === x.step ?inAppMsgSetting.text_color : "#000"}}>
+                            <div onClick={(e) => onSelectStep(x, i)} className={"relative rounded-[10px] p-4 md:pt-8 md:p-6 cursor-pointer w-full"} style={{backgroundColor: selectedStep.step === x.step ? inAppMsgSetting.bgColor : "#fff", color: selectedStep.step === x.step ?inAppMsgSetting.textColor : "#000"}}>
                                 <div className={"absolute top-[8px] right-[8px]"}>
                                 {
-                                    inAppMsgSetting.is_close_button ? <X size={16} stroke={inAppMsgSetting?.btn_color}/> : ""
+                                    inAppMsgSetting.isCloseButton ? <X size={16} stroke={inAppMsgSetting?.btnColor}/> : ""
                                 }</div>
                                 <div className={"flex gap-1 md:gap-3"}>
                                     {
                                         (inAppMsgSetting.from) ?
                                             <div className={"flex-none pt-2 flex-1 w-8"}>
                                                 {
-                                                    (inAppMsgSetting.show_sender === 1 && inAppMsgSetting.from) ?
+                                                    (inAppMsgSetting.showSender && inAppMsgSetting.from) ?
                                                         <Avatar className={"w-[32px] h-[32px]"}>
-                                                            {
-                                                                userDetailsReducer?.user_photo ?
-                                                                    <AvatarImage src={userDetailsReducer?.user_photo}
-                                                                                 alt="@shadcn"/>
-                                                                    :
-                                                                    <AvatarFallback
-                                                                        className={`${theme === "dark" ? "bg-card-foreground" : ""} text-sm`}>
-                                                                        {userDetailsReducer && userDetailsReducer?.user_first_name && userDetailsReducer?.user_first_name.substring(0, 1)}
-                                                                        {userDetailsReducer && userDetailsReducer?.user_last_name && userDetailsReducer?.user_last_name?.substring(0, 1)}
-                                                                    </AvatarFallback>
-                                                            }
+                                                            <AvatarImage src={userDetailsReducer?.profileImage} alt={`${userDetailsReducer?.firstName} ${userDetailsReducer?.lastName}`}/>
+                                                            <AvatarFallback
+                                                                className={`${theme === "dark" ? "bg-card-foreground text-card" : ""} text-xs`}>
+                                                                {userDetailsReducer?.firstName?.substring(0, 1)}
+                                                                {userDetailsReducer?.lastName?.substring(0, 1)}
+                                                            </AvatarFallback>
                                                         </Avatar> : <div>&nbsp;</div>
                                                 }
                                             </div> : ""
@@ -258,13 +252,13 @@ const Surveys = ({inAppMsgSetting, setInAppMsgSetting, selectedStepIndex, setSel
                                                 onChange={(event) => onChangeQuestion("text", event.target.value)}
                                                 className={`w-full text-sm border-none p-0 h-auto focus-visible:ring-offset-0 focus-visible:ring-0 text-wrap`}
                                                 style={{
-                                                    backgroundColor: selectedStep.step === x.step ? inAppMsgSetting.bg_color : "#fff",
-                                                    color: selectedStep.step === x.step ? inAppMsgSetting.text_color : "#000"
+                                                    backgroundColor: selectedStep.step === x.step ? inAppMsgSetting.bgColor : "#fff",
+                                                    color: selectedStep.step === x.step ? inAppMsgSetting.textColor : "#000"
                                                 }}
                                             /> : <span className={"text-wrap text-sm"}>{x.text}</span>
                                         }
                                         {
-                                            x?.question_type === 1 && <Fragment>
+                                            x?.questionType === 1 && <Fragment>
                                                 <div className={"flex flex-wrap gap-3 px-3 pt-3 md:px-[30px] md:pt-[18px]"}>
                                                     {
                                                         renderNumber(x).map(num => (
@@ -275,13 +269,13 @@ const Surveys = ({inAppMsgSetting, setInAppMsgSetting, selectedStepIndex, setSel
                                                     }
                                                 </div>
                                                 <div className={"flex justify-between gap-4 mt-[18px]"}>
-                                                    <h5 className={"text-xs font-normal"}>{x?.start_label}</h5>
-                                                    <h5 className={"text-xs font-normal"}>{x?.end_label}</h5>
+                                                    <h5 className={"text-xs font-normal"}>{x?.startLabel}</h5>
+                                                    <h5 className={"text-xs font-normal"}>{x?.endLabel}</h5>
                                                 </div>
                                             </Fragment>
                                         }
                                         {
-                                            x?.question_type === 2 &&
+                                            x?.questionType === 2 &&
                                             <Fragment>
                                                 <div
                                                     className={"flex justify-center flex-wrap gap-3 px-[30px] pt-[18px]"}>
@@ -292,13 +286,13 @@ const Surveys = ({inAppMsgSetting, setInAppMsgSetting, selectedStepIndex, setSel
                                                     }
                                                 </div>
                                                 <div className={"flex justify-between gap-4 mt-[18px]"}>
-                                                    <h5 className={"text-xs font-normal"}>{x?.start_label}</h5>
-                                                    <h5 className={"text-xs font-normal"}>{x?.end_label}</h5>
+                                                    <h5 className={"text-xs font-normal"}>{x?.startLabel}</h5>
+                                                    <h5 className={"text-xs font-normal"}>{x?.endLabel}</h5>
                                                 </div>
                                             </Fragment>
                                         }
                                         {
-                                            x?.question_type === 3 &&
+                                            x?.questionType === 3 &&
                                             <Fragment>
                                                 <div className={"flex gap-4 mt-4 justify-center"}>
                                                     {Array.from({length: 5}, (_, index) => (
@@ -314,19 +308,19 @@ const Surveys = ({inAppMsgSetting, setInAppMsgSetting, selectedStepIndex, setSel
                                             </Fragment>
                                         }
                                         {
-                                            x?.question_type === 4 &&
+                                            x?.questionType === 4 &&
                                             <Fragment>
                                                 <div className={"flex justify-center gap-6 my-6 flex-wrap"}>
                                                         {
                                                             (x?.reactions || []).map((r, ind) => {
                                                                 return (
-                                                                    r.is_active === 1 ?
+                                                                    r.isActive ?
                                                                         <div className={"relative group hover:cursor-pointer"} key={ind}>
                                                                                 <span onClick={() => onDeleteReaction(r, ind, i)}
                                                                                       className="absolute hidden group-hover:inline-block py-0.5 leading-none right-[-11px] top-[-13px] border rounded shadow -top-1 text-[9px] font-bold tracking-wide  px-0.5 text-background-accent dark:text-foreground/60 dark:border-gray-500/60  dark:bg-dark-accent bg-white">
                                                                                     <Trash2 size={16} className={`${theme === "dark" ? "stroke-muted" : ""}`}/>
                                                                                 </span>
-                                                                            <img key={ind} className={"h-6 w-6 cursor-pointer"} src={r.emoji_url}/>
+                                                                            <img key={ind} className={"h-6 w-6 cursor-pointer"} src={r.emojiUrl}/>
                                                                         </div> : ""
                                                                 )
                                                             })
@@ -347,17 +341,17 @@ const Surveys = ({inAppMsgSetting, setInAppMsgSetting, selectedStepIndex, setSel
                                             </Fragment>
                                         }
                                         {
-                                            x?.question_type === 5 &&
+                                            x?.questionType === 5 &&
                                             <Fragment>
                                                 <div className="mt-3">
-                                                    <Select placeholder={x.placeholder_text} value={""}>
+                                                    <Select placeholder={x.placeholderText} value={""}>
                                                         <SelectTrigger className={`${theme === "dark" ? "bg-card-foreground" : "border-card"} ring-offset-background-0`}>
-                                                            <SelectValue placeholder={x.options.length ? x.placeholder_text : "No data"} />
+                                                            <SelectValue placeholder={x.options.length ? x.placeholderText : "No data"} />
                                                         </SelectTrigger>
                                                         {x.options.length > 0 ? (
                                                             <SelectContent className={`max-w-[404px] ${theme === "dark" ? "bg-card-foreground" : ""}`}>
                                                                 {x?.options.map((option, index) => (
-                                                                    option.is_active === 1 &&
+                                                                    option.isActive &&
                                                                     <SelectItem className={`${theme === "dark" ? "focus:bg-card-foreground" : ""}`} key={index} value={index}>
                                                                         <span className={"block max-w-[300px] overflow-hidden whitespace-nowrap text-ellipsis"}>
                                                                             {option.title}
@@ -377,18 +371,18 @@ const Surveys = ({inAppMsgSetting, setInAppMsgSetting, selectedStepIndex, setSel
                                             </Fragment>
                                         }
                                         {
-                                            x?.question_type === 6 &&
+                                            x?.questionType === 6 &&
                                             <Fragment>
                                                 <div className="mt-3">
-                                                    <Input placeholder={x.placeholder_text} value={""} className={`${theme === "dark" ? "bg-card-foreground" : ""}`}/>
+                                                    <Input placeholder={x.placeholderText} value={""} className={`${theme === "dark" ? "bg-card-foreground" : ""}`}/>
                                                 </div>
                                             </Fragment>
                                         }
                                         {
-                                            x?.question_type === 7 &&
+                                            x?.questionType === 7 &&
                                             <Fragment>
                                                 <div className="mt-3">
-                                                    <Textarea placeholder={x.placeholder_text} value={""} className={`${theme === "dark" ? "bg-card-foreground" : ""}`}/>
+                                                    <Textarea placeholder={x.placeholderText} value={""} className={`${theme === "dark" ? "bg-card-foreground" : ""}`}/>
                                                 </div>
                                             </Fragment>
                                         }

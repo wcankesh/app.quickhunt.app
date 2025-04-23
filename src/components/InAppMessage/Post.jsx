@@ -26,13 +26,13 @@ const Post = ({inAppMsgSetting, setInAppMsgSetting, isLoading}) => {
     const {theme} = useTheme();
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
-    const userDetailsReducer =  allStatusAndTypes.members.find((x) => x.user_id == inAppMsgSetting.from);
+    const userDetailsReducer = allStatusAndTypes.members.find((x) => x.userId == inAppMsgSetting.from);
 
     const handleSave = useCallback(async () => {
         const savedData = await editorCore.current.save();
         setInAppMsgSetting(prevState => ({
             ...prevState,
-            body_text: JSON.stringify({blocks: savedData.blocks})
+            bodyText: JSON.stringify({blocks: savedData.blocks})
         }));
     }, []);
 
@@ -87,10 +87,10 @@ const Post = ({inAppMsgSetting, setInAppMsgSetting, isLoading}) => {
     const handleEmojiSelect = (event) => {
         const clone = [...inAppMsgSetting.reactions];
         const obj = {
-            "id": "",
-            "emoji": event.emoji,
-            "emoji_url": event.imageUrl,
-            is_active: 1,
+            id: "",
+            emoji: event.emoji,
+            emojiUrl: event.imageUrl,
+            isActive: true,
         }
         clone.push(obj)
         setInAppMsgSetting(prevState => ({
@@ -102,8 +102,8 @@ const Post = ({inAppMsgSetting, setInAppMsgSetting, isLoading}) => {
 
     const onDeleteReaction = (record, index) => {
         let clone = [...inAppMsgSetting.reactions];
-        if(record.id){
-            clone[index] = {...record, is_active: 0}
+        if (record.id) {
+            clone[index] = {...record, isActive: false}
         } else {
             clone.splice(index, 1)
         }
@@ -124,7 +124,7 @@ const Post = ({inAppMsgSetting, setInAppMsgSetting, isLoading}) => {
                 onChange: handleSave,
                 data: {
                     time: new Date().getTime(),
-                    blocks: inAppMsgSetting?.body_text?.blocks || [{type: "paragraph", data: {text: "Hey"}}],
+                    blocks: inAppMsgSetting?.bodyText?.blocks || [{type: "paragraph", data: {text: "Hey"}}],
                     version: "2.12.4"
                 }
             });
@@ -139,74 +139,84 @@ const Post = ({inAppMsgSetting, setInAppMsgSetting, isLoading}) => {
     }, [isLoading]);
 
     return (
-        <div className={`p-4 md:px-16 md:py-8 flex flex-col gap-4 bg-muted justify-start overflow-y-auto h-[calc(100%_-_94px)]`}>
-            <Card className={`rounded-[10px] p-0`} >
+        <div
+            className={`p-4 md:px-16 md:py-8 flex flex-col gap-4 bg-muted justify-start overflow-y-auto h-[calc(100%_-_94px)]`}>
+            <Card className={`rounded-[10px] p-0`}>
                 <CardHeader className={"flex px-4 pt-4 pb-0 flex-row justify-end"}>
                     <Button className={`h-4 w-4 p-0 ${theme === "dark" ? "" : "text-muted-foreground"}`}
-                            variant={"ghost hover:none"}><X size={16} stroke={inAppMsgSetting?.btn_color} className={"h-5 w-5"}/></Button>
+                            variant={"ghost hover:none"}><X size={16} stroke={inAppMsgSetting?.btnColor}
+                                                            className={"h-5 w-5"}/></Button>
                 </CardHeader>
                 <CardHeader className={"p-4 pt-0"}>
                     {
-                        (inAppMsgSetting.show_sender === 1 && inAppMsgSetting.from) ? <div className={"pt-0 flex flex-row gap-2"}>
-                            <Avatar className={"w-[32px] h-[32px]"}>
-                                {
-                                    userDetailsReducer?.user_photo ?
-                                        <AvatarImage src={userDetailsReducer?.user_photo} alt="@shadcn"/>
-                                        :
-                                        <AvatarFallback>
-                                            {userDetailsReducer && userDetailsReducer?.user_first_name && userDetailsReducer?.user_first_name.substring(0, 1)}
-                                            {userDetailsReducer && userDetailsReducer?.user_last_name && userDetailsReducer?.user_last_name?.substring(0, 1)}
-                                        </AvatarFallback>
-                                }
-                            </Avatar>
-                            <div className={""}>
+                        (inAppMsgSetting.showSender && inAppMsgSetting.from) ?
+                            <div className={"pt-0 flex flex-row gap-2"}>
+                                <Avatar className={"w-[32px] h-[32px]"}>
+                                    <AvatarImage src={userDetailsReducer?.profileImage}
+                                                 alt={`${userDetailsReducer?.firstName} ${userDetailsReducer?.lastName}`}/>
+                                    <AvatarFallback
+                                        className={`${theme === "dark" ? "bg-card-foreground text-card" : ""} text-xs`}>
+                                        {userDetailsReducer?.firstName?.substring(0, 1)}
+                                        {userDetailsReducer?.lastName?.substring(0, 1)}
+                                    </AvatarFallback>
+                                </Avatar>
                                 <div className={"flex flex-row gap-1"}>
-                                    <h5 className={"text-xs font-normal"}>{userDetailsReducer?.user_first_name} {userDetailsReducer?.user_last_name}</h5>
-                                    <h5 className={`text-xs font-normal ${theme === "dark" ? "" : "text-muted-foreground"}`}>from {projectDetailsReducer?.project_name}</h5>
+                                    <h5 className={"text-xs font-normal"}>{userDetailsReducer?.firstName} {userDetailsReducer?.lastName}</h5>
+                                    <h5 className={`text-xs font-normal ${theme === "dark" ? "" : "text-muted-foreground"}`}>from {projectDetailsReducer?.name}</h5>
                                 </div>
-                            </div>
-                        </div> : ""
+                            </div> : ""
                     }
-                    <div className={"pl-4 pt-4 md:pl-14 md:pt-6 m-0 w-full"}>{isLoading ? "" :  <div id="editorjs"></div>}</div>
+                    <div className={"pl-4 pt-4 md:pl-14 md:pt-6 m-0 w-full"}>{isLoading ? "" :
+                        <div id="editorjs"></div>}</div>
                     {/*<div className={"pl-14 pt-6 m-0 w-full"}><EditorComponent  /></div>*/}
                 </CardHeader>
                 {
-                    inAppMsgSetting.reply_type === 1 ? <CardContent className={`p-4 md:py-5 md:pl-8 md:pr-5 rounded-b-lg flex flex-row justify-between`} style={{background: inAppMsgSetting.bg_color}}>
+                    inAppMsgSetting.replyType === 1 ? <CardContent
+                        className={`p-4 md:py-5 md:pl-8 md:pr-5 rounded-b-lg flex flex-row justify-between`}
+                        style={{background: inAppMsgSetting.bgColor}}>
                         <div className={""}>
                             <div className={"flex flex-row gap-3 items-center text-xs"}>
-                                <MessageCircleMore size={20} stroke={inAppMsgSetting?.icon_color} />
-                                <h5 className={"font-normal"} style={{color: inAppMsgSetting.text_color}}>Write a reply...</h5>
+                                <MessageCircleMore size={20} stroke={inAppMsgSetting?.iconColor}/>
+                                <h5 className={"font-normal"} style={{color: inAppMsgSetting.textColor}}>Write a
+                                    reply...</h5>
                             </div>
                         </div>
                         <div className={"flex gap-3 items-center"}>
-                            <Smile size={20} stroke={inAppMsgSetting?.icon_color}/>
-                            <Paperclip size={20} stroke={inAppMsgSetting?.icon_color}/>
+                            <Smile size={20} stroke={inAppMsgSetting?.iconColor}/>
+                            <Paperclip size={20} stroke={inAppMsgSetting?.iconColor}/>
                         </div>
-                    </CardContent> : inAppMsgSetting.reply_type === 2 ? <CardContent className={`py-5 pl-8 pr-5 rounded-b-lg flex flex-row justify-between`} style={{background: inAppMsgSetting.bg_color}}>
-                        <div className={"flex justify-center gap-5 w-full"}>
-                            {
-                                (inAppMsgSetting.reactions || []).map((x,i)=>{
-                                    return(
-                                        x.is_active === 1 ?
-                                            <div className={"relative group hover:cursor-pointer"}>
-                                                <span onClick={() => onDeleteReaction(x, i)} className="absolute hidden group-hover:inline-block py-0.5 leading-none right-[-11px] top-[-13px] border rounded shadow -top-1 text-[9px] font-semibold tracking-wide px-0.5 text-background-accent dark:text-foreground/60 dark:border-gray-500/60 dark:bg-dark-accent bg-white">
-                                                    <Trash2 size={16} className={`${theme === "dark" ? "stroke-muted" : ""}`}/>
+                    </CardContent> : inAppMsgSetting.replyType === 2 ?
+                        <CardContent className={`py-5 pl-8 pr-5 rounded-b-lg flex flex-row justify-between`}
+                                     style={{background: inAppMsgSetting.bgColor}}>
+                            <div className={"flex justify-center gap-5 w-full"}>
+                                {
+                                    (inAppMsgSetting.reactions || []).map((x, i) => {
+                                        return (
+                                            x.isActive ?
+                                                <div className={"relative group hover:cursor-pointer"}>
+                                                <span onClick={() => onDeleteReaction(x, i)}
+                                                      className="absolute hidden group-hover:inline-block py-0.5 leading-none right-[-11px] top-[-13px] border rounded shadow -top-1 text-[9px] font-semibold tracking-wide px-0.5 text-background-accent dark:text-foreground/60 dark:border-gray-500/60 dark:bg-dark-accent bg-white">
+                                                    <Trash2 size={16}
+                                                            className={`${theme === "dark" ? "stroke-muted" : ""}`}/>
                                                 </span>
-                                                <img key={i} className={"h-6 w-6 cursor-pointer"} src={x.emoji_url}/>
-                                            </div> : ""
-                                    )
-                                })
-                            }
-                            <Popover>
-                                <PopoverTrigger asChild>
-                                    <Button variant={"secondary"} className={"h-6 w-6 rounded-[100%] p-1"}><Plus  size={16}/></Button>
-                                </PopoverTrigger>
-                                <PopoverContent className="w-full p-0 border-none w-[310px]]">
-                                    <EmojiPicker theme={theme === "dark" ? "dark" : "light"} height={350} autoFocusSearch={true} open={true} searchDisabled={false} onEmojiClick={handleEmojiSelect}/>
-                                </PopoverContent>
-                            </Popover>
-                        </div>
-                    </CardContent> : inAppMsgSetting.reply_type === 3 ? "" : ""
+                                                    <img key={i} className={"h-6 w-6 cursor-pointer"} src={x.emojiUrl}/>
+                                                </div> : ""
+                                        )
+                                    })
+                                }
+                                <Popover>
+                                    <PopoverTrigger asChild>
+                                        <Button variant={"secondary"} className={"h-6 w-6 rounded-[100%] p-1"}><Plus
+                                            size={16}/></Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-full p-0 border-none w-[310px]]">
+                                        <EmojiPicker theme={theme === "dark" ? "dark" : "light"} height={350}
+                                                     autoFocusSearch={true} open={true} searchDisabled={false}
+                                                     onEmojiClick={handleEmojiSelect}/>
+                                    </PopoverContent>
+                                </Popover>
+                            </div>
+                        </CardContent> : inAppMsgSetting.replyType === 3 ? "" : ""
                 }
             </Card>
         </div>

@@ -28,30 +28,35 @@ const CheckListAnalyticsView = () => {
     const getSingleInAppMessages = async () => {
         setIsLoading(true)
         const data = await apiService.getSingleInAppMessage(id)
-        if (data.status === 200) {
+        setIsLoading(false);
+        if (data.success) {
             const payload = {
-                ...data.data,
-                body_text: type === "1" ? JSON.parse(data.data.body_text) : data.data.body_text,
+                ...data.data.data,
+                bodyText: type === "1" ? JSON.parse(data.data.data.bodyText) : data.data.data.bodyText,
             }
             const combinedData = {};
-            data.analytics.charts.forEach(({ x, y }) => {
+            data.data.analytics.charts.forEach(({x, y}) => {
                 if (!combinedData[x]) {
-                    combinedData[x] = { view: 0, response: 0, x };
+                    combinedData[x] = {view: 0, response: 0, x};
                 }
                 combinedData[x].view = parseFloat(y);
             });
-            data.analytics.response_charts.forEach(({ x, y }) => {
+            data.data.analytics.responseCharts.forEach(({x, y}) => {
                 if (!combinedData[x]) {
-                    combinedData[x] = { view: 0, response: 0, x };
+                    combinedData[x] = {view: 0, response: 0, x};
                 }
                 combinedData[x].response = parseFloat(y);
             });
             const result = Object.values(combinedData).sort((a, b) => new Date(a.x) - new Date(b.x))
-            setAnalytics({chart:result, analytics: data.analytics.analytics, open_count: data.analytics.open_count, response_count: data.analytics.response_count, responses: data.analytics.responses, response_percentage: data.analytics.response_percentage})
+            setAnalytics({
+                chart: result,
+                analytics: data.data.analytics.analytics,
+                openCount: data.data.analytics.openCount,
+                responseCount: data.data.analytics.responseCount,
+                responses: data.data.analytics.responses,
+                responsePercentage: data.data.analytics.responsePercentage
+            })
             setInAppMsgSetting(payload);
-            setIsLoading(false);
-        } else {
-            setIsLoading(false);
         }
     }
 
@@ -59,21 +64,21 @@ const CheckListAnalyticsView = () => {
         {
             title: "Total View",
             show: true,
-            count: analytics?.open_count || 0,
+            count: analytics?.openCount || 0,
         },
         {
             title: "Total Response",
-            show: inAppMsgSetting?.reply_type === 1,
-            count: analytics?.response_count || 0,
+            show: inAppMsgSetting?.replyType === 1,
+            count: analytics?.responseCount || 0,
         },
         {
             title: "Completion Rate",
-            count: `${((analytics?.response_percentage|| 0) / 100).toFixed(2)}%`,
-            show: inAppMsgSetting?.reply_type === 1,
+            count: `${((analytics?.responsePercentage || 0) / 100).toFixed(2)}%`,
+            show: inAppMsgSetting?.replyType === 1,
         },
     ]
 
-    const links = [{ label: 'In App Message', path: `/app-message` }];
+    const links = [{label: 'In App Message', path: `/app-message`}];
 
     const openedColumns = [
         {
@@ -87,37 +92,42 @@ const CheckListAnalyticsView = () => {
                 </div>
             ),
         },
-        { label: "When it was opened", render: (row) => moment(row.created_at).format("ll") },
+        {label: "When it was opened", render: (row) => moment(row.createdAt).format("ll")},
     ];
 
     const repliedColumns = [
-        { label: "Name", render: (row) => <UserCell name={row.name} email={row.email} /> },
-        { label: "When they replied", render: (row) => moment(row.created_at).format("ll") },
+        {label: "Name", render: (row) => <UserCell name={row.name} email={row.email}/>},
+        {label: "When they replied", render: (row) => moment(row.createdAt).format("ll")},
     ];
 
     return (
         <Fragment>
             <AnalyticsLayout links={links} currentPage={inAppMsgSetting?.title}>
-                <AnalyticsSummary analyticsViews={analyticsViews} isLoading={isLoading} />
+                <AnalyticsSummary analyticsViews={analyticsViews} isLoading={isLoading}/>
                 <AnalyticsLineChart
                     title="How did that change over time?"
                     data={analytics?.chart}
                     isLoading={isLoading}
-                    chartConfig={{ view: { label: "View", color: "#7c3bed80" }, response: { label: "Response", color: "#7c3aed" } }}
+                    chartConfig={{
+                        view: {label: "View", color: "#7c3bed80"},
+                        response: {label: "Response", color: "#7c3aed"}
+                    }}
                     dataKeys={["view", "response"]}
                 />
-                    <Card>
-                        <CardHeader className={"p-4 border-b text-base font-medium"}>Customers who opened</CardHeader>
-                        <CardContent className={"p-0 overflow-auto"}>
-                            <CommonTable columns={openedColumns} data={analytics.analytics || []} isLoading={isLoading} theme={theme} skeletonColumns={2}/>
-                        </CardContent>
-                    </Card>
-                    <Card>
-                        <CardHeader className={"p-4 border-b text-base font-medium"}>Customers who replied</CardHeader>
-                        <CardContent className={"p-0 overflow-auto"}>
-                            <CommonTable columns={repliedColumns} data={analytics.responses || []} isLoading={isLoading} theme={theme} skeletonColumns={2} />
-                        </CardContent>
-                    </Card>
+                <Card>
+                    <CardHeader className={"p-4 border-b text-base font-medium"}>Customers who opened</CardHeader>
+                    <CardContent className={"p-0 overflow-auto"}>
+                        <CommonTable columns={openedColumns} data={analytics.analytics || []} isLoading={isLoading}
+                                     theme={theme} skeletonColumns={2}/>
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardHeader className={"p-4 border-b text-base font-medium"}>Customers who replied</CardHeader>
+                    <CardContent className={"p-0 overflow-auto"}>
+                        <CommonTable columns={repliedColumns} data={analytics.responses || []} isLoading={isLoading}
+                                     theme={theme} skeletonColumns={2}/>
+                    </CardContent>
+                </Card>
             </AnalyticsLayout>
         </Fragment>
     );

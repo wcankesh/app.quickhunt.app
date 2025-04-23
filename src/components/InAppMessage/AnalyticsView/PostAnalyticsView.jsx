@@ -1,16 +1,15 @@
 import React, {Fragment, useEffect, useState} from 'react';
 import {Card, CardContent, CardHeader} from "../../ui/card";
-import {ApiService} from "../../../utils/ApiService";
 import {useSelector} from "react-redux";
 import moment from "moment";
 import {useParams} from "react-router-dom";
 import {useTheme} from "../../theme-provider";
 import {AnalyticsLayout, AnalyticsLineChart, AnalyticsSummary, CommonTable, ImageCarouselCell, UserCell} from "./CommonAnalyticsView/CommonUse";
+import {apiService} from "../../../utils/constent";
 
 const PostAnalyticsView = () => {
     const {theme} = useTheme();
     const {id} = useParams();
-    const apiService = new ApiService();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
 
     const [inAppMsgSetting, setInAppMsgSetting] = useState({});
@@ -19,36 +18,41 @@ const PostAnalyticsView = () => {
 
     useEffect(() => {
         if (id !== "new" && projectDetailsReducer.id) {
-            getSingleInAppMessages();
+            getSingleInAppMessage();
         }
     }, [projectDetailsReducer.id]);
 
-    const getSingleInAppMessages = async () => {
+    const getSingleInAppMessage = async () => {
         setIsLoading(true)
         const data = await apiService.getSingleInAppMessage(id)
-        if (data.status === 200) {
+        setIsLoading(false);
+        if (data.success) {
             const payload = {
-                ...data.data,
+                ...data.data.data,
             }
             const combinedData = {};
-            data.analytics?.charts.forEach(({ x, y }) => {
+            data.data.analytics?.charts.forEach(({x, y}) => {
                 if (!combinedData[x]) {
-                    combinedData[x] = { view: 0, response: 0, x };
+                    combinedData[x] = {view: 0, response: 0, x};
                 }
                 combinedData[x].view = parseFloat(y);
             });
-            data.analytics?.response_charts.forEach(({ x, y }) => {
+            data.data.analytics?.responseCharts.forEach(({x, y}) => {
                 if (!combinedData[x]) {
-                    combinedData[x] = { view: 0, response: 0, x };
+                    combinedData[x] = {view: 0, response: 0, x};
                 }
                 combinedData[x].response = parseFloat(y);
             });
             const result = Object.values(combinedData).sort((a, b) => new Date(a.x) - new Date(b.x))
-            setAnalytics({chart:result, analytics: data.analytics.analytics, open_count: data.analytics.open_count, response_count: data.analytics.response_count, responses: data.analytics.responses, response_percentage: data.analytics.response_percentage})
+            setAnalytics({
+                chart: result,
+                analytics: data.data.analytics.analytics,
+                openCount: data.data.analytics.openCount,
+                responseCount: data.data.analytics.responseCount,
+                responses: data.data.analytics.responses,
+                responsePercentage: data.data.analytics.responsePercentage
+            })
             setInAppMsgSetting(payload)
-            setIsLoading(false);
-        } else {
-            setIsLoading(false);
         }
     }
 
@@ -56,17 +60,17 @@ const PostAnalyticsView = () => {
         {
             title: "Total View",
             show: true,
-            count: analytics?.open_count || 0,
+            count: analytics?.openCount || 0,
         },
         {
             title: "Total Response",
-            show: inAppMsgSetting?.reply_type === 1,
-            count: analytics?.response_count || 0,
+            show: inAppMsgSetting?.replyType === 1,
+            count: analytics?.responseCount || 0,
         },
         {
             title: "Completion Rate",
-            count: `${((analytics?.response_percentage|| 0) / 100).toFixed(2)}%`,
-            show: inAppMsgSetting?.reply_type === 1,
+            count: `${((analytics?.responsePercentage|| 0) / 100).toFixed(2)}%`,
+            show: inAppMsgSetting?.replyType === 1,
         },
     ]
 
@@ -77,14 +81,14 @@ const PostAnalyticsView = () => {
     const repliedColumns = [
         { label: "Name", render: (row) => <UserCell name={row.name} email={row.email} /> },
         { label: "Reply", dataKey: "response", className: "max-w-[270px] truncate text-ellipsis overflow-hidden whitespace-nowrap" },
-        { label: "Reaction", align: "center", render: (row) => row.emoji_url ? <img className="h-6 w-6 cursor-pointer" src={row.emoji_url} /> : "-" },
+        { label: "Reaction", align: "center", render: (row) => row.emojiUrl ? <img className="h-6 w-6 cursor-pointer" src={row.emojiUrl} /> : "-" },
         { label: "Image View", align: "center", render: (row) => <ImageCarouselCell files={row.files} /> },
-        { label: "When they replied", align: "center", render: (row) => moment(row.created_at).format("ll") },
+        { label: "When they replied", align: "center", render: (row) => moment(row.createdAt).format("ll") },
     ];
 
     const openedColumns = [
         { label: "Name", render: (row) => <UserCell name={row.name} email={row.email} /> },
-        { label: "When it was opened", render: (row) => moment(row.created_at).format("ll") },
+        { label: "When it was opened", render: (row) => moment(row.createdAt).format("ll") },
     ];
 
     return (
