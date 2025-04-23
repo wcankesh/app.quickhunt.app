@@ -5,10 +5,9 @@ import {Button} from "../../ui/button";
 import {Icon} from "../../../utils/Icon";
 import {Input} from "../../ui/input";
 import {useDispatch,useSelector,} from "react-redux";
-import {ApiService} from "../../../utils/ApiService";
 import {projectDetailsAction} from "../../../redux/action/ProjectDetailsAction";
 import {allProjectAction} from "../../../redux/action/AllProjectAction";
-import {setProjectDetails} from "../../../utils/constent";
+import {apiService, setProjectDetails} from "../../../utils/constent";
 import {toast} from "../../ui/use-toast";
 import {CircleX, Loader2} from "lucide-react";
 import DeleteDialog from "../../Comman/DeleteDialog";
@@ -16,7 +15,7 @@ import DeleteDialog from "../../Comman/DeleteDialog";
 const initialState = {
     name: '',
     website: "",
-    languageId: 0,
+    languageId: '',
     timezoneId: '',
     logo: '',
     favicon: '',
@@ -34,7 +33,6 @@ const initialStateError = {
 
 const Project = () => {
     const dispatch = useDispatch();
-    const apiService = new ApiService();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const allProjectReducer = useSelector(state => state.allProjectReducer);
     const userDetailsReducer = useSelector(state => state.userDetailsReducer);
@@ -56,8 +54,6 @@ const Project = () => {
         const data = await apiService.getSingleProjects(projectDetailsReducer.id)
         if(data.success) {
             setCreateProjectDetails({...data.data});
-        } else {
-
         }
     }
 
@@ -166,14 +162,13 @@ const Project = () => {
 
         setIsSave(true)
         const data = await apiService.updateProjects(formData, projectDetailsReducer.id)
+        setIsSave(false)
         if(data.success){
             setProjectDetails(data.data);
             dispatch(projectDetailsAction(data.data))
-            setIsSave(false)
             toast({description: data.message})
         } else {
-            setIsSave(false);
-            toast({description: data?.error?.message, variant: "destructive"})
+            toast({description: data.error.message, variant: "destructive"})
         }
     }
 
@@ -204,8 +199,6 @@ const Project = () => {
             setTimeout(() => {
                 history.push('/')
             },2000)
-        } else {
-
         }
         setOpenDelete(false);
     }

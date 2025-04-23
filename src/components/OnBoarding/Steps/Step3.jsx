@@ -13,14 +13,14 @@ const initialStateProject = {
     name: '',
     website: "",
     domain: '',
-    // project_language_id: '3',
-    // project_timezone_id: '90',
-    // project_logo: '',
-    // project_favicon: '',
-    // project_api_key: '',
-    // project_status: '',
-    // project_browser: '',
-    // project_ip_address: '',
+    languageId: '3',
+    timezoneId: '90',
+    logo: '',
+    favicon: '',
+    apiKey: '',
+    status: 1,
+    browser: '',
+    ipAddress: '',
 }
 
 const initialStateErrorProject = {

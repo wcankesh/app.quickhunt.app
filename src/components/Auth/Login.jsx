@@ -1,7 +1,6 @@
 import React, {useState} from 'react';
 import {Button} from "../ui/button"
 import {useNavigate} from "react-router-dom"
-import {ApiService} from "../../utils/ApiService";
 import {apiService, baseUrl, validateForm, validateField, onKeyFire} from "../../utils/constent";
 import {Loader2} from "lucide-react";
 import {useToast} from "../ui/use-toast";
@@ -17,7 +16,6 @@ const initialState = {
 }
 
 const Login = () => {
-    let apiSerVice = new ApiService();
     let navigate = useNavigate();
     const {toast} = useToast();
 
@@ -75,8 +73,8 @@ const Login = () => {
             password: companyDetails.password,
             loginType: "1"
         }
-        const data = await apiSerVice.login(payload)
-        if (data.data.token) {
+        const data = await apiService.login(payload)
+        if (data.success) {
             toast({description: data.message})
             const urlParams = new URLSearchParams(window.location.search);
             const token = urlParams.get('token');
@@ -102,7 +100,7 @@ const Login = () => {
             setIsLoading(false)
         } else {
             setIsLoading(false)
-            toast({variant: "destructive", description: data?.message})
+            toast({variant: "destructive", description: data?.error?.message})
         }
     }
 

@@ -32,7 +32,7 @@ export class ApiService{
                 response = res.data
             }
         }).catch((e) =>{
-            if(e.response.status === 401){
+            if(e.response.status === 403){
                 logout();
                 removeProjectDetails()
                 window.location.replace(`${baseUrl}/login`)
@@ -59,7 +59,7 @@ export class ApiService{
                 response = res.data
             }
         }).catch((e) =>{
-            if(e.response.status === 401){
+            if(e.response.status === 403){
                 logout();
                 removeProjectDetails()
                 window.location.replace(`${baseUrl}/login`)
@@ -232,7 +232,7 @@ export class ApiService{
         return await this.postData(`${baseUrlApi}/search`,payload)
     }
     async updatePosts (payload, id){
-        return await this.patchData(`${baseUrlApi}/post/update-Post?id=${id}?_method=put`,payload, true)
+        return await this.putData(`${baseUrlApi}/post/update-post?id=${id}`,payload, true)
     }
     async deletePosts (id){
         return await this.deleteData(`${baseUrlApi}/post/delete-post?id=${id}`)
@@ -285,7 +285,7 @@ export class ApiService{
 
     /* ---------- Users api ---------- */
     async getAllUsers (id){
-        return await this.getData(`${baseUrlApi}/customerAuth/getAll?projectId=${qs.stringify(id)}`)
+        return await this.getData(`${baseUrlApi}/customerAuth/getAll?${qs.stringify(id)}`)
     }
     async getSingleUser (id){
         return await this.getData(`${baseUrlApi}/customers/${id}?is_history=1`)
@@ -337,7 +337,7 @@ export class ApiService{
 
     /* ---------- Ideas api ---------- */
     async getAllIdea (payload){
-        return await this.getData(`${baseUrlApi}/idea/getAll?projectId=${qs.stringify(payload)}`)
+        return await this.getData(`${baseUrlApi}/idea/getAll?${qs.stringify(payload)}`)
     }
     async ideaSearch (payload){
         return await this.postData(`${baseUrlApi}/idea/search`,payload, )
@@ -441,7 +441,7 @@ export class ApiService{
         return await this.postData(`${baseUrlApi}/article-subCategory/subCategories`, payload, true)
     }
     async getAllCategory (payload){
-        return await this.getData(`${baseUrlApi}/article-category/get-all-categories?projectId=${qs.stringify(payload)}`,)
+        return await this.getData(`${baseUrlApi}/article-category/get-all-categories?${qs.stringify(payload)}`,)
     }
     async getAllSubCategory (id){
         return await this.getData(`${baseUrlApi}/article-subCategory/get-all-subCategories?id=${id}`,)
@@ -461,7 +461,7 @@ export class ApiService{
 
     /* ---------- Help Center Articles api ---------- */
     async getAllArticles (payload){
-        return await this.getData(`${baseUrlApi}/artical/get-all-articles?projectId=${qs.stringify(payload)}`,)
+        return await this.getData(`${baseUrlApi}/artical/get-all-articles?${qs.stringify(payload)}`,)
     }
     async createArticles (payload){
         return await this.postData(`${baseUrlApi}/artical/articles`, payload)
