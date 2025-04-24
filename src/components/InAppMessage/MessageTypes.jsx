@@ -2,10 +2,10 @@ import React, {Fragment, useState, useEffect} from 'react';
 import {Card, CardContent} from "../ui/card";
 import {useNavigate} from "react-router-dom";
 import {baseUrl} from "../../utils/constent";
-import post_img from "../../img/Post.png";
-import checklist_img from "../../img/Checklist.png";
-import banner_img from "../../img/banner.png";
-import survey_img from "../../img/Survey.png";
+import postImg from "../../img/Post.png";
+import checklistImg from "../../img/Checklist.png";
+import bannerImg from "../../img/banner.png";
+import surveyImg from "../../img/Survey.png";
 import {Button} from "../ui/button";
 import {Skeleton} from "../ui/skeleton";
 import {ArrowLeft} from "lucide-react";
@@ -29,25 +29,25 @@ const MessageTypes = () => {
         {
             title: "Post",
             description : "Share important updates and tips with users directly in the app to keep them informed.",
-            img: post_img,
+            img: postImg,
             type: "1"
         },
         {
             title: "Banners",
             description : "Use banners to highlight key messages at the top of the screen for immediate attention",
-            img: banner_img,
+            img: bannerImg,
             type: "2"
         },
         {
             title: "Surveys",
             description :"Collect user feedback with quick surveys to enhance their experience and understand their needs.",
-            img: survey_img,
+            img: surveyImg,
             type: "3"
         },
         {
             title: "Checklist",
             description : "Guide users through tasks with interactive checklists to track their progress effectively.",
-            img: checklist_img,
+            img: checklistImg,
             type: "4"
         }
     ]

@@ -7,9 +7,8 @@ import {useSelector} from "react-redux";
 import {DropdownMenu, DropdownMenuTrigger} from "@radix-ui/react-dropdown-menu";
 import {DropdownMenuContent, DropdownMenuItem} from "../ui/dropdown-menu";
 import {Card, CardContent} from "../ui/card";
-import {useNavigate} from "react-router-dom";
-import {baseUrl} from "../../utils/constent";
-import {ApiService} from "../../utils/ApiService";
+import {useNavigate, useSearchParams} from "react-router-dom";
+import {apiService, baseUrl} from "../../utils/constent";
 import {useToast} from "../ui/use-toast";
 import WidgetAnalytics from "./WidgetAnalytics";
 import {Skeleton} from "../ui/skeleton";
@@ -26,15 +25,13 @@ const perPageLimit = 10;
 const Widgets = () => {
     const {theme, onProModal} = useTheme()
     const navigate = useNavigate();
-    const UrlParams = new URLSearchParams(location.search);
-    const getPageNo = UrlParams.get("pageNo") || 1;
-    let apiSerVice = new ApiService();
+    const [searchParams] = useSearchParams();
+    const getPageNo = searchParams.get("pageNo") || 1;
     const {toast} = useToast()
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const userDetailsReducer = useSelector(state => state.userDetailsReducer);
 
     const [widgetsSetting, setWidgetsSetting] = useState([])
-    const [analyticsObj, setAnalyticsObj] = useState({});
     const [selectedRecordAnalytics, setSelectedRecordAnalytics] = useState({})
     const [isDeleteLoading, setDeleteIsLoading] = useState(false);
     const [isCopyLoading, setCopyIsLoading] = useState(false);
@@ -49,10 +46,12 @@ const Widgets = () => {
     const [totalRecord, setTotalRecord] = useState(0);
     const [emptyContentBlock, setEmptyContentBlock] = useState(true);
 
-    const emptyContent = (status) => {setEmptyContentBlock(status);};
+    const emptyContent = (status) => {
+        setEmptyContentBlock(status);
+    };
 
     const openSheet = (id, type) => {
-        if(type === "delete") {
+        if (type === "delete") {
             setDeleteRecord(id)
             setOpenDelete(true)
         } else {
@@ -60,9 +59,9 @@ const Widgets = () => {
             setSelectedRecordAnalytics(id)
         }
     }
+
     const closeSheet = () => {
         setSheetOpen(false);
-        setAnalyticsObj({})
     }
 
     useEffect(() => {
@@ -75,22 +74,21 @@ const Widgets = () => {
     const getWidgetsSetting = async () => {
         setIsLoading(true)
         const payload = {
-            project_id: projectDetailsReducer.id,
+            projectId: projectDetailsReducer.id,
             page: pageNo,
             limit: perPageLimit
         }
-        const data = await apiSerVice.getWidgetsSetting(payload)
-        if (data.status === 200) {
-            setWidgetsSetting(data.data);
-            setTotalRecord(data.total);
-            setIsLoading(false);
-            if (!data.data || data.data.length === 0) {
+        const data = await apiService.getWidgetsSetting(payload)
+        setIsLoading(false);
+        if (data.success) {
+            setWidgetsSetting(data.data?.widgets);
+            setTotalRecord(data.data.total);
+            if (!data.data?.widgets || data.data?.widgets.length === 0) {
                 emptyContent(true);
             } else {
                 emptyContent(false);
             }
         } else {
-            setIsLoading(false);
             emptyContent(true);
         }
     }
@@ -105,20 +103,19 @@ const Widgets = () => {
                 onProModal(true)
             }
         } else {
-            if(id === "type"){
+            if (id === "type") {
                 navigate(`${baseUrl}/widget/${id}`);
             } else {
                 navigate(`${baseUrl}/widget/${type}/${id}?pageNo=${getPageNo}`);
             }
-
             onProModal(false)
         }
     };
 
     const deleteWidget = async (id) => {
         setDeleteIsLoading(true);
-        const data = await apiSerVice.onDeleteWidget(id, deleteRecord)
-        if (data.status === 200) {
+        const data = await apiService.onDeleteWidget(id, deleteRecord)
+        if (data.success) {
             const clone = [...widgetsSetting];
             const index = clone.findIndex((x) => x.id === id)
             if (index !== -1) {
@@ -134,7 +131,7 @@ const Widgets = () => {
                 setDeleteIsLoading(false);
                 toast({description: data.message});
             } else {
-                toast({variant: "destructive", description: data.message});
+                toast({variant: "destructive", description: data?.error?.message});
             }
         }
     };
@@ -207,8 +204,9 @@ const Widgets = () => {
                     />
                 </Fragment>
             }
-            <div className={"container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-3 md:px-4"}>
 
+            <div
+                className={"container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-3 md:px-4"}>
                 <WidgetAnalytics
                     isOpen={isSheetOpen}
                     onOpen={openSheet}
@@ -220,7 +218,8 @@ const Widgets = () => {
                     <div className={"flex items-center justify-between flex-wrap gap-2"}>
                         <div className={"flex flex-col gap-y-0.5"}>
                             <h1 className="text-2xl font-normal flex-initial w-auto">Widgets ({totalRecord})</h1>
-                            <p className={"text-sm text-muted-foreground"}>Enhance your site with different widgets: Embed, Popover, Modal, and Sidebar, for improved interactivity and access.</p>
+                            <p className={"text-sm text-muted-foreground"}>Enhance your site with different widgets:
+                                Embed, Popover, Modal, and Sidebar, for improved interactivity and access.</p>
                         </div>
                         <div className={"w-full lg:w-auto flex sm:flex-nowrap flex-wrap gap-2 items-center"}>
                             <Button
@@ -239,7 +238,7 @@ const Widgets = () => {
                                         {
                                             ["Name", "Type", "Last Updated", "", "Analytics", "Actions"].map((x, i) => {
                                                 return (
-                                                    <TableHead
+                                                    <TableHead key={i}
                                                         className={`px-2 py-[10px] md:px-3 font-medium text-card-foreground ${i > 1 ? "max-w-[140px] truncate text-ellipsis overflow-hidden whitespace-nowrap" : ""} ${i >= 4 ? 'text-center' : ''}`}>{x}</TableHead>
                                                 )
                                             })
@@ -256,7 +255,7 @@ const Widgets = () => {
                                                             [...Array(6)].map((_, i) => {
                                                                 return (
                                                                     <TableCell
-                                                                        className={"max-w-[373px] px-2 py-[10px] md:px-3"}>
+                                                                        className={"max-w-[373px] px-2 py-[10px] md:px-3"} key={i}>
                                                                         <Skeleton className={"rounded-md  w-full h-7"}/>
                                                                     </TableCell>
                                                                 )
@@ -274,7 +273,7 @@ const Widgets = () => {
                                                     <TableCell
                                                         className={"font-normal p-2 py-[10px] md:px-3 capitalize"}>{x.type}</TableCell>
                                                     <TableCell
-                                                        className={"font-normal p-2 py-[10px] md:px-3"}>{moment(x.created_at).format('D MMM, YYYY')}</TableCell>
+                                                        className={"font-normal p-2 py-[10px] md:px-3"}>{moment(x.createdAt).format('D MMM, YYYY')}</TableCell>
                                                     <TableCell className={" p-2 py-[10px] md:px-3 text-center"}>
                                                         <Button
                                                             className={"py-[6px] px-3 h-auto text-xs font-medium hover:bg-primary"}
@@ -282,10 +281,10 @@ const Widgets = () => {
                                                     </TableCell>
                                                     <TableCell className={"font-normal p-2 py-[10px] md:px-3"}>
                                                         <div className={"flex justify-center"}>
-                                                        <BarChart
-                                                            onClick={() => openSheet(x.id)} size={16}
-                                                            className={"cursor-pointer"}
-                                                        />
+                                                            <BarChart
+                                                                onClick={() => openSheet(x.id)} size={16}
+                                                                className={"cursor-pointer"}
+                                                            />
                                                         </div>
                                                     </TableCell>
                                                     <TableCell className={" p-2 py-[10px] md:px-3 text-center"}>

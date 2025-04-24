@@ -82,7 +82,7 @@ const PostAnalyticsView = () => {
         { label: "Name", render: (row) => <UserCell name={row.name} email={row.email} /> },
         { label: "Reply", dataKey: "response", className: "max-w-[270px] truncate text-ellipsis overflow-hidden whitespace-nowrap" },
         { label: "Reaction", align: "center", render: (row) => row.emojiUrl ? <img className="h-6 w-6 cursor-pointer" src={row.emojiUrl} /> : "-" },
-        { label: "Image View", align: "center", render: (row) => <ImageCarouselCell files={row.files} /> },
+        { label: "Image View", align: "center", render: (row) => <ImageCarouselCell files={row.file} /> },
         { label: "When they replied", align: "center", render: (row) => moment(row.createdAt).format("ll") },
     ];
 

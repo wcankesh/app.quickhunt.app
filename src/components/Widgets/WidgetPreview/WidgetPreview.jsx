@@ -43,7 +43,7 @@ const WidgetPreview = ({widgetsSetting, type, toggle,onToggle }) => {
                     </ul>
                 </main>
                 {
-                    (allStatusAndTypes?.setting?.is_branding === 1) &&
+                    (allStatusAndTypes?.setting?.isBranding === 1) &&
                     <section className={`py-4 ${theme == "dark" ? "bg-card-foreground text-card" : "bg-card"} `}>
                         <h6 className="text-sm font-medium text-end mr-2">Powered by
                             <a className="text-primary" href="https://quickhunt.app" target="_blank">quickhunt</a>
@@ -58,15 +58,14 @@ const WidgetPreview = ({widgetsSetting, type, toggle,onToggle }) => {
             {
                 type === "popover" &&
                 <div className={`QH-popover-admin ${toggle ? "QH-popover-open-admin" : ""}`} style={{
-                    // left: widgetsSetting.launcher_position === 1 ? "40px" : "inherit",
-                    left: (widgetsSetting.launcher_position === 1)
-                        ? (type === "popover" ? `${widgetsSetting.launcher_left_spacing || 20}px` : `${widgetsSetting.launcher_left_spacing || 690}px`)
+                    left: (widgetsSetting.launcherPosition === 1)
+                        ? (type === "popover" ? `${widgetsSetting.launcherLeftSpacing || 20}px` : `${widgetsSetting.launcherLeftSpacing || 690}px`)
                         : "inherit",
-                    right: (widgetsSetting.launcher_position === 2)
-                        ? `${widgetsSetting.launcher_right_spacing || 20}px`
+                    right: (widgetsSetting.launcherPosition === 2)
+                        ? `${widgetsSetting.launcherRightSpacing || 20}px`
                         : "inherit",
-                    bottom: (widgetsSetting.launcher_bottom_spacing) ? `${widgetsSetting.launcher_bottom_spacing || "90"}px` : "inherit",
-                    width: `${widgetsSetting.popover_width}px`, height: `${widgetsSetting.popover_height}px`
+                    bottom: (widgetsSetting.launcherBottomSpacing) ? `${widgetsSetting.launcherBottomSpacing || "90"}px` : "inherit",
+                    width: `${widgetsSetting.popoverWidth}px`, height: `${widgetsSetting.popoverHeight}px`
                 }}>
                     {renderContent()}
                 </div>
@@ -74,24 +73,20 @@ const WidgetPreview = ({widgetsSetting, type, toggle,onToggle }) => {
 
             {
                 type === "sidebar" &&
-                // <div className={"relative h-full"}>
                     <div className={`QH-sidebar-admin ${toggle ? "QH-sidebar-open-admin" : ""} relative`} style={{
-                        // left: widgetsSetting.sidebar_position === 1 ? "350px" : "inherit",
-                        left: widgetsSetting.sidebar_position === 1 ? "0px" : "inherit",
-                        right: widgetsSetting.sidebar_position === 2 ? "0" : "inherit",
+                        left: widgetsSetting.sidebarPosition === 1 ? "0px" : "inherit",
+                        right: widgetsSetting.sidebarPosition === 2 ? "0" : "inherit",
                     }}>
                         <div className="QH-sidebar-content-admin" style={{
-                            // left: widgetsSetting.sidebar_position === 1 ? "350px" : "inherit",
-                            left: widgetsSetting.sidebar_position === 1 ? "0px" : "inherit",
-                            right: widgetsSetting.sidebar_position === 2 ? "0" : "inherit",
-                            bottom: (widgetsSetting.launcher_bottom_spacing) ? `${widgetsSetting.launcher_bottom_spacing || "90"}px` : "inherit",
-                            width: `${widgetsSetting.sidebar_width}px`,
+                            left: widgetsSetting.sidebarPosition === 1 ? "0px" : "inherit",
+                            right: widgetsSetting.sidebarPosition === 2 ? "0" : "inherit",
+                            bottom: (widgetsSetting.launcherBottomSpacing) ? `${widgetsSetting.launcherBottomSpacing || "90"}px` : "inherit",
+                            width: `${widgetsSetting.sidebarWidth}px`,
                         }}>
                             {renderContent()}
                         </div>
                         <div className="QH-sidebar-shadow-admin" onClick={onToggle}>&nbsp;</div>
                     </div>
-                // </div>
             }
 
             {
@@ -100,8 +95,8 @@ const WidgetPreview = ({widgetsSetting, type, toggle,onToggle }) => {
                     <div className={`QH-modal-admin ${toggle ? "QH-modal-open-admin" : ""}`}>
                         <div className={"QH-modal-content-admin"}
                              style={{
-                                 width: `${widgetsSetting.modal_width}px`,
-                                 height: `${widgetsSetting.modal_height}px`,
+                                 width: `${widgetsSetting.modalWidth}px`,
+                                 height: `${widgetsSetting.modalHeight}px`,
                              }}>
                             {renderContent()}
                         </div>

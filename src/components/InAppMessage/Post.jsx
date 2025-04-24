@@ -111,7 +111,6 @@ const Post = ({inAppMsgSetting, setInAppMsgSetting, isLoading}) => {
             ...prevState,
             reactions: clone
         }));
-
     }
 
     useEffect(() => {
@@ -168,7 +167,6 @@ const Post = ({inAppMsgSetting, setInAppMsgSetting, isLoading}) => {
                     }
                     <div className={"pl-4 pt-4 md:pl-14 md:pt-6 m-0 w-full"}>{isLoading ? "" :
                         <div id="editorjs"></div>}</div>
-                    {/*<div className={"pl-14 pt-6 m-0 w-full"}><EditorComponent  /></div>*/}
                 </CardHeader>
                 {
                     inAppMsgSetting.replyType === 1 ? <CardContent
@@ -206,8 +204,7 @@ const Post = ({inAppMsgSetting, setInAppMsgSetting, isLoading}) => {
                                 }
                                 <Popover>
                                     <PopoverTrigger asChild>
-                                        <Button variant={"secondary"} className={"h-6 w-6 rounded-[100%] p-1"}><Plus
-                                            size={16}/></Button>
+                                        <Button variant={"secondary"} className={"h-6 w-6 rounded-[100%] p-1"}><Plus size={16}/></Button>
                                     </PopoverTrigger>
                                     <PopoverContent className="w-full p-0 border-none w-[310px]]">
                                         <EmojiPicker theme={theme === "dark" ? "dark" : "light"} height={350}

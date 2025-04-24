@@ -173,7 +173,7 @@ const ArticleDetail = () => {
             navigate(`${baseUrl}/help/article`);
             toast({description: data.message,});
         } else {
-            toast({description: data.error.message, variant: "destructive",})
+            toast({description: data?.error?.message, variant: "destructive",})
         }
         setLoad('');
     };

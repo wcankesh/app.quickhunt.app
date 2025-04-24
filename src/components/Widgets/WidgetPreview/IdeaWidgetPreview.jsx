@@ -5,12 +5,10 @@ import {Button} from "../../ui/button";
 import {Skeleton} from "../../ui/skeleton"
 import {Icon} from "../../../utils/Icon";
 import ReadMoreText from "../../Comman/ReadMoreText";
-import {cleanQuillHtml, getDateFormat} from "../../../utils/constent";
-import {ApiService} from "../../../utils/ApiService";
+import {apiService, cleanQuillHtml, getDateFormat} from "../../../utils/constent";
 import {useSelector} from "react-redux";
 
 const IdeaWidgetPreview = ({widgetsSetting}) => {
-    let apiSerVice = new ApiService();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
 
     const [ideasList, setIdeasList] = useState([]);
@@ -23,16 +21,14 @@ const IdeaWidgetPreview = ({widgetsSetting}) => {
     }, [projectDetailsReducer.id])
 
     const getAllIdea = async () => {
-        const data = await apiSerVice.getAllIdea({
-            project_id: projectDetailsReducer.id,
+        const data = await apiService.getAllIdea({
+            projectId: projectDetailsReducer.id,
             page: 1,
             limit: 10
         })
-        if (data.status === 200) {
-            setIdeasList(data.data)
-            setIsLoading(false)
-        } else {
-            setIsLoading(false)
+        setIsLoading(false)
+        if (data.success) {
+            setIdeasList(data.data?.ideas)
         }
     }
 
@@ -48,10 +44,9 @@ const IdeaWidgetPreview = ({widgetsSetting}) => {
                     <Button size="icon" variant="outline" className={`w-9 h-9 flex ${btnClass}`}><GalleryVerticalEnd fill="true" className='w-4 -h4'/></Button>
                 </div>
                 <Button className="gap-2 inset-0 shadow-none outline-none" style={{
-                    backgroundColor: widgetsSetting?.btn_background_color,
-                    color: widgetsSetting?.btn_text_color
-                }}><Plus className="w-5 h-5"/>{widgetsSetting.idea_button_label ? widgetsSetting.idea_button_label : "Create Idea"}</Button>
-
+                    backgroundColor: widgetsSetting?.btnBackgroundColor,
+                    color: widgetsSetting?.btnTextColor
+                }}><Plus className="w-5 h-5"/>{widgetsSetting.ideaButtonLabel ? widgetsSetting.ideaButtonLabel : "Create Idea"}</Button>
             </div>
 
             <div className="block overflow-y-auto">
@@ -77,10 +72,10 @@ const IdeaWidgetPreview = ({widgetsSetting}) => {
                                             <div className="flex flex-wrap gap-2 items-start">
                                                 <div className="w-auto flex-initial  flex gap-4 items-center">
                                                     <Button variant={'outline'} size="icon"
-                                                            className={`w-12 h-12 ${btnClass} flex-col cursor-pointer ${idea.user_vote === 1 ? 'text-primary' : 'text-slate-400'}`}
-                                                            style={idea.user_vote === 1 ? {
-                                                                color: widgetsSetting?.btn_background_color,
-                                                                fill: widgetsSetting?.btn_background_color
+                                                            className={`w-12 h-12 ${btnClass} flex-col cursor-pointer ${idea.userVote === 1 ? 'text-primary' : 'text-slate-400'}`}
+                                                            style={idea.userVote === 1 ? {
+                                                                color: widgetsSetting?.btnBackgroundColor,
+                                                                fill: widgetsSetting?.btnBackgroundColor
                                                             } : {fill: 'rgb(148 163 184)'}}
                                                            >
                                                         <Triangle fill="true" className="w-3 h-3"/>
@@ -94,9 +89,8 @@ const IdeaWidgetPreview = ({widgetsSetting}) => {
                                                             <h2
                                                                 className="text-xs cursor-pointer font-medium ">{idea.title}</h2>
                                                         </div>
-                                                        {widgetsSetting?.idea_description === 1 ?
+                                                        {widgetsSetting?.ideaDescription === 1 ?
                                                             <div className={'description-container-widget-preview inline-block w-full text-xs'}>
-                                                                {/*<ReadMoreText html={idea.description} isWidget={true}/>*/}
                                                                 {
                                                                     cleanQuillHtml(idea?.description) ? <ReadMoreText html={idea.description} isWidget={true}/> : null
                                                                 }
@@ -109,19 +103,16 @@ const IdeaWidgetPreview = ({widgetsSetting}) => {
                                                                 <div
                                                                     className="text-xs text-gray-600 font-normal">{idea.name}</div>
                                                                 <div
-                                                                    className="text-xs text-muted-foreground">{getDateFormat(idea.created_at)}</div>
+                                                                    className="text-xs text-muted-foreground">{getDateFormat(idea.createdAt)}</div>
                                                             </div>
-                                                            {idea.roadmap_id && <span style={{
-                                                                borderColor: idea.roadmap_color,
-                                                                color: idea.roadmap_color
-                                                            }}  className="border px-2 py-1 rounded text-exm font-medium">{idea.roadmap_title}</span>}
+                                                            {idea.roadmapStatusId && <span style={{
+                                                                borderColor: idea.roadmapColor,
+                                                                color: idea.roadmapColor
+                                                            }}  className="border px-2 py-1 rounded text-exm font-medium">{idea.roadmapTitle}</span>}
                                                         </div>
                                                     </div>
                                                 </div>
-
-
                                             </div>
-
                                         </div>
                                     )
                                 })
@@ -133,21 +124,20 @@ const IdeaWidgetPreview = ({widgetsSetting}) => {
                                     <div className="flex gap-2 ">
                                         <Button variant="outline" size="icon"
                                               className={`w-8 h-8 text-primary ${btnClass}`}
-                                                style={{color: widgetsSetting?.btn_background_color}}><ChevronsLeft
+                                                style={{color: widgetsSetting?.btnBackgroundColor}}><ChevronsLeft
                                             className="w-5 h-5"/></Button>
                                         <Button variant="outline" size="icon"
                                                 className={`w-8 h-8 text-primary ${btnClass}`}
-                                                style={{color: widgetsSetting?.btn_background_color}}><ChevronLeft
+                                                style={{color: widgetsSetting?.btnBackgroundColor}}><ChevronLeft
                                             className="w-5 h-5"/></Button>
                                         <Button variant="outline" size="icon"
                                                  className={`w-8 h-8 text-primary ${btnClass}`}
-                                                style={{color: widgetsSetting?.btn_background_color}}><ChevronRight
+                                                style={{color: widgetsSetting?.btnBackgroundColor}}><ChevronRight
                                             className="w-5 h-5"/></Button>
                                         <Button variant="outline" size="icon"
                                                 className={`w-8 h-8 text-primary ${btnClass}`}
-                                                style={{color: widgetsSetting?.btn_background_color}}><ChevronsRight
+                                                style={{color: widgetsSetting?.btnBackgroundColor}}><ChevronsRight
                                             className="w-5 h-5"/></Button>
-
                                     </div>
                                 </div>
                             </div>
@@ -161,8 +151,8 @@ const IdeaWidgetPreview = ({widgetsSetting}) => {
                                     Start by adding new items to see them here.</p>
                                 <div className="mt-6">
                                     <Button className="gap-2 inset-0 shadow-none outline-none" style={{
-                                        backgroundColor: widgetsSetting?.btn_background_color,
-                                        color: widgetsSetting?.btn_text_color
+                                        backgroundColor: widgetsSetting?.btnBackgroundColor,
+                                        color: widgetsSetting?.btnTextColor
                                     }}><Plus className="w-5 h-5"/> Add New Idea</Button>
                                 </div>
                             </div>

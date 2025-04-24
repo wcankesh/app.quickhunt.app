@@ -4,35 +4,33 @@ import { X } from "lucide-react";
 import {Card, CardContent, CardHeader, CardTitle} from "../ui/card";
 
 const WidgetAnalytics = ({ isOpen, onOpen, onClose, widgetsSetting, selectedRecordAnalytics }) => {
-
     const widgetData = widgetsSetting.find(widget => widget.id == selectedRecordAnalytics) || {};
 
     const widAnalytics = [
         {
             id: 1,
             title: 'Widget views',
-            count: widgetData?.widget_view,
+            count: widgetData?.widgetView,
         },
         {
             id: 2,
             title: 'Announcement views',
-            count: widgetData?.announcement_view,
+            count: widgetData?.announcementView,
         },
         {
             id: 3,
             title: 'Roadmap views',
-            count: widgetData?.roadmap_view,
+            count: widgetData?.roadmapView,
         },
         {
             id: 4,
             title: 'Ideas page views',
-            count: widgetData?.idea_view,
+            count: widgetData?.ideaView,
         },
     ]
 
     return (
         <Sheet open={isOpen} onOpenChange={isOpen ? onClose : onOpen}>
-            {/*<SheetOverlay className={"inset-0"} />*/}
             <SheetContent className={"lg:max-w-[800px] md:max-w-[620px] sm:max-w-[420px] p-0 outline-none"}>
                 <SheetHeader className={"px-4 py-3 md:py-5 lg:px-8 lg:py-[20px] border-b"}>
                     <div className={"flex justify-between items-center w-full"}>

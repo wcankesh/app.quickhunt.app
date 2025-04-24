@@ -1,10 +1,10 @@
 import React, {Fragment, useState, useEffect} from 'react';
 import {baseUrl} from "../../utils/constent";
 import {Card, CardContent} from "../ui/card";
-import embed_img from "../../img/embed_widget.png";
-import popover_img from "../../img/popover_widget.png";
-import modal_img from "../../img/modal_widget.png";
-import sidebar_img from "../../img/sidebar_widget.png";
+import embedImg from "../../img/embed_widget.png";
+import popoverImg from "../../img/popover_widget.png";
+import modalImg from "../../img/modal_widget.png";
+import sidebarImg from "../../img/sidebar_widget.png";
 import {useNavigate} from "react-router-dom";
 import {Button} from "../ui/button";
 import {ArrowLeft} from "lucide-react";
@@ -29,25 +29,25 @@ const WidgetsTypes = () => {
         {
             title: "Embed Widget",
             description : "Integrate content directly into your website for seamless user interaction.",
-            img: embed_img,
+            img: embedImg,
             type: "embed"
         },
         {
             title: "Popover Widget",
             description : "Display interactive content in a small overlay for quick access without leaving the page.",
-            img: popover_img,
+            img: popoverImg,
             type: "popover"
         },
         {
             title: "Modal Widget",
             description : "Present focused content in a popup window, requiring user action before returning to the main page.",
-            img: modal_img,
+            img: modalImg,
             type: "modal"
         },
         {
             title: "Sidebar Widget",
             description : "Add a persistent sidebar for easy access to additional features or information on your website.",
-            img: sidebar_img,
+            img: sidebarImg,
             type: "sidebar"
         }
     ];

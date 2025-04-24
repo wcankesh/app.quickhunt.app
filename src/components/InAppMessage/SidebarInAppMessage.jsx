@@ -125,7 +125,7 @@ const SidebarInAppMessage = ({
         const trimmedValue = typeof value === "string" ? value.trim() : String(value || "").trim();
         switch (name) {
             case "from":
-                if (inAppMsgSetting.showSender&& !value) {
+                if (inAppMsgSetting.showSender && !value) {
                     return "Sender is required.";
                 }
                 return "";
@@ -440,8 +440,8 @@ const SidebarInAppMessage = ({
                                     <div className="grid w-full items-center gap-1.5">
                                         <div className="flex items-center gap-2">
                                             <Checkbox id="isRedirect"
-                                                      checked={selectedStep.isRedirect === 1}
-                                                      onCheckedChange={(checked) => onChangeChecklist("isRedirect", checked ? 1 : 0)}
+                                                      checked={selectedStep.isRedirect}
+                                                      onCheckedChange={(checked) => onChangeChecklist("isRedirect", checked)}
                                             />
                                             <Label htmlFor="isRedirect" className={"font-normal cursor-pointer"}>Open
                                                 URL in a new tab</Label>
@@ -470,8 +470,8 @@ const SidebarInAppMessage = ({
                             <div className="grid w-full items-center gap-1.5">
                                 <div className="flex items-center gap-2">
                                     <Checkbox id="isRedirect"
-                                              checked={inAppMsgSetting.isRedirect === 1}
-                                              onCheckedChange={(checked) => onChange("isRedirect", checked ? 1 : 0)}
+                                              checked={inAppMsgSetting.isRedirect}
+                                              onCheckedChange={(checked) => onChange("isRedirect", checked)}
                                     />
                                     <Label htmlFor="isRedirect" className={"font-normal cursor-pointer"}>Open URL in a
                                         new tab</Label>
@@ -484,8 +484,8 @@ const SidebarInAppMessage = ({
                         <div className="grid w-full items-center gap-1.5">
                             <div className="flex items-center gap-2">
                                 <Checkbox id="isBannerCloseButton"
-                                          checked={inAppMsgSetting.isBannerCloseButton === 1}
-                                          onCheckedChange={(checked) => onChange("isBannerCloseButton", checked ? 1 : 0)}
+                                          checked={inAppMsgSetting.isBannerCloseButton}
+                                          onCheckedChange={(checked) => onChange("isBannerCloseButton", checked)}
                                 />
                                 <Label htmlFor="isBannerCloseButton" className={"font-normal cursor-pointer"}>Dismiss
                                     the banner on click</Label>

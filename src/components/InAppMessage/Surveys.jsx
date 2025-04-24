@@ -127,11 +127,9 @@ const Surveys = ({inAppMsgSetting, setInAppMsgSetting, selectedStepIndex, setSel
             endNumber: "5",
             startLabel: "Not likely",
             endLabel: "Very likely",
-            isAnswerRequired: "",
+            isAnswerRequired: true,
             step: nextStepNumber,
-            options: value == 5
-                ? [{ id: "", title: "", isActive: true }]
-                : [],
+            options: value == 5 ? [{ id: "", title: "", isActive: true }] : [],
             reactions: value == 4 ? reactionPost : [],
             isActive: true,
             stepId: ""
@@ -148,6 +146,8 @@ const Surveys = ({inAppMsgSetting, setInAppMsgSetting, selectedStepIndex, setSel
             clone.push(type8StepObj);
         }
         setSelectedStep(stepBoj);
+        const newStepIndex = clone.findIndex((x) => x.step === stepBoj.step);
+        setSelectedStepIndex(newStepIndex);
         setInAppMsgSetting((prevState) => ({
             ...prevState,
             steps: clone
@@ -218,7 +218,6 @@ const Surveys = ({inAppMsgSetting, setInAppMsgSetting, selectedStepIndex, setSel
         <div className={"flex flex-col gap-4 py-8 px-[5px] md:px-0 bg-muted justify-start overflow-y-auto h-[calc(100%_-_94px)]"}>
             {
                 inAppMsgSetting.steps.filter((x) => x.isActive).map((x, i) => {
-
                     return(
                         <div className={`flex items-center mx-auto gap-2 md:gap-8 w-full max-w-[623px] w-full`} key={i}>
                             <div className={"flex gap-1"}><span>Step</span> <span>{x.step}</span></div>

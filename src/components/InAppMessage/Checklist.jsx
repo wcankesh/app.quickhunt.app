@@ -53,7 +53,7 @@ const checklists = ({
             actionType: 0,
             actionText: "Open",
             actionUrl: "",
-            isRedirect: 0,
+            isRedirect: false,
             isActive: true,
             checklistId: ""
         };

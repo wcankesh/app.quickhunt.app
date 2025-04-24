@@ -2,7 +2,7 @@ import axios from "axios";
 import {logout, removeProjectDetails, token, baseUrl} from "./constent";
 import qs from 'qs';
 
-const baseUrlApi = 'http://192.168.1.36:3001';
+const baseUrlApi = 'http://192.168.1.12:3001';
 // const baseUrlApi = 'https://code.quickhunt.app/public/api';
 let instance = axios.create();
 instance.interceptors.request.use(function (config) {
@@ -340,7 +340,7 @@ export class ApiService {
 
     /* ---------- Roadmap api ---------- */
     async getRoadmapIdea(payload) {
-        return await this.postData(`${baseUrlApi}/roadmap-idea`, payload)
+        return await this.postData(`${baseUrlApi}/road-map-status/roadmap-idea`, payload)
     }
 
     async getAllRoadmapStatus(id) {
@@ -549,15 +549,15 @@ export class ApiService {
 
     /* ---------- Widget api ---------- */
     async getWidgets(id) {
-        return await this.getData(`${baseUrlApi}/widget/${id}`)
+        return await this.getData(`${baseUrlApi}/widget/get-by-id/${id}`)
     }
 
     async updateWidgets(payload, id) {
-        return await this.postData(`${baseUrlApi}/widget/${id}?_method=PUT`, payload)
+        return await this.putData(`${baseUrlApi}/widget/update/${id}`, payload)
     }
 
     async createWidgets(payload) {
-        return await this.postData(`${baseUrlApi}/widget`, payload)
+        return await this.postData(`${baseUrlApi}/widget/create`, payload)
     }
 
     async onDeleteWidget(id) {
@@ -565,7 +565,7 @@ export class ApiService {
     }
 
     async getWidgetsSetting(payload) {
-        return await this.getData(`${baseUrlApi}/widget?${qs.stringify(payload)}`)
+        return await this.getData(`${baseUrlApi}/widget/get-all?${qs.stringify(payload)}`)
     }
 
     /* ---------- Settings Board api ---------- */

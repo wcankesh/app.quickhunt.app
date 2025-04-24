@@ -8,63 +8,57 @@ const WidgetHeader = ({widgetsSetting, selected, setSelected}) => {
 
     const navList = [
         {
-            title: widgetsSetting.idea_title || 'Ideas',
+            title: widgetsSetting.ideaTitle || 'Ideas',
             icon: Icon.ideasIcon,
             link: 'ideas',
             selected: selected === `ideas`,
-            isCheck: widgetsSetting.is_idea === 0 ? false : true,
-            isRedirect: widgetsSetting.idea_display === 2 ? false : true,
+            isCheck: widgetsSetting.isIdea !== 0,
+            isRedirect: widgetsSetting.ideaDisplay !== 2,
         },
         {
-            title: widgetsSetting.roadmap_title || 'Roadmap',
+            title: widgetsSetting.roadmapTitle || 'Roadmap',
             link: 'roadmap',
             icon: Icon.roadmapIcon,
             selected: selected === `roadmap`,
-            isCheck: widgetsSetting.is_roadmap === 0 ? false : true,
-            isRedirect: widgetsSetting.roadmap_display === 2 ? false : true,
+            isCheck: widgetsSetting.isRoadmap !== 0,
+            isRedirect: widgetsSetting.roadmapDisplay !== 2,
         },
         {
-            title: widgetsSetting.changelog_title || 'Announcements',
+            title: widgetsSetting.changelogTitle || 'Announcements',
             link: 'announcements',
             icon: Icon.announcement,
             selected: selected === `announcements`,
-            isCheck: widgetsSetting.is_announcement === 0 ? false : true,
-            isRedirect: widgetsSetting.changelog_display === 2 ? false : true,
+            isCheck: widgetsSetting.isAnnouncement !== 0,
+            isRedirect: widgetsSetting.changelogDisplay !== 2,
         }
     ];
 
-    const onRedirect = (link,redirectType) => {
-        if(redirectType){
+    const onRedirect = (link, redirectType) => {
+        if (redirectType) {
             setSelected(link);
-        }else{
+        } else {
             window.open(`https://${projectDetailsReducer.domain}/${link}`, "_blank")
         }
     };
 
     return (
-        <header className="border-b border-slate-200" style={{backgroundColor:widgetsSetting.header_bg_color}}>
+        <header className="border-b border-slate-200" style={{backgroundColor: widgetsSetting.headerBgColor}}>
             <div className={"px-3"}>
                 {
-                    widgetsSetting?.hide_header === 1 ?
+                    widgetsSetting?.hideHeader === 1 ?
                         <div className="flex items-center gap-4 justify-between pt-3 pb-4">
                             <div className="inline-block align-middle cursor-pointer">
 
-                                {/*{*/}
-                                {/*    projectDetailsReducer?.project_logo != '' ?*/}
-                                {/*        <img src={`https://code.quickhunt.app/public/storage/project/${projectDetailsReducer.project_logo}`} alt={projectDetailsReducer?.project_name} className="max-h-10"/> : <div className="text-3xl font-medium tracking-tight transition-colors">{projectDetailsReducer?.project_name || ''}</div>*/}
-                                {/*}*/}
-
                                 {
-                                    (projectDetailsReducer && projectDetailsReducer?.project_logo) ? (
+                                    (projectDetailsReducer && projectDetailsReducer?.logo) ? (
                                         <img
-                                            // src={`https://code.quickhunt.app/public/storage/project/${projectDetailsReducer.project_logo}`}
-                                            src={projectDetailsReducer.project_logo}
-                                            alt={projectDetailsReducer?.project_name}
+                                            src={projectDetailsReducer.logo}
+                                            alt={projectDetailsReducer?.name}
                                             className="max-h-10"
                                         />
                                     ) : (
                                         <span className="text-3xl font-medium tracking-tight transition-colors">
-                                            {projectDetailsReducer?.project_name || ''}
+                                            {projectDetailsReducer?.name || ''}
                                         </span>
                                     )
                                 }
@@ -72,21 +66,30 @@ const WidgetHeader = ({widgetsSetting, selected, setSelected}) => {
                             </div>
                             <div className="flex flex-wrap gap-2">
                                 <div className={`gap-2 flex`}>
-                                    <Button variant={"outline"} style={{ borderColor:widgetsSetting?.header_btn_background_color,color:widgetsSetting?.header_btn_background_color, }} className="hover:bg-inherit text-primary border-primary bg-transparent">Sign in</Button>
-                                    <Button style={{ backgroundColor:widgetsSetting?.header_btn_background_color,color:widgetsSetting?.header_btn_text_color}}>Sign up</Button>
+                                    <Button variant={"outline"} style={{
+                                        borderColor: widgetsSetting?.headerBtnBackgroundColor,
+                                        color: widgetsSetting?.headerBtnBackgroundColor,
+                                    }} className="hover:bg-inherit text-primary border-primary bg-transparent">Sign
+                                        in</Button>
+                                    <Button style={{
+                                        backgroundColor: widgetsSetting?.headerBtnBackgroundColor,
+                                        color: widgetsSetting?.headerBtnTextColor
+                                    }}>Sign up</Button>
                                 </div>
 
 
                             </div>
                         </div> : ''
                 }
-                <ul className={`gap-1 mb-b-1 flex ${widgetsSetting?.hide_header === 0 ? 'pt-2' : ''}`}>
+                <ul className={`gap-1 mb-b-1 flex ${widgetsSetting?.hideHeader === 0 ? 'pt-2' : ''}`}>
                     {
                         (navList || []).map((x, i) => {
-                            if(x.isCheck){
+                            if (x.isCheck) {
                                 return (
                                     <li key={`Nav_${i}`}>
-                                        <button onClick={() => onRedirect(x.link, x.isRedirect)} style={{color:x.selected ? widgetsSetting.header_btn_background_color : widgetsSetting.header_text_color}} className={`${x.selected ? 'bg-slate-50 border-slate-200 text-primary' : 'border-transparent'}  border border-b-0 rounded-t-md flex items-center gap-1 text-sm py-2 px-2`} >{x.icon}{x.title}</button>
+                                        <button onClick={() => onRedirect(x.link, x.isRedirect)}
+                                                style={{color: x.selected ? widgetsSetting.headerBtnBackgroundColor : widgetsSetting.headerTextColor}}
+                                                className={`${x.selected ? 'bg-slate-50 border-slate-200 text-primary' : 'border-transparent'}  border border-b-0 rounded-t-md flex items-center gap-1 text-sm py-2 px-2`}>{x.icon}{x.title}</button>
                                     </li>
                                 )
                             }

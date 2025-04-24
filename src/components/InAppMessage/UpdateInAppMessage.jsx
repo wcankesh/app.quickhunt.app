@@ -16,10 +16,10 @@ import {useToast} from "../ui/use-toast";
 import {Skeleton} from "../ui/skeleton";
 
 const initialState = {
-    projectId: "",
+    projectId: null,
     title: "In app message",
     type: 1,
-    bodyText: "",
+    bodyText: null,
     from: null,
     replyTo: null,
     bgColor: "#EEE4FF",
@@ -39,7 +39,7 @@ const initialState = {
     actionType: 0,
     actionText: null,
     actionUrl: null,
-    isRedirect: 0,
+    isRedirect: false,
     isBannerCloseButton: false,
     bannerStyle: null,
     reactions: [],
@@ -106,7 +106,7 @@ const stepBoj = {
     endNumber: "5",
     startLabel: "Not likely",
     endLabel: "Very likely",
-    isAnswerRequired: false,
+    isAnswerRequired: true,
     step: 1,
     options: [],
     reactions: [],
@@ -120,7 +120,7 @@ const checkListObj = {
     actionType: 0,
     actionText: "Open",
     actionUrl: "",
-    isRedirect: 0,
+    isRedirect: false,
     isActive: true,
     checklistId: ""
 }
@@ -211,7 +211,7 @@ const UpdateInAppMessage = () => {
                     ? JSON.stringify({
                         blocks: [{type: "paragraph", data: {text: "Hey"}}]
                     })
-                    : "",
+                    : null,
                 textColor: type === "4" ? "#FFFFFF" : "#000000",
                 steps: type === "3" ? [stepBoj] : [],
                 checklists: type === "4" ? [
@@ -248,24 +248,22 @@ const UpdateInAppMessage = () => {
 
     const createMessage = async () => {
         if (type == "3") {
-            // if (inAppMsgSetting.steps.filter((x) => x.isActive && x.questionType !== 8).length <= 0) {
-            //     toast({variant: "destructive", description: "Add minimum 1 step"})
-            //     return
-            // }
             const activeSteps = inAppMsgSetting.steps.filter((x) => x.isActive && x.questionType !== 8);
-
             if (activeSteps.length <= 0) {
                 toast({ variant: "destructive", description: "Add minimum 1 step" });
                 return;
             }
-
             for (const step of activeSteps) {
-                if (step.questionType === 5 && step.options.some(opt => !opt.title?.trim())) {
-                    toast({
-                        variant: "destructive",
-                        description: "Option is required.",
-                    });
-                    return;
+                if (step.questionType === 5) {
+                    if (!step.options || step.options.length === 0) {
+                        toast({ variant: "destructive", description: "At least one option is required." });
+                        return;
+                    }
+                    const hasEmptyTitle = step.options.some(opt => !opt.title?.trim());
+                    if (hasEmptyTitle) {
+                        toast({ variant: "destructive", description: "Option cannot be empty." });
+                        return;
+                    }
                 }
             }
         }
@@ -285,7 +283,6 @@ const UpdateInAppMessage = () => {
             projectId: projectDetailsReducer.id,
             type: type
         }
-
         setIsSave(true)
         const data = await apiService.createInAppMessage(payload);
         setIsSave(false);
@@ -300,6 +297,27 @@ const UpdateInAppMessage = () => {
     }
 
     const onUpdateMessage = async () => {
+        if (type == "3") {
+            const activeSteps = inAppMsgSetting.steps.filter((x) => x.isActive && x.questionType !== 8);
+            if (activeSteps.length <= 0) {
+                toast({ variant: "destructive", description: "Add minimum 1 step" });
+                return;
+            }
+            for (const step of activeSteps) {
+                if (step.questionType === 5) {
+                    if (!step.options || step.options.length === 0) {
+                        toast({ variant: "destructive", description: "At least one option is required." });
+                        return;
+                    }
+                    const hasEmptyTitle = step.options.some(opt => !opt.title?.trim());
+                    if (hasEmptyTitle) {
+                        toast({ variant: "destructive", description: "Option cannot be empty." });
+                        return;
+                    }
+                }
+            }
+        }
+
         setIsSave(true)
         const startAt = inAppMsgSetting?.startAt
             ? moment(inAppMsgSetting.startAt).format('YYYY-MM-DD HH:mm:ss')
