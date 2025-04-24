@@ -1,5 +1,5 @@
 import React, {useState, Fragment, useEffect, useRef} from 'react';
-import { baseUrl } from "../../../utils/constent";
+import {apiService, baseUrl} from "../../../utils/constent";
 import { Button } from "../../ui/button";
 import {Circle, Loader2, Play} from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -7,7 +7,6 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 import { Label } from "../../ui/label";
 import { Input } from "../../ui/input";
 import {Card, CardHeader} from "../../ui/card";
-import {ApiService} from "../../../utils/ApiService";
 import {useSelector} from "react-redux";
 import {useToast} from "../../ui/use-toast";
 import Embed from "@editorjs/embed";
@@ -54,7 +53,6 @@ import CommonEditor from "../../Comman/CommonEditor";
     }
 
 const ArticleDetail = () => {
-    const apiService = new ApiService();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const {toast} = useToast();
     const navigate = useNavigate();
@@ -175,7 +173,7 @@ const ArticleDetail = () => {
             navigate(`${baseUrl}/help/article`);
             toast({description: data.message,});
         } else {
-            toast({description: data.error, variant: "destructive",})
+            toast({description: data.error.message, variant: "destructive",})
         }
         setLoad('');
     };

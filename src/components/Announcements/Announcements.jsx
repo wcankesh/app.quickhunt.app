@@ -1,6 +1,5 @@
-import React, {useState, useEffect, useRef, useCallback,} from 'react';
+import React, {useState, useEffect, useCallback,} from 'react';
 import {Button} from "../ui/button";
-import {Input} from "../ui/input";
 import AnnouncementsTable from "./AnnouncementsTable";
 import {ChevronLeft, Circle, Filter, Plus, X} from "lucide-react";
 import CreateAnnouncement from "./CreateAnnouncement";
@@ -13,7 +12,6 @@ import {toast} from "../ui/use-toast";
 import {Popover, PopoverTrigger} from "@radix-ui/react-popover";
 import {PopoverContent} from "../ui/popover";
 import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList} from "../ui/command";
-import {Checkbox} from "../ui/checkbox";
 import {Badge} from "../ui/badge";
 import {useLocation, useNavigate} from "react-router-dom";
 import {baseUrl} from "../../utils/constent";
@@ -22,8 +20,9 @@ import {RadioGroup, RadioGroupItem} from "../ui/radio-group";
 import {EmptyDataContent} from "../Comman/EmptyDataContent";
 import {debounce} from "lodash";
 import {CommSearchBar} from "../Comman/CommentEditor";
+import {EmptyAnnounceContent} from "../Comman/EmptyContentForModule";
 
-const initialStateFilter = {l: "", s: "", q:""}
+const initialStateFilter = {labels: "", status: "", search:""}
 
 const perPageLimit = 10;
 
@@ -43,14 +42,13 @@ const Announcements = () => {
     const [announcementList, setAnnouncementList] = useState([]);
     const [selectedRecord, setSelectedRecord] = useState({})
     const [analyticsObj, setAnalyticsObj] = useState({})
-    const [filter, setFilter] = useState({...initialStateFilter, project_id: projectDetailsReducer.id});
+    const [filter, setFilter] = useState({...initialStateFilter, projectId: projectDetailsReducer.id});
     const [pageNo, setPageNo] = useState(Number(getPageNo));
     const [openFilterType, setOpenFilterType] = useState('');
     const [openFilter, setOpenFilter] = useState('');
     const [totalRecord, setTotalRecord] = useState(0);
     const [isLoading, setIsLoading] = useState(true);
     const [isLoadingDelete, setIsLoadingDelete] = useState(false);
-    const [isFilter, setIsFilter] = useState(false);
     const [emptyContentBlock, setEmptyContentBlock] = useState(true);
 
     const emptyContent = (status) => {setEmptyContentBlock(status);};
@@ -65,20 +63,38 @@ const Announcements = () => {
         }
     }, [getNavOpenSheet])
 
+    // useEffect(() => {
+    //         if(filter.labels || filter.status || filter.search || isFilter){
+    //             getAllPosts({
+    //                 projectId: projectDetailsReducer.id,
+    //                 page: pageNo,
+    //                 limit: perPageLimit,
+    //                 search: filter.search,
+    //                 labels: filter.labels,
+    //                 status: filter.status
+    //             });
+    //         } else {
+    //             if(!isFilter && projectDetailsReducer.id){
+    //                 getAllPosts()
+    //             }
+    //         }
+    //     if(getNavOpenSheet) {
+    //         navigate(`${baseUrl}/announcements?opensheet=${getNavOpenSheet}&pageNo=${pageNo}`);
+    //     } else {
+    //         navigate(`${baseUrl}/announcements?pageNo=${pageNo}`);
+    //     }
+    // }, [projectDetailsReducer.id, allStatusAndTypes, pageNo, filter]);
+
     useEffect(() => {
-            if(filter.l || filter.s || filter.q || isFilter){
-                searchAnnouncement({...filter, page: pageNo, project_id: projectDetailsReducer.id,})
-            } else {
-                if(!isFilter && projectDetailsReducer.id){
-                    getAllPosts()
-                }
-            }
+        if(projectDetailsReducer.id){
+            getAllPosts(filter);
+        }
         if(getNavOpenSheet) {
             navigate(`${baseUrl}/announcements?opensheet=${getNavOpenSheet}&pageNo=${pageNo}`);
         } else {
             navigate(`${baseUrl}/announcements?pageNo=${pageNo}`);
         }
-    }, [projectDetailsReducer.id, allStatusAndTypes, pageNo]);
+    }, [projectDetailsReducer.id, allStatusAndTypes, pageNo,]);
 
     useEffect(() => {
         const urlParams = new URLSearchParams(location.search);
@@ -88,18 +104,22 @@ const Announcements = () => {
         }
     }, []);
 
-    const getAllPosts = async () => {
-        setIsLoading(true);
-        const data = await apiService.getAllPosts({
-            project_id: projectDetailsReducer.id,
+    const getAllPosts = async (getFilter = {}) => {
+        const payload = {
+            projectId: projectDetailsReducer.id,
             page: pageNo,
-            limit: perPageLimit
-        })
-        if (data.status === 200) {
-            setAnnouncementList(data.data)
-            setTotalRecord(data.total)
-            setIsFilter(true)
-            if (!data.data || data.data.length === 0) {
+            limit: perPageLimit,
+            search: getFilter?.search,
+            labels: getFilter?.labels,
+            status: getFilter?.status
+        }
+        setIsLoading(true);
+        const data = await apiService.getAllPosts(payload)
+        setIsLoading(false)
+        if (data.success) {
+            setAnnouncementList(data.data.data)
+            setTotalRecord(data.data.total)
+            if (!data.data.data || data.data.data.length === 0) {
                 emptyContent(true);
             } else {
                 emptyContent(false);
@@ -107,64 +127,55 @@ const Announcements = () => {
         } else {
             emptyContent(true);
         }
-        setIsLoading(false)
-    }
-
-    const searchAnnouncement = async (payload) => {
-        setIsLoading(true);
-        const data = await apiService.filterPost(payload)
-        if (data.status === 200) {
-            setIsLoading(false);
-            setAnnouncementList(data.data);
-            setPageNo(payload.page);
-            setTotalRecord(data.total);
-        } else {
-            setIsLoading(false);
-        }
     }
 
     const throttledDebouncedSearch = useCallback(
         debounce((value) => {
             const updatedFilter = {
                 ...filter,
-                project_id: projectDetailsReducer.id,
-                q: value,
+                projectId: projectDetailsReducer.id,
+                search: value,
                 page: 1,
             };
-            searchAnnouncement(updatedFilter);
+            setFilter(updatedFilter);
+            getAllPosts(updatedFilter);
         }, 500),
-        [projectDetailsReducer.id]
+        []
     );
 
     const onChangeSearch = (e) => {
         const value = e.target.value;
-        setFilter( { ...filter, q: value });
+        setFilter( { ...filter, search: value });
         throttledDebouncedSearch(value)
     };
 
     const filterPosts = async (event) => {
         setIsLoading(true)
-        setFilter({...filter, [event.name]: event.value,});
+        const updatedFilter = { ...filter, [event.name]: event.value };
+        setFilter(updatedFilter);
         const payload = {
-            ...filter,
-            project_id: projectDetailsReducer.id,
-            page:1,
-            [event.name]: event.value,
-        }
-        await searchAnnouncement(payload);
+            projectId: projectDetailsReducer.id,
+            page: 1,
+            limit: perPageLimit,
+            search: updatedFilter.search,
+            labels: event.name === "labels" ? event.value : updatedFilter.labels,
+            status: event.name === "status" ? event.value : updatedFilter.status
+        };
+        await getAllPosts(payload);
     }
 
     const clearSearchFilter = () => {
-        setFilter(prev => ({ ...prev, q: '' }));
+        const clone = {...filter, search: ''}
+        setFilter(clone);
         setPageNo(1);
-        getAllPosts('', filter.q);
+        getAllPosts(clone);
     };
 
     const onCloseAnalyticsSheet = () => {setAnalyticsObj({})}
 
     const closeSheet = (record,addRecord) => {
         if (record) {
-            const updatedItems = announcementList.map((x) => x.id === record.id ? {...x, ...record, post_status: record.post_status} : x);
+            const updatedItems = announcementList.map((x) => x.id === record.id ? {...x, ...record, status: record.status} : x);
             setAnnouncementList(updatedItems);
             setSelectedRecord({});
         } else if (addRecord) {
@@ -181,8 +192,8 @@ const Announcements = () => {
 
     const handleDelete = async (id) => {
         setIsLoadingDelete(true)
-        const data = await apiService.deletePosts(id, pageNo)
-        if (data.status === 200) {
+        const data = await apiService.deletePosts(id)
+        if (data.success) {
             setIsLoadingDelete(false)
             const clone = [...announcementList];
             const index = clone.findIndex((x) => x.id === id)
@@ -203,7 +214,7 @@ const Announcements = () => {
         } else {
             setIsLoadingDelete(false)
             toast({
-                description: data.message,
+                description: data.error.message,
                 variant: "destructive"
             })
         }
@@ -217,69 +228,16 @@ const Announcements = () => {
             setIsLoading(true);
             setPageNo(newPage);
             setIsLoading(false);
-            setIsFilter(false)
         }
     };
 
-    const handleBadge = (obj) =>{
-        const payload = {
-            ...filter,
-            project_id: projectDetailsReducer.id,
-            page:1,
-            [obj.value]:""
-        }
-        setFilter({...filter, [obj.value]:"",});
-        searchAnnouncement(payload);
-    }
+    const handleBadge = (obj) => {
+        const updatedFilter = { ...filter, [obj.value]: "" };
+        setFilter(updatedFilter);
+        getAllPosts(updatedFilter);
+    };
 
-    const matchedObject = allStatusAndTypes.labels ? allStatusAndTypes.labels.find(x => x.id === filter.l) : null;
-
-    const EmptyAnnounceContent = [
-        {
-            title: "Start Sharing Updates",
-            description: `No announcements yet? Create your first one to keep users informed about product updates, new features, and improvements.`,
-            btnText: [
-                {title: "Create Announcement", openSheet: true, icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
-            ],
-        },
-        {
-            title: "Create Labels",
-            description: `Organize your announcements by adding labels like "Update," "New Feature," or "Bug Fix" for easy categorization and clarity.`,
-            btnText: [
-                {title: "Create Labels", navigateTo: `${baseUrl}/settings/labels`, icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
-            ],
-        },
-        {
-            title: "Create Categories",
-            description: `Group your announcements into categories such as "Product Updates," "Feature Launches," or "Changelog" to help users find relevant information quickly.`,
-            btnText: [
-                {title: "Create Categories", navigateTo: `${baseUrl}/settings/categories`, icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
-            ],
-        },
-        {
-            title: "Add Emoji",
-            description: `Make your announcements more engaging by adding emojis to highlight key updates or set the tone for your message.`,
-            btnText: [
-                {title: "Add Emojis", navigateTo: `${baseUrl}/settings/emoji`, icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
-            ],
-        },
-        {
-            title: "Create In-App Message",
-            description: `Share announcements directly with users through in-app messages to ensure they stay informed about important updates.`,
-            btnText: [
-                {title: "Create In-App Message", navigateTo: `${baseUrl}/app-message/type`, icon: <Plus size={18} className={"mr-1"} strokeWidth={3}/>},
-            ],
-        },
-        {
-            title: "Explore Examples",
-            description: `See how platforms like Utterbond, Webform, and Rivyo efficiently share announcements to keep their users informed.`,
-            btnText: [
-                {title: "Utterbond", redirect: "https://utterbond.quickhunt.app/announcements"},
-                {title: "Webform", redirect: "https://webform.quickhunt.app/announcements"},
-                {title: "Rivyo", redirect: "https://rivyo.quickhunt.app/announcements"},
-            ],
-        },
-    ];
+    const matchedObject = allStatusAndTypes.labels ? allStatusAndTypes.labels.find(x => x.id === filter.labels) : null;
 
     return (
         <div className={"container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-3 md:px-4"}>
@@ -311,7 +269,7 @@ const Announcements = () => {
                 <div className={"w-full lg:w-auto flex sm:flex-nowrap flex-wrap gap-2 items-center"}>
                     <div className={"flex gap-2 items-center w-full lg:w-auto"}>
                         <CommSearchBar
-                            value={filter.q}
+                            value={filter.search}
                             onChange={onChangeSearch}
                             onClear={clearSearchFilter}
                             placeholder="Search..."
@@ -336,14 +294,14 @@ const Announcements = () => {
                                                         <CommandItem className={"p-0 flex gap-2 items-center cursor-pointer p-1"} onSelect={() => {setOpenFilterType('');}}>
                                                             <ChevronLeft className="mr-2 h-4 w-4"  />  <span className={"flex-1 w-full text-sm font-normal cursor-pointer flex gap-2 items-center"}>Back</span>
                                                         </CommandItem>
-                                                        <RadioGroup value={filter.s} onValueChange={(value) => filterPosts({ name: "s", value })} className={"gap-0.5"}>
-                                                            {(status || []).map((x) => (
-                                                                <CommandItem key={x.value} className={"p-0 flex items-center gap-1 cursor-pointer"}>
+                                                        <RadioGroup value={filter.status} onValueChange={(value) => filterPosts({ name: "status", value })} className={"gap-0.5"}>
+                                                            {(status || []).map((x, i) => (
+                                                                <CommandItem key={i} className={"p-0 flex items-center gap-1 cursor-pointer"}>
                                                                     <div
-                                                                        onClick={() => filterPosts({ name: "s", value: x.value })}
+                                                                        onClick={() => filterPosts({ name: "status", value: x.value })}
                                                                         className="flex items-center gap-1 w-full"
                                                                     >
-                                                                        <RadioGroupItem className="m-2" value={x.value} checked={x.value === filter.s} />
+                                                                        <RadioGroupItem className="m-2" value={x.value} checked={x.value === filter.status} />
                                                                         <span className={"flex-1 w-full text-sm font-normal cursor-pointer"}>{x.label}</span>
                                                                     </div>
                                                                 </CommandItem>
@@ -355,20 +313,20 @@ const Announcements = () => {
                                                         <CommandItem className={"p-0 flex gap-2 items-center cursor-pointer p-1"} onSelect={() => {setOpenFilterType('');}}>
                                                             <ChevronLeft className="mr-2 h-4 w-4"  />  <span className={"flex-1 w-full text-sm font-normal cursor-pointer flex gap-2 items-center"}>Back</span>
                                                         </CommandItem>
-                                                        <RadioGroup value={filter.l} onValueChange={(value) => filterPosts({ name: "l", value })} className={"gap-0.5"}>
-                                                            {(allStatusAndTypes.labels || []).map((x) => (
-                                                                <CommandItem key={x.id} className={"p-0 flex items-center gap-1 cursor-pointer"}>
+                                                        <RadioGroup value={filter.labels} onValueChange={(value) => filterPosts({ name: "labels", value })} className={"gap-0.5"}>
+                                                            {(allStatusAndTypes.labels || []).map((x, i) => (
+                                                                <CommandItem key={i} className={"p-0 flex items-center gap-1 cursor-pointer"}>
                                                                     <div
-                                                                        onClick={() => filterPosts({ name: "l", value: x.id })}
+                                                                        onClick={() => filterPosts({ name: "labels", value: x.id })}
                                                                         className="flex items-center gap-1 w-full"
                                                                     >
-                                                                        <RadioGroupItem className="m-2" value={x.id} checked={x.id == filter.l} />
+                                                                        <RadioGroupItem className="m-2" value={x.id} checked={x.id == filter.labels} />
                                                                         <Circle
-                                                                            fill={x.label_color_code}
-                                                                            stroke={x.label_color_code}
+                                                                            fill={x.colorCode}
+                                                                            stroke={x.colorCode}
                                                                             className={`${theme === "dark" ? "" : "text-muted-foreground"} w-[10px] h-[10px]`}
                                                                         />
-                                                                        <span className={"flex-1 w-full text-sm font-normal"}>{x.label_name}</span>
+                                                                        <span className={"flex-1 w-full text-sm font-normal"}>{x.name}</span>
                                                                     </div>
                                                                 </CommandItem>
                                                             ))}
@@ -399,24 +357,24 @@ const Announcements = () => {
                 </div>
             </div>
 
-            {(filter.s  || filter.l) && <div className={"flex flex-wrap gap-2 mt-6"}>
+            {(filter.status  || filter.labels) && <div className={"flex flex-wrap gap-2 mt-6"}>
                 {
-                    filter.s &&
+                    filter.status &&
                     <Badge variant="outline" className="rounded p-0 font-medium">
                         <span
-                            className="px-3 py-1.5 border-r">{filter.s == 1 ? "Published" : filter.s === 2 ? "Scheduled" : filter.s == 4 ? "Draft" : ""}</span>
+                            className="px-3 py-1.5 border-r">{filter.status == 1 ? "Published" : filter.status === 2 ? "Scheduled" : filter.status == 4 ? "Draft" : ""}</span>
                         <span className="w-7 h-7 flex items-center justify-center cursor-pointer"
-                              onClick={() => handleBadge({name: "status", value: "s"})}>
+                              onClick={() => handleBadge({name: "status", value: "status"})}>
                             <X className='w-4 h-4'/>
                         </span>
                     </Badge>
                 }
                 {
-                    filter.l && <Badge variant="outline" className="rounded p-0 font-medium">
+                    filter.labels && <Badge variant="outline" className="rounded p-0 font-medium">
                         <span className="px-3 py-1.5 border-r flex gap-2 items-center">
-                            <span className={"w-2.5 h-2.5 rounded-full"} style={{backgroundColor: matchedObject.label_color_code}}/>{matchedObject?.label_name}
+                            <span className={"w-2.5 h-2.5 rounded-full"} style={{backgroundColor: matchedObject.colorCode}}/>{matchedObject?.name}
                         </span>
-                        <span className="w-7 h-7 flex items-center justify-center cursor-pointer" onClick={() => handleBadge({name: "label", value: "l"})}><X className='w-4 h-4'/></span>
+                        <span className="w-7 h-7 flex items-center justify-center cursor-pointer" onClick={() => handleBadge({name: "label", value: "labels"})}><X className='w-4 h-4'/></span>
                     </Badge>
                 }
             </div>}
@@ -432,14 +390,14 @@ const Announcements = () => {
                     getAllPosts={getAllPosts}
                 />
                 {
-                    announcementList.length > 0 ?
+                    announcementList?.length > 0 ?
                         <Pagination
                             pageNo={pageNo}
                             totalPages={totalPages}
                             isLoading={isLoading}
                             handlePaginationClick={handlePaginationClick}
                             theme={"light"} // or "dark"
-                            stateLength={announcementList.length}
+                            stateLength={announcementList?.length}
                         /> : ""
                 }
             </Card>

@@ -1,32 +1,19 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import {Button} from "../ui/button";
 import {Loader2} from "lucide-react";
 import {useToast} from "../ui/use-toast";
-import {ApiService} from "../../utils/ApiService";
-import {baseUrl, validateForm, validateField,} from "../../utils/constent";
+import {baseUrl, validateForm, validateField, apiService,} from "../../utils/constent";
 import {useNavigate} from "react-router-dom";
 import AuthLayout from "./CommonAuth/AuthLayout";
 import FormInput from "./CommonAuth/FormInput";
 
 const Forgot = () => {
-    let apiSerVice = new ApiService();
     let navigate = useNavigate();
     const {toast} = useToast()
 
     const [formError, setFormError] = useState({email: ""});
     const [forgotPasswordDetails, setForgotPasswordDetails] = useState({email: ""});
     const [isLoading, setIsLoading] = useState(false);
-
-    const getForgetDetail = async () => {
-        const getDetail = await apiSerVice.forgotPassword();
-        if (getDetail.status === 200) {
-            console.log('getDetail', getDetail)
-        }
-    }
-
-    useEffect(() => {
-        getForgetDetail()
-    }, []);
 
     const onChange = (event) => {
         setForgotPasswordDetails({...forgotPasswordDetails, [event.target.name]: event.target.value})
@@ -57,13 +44,13 @@ const Forgot = () => {
             return;
         }
         setIsLoading(true)
-        const data = await apiSerVice.forgotPassword({email: forgotPasswordDetails.email})
-        if (data.status === 200) {
+        const data = await apiService.forgotPassword({email: forgotPasswordDetails.email})
+        if (data.success) {
             setForgotPasswordDetails({email: ""})
             toast({description: data.message,})
             setIsLoading(false)
         } else {
-            toast({variant: "destructive", description: data.message})
+            toast({variant: "destructive", description: data?.error?.message})
             setIsLoading(false)
         }
     }
@@ -76,7 +63,6 @@ const Forgot = () => {
         } else {
             navigate(`${baseUrl}/${link}`);
         }
-        return;
     };
 
     return (

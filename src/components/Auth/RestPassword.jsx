@@ -2,28 +2,26 @@ import React, {useState} from 'react';
 import {Card, CardContent} from "../ui/card";
 import {Button} from "../ui/button";
 import {Loader2} from "lucide-react";
-import {ApiService} from "../../utils/ApiService";
 import {Icon} from "../../utils/Icon";
 import {useTheme} from "../theme-provider";
 import {useNavigate} from "react-router-dom";
-import {baseUrl} from "../../utils/constent";
+import {apiService, baseUrl} from "../../utils/constent";
 import {useToast} from "../ui/use-toast";
 import FormInput from "./CommonAuth/FormInput";
 
 const RestPassword = () => {
     const {theme} = useTheme();
-    let apiSerVice = new ApiService();
     let navigate = useNavigate();
     const {toast} = useToast();
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get('token');
 
-    const [formError, setFormError] = useState({password:"", confirm_password: ''});
-    const [forgotPasswordDetails, setForgotPasswordDetails] = useState({password:"", confirm_password: ''});
+    const [formError, setFormError] = useState({password:"", confirmPassword: ''});
+    const [forgotPasswordDetails, setForgotPasswordDetails] = useState({password:"", confirmPassword: ''});
     const [isLoading, setIsLoading] = useState(false);
     const [passwordVisibility, setPasswordVisibility] = useState({
         password: false,
-        confirm_password: false
+        confirmPassword: false
     });
 
     const onChange = (event) => {
@@ -53,7 +51,7 @@ const RestPassword = () => {
                 )
                     return "Password must be at least 8 characters with one uppercase letter, one lowercase letter, one number, and one special character";
                 return "";
-            case "confirm_password":
+            case "confirmPassword":
                 if (value.trim() === "") return "Confirm Password is required";
                 if (value !== forgotPasswordDetails.password) return "Passwords must match";
                 return "";
@@ -78,16 +76,15 @@ const RestPassword = () => {
         const payload = {
             token: token,
             password: forgotPasswordDetails.password,
-            confirm_password: forgotPasswordDetails.confirm_password,
+            confirmPassword: forgotPasswordDetails.confirmPassword,
         }
-        const data  = await apiSerVice.resetPassword(payload)
-        if(data.status === 200){
-            setIsLoading(false)
+        const data  = await apiService.resetPassword(payload)
+        setIsLoading(false)
+        if(data.success){
             navigate(`${baseUrl}/login`);
             toast({description: data.message})
         } else {
-            toast({variant: "destructive", description: data.message})
-            setIsLoading(false)
+            toast({variant: "destructive", description: data?.error?.message})
         }
     }
 
@@ -121,14 +118,14 @@ const RestPassword = () => {
                             <div className={"space-y-1"}>
                                 <FormInput
                                     label="Confirm Password"
-                                    error={formError.confirm_password}
+                                    error={formError.confirmPassword}
                                     className={"w-full"}
                                     showToggle
-                                    id="confirm_password"
-                                    type={passwordVisibility.confirm_password ? "text" : "password"}
+                                    id="confirmPassword"
+                                    type={passwordVisibility.confirmPassword ? "text" : "password"}
                                     placeholder={"Confirm Password"}
-                                    value={forgotPasswordDetails.confirm_password}
-                                    name={'confirm_password'}
+                                    value={forgotPasswordDetails.confirmPassword}
+                                    name={'confirmPassword'}
                                     onChange={onChange}
                                     onBlur={onBlur}
                                 />
@@ -136,7 +133,7 @@ const RestPassword = () => {
 
                             <Button
                                 className={"w-full mt-2.5 bg-primary hover:bg-primary font-normal"}
-                                disabled={(forgotPasswordDetails.password === "" || forgotPasswordDetails.password.trim() === "") || (forgotPasswordDetails.confirm_password === "" || forgotPasswordDetails.confirm_password.trim() === "")}
+                                disabled={(forgotPasswordDetails.password === "" || forgotPasswordDetails.password.trim() === "") || (forgotPasswordDetails.confirmPassword === "" || forgotPasswordDetails.confirmPassword.trim() === "")}
                                 onClick={onSubmit}
                             >
                                 {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : ""}

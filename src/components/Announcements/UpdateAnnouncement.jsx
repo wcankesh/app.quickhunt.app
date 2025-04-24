@@ -20,9 +20,9 @@ import {Card, CardContent, CardFooter} from "../ui/card";
 import CommonBreadCrumb from "../Comman/CommonBreadCrumb";
 
 const initialStateError = {
-    post_title: "",
-    post_description: "",
-    post_slug_url: "",
+    title: "",
+    description: "",
+    slugUrl: "",
 }
 
 const UpdateAnnouncement = () => {
@@ -36,6 +36,7 @@ const UpdateAnnouncement = () => {
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
     const userDetailsReducer = useSelector(state => state.userDetailsReducer);
+    console.log("allStatusAndTypes", allStatusAndTypes)
 
     const [formError, setFormError] = useState(initialStateError);
     const [selectedRecord, setSelectedRecord] = useState({});
@@ -48,12 +49,12 @@ const UpdateAnnouncement = () => {
 
     useEffect(() => {
         if (projectDetailsReducer.id) {
-            // if (selectedRecord?.post_slug_url) {
+            // if (selectedRecord?.slugUrl) {
             //     getSinglePosts();
             // } else {
             //     setSelectedRecord({
             //         ...selectedRecord,
-            //         post_assign_to: [userDetailsReducer.id.toString()],
+            //         assignToId: [userDetailsReducer.id.toString()],
             //     });
             // }
             getSinglePosts();
@@ -61,22 +62,26 @@ const UpdateAnnouncement = () => {
             setMemberList(allStatusAndTypes.members);
             setCategoriesList(allStatusAndTypes.categories);
         }
-    }, [projectDetailsReducer.id, allStatusAndTypes, userDetailsReducer.id, getPageNo])
+    }, [projectDetailsReducer.id, allStatusAndTypes,])
 
     const getSinglePosts = async () => {
         const data = await apiService.getSinglePosts(id);
-        if (data.status === 200) {
+        if (data.success) {
             setSelectedRecord({
-                ...data.data,
-                image: data.data?.feature_image,
-                post_assign_to: data.data?.post_assign_to !== null ? data.data?.post_assign_to?.split(',') : [],
-                post_published_at: data.data?.post_published_at ? moment(data.data?.post_published_at).format('YYYY-MM-DD') : moment(new Date()),
-                post_expired_at: data.data?.post_expired_at ? moment(data.data?.post_expired_at).format('YYYY-MM-DD') : undefined,
-                category_id: data.data?.category_id,
-                labels: data.data?.labels || [],
+                ...data.data.data,
+                image: data.data?.data?.featureImage,
+                assignToId: Array.isArray(data.data?.data?.assignToId)
+                    ? data.data?.data?.assignToId
+                    : (data.data?.data?.assignToId || []).length > 0
+                        ? [data.data?.data?.assignToId.toString()]
+                        : [],
+                publishedAt: data.data?.data?.publishedAt ? moment(data.data?.data?.publishedAt).format('YYYY-MM-DD') : moment(new Date()),
+                expiredAt: data.data?.data?.expiredAt ? moment(data.data?.data?.expiredAt).format('YYYY-MM-DD') : undefined,
+                categoryId: data.data?.data?.category?.categoryId,
+                labels: data.data?.data?.labels || [],
             });
         }
-        // setPreviewImage(selectedRecord.feature_image);
+        // setPreviewImage(selectedRecord.featureImage);
     }
 
     const handleFileChange = (file) => {
@@ -111,19 +116,19 @@ const UpdateAnnouncement = () => {
 
     const formValidate = (name, value) => {
         switch (name) {
-            case "post_title":
+            case "title":
                 if (!value || value.trim() === "") {
                     return "Title is required.";
                 } else {
                     return "";
                 }
-            case "post_slug_url":
+            case "slugUrl":
                 if (!value || value.trim() === "") {
                     return "Permalink / Slug is required.";
                 } else {
                     return "";
                 }
-            case "post_description":
+            case "description":
                 const cleanValue = value.trim();
                 const emptyContent = /^(<p>\s*<\/p>|<p><br><\/p>|<\/?[^>]+>)*$/;
                 if (!value || cleanValue === "" || emptyContent.test(cleanValue)) {
@@ -146,28 +151,28 @@ const UpdateAnnouncement = () => {
     const onChangeText = (event) => {
         const {name, value} = event.target;
         let updatedDetails = {...selectedRecord};
-        if (name === "post_title") {
+        if (name === "title") {
             const slug = value
                 .replace(/[^a-z0-9\s]/gi, '')
                 .replace(/\s+/g, '-')
                 .toLowerCase();
 
-            if (updatedDetails.post_title.replace(/[^a-z0-9\s]/gi, '')
+            if (updatedDetails.title.replace(/[^a-z0-9\s]/gi, '')
                 .replace(/\s+/g, '-')
-                .toLowerCase() === updatedDetails.post_slug_url) {
+                .toLowerCase() === updatedDetails.slugUrl) {
                 updatedDetails = {
                     ...updatedDetails,
-                    post_title: value,
-                    post_slug_url: slug
+                    title: value,
+                    slugUrl: slug
                 };
             } else {
                 updatedDetails = {
                     ...updatedDetails,
-                    post_title: value,
+                    title: value,
                 };
             }
 
-        } else if (name === "post_slug_url") {
+        } else if (name === "slugUrl") {
             const slug = value
                 .replace(/[^a-z0-9\s-]/gi, '')
                 .replace(/\s+/g, '-')
@@ -175,7 +180,7 @@ const UpdateAnnouncement = () => {
 
             updatedDetails = {
                 ...updatedDetails,
-                post_slug_url: slug
+                slugUrl: slug
             };
         } else {
             updatedDetails[name] = value;
@@ -188,7 +193,7 @@ const UpdateAnnouncement = () => {
     };
 
     const onChangeCategory = (selectedItems) => {
-        setSelectedRecord({...selectedRecord, category_id: selectedItems === null ? "" : selectedItems})
+        setSelectedRecord({...selectedRecord, categoryId: selectedItems === null ? "" : selectedItems})
     }
 
     const commonToggle = (name, value) => {
@@ -198,16 +203,16 @@ const UpdateAnnouncement = () => {
     const onDateChange = (name, date) => {
         if (date) {
             let obj = {...selectedRecord, [name]: date};
-            if (name === "post_published_at") {
+            if (name === "publishedAt") {
                 if (date > new Date()) {
-                    obj = {...obj, post_status: 2}
+                    obj = {...obj, status: 2}
                 } else {
-                    obj = {...obj, post_status: 1}
+                    obj = {...obj, status: 1}
                 }
-                // if (selectedRecord.post_expired_at) {
-                //     obj = { ...obj, post_expired_at: null };
+                // if (selectedRecord.expiredAt) {
+                //     obj = { ...obj, expiredAt: null };
                 // }
-                obj = { ...obj, post_expired_at: null, post_expired_boolean: 0 };
+                obj = { ...obj, expiredAt: null, expiredBoolean: 0 };
             }
             setSelectedRecord(obj);
             setPopoverOpen(false);
@@ -229,29 +234,29 @@ const UpdateAnnouncement = () => {
         }
 
         if (
-            selectedRecord.post_expired_boolean === 1 &&
-            !selectedRecord.post_expired_at
+            selectedRecord.expiredBoolean === 1 &&
+            !selectedRecord.expiredAt
         ) {
-            selectedRecord.post_expired_boolean = 0;
+            selectedRecord.expiredBoolean = 0;
         }
 
         setIsLoad(loader)
         let formData = new FormData();
-        formData.append("post_project_id", projectDetailsReducer.id);
+        // formData.append("projectId", projectDetailsReducer.id);
         Object.keys(selectedRecord).map((x) => {
             if (x !== "labels") {
-                if (x === "post_assign_to") {
+                if (x === "assignToId") {
                     formData.append(x, selectedRecord[x]);
-                } else if (x === "post_slug_url") {
-                    formData.append("post_slug_url", selectedRecord?.post_slug_url ? selectedRecord?.post_slug_url : selectedRecord?.post_title.replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-').replace(/\//g, "-").toLowerCase());
-                } else if (x === "post_published_at") {
-                    formData.append("post_published_at", moment(selectedRecord?.post_published_at).format("YYYY-MM-DD"));
-                } else if (x === "post_expired_at") {
-                    formData.append("post_expired_at", selectedRecord?.post_expired_boolean === 1 ? moment(selectedRecord?.post_expired_at).format("YYYY-MM-DD") : "");
-                } else if (x === "delete_image" && selectedRecord?.image?.name) {
+                } else if (x === "slugUrl") {
+                    formData.append("slugUrl", selectedRecord?.slugUrl ? selectedRecord?.slugUrl : selectedRecord?.title.replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-').replace(/\//g, "-").toLowerCase());
+                } else if (x === "publishedAt") {
+                    formData.append("publishedAt", moment(selectedRecord?.publishedAt).format("YYYY-MM-DD"));
+                } else if (x === "expiredAt") {
+                    formData.append("expiredAt", selectedRecord?.expiredBoolean === 1 ? moment(selectedRecord?.expiredAt).format("YYYY-MM-DD") : "");
+                } else if (x === "deleteImage" && selectedRecord?.image?.name) {
 
-                } else if (x === "category_id" && (selectedRecord[x] === null || selectedRecord[x] === "null")) {
-                    formData.append("category_id", "");
+                } else if (x === "categoryId" && (selectedRecord[x] === null || selectedRecord[x] === "null")) {
+                    formData.append("categoryId", "");
                 } else {
                     formData.append(x, selectedRecord[x]);
                 }
@@ -264,35 +269,31 @@ const UpdateAnnouncement = () => {
         }
 
         const data = await apiService.updatePosts(formData, selectedRecord?.id)
-        if (data.status === 200) {
+        if (data.success) {
+            console.log("data", data)
             setSelectedRecord(selectedRecord)
             setIsLoad('')
-            toast({
-                description: data.message,
-            });
+            toast({description: data.message,});
 
         } else {
             setIsLoad('')
-            toast({
-                description: data.message,
-                variant: "destructive"
-            });
+            toast({description: data.error.message, variant: "destructive"});
         }
     }
 
     const handleValueChange = (value) => {
-        // const clone = [...changeLogDetails.post_assign_to]
+        // const clone = [...changeLogDetails.assignToId]
         // const index = clone.indexOf(value);
         // if (index > -1) {
         //     clone.splice(index, 1);
         // } else {
         //     clone.push(value);
         // }
-        setSelectedRecord({...selectedRecord, post_assign_to: [value]});
+        setSelectedRecord({...selectedRecord, assignToId: [value]});
     };
 
     const onChangeLabel = (value) => {
-        const clone = [...selectedRecord.labels]
+        const clone = [...(selectedRecord.labels || [])]
         const index = clone.indexOf(value);
         if (index > -1) {
             clone.splice(index, 1);
@@ -308,7 +309,7 @@ const UpdateAnnouncement = () => {
         { label: 'Announcement', path: `/announcements?pageNo=${getPageNo}` }
     ];
 
-    const publishDate = selectedRecord?.post_published_at ? new Date(selectedRecord.post_published_at) : null;
+    const publishDate = selectedRecord?.publishedAt ? new Date(selectedRecord.publishedAt) : null;
     const isDateDisabled = (date) => {
         return publishDate && date < publishDate;
     };
@@ -318,7 +319,7 @@ const UpdateAnnouncement = () => {
             <div className={"flex justify-between items-center gap-2"}>
                 <CommonBreadCrumb
                     links={links}
-                    currentPage={selectedRecord?.post_title}
+                    currentPage={selectedRecord?.title}
                     truncateLimit={30}
                 />
                 <div className={"flex items-center gap-4"}>
@@ -326,7 +327,7 @@ const UpdateAnnouncement = () => {
                             onClick={() => commonToggle("post_pin_to_top", selectedRecord.post_pin_to_top === 1 ? 0 : 1)}
                     >
                         {
-                            selectedRecord.post_pin_to_top === 1 ?
+                            selectedRecord.pinTop === 1 ?
                                 <Pin size={15} className={`${theme === "dark" ? "fill-card-foreground" : "fill-card-foreground"}`}/> :
                                 <Pin size={15}/>
                         }
@@ -357,28 +358,28 @@ const UpdateAnnouncement = () => {
                             <div className="w-full flex flex-col gap-4">
                                 <div className="w-full flex flex-col gap-2">
                                     <Label htmlFor="title" className={"font-normal"}>Title</Label>
-                                    <Input type="text" id="title" className={"h-9"} name={"post_title"}
-                                           value={selectedRecord.post_title} onChange={onChangeText}/>
-                                    {formError.post_title &&
-                                    <span className="text-sm text-red-500">{formError.post_title}</span>}
+                                    <Input type="text" id="title" className={"h-9"} name={"title"}
+                                           value={selectedRecord.title} onChange={onChangeText}/>
+                                    {formError.title &&
+                                    <span className="text-sm text-red-500">{formError.title}</span>}
                                 </div>
                                 <div className="w-full flex flex-col gap-2">
                                     <Label htmlFor="link" className={"font-normal"}>Permalink / Slug</Label>
-                                    <Input type="text" className={"h-9"} id="link" name={"post_slug_url"}
-                                           value={selectedRecord.post_slug_url} onChange={onChangeText}/>
+                                    <Input type="text" className={"h-9"} id="link" name={"slugUrl"}
+                                           value={selectedRecord.slugUrl} onChange={onChangeText}/>
                                     <p className={"text-sm font-normal text-muted-foreground break-words"}>This release will
                                         be available at {projectDetailsReducer.domain ? <a
-                                            href={`https://${projectDetailsReducer.domain?.toLowerCase()}/announcements/${selectedRecord.post_slug_url?.toLowerCase()}`}
+                                            href={`https://${projectDetailsReducer.domain?.toLowerCase()}/announcements/${selectedRecord.slugUrl?.toLowerCase()}`}
                                             target={"_blank"}
-                                            className={"text-primary max-w-[593px] w-full break-words text-sm"}>{`https://${projectDetailsReducer.domain?.toLowerCase()}/announcements/${selectedRecord.post_slug_url?.toLowerCase()}`}</a> : ""}</p>
-                                    {formError?.post_slug_url &&
-                                    <span className="text-sm text-red-500">{formError?.post_slug_url}</span>}
+                                            className={"text-primary max-w-[593px] w-full break-words text-sm"}>{`https://${projectDetailsReducer.domain?.toLowerCase()}/announcements/${selectedRecord.slugUrl?.toLowerCase()}`}</a> : ""}</p>
+                                    {formError?.slugUrl &&
+                                    <span className="text-sm text-red-500">{formError?.slugUrl}</span>}
                                 </div>
                                 <div className="w-full flex flex-col gap-2">
                                     <Label htmlFor="description" className={"font-normal"}>Description</Label>
-                                    <ReactQuillEditor className={"min-h-[145px] h-full"} value={selectedRecord.post_description} onChange={onChangeText}
-                                                      name={"post_description"}/>
-                                    {formError.post_description && <span className="text-sm text-red-500">{formError.post_description}</span>}
+                                    <ReactQuillEditor className={"min-h-[145px] h-full"} value={selectedRecord.description} onChange={onChangeText}
+                                                      name={"description"}/>
+                                    {formError.description && <span className="text-sm text-red-500">{formError.description}</span>}
                                 </div>
                             </div>
                         </div>
@@ -397,17 +398,18 @@ const UpdateAnnouncement = () => {
                                                     <div className={"flex gap-[2px]"}>
                                                         {
                                                             (selectedRecord.labels || []).map((x, i) => {
+                                                                console.log("xxxx", x)
                                                                 const findObj = labelList.find((y) => y.id == x);
                                                                 return (
                                                                     <Badge key={i}
                                                                         variant={"outline"}
                                                                         style={{
-                                                                            color: findObj?.label_color_code,
-                                                                            borderColor: findObj?.label_color_code,
+                                                                            color: findObj?.colorCode,
+                                                                            borderColor: findObj?.colorCode,
                                                                             textTransform: "capitalize"
                                                                         }}
-                                                                        className={`h-[20px] py-0 px-2 text-xs rounded-[5px]  font-normal text-[${findObj?.label_color_code}] border-[${findObj?.label_color_code}] capitalize`}
-                                                                    ><span className={"max-w-[100px] truncate text-ellipsis overflow-hidden whitespace-nowrap"}>{findObj?.label_name}</span></Badge>
+                                                                        className={`h-[20px] py-0 px-2 text-xs rounded-[5px]  font-normal text-[${findObj?.colorCode}] border-[${findObj?.colorCode}] capitalize`}
+                                                                    ><span className={"max-w-[100px] truncate text-ellipsis overflow-hidden whitespace-nowrap"}>{findObj?.name}</span></Badge>
                                                                 )
                                                             })
                                                         }
@@ -431,10 +433,10 @@ const UpdateAnnouncement = () => {
                                                                             <div className={"h-[18px] w-[18px]"}/>}
                                                                     </div>
                                                                     <div className={"flex items-center gap-2"}>
-                                                                        <Circle fill={x.label_color_code}
-                                                                                stroke={x.label_color_code}
+                                                                        <Circle fill={x.colorCode}
+                                                                                stroke={x.colorCode}
                                                                                 className={`${theme === "dark" ? "" : "text-muted-foreground"} w-[10px] h-[10px]`}/>
-                                                                        <span className={"max-w-[150px] truncate text-ellipsis overflow-hidden whitespace-nowrap"}>{x.label_name}</span>
+                                                                        <span className={"max-w-[150px] truncate text-ellipsis overflow-hidden whitespace-nowrap"}>{x.name}</span>
                                                                     </div>
                                                                 </div>
                                                             </SelectItem>
@@ -448,20 +450,20 @@ const UpdateAnnouncement = () => {
                                 <div className={"w-full space-y-1.5"}>
                                     <Label className={"font-normal"}>Assign to</Label>
                                     <Select onValueChange={handleValueChange} value={[]}>
-                                    {/*<Select onValueChange={handleValueChange} value={selectedRecord?.post_assign_to?.length > 0 ? selectedRecord.post_assign_to[0] : undefined}>*/}
+                                    {/*<Select onValueChange={handleValueChange} value={selectedRecord?.assignToId?.length > 0 ? selectedRecord.assignToId[0] : undefined}>*/}
                                         <SelectTrigger className={"h-9"}>
                                             <SelectValue className={"text-muted-foreground text-sm"}>
                                                 {
-                                                    selectedRecord?.post_assign_to?.length > 0 ? (
+                                                    selectedRecord?.assignToId?.length > 0 ? (
                                                         <div className={"flex gap-[2px]"}>
                                                             {
-                                                                Array.isArray(selectedRecord?.post_assign_to) && (selectedRecord?.post_assign_to || []).map((x, index) => {
-                                                                    const findObj = memberList.find((y,) => y.user_id == x);
+                                                                Array.isArray(selectedRecord?.assignToId) && (selectedRecord?.assignToId || []).map((x, index) => {
+                                                                    const findObj = memberList.find((y,) => y.userId == x);
                                                                     return (
                                                                         <div key={index}
                                                                              className={`${theme === "dark" ? "text-card bg-accent-foreground" : "bg-muted-foreground/30"} text-sm flex gap-[2px] items-center rounded py-0 px-2`}
                                                                              onClick={(e) => deleteAssignTo(e, index)}>
-                                                                            {findObj?.user_first_name ? findObj?.user_first_name : ''}
+                                                                            {findObj?.firstName ? findObj?.firstName : ''}
                                                                         </div>
                                                                     )
                                                                 })
@@ -473,15 +475,15 @@ const UpdateAnnouncement = () => {
                                         <SelectContent>
                                             <SelectGroup>
                                                 {(memberList || []).map((x, i) => (
-                                                    <SelectItem className={"p-2"} key={i} value={x.user_id}>
+                                                    <SelectItem className={"p-2"} key={i} value={x.userId}>
                                                         <div className={"flex gap-2"}>
-                                                            <div onClick={() => handleValueChange(x.user_id)}
+                                                            <div onClick={() => handleValueChange(x.userId)}
                                                                  className="checkbox-icon">
-                                                                {selectedRecord?.post_assign_to?.includes(x.user_id) ?
+                                                                {selectedRecord?.assignToId?.includes(x.userId) ?
                                                                     <Check size={18}/> :
                                                                     <div className={"h-[18px] w-[18px]"}/>}
                                                             </div>
-                                                            <span>{x.user_first_name ? x.user_first_name : ''} {x.user_last_name ? x.user_last_name : ''}</span>
+                                                            <span>{x.firstName ? x.firstName : ''} {x.lastName ? x.lastName : ''}</span>
                                                         </div>
                                                     </SelectItem>
                                                 ))}
@@ -493,12 +495,12 @@ const UpdateAnnouncement = () => {
                                 <div className={"w-full space-y-1.5"}>
                                     <Label className={"font-normal"}>Category</Label>
                                     <Select
-                                        value={selectedRecord && selectedRecord?.category_id && selectedRecord?.category_id?.toString()}
+                                        value={selectedRecord && selectedRecord?.categoryId && selectedRecord?.categoryId?.toString()}
                                         onValueChange={onChangeCategory}>
                                         <SelectTrigger className="h-9">
-                                            {selectedRecord?.category_id ? (
+                                            {selectedRecord?.categoryId ? (
                                                 <SelectValue>
-                                                    {categoriesList.find(x => x.id.toString() === selectedRecord.category_id.toString())?.name}
+                                                    {categoriesList.find(x => x.id.toString() === selectedRecord.categoryId.toString())?.name}
                                                 </SelectValue>
                                             ) : (
                                                 <span className="text-muted-foreground">Select a category</span>
@@ -511,7 +513,7 @@ const UpdateAnnouncement = () => {
                                                     (categoriesList || []).map((x, i) => {
                                                         return (
                                                             <SelectItem key={i}
-                                                                        value={x.id.toString()}>{x.name}</SelectItem>
+                                                                        value={x.id.toString()}>{x.title}</SelectItem>
                                                         )
                                                     })
                                                 }
@@ -536,7 +538,7 @@ const UpdateAnnouncement = () => {
                                                         <CircleX
                                                             size={20}
                                                             className={`stroke-gray-500 dark:stroke-white cursor-pointer absolute top-0 left-full transform -translate-x-1/2 -translate-y-1/2 z-10`}
-                                                            onClick={() => onDeleteImg('delete_image', selectedRecord?.image?.name ? "" : selectedRecord?.image?.replace("https://code.quickhunt.app/public/storage/post/", ""))}
+                                                            onClick={() => onDeleteImg('deleteImage', selectedRecord?.image?.name ? "" : selectedRecord?.image?.replace("https://code.quickhunt.app/public/storage/post/", ""))}
                                                         />
                                                     </div>
                                                 ) : (
@@ -545,7 +547,7 @@ const UpdateAnnouncement = () => {
                                                         <CircleX
                                                             size={20}
                                                             className={`stroke-gray-500 dark:stroke-white cursor-pointer absolute top-0 left-full transform -translate-x-1/2 -translate-y-1/2 z-10`}
-                                                            onClick={() => onDeleteImg('delete_image', selectedRecord?.image?.name ? "" : selectedRecord?.image?.replace("https://code.quickhunt.app/public/storage/post/", ""))}
+                                                            onClick={() => onDeleteImg('deleteImage', selectedRecord?.image?.name ? "" : selectedRecord?.image?.replace("https://code.quickhunt.app/public/storage/post/", ""))}
                                                         />
                                                     </div>
                                                 )}
@@ -580,9 +582,9 @@ const UpdateAnnouncement = () => {
                                                     variant="outline"
                                                     className={"justify-between hover:bg-card text-left font-normal d-flex text-muted-foreground hover:text-muted-foreground bg-card"}
                                                 >
-                                                    {/*{moment(selectedRecord?.post_published_at).format("LL")}*/}
-                                                    {selectedRecord.post_published_at
-                                                        ? moment(selectedRecord.post_published_at).format("LL")
+                                                    {/*{moment(selectedRecord?.publishedAt).format("LL")}*/}
+                                                    {selectedRecord.publishedAt
+                                                        ? moment(selectedRecord.publishedAt).format("LL")
                                                         : "Select Date"}
                                                 </Button>
                                             </PopoverTrigger>
@@ -591,14 +593,14 @@ const UpdateAnnouncement = () => {
                                                     mode="single"
                                                     captionLayout="dropdown"
                                                     showOutsideDays={false}
-                                                    selected={selectedRecord?.post_published_at ? new Date(selectedRecord?.post_published_at) : new Date()}
-                                                    onSelect={(date) => onDateChange("post_published_at", date)}
+                                                    selected={selectedRecord?.publishedAt ? new Date(selectedRecord?.publishedAt) : new Date()}
+                                                    onSelect={(date) => onDateChange("publishedAt", date)}
                                                     startMonth={new Date(2024, 0)}
                                                     endMonth={new Date(2050, 12)}
                                                     hideNavigation
                                                     defaultMonth={
-                                                        selectedRecord.post_published_at
-                                                            ? new Date(selectedRecord.post_published_at)
+                                                        selectedRecord.publishedAt
+                                                            ? new Date(selectedRecord.publishedAt)
                                                             : new Date()
                                                     }
                                                 />
@@ -609,12 +611,12 @@ const UpdateAnnouncement = () => {
                                         <div className="flex items-center space-x-2">
                                             <Checkbox
                                                 id="expire_date"
-                                                checked={selectedRecord?.post_expired_boolean === 1}
-                                                onCheckedChange={(checked) => commonToggle("post_expired_boolean", checked ? 1 : 0)}
+                                                checked={selectedRecord?.expiredBoolean === 1}
+                                                onCheckedChange={(checked) => commonToggle("expiredBoolean", checked ? 1 : 0)}
                                             />
                                             <label htmlFor="expire_date" className="text-sm font-normal">Expire At</label>
                                         </div>
-                                        {selectedRecord?.post_expired_boolean === 1 && (
+                                        {selectedRecord?.expiredBoolean === 1 && (
                                             <div className="grid w-full gap-2 basis-1/2">
                                                 <Popover open={popoverOpenExpired} onOpenChange={setPopoverOpenExpired}>
                                                     <PopoverTrigger asChild>
@@ -623,9 +625,9 @@ const UpdateAnnouncement = () => {
                                                             variant="outline"
                                                             className={"justify-between hover:bg-card text-left font-normal d-flex text-muted-foreground hover:text-muted-foreground bg-card"}
                                                         >
-                                                            {/*{moment(selectedRecord?.post_expired_at).format("LL")}*/}
-                                                            {selectedRecord?.post_expired_at
-                                                                ? moment(selectedRecord.post_expired_at).format("LL")
+                                                            {/*{moment(selectedRecord?.expiredAt).format("LL")}*/}
+                                                            {selectedRecord?.expiredAt
+                                                                ? moment(selectedRecord.expiredAt).format("LL")
                                                                 : "Select Expiration Date"}
                                                             <CalendarIcon className="mr-2 h-4 w-4" />
                                                         </Button>
@@ -635,14 +637,14 @@ const UpdateAnnouncement = () => {
                                                             mode="single"
                                                             showOutsideDays={false}
                                                             captionLayout="dropdown"
-                                                            // selected={selectedRecord?.post_expired_at}
-                                                            selected={selectedRecord?.post_expired_at ? new Date(selectedRecord.post_expired_at) : null}
-                                                            onSelect={(date) => onDateChange("post_expired_at", date)}
+                                                            // selected={selectedRecord?.expiredAt}
+                                                            selected={selectedRecord?.expiredAt ? new Date(selectedRecord.expiredAt) : null}
+                                                            onSelect={(date) => onDateChange("expiredAt", date)}
                                                             // startMonth={new Date(2024, 0)}
                                                             // endMonth={new Date(2050, 12)}
 
-                                                            // startMonth={selectedRecord?.post_published_at ? new Date(selectedRecord.post_published_at) : new Date()}
-                                                            // fromDate={selectedRecord?.post_published_at ? new Date(selectedRecord.post_published_at) : null}
+                                                            // startMonth={selectedRecord?.publishedAt ? new Date(selectedRecord.publishedAt) : new Date()}
+                                                            // fromDate={selectedRecord?.publishedAt ? new Date(selectedRecord.publishedAt) : null}
 
                                                             endMonth={new Date(2050, 12)}
                                                             startMonth={publishDate || new Date()}

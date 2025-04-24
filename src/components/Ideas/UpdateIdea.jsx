@@ -13,7 +13,6 @@ import {Tabs, TabsContent, TabsList, TabsTrigger} from "../ui/tabs";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "../ui/table";
 import {useTheme} from "../theme-provider";
 import {useToast} from "../ui/use-toast";
-import {ApiService} from "../../utils/ApiService";
 import {useDispatch, useSelector} from "react-redux";
 import moment from "moment";
 import {DropdownMenu, DropdownMenuTrigger} from "@radix-ui/react-dropdown-menu";
@@ -29,6 +28,7 @@ import {debounce} from "lodash";
 import EmptyData from "../Comman/EmptyData";
 import Pagination from "../Comman/Pagination";
 import {inboxMarkReadAction} from "../../redux/action/InboxMarkReadAction";
+import {apiService} from "../../utils/constent";
 
 const perPageLimit = 10
 
@@ -59,7 +59,6 @@ const UpdateIdea = () => {
     const UrlParams = new URLSearchParams(location.search);
     const getPageNo = UrlParams.get("pageNo") || 1;
     const {theme} = useTheme()
-    let apiSerVice = new ApiService();
     const {toast} = useToast();
     const { id } = useParams();
     const dispatch = useDispatch();
@@ -130,7 +129,7 @@ const UpdateIdea = () => {
             page: pageNo,
             limit: perPageLimit
         }
-        const data = await apiSerVice.getIdeaVote(payload)
+        const data = await apiService.getIdeaVote(payload)
         if(data.success) {
             setIdeasVoteList(data.data)
             setTotalRecord(data.data.total)
@@ -169,7 +168,7 @@ const UpdateIdea = () => {
             projectId: projectId,
             search: value,
         }
-        const data = await apiSerVice.getAllUsers(payload);
+        const data = await apiService.getAllUsers(payload);
         if (data.success) {
             setGetAllUsersList(data.data)
         }
@@ -210,7 +209,7 @@ const UpdateIdea = () => {
             firstSeen: new Date(),
             lastSeen: new Date(),
         }
-        const data = await apiSerVice.createUsers(payload)
+        const data = await apiService.createUsers(payload)
         if(data.success) {
             const newUser  = {
                 id: data.data.id,
@@ -233,7 +232,7 @@ const UpdateIdea = () => {
                 ...prev,
                 voteLists: clone
             }));
-            const upvoteResponse = await apiSerVice.userManualUpVote({
+            const upvoteResponse = await apiService.userManualUpVote({
                 ideaId: selectedIdea.id,
                 userId: data.data.id,
             });
@@ -260,7 +259,7 @@ const UpdateIdea = () => {
             id: id,
             ideaId: selectedIdea.id
         }
-        const data = await apiSerVice.removeUserVote(payload)
+        const data = await apiService.removeUserVote(payload)
         let clone = Array.isArray(ideasVoteList) ? [...ideasVoteList] : [];
         if(data.success) {
             clone.splice(index,1);
@@ -304,7 +303,7 @@ const UpdateIdea = () => {
                     email: selectedUser.email,
                 };
                 updatedVoteList.push(newUserPayload);
-                const upvoteResponse = await apiSerVice.userManualUpVote({
+                const upvoteResponse = await apiService.userManualUpVote({
                     ideaId: selectedIdea.id,
                     userId: selectedUser.id,
                 });
@@ -334,7 +333,7 @@ const UpdateIdea = () => {
 
     const getSingleIdea = async () => {
         setIsLoading(true)
-        const data = await apiSerVice.getSingleIdea(id);
+        const data = await apiService.getSingleIdea(id);
         if (data.success) {
             setIsLoading(false)
             const ideaData = {...data.data, isRead: 1,
@@ -379,7 +378,7 @@ const UpdateIdea = () => {
                     ideaId: selectedIdea.id,
                     type: type
                 };
-                const data = await apiSerVice.giveVote(payload);
+                const data = await apiService.giveVote(payload);
                 if (data.success) {
                     const clone = { ...selectedIdea };
                     let newVoteCount = clone.vote;
@@ -424,12 +423,12 @@ const UpdateIdea = () => {
         setIsSaveComment(true)
         let formData = new FormData();
         for (let i = 0; i < commentFiles.length; i++) {
-            formData.append(`images[]`, commentFiles[i]);
+            formData.append(`images`, commentFiles[i]);
         }
         formData.append('comment', commentText);
         formData.append('ideaId', selectedIdea.id);
         formData.append('parentId', '');
-        const data = await apiSerVice.createComment(formData)
+        const data = await apiService.createComment(formData)
         if (data.success) {
             const clone = selectedIdea && selectedIdea.comments ? [...selectedIdea.comments] : [];
             clone.unshift(data.data)
@@ -441,17 +440,17 @@ const UpdateIdea = () => {
             setIsSaveComment(false)
         } else {
             setIsSaveComment(false)
-            toast({variant: "destructive", description: data.message})
+            toast({variant: "destructive", description: data.error.message})
         }
     }
 
     const onShowSubComment = (index) => {
         const updatedComments = selectedIdea.comments.map((comment, i) => ({
             ...comment,
-            show_reply: i === index ? !comment.show_reply : false,
+            showReply: i === index ? !comment.showReply : false,
         }));
         setSelectedIdea({ ...selectedIdea, comments: updatedComments });
-        if (updatedComments[index].show_reply) {
+        if (updatedComments[index].showReply) {
             setSubCommentTextEditIdx(index);
             setSubCommentText("");
         } else {
@@ -463,24 +462,23 @@ const UpdateIdea = () => {
         setIsSaveSubComment(true)
         let formData = new FormData();
         for (let i = 0; i < subCommentFiles.length; i++) {
-            formData.append(`images[]`, subCommentFiles[i]);
+            formData.append(`images`, subCommentFiles[i]);
         }
         formData.append('comment', subCommentText);
         formData.append('ideaId', selectedIdea.id);
         formData.append('parentId', record.id);
-        const data = await apiSerVice.createComment(formData)
+        const data = await apiService.createComment(formData)
+        setIsSaveSubComment(false)
         if (data.success) {
             const clone = [...selectedIdea.comments];
-            clone[index].reply.push(data.data)
+            clone[index]?.reply?.push(data.data)
             let obj = {...selectedIdea, comments: clone};
             setSelectedIdea(obj);
             setSubCommentText('');
             setSubCommentFiles([])
-            setIsSaveSubComment(false)
             toast({description: data.message})
         } else {
-            setIsSaveSubComment(false)
-            toast({variant: "destructive", description: data.message})
+            toast({variant: "destructive", description: data?.error?.message})
         }
     }
 
@@ -489,7 +487,7 @@ const UpdateIdea = () => {
         setSelectedIdea({...selectedIdea, coverImage: file})
         let formData = new FormData();
         formData.append("coverImage", file);
-        const data = await apiSerVice.updateIdea(formData, selectedIdea.id)
+        const data = await apiService.updateIdea(formData, selectedIdea.id)
         if (data.success) {
             setSelectedIdea({...data.data})
             // setIdeasList(clone);
@@ -519,23 +517,23 @@ const UpdateIdea = () => {
     };
 
     const handleSubCommentUploadImg = (event) => {
-        const files = event.target.files;
+        const files = Array.from(event.target.files); // Convert FileList to array
         if (selectedSubComment && selectedSubComment.id && selectedComment && selectedComment.id) {
-            const clone = [...selectedSubComment.images, ...files,]
-            // let old = selectedSubComment && selectedSubComment.images && selectedSubComment.images.length ? [...selectedSubComment.images] : [];
-            // const newImageClone = [...old, ...files,];
-            let selectedSubCommentObj = {...selectedSubComment, images: clone}
+            // Ensure images is an array, default to empty array if undefined
+            const currentImages = Array.isArray(selectedSubComment.images) ? selectedSubComment.images : [];
+            const clone = [...currentImages, ...files]; // Spread the ensured array
+            let selectedSubCommentObj = { ...selectedSubComment, images: clone };
             setSelectedSubComment(selectedSubCommentObj);
-            let index = ((selectedComment && selectedComment.reply) || []).findIndex((x) => x.id === selectedSubComment.id)
+            let index = ((selectedComment && selectedComment.reply) || []).findIndex((x) => x.id === selectedSubComment.id);
             if (index !== -1) {
                 const cloneReplay = [...selectedComment.reply];
                 cloneReplay[index] = selectedSubCommentObj;
-                setSelectedComment({...selectedComment, reply: cloneReplay})
+                setSelectedComment({ ...selectedComment, reply: cloneReplay });
             }
         } else {
-            setSubCommentFiles([...subCommentFiles, ...files])
+            setSubCommentFiles([...subCommentFiles, ...files]);
         }
-    }
+    };
 
     const onChangeStatus = async (name, value) => {
         if (name === "isActive") {
@@ -553,7 +551,7 @@ const UpdateIdea = () => {
             value = "";
         }
         formData.append(name, value);
-        const data = await apiSerVice.updateIdea(formData, selectedIdea.id)
+        const data = await apiService.updateIdea(formData, selectedIdea.id)
         if (data.success) {
             // setSelectedIdea({
             //     ...data.data,
@@ -649,14 +647,14 @@ const UpdateIdea = () => {
         let formData = new FormData();
         if (selectedComment && selectedComment.images && selectedComment.images.length) {
             for (let i = 0; i < selectedComment.images.length; i++) {
-                formData.append(`images[${i}]`, selectedComment.images[i]);
+                formData.append(`images`, selectedComment.images[i]);
             }
         }
         // for (let i = 0; i < deletedCommentImage.length; i++) {
-        //     formData.append(`delete_image[${i}]`, deletedCommentImage[i].replace('https://code.quickhunt.app/public/storage/feature_idea/', ''));
+        //     formData.append(`removeImages[${i}]`, deletedCommentImage[i].replace('https://code.quickhunt.app/public/storage/feature_idea/', ''));
         // }
         // Filter deletedCommentImage to only include images not present in current selectedComment.images
-        const currentImageFilenames = selectedComment.images.map(img => {
+        const currentImageFilenames = selectedComment?.images.map(img => {
             if (typeof img === 'string') {
                 return img.replace('https://code.quickhunt.app/public/storage/feature_idea/', '');
             } else if (img instanceof File) {
@@ -672,12 +670,12 @@ const UpdateIdea = () => {
 
         // Append only valid deletions
         for (let i = 0; i < validDeletedImages.length; i++) {
-            formData.append(`delete_image[${i}]`, validDeletedImages[i]);
+            formData.append(`removeImages[${i}]`, validDeletedImages[i]);
         }
 
         formData.append('comment', selectedComment.comment);
-        formData.append('id', selectedComment.id);
-        const data = await apiSerVice.updateComment(formData)
+        const data = await apiService.updateComment(selectedComment.id, formData)
+        setIsSaveUpdateComment(false)
         if (data.success) {
             let updatedImages = Array.isArray(data.data.images) ? data.data.images : [];
             let obj = { ...selectedComment, images: updatedImages };
@@ -690,11 +688,9 @@ const UpdateIdea = () => {
             setSelectedComment(null);
             setIsEditComment(false)
             setDeletedCommentImage([])
-            setIsSaveUpdateComment(false)
             toast({description: data.message})
         } else {
-            toast({variant: "destructive", description: data.message})
-            setIsSaveUpdateComment(false)
+            toast({variant: "destructive", description: data?.error?.message})
         }
     }
 
@@ -703,15 +699,14 @@ const UpdateIdea = () => {
         let formData = new FormData();
         if (selectedSubComment && selectedSubComment.images && selectedSubComment.images.length) {
             for (let i = 0; i < selectedSubComment.images.length; i++) {
-                formData.append(`images[${i}]`, selectedSubComment.images[i]);
+                formData.append(`images`, selectedSubComment.images[i]);
             }
         }
         for (let i = 0; i < deletedSubCommentImage.length; i++) {
-            formData.append(`delete_image[${i}]`, deletedSubCommentImage[i].replace('https://code.quickhunt.app/public/storage/feature_idea/', ''));
+            formData.append(`removeImages[${i}]`, deletedSubCommentImage[i].replace('https://code.quickhunt.app/public/storage/feature_idea/', ''));
         }
         formData.append('comment', selectedSubComment.comment);
-        formData.append('id', selectedSubComment.id);
-        const data = await apiSerVice.updateComment(formData)
+        const data = await apiService.updateComment(selectedSubComment.id, formData)
         if (data.success) {
 
             const commentIndex = ((selectedIdea.comments) || []).findIndex((x) => x.id === selectedComment.id);
@@ -735,7 +730,7 @@ const UpdateIdea = () => {
     }
 
     const deleteComment = async (id, indexs) => {
-        const data = await apiSerVice.deleteComment({id: id})
+        const data = await apiService.deleteComment({id: id})
         if (data.success) {
             const cloneComment = [...selectedIdea.comments];
             cloneComment.splice(indexs, 1);
@@ -749,7 +744,7 @@ const UpdateIdea = () => {
     }
 
     const deleteSubComment = async (id, record, index, subIndex) => {
-        const data = await apiSerVice.deleteComment({id: id})
+        const data = await apiService.deleteComment({id: id})
         if (data.success) {
             const cloneComment = [...selectedIdea.comments];
             cloneComment[index].reply.splice(subIndex, 1);
@@ -837,7 +832,6 @@ const UpdateIdea = () => {
     };
 
     const onCreateIdea = async () => {
-        console.log(selectedIdea)
         let validationErrors = {};
         Object.keys(selectedIdea).forEach(name => {
             const error = formValidate(name, selectedIdea[name]);
@@ -872,7 +866,7 @@ const UpdateIdea = () => {
             formData.append('image', resizedImage);
         }
 
-        const data = await apiSerVice.updateIdea(formData, selectedIdea.id)
+        const data = await apiService.updateIdea(formData, selectedIdea.id)
         if (data.success) {
             // setSelectedIdea({...selectedIdea})
             setOldSelectedIdea({...selectedIdea})
@@ -1115,7 +1109,7 @@ const UpdateIdea = () => {
                         </DialogContent>
                     </Dialog>
             }
-            <div className={"px-4 py-3 lg:py-6 lg:px-8 border-b"}>
+            <div className={"px-4 py-3 lg:p-6 border-b"}>
                 <CommonBreadCrumb
                     links={links}
                     currentPage={selectedIdea?.title}
@@ -1515,7 +1509,7 @@ const UpdateIdea = () => {
                                                                     {
                                                                         (selectedIdea?.images || []).map((x, i) => {
                                                                                 return (
-                                                                                    <Fragment>
+                                                                                    <Fragment key={i}>
                                                                                         {
                                                                                             x && x.name ?
                                                                                                 <div
@@ -1751,14 +1745,14 @@ const UpdateIdea = () => {
                                                                             <div className={"update-idea text-sm rounded-full text-center"}>
                                                                                 <UserAvatar
                                                                                     userPhoto={x?.profileImage}
-                                                                                    userName={x?.name ? x?.name : x?.username}
+                                                                                    userName={x?.name && x.name !== "null" ? x.name : x?.userName}
                                                                                 />
                                                                             </div>
                                                                         </div>
                                                                         <div className={"w-full flex flex-col space-y-3"}>
                                                                             <div className={"flex gap-1 flex-wrap justify-between"}>
                                                                                 <div className={"flex items-start"}>
-                                                                                    <h4 className={"text-sm font-normal"}>{x?.name ? x?.name : x?.user_name}</h4>
+                                                                                    <h4 className={"text-sm font-normal"}>{x?.name && x.name !== "null" ? x.name : x?.userName}</h4>
                                                                                     <p className={"text-sm font-normal flex items-center text-muted-foreground"}>
                                                                                         <Dot size={20}
                                                                                              className={"fill-text-card-foreground stroke-text-card-foreground"}/>
@@ -1847,26 +1841,26 @@ const UpdateIdea = () => {
                                                                                     </div>
                                                                             }
                                                                             {
-                                                                                x.show_reply ?
+                                                                                x.showReply ?
                                                                                     <div
                                                                                         className={"space-y-3"}>
                                                                                         {
                                                                                             (x?.reply || []).map((y, j) => {
                                                                                                 return (
-                                                                                                    <Fragment>
+                                                                                                    <Fragment key={j}>
                                                                                                         <div
                                                                                                             className={"flex gap-2"}>
                                                                                                             <div>
                                                                                                                 <div
                                                                                                                     className={"update-idea text-sm rounded-full text-center"}>
-                                                                                                                    <UserAvatar userPhoto={y.profileimage} userName={y?.firstname}/>
+                                                                                                                    <UserAvatar userPhoto={y.profileimage} userName={y?.name && y.name !== "null" ? y.name : y?.userName}/>
                                                                                                                 </div>
                                                                                                             </div>
                                                                                                             <div
                                                                                                                 className={"w-full space-y-2"}>
                                                                                                                 <div className={"flex justify-between"}>
                                                                                                                     <div className={"flex items-start"}>
-                                                                                                                        <h4 className={"text-sm font-normal"}>{y?.name ? y?.name : y?.user_name}</h4>
+                                                                                                                        <h4 className={"text-sm font-normal"}>{y?.name && y.name !== "null" ? y.name : y?.userName}</h4>
                                                                                                                         <p className={"text-sm font-normal flex items-center text-muted-foreground"}>
                                                                                                                             <Dot
                                                                                                                                 size={20}
@@ -1945,7 +1939,7 @@ const UpdateIdea = () => {
                                                                                                         {
                                                                                                             (subCommentFiles || []).map((z, i) => {
                                                                                                                 return (
-                                                                                                                    <div>
+                                                                                                                    <div key={i}>
                                                                                                                         {
                                                                                                                             z && z.name ?
                                                                                                                                 <div

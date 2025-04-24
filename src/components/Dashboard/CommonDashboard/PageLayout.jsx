@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { MoveLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { baseUrl } from "../../../utils/constent";
-import { ApiService } from "../../../utils/ApiService";
+import {apiService, baseUrl} from "../../../utils/constent";
 import { useSelector } from "react-redux";
 import { Card, CardContent } from "../../ui/card";
 import EmptyData from "../../Comman/EmptyData";
@@ -17,7 +16,6 @@ const PageLayout = ({
                     }) => {
     const navigate = useNavigate();
     const projectDetailsReducer = useSelector((state) => state.projectDetailsReducer);
-    const apiService = new ApiService();
 
     const [isLoading, setIsLoading] = useState(false);
     const [pageNo, setPageNo] = useState(1);
@@ -51,14 +49,14 @@ const PageLayout = ({
     const fetchData = async () => {
         setIsLoading(true);
         const data = await apiService[apiMethod]({
-            project_id: projectDetailsReducer.id,
+            projectId: projectDetailsReducer.id,
             page: pageNo,
             limit: perPageLimit,
         });
         setIsLoading(false);
-        if (data.status === 200) {
-            setChartList(data.data);
-            setTotalRecord(data.total);
+        if (data.success) {
+            setChartList(data.data.data);
+            setTotalRecord(data.data.total);
         }
     };
 

@@ -237,7 +237,8 @@ const HeaderBar = ({setIsMobile}) => {
         };
 
         const data = await apiSerVice.createProjects(payload)
-        if (data.status === 200) {
+        setIsCreateLoading(false);
+        if (data.success) {
             const clone = [...projectList];
             let obj = {
                 ...data.data,
@@ -252,13 +253,11 @@ const HeaderBar = ({setIsMobile}) => {
             dispatch(projectDetailsAction(obj))
             toast({description: data.message})
             setCreateProjectDetails(initialStateProject)
-            setIsCreateLoading(false);
             navigate(`${baseUrl}/dashboard`);
             closeSheet();
             // setSheetOpen(false)
         } else {
-            setIsCreateLoading(false);
-            toast({variant: "destructive" ,description: data.message})
+            toast({variant: "destructive" ,description: data?.error?.message})
         }
         // closeSheet()
     }

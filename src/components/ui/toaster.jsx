@@ -24,7 +24,7 @@ export function Toaster() {
               {title && <ToastTitle>{title}</ToastTitle>}
               {description && (
                 <ToastDescription><div className={"flex gap-2"}>
-                  {props.variant === "destructive" ?  <XCircle className="h-5 w-5 text-white-500" /> :<CheckCircle className="h-5 w-5 text-green-500" />}
+                  {props.variant === "destructive" ?  <XCircle className="h-5 w-5 text-white-500" /> : <span><CheckCircle className="h-5 w-5 text-green-500" /></span>}
 
                   {description}
                 </div></ToastDescription>

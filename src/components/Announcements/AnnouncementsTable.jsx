@@ -34,20 +34,28 @@ const AnnouncementsTable = ({data, isLoading, setSelectedRecord, handleDelete, s
     const navigate = useNavigate();
     const {theme} = useTheme();
 
-    const [announcementData, setAnnouncementData] = useState(data);
+    const [announcementData, setAnnouncementData] = useState([]);
     const [sortOrder, setSortOrder] = useState('asc');
     const [sortedColumn, setSortedColumn] = useState('');
     const [idToDelete, setIdToDelete] = useState(null);
     const [openDelete, setOpenDelete] = useState(false);
 
+    // useEffect(() => {
+    //     // const updatedData = data.map(item => ({
+    //     //     ...item,
+    //     //     status: item.status ?? 1,
+    //     // }));
+    //     // setAnnouncementData(updatedData);
+    //     setAnnouncementData(data.map((item) => ({...item, status: item.status ?? 1})));
+    //     // navigate(`${baseUrl}/announcements?pageNo=${getPageNo}`);
+    // }, [data]);
+
     useEffect(() => {
-        // const updatedData = data.map(item => ({
-        //     ...item,
-        //     post_status: item.post_status ?? 1,
-        // }));
-        // setAnnouncementData(updatedData);
-        setAnnouncementData(data.map((item) => ({...item, post_status: item.post_status ?? 1})));
-        // navigate(`${baseUrl}/announcements?pageNo=${getPageNo}`);
+        if (Array.isArray(data)) {
+            setAnnouncementData(data.map((item) => ({ ...item, status: item.status ?? 1 })));
+        } else {
+            setAnnouncementData([]); // Default to empty array if data is not an array
+        }
     }, [data]);
 
     const toggleSort = (column) => {
@@ -60,8 +68,8 @@ const AnnouncementsTable = ({data, isLoading, setSelectedRecord, handleDelete, s
         }
         if (column === "Published At") {
             sortedData.sort((a, d) => {
-                const dateA = new Date(a.post_published_at);
-                const dateD = new Date(d.post_published_at);
+                const dateA = new Date(a.publishedAt);
+                const dateD = new Date(d.publishedAt);
                 return sortOrder === 'asc' ? dateA - dateD : dateD - dateA;
             });
         }
@@ -71,24 +79,24 @@ const AnnouncementsTable = ({data, isLoading, setSelectedRecord, handleDelete, s
     const handleStatusChange = async (object, value) => {
         setAnnouncementData(announcementData.map(x => x.id === object.id ? {
             ...x,
-            post_status: value,
-            post_published_at: value === 1 ? moment(new Date()).format("YYYY-MM-DD") : object.post_published_at
+            status: value,
+            publishedAt: value === 1 ? moment(new Date()).format("YYYY-MM-DD") : object.publishedAt
         } : x));
         const labelIds = object.labels.map(label => label.id);
         const payload = {
             ...object,
-            post_status: value,
-            post_published_at: value === 1 ? moment(new Date()).format("YYYY-MM-DD") : object.post_published_at,
+            status: value,
+            publishedAt: value === 1 ? moment(new Date()).format("YYYY-MM-DD") : object.publishedAt,
             labels: labelIds
         }
         const data = await apiService.updatePosts(payload, object.id);
-        if (data.status === 200) {
+        if (data.success) {
             toast({
                 description: data.message,
             });
         } else {
             toast({
-                description: data.message,
+                description: data.error.message,
                 variant: "destructive",
             });
         }
@@ -158,7 +166,7 @@ const AnnouncementsTable = ({data, isLoading, setSelectedRecord, handleDelete, s
                                             {
                                                 [...Array(7)].map((_, i) => {
                                                     return (
-                                                        <TableCell className={"max-w-[373px] px-2 py-[10px] md:px-3"}>
+                                                        <TableCell key={i} className={"max-w-[373px] px-2 py-[10px] md:px-3"}>
                                                             <Skeleton className={"rounded-md w-full h-7"}/>
                                                         </TableCell>
                                                     )
@@ -170,12 +178,12 @@ const AnnouncementsTable = ({data, isLoading, setSelectedRecord, handleDelete, s
                             ) : announcementData.length > 0 ? <>
                                 {(announcementData || []).map((x, index) => {
                                     return (
-                                        <TableRow key={x?.id} className={""}>
+                                        <TableRow key={index} className={""}>
                                             <TableCell className={`inline-flex gap-2 md:gap-1 flex-wrap items-center px-2 py-[10px] md:px-3 font-normal`}>
                                                 <span
                                                     className={"cursor-pointer max-w-[270px] truncate text-ellipsis overflow-hidden whitespace-nowrap"}
-                                                    onClick={() => onEdit(x)}>{x?.post_title}</span>
-                                                {x.post_pin_to_top === 1 && <Pin size={14} className={`fill-card-foreground`}/>}
+                                                    onClick={() => onEdit(x)}>{x?.title}</span>
+                                                {x.pinTop === 1 && <Pin size={14} className={`fill-card-foreground`}/>}
                                                 {
                                                     x.labels && x.labels.length > 0 ?
                                                         <div className={"flex flex-wrap gap-1"}>
@@ -185,12 +193,12 @@ const AnnouncementsTable = ({data, isLoading, setSelectedRecord, handleDelete, s
                                                                         return (
                                                                             <Badge variant={"outline"} key={index}
                                                                                    style={{
-                                                                                       color: y.label_color_code,
-                                                                                       borderColor: y.label_color_code,
+                                                                                       color: y.colorCode,
+                                                                                       borderColor: y.colorCode,
                                                                                        textTransform: "capitalize"
                                                                                    }}
-                                                                                   className={`h-[20px] py-0 px-2 text-xs rounded-[5px]  font-medium text-[${y.label_color_code}] border-[${y.label_color_code}] capitalize`}>
-                                                                                <span className={"max-w-[85px] truncate text-ellipsis overflow-hidden whitespace-nowrap"}>{y.label_name}</span>
+                                                                                   className={`h-[20px] py-0 px-2 text-xs rounded-[5px]  font-medium text-[${y.colorCode}] border-[${y.colorCode}] capitalize`}>
+                                                                                <span className={"max-w-[85px] truncate text-ellipsis overflow-hidden whitespace-nowrap"}>{y.name}</span>
                                                                             </Badge>
                                                                         )
                                                                     })
@@ -199,18 +207,18 @@ const AnnouncementsTable = ({data, isLoading, setSelectedRecord, handleDelete, s
                                                         </div> : ""}
                                             </TableCell>
                                             <TableCell
-                                                className={`font-normal px-2 py-[10px] md:px-3`}>{x?.post_modified_date ? moment.utc(x.post_modified_date).local().startOf('seconds').fromNow() : "-"}</TableCell>
-                                            <TableCell className={`font-normal px-2 py-[10px] md:px-3`}>{x.post_published_at ? moment(x.post_published_at).format('D MMM, YYYY') : moment().format('D MMM, YYYY')}</TableCell>
+                                                className={`font-normal px-2 py-[10px] md:px-3`}>{x?.updatedAt ? moment.utc(x.updatedAt).local().startOf('seconds').fromNow() : "-"}</TableCell>
+                                            <TableCell className={`font-normal px-2 py-[10px] md:px-3`}>{x.publishedAt ? moment(x.publishedAt).format('D MMM, YYYY') : moment().format('D MMM, YYYY')}</TableCell>
                                             <TableCell className={"px-2 py-[10px] md:px-3"}>
-                                                <Select value={x.post_status}
+                                                <Select value={x.status}
                                                         onValueChange={(value) => handleStatusChange(x, value)}>
                                                     <SelectTrigger className="w-[137px] h-7">
-                                                        <SelectValue placeholder={x.post_status ? status.find(s => s.value == x.post_status)?.name : "Publish"}/>
+                                                        <SelectValue placeholder={x.status ? status.find(s => s.value == x.status)?.name : "Publish"}/>
                                                     </SelectTrigger>
                                                     <SelectContent>
                                                         <SelectGroup>
                                                             {
-                                                                (x.post_status === 2 ? status2 : status || []).map((x, i) => {
+                                                                (x.status === 2 ? status2 : status || []).map((x, i) => {
                                                                     return (
                                                                         <Fragment key={i}>
                                                                             <SelectItem value={x.value}
@@ -233,7 +241,7 @@ const AnnouncementsTable = ({data, isLoading, setSelectedRecord, handleDelete, s
                                             </TableCell>
                                             <TableCell className={"px-2 py-[10px] md:px-3"}>
                                                 <Button
-                                                    disabled={x.post_status !== 1}
+                                                    disabled={x.status !== 1}
                                                     variant={"ghost"}
                                                     onClick={() => shareFeedback(x.domain, x.post_slug_url)}
                                                     className={"p-0 h-auto"}

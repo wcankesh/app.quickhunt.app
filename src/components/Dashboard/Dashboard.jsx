@@ -1,7 +1,6 @@
 import React, {Fragment, useEffect, useState} from "react"
 import {Card, CardContent, CardHeader, CardTitle} from "../ui/card"
 import moment from "moment";
-import {ApiService} from "../../utils/ApiService";
 import {useSelector} from "react-redux";
 import EmptyData from "../Comman/EmptyData";
 import {chartLoading, commonLoad} from "../Comman/CommSkel";
@@ -11,7 +10,7 @@ import ReadMoreText from "../Comman/ReadMoreText";
 import {DateRangePicker, formatDate, getPresetRange, PRESETS} from "../ui/date-range-picker";
 import {Button} from "../ui/button";
 import {useNavigate} from "react-router-dom";
-import {baseUrl} from "../../utils/constent";
+import {apiService, baseUrl} from "../../utils/constent";
 import {Badge} from "../ui/badge";
 import {UserAvatar} from "../Comman/CommentEditor";
 
@@ -27,7 +26,6 @@ const chartConfig = {
 }
 
 export function Dashboard() {
-    let apiSerVice = new ApiService();
     const navigate = useNavigate();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
@@ -61,17 +59,17 @@ export function Dashboard() {
             {
                 id: "",
                 feedback: "",
-                customer_email_id: "",
-                customer_name: "",
-                created_at: "",
+                customerEmail: "",
+                customerName: "",
+                createdAt: "",
             }
         ],
         reactions: [
             {
-                created_at: "",
-                customer_name: "",
-                post_title: "",
-                reaction_id: "",
+                createdAt: "",
+                customerName: "",
+                title: "",
+                reactionId: "",
             }
         ]
     });
@@ -84,13 +82,13 @@ export function Dashboard() {
 
     const dashboardData = async () => {
         const payload = {
-            project_id: projectDetailsReducer.id,
-            start_date: moment(state.from).format("DD-MM-YYYY"),
-            end_date: moment(state.to).format("DD-MM-YYYY"),
+            projectId: projectDetailsReducer.id,
+            startDate: moment(state.from).format("YYYY-MM-DD"),
+            endDate: moment(state.to).format("YYYY-MM-DD"),
         }
         setIsLoading(true)
-        const data = await apiSerVice.dashboardData(payload)
-        if (data.status === 200) {
+        const data = await apiService.dashboardData(payload)
+        if (data.success) {
             setIsLoading(false)
             const feedbackAnalytics = data.data.feedbackAnalytics.map((j) => ({
                 x: new Date(j.x),
@@ -257,51 +255,54 @@ export function Dashboard() {
                                         <CardContent className={"p-0"}>{commonLoad.dashboardComments}</CardContent>
                                     ) : (
                                         (chartList.feedbacks && chartList.feedbacks.length > 0) ? (
-                                            (chartList.feedbacks || []).map((x, i) => (
-                                                <Fragment key={i}>
-                                                    <CardContent className={"py-2.5 px-6 flex flex-col gap-4 border-b last:border-b-0"}>
-                                                        <div className="flex gap-2 items-center justify-between cursor-pointer">
-                                                            <div
-                                                                className="flex gap-2 items-center"
-                                                                onClick={() => {
-                                                                    if (x.type === 1) {
-                                                                        navigate(`${baseUrl}/announcements/${x.post_id}`);
-                                                                    } else if (x.type === 2) {
-                                                                        navigate(`${baseUrl}/ideas/${x.post_id}`);
-                                                                    }
-                                                                }}
-                                                            >
-                                                                <div className={"update-idea text-sm rounded-full text-center"}>
-                                                                    <UserAvatar userPhoto={x.user_photo} userName={x.customer_name && x.customer_name.substring(0, 1).toUpperCase()} />
+                                            (chartList.feedbacks || []).map((x, i) => {
+                                                console.log("xxxxx", x)
+                                                return (
+                                                    <Fragment key={i}>
+                                                        <CardContent className={"py-2.5 px-6 flex flex-col gap-4 border-b last:border-b-0"}>
+                                                            <div className="flex gap-2 items-center justify-between cursor-pointer">
+                                                                <div
+                                                                    className="flex gap-2 items-center"
+                                                                    onClick={() => {
+                                                                        if (x.type === 1) {
+                                                                            navigate(`${baseUrl}/announcements/${x.postId}`);
+                                                                        } else if (x.type === 2) {
+                                                                            navigate(`${baseUrl}/ideas/${x.postId}`);
+                                                                        }
+                                                                    }}
+                                                                >
+                                                                    <div className={"update-idea text-sm rounded-full text-center"}>
+                                                                        <UserAvatar userPhoto={x.userPhoto} userName={x.customerName && x.customerName.substring(0, 1).toUpperCase()} />
+                                                                    </div>
+                                                                    <div className={"flex items-center flex-wrap gap-1 md:gap-2"}>
+                                                                        <h4 className="text-sm font-medium">{x.customerName}</h4>
+                                                                        <p className="text-xs text-muted-foreground">{x.customerEmail}</p>
+                                                                    </div>
                                                                 </div>
-                                                                <div className={"flex items-center flex-wrap gap-1 md:gap-2"}>
-                                                                <h4 className="text-sm font-medium">{x.customer_name}</h4>
-                                                                <p className="text-xs text-muted-foreground">{x.customer_email}</p>
-                                                                </div>
+                                                                <Badge
+                                                                    variant={"outline"}
+                                                                    className={`text-xs font-normal text-muted-foreground ${x.type === 1 ? "text-[#3b82f6] border-[#3b82f6]" : "text-[#63c8d9] border-[#63c8d9]"}`}
+                                                                >
+                                                                    {x.type === 1 ? "Announcement" : "Idea"}
+                                                                </Badge>
                                                             </div>
-                                                            <Badge
-                                                                variant={"outline"}
-                                                                className={`text-xs font-normal text-muted-foreground ${x.type === 1 ? "text-[#3b82f6] border-[#3b82f6]" : "text-[#63c8d9] border-[#63c8d9]"}`}
-                                                            >
-                                                                {x.type === 1 ? "Announcement" : "Idea"}
-                                                            </Badge>
-                                                        </div>
-                                                        <div className="text-xs font-normal text-foreground cursor-pointer">
-                                                            <ReadMoreText
-                                                                html={x.comment}
-                                                                maxLength={100}
-                                                                onTextClick={() => {
-                                                                    if (x.type === 1) {
-                                                                        navigate(`${baseUrl}/announcements/${x.post_id}`);
-                                                                    } else if (x.type === 2) {
-                                                                        navigate(`${baseUrl}/ideas/${x.post_id}`);
-                                                                    }
-                                                                }}
-                                                            />
-                                                        </div>
-                                                    </CardContent>
-                                                </Fragment>
-                                            ))
+                                                            <div className="text-xs font-normal text-foreground cursor-pointer">
+                                                                <ReadMoreText
+                                                                    html={x.comment}
+                                                                    maxLength={100}
+                                                                    onTextClick={() => {
+                                                                        if (x.type === 1) {
+                                                                            navigate(`${baseUrl}/announcements/${x.postId}`);
+                                                                        } else if (x.type === 2) {
+                                                                            navigate(`${baseUrl}/ideas/${x.postId}`);
+                                                                        }
+                                                                    }}
+                                                                />
+                                                            </div>
+                                                        </CardContent>
+                                                    </Fragment>
+                                                )
+                                            })
                                         ) : (
                                             <EmptyData/>
                                         )
@@ -328,7 +329,8 @@ export function Dashboard() {
                                     ) : (
                                         (chartList.reactions && chartList.reactions.length > 0) ? (
                                             (chartList.reactions || []).map((x, i) => {
-                                                const emoji = allStatusAndTypes.emoji.find((e) => e.id === x.reaction_id) || {emoji_url: ""};
+                                                console.log("reaction x", x)
+                                                const emoji = allStatusAndTypes.emoji.find((e) => e.id === x.reactionId) || {emoji_url: ""};
                                                 return (
                                                     <Fragment key={i}>
                                                         <CardContent className={"py-2.5 px-6 border-b last:border-b-0"}>
@@ -338,15 +340,15 @@ export function Dashboard() {
                                                                     <div className="flex gap-1 items-center">
                                                                         <h4
                                                                             className="text-sm font-medium cursor-pointer"
-                                                                            onClick={() => navigate(`${baseUrl}/announcements/analytic-view?postId=${x.post_id}`)}
-                                                                        >{x.customer_name}</h4>
+                                                                            onClick={() => navigate(`${baseUrl}/announcements/analytic-view?postId=${x.postId}`)}
+                                                                        >{x.customerName}</h4>
                                                                         <p className="text-xs text-muted-foreground">Reacted
                                                                             To</p>
                                                                     </div>
                                                                     <p
                                                                         className="text-xs font-medium text-foreground cursor-pointer"
-                                                                        onClick={() => navigate(`${baseUrl}/announcements/analytic-view?postId=${x.post_id}`)}
-                                                                    >"{x.post_title}"</p>
+                                                                        onClick={() => navigate(`${baseUrl}/announcements/analytic-view?postId=${x.postId}`)}
+                                                                    >"{x.title}"</p>
                                                                 </div>
                                                             </div>
                                                         </CardContent>

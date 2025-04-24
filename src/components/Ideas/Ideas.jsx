@@ -5,10 +5,9 @@ import {Card, CardContent} from "../ui/card";
 import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "../ui/select";
 import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList} from "../ui/command";
 import {Checkbox} from "../ui/checkbox";
-import {ApiService} from "../../utils/ApiService";
 import {useNavigate} from "react-router";
 import {useSelector} from "react-redux";
-import {baseUrl} from "../../utils/constent";
+import {apiService, baseUrl} from "../../utils/constent";
 import moment from "moment";
 import {useToast} from "../ui/use-toast";
 import ReadMoreText from "../Comman/ReadMoreText";
@@ -30,21 +29,21 @@ import {DisplayReactQuill} from "../Comman/ReactQuillEditor";
 import {EmptyIdeaContent} from "../Comman/EmptyContentForModule";
 
 const filterByStatus = [
-    {name: "Archived", value: "archive",},
-    {name: "Bugs", value: "bug",},
+    {name: "Archived", value: "isArchive",},
+    {name: "Bugs", value: "isActive",},
 ]
 
 const perPageLimit = 10
 
 const initialStateFilter = {
     all: "",
-    archive: "",
-    bug: "",
-    no_status: "",
-    roadmap: [],
-    topic: [],
+    roadmapStatusId: [],
+    search: "",
+    tagId: [],
     status: [],
-    search: ""
+    isArchive: "",
+    isActive: "",
+    noStatus: "",
 };
 
 const Ideas = () => {
@@ -52,7 +51,6 @@ const Ideas = () => {
     const UrlParams = new URLSearchParams(location.search);
     const getPageNo = UrlParams.get("pageNo") || 1;
     const getNavOpenSheet = UrlParams.get("opensheet") || false;
-    let apiSerVice = new ApiService();
     const {toast} = useToast()
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
@@ -88,13 +86,8 @@ const Ideas = () => {
     const closeCreateIdea = () => {setSheetOpenCreate(false)};
 
     useEffect(() => {
-        if (filter?.topic?.length || filter?.roadmap?.length || filter?.bug || filter?.archive /*|| filter.no_status*/ || filter?.all || filter?.search) {
-            let payload = {...filter, projectId: projectDetailsReducer.id, page: pageNo, limit: perPageLimit}
-            ideaSearch(payload)
-        } else {
-            if(projectDetailsReducer.id){
-                getAllIdea()
-            }
+        if(projectDetailsReducer.id){
+            getAllIdea(filter);
         }
         setTopicLists( allStatusAndTypes.topics)
         setRoadmapStatus(allStatusAndTypes.roadmapStatus)
@@ -105,12 +98,18 @@ const Ideas = () => {
         }
     }, [projectDetailsReducer.id, pageNo, allStatusAndTypes])
 
-    const getAllIdea = async () => {
+    const getAllIdea = async (getFilter = {}) => {
         setLoad('list');
-        const data = await apiSerVice.getAllIdea({
+        const data = await apiService.getAllIdea({
             projectId: projectDetailsReducer.id,
             page: pageNo,
-            limit: perPageLimit
+            limit: perPageLimit,
+            search: getFilter?.search,
+            tagId: getFilter?.tagId,
+            roadmapStatusId: getFilter?.roadmapStatusId,
+            isArchive: getFilter?.isArchive,
+            isActive: getFilter?.isActive,
+            all: getFilter?.all
         })
         if (data.success) {
             setIdeasList(data?.data?.ideas)
@@ -129,10 +128,10 @@ const Ideas = () => {
 
     const ideaSearch = async (payload) => {
         setLoad('search')
-        const data = await apiSerVice.ideaSearch(payload)
-        if (data.status === 200) {
-            setIdeasList(data.data)
-            setTotalRecord(data.total)
+        const data = await apiService.ideaSearch(payload)
+        if (data.success) {
+            setIdeasList(data.data.data)
+            setTotalRecord(data.data.total)
             setPageNo(payload.page)
             setLoad('')
         } else {
@@ -148,7 +147,8 @@ const Ideas = () => {
                 search: value,
                 page: 1,
             };
-            ideaSearch(updatedFilter);
+            setFilter(updatedFilter);
+            getAllIdea(updatedFilter);
         }, 500),
         []
     );
@@ -191,49 +191,49 @@ const Ideas = () => {
             page: 1,
             limit: perPageLimit,
         };
-        if (e.name === "topic") {
+        if (e.name === "tagId") {
             if (e.value !== null) {
-                const clone = [...payload.topic];
+                const clone = [...payload.tagId];
                 const index = clone.findIndex(item => item === e.value);
                 if (index !== -1) {
                     clone.splice(index, 1);
                 } else {
                     clone.push(e.value);
                 }
-                payload.topic = clone;
+                payload.tagId = clone;
             } else {
-                payload.topic = [];
+                payload.tagId = [];
             }
-        } else if (e.name === "roadmap") {
+        } else if (e.name === "roadmapStatusId") {
             if (e.value !== null) {
-                const clone = [...payload.roadmap];
+                const clone = [...payload.roadmapStatusId];
                 const index = clone.findIndex(item => item === e.value);
                 if (index !== -1) {
                     clone.splice(index, 1);
                 } else {
                     clone.push(e.value);
                 }
-                payload.roadmap = clone;
+                payload.roadmapStatusId = clone;
             } else {
-                payload.roadmap = [];
+                payload.roadmapStatusId = [];
             }
         } else if (e.name === "status") {
-            if (e.value === "bug") {
-                payload.bug = payload.bug === 1 ? 0 : 1;
-                payload.archive = 0;
-                payload.all = 0;
-            } else if (e.value === "archive") {
-                payload.archive = payload.archive === 1 ? 0 : 1;
-                payload.bug = 0;
-                payload.all = 0;
+            if (e.value === "isActive") {
+                payload.isActive = payload.isActive === false;
+                payload.isArchive = '';
+                payload.all = "";
+            } else if (e.value === "isArchive") {
+                payload.isArchive = payload.isArchive !== true;
+                payload.isActive = false;
+                payload.all = "";
             } else if (e.value === null) {
-                payload.archive = 1;
-                payload.bug = 1;
-                payload.all = 1;
+                payload.isArchive = true;
+                payload.isActive = true;
+                payload.all = "";
             }
         }
         setFilter(payload);
-        ideaSearch(payload);
+        getAllIdea(payload);
     };
 
     const giveVote = async (record, type) => {
@@ -244,7 +244,7 @@ const Ideas = () => {
                     ideaId: record.id,
                     type: type
                 };
-                const data = await apiSerVice.giveVote(payload);
+                const data = await apiService.giveVote(payload);
                 if (data.success) {
                     const clone = [...ideasList];
                     const index = clone.findIndex((x) => x.id === record.id);
@@ -282,14 +282,14 @@ const Ideas = () => {
             value = "";
         }
         formData.append(name, value);
-        const data = await apiSerVice.updateIdea(formData, record?.id);
+        const data = await apiService.updateIdea(formData, record?.id);
         if (data.success) {
             const clone = [...ideasList];
-            if (name == "isArchive" || name == "isActive") {
+            if (name === "isArchive" || name === "isActive") {
                 clone[index][name] = value;
                 const removeStatus =
-                    (filter.bug == 1 && clone[index].isActive == 1) ||
-                    (filter.archive == 1 && clone[index]?.isArchive == 0);
+                    (filter.isActive && clone[index].isActive) ||
+                    (filter.isArchive && clone[index]?.isArchive === false);
                 if (removeStatus) {
                     clone.splice(index, 1);
                     setTotalRecord(clone.length)
@@ -302,14 +302,14 @@ const Ideas = () => {
             // ideaSearch(payload)
             toast({description: data.message});
         } else {
-            toast({variant: "destructive", description: data.message});
+            toast({variant: "destructive", description: data?.error?.message});
         }
     };
 
     const onDeleteIdea = async (id) => {
         if (id) {
             setDeleteIsLoading(true)
-            const data = await apiSerVice.onDeleteIdea(id);
+            const data = await apiService.onDeleteIdea(id);
             if (data.success) {
                 const filteredIdeas = ideasList.filter((idea) => idea.id !== id);
                 setIdeasList(filteredIdeas);
@@ -364,19 +364,19 @@ const Ideas = () => {
                     />
                 }
 
-                    <div className="flex flex-wrap items-center gap-2 justify-between">
-                        <div className={"flex flex-col flex-1 gap-y-0.5"}>
-                            <h1 className="text-2xl font-normal flex-initial w-auto">Ideas ({totalRecord})</h1>
-                            <p className={"text-sm text-muted-foreground"}>Create and display your ideas on your website and encourage users to upvote and comment with their feedback.</p>
-                        </div>
-                        <div className="w-full lg:w-auto flex sm:flex-nowrap flex-wrap gap-2 items-center">
-                            <div className={"flex gap-2 items-center w-full lg:w-auto"}>
-                                <CommSearchBar
-                                    value={filter.search}
-                                    onChange={onChangeSearch}
-                                    onClear={clearSearchFilter}
-                                    placeholder="Search..."
-                                />
+                <div className="flex flex-wrap items-center gap-2 justify-between">
+                    <div className={"flex flex-col flex-1 gap-y-0.5"}>
+                        <h1 className="text-2xl font-normal flex-initial w-auto">Ideas ({totalRecord})</h1>
+                        <p className={"text-sm text-muted-foreground"}>Create and display your ideas on your website and encourage users to upvote and comment with their feedback.</p>
+                    </div>
+                    <div className="w-full lg:w-auto flex sm:flex-nowrap flex-wrap gap-2 items-center">
+                        <div className={"flex gap-2 items-center w-full lg:w-auto"}>
+                            <CommSearchBar
+                                value={filter.search}
+                                onChange={onChangeSearch}
+                                onClear={clearSearchFilter}
+                                placeholder="Search..."
+                            />
                             <Popover
                                 open={openFilter}
                                 onOpenChange={() => {
@@ -394,7 +394,7 @@ const Ideas = () => {
                                         <CommandList className="w-full">
                                             <CommandEmpty>No filter found.</CommandEmpty>
                                             {
-                                                openFilterType === 'topic' ? <CommandGroup>
+                                                openFilterType === 'tagId' ? <CommandGroup>
                                                     <CommandItem onSelect={() => {setOpenFilterType('')}} className={"p-0 flex gap-2 items-center cursor-pointer p-1"}>
                                                         <ChevronLeft className="mr-2 h-4 w-4" />
                                                         <span className={"flex-1 w-full text-sm font-normal cursor-pointer flex gap-2 items-center"}>
@@ -404,20 +404,20 @@ const Ideas = () => {
                                                     {(topicLists || []).map((x, i) => {
                                                         return (
                                                             <CommandItem key={i} value={x.id} className={"p-0 flex gap-1 items-center cursor-pointer"}>
-                                                                    <Checkbox
-                                                                        className={'m-2'}
-                                                                        checked={filter.topic.includes(x.id)}
-                                                                        onClick={() => {
-                                                                            handleChange({name: "topic" , value: x.id});
-                                                                            setOpenFilter(true);
-                                                                            setOpenFilterType('topic');
-                                                                        }}
-                                                                    />
+                                                                <Checkbox
+                                                                    className={'m-2'}
+                                                                    checked={filter.tagId.includes(x.id)}
+                                                                    onClick={() => {
+                                                                        handleChange({name: "tagId" , value: x.id});
+                                                                        setOpenFilter(true);
+                                                                        setOpenFilterType('tagId');
+                                                                    }}
+                                                                />
                                                                 <span
                                                                     onClick={() => {
-                                                                        handleChange({name: "topic" , value: x.id});
+                                                                        handleChange({name: "tagId" , value: x.id});
                                                                         setOpenFilter(true);
-                                                                        setOpenFilterType('topic');
+                                                                        setOpenFilterType('tagId');
                                                                     }}
                                                                     className={"flex-1 w-full text-sm font-normal cursor-pointer flex gap-2 items-center"}
                                                                 >
@@ -426,7 +426,7 @@ const Ideas = () => {
                                                             </CommandItem>
                                                         )
                                                     })}
-                                                </CommandGroup> : openFilterType === 'roadmap' ?
+                                                </CommandGroup> : openFilterType === 'roadmapStatusId' ?
                                                     <CommandGroup>
                                                         <CommandItem onSelect={() => {setOpenFilterType('')}} className={"p-0 flex gap-2 items-center cursor-pointer p-1"}>
                                                             <ChevronLeft className="mr-2 h-4 w-4" />
@@ -434,33 +434,33 @@ const Ideas = () => {
                                                                 Back
                                                             </span>
                                                         </CommandItem>
-                                                    {(roadmapStatus || []).map((x, i) => {
-                                                        return (
-                                                            <CommandItem key={i} value={x.value} className={"p-0 flex gap-1 items-center cursor-pointer"}>
-                                                                <Checkbox
-                                                                    className={'m-2'}
-                                                                    checked={filter.roadmap.includes(x.id)}
-                                                                    onClick={() => {
-                                                                        handleChange({name: "roadmap" , value: x.id});
-                                                                        setOpenFilter(true);
-                                                                        setOpenFilterType('roadmap');
-                                                                    }}
-                                                                />
-                                                                <span
-                                                                    onClick={() => {
-                                                                        handleChange({name: "roadmap" , value: x.id});
-                                                                        setOpenFilter(true);
-                                                                        setOpenFilterType('roadmap');
-                                                                    }}
-                                                                    className={"flex-1 w-full text-sm font-normal cursor-pointer flex gap-2 items-center capitalize"}
-                                                                >
+                                                        {(roadmapStatus || []).map((x, i) => {
+                                                            return (
+                                                                <CommandItem key={i} value={x.value} className={"p-0 flex gap-1 items-center cursor-pointer"}>
+                                                                    <Checkbox
+                                                                        className={'m-2'}
+                                                                        checked={filter.roadmapStatusId.includes(x.id)}
+                                                                        onClick={() => {
+                                                                            handleChange({name: "roadmapStatusId" , value: x.id});
+                                                                            setOpenFilter(true);
+                                                                            setOpenFilterType('roadmapStatusId');
+                                                                        }}
+                                                                    />
+                                                                    <span
+                                                                        onClick={() => {
+                                                                            handleChange({name: "roadmapStatusId" , value: x.id});
+                                                                            setOpenFilter(true);
+                                                                            setOpenFilterType('roadmapStatusId');
+                                                                        }}
+                                                                        className={"flex-1 w-full text-sm font-normal cursor-pointer flex gap-2 items-center capitalize"}
+                                                                    >
                                                                     <span className={"w-2.5 h-2.5 rounded-full"} style={{backgroundColor: x.colorCode}}/>
-                                                                    {x.title}
+                                                                        {x.title}
                                                                 </span>
-                                                            </CommandItem>
-                                                        )
-                                                    })}
-                                                </CommandGroup> : openFilterType === 'status' ?
+                                                                </CommandItem>
+                                                            )
+                                                        })}
+                                                    </CommandGroup> : openFilterType === 'status' ?
                                                         <CommandGroup>
                                                             <CommandItem onSelect={() => { setOpenFilterType('') }} className={"p-0 flex gap-2 items-center cursor-pointer p-1"}>
                                                                 <ChevronLeft className="mr-2 h-4 w-4" />
@@ -482,7 +482,7 @@ const Ideas = () => {
                                                                                 id={x.value}
                                                                                 value={x.value}
                                                                                 className="m-2"
-                                                                                checked={filter[x.value] === 1}
+                                                                                checked={filter[x.value] == 1}
                                                                             />
                                                                             <span
                                                                                 onClick={() => {
@@ -501,10 +501,10 @@ const Ideas = () => {
                                                         <CommandGroup>
                                                             <CommandItem onSelect={() => {setOpenFilterType('status');}}>
                                                                 <span className={"text-sm font-normal cursor-pointer"}>Status</span>
-                                                            </CommandItem>  <CommandItem onSelect={() => {setOpenFilterType('topic');}}>
-                                                                <span className={"text-sm font-normal cursor-pointer"}>Topics</span>
-                                                            </CommandItem>
-                                                            <CommandItem onSelect={() => {setOpenFilterType('roadmap');}}>
+                                                            </CommandItem>  <CommandItem onSelect={() => {setOpenFilterType('tagId');}}>
+                                                            <span className={"text-sm font-normal cursor-pointer"}>Topics</span>
+                                                        </CommandItem>
+                                                            <CommandItem onSelect={() => {setOpenFilterType('roadmapStatusId');}}>
                                                                 <span className={"text-sm font-normal cursor-pointer"}>Roadmap</span>
                                                             </CommandItem>
                                                         </CommandGroup>
@@ -513,60 +513,60 @@ const Ideas = () => {
                                     </Command>
                                 </PopoverContent>
                             </Popover>
-                            </div>
-                            <Button className={"gap-2 font-medium hover:bg-primary"} onClick={openCreateIdea}><Plus size={20} strokeWidth={3}/><span className={"text-xs md:text-sm font-medium"}>Create Idea</span></Button>
                         </div>
+                        <Button className={"gap-2 font-medium hover:bg-primary"} onClick={openCreateIdea}><Plus size={20} strokeWidth={3}/><span className={"text-xs md:text-sm font-medium"}>Create Idea</span></Button>
                     </div>
-                    {
-                        (filter?.topic?.length > 0 || filter?.roadmap?.length > 0 || filter?.archive == 1 || filter?.bug == 1) && <div className="flex flex-wrap gap-2 my-6">
-                            {
-                                (filter.topic || []).map((data,index) =>{
-                                    const findTopic = (topicLists || []).find((topic) => topic.id === data);
-                                    return(
-                                        <Badge key={`selected-${findTopic.id}`} variant="outline" className="rounded p-0 font-medium"><span className="px-3 py-1.5 border-r">{findTopic.title}</span>
-                                            <span className="w-7 h-7 flex items-center justify-center cursor-pointer" onClick={() => handleChange({name: "topic" , value: data})}>
+                </div>
+                {
+                    (filter?.tagId?.length > 0 || filter?.roadmapStatusId?.length > 0 || filter?.isArchive || filter?.isActive) && <div className="flex flex-wrap gap-2 my-6">
+                        {
+                            (filter.tagId || []).map((data,index) =>{
+                                const findTopic = (topicLists || []).find((tagId) => tagId.id === data);
+                                return(
+                                    <Badge key={`selected-${findTopic.id}`} variant="outline" className="rounded p-0 font-medium"><span className="px-3 py-1.5 border-r">{findTopic.title}</span>
+                                        <span className="w-7 h-7 flex items-center justify-center cursor-pointer" onClick={() => handleChange({name: "tagId" , value: data})}>
                                                 <X className='w-4 h-4'/>
                                             </span>
-                                        </Badge>
-                                    )
-                                })
-                            }
-                            {
-                                (filter.roadmap || []).map((data,index) =>{
-                                    const findRoadmap = (roadmapStatus || []).find((roadmap) => roadmap.id === data);
-                                    return(
-                                        <Badge key={`selected-${findRoadmap.id}`} variant="outline" className="rounded p-0 font-medium">
+                                    </Badge>
+                                )
+                            })
+                        }
+                        {
+                            (filter.roadmapStatusId || []).map((data,index) =>{
+                                const findRoadmap = (roadmapStatus || []).find((roadmapStatusId) => roadmapStatusId.id === data);
+                                return(
+                                    <Badge key={`selected-${findRoadmap.id}`} variant="outline" className="rounded p-0 font-medium">
                                             <span className="px-3 py-1.5 border-r flex gap-2 items-center">
                                                 <span className={"w-2.5 h-2.5  rounded-full"} style={{backgroundColor: findRoadmap.colorCode}}/>
                                                 {findRoadmap.title}
                                             </span>
-                                            <span className="w-7 h-7 flex items-center justify-center cursor-pointer" onClick={() => handleChange({name: "roadmap" , value: data})}>
+                                        <span className="w-7 h-7 flex items-center justify-center cursor-pointer" onClick={() => handleChange({name: "roadmapStatusId" , value: data})}>
                                                 <X className='w-4 h-4'/>
                                             </span>
-                                        </Badge>
-                                    )
-                                })
-                            }
-                            {
-                                filter.archive === 1 &&
-                                <Badge key={`selected-${filter.archive}`} variant="outline" className="rounded p-0 font-medium">
-                                    <span className="px-3 py-1.5 border-r">Archived</span>
-                                    <span className="w-7 h-7 flex items-center justify-center cursor-pointer" onClick={() =>  handleChange({name: "status" , value: "archive"})}>
+                                    </Badge>
+                                )
+                            })
+                        }
+                        {
+                            filter.isArchive &&
+                            <Badge key={`selected-${filter.isArchive}`} variant="outline" className="rounded p-0 font-medium">
+                                <span className="px-3 py-1.5 border-r">Archived</span>
+                                <span className="w-7 h-7 flex items-center justify-center cursor-pointer" onClick={() =>  handleChange({name: "status" , value: "isArchive"})}>
                                         <X className='w-4 h-4'/>
                                     </span>
-                                </Badge>
-                            }
-                            {
-                                filter.bug === 1 &&
-                                <Badge key={`selected-${filter.bug}`} variant="outline" className="rounded p-0 font-medium">
-                                    <span className="px-3 py-1.5 border-r">Bugs</span>
-                                    <span className="w-7 h-7 flex items-center justify-center cursor-pointer" onClick={() =>  handleChange({name: "status" , value: "bug"})}>
+                            </Badge>
+                        }
+                        {
+                            !filter.isActive &&
+                            <Badge key={`selected-${!filter.isActive}`} variant="outline" className="rounded p-0 font-medium">
+                                <span className="px-3 py-1.5 border-r">Bugs</span>
+                                <span className="w-7 h-7 flex items-center justify-center cursor-pointer" onClick={() =>  handleChange({name: "status" , value: "isActive"})}>
                                         <X className='w-4 h-4'/>
                                     </span>
-                                </Badge>
-                            }
-                        </div>
-                    }
+                            </Badge>
+                        }
+                    </div>
+                }
 
                 <Card className={"my-6"}>
                     {
@@ -619,17 +619,17 @@ const Ideas = () => {
                                                                                 <PopoverTrigger asChild>
                                                                                     <Button variant={"ghost hove:none"} className={"p-0 h-[24px]"}>
                                                                                         <div className={"flex justify-between items-center"}>
-                                                                                                <div className={"text-sm text-center"}>
-                                                                                                    <div className={`flex flex-wrap gap-2`}>
-                                                                                                        {
-                                                                                                            x?.tags?.slice(0, 1).map((topic, i) => (
-                                                                                                                <div className={"text-sm font-normal"} key={i}>
-                                                                                                                    {topic?.title}
-                                                                                                                </div>
-                                                                                                            ))
-                                                                                                        }
-                                                                                                    </div>
+                                                                                            <div className={"text-sm text-center"}>
+                                                                                                <div className={`flex flex-wrap gap-2`}>
+                                                                                                    {
+                                                                                                        x?.tags?.slice(0, 1).map((tagId, i) => (
+                                                                                                            <div className={"text-sm font-normal"} key={i}>
+                                                                                                                {tagId?.title}
+                                                                                                            </div>
+                                                                                                        ))
+                                                                                                    }
                                                                                                 </div>
+                                                                                            </div>
                                                                                             {
                                                                                                 (x?.tags?.length > 1) &&
                                                                                                 <div
@@ -710,7 +710,7 @@ const Ideas = () => {
                                                                         </SelectContent>
                                                                     </Select>
                                                                     {
-                                                                        x.isActive == 0 &&
+                                                                        x.isActive === false &&
                                                                         <Badge
                                                                             variant={"outline"}
                                                                             className={`border border-red-500 text-red-500 bg-red-100 `}
@@ -719,7 +719,7 @@ const Ideas = () => {
                                                                         </Badge>
                                                                     }
                                                                     {
-                                                                        x?.isArchive == 1 &&
+                                                                        x?.isArchive &&
                                                                         <Badge
                                                                             variant={"outline"}
                                                                             className={`border border-green-500 text-green-500 bg-green-100
@@ -728,7 +728,7 @@ const Ideas = () => {
                                                                             Archive
                                                                         </Badge>
                                                                     }
-                                                                    {x.pinToTop === 1 && <Pin size={16} className={`fill-card-foreground`}/>}
+                                                                    {x.pinToTop == 1 && <Pin size={16} className={`fill-card-foreground`}/>}
                                                                     <DropdownMenu>
                                                                         <DropdownMenuTrigger>
                                                                             <Ellipsis size={16}/>
@@ -739,13 +739,13 @@ const Ideas = () => {
                                                                                 onClick={() => openDetailsSheet(x)}>Edit</DropdownMenuItem>
                                                                             <DropdownMenuItem
                                                                                 className={"cursor-pointer"}
-                                                                                onClick={() => handleStatusUpdate("isArchive", x?.isArchive == 1 ? 0 : 1, i, x)}>
-                                                                                {x?.isArchive == 1 ? "Unarchive" : "Archive"}
+                                                                                onClick={() => handleStatusUpdate("isArchive", x?.isArchive !== true, i, x)}>
+                                                                                {x?.isArchive ? "Unarchive" : "Archive"}
                                                                             </DropdownMenuItem>
                                                                             <DropdownMenuItem
                                                                                 className={"cursor-pointer capitalize"}
-                                                                                onClick={() => handleStatusUpdate("isActive", x.isActive == 1 ? 0 : 1, i, x)}>
-                                                                                {x.isActive == 0 ? "Convert to Idea" : "Mark as bug"}
+                                                                                onClick={() => handleStatusUpdate("isActive", x.isActive !== true, i, x)}>
+                                                                                {x.isActive ? "Mark as Bug" : "Convert to Idea"}
                                                                             </DropdownMenuItem>
                                                                             <DropdownMenuItem
                                                                                 className={"cursor-pointer"}

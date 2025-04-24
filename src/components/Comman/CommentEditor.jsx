@@ -34,37 +34,40 @@ export const CommentEditor = ({isEditMode, comment, images = [], onUpdateComment
                     />
                     {imageArray.length > 0 && (
                         <div className="flex gap-3 flex-wrap">
-                            {imageArray.map((img, index) => (
-                                <Fragment key={index}>
-                                    {
-                                        img && img?.name ?
-                                            <div className="w-[50px] h-[50px] md:w-[100px] md:h-[100px] relative border p-[3px]">
-                                                <img
-                                                    className="upload-img"
-                                                    src={img?.name ? URL.createObjectURL(img) : img}
-                                                    alt=""
-                                                />
-                                                <CircleX
-                                                    size={20}
-                                                    className={`stroke-gray-500 dark:stroke-white cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
-                                                    onClick={() => onDeleteImage(index, !!img.name)}
-                                                />
-                                            </div> :
-                                            <div className="w-[50px] h-[50px] md:w-[100px] md:h-[100px] relative border p-[3px]">
-                                                <img
-                                                    className="upload-img"
-                                                    src={img?.name ? URL.createObjectURL(img) : img}
-                                                    alt=""
-                                                />
-                                                <CircleX
-                                                    size={20}
-                                                    className={`stroke-gray-500 dark:stroke-white cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
-                                                    onClick={() => onDeleteImage(index, !!img.name)}
-                                                />
-                                            </div>
-                                    }
-                                </Fragment>
-                            ))}
+                            {imageArray.map((img, index) => {
+                                console.log(img)
+                                return (
+                                    <Fragment key={index}>
+                                        {
+                                            img && img?.name ?
+                                                <div className="w-[50px] h-[50px] md:w-[100px] md:h-[100px] relative border p-[3px]">
+                                                    <img
+                                                        className="upload-img"
+                                                        src={img?.name ? URL.createObjectURL(img) : img}
+                                                        alt=""
+                                                    />
+                                                    <CircleX
+                                                        size={20}
+                                                        className={`stroke-gray-500 dark:stroke-white cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
+                                                        onClick={() => onDeleteImage(index, !!img.name)}
+                                                    />
+                                                </div> :
+                                                <div className="w-[50px] h-[50px] md:w-[100px] md:h-[100px] relative border p-[3px]">
+                                                    <img
+                                                        className="upload-img"
+                                                        src={img?.name ? URL.createObjectURL(img) : img}
+                                                        alt=""
+                                                    />
+                                                    <CircleX
+                                                        size={20}
+                                                        className={`stroke-gray-500 dark:stroke-white cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
+                                                        onClick={() => onDeleteImage(index, !!img.name)}
+                                                    />
+                                                </div>
+                                        }
+                                    </Fragment>
+                                )
+                            })}
                         </div>
                     )}
                     <div className="flex gap-2">
@@ -98,15 +101,17 @@ export const CommentEditor = ({isEditMode, comment, images = [], onUpdateComment
                 <div className="space-y-2">
                     <p className="text-xs">{renderCommentWithLinks(comment)}</p>
                     <div className="flex gap-2 flex-wrap">
-                        {imageArray.map((img, index) => (
-                            <div
-                                key={index}
-                                className="w-[50px] h-[50px] md:w-[100px] md:h-[100px] border p-[3px]"
-                                onClick={() => onImageClick(img)}
-                            >
-                                <img className="upload-img cursor-pointer" src={img} alt=""/>
-                            </div>
-                        ))}
+                        {imageArray.map((img, index) => {
+                            return (
+                                <div
+                                    key={index}
+                                    className="w-[50px] h-[50px] md:w-[100px] md:h-[100px] border p-[3px]"
+                                    onClick={() => onImageClick(img)}
+                                >
+                                    <img className="upload-img cursor-pointer" src={img} alt=""/>
+                                </div>
+                            )
+                        })}
                     </div>
                 </div>
             )}

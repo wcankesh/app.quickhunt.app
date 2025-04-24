@@ -3,7 +3,7 @@ import {useTheme} from "../theme-provider";
 import {ApiService} from "../../utils/ApiService";
 import {useNavigate} from "react-router-dom";
 import {useToast} from "../ui/use-toast";
-import {baseUrl, setProjectDetails} from "../../utils/constent";
+import {apiService, baseUrl, setProjectDetails} from "../../utils/constent";
 import {Button} from "../ui/button";
 import {Loader2} from "lucide-react";
 import {projectDetailsAction} from "../../redux/action/ProjectDetailsAction";
@@ -12,24 +12,24 @@ import AuthLayout from "./CommonAuth/AuthLayout";
 import FormInput from "./CommonAuth/FormInput";
 
 const initialStateProject = {
-    project_name: '',
-    project_website: "",
-    project_language_id: '3',
-    project_timezone_id: '90',
-    project_logo: '',
-    project_favicon: '',
-    project_api_key: '',
-    project_status: '',
-    project_browser: '',
-    project_ip_address: '',
-    domain: ''
+    name: '',
+    website: "",
+    domain: '',
+    languageId: '3',
+    timezoneId: '90',
+    logo: '',
+    favicon: '',
+    apiKey: '',
+    status: 1,
+    browser: '',
+    ipAddress: '',
 }
+
 const initialStateErrorProject = {
-    project_name: '',
+    name: '',
 }
 const Project = () => {
     const {theme} = useTheme();
-    let apiSerVice = new ApiService()
     let navigate = useNavigate();
     const dispatch = useDispatch();
     const {toast} = useToast();
@@ -40,7 +40,7 @@ const Project = () => {
 
     const onChangeText = (event) => {
         const { name, value } = event.target;
-        if(name === "project_name" || name === 'domain'){
+        if(name === "name" || name === 'domain'){
             const cleanDomain = (name) => name.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
             const sanitizedProjectName = cleanDomain(value);
             setCreateProjectDetails({
@@ -62,7 +62,7 @@ const Project = () => {
 
     const formValidate = (name, value) => {
         switch (name) {
-            case "project_name":
+            case "name":
                 if (!value || value.trim() === "") {
                     return "Project name is required";
                 } else {
@@ -90,28 +90,27 @@ const Project = () => {
         }
 
         const cleanDomain = (name) => name.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-        const sanitizedProjectName = cleanDomain(createProjectDetails.project_name);
+        const sanitizedProjectName = cleanDomain(createProjectDetails.name);
         const domain = `${cleanDomain(createProjectDetails.domain || sanitizedProjectName)}.quickhunt.app`;
         const payload = {
             ...createProjectDetails,
             domain
         };
 
-        const data = await apiSerVice.createProjects(payload)
-        if (data.status === 200) {
+        const data = await apiService.createProjects(payload)
+        setIsCreateLoading(false);
+        if (data.success) {
             let obj = {
                 ...data.data,
-                Title: data.data.project_name,
+                Title: data.data.name,
             };
             setProjectDetails(obj);
             dispatch(projectDetailsAction(obj))
             toast({description: data.message})
             setCreateProjectDetails(initialStateProject)
-            setIsCreateLoading(false);
             navigate(`${baseUrl}/dashboard`);
         } else {
-            setIsCreateLoading(false);
-            toast({variant: "destructive" ,description: data.message})
+            toast({variant: "destructive" ,description: data?.error?.message})
         }
     }
 
@@ -120,7 +119,7 @@ const Project = () => {
             title: "Project Name",
             placeholder: "Project Name",
             className: `${theme === "dark" ? "" : "placeholder:text-muted-foreground/75"}`,
-            name: "project_name",
+            name: "name",
         },
         {
             title: "Project Website",

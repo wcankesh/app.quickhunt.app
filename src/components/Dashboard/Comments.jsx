@@ -20,27 +20,27 @@ const Comments = () => {
                 <div
                     className="flex gap-2 items-center cursor-pointer"
                     onClick={() => {
-                        if (x.type === 1) navigate(`${baseUrl}/announcements/${x.post_id}`);
-                        else if (x.type === 2) navigate(`${baseUrl}/ideas/${x.post_id}`);
+                        if (x.type == 1) navigate(`${baseUrl}/announcements/${x.postId}`);
+                        else if (x.type == 2) navigate(`${baseUrl}/ideas/${x.postId}`);
                     }}
                 >
                     <Avatar className="w-[20px] h-[20px]">
                         {x.user_photo ? (
                             <AvatarImage src={x.user_photo} alt="" />
                         ) : (
-                            <AvatarFallback>{x.customer_name?.substring(0, 1).toUpperCase()}</AvatarFallback>
+                            <AvatarFallback>{x.customerName?.substring(0, 1).toUpperCase()}</AvatarFallback>
                         )}
                     </Avatar>
                     <div className="flex items-center flex-wrap gap-1 md:gap-2">
-                        <h4 className="text-sm font-semibold">{x.customer_name}</h4>
-                        <p className="text-xs font-medium text-muted-foreground">{x.customer_email}</p>
+                        <h4 className="text-sm font-semibold">{x.customerName}</h4>
+                        <p className="text-xs font-medium text-muted-foreground">{x.customerEmail}</p>
                     </div>
                 </div>
                 <Badge
                     variant="outline"
-                    className={`text-xs font-medium text-muted-foreground ${x.type === 1 ? "text-[#3b82f6] border-[#3b82f6]" : "text-[#63c8d9] border-[#63c8d9]"}`}
+                    className={`text-xs font-medium text-muted-foreground ${x.type == 1 ? "text-[#3b82f6] border-[#3b82f6]" : "text-[#63c8d9] border-[#63c8d9]"}`}
                 >
-                    {x.type === 1 ? "Announcement" : "Idea"}
+                    {x.type == 1 ? "Announcement" : "Idea"}
                 </Badge>
             </div>
             <div className="text-xs font-medium text-foreground">

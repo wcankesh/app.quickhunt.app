@@ -2,7 +2,7 @@ import axios from "axios";
 import {logout, removeProjectDetails, token, baseUrl} from "./constent";
 import qs from 'qs';
 
-const baseUrlApi = 'http://192.168.1.12:3000';
+const baseUrlApi = 'http://192.168.1.36:3001';
 // const baseUrlApi = 'https://code.quickhunt.app/public/api';
 let instance = axios.create();
 instance.interceptors.request.use(function (config) {
@@ -60,7 +60,7 @@ export class ApiService {
                 response = res.data
             }
         }).catch((e) => {
-            if (e.response.status === 401) {
+            if (e.response.status === 403) {
                 logout();
                 removeProjectDetails()
                 window.location.replace(`${baseUrl}/login`)
@@ -202,11 +202,11 @@ export class ApiService {
     }
 
     async forgotPassword(payload) {
-        return await this.postData(`${baseUrlApi}/forgot-password`, payload)
+        return await this.postData(`${baseUrlApi}/auth/forgot-password`, payload)
     }
 
     async resetPassword(payload) {
-        return await this.postData(`${baseUrlApi}/reset-password`, payload)
+        return await this.postData(`${baseUrlApi}/auth/reset-password`, payload)
     }
 
     async getInvitationDetail(token) {
@@ -375,11 +375,11 @@ export class ApiService {
 
     /* ---------- Ideas api ---------- */
     async getAllIdea (payload){
-        return await this.getData(`${baseUrlApi}/idea/getAll?${qs.stringify(payload)}`)
+        return await this.postData(`${baseUrlApi}/idea/getAll`, payload)
     }
 
     async ideaSearch(payload) {
-        return await this.postData(`${baseUrlApi}/idea/search`, payload,)
+        return await this.postData(`${baseUrlApi}/v1/idea/search`, payload,)
     }
 
     // async getIdeaVote (payload){
@@ -406,7 +406,7 @@ export class ApiService {
     }
 
     async updateIdea(payload, id) {
-        return await this.putData(`${baseUrlApi}/idea/update/${id}?_method=put`, payload, true)
+        return await this.putData(`${baseUrlApi}/idea/update/${id}`, payload, true)
     }
 
     async onDeleteIdea(id) {
@@ -428,8 +428,8 @@ export class ApiService {
         return await this.postData(`${baseUrlApi}/comment/add`, payload, true)
     }
 
-    async updateComment(id) {
-        return await this.postData(`${baseUrlApi}/comment/update/${id}`, true)
+    async updateComment(id, payload) {
+        return await this.putData(`${baseUrlApi}/comment/update/${id}`, payload, true)
     }
 
     async deleteComment(id) {
@@ -446,15 +446,15 @@ export class ApiService {
 
     /* ---------- Dashboard api ---------- */
     async dashboardData(payload) {
-        return await this.postData(`${baseUrlApi}/dashboard`, payload)
+        return await this.postData(`${baseUrlApi}/project/dashboard`, payload)
     }
 
     async dashboardDataFeed(payload) {
-        return await this.postData(`${baseUrlApi}/feedbacks?${qs.stringify(payload)}`)
+        return await this.postData(`${baseUrlApi}/project/feedbacks`, payload)
     }
 
     async dashboardDataReactions(payload) {
-        return await this.postData(`${baseUrlApi}/reactions?${qs.stringify(payload)}`)
+        return await this.postData(`${baseUrlApi}/project/reactions`, payload)
     }
 
     /* ---------- In App Message api ---------- */

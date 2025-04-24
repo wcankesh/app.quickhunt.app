@@ -53,12 +53,12 @@ const Login = () => {
     const onRedirect = (link) => {
         const urlParams = new URLSearchParams(window.location.search);
         const token = urlParams.get('token');
+        console.log("token", token)
         if (token) {
             navigate(`${baseUrl}/${link}?token=${token}`);
         } else {
             navigate(`${baseUrl}/${link}`);
         }
-        return;
     };
 
     const onLogin = async () => {
