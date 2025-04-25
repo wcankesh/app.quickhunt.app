@@ -10,18 +10,18 @@ import {Loader2} from "lucide-react";
 import {useTheme} from "../../theme-provider";
 
 const initialState = {
-    accent_color: '#8b54f3',
+    accentColor: '#8b54f3',
     title: '',
-    meta_title: '',
-    meta_description: '',
-    custom_domain: '',
-    google_analytics_id: '',
-    custom_javascript: '',
-    hide_from_search_engine: '',
-    private_mode: '',
-    is_active: '',
+    metaTitle: '',
+    metaDescription: '',
+    customDomain: '',
+    googleAnalyticsId: '',
+    customJavascript: '',
+    hideFromSearchEngine: '',
+    privateMode: '',
+    isActive: '',
     domain: '',
-    is_login: 0,
+    isLogin: 0,
     id: ''
 }
 
@@ -49,7 +49,7 @@ const Domain = () => {
 
     const getPortalSetting = async () => {
         const data = await apiService.getPortalSetting(projectDetailsReducer.id)
-        if(data.status === 200){
+        if(data.success){
             setSettingData({...data.data})
         } else {
 
@@ -63,24 +63,19 @@ const Domain = () => {
             setIsSave(true)
             const payload = {
                 project_id: projectDetailsReducer.id,
-                custom_domain: settingData.custom_domain || null,
-                google_analytics_id: settingData.google_analytics_id,
-                private_mode: settingData.private_mode,
-                hide_from_search_engine: settingData.hide_from_search_engine,
-                is_login: settingData.is_login,
+                customDomain: settingData.customDomain || null,
+                googleAnalyticsId: settingData.googleAnalyticsId,
+                privateMode: settingData.privateMode,
+                hideFromSearchEngine: settingData.hideFromSearchEngine,
+                isLogin: settingData.isLogin,
             }
             const data = await apiService.updatePortalSetting(settingData.id, payload)
             if(data.status === 200){
                 setIsSave(false)
-                toast({
-                    description:"Domain update successfully"
-                })
+                toast({description:"Domain update successfully"})
             } else {
                 setIsSave(false);
-                toast({
-                    description:"Something went wrong",
-                    variant: "destructive"
-                })
+                toast({description:"Something went wrong", variant: "destructive"})
             }
         }
     }
@@ -98,7 +93,7 @@ const Domain = () => {
                 </div>
                 <div className="space-y-1">
                     <Label htmlFor="text" className={"font-normal capitalize"}>Custom Domain</Label>
-                    <Input disabled={userDetailsReducer.plan === 0} value={settingData.custom_domain} name={"custom_domain"} onChange={onChange} type="text" id="text" placeholder="example.com" />
+                    <Input disabled={userDetailsReducer.plan === 0} value={settingData.customDomain} name={"customDomain"} onChange={onChange} type="text" id="text" placeholder="example.com" />
                 </div>
                 <p className={"text-sm font-normal text-muted-foreground"}>
                     <span className={"font-medium"}>Note:</span> Add a new

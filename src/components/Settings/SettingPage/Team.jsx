@@ -9,7 +9,6 @@ import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "../
 import {Ellipsis, Loader2, Trash2, X} from "lucide-react";
 import {useTheme} from "../../theme-provider";
 import {Sheet,SheetContent, SheetHeader, SheetTitle} from "../../ui/sheet";
-import {ApiService} from "../../../utils/ApiService";
 import {useSelector} from "react-redux";
 import {Badge} from "../../ui/badge";
 import moment from "moment";
@@ -19,6 +18,7 @@ import {toast} from "../../ui/use-toast";
 import {Skeleton} from "../../ui/skeleton";
 import EmptyData from "../../Comman/EmptyData";
 import DeleteDialog from "../../Comman/DeleteDialog";
+import {apiService} from "../../../utils/constent";
 
 const initialState = {
     email: "",
@@ -29,7 +29,6 @@ const initialStateError = {
 
 const Team = () => {
     const {theme, onProModal} = useTheme();
-    const apiService = new ApiService();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const userDetailsReducer = useSelector(state => state.userDetailsReducer);
 
@@ -56,8 +55,8 @@ const Team = () => {
         setIsLoading(true)
         const data = await apiService.getAllMember(projectDetailsReducer.id)
         if (data.success) {
-            setMemberList(data.data);
-            setIsAdmin(data.is_admin)
+            setMemberList(data.data.data);
+            setIsAdmin(data.data.isAdmin)
             setIsLoading(false);
         } else {
             setIsLoading(false);
@@ -143,7 +142,7 @@ const Team = () => {
         } else {
             setIsSave(false);
             toast({
-                description: data?.error,
+                description: data?.error.message,
                 variant: "destructive"
             })
 
@@ -157,9 +156,10 @@ const Team = () => {
     };
 
     const onResendUser = async (x) => {
+        console.log("xxx", x)
         const payload = {
-            projectId: x.projectId,
-            email: x.member_email,
+            projectId: projectDetailsReducer.id,
+            email: x.email,
             type: '2',
             id: x.id
         }
@@ -181,11 +181,11 @@ const Team = () => {
             // });
             // setInvitationList(updatedList);
             toast({
-                description: "Resend invitation successfully"
+                description: data.message
             })
         } else {
             toast({
-                description: "Something went wrong",
+                description: data.error.message,
                 variant: "destructive"
             })
         }
@@ -207,8 +207,8 @@ const Team = () => {
     const onDelete = async () => {
         setIsLoadingDelete(true);
         const payload = {
-            projectId: deleteObj.projectId,
-            email: deleteObj.member_email,
+            projectId: projectDetailsReducer.id,
+            email: deleteObj.email,
             type: '3',
             id: deleteObj.id
         }
@@ -221,12 +221,12 @@ const Team = () => {
                 setInvitationList(clone);
             }
             toast({
-                description: "Revoke invitation successfully"
+                description: data.message
             });
             setIsLoadingDelete(false);
         } else {
-            toast({
-                description: "Something went wrong."
+            toast({ variant: "destructive",
+                description: data.error.message
             });
             setIsLoadingDelete(false);
         }
@@ -328,24 +328,24 @@ const Team = () => {
                                                 : memberList?.length > 0 ? <>
                                                     {
                                                         (memberList || []).map((x, i) => {
+                                                            console.log("xxx", x)
                                                             return (
                                                                 <TableRow key={i}>
                                                                     <TableCell className={"py-[10px] px-[12px]"}>
                                                                         <div className={"flex gap-2 items-center"}>
                                                                             <Avatar className={"w-[30px] h-[30px]"}>
-                                                                                {
-                                                                                    x?.user?.profileImage ?
-                                                                                        <AvatarImage src={x?.user?.profileImage}
-                                                                                                     alt={x && x?.user?.firstName?.substring(0, 1)?.toUpperCase() && x?.user?.lastName?.substring(0, 1)?.toUpperCase()}
-                                                                                        />
-                                                                                        :
-                                                                                        <AvatarFallback
-                                                                                            className={"bg-primary/10 border-primary border text-sm text-primary font-medium"}>{x?.user?.firstName?.substring(0, 1)?.toUpperCase()}{x?.user?.lastName?.substring(0, 1)?.toUpperCase()}</AvatarFallback>
-                                                                                }
+                                                                                <AvatarImage
+                                                                                    src={x?.profileImage}
+                                                                                    alt={x && x?.firstName?.substring(0, 1)?.toUpperCase() && x?.lastName?.substring(0, 1)?.toUpperCase()}
+                                                                                />
+                                                                                <AvatarFallback
+                                                                                    className={"bg-primary/10 border-primary border text-sm text-primary font-medium"}>
+                                                                                    {x?.firstName?.substring(0, 1)?.toUpperCase()}{x?.lastName?.substring(0, 1)?.toUpperCase()}
+                                                                                </AvatarFallback>
                                                                             </Avatar>
                                                                             <div>
-                                                                                <h3 className={"text-sm font-normal"}>{x?.user?.firstName} {x?.user?.lastName}</h3>
-                                                                                <p className={"text-xs font-normal text-muted-foreground"}>{x?.user?.email}</p>
+                                                                                <h3 className={"text-sm font-normal"}>{x?.firstName} {x?.lastName}</h3>
+                                                                                <p className={"text-xs font-normal text-muted-foreground"}>{x?.email}</p>
                                                                             </div>
                                                                         </div>
                                                                     </TableCell>

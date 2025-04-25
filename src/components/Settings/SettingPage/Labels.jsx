@@ -6,13 +6,13 @@ import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "../
 import ColorInput from "../../Comman/ColorPicker";
 import {Input} from "../../ui/input";
 import {useTheme} from "../../theme-provider";
-import {ApiService} from "../../../utils/ApiService";
 import {useDispatch, useSelector} from "react-redux";
 import {allStatusAndTypesAction} from "../../../redux/action/AllStatusAndTypesAction";
 import {toast} from "../../ui/use-toast";
 import EmptyData from "../../Comman/EmptyData";
 import randomColor from 'randomcolor';
 import DeleteDialog from "../../Comman/DeleteDialog";
+import {apiService} from "../../../utils/constent";
 
 const initialNewLabel = {
     name: '',
@@ -21,7 +21,6 @@ const initialNewLabel = {
 
 const Labels = () => {
     const {theme} = useTheme();
-    const apiService = new ApiService();
     const dispatch = useDispatch();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
@@ -179,15 +178,10 @@ const Labels = () => {
                 dispatch(allStatusAndTypesAction({...allStatusAndTypes, labels: clone}))
             }
             setIsSave(false)
-            toast({
-                description:data.message
-            })
+            toast({description:data.message})
         } else {
             setIsSave(false);
-            toast({
-                description:data?.message,
-                variant: "destructive"
-            })
+            toast({description:data?.error?.message, variant: "destructive"})
         }
         setLabelError({
             ...labelError,
