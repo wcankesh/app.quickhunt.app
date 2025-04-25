@@ -307,7 +307,9 @@ const GeneralSettings = () => {
                                                                                     </div>
                                                                                     : y.field === "select" ?
                                                                                         <div className="announce-create-switch flex gap-4">
-                                                                                            <Select onValueChange={(value) => onChange('timezone', value)} value={generalSettingData.timezone}>
+                                                                                            {console.log(generalSettingData.timezone)}
+                                                                                            {console.log(timeZoneJson)}
+                                                                                            <Select onValueChange={(value) => onChange('timezone', value)} defaultValue={generalSettingData.timezone} value={generalSettingData.timezone}>
                                                                                                 <SelectTrigger>
                                                                                                     <SelectValue placeholder={generalSettingData.timezone} />
                                                                                                 </SelectTrigger>
@@ -324,7 +326,6 @@ const GeneralSettings = () => {
                                                                                         </div>
                                                                                         : y.field === "switch" ?
                                                                                             <Fragment>
-                                                                                                {console.log("generalSettingData.timezone", generalSettingData.timezone)}
                                                                                                 <div className="space-y-3">
                                                                                                 <div className="announce-create-switch flex gap-4">
                                                                                                     <Switch

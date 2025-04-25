@@ -1,10 +1,10 @@
-import React, {useState,useEffect} from 'react';
+import React, {useState, useEffect} from 'react';
 import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "../../ui/card";
 import {Label} from "../../ui/label";
 import {Input} from "../../ui/input";
 import {Button} from "../../ui/button";
 import {CircleX, Eye, EyeOff, Loader2, Upload} from "lucide-react";
-import {useSelector,useDispatch} from "react-redux";
+import {useSelector, useDispatch} from "react-redux";
 import {userDetailsAction} from "../../../redux/action/UserDetailAction";
 import {toast} from "../../ui/use-toast";
 import {apiService} from "../../../utils/constent";
@@ -23,19 +23,19 @@ const initialState = {
     user_updated_date: "",
 }
 
-const initialStateError ={
-    firstName:'',
-    lastName:''
+const initialStateError = {
+    firstName: '',
+    lastName: ''
 }
-const initialStateErrorPassWord ={
-    currentPassword:'',
-    password:'',
-    passwordConfirmation:'',
+const initialStateErrorPassWord = {
+    currentPassword: '',
+    password: '',
+    passwordConfirmation: '',
 }
-const initialStatePassWord ={
-    currentPassword:'',
-    password:'',
-    passwordConfirmation:'',
+const initialStatePassWord = {
+    currentPassword: '',
+    password: '',
+    passwordConfirmation: '',
 }
 
 const Profile = () => {
@@ -56,10 +56,10 @@ const Profile = () => {
 
     useEffect(() => {
         setUserDetails({...userDetailsReducer});
-    },[userDetailsReducer]);
+    }, [userDetailsReducer]);
 
     const onChange = (event) => {
-        setUserDetails({...userDetails, [event.target.name] : event.target.value})
+        setUserDetails({...userDetails, [event.target.name]: event.target.value})
         setFormError(formError => ({
             ...formError,
             [event.target.name]: formValidate(event.target.name, event.target.value)
@@ -74,16 +74,16 @@ const Profile = () => {
         });
     };
 
-    const onBlurPassWord = (event)=> {
+    const onBlurPassWord = (event) => {
         const {name, value} = event.target;
         setFormErrorPassword({
             ...formErrorPassword,
-            [name]:formValidate(name,value)
+            [name]: formValidate(name, value)
         });
     }
 
     const onChangePassword = (event) => {
-        setPassword({...password, [event.target.name] : event.target.value})
+        setPassword({...password, [event.target.name]: event.target.value})
         setFormErrorPassword(formErrorPassword => ({
             ...formErrorPassword,
             [event.target.name]: formValidate(event.target.name, event.target.value)
@@ -107,13 +107,11 @@ const Profile = () => {
             case "email":
                 if (!value || value.trim() === "") {
                     return "Email is required";
-                }
-                else if (!value.match(/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/)) {
+                } else if (!value.match(/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/)) {
                     return "Enter a valid email address";
                 } else if (!value.endsWith(".com")) {
                     return "Email must end with .com";
-                }
-                else {
+                } else {
                     return "";
                 }
             case "currentPassword":
@@ -125,13 +123,15 @@ const Profile = () => {
             case "password":
                 if (!value || value.trim() === "") {
                     return "Password is required";
-                } else if (
-                    !value.match(
-                        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
-                    )
-                ) {
-                    return "Password must be at least 8 characters with one uppercase letter, one lowercase letter, one number, and one special character";
-                } else {
+                }
+                // else if (
+                //     !value.match(
+                //         /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
+                //     )
+                // ) {
+                //     return "Password must be at least 8 characters with one uppercase letter, one lowercase letter, one number, and one special character";
+                // }
+                else {
                     return "";
                 }
             case "passwordConfirmation":
@@ -171,7 +171,7 @@ const Profile = () => {
     };
 
     const onDeleteImg = async (name, value) => {
-        if(userDetails && userDetails?.profileImage && userDetails.profileImage?.name){
+        if (userDetails && userDetails?.profileImage && userDetails.profileImage?.name) {
             setUserDetails({...userDetails, profileImage: ""})
         } else {
             setUserDetails({...userDetails, [name]: value, profileImage: ""})
@@ -195,27 +195,24 @@ const Profile = () => {
         const obj = {
             firstName: userDetails.firstName,
             lastName: userDetails.lastName,
-            // email: userDetails.email,
             profileImage: userDetails.profileImage,
-            // user_job_title: userDetails.user_job_title,
             deleteImage: userDetails?.deleteImage || '',
         }
         Object.keys(obj).map((x) => {
-            if(x === "deleteImage" && obj?.profileImage?.name){
+            if (x === "deleteImage" && obj?.profileImage?.name) {
 
-            }  else {
-                formData.append(x,obj[x]);
+            } else {
+                formData.append(x, obj[x]);
             }
         })
 
         const data = await apiService.updateLoginUserDetails(formData, userDetailsReducer.id);
-        if(data.success){
+        setIsLoading(false);
+        if (data.success) {
             dispatch(userDetailsAction({...data.data}));
-            setIsLoading(false);
             toast({description: data.message,});
         } else {
-            setIsLoading(false);
-            toast({description: data.error, variant:"destructive"});
+            toast({description: data?.error?.message, variant: "destructive"});
         }
     }
 
@@ -237,13 +234,12 @@ const Profile = () => {
         formData.append('password', password.password);
         formData.append('passwordConfirmation', password.passwordConfirmation);
         const data = await apiService.updateLoginUserDetails(formData);
-        if(data.success){
-            setIsLoadingPass(false)
+        setIsLoadingPass(false)
+        if (data.success) {
             setPassword(initialStatePassWord);
             toast({description: data.message,})
-        }else {
-            setIsLoadingPass(false);
-            toast({description: data.error, variant:"destructive"});
+        } else {
+            toast({description: data?.error?.message, variant: "destructive"});
         }
     }
 
@@ -252,7 +248,8 @@ const Profile = () => {
             <Card>
                 <CardHeader className={"gap-1 border-b p-4 sm:px-5 sm:py-4"}>
                     <CardTitle className={"font-normal text-xl lg:text-2xl capitalize"}>Edit Profile</CardTitle>
-                    <CardDescription className={" text-sm text-muted-foreground p-0"}>Manage your account settings.</CardDescription>
+                    <CardDescription className={" text-sm text-muted-foreground p-0"}>Manage your account
+                        settings.</CardDescription>
                 </CardHeader>
                 <CardContent className={"py-4 px-4 sm:px-5 sm:py-4 border-b"}>
                     <div className={"flex gap-4 flex-wrap lg:flex-nowrap md:flex-nowrap sm:flex-wrap"}>
@@ -261,7 +258,8 @@ const Profile = () => {
                                 userDetails?.profileImage ?
                                     <div>
                                         {userDetails && userDetails.profileImage && userDetails.profileImage.name ?
-                                            <div className={"w-[80px] h-[80px] sm:w-[132px] sm:h-[128px] relative border"}>
+                                            <div
+                                                className={"w-[80px] h-[80px] sm:w-[132px] sm:h-[128px] relative border"}>
                                                 <img
                                                     className="h-full w-full rounded-md object-cover"
                                                     src={userDetails && userDetails.profileImage && userDetails.profileImage.name ? URL.createObjectURL(userDetails.profileImage) : userDetails.profileImage}
@@ -273,7 +271,8 @@ const Profile = () => {
                                                     onClick={() => onDeleteImg('deleteImage', userDetails && userDetails?.profileImage && userDetails.profileImage?.name ? "" : userDetails.profileImage.replace("https://code.quickhunt.app/public/storage/user/", ""))}
                                                 />
                                             </div> : userDetails.profileImage ?
-                                                <div className={"w-[80px] h-[80px] sm:w-[132px] sm:h-[128px] relative border"}>
+                                                <div
+                                                    className={"w-[80px] h-[80px] sm:w-[132px] sm:h-[128px] relative border"}>
                                                     <img
                                                         className="h-full w-full rounded-md object-cover"
                                                         src={userDetails.profileImage}
@@ -298,11 +297,12 @@ const Profile = () => {
                                             htmlFor="pictureInput"
                                             className="flex w-[80px] h-[80px] sm:w-[132px] sm:h-[128px] py-0 justify-center items-center flex-shrink-0 border-dashed border-[1px] border-gray-300 rounded cursor-pointer"
                                         >
-                                            <Upload className="h-4 w-4 text-muted-foreground" />
+                                            <Upload className="h-4 w-4 text-muted-foreground"/>
                                         </label>
                                     </div>
                             }
-                                        {formError.profileImage && <div className={"text-xs text-destructive"}>{formError.profileImage}</div>}
+                            {formError.profileImage &&
+                            <div className={"text-xs text-destructive"}>{formError.profileImage}</div>}
                         </div>
 
                         <div className={"flex flex-col gap-4 w-full sm:w-full"}>
@@ -366,7 +366,7 @@ const Profile = () => {
                     <Button onClick={onUpdateUser}
                             className={`w-[111px] text-sm font-medium hover:bg-primary`}
                     >
-                        {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save Changes"}</Button>
+                        {isLoading ? <Loader2 className="h-4 w-4 animate-spin"/> : "Save Changes"}</Button>
                 </CardFooter>
             </Card>
 
@@ -377,82 +377,91 @@ const Profile = () => {
                 <CardContent className={"py-4 px-4 sm:px-5 sm:py-4"}>
                     <div className={"flex flex-col gap-4"}>
                         <div className={"space-y-1"}>
-                        <Label htmlFor="currentPassword" className={"font-normal"}>Current password</Label>
-                        <div className={"relative"}>
-                            <Input
-                                id="currentPassword"
-                                type={passwordVisibility.userCurrentPassword ? "text" : "password"}
-                                placeholder={"Current Password"}
-                                value={password.currentPassword}
-                                name="currentPassword"
-                                onChange={onChangePassword}
-                                onBlur={onBlurPassWord}
-                                className={"bg-card"}
-                            />
-                            <Button variant={"ghost hover:none"} onClick={() => togglePasswordVisibility('userCurrentPassword')}
-                                    className={"absolute top-0 right-0"}>
-                                {passwordVisibility.userCurrentPassword ? <Eye className={"w-[16px] h-[16px]"}/> : <EyeOff className={"w-[16px] h-[16px]"}/>}
-                            </Button>
-                            {
-                                formErrorPassword.currentPassword &&
-                                <span className="text-destructive text-sm">{formErrorPassword.currentPassword}</span>
-                            }
-                        </div>
-                        </div>
-
-                        <div>
-                        <Label htmlFor="password" className={"font-normal"}>Password</Label>
-                        <div className={"relative"}>
-                            <Input
-                                id="password"
-                                type={passwordVisibility.userPassword ? "text" : "password"}
-                                placeholder={"Password"}
-                                value={password.password}
-                                name="password"
-                                onChange={onChangePassword}
-                                onBlur={onBlurPassWord}
-                                className={"bg-card"}
-                            />
-                            <Button variant={"ghost hover:none"} onClick={() => togglePasswordVisibility('userPassword')}
-                                    className={"absolute top-0 right-0"}>
-                                {passwordVisibility.userPassword ? <Eye className={"w-[16px] h-[16px]"}/> : <EyeOff className={"w-[16px] h-[16px]"}/>}
-                            </Button>
-                            {
-                                formErrorPassword.password &&
-                                <span className="text-destructive text-sm">{formErrorPassword.password}</span>
-                            }
-                        </div>
+                            <Label htmlFor="currentPassword" className={"font-normal"}>Current password</Label>
+                            <div className={"relative"}>
+                                <Input
+                                    id="currentPassword"
+                                    type={passwordVisibility.userCurrentPassword ? "text" : "password"}
+                                    placeholder={"Current Password"}
+                                    value={password.currentPassword}
+                                    name="currentPassword"
+                                    onChange={onChangePassword}
+                                    onBlur={onBlurPassWord}
+                                    className={"bg-card"}
+                                />
+                                <Button variant={"ghost hover:none"}
+                                        onClick={() => togglePasswordVisibility('userCurrentPassword')}
+                                        className={"absolute top-0 right-0"}>
+                                    {passwordVisibility.userCurrentPassword ? <Eye className={"w-[16px] h-[16px]"}/> :
+                                        <EyeOff className={"w-[16px] h-[16px]"}/>}
+                                </Button>
+                                {
+                                    formErrorPassword.currentPassword &&
+                                    <span
+                                        className="text-destructive text-sm">{formErrorPassword.currentPassword}</span>
+                                }
+                            </div>
                         </div>
 
                         <div>
-                        <Label htmlFor="password_confirm" className={"font-normal"}>Password confirmation</Label>
-                        <div className={"relative"}>
-                            <Input
-                                id="password_confirm"
-                                type={passwordVisibility.userConfirmPassword ? "text" : "password"}
-                                placeholder={"Confirm Password"}
-                                value={password.passwordConfirmation}
-                                name="passwordConfirmation"
-                                onChange={onChangePassword}
-                                onBlur={onBlurPassWord}
-                                className={"bg-card"}
-                            />
-                            <Button variant={"ghost hover:none"} onClick={() => togglePasswordVisibility('userConfirmPassword')}
-                                    className={"absolute top-0 right-0"}>
-                                {passwordVisibility.userConfirmPassword ? <Eye className={"w-[16px] h-[16px]"}/> : <EyeOff className={"w-[16px] h-[16px]"}/>}
-                            </Button>
-                            {
-                                formErrorPassword.passwordConfirmation &&
-                                <span className="text-destructive text-sm">{formErrorPassword.passwordConfirmation}</span>
-                            }
+                            <Label htmlFor="password" className={"font-normal"}>Password</Label>
+                            <div className={"relative"}>
+                                <Input
+                                    id="password"
+                                    type={passwordVisibility.userPassword ? "text" : "password"}
+                                    placeholder={"Password"}
+                                    value={password.password}
+                                    name="password"
+                                    onChange={onChangePassword}
+                                    onBlur={onBlurPassWord}
+                                    className={"bg-card"}
+                                />
+                                <Button variant={"ghost hover:none"}
+                                        onClick={() => togglePasswordVisibility('userPassword')}
+                                        className={"absolute top-0 right-0"}>
+                                    {passwordVisibility.userPassword ? <Eye className={"w-[16px] h-[16px]"}/> :
+                                        <EyeOff className={"w-[16px] h-[16px]"}/>}
+                                </Button>
+                                {
+                                    formErrorPassword.password &&
+                                    <span className="text-destructive text-sm">{formErrorPassword.password}</span>
+                                }
+                            </div>
                         </div>
+
+                        <div>
+                            <Label htmlFor="password_confirm" className={"font-normal"}>Password confirmation</Label>
+                            <div className={"relative"}>
+                                <Input
+                                    id="password_confirm"
+                                    type={passwordVisibility.userConfirmPassword ? "text" : "password"}
+                                    placeholder={"Confirm Password"}
+                                    value={password.passwordConfirmation}
+                                    name="passwordConfirmation"
+                                    onChange={onChangePassword}
+                                    onBlur={onBlurPassWord}
+                                    className={"bg-card"}
+                                />
+                                <Button variant={"ghost hover:none"}
+                                        onClick={() => togglePasswordVisibility('userConfirmPassword')}
+                                        className={"absolute top-0 right-0"}>
+                                    {passwordVisibility.userConfirmPassword ? <Eye className={"w-[16px] h-[16px]"}/> :
+                                        <EyeOff className={"w-[16px] h-[16px]"}/>}
+                                </Button>
+                                {
+                                    formErrorPassword.passwordConfirmation &&
+                                    <span
+                                        className="text-destructive text-sm">{formErrorPassword.passwordConfirmation}</span>
+                                }
+                            </div>
                         </div>
 
                     </div>
                 </CardContent>
                 <CardFooter className={"justify-end p-4 pt-0 sm:px-6"}>
                     <Button className={`w-[134px] text-sm font-medium hover:bg-primary`}
-                            onClick={updatePassword}>{isLoadingPass ? <Loader2 className="h-4 w-4 animate-spin" /> : "Update Password"}</Button>
+                            onClick={updatePassword}>{isLoadingPass ?
+                        <Loader2 className="h-4 w-4 animate-spin"/> : "Update Password"}</Button>
                 </CardFooter>
             </Card>
         </div>

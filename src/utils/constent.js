@@ -7,7 +7,8 @@ const PROJECT_KEY = 'currentProject';
 
 export const DO_SPACES_ENDPOINT = import.meta.env.VITE_APP_DO_SPACES_ENDPOINT;
 export const googleClientId = import.meta.env.VITE_APP_GOOGLE_CLIENT_ID;
-export const baseUrlApi = import.meta.env.VITE_APP_API_URL;
+export const BASE_URL_API = import.meta.env.VITE_APP_API_URL;
+export const WIDGET_DOMAIN = import.meta.env.VITE_APP_WIDGET_DOMAIN;
 
 export const login = () => {
     localStorage.setItem(TOKEN_KEY, 'TestLogin');
@@ -98,41 +99,36 @@ export const getDateFormat = (date) => {
 
 // formValidation
 export const validateField = (name, value, additionalData = {}) => {
-    // Helper to generate a user-friendly label
     const getLabel = (fieldName) => {
         return fieldName
-            .replace(/([A-Z])/g, ' $1')       // insert space before capital letters
-            .replace(/_/g, ' ')               // replace underscores with space
-            .replace(/^./, str => str.toUpperCase()); // capitalize first letter
+            .replace(/([A-Z])/g, ' $1')
+            .replace(/_/g, ' ')
+            .replace(/^./, str => str.toUpperCase());
     };
-
     switch (name) {
         case 'email':
             if (!value || value.trim() === '') return 'Email is required';
             if (!/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,})+$/.test(value))
                 return 'Enter a valid email address';
             return '';
-
         case 'password':
             if (!value || value.trim() === '') return 'Password is required';
-            if (
-                additionalData.requireStrongPassword &&
-                !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(value)
-            ) {
-                return 'Password must be at least 8 characters with one uppercase letter, one lowercase letter, one number, and one special character';
-            }
+            // if (
+            //     additionalData?.requireStrongPassword &&
+            //     !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(value)
+            // ) {
+            //     return 'Password must be at least 8 characters with one uppercase letter, one lowercase letter, one number, and one special character';
+            // }
             return '';
-
         case 'confirmPassword':
-            if (!value || value.trim() === '') return 'Confirm password is required';
-            if (value !== additionalData.confirmPassword) return 'Passwords do not match';
+            if (!value || value?.trim() === '') return 'Confirm password is required';
+            if (value !== additionalData.password) return 'Passwords do not match';
             return '';
-
         case 'firstName':
         case 'lastName':
         default:
             const label = getLabel(name);
-            return value.trim() === '' ? `${label} is required` : '';
+            return value?.trim() === '' ? `${label} is required` : '';
     }
 };
 

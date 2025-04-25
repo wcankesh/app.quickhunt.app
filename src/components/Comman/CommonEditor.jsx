@@ -11,6 +11,7 @@ import LinkTool from '@editorjs/link';
 import Image from '@editorjs/image';
 import Quote from '@editorjs/quote';
 import InlineCode from '@editorjs/inline-code';
+import {BASE_URL_API} from "../../utils/constent";
 
 const editorConstants = {
     embed: Embed,
@@ -34,7 +35,7 @@ const editorConstants = {
         inlineToolbar: true,
         config: {
             endpoints: {
-                byFile: 'http://192.168.1.36:3001/upload',
+                byFile: `${BASE_URL_API}/upload`,
                 byUrl: 'https://code.quickhunt.app/public/storage/post',
             },
             field: 'image',

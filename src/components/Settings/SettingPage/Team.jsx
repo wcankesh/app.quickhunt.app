@@ -156,7 +156,6 @@ const Team = () => {
     };
 
     const onResendUser = async (x) => {
-        console.log("xxx", x)
         const payload = {
             projectId: projectDetailsReducer.id,
             email: x.email,
@@ -328,7 +327,6 @@ const Team = () => {
                                                 : memberList?.length > 0 ? <>
                                                     {
                                                         (memberList || []).map((x, i) => {
-                                                            console.log("xxx", x)
                                                             return (
                                                                 <TableRow key={i}>
                                                                     <TableCell className={"py-[10px] px-[12px]"}>

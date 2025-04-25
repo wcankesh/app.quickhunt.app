@@ -8,7 +8,7 @@ import {DropdownMenu, DropdownMenuTrigger} from "@radix-ui/react-dropdown-menu";
 import {DropdownMenuContent, DropdownMenuItem} from "../ui/dropdown-menu";
 import {Card, CardContent} from "../ui/card";
 import {useNavigate, useSearchParams} from "react-router-dom";
-import {apiService, baseUrl} from "../../utils/constent";
+import {apiService, baseUrl, WIDGET_DOMAIN} from "../../utils/constent";
 import {useToast} from "../ui/use-toast";
 import WidgetAnalytics from "./WidgetAnalytics";
 import {Skeleton} from "../ui/skeleton";
@@ -162,12 +162,12 @@ const Widgets = () => {
 
     const codeString = selectedType === "embed" ? `
     <div class="quickhunt-widget-embed" Quickhunt_Widget_Key=${selectedId} widget-width="740px" widget-height="460px"></div>
-    <script src="https://fw.quickhunt.app/widgetScript.js"></script>
+    <script src="${WIDGET_DOMAIN}/widgetScript.js"></script>
     ` : `<script>
     window.Quickhunt_Config = window.Quickhunt_Config || [];
     window.Quickhunt_Config.push({ Quickhunt_Widget_Key:  ${selectedId}});
 </script>
-<script src="https://fw.quickhunt.app/widgetScript.js"></script>`;
+<script src="${WIDGET_DOMAIN}/widgetScript.js"></script>`;
     const embedLink = `https://${projectDetailsReducer.domain}/widget/ideas?widget=${selectedId}`
     const iFrame = `<iframe src="${embedLink}" style="border: 0px; outline: 0px; width: 450px; height: 400px;"></iframe>`
     const callback = `window.Quickhunt('${selectedId}')`

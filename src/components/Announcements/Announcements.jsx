@@ -7,7 +7,6 @@ import {useTheme} from "../theme-provider";
 import {useSelector} from "react-redux";
 import {ApiService} from "../../utils/ApiService";
 import {Card} from "../ui/card";
-import SheetAnalyticsView from "./SheetAnalyticsView";
 import {toast} from "../ui/use-toast";
 import {Popover, PopoverTrigger} from "@radix-ui/react-popover";
 import {PopoverContent} from "../ui/popover";
@@ -252,13 +251,6 @@ const Announcements = () => {
                 setSelectedRecord={setSelectedRecord}
                 announcementList={announcementList}
                 setAnnouncementList={setAnnouncementList}
-            />}
-
-            {analyticsObj?.id &&
-            <SheetAnalyticsView
-                onClose={onCloseAnalyticsSheet}
-                analyticsObj={analyticsObj}
-                setAnalyticsObj={setAnalyticsObj}
             />}
 
             <div className={"flex items-center justify-between flex-wrap gap-2"}>

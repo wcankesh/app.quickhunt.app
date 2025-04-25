@@ -1,5 +1,5 @@
 import React, {useState, Fragment, useEffect, useRef} from 'react';
-import {apiService, baseUrl} from "../../../utils/constent";
+import {apiService, BASE_URL_API, baseUrl} from "../../../utils/constent";
 import { Button } from "../../ui/button";
 import {Circle, Loader2, Play} from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -23,7 +23,6 @@ import InlineCode from "@editorjs/inline-code";
 import EditorJS from "@editorjs/editorjs";
 import CommonBreadCrumb from "../../Comman/CommonBreadCrumb";
 import {Skeleton} from "../../ui/skeleton";
-import CommonEditor from "../../Comman/CommonEditor";
 
     const statusOptions = [
         { name: "Publish", value: 1, fillColor: "#389E0D", strokeColor: "#389E0D" },
@@ -34,9 +33,7 @@ import CommonEditor from "../../Comman/CommonEditor";
         {
             title: 'New Article',
             categoryId: null,
-            category_title: "",
             subcategoryId: null,
-            sub_category_title: "",
             description: "",
             isActive: 1,
         }
@@ -45,9 +42,7 @@ import CommonEditor from "../../Comman/CommonEditor";
     {
         title: '',
         categoryId: null,
-        category_title: "",
         subcategoryId: null,
-        sub_category_title: "",
         description: "",
         isActive: 1,
     }
@@ -62,7 +57,6 @@ const ArticleDetail = () => {
     const [articlesDetails, setArticlesDetails] = useState(initialState);
     const [formError, setFormError] = useState(initialStateError);
     const [articleList, setArticleList] = useState([]);
-    const [loading, setLoading] = useState(true);
     const [load, setLoad] = useState('');
     const [isLoading, setIsLoading] = useState(true);
     const [isLoadBreadCrumb, setIsLoadBreadCrumb] = useState(true);
@@ -75,14 +69,13 @@ const ArticleDetail = () => {
     }, [id, projectDetailsReducer.id])
 
     const getAllCategory = async () => {
-        // setIsLoading(true);
         const data = await apiService.getAllCategory({
             projectId: projectDetailsReducer.id,
         });
+        setIsLoading(false)
         if (data.success) {
             setArticleList(data.data?.rows);
         }
-        setIsLoading(false)
     };
 
     const getSingleArticle = async () => {
@@ -272,7 +265,7 @@ const ArticleDetail = () => {
 
             config: {
                 endpoints: {
-                    byFile: 'http://192.168.1.36:3001/artical/upload-image', // Your file upload endpoint
+                    byFile: `${BASE_URL_API}/artical/upload-image`, // Your file upload endpoint
                     byUrl: 'https://code.quickhunt.app/public/storage/post', // Your endpoint that provides image by URL
                 },
                 field: 'image',

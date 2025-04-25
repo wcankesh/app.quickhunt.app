@@ -2,7 +2,7 @@ import React from 'react';
 import {CardHeader, Card, CardContent, CardTitle, CardDescription} from "../ui/card";
 import {Button} from "../ui/button";
 import {useNavigate} from "react-router-dom";
-import {baseUrl, baseUrlApi} from "../../utils/constent";
+import {baseUrl, BASE_URL_API} from "../../utils/constent";
 import {useSelector} from "react-redux";
 
 const ImportExport = () => {
@@ -31,7 +31,7 @@ const ImportExport = () => {
                     <h5 className={"text-base font-normal capitalize"}>Export Data</h5>
                     <p className={"text-muted-foreground text-sm"}>Export your ideas in CSV format! The process may take up to 30 seconds.</p>
                 </div>
-                <Button className={"font-medium hover:bg-primary"} onClick={() => window.open(`${baseUrlApi}/idea/export?projectId=${projectDetailsReducer.id}`, "_blank")}>Export Data</Button>
+                <Button className={"font-medium hover:bg-primary"} onClick={() => window.open(`${BASE_URL_API}/idea/export?projectId=${projectDetailsReducer.id}`, "_blank")}>Export Data</Button>
             </CardContent>
         </Card>
     );

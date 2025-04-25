@@ -20,6 +20,7 @@ import Marker from "@editorjs/marker";
 import InlineCode from "@editorjs/inline-code";
 import {PopoverTrigger} from "@radix-ui/react-popover";
 import {Popover, PopoverContent} from "../ui/popover";
+import {BASE_URL_API} from "../../utils/constent";
 
 const Post = ({inAppMsgSetting, setInAppMsgSetting, isLoading}) => {
     const editorCore = useRef(null);
@@ -58,7 +59,7 @@ const Post = ({inAppMsgSetting, setInAppMsgSetting, isLoading}) => {
             inlineToolbar: true,
             config: {
                 endpoints: {
-                    byFile: 'http://192.168.1.36:3001/upload', // Your file upload endpoint
+                    byFile: `${BASE_URL_API}/upload`, // Your file upload endpoint
                     byUrl: 'https://code.quickhunt.app/public/storage/post', // Your endpoint that provides image by URL
                 },
                 field: 'image',

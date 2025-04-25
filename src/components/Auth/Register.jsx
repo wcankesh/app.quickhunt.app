@@ -1,8 +1,7 @@
 import React, {useState} from 'react';
 import {Button} from "../ui/button"
 import {useNavigate} from "react-router-dom"
-import {ApiService} from "../../utils/ApiService";
-import {baseUrl, onKeyFire, validateForm, validateField,} from "../../utils/constent";
+import {baseUrl, onKeyFire, validateForm, validateField, apiService,} from "../../utils/constent";
 import {Loader2} from "lucide-react";
 import {useToast} from "../ui/use-toast";
 import WithGoogle from "./WithGoogle";
@@ -17,11 +16,10 @@ const initialState = {
     email: '',
     password: '',
     confirmPassword: '',
-    userStatus: '1'
+    userStatus: '1',
 }
 
 const Register = () => {
-    let apiSerVice = new ApiService()
     let navigate = useNavigate();
     const {toast} = useToast();
     const dispatch = useDispatch();
@@ -31,7 +29,7 @@ const Register = () => {
     const [isLoading, setIsLoading] = useState(false);
 
     const onChange = (event) => {
-        const { name, value } = event.target;
+        const {name, value} = event.target;
         setCompanyDetails(prev => ({
             ...prev,
             [name]: value
@@ -64,7 +62,6 @@ const Register = () => {
         } else {
             navigate(`${baseUrl}/${link}`);
         }
-        return;
     };
 
     const onRegister = async () => {
@@ -80,7 +77,8 @@ const Register = () => {
             email: companyDetails.email,
             password: companyDetails.password
         }
-        const data = await apiSerVice.adminSignup(payload)
+        const data = await apiService.adminSignup(payload)
+        setIsLoading(false)
         if (data.success) {
             let userDetails = {...data.data};
             delete userDetails?.token;
@@ -89,10 +87,8 @@ const Register = () => {
             dispatch(userDetailsAction({...data.data}))
             navigate(`${baseUrl}/on-boarding`);
             toast({description: data.message})
-            setIsLoading(false)
         } else {
-            setIsLoading(false)
-            toast({variant: "destructive" ,description: data.error.message,})
+            toast({variant: "destructive", description: data.error.message,})
         }
     }
 
@@ -165,11 +161,11 @@ const Register = () => {
                             Continue Registration
                         </Button>
                         <div className="or-divider flex items-center">
-                            <div className="border-t basis-4/12 border-muted-foreground" />
+                            <div className="border-t basis-4/12 border-muted-foreground"/>
                             <p className="text-xs text-muted-foreground basis-4/12 text-center">Or continue with</p>
-                            <div className="border-t basis-4/12 border-muted-foreground" />
+                            <div className="border-t basis-4/12 border-muted-foreground"/>
                         </div>
-                        <WithGoogle title="Signup With Google" />
+                        <WithGoogle title="Signup With Google"/>
                         <div className="text-center text-xs md:text-sm">
                             <p className={"text-sm text-muted-foreground"}>Already have an account?{" "}
                                 <Button

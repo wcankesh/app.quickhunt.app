@@ -85,7 +85,7 @@ const WidgetsTypes = () => {
                                             {isLoading ? (
                                                 <Skeleton className="h-[224px] bg-muted-foreground/[0.2]" />
                                             ) : (
-                                                <img className="max-w-[706px] w-full" src={x.img} alt="" />
+                                                <img className="max-w-[706px] w-full" src={x.img} alt={x.title} height={225} />
                                             )}
                                         </CardContent>
                                     </Card>

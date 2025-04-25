@@ -42,25 +42,6 @@ const ImportIdea = () => {
         const [isLoading, setIsLoading] = useState(false);
         const [isDirectImport, setIsDirectImport] = useState(true);
 
-        const handleFileUploadd = (e) => {
-            const file = e.target.files[0];
-            Papa.parse(file, {
-                header: true,
-                skipEmptyLines: true,
-                complete: function (results) {
-                    const data = results.data;
-                    setHeaders(Object.keys(data[0]));
-                    setTableData(data);
-                },
-            });
-            setSelectedCSVFile(file);
-            setSelectedColumn([]);
-            setColumnList(initialColumnList);
-            setCsvRoadmap([]);
-            setCsvBoard([]);
-            setStep(2);
-        };
-
         const handleFileUpload = async (e) => {
             const file = e.target.files[0];
             if (!file) return;
@@ -206,28 +187,29 @@ const ImportIdea = () => {
                 columns.push({key: x.id, value: x.csvColumn})
             });
 
-            setIsLoading(true)
-            let formData = new FormData();
-            formData.append("projectId", projectDetailsReducer.id);
-            formData.append("csvData", JSON.stringify(selectedCSVFile));
-            formData.append("columns", JSON.stringify(columns));
-            formData.append("boardsMap", JSON.stringify(csvBoard));
-            formData.append("roadmapsMap", JSON.stringify(csvRoadmap));
+            const result = (selectedCSVFile || []).map(item => {
+                const mappedItem = {};
+                columns.forEach(col => {
+                    mappedItem[col.value] = item[col.value];
+                });
+                return mappedItem;
+            });
+
             const payload = {
                 projectId: projectDetailsReducer.id,
-                csvData: JSON.stringify(selectedCSVFile),
+                csvData: JSON.stringify(result),
                 columns: JSON.stringify(columns),
                 boardsMap: JSON.stringify(csvBoard),
                 roadmapsMap: JSON.stringify(csvRoadmap),
             }
 
-            const data = await apiService.ideaImport(payload, false)
+            setIsLoading(true)
+            const data = await apiService.ideaImport(payload)
+            setIsLoading(false)
             if (data.success) {
-                setIsLoading(false)
                 toast({description: data.message})
                 navigate(`${baseUrl}/ideas`);
             } else {
-                setIsLoading(false)
                 toast({description: data?.error?.message, variant: "destructive"})
             }
         }

@@ -7,7 +7,8 @@ import {baseUrl} from "../utils/constent";
 const ThemeProviderContext = createContext();
 
 export function ThemeProvider({children, defaultTheme = "system", storageKey = "vite-ui-theme", ...props}) {
-    const [theme, setTheme] = useState(() => (localStorage.getItem(storageKey)) || defaultTheme)
+    // const [theme, setTheme] = useState(() => (localStorage.getItem(storageKey)) || defaultTheme)
+    const [theme, setTheme] = useState('!')
     const [isProModal, setIsProModal] = useState(false);
     let navigate = useNavigate();
     useEffect(() => {
@@ -37,6 +38,7 @@ export function ThemeProvider({children, defaultTheme = "system", storageKey = "
     }
 
     const planList = ['Custom Domain + SSL', 'Remove Branding', 'Post Scheduling', 'Post Expiring', 'Comment and Reactions', 'Integration']
+
     return (
         <ThemeProviderContext.Provider {...props} value={value}>
             {children}

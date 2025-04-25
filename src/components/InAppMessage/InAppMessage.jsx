@@ -9,7 +9,7 @@ import {useTheme} from "../theme-provider";
 import {Skeleton} from "../ui/skeleton";
 import {Badge} from "../ui/badge";
 import {useNavigate, useSearchParams} from "react-router-dom";
-import {baseUrl} from "../../utils/constent";
+import {baseUrl, WIDGET_DOMAIN} from "../../utils/constent";
 import {ApiService} from "../../utils/ApiService";
 import {useSelector} from "react-redux";
 import EmptyData from "../Comman/EmptyData";
@@ -231,7 +231,7 @@ const InAppMessage = () => {
     window.Quickhunt_In_App_Message_Config = window.Quickhunt_In_App_Message_Config || [];
     window.Quickhunt_In_App_Message_Config.push({ Quickhunt_In_App_Message_Key:  "${selectedId}"});
 </script>
-<script src="https://fw.quickhunt.app/widgetScript.js"></script>`;
+<script src="${WIDGET_DOMAIN}/widgetScript.js"></script>`;
 
     return (
         <Fragment>

@@ -2,6 +2,7 @@ import React, {useEffect, useRef} from 'react';
 import EditorJS from "@editorjs/editorjs";
 import Embed from "@editorjs/embed";
 import Image from "@editorjs/image";
+import {BASE_URL_API} from "../../utils/constent";
 
 const Editor = ({blocks, onChange}) => {
     const editorRef = useRef(null);
@@ -14,7 +15,7 @@ const Editor = ({blocks, onChange}) => {
             inlineToolbar : true,
             config: {
                 endpoints: {
-                    byFile: 'http://192.168.1.36:3001/upload', // Your file upload endpoint
+                    byFile: `${BASE_URL_API}/upload`, // Your file upload endpoint
                     byUrl: 'https://code.quickhunt.app/public/storage/post', // Your endpoint that provides image by URL
                 },
                 field: 'image',

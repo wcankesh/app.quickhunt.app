@@ -12,7 +12,6 @@ instance.interceptors.request.use(function (config) {
         config.headers["Authorization"] = `Bearer ${token() || ''}`
     }
     return config;
-
 });
 
 export class ApiService {
@@ -33,7 +32,7 @@ export class ApiService {
                 response = res.data
             }
         }).catch((e) => {
-            if (e.response.status === 401) {
+            if (e.response.status === 403) {
                 logout();
                 removeProjectDetails()
                 window.location.replace(`${baseUrl}/login`)
@@ -86,7 +85,7 @@ export class ApiService {
                 response = res.data
             }
         }).catch((e) => {
-            if (e.response.status === 401) {
+            if (e.response.status === 403) {
                 logout();
                 removeProjectDetails()
                 window.location.replace(`${baseUrl}/login`)
@@ -112,7 +111,7 @@ export class ApiService {
                 response = res.data
             }
         }).catch((e) => {
-            if (e.response.status === 401) {
+            if (e.response.status === 403) {
                 logout();
                 removeProjectDetails()
                 window.location.replace(`${baseUrl}/login`)
@@ -138,7 +137,7 @@ export class ApiService {
                 response = res.data
             }
         }).catch((e) => {
-            if (e.response.status === 401) {
+            if (e.response.status === 403) {
                 logout();
                 removeProjectDetails()
                 window.location.replace(`${baseUrl}/login`)
@@ -638,7 +637,7 @@ export class ApiService {
     }
 
     /* ---------- Import Export api ---------- */
-    async ideaImport(payload, isFormData) {
+    async ideaImport(payload) {
         return await this.postData(`${baseUrlApi}/idea/import`, payload)
     }
 
