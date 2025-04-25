@@ -2,9 +2,9 @@ import axios from "axios";
 import {logout, removeProjectDetails, token, baseUrl} from "./constent";
 import qs from 'qs';
 
-const baseUrlApi = 'http://192.168.1.36:3001';
-// const baseUrlApi = 'https://code.quickhunt.app/public/api';
-let instance = axios.create();
+const baseUrlApi = import.meta.env.VITE_APP_API_URL;
+const instance = axios.create();
+
 instance.interceptors.request.use(function (config) {
     if (config?.headers?.Authorization) {
         config.headers["Authorization"] = config?.headers?.Authorization
@@ -638,8 +638,8 @@ export class ApiService {
     }
 
     /* ---------- Import Export api ---------- */
-    async ideaImport(payload) {
-        return await this.postData(`${baseUrlApi}/idea/import`, payload, true)
+    async ideaImport(payload, isFormData) {
+        return await this.postData(`${baseUrlApi}/idea/import`, payload)
     }
 
     /* ---------- HeaderBar Api ---------- */

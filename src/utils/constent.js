@@ -7,6 +7,7 @@ const PROJECT_KEY = 'currentProject';
 
 export const DO_SPACES_ENDPOINT = import.meta.env.VITE_APP_DO_SPACES_ENDPOINT;
 export const googleClientId = import.meta.env.VITE_APP_GOOGLE_CLIENT_ID;
+export const baseUrlApi = import.meta.env.VITE_APP_API_URL;
 
 export const login = () => {
     localStorage.setItem(TOKEN_KEY, 'TestLogin');
@@ -18,10 +19,7 @@ export const getLSUserDetails = () => {
 }
 
 export const getTokenVerify = () => {
-    if (localStorage.getItem('token-verify-onboard')) {
-        return true;
-    }
-    return false;
+    return !!localStorage.getItem('token-verify-onboard');
 }
 
 export const logout = () => {
@@ -45,12 +43,8 @@ export const removeProjectDetails = () => {
 }
 
 export const isLogin = () => {
-    if (localStorage.getItem(TOKEN_KEY)) {
-        return true;
-    }
-    return false;
+    return !!localStorage.getItem(TOKEN_KEY);
 }
-
 
 // Check if the token is about to expire (within the next minute)
 export const isTokenAboutToExpire = () => {
