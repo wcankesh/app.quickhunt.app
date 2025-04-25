@@ -23,7 +23,6 @@ const AnalyticsViews = () => {
     const dispatch = useDispatch();
     const allEmoji = useSelector(state => state.allStatusAndTypes.emoji);
     const inboxMarkReadReducer = useSelector(state => state.inboxMarkRead);
-
     const [analyticsObj, setAnalyticsObj] = useState({})
     const [feedbackList, setFeedbackList] = useState([])
     const [reactionList, setReactionList] = useState([])
@@ -34,10 +33,6 @@ const AnalyticsViews = () => {
     const [isLoadingReaction, setIsLoadingReaction] = useState(false)
     const [isLoadingFeedBack, setIsLoadingFeedBack] = useState(false)
     const [isLoading, setIsLoading] = useState(true);
-
-    console.log("analyticsObj", analyticsObj)
-    console.log("feedbackList", feedbackList)
-    console.log("reactionList", reactionList)
 
     useEffect(() => {
         if (postId) {
@@ -51,8 +46,6 @@ const AnalyticsViews = () => {
             const getSinglePosts = async () => {
                 const data = await apiService.getSinglePosts(postId);
                 if (data.success) {
-                    console.log("data", data)
-                    console.log("data data", data.data.data.title)
                     setAnalyticsObj({
                         ...data.data.data,
                         image: data?.data?.data?.featureImage,
@@ -68,7 +61,6 @@ const AnalyticsViews = () => {
                         }
                         return item;
                     });
-
                     dispatch(inboxMarkReadAction(updateInbox));
                 }
             }
@@ -93,14 +85,10 @@ const AnalyticsViews = () => {
     const getReaction = async () => {
         setIsLoadingReaction(true)
         const data = await apiService.getReaction(postId)
+        setIsLoadingReaction(false)
         if (data.success) {
-            console.log("data rea", data)
-            console.log("data data rea", data.data.views)
             setReactionList(data.data.reactions)
             setViews(data.data.views)
-            setIsLoadingReaction(false)
-        } else {
-            setIsLoadingReaction(false)
         }
     }
 

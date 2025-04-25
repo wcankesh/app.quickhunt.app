@@ -90,7 +90,7 @@ const RoadmapWidgetPreview = ({widgetsSetting}) => {
                                                                             className={`cursor-pointer w-[320px] ${cardClass}`}
                                                                             key={`roadmap_idea_${idea.id}`}>
                                                                             {
-                                                                                (idea.coverImage !== '' && widgetsSetting.roadmapImage === 1) &&
+                                                                                (idea.coverImage !== '' && widgetsSetting.roadmapImage) &&
                                                                                 <AspectRatio ratio={10 / 5}
                                                                                              className={`bg-muted rounded-ss-md rounded-se-md mb-1 ${cardClass}`}>
                                                                                     <img src={idea.coverImage} alt={idea.title}

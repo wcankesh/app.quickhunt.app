@@ -89,7 +89,7 @@ const IdeaWidgetPreview = ({widgetsSetting}) => {
                                                             <h2
                                                                 className="text-xs cursor-pointer font-medium ">{idea.title}</h2>
                                                         </div>
-                                                        {widgetsSetting?.ideaDescription === 1 ?
+                                                        {widgetsSetting?.ideaDescription ?
                                                             <div className={'description-container-widget-preview inline-block w-full text-xs'}>
                                                                 {
                                                                     cleanQuillHtml(idea?.description) ? <ReadMoreText html={idea.description} isWidget={true}/> : null

@@ -809,7 +809,7 @@ const UpdateIdea = () => {
             [event.target.name]: formValidate(event.target.name, event.target.value)
         }));
     }
-    console.log("selectedIdea?.voteLists", selectedIdea)
+
     const formValidateCr = (name, value) => {
         switch (name) {
             case "title":

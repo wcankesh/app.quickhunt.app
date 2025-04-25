@@ -243,7 +243,7 @@ const AnnouncementsTable = ({data, isLoading, setSelectedRecord, handleDelete, s
                                                 <Button
                                                     disabled={x.status !== 1}
                                                     variant={"ghost"}
-                                                    onClick={() => shareFeedback(x.domain, x.post_slug_url)}
+                                                    onClick={() => shareFeedback(x.domain, x.slugUrl)}
                                                     className={"p-0 h-auto"}
                                                 >
                                                     <Eye size={18} className={`font-normal`}/>

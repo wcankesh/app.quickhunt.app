@@ -51,9 +51,6 @@ const CommonEditor = ({ value, onChange, setArticlesDetails }) => {
 
     const handleSave = React.useCallback(async () => {
         const savedData = await editorInstance.current.save();
-        console.log(
-            savedData.blocks
-        )
         setArticlesDetails(prevState => ({
             ...prevState,
             description: JSON.stringify({blocks: savedData.blocks})

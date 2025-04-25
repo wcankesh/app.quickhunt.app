@@ -71,7 +71,7 @@ const AnnouncementWidgetPreview = ({widgetsSetting}) => {
                                     return (
                                         <div key={`announcement_${x.id}`} className={`box-border  ${index != 0 ? 'border-t border-zinc-200' : ''}`}>
                                             {
-                                                (x.featureImage !== '' && widgetsSetting?.announcementImage === 1) &&
+                                                (x.featureImage !== '' && widgetsSetting?.announcementImage) &&
                                                 <AspectRatio ratio={10 / 5} className="bg-muted dark:bg-slate-50 rounded-ss-md rounded-se-md mb-1">
                                                     <img src={x.featureImage} alt={x.title} className="w-full h-full object-contain object-center"/>
                                                 </AspectRatio>
@@ -101,17 +101,17 @@ const AnnouncementWidgetPreview = ({widgetsSetting}) => {
                                                         }
                                                     </div>
                                                 </div>
-                                                {widgetsSetting?.announcementDescription === 1 ? <div className="inline-block pt-4 text-xs">
+                                                {widgetsSetting?.announcementDescription ? <div className="inline-block pt-4 text-xs">
                                                     <ReadMoreText html={x.description}/>
                                                 </div> : ''
                                                 }
 
-                                                {widgetsSetting?.changelogReaction === 1 || widgetsSetting?.isComment === 1 ? <div className={"pt-6"}>
+                                                {widgetsSetting?.changelogReaction || widgetsSetting?.isComment ? <div className={"pt-6"}>
                                                     <Accordion type="single"  className={"border-t border-b  rounded-lg border-[#e2e8f0]"}>
                                                         <AccordionItem value="item-1" className={"border-0 border-l border-r rounded-lg py-2 border-[#e2e8f0]"}>
                                                             <div className={"flex items-center justify-between gap-3 pl-2 pr-3"}>
                                                                 {
-                                                                    widgetsSetting?.changelogReaction === 1 ? <div className={"flex gap-2.5 items-center"}>
+                                                                    widgetsSetting?.changelogReaction ? <div className={"flex gap-2.5 items-center"}>
                                                                         {
                                                                             (allStatusAndTypes.emoji || []).map((e, i) => {
                                                                                 const findEmoji = (x.reactions || []).find((r) => r.reactionId == e.id) || {count: 0};
@@ -157,13 +157,13 @@ const AnnouncementWidgetPreview = ({widgetsSetting}) => {
                                                                     </div> : ''
                                                                 }
                                                                 {
-                                                                    widgetsSetting?.isComment === 1 ? <AccordionTrigger className={`flex w-full relative items-center justify-end no-underline hover:no-underline py-1 `}>
-                                                                        <div className={`text-left ${widgetsSetting?.changelogReaction === 0 ? 'border-l px-3' : 'px-3'} text-sm leading-5 truncate absolute -left-15 right-5`} style={{overflow: "visible"}}>Write a comment...</div>
+                                                                    widgetsSetting?.isComment ? <AccordionTrigger className={`flex w-full relative items-center justify-end no-underline hover:no-underline py-1 `}>
+                                                                        <div className={`text-left ${widgetsSetting?.changelogReaction === false ? 'border-l px-3' : 'px-3'} text-sm leading-5 truncate absolute -left-15 right-5`} style={{overflow: "visible"}}>Write a comment...</div>
                                                                     </AccordionTrigger> : ''
                                                                 }
                                                             </div>
                                                             {
-                                                                widgetsSetting?.isComment === 1 ?
+                                                                widgetsSetting?.isComment ?
                                                                     <AccordionContent className={"p-0"}>
                                                                         <div className="relative overflow-hidden  border-t mt-2 border-[#e2e8f0]">
                                                                             <Textarea on id="message" placeholder="Type your message here..." className={`${cardClass} min-h-12 resize-none border-0 p-3 shadow-none focus-visible:ring-0 ring-offset-color-0`}/>

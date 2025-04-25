@@ -26,11 +26,10 @@ const initialState = {
     launcherRightSpacing: "20",
     launcherLeftSpacing: "20",
     launcherBottomSpacing: "90",
-    isIdea: 1,
-    isRoadmap: 1,
-    isAnnouncement: 1,
-    isNavigate: 1,
-    isLauncherIcon: 1,
+    isIdea: true,
+    isRoadmap: true,
+    isAnnouncement: true,
+    isLauncherIcon: true,
     headerBgColor: "#ffffff",
     headerTextColor: "#000000",
     headerBtnBackgroundColor: "#7c3aed",
@@ -50,13 +49,13 @@ const initialState = {
     roadmapDisplay: 1,
     changelogTitle: "Announcement",
     changelogDisplay: 1,
-    changelogReaction: 0,
-    hideHeader: 0,
-    announcementDescription: 0,
-    announcementImage: 0,
-    ideaDescription: 0,
-    roadmapImage: 0,
-    isComment: 0,
+    changelogReaction: false,
+    hideHeader: false,
+    announcementDescription: false,
+    announcementImage: false,
+    ideaDescription: false,
+    roadmapImage: false,
+    isComment: false,
 }
 
 const UpdateWidget = () => {
@@ -255,8 +254,8 @@ const UpdateWidget = () => {
                                 <div className={"flex gap-2 items-center"}>
                                     <Checkbox
                                         id={"isLauncherIcon"}
-                                        checked={widgetsSetting.isLauncherIcon === 1}
-                                        onCheckedChange={(checked) => onChangeCheckBox("isLauncherIcon", checked ? 1 : 0)}
+                                        checked={widgetsSetting.isLauncherIcon}
+                                        onCheckedChange={(checked) => onChangeCheckBox("isLauncherIcon", checked)}
                                     />
                                     <label htmlFor="isLauncherIcon" className="text-sm">Show Launcher Icon</label>
                                 </div>
@@ -345,8 +344,8 @@ const UpdateWidget = () => {
                         <div className={"flex gap-2 items-center"}>
                             <Checkbox
                                 id={"hideHeader"}
-                                checked={widgetsSetting.hideHeader === 1}
-                                onCheckedChange={(checked) => onChangeCheckBox("hideHeader", checked ? 1 : 0)}
+                                checked={widgetsSetting.hideHeader}
+                                onCheckedChange={(checked) => onChangeCheckBox("hideHeader", checked)}
                             />
                             <label htmlFor="hideHeader" className="text-sm">Show header</label>
                         </div>
@@ -369,38 +368,38 @@ const UpdateWidget = () => {
                             <div className={"flex gap-2 items-center"}>
                                 <Checkbox
                                     id={"isAnnouncement"}
-                                    checked={widgetsSetting.isAnnouncement === 1}
-                                    onCheckedChange={(checked) => onChangeCheckBox("isAnnouncement", checked ? 1 : 0)}
+                                    checked={widgetsSetting.isAnnouncement}
+                                    onCheckedChange={(checked) => onChangeCheckBox("isAnnouncement", checked)}
                                 />
                                 <label htmlFor="isAnnouncement" className="text-sm">Show
                                     Announcement</label>
                             </div>
                             <div className={"flex gap-2 items-center"}>
                                 <Checkbox
-                                    disabled={widgetsSetting.isAnnouncement !== 1}
+                                    disabled={widgetsSetting.isAnnouncement !== true}
                                     id={"announcementDescription"}
-                                    checked={widgetsSetting.announcementDescription === 1}
-                                    onCheckedChange={(checked) => onChangeCheckBox("announcementDescription", checked ? 1 : 0)}
+                                    checked={widgetsSetting.announcementDescription}
+                                    onCheckedChange={(checked) => onChangeCheckBox("announcementDescription", checked)}
                                 />
                                 <label htmlFor="announcementDescription" className="text-sm">Show
                                     Description</label>
                             </div>
                             <div className={"flex gap-2 items-center"}>
                                 <Checkbox
-                                    disabled={widgetsSetting.isAnnouncement !== 1}
+                                    disabled={widgetsSetting.isAnnouncement !== true}
                                     id={"announcementImage"}
-                                    checked={widgetsSetting.announcementImage === 1}
-                                    onCheckedChange={(checked) => onChangeCheckBox("announcementImage", checked ? 1 : 0)}
+                                    checked={widgetsSetting.announcementImage}
+                                    onCheckedChange={(checked) => onChangeCheckBox("announcementImage", checked)}
                                 />
                                 <label htmlFor="announcementImage" className="text-sm">Show
                                     Image</label>
                             </div>
                             <div className={"flex gap-2 items-center"}>
                                 <Checkbox
-                                    disabled={widgetsSetting.isAnnouncement !== 1}
+                                    disabled={widgetsSetting.isAnnouncement !== true}
                                     id={"changelogReaction"}
-                                    checked={widgetsSetting.changelogReaction === 1}
-                                    onCheckedChange={(checked) => onChangeCheckBox("changelogReaction", checked ? 1 : 0)}
+                                    checked={widgetsSetting.changelogReaction}
+                                    onCheckedChange={(checked) => onChangeCheckBox("changelogReaction", checked)}
                                 />
                                 <label htmlFor="changelogReaction" className="text-sm">Show
                                     Reaction</label>
@@ -408,23 +407,23 @@ const UpdateWidget = () => {
                             <div className={"flex gap-2 items-center"}>
                                 <Checkbox
                                     id={"isComment"}
-                                    disabled={widgetsSetting.isAnnouncement !== 1}
-                                    checked={widgetsSetting.isComment === 1}
-                                    onCheckedChange={(checked) => onChangeCheckBox("isComment", checked ? 1 : 0)}
+                                    disabled={widgetsSetting.isAnnouncement !== true}
+                                    checked={widgetsSetting.isComment}
+                                    onCheckedChange={(checked) => onChangeCheckBox("isComment", checked)}
                                 />
                                 <label htmlFor="isComment" className="text-sm">Show Comment</label>
                             </div>
                             <div className="space-y-2">
                                 <Label className={"font-normal"}>Title</Label>
                                 <Input value={widgetsSetting.changelogTitle}
-                                       disabled={widgetsSetting.isAnnouncement !== 1}
+                                       disabled={widgetsSetting.isAnnouncement !== true}
                                        onChange={(e) => onChange("changelogTitle", e.target.value)}
                                 />
                             </div>
                             <div className="flex flex-col gap-2">
                                 <Label className={"font-normal"}>Display</Label>
                                 <Select value={widgetsSetting.changelogDisplay}
-                                        disabled={widgetsSetting.isAnnouncement !== 1}
+                                        disabled={widgetsSetting.isAnnouncement !== true}
                                         onValueChange={(value) => onChange("changelogDisplay", value)}>
                                     <SelectTrigger>
                                         <SelectValue placeholder={1}/>
@@ -446,17 +445,17 @@ const UpdateWidget = () => {
                             <div className={"flex gap-2 items-center"}>
                                 <Checkbox
                                     id={"isRoadmap"}
-                                    checked={widgetsSetting.isRoadmap === 1}
-                                    onCheckedChange={(checked) => onChangeCheckBox("isRoadmap", checked ? 1 : 0)}
+                                    checked={widgetsSetting.isRoadmap}
+                                    onCheckedChange={(checked) => onChangeCheckBox("isRoadmap", checked)}
                                 />
                                 <label htmlFor="isRoadmap" className="text-sm">Show Roadmap</label>
                             </div>
                             <div className={"flex gap-2 items-center"}>
                                 <Checkbox
-                                    disabled={widgetsSetting.isRoadmap !== 1}
+                                    disabled={widgetsSetting.isRoadmap !== true}
                                     id={"roadmapImage"}
-                                    checked={widgetsSetting.roadmapImage === 1}
-                                    onCheckedChange={(checked) => onChangeCheckBox("roadmapImage", checked ? 1 : 0)}
+                                    checked={widgetsSetting.roadmapImage}
+                                    onCheckedChange={(checked) => onChangeCheckBox("roadmapImage", checked)}
                                 />
                                 <label htmlFor="roadmapImage" className="text-sm">Show
                                     Image</label>
@@ -464,13 +463,13 @@ const UpdateWidget = () => {
                             <div className="space-y-2">
                                 <Label className={"font-normal"}>Title</Label>
                                 <Input value={widgetsSetting.roadmapTitle}
-                                       disabled={widgetsSetting.isRoadmap !== 1}
+                                       disabled={widgetsSetting.isRoadmap !== true}
                                        onChange={(e) => onChange("roadmapTitle", e.target.value)}/>
                             </div>
                             <div className="flex flex-col gap-3">
                                 <Label className={"font-normal"}>Display</Label>
                                 <Select value={widgetsSetting.roadmapDisplay}
-                                        disabled={widgetsSetting.isRoadmap !== 1}
+                                        disabled={widgetsSetting.isRoadmap !== true}
                                         onValueChange={(value) => onChange("roadmapDisplay", value)}>
                                     <SelectTrigger>
                                         <SelectValue placeholder={1}/>
@@ -492,30 +491,30 @@ const UpdateWidget = () => {
                             <div className={"flex gap-2 items-center"}>
                                 <Checkbox
                                     id={"isIdea"}
-                                    checked={widgetsSetting.isIdea === 1}
-                                    onCheckedChange={(checked) => onChangeCheckBox("isIdea", checked ? 1 : 0)}
+                                    checked={widgetsSetting.isIdea}
+                                    onCheckedChange={(checked) => onChangeCheckBox("isIdea", checked)}
                                 />
                                 <label htmlFor="isIdea" className="text-sm">Show Ideas</label>
                             </div>
                             <div className={"flex gap-2 items-center"}>
                                 <Checkbox
-                                    disabled={widgetsSetting.isIdea !== 1}
+                                    disabled={widgetsSetting.isIdea !== true}
                                     id={"ideaDescription"}
-                                    checked={widgetsSetting.ideaDescription === 1}
-                                    onCheckedChange={(checked) => onChangeCheckBox("ideaDescription", checked ? 1 : 0)}
+                                    checked={widgetsSetting.ideaDescription}
+                                    onCheckedChange={(checked) => onChangeCheckBox("ideaDescription", checked)}
                                 />
                                 <label htmlFor="ideaDescription" className="text-sm">Show
                                     Description</label>
                             </div>
                             <div className="space-y-2">
                                 <Label className={"font-normal"}>Title</Label>
-                                <Input value={widgetsSetting.ideaTitle} disabled={widgetsSetting.isIdea !== 1}
+                                <Input value={widgetsSetting.ideaTitle} disabled={widgetsSetting.isIdea !== true}
                                        onChange={(e) => onChange("ideaTitle", e.target.value)}/>
                             </div>
                             <div className="flex flex-col gap-3">
                                 <Label className={"font-normal"}>Display</Label>
                                 <Select value={widgetsSetting.ideaDisplay}
-                                        disabled={widgetsSetting.isIdea !== 1}
+                                        disabled={widgetsSetting.isIdea !== true}
                                         onValueChange={(value) => onChange("ideaDisplay", value)}>
                                     <SelectTrigger>
                                         <SelectValue placeholder={1}/>
@@ -531,7 +530,7 @@ const UpdateWidget = () => {
                             <div className="flex flex-col gap-3">
                                 <Label className={"font-normal"}>Button Label</Label>
                                 <Input value={widgetsSetting.ideaButtonLabel} name="ideaButtonLabel"
-                                       disabled={widgetsSetting.isIdea !== 1}
+                                       disabled={widgetsSetting.isIdea !== true}
                                        onChange={(e) => onChange("ideaButtonLabel", e.target.value)}/>
                             </div>
                         </div>
@@ -679,7 +678,7 @@ const UpdateWidget = () => {
                 </div>
                 <div className={"bg-muted w-full h-[100vh] md:h-full overflow-y-auto relative"}>
                     {
-                        (type !== "embed" && widgetsSetting?.isLauncherIcon == 1) &&
+                        (type !== "embed" && widgetsSetting?.isLauncherIcon) &&
                         <div className='QH-floating-trigger' onClick={onToggle} style={{
                             backgroundColor: widgetsSetting.launcherIconBgColor,
                             left: (widgetsSetting.launcherPosition === 1)

@@ -539,7 +539,7 @@ export class ApiService {
     }
 
     async onDeleteWidget(id) {
-        return await this.deleteData(`${baseUrlApi}/widget/${id}`)
+        return await this.deleteData(`${baseUrlApi}/widget/delete/${id}`)
     }
 
     async getWidgetsSetting(payload) {
@@ -644,7 +644,7 @@ export class ApiService {
 
     /* ---------- HeaderBar Api ---------- */
     async getAllStatusAndTypes(id) {
-        return await this.getData(`${baseUrlApi}/project/all-Detail?id=${id}`)
+        return await this.getData(`${baseUrlApi}/project/all-detail?id=${id}`)
     }
 
     /* ---------- Pricing Plan Api ---------- */

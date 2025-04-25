@@ -12,7 +12,7 @@ const WidgetHeader = ({widgetsSetting, selected, setSelected}) => {
             icon: Icon.ideasIcon,
             link: 'ideas',
             selected: selected === `ideas`,
-            isCheck: widgetsSetting.isIdea !== 0,
+            isCheck: widgetsSetting.isIdea !== false,
             isRedirect: widgetsSetting.ideaDisplay !== 2,
         },
         {
@@ -20,7 +20,7 @@ const WidgetHeader = ({widgetsSetting, selected, setSelected}) => {
             link: 'roadmap',
             icon: Icon.roadmapIcon,
             selected: selected === `roadmap`,
-            isCheck: widgetsSetting.isRoadmap !== 0,
+            isCheck: widgetsSetting.isRoadmap !== false,
             isRedirect: widgetsSetting.roadmapDisplay !== 2,
         },
         {
@@ -28,7 +28,7 @@ const WidgetHeader = ({widgetsSetting, selected, setSelected}) => {
             link: 'announcements',
             icon: Icon.announcement,
             selected: selected === `announcements`,
-            isCheck: widgetsSetting.isAnnouncement !== 0,
+            isCheck: widgetsSetting.isAnnouncement !== false,
             isRedirect: widgetsSetting.changelogDisplay !== 2,
         }
     ];
@@ -45,7 +45,7 @@ const WidgetHeader = ({widgetsSetting, selected, setSelected}) => {
         <header className="border-b border-slate-200" style={{backgroundColor: widgetsSetting.headerBgColor}}>
             <div className={"px-3"}>
                 {
-                    widgetsSetting?.hideHeader === 1 ?
+                    widgetsSetting?.hideHeader ?
                         <div className="flex items-center gap-4 justify-between pt-3 pb-4">
                             <div className="inline-block align-middle cursor-pointer">
 
@@ -81,7 +81,7 @@ const WidgetHeader = ({widgetsSetting, selected, setSelected}) => {
                             </div>
                         </div> : ''
                 }
-                <ul className={`gap-1 mb-b-1 flex ${widgetsSetting?.hideHeader === 0 ? 'pt-2' : ''}`}>
+                <ul className={`gap-1 mb-b-1 flex ${widgetsSetting?.hideHeader === false ? 'pt-2' : ''}`}>
                     {
                         (navList || []).map((x, i) => {
                             if (x.isCheck) {
