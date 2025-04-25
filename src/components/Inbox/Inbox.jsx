@@ -3,7 +3,6 @@ import {Check, Eye, EyeOff, GalleryVerticalEnd, Lightbulb, MessageCircleMore, Me
 import {Button} from "../ui/button";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "../ui/tabs";
 import EmptyData from "../Comman/EmptyData";
-import {ApiService} from "../../utils/ApiService";
 import {useToast} from "../ui/use-toast";
 import {useDispatch, useSelector} from "react-redux";
 import moment from "moment";
@@ -15,6 +14,7 @@ import Pagination from "../Comman/Pagination";
 import {useNavigate} from "react-router";
 import {inboxMarkReadAction} from "../../redux/action/InboxMarkReadAction";
 import {UserAvatar} from "../Comman/CommentEditor";
+import {apiService} from "../../utils/constent";
 
 const perPageLimit = 10;
 
@@ -29,21 +29,20 @@ const TabTitle = {
 
 const UserActionsList = ({ userActions, sourceTitle, isLoading, selectedTab, isEyeTabActive, onUnreadCheck, setUserActions, projectDetailsReducer}) => {
     const navigate = useNavigate();
-    const apiService = new ApiService();
     const dispatch = useDispatch();
 
     const filteredActions = isEyeTabActive
-        ? userActions.filter(action => action?.is_read === 0)
+        ? userActions.filter(action => action?.isRead === 0)
         : userActions;
 
     // const filteredActions = userActions.filter(action => {
     //     if (selectedTab === 1) {
     //         return true;
     //     }
-    //     return isEyeTabActive ? action?.is_read === 0 : action?.is_read === 1;
+    //     return isEyeTabActive ? action?.isRead === 0 : action?.isRead === 1;
     // });
 
-    // const hasUnreadActions = filteredActions.some(action => action?.is_read === 0);
+    // const hasUnreadActions = filteredActions.some(action => action?.isRead === 0);
     // onUnreadCheck(hasUnreadActions);
 
     if (isLoading || !filteredActions.length) {
@@ -66,14 +65,14 @@ const UserActionsList = ({ userActions, sourceTitle, isLoading, selectedTab, isE
         if (source === "feature_ideas" || source === "feature_idea_comments" || source === "feature_idea_votes") {
             navigate(`/ideas/${id}`);
         } else if (source === "post_feedbacks" || source === "post_reactions") {
-            navigate(`/announcements/analytic-view?postId=${id}`);
+            navigate(`/announcements/analytic-view?id=${id}`);
         }
-        const response = await apiService.inboxMarkAllRead({ project_id: projectDetailsReducer.id, id });
-        if (response.status === 200) {
-            const update = (userActions || []).map(action => action.id === id ? { ...action, is_read: 1 } : action);
-            setUserActions(update);
-            dispatch(inboxMarkReadAction(update));
-        }
+        // const response = await apiService.inboxMarkAllRead({ projectId: projectDetailsReducer.id, id });
+        // if (response.success) {
+        //     const update = (userActions || []).map(action => action.id === id ? { ...action, isRead: 1 } : action);
+        //     setUserActions(update);
+        //     dispatch(inboxMarkReadAction(update));
+        // }
     }
 
     return (
@@ -84,26 +83,26 @@ const UserActionsList = ({ userActions, sourceTitle, isLoading, selectedTab, isE
                         {sourceTitle.map((source, i) => {
                             if (action.source === source.value) {
                                 return (
-                                    <div onClick={() => navigateAction(action?.id, action.source)} className={`px-2 py-[10px] md:px-3 flex gap-4 cursor-pointer last:rounded-b-lg ${action?.is_read === 0 ? "bg-muted/[0.6] hover:bg-card" : "bg-card"}`} key={i}>
+                                    <div onClick={() => navigateAction(action?.id, action.source)} className={`px-2 py-[10px] md:px-3 flex gap-4 cursor-pointer last:rounded-b-lg ${action?.isRead === 0 ? "bg-muted/[0.6] hover:bg-card" : "bg-card"}`} key={i}>
                                         <div>
                                             <UserAvatar
-                                                userPhoto={action?.user_photo}
-                                                userName={action?.customer_first_name && action?.customer_first_name.substring(0, 1).toUpperCase()}
+                                                userPhoto={action?.userPhoto}
+                                                userName={action?.customerFirstName && action?.customerFirstName.substring(0, 1).toUpperCase()}
                                                 className={"w-[30px] h-[30px]"}
                                             />
                                         </div>
                                         <div className={"w-full flex flex-wrap justify-between gap-2"}>
                                         <div className={"flex gap-3"}>
                                             <div className={"space-y-3"}>
-                                                <div className={`${action?.is_read === 0 ? "font-medium" : "font-normal"} flex flex-wrap gap-2 md:gap-4`}>
-                                                    <h2>{action?.customer_first_name} {action?.customer_last_name}</h2>
+                                                <div className={`${action?.isRead === 0 ? "font-medium" : "font-normal"} flex flex-wrap gap-2 md:gap-4`}>
+                                                    <h2>{action?.customerFirstName} {action?.customerLastName}</h2>
                                                     <p className={`flex gap-2 items-center`}><MessageCircleMore size={15} /><span className={`text-muted-foreground`}>{source.title}</span></p>
                                                 </div>
                                                 <div>
                                                     {source.value === "post_reactions" ? (
                                                         <div className={"flex items-center gap-2"}>
                                                             <Avatar className={"rounded-none w-[20px] h-[20px]"}>
-                                                                <AvatarImage src={action.emoji_url} />
+                                                                <AvatarImage src={action.emojiUrl} />
                                                             </Avatar>
                                                             <span className={"text-sm text-muted-foreground text-wrap"}>{action.title}</span>
                                                         </div>
@@ -114,7 +113,7 @@ const UserActionsList = ({ userActions, sourceTitle, isLoading, selectedTab, isE
                                             </div>
                                         </div>
                                         <span className={"text-sm text-muted-foreground"}>
-                                            {action?.created_at ? moment(action?.created_at).format('D MMM, YYYY h:mm A') : "-"}
+                                            {action?.createdAt ? moment(action?.createdAt).format('D MMM, YYYY h:mm A') : "-"}
                                         </span>
                                         </div>
                                     </div>
@@ -130,7 +129,6 @@ const UserActionsList = ({ userActions, sourceTitle, isLoading, selectedTab, isE
 };
 
 const Inbox = () => {
-    const apiService = new ApiService();
     const UrlParams = new URLSearchParams(location.search);
     const getPageNo = UrlParams.get("pageNo") || 1;
     const {toast} = useToast();
@@ -154,25 +152,25 @@ const Inbox = () => {
 
     useEffect(() => {
         const filteredActions = isEyeTabActive
-            ? userActions.filter(action => action?.is_read === 0)
+            ? userActions.filter(action => action?.isRead === 0)
             : userActions;
-        const hasUnread = filteredActions.some(action => action?.is_read === 0);
+        const hasUnread = filteredActions.some(action => action?.isRead === 0);
         setShowMarkAllRead(hasUnread);
     }, [userActions, isEyeTabActive]);
 
     const getInboxNotification = async () => {
         setIsLoading(true);
         const payload = {
-            project_id: projectDetailsReducer.id,
+            projectId: projectDetailsReducer.id,
             type: selectedTab,
             page: pageNo,
             limit: perPageLimit,
-            is_unread: isEyeTabActive ? 1 : 0
+            isRead: isEyeTabActive ? 1 : 0
         }
         const data = await apiService.inboxNotification(payload);
-        if(data.status === 200) {
-            setUserActions(Array.isArray(data.data) ? data.data : []);
-            const totalPage = Math.ceil(data.total / perPageLimit);
+        if(data.success) {
+            setUserActions(Array.isArray(data.data.data) ? data.data.data : []);
+            const totalPage = Math.ceil(data.data.total / perPageLimit);
             setTotalPages(totalPage)
             setIsLoading(false)
         } else {
@@ -182,10 +180,10 @@ const Inbox = () => {
 
     const markAsAllRead = async () => {
         setIsLoading(true);
-        const data = await apiService.inboxMarkAllRead({project_id: projectDetailsReducer.id, type: selectedTab});
-        if(data.status === 200) {
+        const data = await apiService.inboxMarkAllRead({projectId: projectDetailsReducer.id, type: selectedTab});
+        if(data.success) {
             const updatedActions = userActions.map((action) =>
-                action.source === TabTitle[selectedTab] ? { ...action, is_read: 1 } : selectedTab === 1 ? { ...action, is_read: 1 } : action
+                action.source === TabTitle[selectedTab] ? { ...action, isRead: 1 } : selectedTab === 1 ? { ...action, isRead: 1 } : action
             );
             setUserActions(updatedActions);
             dispatch(inboxMarkReadAction(updatedActions));

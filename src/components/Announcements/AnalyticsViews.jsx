@@ -46,15 +46,16 @@ const AnalyticsViews = () => {
             const getSinglePosts = async () => {
                 const data = await apiService.getSinglePosts(postId);
                 if (data.success) {
-                    setAnalyticsObj({
-                        ...data.data.data,
-                        image: data?.data?.data?.featureImage,
-                        assignToId: data.data?.data.assignToId !== null ? data.data?.data.assignToId?.split(',') : [],
-                        publishedAt: data.data?.data.publishedAt ? moment(data.data?.data.publishedAt).format('YYYY-MM-DD') : moment(new Date()),
-                        expiredAt: data.data?.data.expiredAt ? moment(data.data?.data.expiredAt).format('YYYY-MM-DD') : undefined,
-                        categoryId: data.data?.data.categoryId,
-                        labels: data.data?.data.labels || [],
-                    });
+                    setAnalyticsObj(data.data.data)
+                    // setAnalyticsObj({
+                    //     ...data.data.data,
+                    //     image: data?.data?.data?.featureImage,
+                    //     assignToId: data.data?.data.assignToId !== null ? data.data?.data.assignToId?.split(',') : [],
+                    //     publishedAt: data.data?.data.publishedAt ? moment(data.data?.data.publishedAt).format('YYYY-MM-DD') : moment(new Date()),
+                    //     expiredAt: data.data?.data.expiredAt ? moment(data.data?.data.expiredAt).format('YYYY-MM-DD') : undefined,
+                    //     categoryId: data.data?.data.categoryId,
+                    //     labels: data.data?.data.labels || [],
+                    // });
                     const updateInbox = inboxMarkReadReducer.map(item => {
                         if ((item.source === 'post_feedbacks' || item.source === 'post_reactions') && item.id === data.data.data.id) {
                             return {...item, isRead: 1};

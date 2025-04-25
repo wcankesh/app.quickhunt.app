@@ -70,12 +70,12 @@ const UserActionsList = ({ userActions, setCustomerList, sourceTitle, isLoadingU
         } else if (source === "post_feedbacks" || source === "post_reactions") {
             navigate(`/announcements/analytic-view?postId=${id}`);
         }
-        const response = await apiService.inboxMarkAllRead({ projectId: projectDetailsReducer.id, id });
-        if (response.status === 200) {
-            const update = (userActions || []).map(action => action.id === id ? { ...action, is_read: 1 } : action);
-            setCustomerList(update);
-            dispatch(inboxMarkReadAction(update));
-        }
+        // const response = await apiService.inboxMarkAllRead({ projectId: projectDetailsReducer.id, id });
+        // if (response.status === 200) {
+        //     const update = (userActions || []).map(action => action.id === id ? { ...action, is_read: 1 } : action);
+        //     setCustomerList(update);
+        //     dispatch(inboxMarkReadAction(update));
+        // }
     }
 
     return (

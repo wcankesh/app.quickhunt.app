@@ -251,7 +251,7 @@ const AnnouncementsTable = ({data, isLoading, setSelectedRecord, handleDelete, s
                                             </TableCell>
                                             <TableCell className={"px-2 py-[10px] md:px-3"}>
                                                 <Button
-                                                    onClick={() => navigate(`${baseUrl}/announcements/analytic-view?postId=${x.id}?pageNo=${getPageNo}`)}
+                                                    onClick={() => navigate(`${baseUrl}/announcements/analytic-view?id=${x.id}`)}
                                                     variant={"ghost"}
                                                     className={"p-0 h-auto"}
                                                 >

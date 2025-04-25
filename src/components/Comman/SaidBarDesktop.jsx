@@ -52,11 +52,11 @@ const SaidBarDesktop = ({isMobile, setIsMobile}) => {
 
     const getInboxNotification = async () => {
         const payload = {
-            project_id: projectDetailsReducer.id,
+            projectId: projectDetailsReducer.id,
             type: 1,
         }
         const data = await apiService.inboxNotification(payload);
-        if(data.status === 200) {
+        if(data.success) {
             dispatch(inboxMarkReadAction(data.data));
         }
     }

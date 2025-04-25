@@ -3,7 +3,6 @@ import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} f
 import {Label} from "../../ui/label";
 import {Input} from "../../ui/input";
 import {Switch} from "../../ui/switch";
-import {ApiService} from "../../../utils/ApiService";
 import {useToast} from "../../ui/use-toast";
 import {useSelector} from "react-redux";
 import {Button} from "../../ui/button";
@@ -12,33 +11,32 @@ import ColorInput from "../../Comman/ColorPicker";
 import {Checkbox} from "../../ui/checkbox";
 import {Select, SelectValue} from "@radix-ui/react-select";
 import {SelectContent, SelectItem, SelectTrigger} from "../../ui/select";
-import {timeZoneJson} from "../../../utils/constent";
+import {apiService, timeZoneJson} from "../../../utils/constent";
 import {useTheme} from "../../theme-provider";
 
 const initialState = {
-    announcement_title: "",
-    btn_background_color: "#7c3aed",
-    btn_text_color: "#ffffff",
-    header_bg_color: "#FFFFFF",
-    header_text_color: "#030712",
-    header_btn_background_color: "#7c3aed",
-    header_btn_text_color: "#FFFFFF",
-    idea_title: "",
-    is_announcement: 1,
-    is_branding: 1,
-    is_comment: 1,
-    is_idea: 1,
-    is_reaction: 1,
-    is_roadmap: 1,
-    private_mode: 0,
+    announcementTitle: "",
+    btnBackgroundColor: "#7c3aed",
+    btnTextColor: "#ffffff",
+    headerBgColor: "#FFFFFF",
+    headerTextColor: "#030712",
+    headerBtnBackgroundColor: "#7c3aed",
+    headerBtnTextColor: "#FFFFFF",
+    ideaTitle: "",
+    isAnnouncement: 1,
+    isBranding: 1,
+    isComment: 1,
+    isIdea: 1,
+    isReaction: 1,
+    isRoadmap: 1,
+    privateMode: 0,
     password: '',
-    roadmap_title: "",
+    roadmapTitle: "",
     timezone: "Asia/Kolkata",
 }
 
 const GeneralSettings = () => {
     const {theme} = useTheme();
-    let apiSerVice = new ApiService();
     const {toast} = useToast();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const userDetailsReducer = useSelector(state => state.userDetailsReducer);
@@ -54,11 +52,9 @@ const GeneralSettings = () => {
 
     useEffect(() => {
         const getPortalSetting = async () => {
-            const data = await apiSerVice.getPortalSetting(projectDetailsReducer.id)
-            if (data.status === 200) {
-                setGeneralSettingData(data.data);
-            } else {
-
+            const data = await apiService.getPortalSetting(projectDetailsReducer.id)
+            if (data.success) {
+                setGeneralSettingData(data.data.data);
             }
         }
         if (projectDetailsReducer.id) {
@@ -106,64 +102,59 @@ const GeneralSettings = () => {
         setIsSave(true)
         const payload = {
             ...generalSettingData,
-            project_id: projectDetailsReducer.id,
+            projectId: projectDetailsReducer.id,
         }
-        const data = await apiSerVice.updatePortalSetting(generalSettingData.id, payload)
-        if (data.status === 200) {
+        const data = await apiService.updatePortalSetting(generalSettingData.id, payload)
+        if (data.success) {
             setIsSave(false)
-            toast({
-                description: data.message
-            })
+            toast({description: data.message})
         } else {
             setIsSave(false);
-            toast({
-                description: data.message,
-                variant: "destructive"
-            })
+            toast({description: data?.error?.message, variant: "destructive"})
         }
     }
 
     const initialStateFields = [
         {
             title: "Announcement",
-            nameSwitch: "is_announcement",
+            nameSwitch: "isAnnouncement",
             input: [
                 {
                     field: "text",
                     label: "Title",
-                    name: "announcement_title",
+                    name: "announcementTitle",
                 },
                 {
                     field: "checkbox",
                     label: "Reactions",
-                    name: "is_reaction",
+                    name: "isReaction",
                 },
                 {
                     field: "checkbox",
                     label: "Show Comment",
-                    name: "is_comment",
+                    name: "isComment",
                 },
             ],
         },
         {
             title: "Roadmap",
-            nameSwitch: "is_roadmap",
+            nameSwitch: "isRoadmap",
             input: [
                 {
                     field: "text",
                     label: "Title",
-                    name: "roadmap_title",
+                    name: "roadmapTitle",
                 },
             ],
         },
         {
             title: "Ideas",
-            nameSwitch: "is_idea",
+            nameSwitch: "isIdea",
             input: [
                 {
                     field: "text",
                     label: "Title",
-                    name: "idea_title",
+                    name: "ideaTitle",
                 },
             ],
         },
@@ -173,23 +164,23 @@ const GeneralSettings = () => {
                 {
                     field: "color",
                     label: "Background Color",
-                    name: "header_bg_color",
-                    value: "header_bg_color",
+                    name: "headerBgColor",
+                    value: "headerBgColor",
                 },
                 {
                     field: "color",
                     label: "Text Color",
-                    name: "header_text_color",
+                    name: "headerTextColor",
                 },
                 {
                     field: "color",
                     label: "Button Background Color",
-                    name: "header_btn_background_color",
+                    name: "headerBtnBackgroundColor",
                 },
                 {
                     field: "color",
                     label: "Button Text Color",
-                    name: "header_btn_text_color",
+                    name: "headerBtnTextColor",
                 },
             ],
         },
@@ -199,12 +190,12 @@ const GeneralSettings = () => {
                 {
                     field: "color",
                     label: "Button Background Color",
-                    name: "btn_background_color",
+                    name: "btnBackgroundColor",
                 },
                 {
                     field: "color",
                     label: "Button Text Color",
-                    name: "btn_text_color",
+                    name: "btnTextColor",
                 },
             ],
         },
@@ -224,7 +215,7 @@ const GeneralSettings = () => {
                 {
                     field: "switch",
                     label: "Show Branding",
-                    name: "is_branding",
+                    name: "isBranding",
                 },
             ],
         },
@@ -234,7 +225,7 @@ const GeneralSettings = () => {
                 {
                     field: "switch",
                     label: "Enable the option and set a password to make your organization private.",
-                    name: "private_mode",
+                    name: "privateMode",
                 },
                 {
                     field: "password",
@@ -333,17 +324,18 @@ const GeneralSettings = () => {
                                                                                         </div>
                                                                                         : y.field === "switch" ?
                                                                                             <Fragment>
+                                                                                                {console.log("generalSettingData.timezone", generalSettingData.timezone)}
                                                                                                 <div className="space-y-3">
                                                                                                 <div className="announce-create-switch flex gap-4">
                                                                                                     <Switch
                                                                                                         className="w-[38px] h-[20px]"
                                                                                                         checked={generalSettingData?.[y.name] === 1}
-                                                                                                        disabled={y.name === "private_mode" ? "" : userDetailsReducer.plan === 0}
+                                                                                                        disabled={y.name === "privateMode" ? "" : userDetailsReducer.plan === 0}
                                                                                                         onCheckedChange={(checked) => onChange(y.name, checked ? 1 : 0)}
                                                                                                     />
                                                                                                     <p className="text-sm text-muted-foreground font-normal">{y.label}</p>
                                                                                                 </div>
-                                                                                                    {y.name === "private_mode" && generalSettingData?.private_mode === 1 && (
+                                                                                                    {y.name === "privateMode" && generalSettingData?.privateMode === 1 && (
                                                                                                         <div className={"w-3/4"}>
                                                                                                             <Label className="text-sm font-normal">Password</Label>
                                                                                                             <div className={"relative"}>

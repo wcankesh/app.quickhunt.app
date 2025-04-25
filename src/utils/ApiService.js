@@ -204,11 +204,11 @@ export class ApiService {
     }
 
     async getInvitationDetail(token) {
-        return await this.getData(`${baseUrlApi}/invitedUser/get-invitation-detail?token=${token}`,)
+        return await this.getData(`${baseUrlApi}/invited-user/get-invitation-detail?token=${token}`,)
     }
 
     async join(payload) {
-        return await this.postData(`${baseUrlApi}/invitedUser/accept-Reject`, payload)
+        return await this.postData(`${baseUrlApi}/invited-user/accept-Reject`, payload)
     }
 
     /* --------------------------------- On Boarding ----------------------------------- */
@@ -296,11 +296,11 @@ export class ApiService {
 
     /* ---------- Inbox api ---------- */
     async inboxNotification(payload) {
-        return await this.postData(`${baseUrlApi}/notifications`, payload)
+        return await this.postData(`${baseUrlApi}/project/notifications`, payload)
     }
 
     async inboxMarkAllRead(payload) {
-        return await this.postData(`${baseUrlApi}/mark-read`, payload)
+        return await this.postData(`${baseUrlApi}/project/mark-read`, payload)
     }
 
     /* ---------- Users api ---------- */
@@ -578,11 +578,11 @@ export class ApiService {
 
     /* ---------- Settings Domain api and GeneralSettings api ---------- */
     async getPortalSetting(id) {
-        return await this.getData(`${baseUrlApi}/setting?project_id=${id}`,)
+        return await this.getData(`${baseUrlApi}/setting/get-single-setting?id=${id}`,)
     }
 
     async updatePortalSetting(id, payload) {
-        return await this.putData(`${baseUrlApi}/setting/${id}`, payload)
+        return await this.putData(`${baseUrlApi}/setting/update-setting?id=${id}`, payload)
     }
 
     /* ---------- Settings Emoji api ---------- */
@@ -626,15 +626,15 @@ export class ApiService {
     }
 
     async getInvitation(id) {
-        return await this.getData(`${baseUrlApi}/invitedUser/get-all-invitedUsers?id=${id}`)
+        return await this.getData(`${baseUrlApi}/invited-user/get-all-invitedUsers?id=${id}`)
     }
 
     async inviteUser(payload) {
-        return await this.postData(`${baseUrlApi}/invitedUser/invite-member`, payload)
+        return await this.postData(`${baseUrlApi}/invited-user/invite-member`, payload)
     }
 
     async removeMember(id) {
-        return await this.deleteData(`${baseUrlApi}/invitedUser/revoke-invitation?id=${id}`)
+        return await this.deleteData(`${baseUrlApi}/invited-user/revoke-invitation?id=${id}`)
     }
 
     /* ---------- Import Export api ---------- */
