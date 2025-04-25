@@ -1,26 +1,25 @@
 import React, {useState, useEffect} from 'react';
-import {ApiService} from "../../utils/ApiService";
 import {useSelector} from "react-redux";
 import {useToast} from "../ui/use-toast";
 import CommCreateSheet from "../Comman/CommCreateSheet";
+import {apiService} from "../../utils/constent";
 
 const initialState = {
     title: "",
     images: [],
-    topic: [],
-    project_id: "",
+    topicId: [],
+    projectId: "",
     description: "",
-    board: ""
+    boardId: ""
 }
 
 const initialStateError = {
     title: "",
     description: "",
-    board: ""
+    boardId: ""
 }
 
 const CreateRoadmapIdea = ({isOpen, onOpen, onClose, closeCreateIdea, selectedRoadmap, roadmapList, setRoadmapList,}) => {
-    let apiSerVice = new ApiService();
     const { toast } = useToast()
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
@@ -33,19 +32,19 @@ const CreateRoadmapIdea = ({isOpen, onOpen, onClose, closeCreateIdea, selectedRo
     useEffect(() => {
         if(projectDetailsReducer.id){
             setTopicLists(allStatusAndTypes.topics)
-            setIdeaDetail({...initialState, board: allStatusAndTypes?.boards[0]?.id})
+            setIdeaDetail({...initialState, boardId: allStatusAndTypes?.boards[0]?.id})
         }
     }, [projectDetailsReducer.id, allStatusAndTypes]);
 
     const handleChange = (id) => {
-        const clone = [...ideaDetail.topic];
+        const clone = [...ideaDetail.topicId];
         const index = clone.indexOf(id);
         if (index > -1) {
             clone.splice(index, 1);
         } else {
             clone.push(id);
         }
-        setIdeaDetail({ ...ideaDetail, topic: clone });
+        setIdeaDetail({ ...ideaDetail, topicId: clone });
     };
 
     const onCreateIdea = async () => {
@@ -64,14 +63,17 @@ const CreateRoadmapIdea = ({isOpen, onOpen, onClose, closeCreateIdea, selectedRo
         setIsLoading(true)
         let formData = new FormData();
         formData.append('title', ideaDetail.title);
-        formData.append('slug_url', ideaDetail.title ? ideaDetail.title.replace(/ /g,"-").replace(/\?/g, "-") :"");
+        formData.append('slugUrl', ideaDetail.title ? ideaDetail.title.replace(/ /g,"-").replace(/\?/g, "-") :"");
         formData.append('description', ideaDetail.description);
-        formData.append('project_id', projectDetailsReducer.id);
-        formData.append('board', ideaDetail.board);
-        formData.append('topic', ideaDetail.topic.join());
-        formData.append('roadmap_id', selectedRoadmap && selectedRoadmap ? selectedRoadmap : "");
-        const data = await apiSerVice.createIdea(formData)
-        if(data.status === 200){
+        formData.append('projectId', projectDetailsReducer.id);
+        formData.append('boardId', ideaDetail.boardId);
+        // formData.append('topicId', ideaDetail.topicId.join());
+        ideaDetail.topicId.forEach(id => {
+            formData.append('topicId[]', id);
+        });
+        formData.append('roadmapStatusId', selectedRoadmap && selectedRoadmap ? selectedRoadmap : "");
+        const data = await apiService.createIdea(formData)
+        if(data.success){
             let cloneRoadmap = [...roadmapList.columns];
             // cloneRoadmap.push(data.data);
             const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap);
@@ -100,7 +102,7 @@ const CreateRoadmapIdea = ({isOpen, onOpen, onClose, closeCreateIdea, selectedRo
                 } else {
                     return "";
                 }
-            case "board":
+            case "boardId":
                 if (!value || value.toString().trim() === "") {
                     return "Board is required";
                 } else {

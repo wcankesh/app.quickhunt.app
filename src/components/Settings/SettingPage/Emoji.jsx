@@ -226,7 +226,6 @@ const Emoji = () => {
                                  emojiList.length > 0 ? <>
                                     {
                                         (emojiList || []).map((x, i) => {
-                                            console.log(x)
                                             return (
                                                 <TableRow key={i}>
                                                     {

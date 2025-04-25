@@ -36,7 +36,6 @@ const UpdateAnnouncement = () => {
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
     const userDetailsReducer = useSelector(state => state.userDetailsReducer);
-    console.log("allStatusAndTypes", allStatusAndTypes)
 
     const [formError, setFormError] = useState(initialStateError);
     const [selectedRecord, setSelectedRecord] = useState({});
@@ -270,7 +269,6 @@ const UpdateAnnouncement = () => {
 
         const data = await apiService.updatePosts(formData, selectedRecord?.id)
         if (data.success) {
-            console.log("data", data)
             setSelectedRecord(selectedRecord)
             setIsLoad('')
             toast({description: data.message,});
@@ -333,7 +331,7 @@ const UpdateAnnouncement = () => {
                         }
                     </Button>
                     <Button
-                        onClick={() => navigate(`${baseUrl}/announcements/analytic-view?postId=${selectedRecord.id}?pageNo=${getPageNo}`)}
+                        onClick={() => navigate(`${baseUrl}/announcements/analytic-view?id=${selectedRecord.id}`)}
                         variant="outline" className={"w-9 h-9"} size="icon"
                     >
                         <BarChart size={15}/>
@@ -398,7 +396,6 @@ const UpdateAnnouncement = () => {
                                                     <div className={"flex gap-[2px]"}>
                                                         {
                                                             (selectedRecord.labels || []).map((x, i) => {
-                                                                console.log("xxxx", x)
                                                                 const findObj = labelList.find((y) => y.id == x);
                                                                 return (
                                                                     <Badge key={i}

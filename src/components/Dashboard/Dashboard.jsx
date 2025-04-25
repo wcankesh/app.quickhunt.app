@@ -256,7 +256,6 @@ export function Dashboard() {
                                     ) : (
                                         (chartList.feedbacks && chartList.feedbacks.length > 0) ? (
                                             (chartList.feedbacks || []).map((x, i) => {
-                                                console.log("xxxxx", x)
                                                 return (
                                                     <Fragment key={i}>
                                                         <CardContent className={"py-2.5 px-6 flex flex-col gap-4 border-b last:border-b-0"}>
@@ -329,7 +328,6 @@ export function Dashboard() {
                                     ) : (
                                         (chartList.reactions && chartList.reactions.length > 0) ? (
                                             (chartList.reactions || []).map((x, i) => {
-                                                console.log("reaction x", x)
                                                 const emoji = allStatusAndTypes.emoji.find((e) => e.id === x.reactionId) || {emoji_url: ""};
                                                 return (
                                                     <Fragment key={i}>

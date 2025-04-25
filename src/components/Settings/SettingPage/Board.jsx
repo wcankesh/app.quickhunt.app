@@ -4,7 +4,6 @@ import {Button} from "../../ui/button";
 import {Check, Loader2, Pencil, Plus, Trash2, X} from "lucide-react";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "../../ui/table";
 import {useSelector,useDispatch} from "react-redux";
-import {ApiService} from "../../../utils/ApiService";
 import {useTheme} from "../../theme-provider";
 import {Input} from "../../ui/input";
 import moment from "moment";
@@ -13,13 +12,13 @@ import {toast} from "../../ui/use-toast";
 import {Separator} from "../../ui/separator";
 import EmptyData from "../../Comman/EmptyData";
 import DeleteDialog from "../../Comman/DeleteDialog";
+import {apiService} from "../../../utils/constent";
 
 const initialState ={
     title:""
 }
 
 const Board = () => {
-    let apiService = new ApiService();
     const {theme, onProModal} = useTheme();
     const dispatch = useDispatch();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
@@ -119,16 +118,11 @@ const Board = () => {
                 dispatch(allStatusAndTypesAction({...allStatusAndTypes, boards: clone}));
             }
             setIsSave(false);
-            toast({
-                description:data.message
-            });
+            toast({description:data.message});
             setIsEdit(null);
         } else {
             setIsSave(false);
-            toast({
-                description:data?.error.message,
-                variant: "destructive"
-            });
+            toast({description:data?.error.message, variant: "destructive"});
         }
     }
 
@@ -160,15 +154,10 @@ const Board = () => {
             setBoardList(clone);
             setIsSave(false);
             dispatch(allStatusAndTypesAction({...allStatusAndTypes, boards: clone}));
-            toast({
-                description:data.message
-            });
+            toast({description:data.message});
         } else {
             setIsSave(false);
-            toast({
-                description:data.message,
-                variant: "destructive",
-            });
+            toast({description:data?.error?.message, variant: "destructive",});
         }
         setIsEdit(null);
     };
@@ -185,16 +174,11 @@ const Board = () => {
                 dispatch(allStatusAndTypesAction({...allStatusAndTypes, boards: clone}));
                 setDeleteId(null);
             }
-            toast({
-                description:data.message
-            });
+            toast({description:data.message});
             setOpenDelete(false)
             setIsLoadingDelete(false);
         } else {
-            toast({
-                description:data.message,
-                variant: "destructive"
-            });
+            toast({description:data?.error?.message, variant: "destructive"});
             setOpenDelete(false);
             setIsLoadingDelete(false);
         }
@@ -345,7 +329,7 @@ const Board = () => {
                                                                         {x.title}
                                                                     </TableCell>
                                                                     <TableCell className={`px-2 py-[10px] md:px-3 font-normal text-xs ${theme === "dark" ? "" : "text-muted-foreground"}`}>
-                                                                        {moment.utc(x?.updated_at).local().startOf('seconds').fromNow()}
+                                                                        {moment.utc(x?.updatedAt).local().startOf('seconds').fromNow()}
                                                                     </TableCell>
                                                                     <TableCell className={`flex px-2 py-[10px] md:px-3 ${theme === "dark" ? "" : "text-muted-foreground"} `}>
                                                                         <Fragment>

@@ -35,7 +35,6 @@ export const CommentEditor = ({isEditMode, comment, images = [], onUpdateComment
                     {imageArray.length > 0 && (
                         <div className="flex gap-3 flex-wrap">
                             {imageArray.map((img, index) => {
-                                console.log(img)
                                 return (
                                     <Fragment key={index}>
                                         {

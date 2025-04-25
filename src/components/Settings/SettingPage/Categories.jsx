@@ -5,13 +5,13 @@ import {Check, Loader2, Pencil, Plus, Trash2, X} from "lucide-react";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "../../ui/table";
 import {useTheme} from "../../theme-provider";
 import {Input} from "../../ui/input";
-import {ApiService} from "../../../utils/ApiService";
 import {useSelector, useDispatch} from "react-redux";
 import moment from "moment";
 import {allStatusAndTypesAction} from "../../../redux/action/AllStatusAndTypesAction";
 import {toast} from "../../ui/use-toast";
 import EmptyData from "../../Comman/EmptyData";
 import DeleteDialog from "../../Comman/DeleteDialog";
+import {apiService} from "../../../utils/constent";
 
 const initialState = {
     title: "",
@@ -20,7 +20,6 @@ const initialState = {
 
 const Categories = () => {
     const {theme} = useTheme();
-    const apiService = new ApiService();
     const dispatch = useDispatch();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
@@ -201,16 +200,11 @@ const Categories = () => {
                 setCategoriesList(clone)
             }
             setIsSave(false);
-            toast({
-                description:data.message
-            });
+            toast({description:data.message});
             setIsEdit(null);
         } else {
             setIsSave(false);
-            toast({
-                description:data?.error.message,
-                variant: "destructive"
-            });
+            toast({description:data?.error.message, variant: "destructive"});
         }
     }
 

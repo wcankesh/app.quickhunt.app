@@ -496,7 +496,7 @@ const UpdateIdea = () => {
             toast({description: data.message})
         } else {
             setIsLoading(false)
-            toast({variant: "destructive", description: data.message})
+            toast({variant: "destructive", description: data?.error?.message})
         }
     };
 
@@ -708,7 +708,6 @@ const UpdateIdea = () => {
         formData.append('comment', selectedSubComment.comment);
         const data = await apiService.updateComment(selectedSubComment.id, formData)
         if (data.success) {
-
             const commentIndex = ((selectedIdea.comments) || []).findIndex((x) => x.id === selectedComment.id);
             if (commentIndex !== -1) {
                 const cloneComment = [...selectedIdea.comments];
@@ -730,7 +729,7 @@ const UpdateIdea = () => {
     }
 
     const deleteComment = async (id, indexs) => {
-        const data = await apiService.deleteComment({id: id})
+        const data = await apiService.deleteComment(id)
         if (data.success) {
             const cloneComment = [...selectedIdea.comments];
             cloneComment.splice(indexs, 1);
@@ -739,12 +738,12 @@ const UpdateIdea = () => {
 
             toast({description: data.message})
         } else {
-            toast({variant: "destructive", description: data.message})
+            toast({variant: "destructive", description: data?.error?.message})
         }
     }
 
     const deleteSubComment = async (id, record, index, subIndex) => {
-        const data = await apiService.deleteComment({id: id})
+        const data = await apiService.deleteComment(id)
         if (data.success) {
             const cloneComment = [...selectedIdea.comments];
             cloneComment[index].reply.splice(subIndex, 1);
@@ -810,7 +809,7 @@ const UpdateIdea = () => {
             [event.target.name]: formValidate(event.target.name, event.target.value)
         }));
     }
-
+    console.log("selectedIdea?.voteLists", selectedIdea)
     const formValidateCr = (name, value) => {
         switch (name) {
             case "title":
@@ -1168,12 +1167,12 @@ const UpdateIdea = () => {
                                 className={`hover:bg-muted w-[125px] ${theme === "dark" ? "" : "border-muted-foreground text-muted-foreground"} capitalize text-sm font-medium`}
                                 onClick={() => onChangeStatus(
                                     "isActive",
-                                    selectedIdea?.isActive === 1 ? 0 : 1
+                                    selectedIdea?.isActive === false
                                 )}
                             >
                                 {
                                     isLoadingBug ? <Loader2
-                                        className="h-4 w-4 animate-spin"/> : (selectedIdea?.isActive === 0 ? "Convert to Idea" : "Mark as bug")
+                                        className="h-4 w-4 animate-spin"/> : (selectedIdea?.isActive === false ? "Convert to Idea" : "Mark as bug")
                                 }
                             </Button>
                         </div>
@@ -1189,12 +1188,12 @@ const UpdateIdea = () => {
                                 className={`w-[89px] hover:bg-muted ${theme === "dark" ? "" : "border-muted-foreground text-muted-foreground"} text-sm font-medium`}
                                 onClick={() => onChangeStatus(
                                     "isArchive",
-                                    selectedIdea?.isArchive === 1 ? 0 : 1
+                                    selectedIdea?.isArchive !== true
                                 )}
                             >
                                 {
                                     isLoadingArchive ? <Loader2
-                                        className="h-4 w-4 animate-spin"/> : (selectedIdea?.isArchive === 1 ? "Unarchive" : "Archive")
+                                        className="h-4 w-4 animate-spin"/> : (selectedIdea?.isArchive ? "Unarchive" : "Archive")
                                 }
                             </Button>
                         </div>
@@ -1432,16 +1431,16 @@ const UpdateIdea = () => {
                                                                         <DropdownMenuItem className={"cursor-pointer capitalize"}
                                                                                           onClick={() => onChangeStatus(
                                                                                               "isActive",
-                                                                                              selectedIdea?.isActive === 1 ? 0 : 1
+                                                                                              selectedIdea?.isActive === false
                                                                                           )}>
-                                                                            {selectedIdea?.isActive === 0 ? "Convert to Idea" : "Mark as bug"}
+                                                                            {selectedIdea?.isActive === false ? "Convert to Idea" : "Mark as bug"}
                                                                         </DropdownMenuItem>
                                                                         <DropdownMenuItem className={"cursor-pointer"}
                                                                                           onClick={() => onChangeStatus(
                                                                                               "isArchive",
-                                                                                              selectedIdea?.isArchive === 1 ? 0 : 1
+                                                                                              selectedIdea?.isArchive !== true
                                                                                           )}>
-                                                                            {selectedIdea?.isArchive === 1 ? "Unarchive" : "Archive"}
+                                                                            {selectedIdea?.isArchive ? "Unarchive" : "Archive"}
                                                                         </DropdownMenuItem>
                                                                     </DropdownMenuContent>
                                                                 </DropdownMenu>
@@ -1453,16 +1452,16 @@ const UpdateIdea = () => {
                                                                     statusButtons={[
                                                                         {
                                                                             statusKey: "isActive",
-                                                                            statusValue: selectedIdea?.isActive === 1 ? 0 : 1,
+                                                                            statusValue: selectedIdea?.isActive === false,
                                                                             isLoading: isLoadingBug,
-                                                                            label: selectedIdea?.isActive === 0 ? "Convert to Idea" : "Mark as Bug",
+                                                                            label: selectedIdea?.isActive === false ? "Convert to Idea" : "Mark as Bug",
                                                                             width: "w-[110px]"
                                                                         },
                                                                         {
                                                                             statusKey: "isArchive",
-                                                                            statusValue: selectedIdea?.isArchive === 1 ? 0 : 1,
+                                                                            statusValue: selectedIdea?.isArchive !== true,
                                                                             isLoading: isLoadingArchive,
-                                                                            label: selectedIdea?.isArchive === 1 ? "Unarchive" : "Archive",
+                                                                            label: selectedIdea?.isArchive ? "Unarchive" : "Archive",
                                                                             width: "w-[80px]"
                                                                         }
                                                                     ]}
@@ -1905,7 +1904,7 @@ const UpdateIdea = () => {
                                                                                                                                 images={selectedSubComment?.images}
                                                                                                                                 onUpdateComment={onUpdateSubComment}
                                                                                                                                 onCancelComment={onCancelSubComment}
-                                                                                                                                onDeleteImage={(i) => onDeleteSubCommentImage(i)}
+                                                                                                                                onDeleteImage={(i) => onDeleteSubCommentImage(i, true)}
                                                                                                                                 onImageUpload={handleSubCommentUploadImg}
                                                                                                                                 onCommentChange={(e) => onChangeTextSubComment(e)}
                                                                                                                                 isSaving={isSaveUpdateSubComment}

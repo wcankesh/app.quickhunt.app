@@ -5,9 +5,9 @@ import {Input} from "../../ui/input";
 import {Button} from "../../ui/button";
 import {CircleX, Eye, EyeOff, Loader2, Upload} from "lucide-react";
 import {useSelector,useDispatch} from "react-redux";
-import {ApiService} from "../../../utils/ApiService";
 import {userDetailsAction} from "../../../redux/action/UserDetailAction";
 import {toast} from "../../ui/use-toast";
+import {apiService} from "../../../utils/constent";
 
 const initialState = {
     id: "",
@@ -18,7 +18,7 @@ const initialState = {
     user_ip_address: null,
     user_job_title: "",
     lastName: "",
-    image: "",
+    profileImage: "",
     user_status: "",
     user_updated_date: "",
 }
@@ -40,7 +40,6 @@ const initialStatePassWord ={
 
 const Profile = () => {
     const dispatch = useDispatch();
-    const apiSerVice = new ApiService();
     const userDetailsReducer = useSelector(state => state.userDetailsReducer);
 
     const [userDetails, setUserDetails] = useState(initialState);
@@ -143,7 +142,7 @@ const Profile = () => {
                 } else {
                     return "";
                 }
-            case "image":
+            case "profileImage":
                 if (value && value.size > 5 * 1024 * 1024) {
                     return "Image size must be less than 5 MB.";
                 } else {
@@ -163,19 +162,19 @@ const Profile = () => {
         const selectedFile = file.target.files[0];
         setUserDetails({
             ...userDetails,
-            image: selectedFile
+            profileImage: selectedFile
         });
         setFormError(formError => ({
             ...formError,
-            'image': formValidate('image', selectedFile)
+            'profileImage': formValidate('profileImage', selectedFile)
         }));
     };
 
     const onDeleteImg = async (name, value) => {
-        if(userDetails && userDetails?.image && userDetails.image?.name){
-            setUserDetails({...userDetails, image: ""})
+        if(userDetails && userDetails?.profileImage && userDetails.profileImage?.name){
+            setUserDetails({...userDetails, profileImage: ""})
         } else {
-            setUserDetails({...userDetails, [name]: value, image: ""})
+            setUserDetails({...userDetails, [name]: value, profileImage: ""})
         }
     }
 
@@ -197,19 +196,19 @@ const Profile = () => {
             firstName: userDetails.firstName,
             lastName: userDetails.lastName,
             // email: userDetails.email,
-            image: userDetails.image,
+            profileImage: userDetails.profileImage,
             // user_job_title: userDetails.user_job_title,
             deleteImage: userDetails?.deleteImage || '',
         }
         Object.keys(obj).map((x) => {
-            if(x === "deleteImage" && obj?.image?.name){
+            if(x === "deleteImage" && obj?.profileImage?.name){
 
             }  else {
                 formData.append(x,obj[x]);
             }
         })
 
-        const data = await apiSerVice.updateLoginUserDetails(formData, userDetailsReducer.id);
+        const data = await apiService.updateLoginUserDetails(formData, userDetailsReducer.id);
         if(data.success){
             dispatch(userDetailsAction({...data.data}));
             setIsLoading(false);
@@ -237,7 +236,7 @@ const Profile = () => {
         formData.append('currentPassword', password.currentPassword);
         formData.append('password', password.password);
         formData.append('passwordConfirmation', password.passwordConfirmation);
-        const data = await apiSerVice.updateLoginUserDetails(formData);
+        const data = await apiService.updateLoginUserDetails(formData);
         if(data.success){
             setIsLoadingPass(false)
             setPassword(initialStatePassWord);
@@ -259,30 +258,30 @@ const Profile = () => {
                     <div className={"flex gap-4 flex-wrap lg:flex-nowrap md:flex-nowrap sm:flex-wrap"}>
                         <div className="flex flex-col justify-center mt-2 relative">
                             {
-                                userDetails?.image ?
+                                userDetails?.profileImage ?
                                     <div>
-                                        {userDetails && userDetails.image && userDetails.image.name ?
+                                        {userDetails && userDetails.profileImage && userDetails.profileImage.name ?
                                             <div className={"w-[80px] h-[80px] sm:w-[132px] sm:h-[128px] relative border"}>
                                                 <img
                                                     className="h-full w-full rounded-md object-cover"
-                                                    src={userDetails && userDetails.image && userDetails.image.name ? URL.createObjectURL(userDetails.image) : userDetails.image}
+                                                    src={userDetails && userDetails.profileImage && userDetails.profileImage.name ? URL.createObjectURL(userDetails.profileImage) : userDetails.profileImage}
                                                     alt=""
                                                 />
                                                 <CircleX
                                                     size={20}
                                                     className={`stroke-gray-500 dark:stroke-white cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
-                                                    onClick={() => onDeleteImg('deleteImage', userDetails && userDetails?.image && userDetails.image?.name ? "" : userDetails.image.replace("https://code.quickhunt.app/public/storage/user/", ""))}
+                                                    onClick={() => onDeleteImg('deleteImage', userDetails && userDetails?.profileImage && userDetails.profileImage?.name ? "" : userDetails.profileImage.replace("https://code.quickhunt.app/public/storage/user/", ""))}
                                                 />
-                                            </div> : userDetails.image ?
+                                            </div> : userDetails.profileImage ?
                                                 <div className={"w-[80px] h-[80px] sm:w-[132px] sm:h-[128px] relative border"}>
                                                     <img
                                                         className="h-full w-full rounded-md object-cover"
-                                                        src={userDetails.image}
+                                                        src={userDetails.profileImage}
                                                         alt=""/>
                                                     <CircleX
                                                         size={20}
                                                         className={`stroke-gray-500 dark:stroke-white cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
-                                                        onClick={() => onDeleteImg('deleteImage', userDetails && userDetails?.image && userDetails.image?.name ? "" : userDetails.image.replace("https://code.quickhunt.app/public/storage/user/", ""))}
+                                                        onClick={() => onDeleteImg('deleteImage', userDetails && userDetails?.profileImage && userDetails.profileImage?.name ? "" : userDetails.profileImage.replace("https://code.quickhunt.app/public/storage/user/", ""))}
                                                     />
                                                 </div>
                                                 : ''}
@@ -292,7 +291,7 @@ const Profile = () => {
                                             id="pictureInput"
                                             type="file"
                                             className="hidden"
-                                            accept={"image/*"}
+                                            accept={"profileImage/*"}
                                             onChange={handleFileChange}
                                         />
                                         <label
@@ -303,7 +302,7 @@ const Profile = () => {
                                         </label>
                                     </div>
                             }
-                                        {formError.image && <div className={"text-xs text-destructive"}>{formError.image}</div>}
+                                        {formError.profileImage && <div className={"text-xs text-destructive"}>{formError.profileImage}</div>}
                         </div>
 
                         <div className={"flex flex-col gap-4 w-full sm:w-full"}>

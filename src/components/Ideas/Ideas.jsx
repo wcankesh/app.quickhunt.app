@@ -109,7 +109,6 @@ const Ideas = () => {
             roadmapStatusId: getFilter?.roadmapStatusId,
             isArchive: getFilter?.isArchive,
             isActive: getFilter?.isActive,
-            all: getFilter?.all
         })
         if (data.success) {
             setIdeasList(data?.data?.ideas)
@@ -224,11 +223,11 @@ const Ideas = () => {
                 payload.all = "";
             } else if (e.value === "isArchive") {
                 payload.isArchive = payload.isArchive !== true;
-                payload.isActive = false;
+                payload.isActive = "";
                 payload.all = "";
             } else if (e.value === null) {
-                payload.isArchive = true;
-                payload.isActive = true;
+                payload.isArchive = "";
+                payload.isActive = "";
                 payload.all = "";
             }
         }
@@ -288,7 +287,7 @@ const Ideas = () => {
             if (name === "isArchive" || name === "isActive") {
                 clone[index][name] = value;
                 const removeStatus =
-                    (filter.isActive && clone[index].isActive) ||
+                    (filter.isActive === false && clone[index].isActive === false) ||
                     (filter.isArchive && clone[index]?.isArchive === false);
                 if (removeStatus) {
                     clone.splice(index, 1);
@@ -518,7 +517,7 @@ const Ideas = () => {
                     </div>
                 </div>
                 {
-                    (filter?.tagId?.length > 0 || filter?.roadmapStatusId?.length > 0 || filter?.isArchive || filter?.isActive) && <div className="flex flex-wrap gap-2 my-6">
+                    (filter?.tagId?.length > 0 || filter?.roadmapStatusId?.length > 0 || filter?.isArchive || filter?.isActive === false) && <div className="flex flex-wrap gap-2 my-6">
                         {
                             (filter.tagId || []).map((data,index) =>{
                                 const findTopic = (topicLists || []).find((tagId) => tagId.id === data);
@@ -557,8 +556,8 @@ const Ideas = () => {
                             </Badge>
                         }
                         {
-                            !filter.isActive &&
-                            <Badge key={`selected-${!filter.isActive}`} variant="outline" className="rounded p-0 font-medium">
+                            filter.isActive === false &&
+                            <Badge key={`selected-${filter.isActive === false}`} variant="outline" className="rounded p-0 font-medium">
                                 <span className="px-3 py-1.5 border-r">Bugs</span>
                                 <span className="w-7 h-7 flex items-center justify-center cursor-pointer" onClick={() =>  handleChange({name: "status" , value: "isActive"})}>
                                         <X className='w-4 h-4'/>
@@ -744,8 +743,8 @@ const Ideas = () => {
                                                                             </DropdownMenuItem>
                                                                             <DropdownMenuItem
                                                                                 className={"cursor-pointer capitalize"}
-                                                                                onClick={() => handleStatusUpdate("isActive", x.isActive !== true, i, x)}>
-                                                                                {x.isActive ? "Mark as Bug" : "Convert to Idea"}
+                                                                                onClick={() => handleStatusUpdate("isActive", x.isActive === false, i, x)}>
+                                                                                {x.isActive === false ? "Convert to Idea" : "Mark as Bug"}
                                                                             </DropdownMenuItem>
                                                                             <DropdownMenuItem
                                                                                 className={"cursor-pointer"}

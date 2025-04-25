@@ -257,7 +257,6 @@ const Statuses = () => {
         const clone = [];
         const rank = [];
         dragAndDrop.updatedOrder.map((x, i) => {
-            console.log("x", x.id)
             clone.push({...x, rank: i, })
             rank.push({rank:i, id:x.id})
         });

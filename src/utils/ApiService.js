@@ -2,7 +2,7 @@ import axios from "axios";
 import {logout, removeProjectDetails, token, baseUrl} from "./constent";
 import qs from 'qs';
 
-const baseUrlApi = 'http://192.168.1.12:3001';
+const baseUrlApi = 'http://192.168.1.36:3001';
 // const baseUrlApi = 'https://code.quickhunt.app/public/api';
 let instance = axios.create();
 instance.interceptors.request.use(function (config) {
@@ -183,18 +183,12 @@ export class ApiService {
         return await this.postData(`${baseUrlApi}/logout`, payload)
     }
 
-    // async getLoginUserDetails (token = {}){
-    //     return await this.getData(`${baseUrlApi}/user`, token)
-    // }
     async getLoginUserDetails(token = {}) {
         return await this.getData(`${baseUrlApi}/auth/user`, token)
     }
 
-    // async updateLoginUserDetails (payload, id){
-    //     return await this.postData(`${baseUrlApi}/users/${id}?_method=PUT`, payload, true)
-    // }
     async updateLoginUserDetails(payload) {
-        return await this.patchData(`${baseUrlApi}/auth/update-user`, payload, true)
+        return await this.putData(`${baseUrlApi}/auth/update-user`, payload, true)
     }
 
     async changePassword(payload) {
@@ -255,7 +249,7 @@ export class ApiService {
     }
 
     async getFeedback(id) {
-        return await this.postData(`${baseUrlApi}/post-feedback/get-feedback?id=${id}`)
+        return await this.getData(`${baseUrlApi}/post-feedback/get-feedback?id=${id}`)
     }
 
     async getReaction(id) {
@@ -377,25 +371,12 @@ export class ApiService {
     async getAllIdea (payload){
         return await this.postData(`${baseUrlApi}/idea/getAll`, payload)
     }
-
-    async ideaSearch(payload) {
-        return await this.postData(`${baseUrlApi}/v1/idea/search`, payload,)
-    }
-
-    // async getIdeaVote (payload){
-    //     return await this.postData(`${baseUrlApi}/idea/votes`,payload, )
-    // }
     async getIdeaVote(payload) {
         return await this.postData(`${baseUrlApi}/vote/get-votes`, payload,)
     }
-
-    // async removeUserVote (payload){
-    //     return await this.postData(`${baseUrlApi}/idea/remove-vote`,payload, )
-    // }
     async removeUserVote(payload) {
         return await this.postData(`${baseUrlApi}/vote/remove-vote`, payload,)
     }
-
     async getSingleIdea(id) {
         return await this.getData(`${baseUrlApi}/idea/getOne/${id}`)
     }
@@ -414,16 +395,13 @@ export class ApiService {
     }
 
     async setRoadmapRank(payload) {
-        return await this.postData(`${baseUrlApi}/feature-idea/rank`, payload)
+        return await this.postData(`${baseUrlApi}/idea/rank`, payload)
     }
 
     async createIdea(payload) {
         return await this.postData(`${baseUrlApi}/idea/create`, payload, true)
     }
 
-    // async createComment (payload){
-    //     return await this.postData(`${baseUrlApi}/v1/comment`,payload, true)
-    // }
     async createComment(payload) {
         return await this.postData(`${baseUrlApi}/comment/add`, payload, true)
     }
@@ -433,7 +411,7 @@ export class ApiService {
     }
 
     async deleteComment(id) {
-        return await this.postData(`${baseUrlApi}/comment/delete/${id}`)
+        return await this.deleteData(`${baseUrlApi}/comment/delete/${id}`)
     }
 
     async roadmapStatusRank(payload) {
@@ -668,10 +646,6 @@ export class ApiService {
     async getAllStatusAndTypes(id) {
         return await this.getData(`${baseUrlApi}/project/all-Detail?id=${id}`)
     }
-
-    // async getAllProjects (){
-    //     return await this.getData(`${baseUrlApi}/project/getAll`)
-    // }
 
     /* ---------- Pricing Plan Api ---------- */
     async cancelPlan() {

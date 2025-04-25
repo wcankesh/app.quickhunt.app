@@ -1,9 +1,7 @@
 import React, {useState, useEffect} from 'react';
-import {ApiService} from "../../utils/ApiService";
 import {useDispatch, useSelector} from "react-redux";
 import {useToast} from "../ui/use-toast";
-import {useTheme} from "../theme-provider";
-import {baseUrl} from "../../utils/constent";
+import {apiService, baseUrl} from "../../utils/constent";
 import {useNavigate} from "react-router";
 import CommCreateSheet from "../Comman/CommCreateSheet";
 import {inboxMarkReadAction} from "../../redux/action/InboxMarkReadAction";
@@ -24,9 +22,7 @@ const initialStateError = {
 }
 
 const CreateIdea = ({isOpen, onOpen, onClose, closeCreateIdea, setIdeasList, ideasList, getAllIdea, pageNo}) => {
-    const {theme} = useTheme()
     const navigate = useNavigate();
-    let apiSerVice = new ApiService();
     const { toast } = useToast();
     const dispatch = useDispatch();
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
@@ -88,7 +84,7 @@ const CreateIdea = ({isOpen, onOpen, onClose, closeCreateIdea, setIdeasList, ide
         ideaDetail.topicId.forEach(id => {
             formData.append('topicId[]', id);
         });
-        const data = await apiSerVice.createIdea(formData)
+        const data = await apiService.createIdea(formData)
         if(data.success){
             const clone = [...ideasList];
             clone.push(data.data)

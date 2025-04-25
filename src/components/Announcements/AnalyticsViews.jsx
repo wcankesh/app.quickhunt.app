@@ -3,7 +3,6 @@ import {Separator} from "../ui/separator";
 import {Icon} from "../../utils/Icon";
 import {Button} from "../ui/button";
 import {ChevronLeft, ChevronRight, X} from "lucide-react";
-import {ApiService} from "../../utils/ApiService";
 import {Skeleton} from "../ui/skeleton";
 import {useDispatch, useSelector} from "react-redux";
 import ReadMoreText from "../Comman/ReadMoreText";
@@ -12,15 +11,15 @@ import moment from "moment";
 import {Card, CardContent} from "../ui/card";
 import CommonBreadCrumb from "../Comman/CommonBreadCrumb";
 import {inboxMarkReadAction} from "../../redux/action/InboxMarkReadAction";
+import {apiService} from "../../utils/constent";
 
 const perPageLimit = 10;
 
 const AnalyticsViews = () => {
     const location = useLocation();
     const urlParams = new URLSearchParams(location.search);
-    const postId = urlParams.get("postId");
+    const postId = urlParams.get("id");
     const getPageNo = urlParams.get("pageNo") || 1;
-    const apiService = new ApiService();
     const dispatch = useDispatch();
     const allEmoji = useSelector(state => state.allStatusAndTypes.emoji);
     const inboxMarkReadReducer = useSelector(state => state.inboxMarkRead);
@@ -36,6 +35,10 @@ const AnalyticsViews = () => {
     const [isLoadingFeedBack, setIsLoadingFeedBack] = useState(false)
     const [isLoading, setIsLoading] = useState(true);
 
+    console.log("analyticsObj", analyticsObj)
+    console.log("feedbackList", feedbackList)
+    console.log("reactionList", reactionList)
+
     useEffect(() => {
         if (postId) {
             getReaction();
@@ -44,22 +47,24 @@ const AnalyticsViews = () => {
     }, [postId, pageNo]);
 
     useEffect(() => {
-        if(!analyticsObj?.post_title){
+        if(!analyticsObj?.title){
             const getSinglePosts = async () => {
                 const data = await apiService.getSinglePosts(postId);
-                if (data.status === 200) {
+                if (data.success) {
+                    console.log("data", data)
+                    console.log("data data", data.data.data.title)
                     setAnalyticsObj({
-                        ...data.data,
-                        image: data.data?.feature_image,
-                        post_assign_to: data.data?.post_assign_to !== null ? data.data?.post_assign_to?.split(',') : [],
-                        post_published_at: data.data?.post_published_at ? moment(data.data?.post_published_at).format('YYYY-MM-DD') : moment(new Date()),
-                        post_expired_at: data.data?.post_expired_at ? moment(data.data?.post_expired_at).format('YYYY-MM-DD') : undefined,
-                        category_id: data.data?.category_id,
-                        labels: data.data?.labels || [],
+                        ...data.data.data,
+                        image: data?.data?.data?.featureImage,
+                        assignToId: data.data?.data.assignToId !== null ? data.data?.data.assignToId?.split(',') : [],
+                        publishedAt: data.data?.data.publishedAt ? moment(data.data?.data.publishedAt).format('YYYY-MM-DD') : moment(new Date()),
+                        expiredAt: data.data?.data.expiredAt ? moment(data.data?.data.expiredAt).format('YYYY-MM-DD') : undefined,
+                        categoryId: data.data?.data.categoryId,
+                        labels: data.data?.data.labels || [],
                     });
                     const updateInbox = inboxMarkReadReducer.map(item => {
-                        if ((item.source === 'post_feedbacks' || item.source === 'post_reactions') && item.id === data.data.id) {
-                            return {...item, is_read: 1};
+                        if ((item.source === 'post_feedbacks' || item.source === 'post_reactions') && item.id === data.data.data.id) {
+                            return {...item, isRead: 1};
                         }
                         return item;
                     });
@@ -75,13 +80,9 @@ const AnalyticsViews = () => {
     const getFeedback = async () => {
         setIsLoadingFeedBack(true);
         setIsLoading(true);
-        const data = await apiService.getFeedback({
-            post_id: postId,
-            page: pageNo,
-            limit: perPageLimit
-        });
-        if (data.status === 200) {
-            setFeedbackList(data.data);
+        const data = await apiService.getFeedback(postId);
+        if (data.success) {
+            setFeedbackList(data.data.data);
             setTotalFeedback(data.total);
             setTotalRecord(data.total);
         }
@@ -91,8 +92,10 @@ const AnalyticsViews = () => {
 
     const getReaction = async () => {
         setIsLoadingReaction(true)
-        const data = await apiService.getReaction({post_id: postId})
-        if (data.status === 200) {
+        const data = await apiService.getReaction(postId)
+        if (data.success) {
+            console.log("data rea", data)
+            console.log("data data rea", data.data.views)
             setReactionList(data.data.reactions)
             setViews(data.data.views)
             setIsLoadingReaction(false)
@@ -137,7 +140,7 @@ const AnalyticsViews = () => {
                 <div className={"pb-6"}>
                     <CommonBreadCrumb
                         links={links}
-                        currentPage={analyticsObj?.post_title}
+                        currentPage={analyticsObj?.title}
                         truncateLimit={30}
                     />
                 </div>

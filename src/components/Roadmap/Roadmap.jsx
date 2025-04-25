@@ -4,15 +4,14 @@ import {Circle, Plus} from "lucide-react";
 import {Button} from "../ui/button";
 import UpdateRoadMapIdea from "./UpdateRoadMapIdea";
 import {useSelector} from "react-redux";
-import {ApiService} from "../../utils/ApiService";
 import Board, {moveCard} from '@asseinfo/react-kanban'
 import "@asseinfo/react-kanban/dist/styles.css";
 import CreateRoadmapIdea from "./CreateRoadmapIdea";
 import {useToast} from "../ui/use-toast";
 import {commonLoad} from "../Comman/CommSkel";
 import {EmptyDataContent} from "../Comman/EmptyDataContent";
-import {baseUrl} from "../../utils/constent";
 import {EmptyRoadmapContent} from "../Comman/EmptyContentForModule";
+import {apiService} from "../../utils/constent";
 
 const loading = {
     columns: Array.from({ length: 5 }, (_, index) => ({
@@ -27,7 +26,6 @@ const loading = {
 
 const Roadmap = () => {
     const {toast} = useToast()
-    const apiService = new ApiService();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
 
     const [roadmapList, setRoadmapList] = useState({columns: []})
@@ -46,7 +44,7 @@ const Roadmap = () => {
     const closeSheet = () => setIsSheetOpen({ open: false, type: "" });
 
     const openDetailsSheet = (record) => {
-        const findRoadmap = roadmapList.columns.find((x) => x.id === record.roadmap_id)
+        const findRoadmap = roadmapList.columns.find((x) => x.id === record.roadmapStatusId)
         setSelectedIdea(record)
         setOriginalIdea(record)
         setSelectedRoadmap(findRoadmap)
@@ -62,15 +60,15 @@ const Roadmap = () => {
     const getRoadmapIdea = async () => {
         setIsLoading(true)
         const payload = {
-            project_id: projectDetailsReducer.id,
-            roadmap_id: "",
+            projectId: projectDetailsReducer.id,
+            roadmapStatusId: "",
             page: "",
             limit: "",
         }
         const data = await apiService.getRoadmapIdea(payload)
-        if (data.status === 200) {
+        if (data.success) {
             const roadmapListClone = [];
-            data.data.data.map((x) => {
+            data?.data?.data?.map((x) => {
                 roadmapListClone.push({...x, cards: x.ideas})
             });
             setRoadmapList({columns: roadmapListClone})
@@ -90,11 +88,11 @@ const Roadmap = () => {
     const setRoadmapRank = async (updatedCards, columnId) => {
         const rankPayload = updatedCards.map((card, index) => ({
             id: card.id,
-            roadmap_id: columnId,
+            roadmapStatusId: columnId,
             rank: index,
         }));
-        const data = await apiService.setRoadmapRank({ rank: rankPayload });
-        if (data.status === 200) {
+        const data = await apiService.setRoadmapRank({ ranks: rankPayload });
+        if (data.success) {
            // toast({ description: data.message });
         } else {
             toast({ variant: "destructive", description: data.message });
@@ -103,9 +101,9 @@ const Roadmap = () => {
 
     const callApi = async (columnId, payload) => {
         let formData = new FormData();
-        formData.append("roadmap_id", columnId);
+        formData.append("roadmapStatusId", columnId);
         const data = await apiService.updateIdea(formData, payload)
-        if (data.status === 200) {
+        if (data.success) {
             toast({description: data.message})
         } else {
 
@@ -136,7 +134,7 @@ const Roadmap = () => {
             destinationCards = destinationCards.map((card, index) => ({
                 ...card,
                 rank: index,
-                roadmap_id: destination.toColumnId
+                roadmapStatusId: destination.toColumnId
             }));
             updatedColumns[destinationIndex] = {
                 ...updatedColumns[destinationIndex],
@@ -150,7 +148,7 @@ const Roadmap = () => {
 
         const updatedCard = {
             ..._card,
-            roadmap_id: destination.toColumnId,
+            roadmapStatusId: destination.toColumnId,
         };
         setSelectedIdea(updatedCard);
     };

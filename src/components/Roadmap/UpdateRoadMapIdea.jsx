@@ -1,37 +1,36 @@
-import React, {Fragment, useState, useEffect} from 'react';
+import React, {Fragment, useEffect, useState} from 'react';
 import {Sheet, SheetContent, SheetHeader} from "../ui/sheet";
 import {Button} from "../ui/button";
-import {ArrowBigUp, Check, Circle, CircleX, Dot, Loader2, MessageCircleMore, Paperclip, Pencil, Pin, Trash2, X} from "lucide-react";
+import {ArrowBigUp, Check, Circle, CircleX, Dot, Loader2, MessageCircleMore, Paperclip, Pencil, Trash2, X} from "lucide-react";
 import {RadioGroup, RadioGroupItem} from "../ui/radio-group";
 import {Label} from "../ui/label";
 import {Input} from "../ui/input";
 import {Avatar, AvatarFallback} from "../ui/avatar";
 import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "../ui/select";
-import {Popover, PopoverTrigger, PopoverContent} from "../ui/popover";
+import {Popover, PopoverContent, PopoverTrigger} from "../ui/popover";
 import {Textarea} from "../ui/textarea";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "../ui/tabs";
 import {useTheme} from "../theme-provider";
 import {useToast} from "../ui/use-toast";
-import {ApiService} from "../../utils/ApiService";
 import {useSelector} from "react-redux";
 import moment from "moment";
 import ReactQuillEditor from "../Comman/ReactQuillEditor";
 import ImageUploader from "../Comman/ImageUploader";
 import {CommentEditor, ImageGallery, SaveCancelButton, UserAvatar} from "../Comman/CommentEditor";
 import {Skeleton} from "../ui/skeleton";
+import {apiService} from "../../utils/constent";
 
 const initialStateError = {
     title: "",
     description: "",
-    board: "",
-    cover_image: "",
+    boardId: "",
+    coverImage: "",
 }
 
 const pathUrl = "https://code.quickhunt.app/public/storage/feature_idea/";
 
 const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedIdea, setSelectedRoadmap, selectedRoadmap, roadmapList, setRoadmapList, originalIdea, setOriginalIdea}) => {
     const {theme} = useTheme()
-    let apiSerVice = new ApiService();
     const {toast} = useToast()
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
@@ -65,12 +64,12 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
         if (projectDetailsReducer.id) {
             setTopicLists(allStatusAndTypes.topics)
             setDescription(selectedIdea?.description)
-            setRoadmapStatus(allStatusAndTypes.roadmap_status)
+            setRoadmapStatus(allStatusAndTypes.roadmapStatus)
         }
     }, [projectDetailsReducer.id, allStatusAndTypes]);
 
     const handleChangeTopic = (id) => {
-        const clone = [...selectedIdea?.topic];
+        const clone = [...selectedIdea?.tags];
         const index = clone.findIndex(item => item.id === id);
         if (index !== -1) {
             clone.splice(index, 1);
@@ -80,21 +79,21 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                 clone.push(topicToAdd);
             }
         }
-        setSelectedIdea({...selectedIdea, topic: clone});
+        setSelectedIdea({...selectedIdea, tags: clone});
     };
 
     const giveVote = async (type) => {
-        if (selectedIdea?.is_edit !== 1) {
-            if (selectedIdea?.user_vote === type) {
+        if (selectedIdea?.isEdit !== 1) {
+            if (selectedIdea?.userVote === type) {
 
             } else {
                 const payload = {
-                    feature_idea_id: selectedIdea?.id,
+                    ideaId: selectedIdea?.id,
                     type: type
                 }
 
-                const data = await apiSerVice.giveVote(payload);
-                if (data.status === 200) {
+                const data = await apiService.giveVote(payload);
+                if (data.success) {
                     let cloneRoadmap = [...roadmapList.columns];
                     const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap.id);
                     if (roadmapIndex !== -1) {
@@ -104,16 +103,16 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                             let newVoteCount = clone[index].vote;
                             newVoteCount = type === 1 ? newVoteCount + 1 : newVoteCount >= 1 ? newVoteCount - 1 : 0;
                             clone[index].vote = newVoteCount;
-                            clone[index].user_vote = type;
-                            let vote_list = [...clone[index].vote_list];
+                            clone[index].userVote = type;
+                            let voteList = [...clone[index].voteList];
                             if (type === 1) {
-                                vote_list.push(data.data)
-                                clone[index].vote_list = vote_list;
+                                voteList.push(data.data)
+                                clone[index].voteList = voteList;
                             } else {
-                                let voteIndex = vote_list.findIndex((x) => x.name === data.data.name);
+                                let voteIndex = voteList.findIndex((x) => (x.name || x?.firstname) == (data.data.name || data.data?.firstname));
                                 if (voteIndex !== -1) {
-                                    vote_list.splice(voteIndex, 1)
-                                    clone[index].vote_list = vote_list;
+                                    voteList.splice(voteIndex, 1)
+                                    clone[index].voteList = voteList;
                                 }
                             }
                             cloneRoadmap[roadmapIndex] = {...cloneRoadmap[roadmapIndex], ideas: clone, cards: clone};
@@ -123,7 +122,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
 
                     toast({description: data.message})
                 } else {
-                    toast({variant: "destructive", description: data.message})
+                    toast({variant: "destructive", description: data?.error?.message})
                 }
             }
         } else {
@@ -146,31 +145,17 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
         setIsSaveComment(true)
         let formData = new FormData();
         for (let i = 0; i < commentFiles.length; i++) {
-            formData.append(`images[]`, commentFiles[i]);
+            formData.append(`images`, commentFiles[i]);
         }
         formData.append('comment', commentText);
-        formData.append('feature_idea_id', selectedIdea?.id);
-        formData.append('reply_id', '');
-        const data = await apiSerVice.createComment(formData)
+        formData.append('ideaId', selectedIdea?.id);
+        formData.append('parentId', '');
+        const data = await apiService.createComment(formData)
 
-        if (data.status === 200) {
+        if (data.success) {
             setIsSaveComment(false)
-            // let cloneRoadmap = [...roadmapList.columns];
             const cloneRoadmap = JSON.parse(JSON.stringify(roadmapList.columns));
             const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap?.id);
-            // if (roadmapIndex !== -1) {
-            //     const ideaIndex = cloneRoadmap[roadmapIndex].ideas.findIndex((x) => x.id === selectedIdea?.id);
-            //     if (ideaIndex !== -1) {
-            //         let cloneIdeas = [cloneRoadmap[roadmapIndex].ideas];
-            //         let cloneIdea = {...cloneRoadmap[roadmapIndex].ideas[ideaIndex]};
-            //         const cloneComments = cloneIdea && cloneIdea?.comments ? [...cloneIdea?.comments] : [];
-            //         cloneComments.push(data.data);
-            //         cloneIdea = {...cloneIdea, comments: cloneComments};
-            //         cloneIdeas[ideaIndex] = cloneIdea;
-            //         setSelectedIdea(cloneIdea);
-            //         cloneRoadmap[roadmapIndex] = {...cloneRoadmap[roadmapIndex], ideas: cloneIdeas, cards: cloneIdeas}
-            //     }
-            // }
             if (roadmapIndex !== -1) {
                 const ideaIndex = cloneRoadmap[roadmapIndex].ideas.findIndex((x) => x.id === selectedIdea?.id);
                 if (ideaIndex !== -1) {
@@ -180,7 +165,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                     cloneIdea = { ...cloneIdea, comments: cloneComments };
                     cloneRoadmap[roadmapIndex].ideas[ideaIndex] = cloneIdea;
                     setSelectedIdea(cloneIdea);
-                    cloneRoadmap[roadmapIndex].cards = [...cloneRoadmap[roadmapIndex].ideas]; // Maintain cards
+                    cloneRoadmap[roadmapIndex].cards = [...cloneRoadmap[roadmapIndex].ideas];
                 }
             }
             setRoadmapList({columns: cloneRoadmap});
@@ -189,17 +174,17 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
             setCommentFiles([])
         } else {
             setIsSaveComment(false)
-            toast({variant: "destructive", description: data.message})
+            toast({variant: "destructive", description: data?.error?.message})
         }
     }
 
     const onShowSubComment = (index) => {
         const updatedComments = selectedIdea.comments.map((comment, i) => ({
             ...comment,
-            show_reply: i === index ? !comment.show_reply : false,
+            showReply: i === index ? !comment.showReply : false,
         }));
         setSelectedIdea({ ...selectedIdea, comments: updatedComments });
-        if (updatedComments[index].show_reply) {
+        if (updatedComments[index].showReply) {
             setSubCommentTextEditIdx(index);
             setSubCommentText("");
         } else {
@@ -211,13 +196,13 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
         setIsSaveSubComment(true)
         let formData = new FormData();
         for (let i = 0; i < subCommentFiles.length; i++) {
-            formData.append(`images[]`, subCommentFiles[i]);
+            formData.append(`images`, subCommentFiles[i]);
         }
         formData.append('comment', subCommentText);
-        formData.append('feature_idea_id', selectedIdea?.id);
-        formData.append('reply_id', record.id);
-        const data = await apiSerVice.createComment(formData)
-        if (data.status === 200) {
+        formData.append('ideaId', selectedIdea?.id);
+        formData.append('parentId', record.id);
+        const data = await apiService.createComment(formData)
+        if (data.success) {
 
             let cloneRoadmap = [...roadmapList.columns];
             const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap?.id);
@@ -244,17 +229,17 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
             toast({description: data.message})
         } else {
             setIsSaveSubComment(false)
-            toast({variant: "destructive", description: data.message})
+            toast({variant: "destructive", description: data?.error?.message})
         }
     }
 
     const handleFeatureImgUpload = async (event) => {
         const file = event.target?.files[0];
-        setSelectedIdea({...selectedIdea, cover_image: file})
+        setSelectedIdea({...selectedIdea, coverImage: file})
         let formData = new FormData();
-        formData.append("cover_image", file);
-        const data = await apiSerVice.updateIdea(formData, selectedIdea?.id)
-        if (data.status === 200) {
+        formData.append("coverImage", file);
+        const data = await apiService.updateIdea(formData, selectedIdea?.id)
+        if (data.success) {
             let cloneRoadmap = [...roadmapList.columns];
             const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap?.id);
             if (roadmapIndex !== -1) {
@@ -271,15 +256,15 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
             toast({description: data.message})
         } else {
             setIsLoading(false)
-            toast({variant: "destructive", description: data.message})
+            toast({variant: "destructive", description: data?.error?.message})
         }
     };
 
     const handleAddCommentImg = (event) => {
-        const {files} = event.target;
+        const { files } = event.target;
         if (selectedComment && selectedComment.id) {
-            const clone = [...selectedComment.images];
-            clone.push(files[0]);
+            const images = Array.isArray(selectedComment.images) ? selectedComment.images : [];
+            const clone = [...images, ...Array.from(files)];
             setSelectedComment({
                 ...selectedComment,
                 images: clone,
@@ -287,6 +272,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
         } else {
             setCommentFiles([...commentFiles, ...files]);
         }
+
         event.target.value = "";
     };
 
@@ -294,20 +280,10 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
         const { files } = event.target;
 
         if (selectedSubComment && selectedSubComment.id && selectedComment && selectedComment.id) {
-            const cloneImages = [...selectedSubComment.images, files[0]];
-            const oldImages = selectedSubComment?.newImage?.length
-                ? [...selectedSubComment.newImage]
-                : [];
-            const newImageClone = [...oldImages, files[0]];
-
-            const updatedSubComment = {
-                ...selectedSubComment,
-                images: cloneImages,
-                newImage: newImageClone,
-            };
-
+            const images = Array.isArray(selectedSubComment.images) ? selectedSubComment.images : [];
+            const newImages = [...images, ...Array.from(files)];
+            const updatedSubComment = {...selectedSubComment, images: newImages,};
             setSelectedSubComment(updatedSubComment);
-
             const replyIndex = (selectedComment.reply || []).findIndex(
                 (reply) => reply.id === selectedSubComment.id
             );
@@ -329,18 +305,18 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
     const onChangeStatus = async (name, value) => {
         setIsLoadingSidebar(name);
         setSelectedIdea({...selectedIdea, [name]: value})
-        if (name === "delete_cover_image") {
-            setSelectedIdea({...selectedIdea, cover_image: ""})
+        if (name === "removeCoverImage") {
+            setSelectedIdea({...selectedIdea, coverImage: ""})
         } else {
             setSelectedIdea({...selectedIdea, [name]: value})
         }
         let formData = new FormData();
-        if (name === "roadmap_id" && value === null) {
+        if (name === "roadmapStatusId" && value === null) {
             value = "";
         }
         formData.append(name, value);
-        const data = await apiSerVice.updateIdea(formData, selectedIdea?.id)
-        if (data.status === 200) {
+        const data = await apiService.updateIdea(formData, selectedIdea?.id)
+        if (data.success) {
             let cloneRoadmap = [...roadmapList.columns];
             const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap?.id);
             if (roadmapIndex !== -1) {
@@ -362,7 +338,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                             cards: cloneIdeas
                         }
                     }
-                } else if (name === "roadmap_id") {
+                } else if (name === "roadmapStatusId") {
                     const oldIdeaIndex = cloneRoadmap[roadmapIndex].ideas.findIndex((x) => x.id === selectedIdea?.id);
                     const oldRoadmapIndex = roadmapIndex;
                     const newRoadmapIndex = cloneRoadmap.findIndex((x) => x.id == value);
@@ -401,12 +377,13 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
         } else {
             setIsLoading(false)
             setIsLoadingSidebar('');
-            toast({variant: "destructive", description: data.message})
+            toast({variant: "destructive", description: data?.error?.message})
         }
     }
 
     const onEditComment = (record, index) => {
-        setSelectedComment(record);
+        // setSelectedComment(record);
+        setSelectedComment({ ...record, images: record.images || [] });
         setSelectedCommentIndex(index)
         setIsEditComment(true)
     }
@@ -442,8 +419,8 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
         //     setDeletedCommentImage(cloneImage);
         // }
         const cloneImages = [...selectedComment.images];
-        const isServerImage = typeof cloneImages[index] === "string" &&
-            cloneImages[index].startsWith('https://code.quickhunt.app/public/');
+        // const isServerImage = typeof cloneImages[index] === "string" && cloneImages[index].startsWith('https://code.quickhunt.app/public/');
+        const isServerImage = typeof cloneImages[index] === "string";
         if (isServerImage) {
             const cloneDeletedImages = [...deletedCommentImage];
             cloneDeletedImages.push(
@@ -460,35 +437,23 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
         });
     }
 
-    const onDeleteSubCommentImage = (index) => {
-        const cloneImages = [...selectedSubComment.images];
-
-        const isServerImage = typeof cloneImages[index] === "string" &&
-            cloneImages[index].startsWith('https://code.quickhunt.app/public/');
-
-        if (isServerImage) {
+    const onDeleteSubCommentImage = (index, isOld) => {
+        if (isOld) {
+            const cloneImages = [...selectedSubComment.images];
             const cloneDeletedImages = [...deletedSubCommentImage];
-            cloneDeletedImages.push(
-                cloneImages[index].replace('https://code.quickhunt.app/public/storage/feature_idea/', '')
-            );
+            cloneDeletedImages.push(cloneImages[index].replace('https://code.quickhunt.app/public/storage/feature_idea/', ''));
             cloneImages.splice(index, 1);
-            setDeletedSubCommentImage(cloneDeletedImages);
-        } else {
-            cloneImages.splice(index, 1);
-        }
-
-        if (selectedSubComment && selectedSubComment.newImage && selectedSubComment.newImage.length) {
-            const cloneNewImage = [...selectedSubComment.newImage];
-            cloneNewImage.splice(index, 1);
             setSelectedSubComment({
                 ...selectedSubComment,
-                // newImage: cloneNewImage,
                 images: cloneImages,
             });
+            setDeletedSubCommentImage(cloneDeletedImages);
         } else {
+            const cloneNewImages = [...selectedSubComment.images];
+            cloneNewImages.splice(index, 1);
             setSelectedSubComment({
                 ...selectedSubComment,
-                images: cloneImages,
+                images: cloneNewImages,
             });
         }
     };
@@ -496,28 +461,27 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
     const onUpdateComment = async () => {
         setIsSaveUpdateComment(true)
         let formData = new FormData();
-        if (selectedComment && selectedComment.newImage && selectedComment.newImage.length) {
-            for (let i = 0; i < selectedComment.newImage.length; i++) {
-                formData.append(`images[${i}]`, selectedComment.newImage[i]);
+        if (selectedComment && selectedComment.images && selectedComment.images.length) {
+            for (let i = 0; i < selectedComment.images.length; i++) {
+                formData.append(`images`, selectedComment.images[i]);
             }
         }
         for (let i = 0; i < deletedCommentImage.length; i++) {
-            formData.append(`delete_image[${i}]`, deletedCommentImage[i].replace('https://code.quickhunt.app/public/storage/feature_idea/', ''));
+            formData.append(`removeImages[${i}]`, deletedCommentImage[i].replace('https://code.quickhunt.app/public/storage/feature_idea/', ''));
         }
+
         formData.append('comment', selectedComment.comment);
-        formData.append('id', selectedComment.id);
-        const data = await apiSerVice.updateComment(formData)
-        if (data.status === 200) {
+        const data = await apiService.updateComment(selectedComment.id, formData)
+        if (data.success) {
             let cloneRoadmap = [...roadmapList.columns];
-            const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap?.id);
+            const roadmapIndex = cloneRoadmap.findIndex((x) => x.id == selectedRoadmap?.id);
             if (roadmapIndex !== -1) {
-                const ideaIndex = cloneRoadmap[roadmapIndex].ideas.findIndex((x) => x.id === selectedIdea?.id);
+                const ideaIndex = cloneRoadmap[roadmapIndex].ideas.findIndex((x) => x.id == selectedIdea?.id);
                 if (ideaIndex !== -1) {
                     let cloneIdeas = [cloneRoadmap[roadmapIndex].ideas];
                     let cloneIdea = {...cloneRoadmap[roadmapIndex].ideas[ideaIndex]};
                     const cloneComments = cloneIdea && cloneIdea?.comments ? [...cloneIdea?.comments] : [];
-                    let obj = {...selectedComment, images: data.data.images}
-                    cloneComments[selectedCommentIndex] = obj;
+                    cloneComments[selectedCommentIndex] = {...selectedComment, images: data.data.images};
                     cloneIdea = {...cloneIdea, comments: cloneComments};
                     cloneIdeas[ideaIndex] = cloneIdea;
                     setSelectedIdea(cloneIdea);
@@ -532,26 +496,24 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
             setIsSaveUpdateComment(false)
             toast({description: data.message})
         } else {
-            toast({variant: "destructive", description: data.message})
+            toast({variant: "destructive", description: data?.error?.message})
             setIsSaveUpdateComment(false)
         }
     }
-
     const onUpdateSubComment = async () => {
         setIsSaveUpdateSubComment(true)
         let formData = new FormData();
-        if (selectedSubComment && selectedSubComment.newImage && selectedSubComment.newImage.length) {
-            for (let i = 0; i < selectedSubComment.newImage.length; i++) {
-                formData.append(`images[${i}]`, selectedSubComment.newImage[i]);
+        if (selectedSubComment && selectedSubComment.images && selectedSubComment.images.length) {
+            for (let i = 0; i < selectedSubComment.images.length; i++) {
+                formData.append(`images`, selectedSubComment.images[i]);
             }
         }
         for (let i = 0; i < deletedSubCommentImage.length; i++) {
-            formData.append(`delete_image[${i}]`, deletedSubCommentImage[i].replace('https://code.quickhunt.app/public/storage/feature_idea/', ''));
+            formData.append(`removeImages[${i}]`, deletedSubCommentImage[i].replace('https://code.quickhunt.app/public/storage/feature_idea/', ''));
         }
         formData.append('comment', selectedSubComment.comment);
-        formData.append('id', selectedSubComment.id);
-        const data = await apiSerVice.updateComment(formData)
-        if (data.status === 200) {
+        const data = await apiService.updateComment(selectedSubComment.id, formData)
+        if (data.success) {
             let cloneRoadmap = [...roadmapList.columns];
             const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap.id);
             if (roadmapIndex !== -1) {
@@ -578,14 +540,14 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
             setIsSaveUpdateSubComment(false)
             toast({description: data.message})
         } else {
-            toast({variant: "destructive", description: data.message})
+            toast({variant: "destructive", description: data?.error?.message})
             setIsSaveUpdateSubComment(false)
         }
     }
 
     const deleteComment = async (id, indexs) => {
-        const data = await apiSerVice.deleteComment({id: id})
-        if (data.status === 200) {
+        const data = await apiService.deleteComment(id)
+        if (data.success) {
             let cloneRoadmap = [...roadmapList.columns];
             const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap?.id);
             if (roadmapIndex !== -1) {
@@ -604,13 +566,13 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
             setRoadmapList({columns: cloneRoadmap});
             toast({description: data.message})
         } else {
-            toast({variant: "destructive", description: data.message})
+            toast({variant: "destructive", description: data?.error?.message})
         }
     }
 
     const deleteSubComment = async (id, record, index, subIndex) => {
-        const data = await apiSerVice.deleteComment({id: id})
-        if (data.status === 200) {
+        const data = await apiService.deleteComment(id)
+        if (data.success) {
             let cloneRoadmap = [...roadmapList.columns];
             const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap?.id);
             if (roadmapIndex !== -1) {
@@ -631,7 +593,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
             setRoadmapList({columns: cloneRoadmap})
             toast({description: data.message})
         } else {
-            toast({variant: "destructive", description: data.message})
+            toast({variant: "destructive", description: data?.error?.message})
         }
     }
 
@@ -650,13 +612,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                 } else {
                     return "";
                 }
-            // case "description":
-            //     if (!value || value.trim() === "") {
-            //         return "Description is required";
-            //     } else {
-            //         return "";
-            //     }
-            case "board":
+            case "boardId":
                 if (!value || value?.toString()?.trim() === "") {
                     return "Board is required";
                 } else {
@@ -702,19 +658,22 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
         let formData = new FormData();
         let topics = [];
 
-        (selectedIdea?.topic || []).map((x) => {
+        (selectedIdea?.tags || []).map((x) => {
             topics.push(x.id)
         })
         formData.append('title', selectedIdea?.title);
-        formData.append('board', selectedIdea.board);
-        formData.append('slug_url', selectedIdea?.title ? selectedIdea?.title.replace(/ /g, "-").replace(/\?/g, "-") : "");
+        formData.append('boardId', selectedIdea.boardId);
+        formData.append('slugUrl', selectedIdea?.title ? selectedIdea?.title.replace(/ /g, "-").replace(/\?/g, "-") : "");
         // formData.append('description', selectedIdea?.description?.trim() === '' ? "" : selectedIdea?.description);
         formData.append('description', selectedIdea.description ? selectedIdea.description : "");
-        formData.append('topic', topics.join(","));
-        const data = await apiSerVice.updateIdea(formData, selectedIdea?.id)
-        if (data.status === 200) {
+        // formData.append('tags', topics.join(","));
+        topics.forEach(id => {
+            formData.append('topicId[]', id);
+        });
+        const data = await apiService.updateIdea(formData, selectedIdea?.id)
+        if (data.success) {
             let cloneRoadmap = [...roadmapList.columns];
-            const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedIdea?.roadmap_id);
+            const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedIdea?.roadmapStatusId);
             if (roadmapIndex !== -1) {
                 const ideaIndex = cloneRoadmap[roadmapIndex].ideas.findIndex((x) => x.id === selectedIdea?.id);
                 if (ideaIndex !== -1) {
@@ -730,7 +689,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
             toast({description: data.message})
         } else {
             setIsLoadingCreateIdea(false)
-            toast({variant: "destructive", description: data.message})
+            toast({variant: "destructive", description: data?.error?.message})
         }
     }
 
@@ -794,8 +753,8 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                 </div>
                                 <div className={"flex flex-col "}>
                                     <RadioGroup
-                                        onValueChange={(value) => onChangeStatus('roadmap_id', value)}
-                                        value={selectedIdea?.roadmap_id}
+                                        onValueChange={(value) => onChangeStatus('roadmapStatusId', value)}
+                                        value={selectedIdea?.roadmapStatusId}
                                     >
                                         {
                                             (roadmapStatus || []).map((x, i) => {
@@ -816,17 +775,11 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                 <div className="py-4 pl-8 pr-6 w-full space-y-1.5">
                                     <Label htmlFor="picture" className={"font-normal capitalize"}>Featured image</Label>
                                     <div className="w-[282px] h-[128px] flex gap-1">
-
                                         <ImageUploader
-                                            // selectedImage={selectedIdea}
-                                            // onChangeStatus={onChangeStatus}
-                                            // handleUpload={handleFeatureImgUpload}
-
-                                            image={selectedIdea?.cover_image}
-                                            onDelete={() => onChangeStatus('delete_cover_image', selectedIdea && selectedIdea?.cover_image && selectedIdea?.cover_image?.name ? "" : [selectedIdea?.cover_image.replace("https://code.quickhunt.app/public/storage/feature_idea/", "")])}
+                                            image={selectedIdea?.coverImage}
+                                            onDelete={() => onChangeStatus('removeCoverImage', selectedIdea && selectedIdea?.coverImage && selectedIdea?.coverImage?.name ? "" : [selectedIdea?.coverImage.replace("https://code.quickhunt.app/public/storage/feature_idea/", "")])}
                                             onUpload={handleFeatureImgUpload}
                                             altText="Cover Image"
-
                                         />
                                     </div>
                                 </div>
@@ -859,11 +812,11 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                 <Select
                                                     onValueChange={(value) => onChangeText({
                                                         target: {
-                                                            name: "board",
+                                                            name: "boardId",
                                                             value
                                                         }
                                                     })}
-                                                    value={selectedIdea.board}>
+                                                    value={selectedIdea.boardId}>
                                                     <SelectTrigger className="bg-card">
                                                         <SelectValue/>
                                                     </SelectTrigger>
@@ -883,19 +836,19 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                         </SelectGroup>
                                                     </SelectContent>
                                                 </Select>
-                                                {formError.board &&
-                                                <span className="text-red-500 text-sm">{formError.board}</span>}
+                                                {formError.boardId &&
+                                                <span className="text-red-500 text-sm">{formError.boardId}</span>}
                                             </div>
                                         </div>
                                         <div className={"px-4 py-3 lg:py-6 lg:px-8 border-b space-y-2"}>
                                             <Label className={"font-normal"}>Choose Topics for this Idea (optional)</Label>
                                             <Select onValueChange={handleChangeTopic}
-                                                    value={selectedIdea?.topic.map(x => x.id)}>
+                                                    value={selectedIdea?.tags.map(x => x.id)}>
                                                 <SelectTrigger>
                                                     <SelectValue className={"text-muted-foreground text-sm"}
                                                                  placeholder="Assign to">
                                                         <div className={"flex gap-[2px]"}>
-                                                            {(selectedIdea?.topic || []).map((x, index) => {
+                                                            {(selectedIdea?.tags || []).map((x, index) => {
                                                                 const findObj = (topicLists || []).find((y) => y.id === x?.id);
                                                                 return (
                                                                     <div key={index}
@@ -906,7 +859,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                                     </div>
                                                                 );
                                                             })}
-                                                            {(selectedIdea?.topic || []).length > 2}
+                                                            {(selectedIdea?.tags || []).length > 2}
                                                         </div>
                                                     </SelectValue>
                                                 </SelectTrigger>
@@ -919,7 +872,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                                         <div className={"flex gap-2"}>
                                                                             <div onClick={() => handleChangeTopic(x.id)}
                                                                                  className="checkbox-icon">
-                                                                                {(selectedIdea?.topic.map((x) => x.id) || []).includes(x.id) ?
+                                                                                {(selectedIdea?.tags.map((x) => x.id) || []).includes(x.id) ?
                                                                                     <Check size={18}/> : <div className={"h-[18px] w-[18px]"}/>}
                                                                             </div>
                                                                             <span>{x.title ? x.title : ""}</span>
@@ -954,13 +907,13 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                         </Button>
                                                         <p className={"text-xl font-normal"}>{selectedIdea?.vote}</p>
                                                         {
-                                                            selectedIdea && selectedIdea?.vote_list && selectedIdea?.vote_list.length ?
+                                                            selectedIdea && selectedIdea?.voteList && selectedIdea?.voteList.length ?
                                                                 <Popover>
                                                                     <PopoverTrigger asChild>
                                                                         <Button variant="ghost hover-none"
                                                                                 className={"rounded-full p-0 h-[24px]"}>
                                                                             {
-                                                                                (selectedIdea.vote_list.slice(0, 1) || []).map((x, i) => {
+                                                                                (selectedIdea.voteList.slice(0, 1) || []).map((x, i) => {
                                                                                     return (
                                                                                         <div className={"flex"}
                                                                                              key={i}>
@@ -976,10 +929,10 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                                                                 </div>
                                                                                             </div>
                                                                                             {
-                                                                                                (selectedIdea?.vote_list.length > 1) &&
+                                                                                                (selectedIdea?.voteList.length > 1) &&
                                                                                                 <div
                                                                                                     className={"update-idea text-sm rounded-full border text-center ml-[-5px]"}>
-                                                                                                    <Avatar><AvatarFallback>+{selectedIdea?.vote_list.length - 1}</AvatarFallback></Avatar>
+                                                                                                    <Avatar><AvatarFallback>+{selectedIdea?.voteList.length - 1}</AvatarFallback></Avatar>
                                                                                                 </div>
                                                                                             }
                                                                                         </div>
@@ -991,23 +944,23 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                                     <PopoverContent className="p-0" align={"start"}>
                                                                         <div>
                                                                             <div className="py-3 px-4">
-                                                                                <h4 className="font-normal leading-none text-sm">{`Voters (${selectedIdea?.vote_list.length})`}</h4>
+                                                                                <h4 className="font-normal leading-none text-sm">{`Voters (${selectedIdea?.voteList.length})`}</h4>
                                                                             </div>
                                                                             <div
                                                                                 className="border-t px-4 py-3 space-y-2">
                                                                                 {
-                                                                                    (selectedIdea?.vote_list || []).map((x, i) => {
+                                                                                    (selectedIdea?.voteList || []).map((x, i) => {
                                                                                         return (
                                                                                             <div className={"flex gap-2"} key={i}>
                                                                                                 <div
                                                                                                     className={"update-idea text-sm rounded-full text-center"}>
                                                                                                     <UserAvatar
-                                                                                                        userPhoto={x.user_photo}
-                                                                                                        userName={x.name ? x.name : x?.user_name}
+                                                                                                        userPhoto={x.userphoto}
+                                                                                                        userName={x?.name ? x?.name : x?.username}
                                                                                                         className="w-[20px] h-[20px]"
                                                                                                     />
                                                                                                 </div>
-                                                                                                <h4 className={"text-sm font-normal"}>{x.name ? x.name : x?.user_name}</h4>
+                                                                                                <h4 className={"text-sm font-normal"}>{x?.name ? x?.name : x?.username}</h4>
                                                                                             </div>
                                                                                         )
                                                                                     })
@@ -1021,7 +974,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                     </div>
                                                     <div className={"flex gap-2"}>
                                                         {
-                                                            selectedIdea?.is_edit === 1 ?
+                                                            selectedIdea?.isEdit === 1 ?
                                                                 <Button
                                                                     variant={"outline"}
                                                                     className={"w-[30px] h-[30px] p-1"}
@@ -1095,7 +1048,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                         <div className={"flex items-center gap-2"}>
                                                             <UserAvatar
                                                                 userPhoto={selectedIdea?.user_photo}
-                                                                userName={selectedIdea?.name ? selectedIdea?.name : selectedIdea?.user_name}
+                                                                userName={selectedIdea?.name}
                                                             />
                                                             <div className={"flex items-center"}>
                                                                 {
@@ -1103,11 +1056,11 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                                         <Skeleton className="w-[50px] h-[20px]" />
                                                                         :
                                                                         <Fragment>
-                                                                            <h4 className={"text-sm font-normal"}>{selectedIdea?.name ? selectedIdea?.name : selectedIdea?.user_name}</h4>
+                                                                            <h4 className={"text-sm font-normal"}>{selectedIdea?.name}</h4>
                                                                             <p className={"text-sm font-normal flex items-center text-muted-foreground"}>
                                                                                 <Dot size={20}
                                                                                      className={"fill-text-card-foreground stroke-text-card-foreground"}/>
-                                                                                {moment(selectedIdea?.created_at).format('D MMM')}
+                                                                                {moment(selectedIdea?.createdAt).format('D MMM')}
                                                                             </p>
                                                                         </Fragment>
                                                                 }
@@ -1117,8 +1070,8 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                         {
                                                             isLoading ? <Skeleton className={"w-[224px] h-[24px] px-3 py-1"} /> :
                                                                 <Select
-                                                                    onValueChange={(value) => onChangeStatus('roadmap_id', value)}
-                                                                    value={selectedIdea?.roadmap_id}
+                                                                    onValueChange={(value) => onChangeStatus('roadmapStatusId', value)}
+                                                                    value={selectedIdea?.roadmapStatusId}
                                                                 >
                                                                     <SelectTrigger className="w-[224px] h-[24px] px-3 py-1">
                                                                         <SelectValue/>
@@ -1157,12 +1110,8 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                     <div className="w-[282px] h-[128px] flex gap-1">
 
                                                         <ImageUploader
-                                                            // selectedImage={selectedIdea}
-                                                            // onChangeStatus={onChangeStatus}
-                                                            // handleUpload={handleFeatureImgUpload}
-
-                                                            image={selectedIdea?.cover_image}
-                                                            onDelete={() => onChangeStatus('delete_cover_image', selectedIdea && selectedIdea?.cover_image && selectedIdea?.cover_image?.name ? "" : [selectedIdea?.cover_image.replace("https://code.quickhunt.app/public/storage/feature_idea/", "")])}
+                                                            image={selectedIdea?.coverImage}
+                                                            onDelete={() => onChangeStatus('removeCoverImage', selectedIdea && selectedIdea?.coverImage && selectedIdea?.coverImage?.name ? "" : [selectedIdea?.coverImage.replace("https://code.quickhunt.app/public/storage/feature_idea/", "")])}
                                                             onUpload={handleFeatureImgUpload}
                                                             altText="Cover Image"
 
@@ -1307,8 +1256,8 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                                             <div className={"flex gap-2 p-4 lg:px-8 border-b last:border-b-0"}>
                                                                                 <div>
                                                                                     <UserAvatar
-                                                                                        userPhoto={x?.user_photo}
-                                                                                        userName={x.name ? x.name : x?.user_name}
+                                                                                        userPhoto={x?.profileImage}
+                                                                                        userName={x?.name && x.name !== "null" ? x.name : x?.userName}
                                                                                     />
                                                                                 </div>
                                                                                 <div
@@ -1316,17 +1265,17 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                                                     <div
                                                                                         className={"flex gap-1 flex-wrap justify-between"}>
                                                                                         <div className={"flex items-start"}>
-                                                                                            <h4 className={"text-sm font-normal"}>{x.name ? x.name : x?.user_name}</h4>
+                                                                                            <h4 className={"text-sm font-normal"}>{x?.name && x.name !== "null" ? x.name : x?.userName}</h4>
                                                                                             <p className={"text-sm font-normal flex items-center text-muted-foreground"}>
                                                                                                 <Dot size={20}
                                                                                                      className={"fill-text-card-foreground stroke-text-card-foreground"}/>
-                                                                                                {moment.utc(x.created_at).local().startOf('seconds').fromNow()}
+                                                                                                {moment.utc(x.createdAt).local().startOf('seconds').fromNow()}
                                                                                             </p>
                                                                                         </div>
                                                                                         <div className={"flex gap-2"}>
                                                                                             {
                                                                                                 selectedCommentIndex === i && isEditComment ? "" :
-                                                                                                    x.is_edit === 1 ?
+                                                                                                    x.isEdit === 1 ?
                                                                                                         <><Button
                                                                                                             variant={"outline"}
                                                                                                             className={"w-[30px] h-[30px] p-1"}
@@ -1354,7 +1303,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                                                                         images={selectedComment?.images}
                                                                                                         onUpdateComment={onUpdateComment}
                                                                                                         onCancelComment={onCancelComment}
-                                                                                                        onDeleteImage={(i) => onDeleteCommentImage(i, true)}
+                                                                                                        onDeleteImage={(i) => onDeleteCommentImage(i)}
                                                                                                         onImageUpload={handleAddCommentImg}
                                                                                                         onCommentChange={(e) => setSelectedComment({...selectedComment, comment: e.target.value})}
                                                                                                         isSaving={isSaveUpdateComment}
@@ -1396,7 +1345,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                                                             </div>
                                                                                     }
                                                                                     {
-                                                                                        x.show_reply ?
+                                                                                        x.showReply ?
                                                                                             <div
                                                                                                 className={"space-y-3"}>
                                                                                                 {
@@ -1408,24 +1357,25 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                                                                                     <div>
                                                                                                                         <div
                                                                                                                             className={"update-idea text-sm rounded-full text-center"}>
-                                                                                                                            <UserAvatar userName={selectedIdea?.name ? selectedIdea?.name : selectedIdea?.user_name}/>
+                                                                                                                            <UserAvatar userPhoto={y.profileimage} userName={y?.name && y.name !== "null" ? y.name : y?.userName}/>
+                                                                                                                            {/*<UserAvatar userName={selectedIdea?.name ? selectedIdea?.name : selectedIdea?.user_name}/>*/}
                                                                                                                         </div>
                                                                                                                     </div>
                                                                                                                     <div
                                                                                                                         className={"w-full space-y-2"}>
                                                                                                                         <div className={"flex justify-between"}>
                                                                                                                             <div className={"flex items-start"}>
-                                                                                                                                <h4 className={"text-sm font-normal"}>{y.name ? y.name : y?.user_name}</h4>
+                                                                                                                                <h4 className={"text-sm font-normal"}>{y?.name && y.name !== "null" ? y.name : y?.userName}</h4>
                                                                                                                                 <p className={"text-sm font-normal flex items-center text-muted-foreground"}>
                                                                                                                                     <Dot
                                                                                                                                         size={20}
                                                                                                                                         className={"fill-text-card-foreground stroke-text-card-foreground"}/>
-                                                                                                                                    {moment.utc(y.created_at).local().startOf('seconds').fromNow()}
+                                                                                                                                    {moment.utc(y.createdAt).local().startOf('seconds').fromNow()}
                                                                                                                                 </p>
                                                                                                                             </div>
                                                                                                                             {
                                                                                                                                 selectedCommentIndex === i && selectedSubCommentIndex === j ? "" :
-                                                                                                                                    y.is_edit === 1 ?
+                                                                                                                                    y.isEdit === 1 ?
                                                                                                                                         <div
                                                                                                                                             className="flex gap-2">
                                                                                                                                             <Button
@@ -1451,7 +1401,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                                                                                                     images={selectedSubComment?.images}
                                                                                                                                     onUpdateComment={onUpdateSubComment}
                                                                                                                                     onCancelComment={onCancelSubComment}
-                                                                                                                                    onDeleteImage={(i) => onDeleteSubCommentImage(i)}
+                                                                                                                                    onDeleteImage={(i) => onDeleteSubCommentImage(i, true)}
                                                                                                                                     onImageUpload={handleSubCommentUploadImg}
                                                                                                                                     onCommentChange={(e) => onChangeTextSubComment(e)}
                                                                                                                                     isSaving={isSaveUpdateSubComment}
