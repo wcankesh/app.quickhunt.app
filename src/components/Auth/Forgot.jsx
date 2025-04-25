@@ -43,15 +43,19 @@ const Forgot = () => {
             setFormError(validationErrors);
             return;
         }
+        if (!forgotPasswordDetails.email || formError.email) {
+            setFormError({ email: "Please enter a valid email address" });
+            return;
+        }
         setIsLoading(true)
         const data = await apiService.forgotPassword({email: forgotPasswordDetails.email})
         if (data.success) {
+            setIsLoading(false)
             setForgotPasswordDetails({email: ""})
             toast({description: data.message,})
-            setIsLoading(false)
         } else {
-            toast({variant: "destructive", description: data?.error?.message})
             setIsLoading(false)
+            toast({variant: "destructive", description: data?.error?.message})
         }
     }
 

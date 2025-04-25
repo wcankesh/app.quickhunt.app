@@ -29,7 +29,9 @@ const Social = () => {
     const [isSave,setIsSave]=useState(false);
 
     useEffect(() => {
-       setSocialLink(allStatusAndTypes.social)
+        if (allStatusAndTypes.social) {
+            setSocialLink(allStatusAndTypes.social);
+        }
     },[allStatusAndTypes]);
 
     // const onChange =(e)=>{
@@ -120,6 +122,7 @@ const Social = () => {
 
 
     const onUpdateSocialSetting = async () => {
+        if (!socialLink) return;
         let validationErrors = {};
         Object.keys(socialLink).forEach(name => {
             const error = formValidate(name, socialLink[name]);

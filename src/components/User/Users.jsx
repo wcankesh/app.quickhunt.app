@@ -72,7 +72,7 @@ const UserActionsList = ({ userActions, setCustomerList, sourceTitle, isLoadingU
         }
         // const response = await apiService.inboxMarkAllRead({ projectId: projectDetailsReducer.id, id });
         // if (response.status === 200) {
-        //     const update = (userActions || []).map(action => action.id === id ? { ...action, is_read: 1 } : action);
+        //     const update = (userActions || []).map(action => action.id === id ? { ...action, isRead: 1 } : action);
         //     setCustomerList(update);
         //     dispatch(inboxMarkReadAction(update));
         // }

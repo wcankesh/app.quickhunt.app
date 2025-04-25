@@ -22,7 +22,7 @@ import {
     Users,
     UsersRound, X
 } from "lucide-react";
-import {Sheet, SheetContent, SheetHeader, SheetOverlay, SheetTrigger} from "../ui/sheet";
+import {Sheet, SheetContent, SheetHeader, SheetTrigger} from "../ui/sheet";
 import {inboxMarkReadAction} from "../../redux/action/InboxMarkReadAction";
 
 const SaidBarDesktop = ({isMobile, setIsMobile}) => {
@@ -45,7 +45,7 @@ const SaidBarDesktop = ({isMobile, setIsMobile}) => {
 
     useEffect(() => {
         if(inboxMarkRead){
-            const unreadNotifications = inboxMarkRead.filter(notification => notification?.is_read == 0);
+            const unreadNotifications = inboxMarkRead.filter(notification => notification?.isRead == 0);
             setUnreadCount(unreadNotifications.length);
         }
     }, [inboxMarkRead])
@@ -57,7 +57,7 @@ const SaidBarDesktop = ({isMobile, setIsMobile}) => {
         }
         const data = await apiService.inboxNotification(payload);
         if(data.success) {
-            dispatch(inboxMarkReadAction(data.data));
+            dispatch(inboxMarkReadAction(data.data.data));
         }
     }
 
@@ -167,11 +167,11 @@ const SaidBarDesktop = ({isMobile, setIsMobile}) => {
         //     isDisplay: true,
         // },
         {
-            title: `${userDetailsReducer.trial_days} days trial left`,
+            title: `${userDetailsReducer.trialDays} days trial left`,
             link: '/pricing-plan',
             icon: <DatabaseBackup size={15} />,
             selected: false,
-            isDisplay: userDetailsReducer?.trial_days > 0 && userDetailsReducer.plan === 1,
+            isDisplay: userDetailsReducer?.trialDays > 0 && userDetailsReducer.plan === 1,
         },
         {
             title: 'What’s New',
