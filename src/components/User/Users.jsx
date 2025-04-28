@@ -4,7 +4,6 @@ import {Clock, GalleryVerticalEnd, Info, Lightbulb, Loader2, Mail, MapPin, Messa
 import {Card, CardContent} from "../ui/card";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "../ui/table";
 import {useTheme} from "../theme-provider";
-import {ApiService} from "../../utils/ApiService";
 import {useDispatch, useSelector} from "react-redux";
 import {useToast} from "../ui/use-toast";
 import {Skeleton} from "../ui/skeleton";
@@ -15,13 +14,13 @@ import {Input} from "../ui/input";
 import {Switch} from "../ui/switch";
 import Pagination from "../Comman/Pagination";
 import DeleteDialog from "../Comman/DeleteDialog";
-import {baseUrl} from "../../utils/constent";
+import {apiService, baseUrl} from "../../utils/constent";
 import {useNavigate} from "react-router";
 import {EmptyDataContent} from "../Comman/EmptyDataContent";
 import moment from "moment";
 import {TabsContent, TabsList, TabsTrigger} from "../ui/tabs";
 import {Tabs} from "@radix-ui/react-tabs";
-import {Avatar, AvatarFallback, AvatarImage} from "../ui/avatar";
+import {Avatar, AvatarImage} from "../ui/avatar";
 import {UserAvatar} from "../Comman/CommentEditor";
 import {inboxMarkReadAction} from "../../redux/action/InboxMarkReadAction";
 import {EmptyUserContent} from "../Comman/EmptyContentForModule";
@@ -33,10 +32,10 @@ const initialState = {
     name: '',
     email: '',
     emailNotification: false,
-    customer_first_seen: '',
-    customer_last_seen: '',
-    user_browser: '',
-    user_ip_address : '',
+    firstSeen: '',
+    lastSeen: '',
+    browser: '',
+    ipAddress : '',
 }
 const initialStateError = {
     name: "",
@@ -45,7 +44,6 @@ const initialStateError = {
 
 const UserActionsList = ({ userActions, setCustomerList, sourceTitle, isLoadingUserDetail, selectedTab, pageNoAction, totalPagesAction, handlePaginationClickAction, projectDetailsReducer }) => {
     const navigate = useNavigate();
-    const apiService = new ApiService();
     const dispatch = useDispatch();
 
     if (isLoadingUserDetail || !userActions.length) {
@@ -68,7 +66,7 @@ const UserActionsList = ({ userActions, setCustomerList, sourceTitle, isLoadingU
         if (source === "feature_ideas" || source === "feature_idea_comments" || source === "feature_idea_votes") {
             navigate(`/ideas/${id}`);
         } else if (source === "post_feedbacks" || source === "post_reactions") {
-            navigate(`/announcements/analytic-view?postId=${id}`);
+            navigate(`/announcements/analytic-view?id=${id}`);
         }
         // const response = await apiService.inboxMarkAllRead({ projectId: projectDetailsReducer.id, id });
         // if (response.status === 200) {
@@ -128,7 +126,6 @@ const UserActionsList = ({ userActions, setCustomerList, sourceTitle, isLoadingU
 const Users = () => {
     const {theme} =useTheme();
     const navigate = useNavigate();
-    const apiService = new ApiService();
     const UrlParams = new URLSearchParams(location.search);
     const getPageNo = UrlParams.get("pageNo") || 1;
     const {toast} = useToast()
@@ -222,16 +219,15 @@ const Users = () => {
     const getAllUsers = async () => {
         setIsLoading(true);
         const payload = {
-            projectId: projectDetailsReducer.id,
             page: pageNo,
             limit: perPageLimit
         }
-        const data = await apiService.getAllUsers(payload);
+        const data = await apiService.getAllUsers(projectDetailsReducer.id, payload);
         if (data.success) {
             setCustomerList(data.data);
             setTotalRecord(data?.data.total);
-            setIsAdmin(data?.isAdmin);
-            if (!data.data || data.data.length === 0) {
+            setIsAdmin(data?.data.isAdmin);
+            if (!data.data.customers || data.data.customers.length === 0) {
                 emptyContent(true);
             } else {
                 emptyContent(false);
@@ -265,7 +261,7 @@ const Users = () => {
             setIsLoadingDelete(false);
         }
         else{
-            toast({description:data.message, variant: "destructive",});
+            toast({description: data.error.message, variant: "destructive",});
             setIsLoadingDelete(false);
         }
         setOpenDelete(false);
@@ -288,21 +284,21 @@ const Users = () => {
         const payload = {
             ...customerDetails,
             projectId: projectDetailsReducer.id,
-            customer_first_seen: new Date(),
-            customer_last_seen: new Date(),
+            firstSeen: new Date(),
+            lastSeen: new Date(),
         }
         const data = await apiService.createUsers(payload)
         if(data.success) {
             setIsSave(false);
             setCustomerDetails(initialState);
             toast({description: data.message,});
-            const clone = [...customerList];
+            const clone = Array.isArray(customerList) ? [...customerList] : [];
             clone.unshift(data.data);
             setCustomerList(clone);
             getAllUsers();
         } else {
             setIsSave(false);
-            toast({description:data.message, variant: "destructive",})
+            toast({description: data.error.message, variant: "destructive",})
         }
         closeSheet();
     };
@@ -310,7 +306,7 @@ const Users = () => {
     const getUserActions = async () => {
         setIsLoadingUserDetail(true);
         const payload = {
-            user_id: selectedCustomer?.id,
+            userId: selectedCustomer?.id,
             type: selectedTab,
             page: pageNoAction,
             limit: perPageLimit
@@ -318,7 +314,7 @@ const Users = () => {
         const data = await apiService.userAction(payload);
         if(data.success) {
             setUserActions(Array.isArray(data.data) ? data.data : []);
-            setTotalRecordAction(data.total)
+            setTotalRecordAction(data.data.total)
             // toast({description: data.message,});
             setIsLoadingUserDetail(false)
         } else {

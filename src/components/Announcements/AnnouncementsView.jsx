@@ -33,15 +33,10 @@ const AnnouncementsView = ({data,isLoading,setSelectedRecord,handleDelete,setAna
         setAnnouncementList(announcementList.map(x => x.id === object.id ? { ...x, post_save_as_draft: value } : x));
         const payload = {...object,post_save_as_draft:value}
         const data = await apiService.updatePosts(payload,object.id);
-        if(data.status === 200){
-            toast({
-                title: data.success,
-            });
+        if(data.success){
+            toast({title: data.message,});
         } else {
-            toast({
-                title: data.success,
-                variant: "destructive",
-            });
+            toast({title: data.error.message, variant: "destructive",});
         }
     };
 

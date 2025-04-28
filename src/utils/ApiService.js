@@ -304,7 +304,7 @@ export class ApiService {
 
     /* ---------- Users api ---------- */
     async getAllUsers (id){
-        return await this.getData(`${baseUrlApi}/customerAuth/getAll?${qs.stringify(id)}`)
+        return await this.getData(`${baseUrlApi}/customer-auth/get-all?projectId=${id}`)
     }
 
     async getSingleUser(id) {
@@ -312,7 +312,7 @@ export class ApiService {
     }
 
     async createUsers(payload) {
-        return await this.postData(`${baseUrlApi}/customerAuth/store`, payload)
+        return await this.postData(`${baseUrlApi}/customer-auth/store`, payload)
     }
 
     async userManualUpVote(payload) {
@@ -320,7 +320,7 @@ export class ApiService {
     }
 
     async userAction(payload) {
-        return await this.postData(`${baseUrlApi}/customerAuth/vote`, payload)
+        return await this.postData(`${baseUrlApi}/customer-auth/customer-actions`, payload)
     }
 
     async updateUsers(payload, id) {

@@ -1,12 +1,11 @@
 import React, {useEffect, useState, Fragment} from 'react';
-import {Sheet, SheetContent, SheetHeader, SheetOverlay, SheetTitle,} from "../ui/sheet";
+import {Sheet, SheetContent, SheetHeader, SheetTitle,} from "../ui/sheet";
 import {CalendarIcon, Check, Circle, Pin, X, Loader2, CircleX, Upload} from "lucide-react";
 import {Label} from "../ui/label";
 import {Input} from "../ui/input";
 import {Button} from "../ui/button";
 import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue,} from "../ui/select";
 import moment from "moment";
-import {ApiService} from "../../utils/ApiService";
 import {useSelector} from "react-redux";
 import {useTheme} from "../theme-provider";
 import {Popover, PopoverContent, PopoverTrigger} from "../ui/popover";
@@ -16,6 +15,7 @@ import {Badge} from "../ui/badge";
 import ReactQuillEditor from "../Comman/ReactQuillEditor";
 import {Checkbox} from "../ui/checkbox";
 import {ImageUploader} from "../Comman/CommentEditor";
+import {apiService} from "../../utils/constent";
 
 const initialState = {
     description: '',
@@ -43,7 +43,6 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
     const userDetailsReducer = useSelector(state => state.userDetailsReducer);
     const {theme} = useTheme();
-    let apiService = new ApiService();
 
     const [changeLogDetails, setChangeLogDetails] = useState(initialState);
     const [formError, setFormError] = useState(initialStateError);
@@ -216,9 +215,8 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
 
     const onDateChange = (name, date) => {
         if (date) {
-            const formattedDate = new Date(date); // Ensure it's a valid Date object
+            const formattedDate = new Date(date);
             let obj = { ...changeLogDetails, [name]: formattedDate };
-
             if (name === "publishedAt") {
                 if (formattedDate > new Date()) {
                     obj = { ...obj, status: 2 }; // Future date
@@ -226,7 +224,6 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
                     obj = { ...obj, status: 1 }; // Past or current date
                 }
             }
-
             setChangeLogDetails(obj);
             setPopoverOpen(false);
             setPopoverOpenExpired(false);
@@ -252,10 +249,7 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
 
         const isSlugTaken = (announcementList.data || []).some(x => x.slug === changeLogDetails.slug);
         if (isSlugTaken) {
-            toast({
-                description: "The post slug url has already been taken.",
-                variant: "destructive",
-            });
+            toast({description: "The post slug url has already been taken.", variant: "destructive",});
             return;
         }
 
@@ -282,9 +276,9 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
                     formData.append("publishedAt", moment(changeLogDetails.publishedAt).format("YYYY-MM-DD"));
                 } else if (x === "expiredAt") {
                     formData.append("expiredAt", changeLogDetails.expiredBoolean === 1 ? moment(changeLogDetails.expiredAt).format("YYYY-MM-DD") : "");
-                } else if (x === "delete_image" && changeLogDetails?.image?.name) {
+                } else if (x === "deleteImage" && changeLogDetails?.image?.name) {
 
-                } else if (x === "categoryId" && (changeLogDetails[x] === null || changeLogDetails[x] === "null")) {
+                } else if (x === "categoryId" && (changeLogDetails[x] == null || changeLogDetails[x] === "null")) {
                     formData.append("categoryId", "");
                 } else {
                     formData.append(x, changeLogDetails[x]);
@@ -351,7 +345,6 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
 
     return (
         <Sheet open={isOpen} onOpenChange={isOpen ? onClose : onOpen}>
-            {/*<SheetOverlay className={"inset-0"}/>*/}
             <SheetContent className={"pt-6 p-0 lg:max-w-[663px] md:max-w-[720px] sm:max-w-[520px]"}>
                 <SheetHeader
                     className={`px-3 py-4 lg:px-8 lg:py-[20px] flex flex-row justify-between items-center border-b space-y-0`}>
@@ -587,7 +580,7 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
                                 {/*                    <CircleX*/}
                                 {/*                        size={20}*/}
                                 {/*                        className={`light:text-muted-foreground dark:text-card cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}*/}
-                                {/*                        onClick={() => onDeleteImg('delete_image', changeLogDetails && changeLogDetails?.image && changeLogDetails.image?.name ? "" : changeLogDetails.image.replace("https://code.quickhunt.app/public/storage/post/", ""))}*/}
+                                {/*                        onClick={() => onDeleteImg('deleteImage', changeLogDetails && changeLogDetails?.image && changeLogDetails.image?.name ? "" : changeLogDetails.image.replace("https://code.quickhunt.app/public/storage/post/", ""))}*/}
                                 {/*                    />*/}
                                 {/*                </div> :*/}
                                 {/*                <div className={"w-[282px] h-[128px] relative border p-[5px]"}>*/}
@@ -596,7 +589,7 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
                                 {/*                    <CircleX*/}
                                 {/*                        size={20}*/}
                                 {/*                        className={`light:text-muted-foreground dark:text-card cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}*/}
-                                {/*                        onClick={() => onDeleteImg('delete_image', changeLogDetails && changeLogDetails?.image && changeLogDetails.image?.name ? "" : changeLogDetails.image.replace("https://code.quickhunt.app/public/storage/post/", ""))}*/}
+                                {/*                        onClick={() => onDeleteImg('deleteImage', changeLogDetails && changeLogDetails?.image && changeLogDetails.image?.name ? "" : changeLogDetails.image.replace("https://code.quickhunt.app/public/storage/post/", ""))}*/}
                                 {/*                    />*/}
                                 {/*                </div>*/}
                                 {/*            }*/}

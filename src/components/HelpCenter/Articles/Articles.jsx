@@ -8,9 +8,8 @@ import {useTheme} from "../../theme-provider";
 import {DropdownMenu, DropdownMenuPortal, DropdownMenuSub, DropdownMenuTrigger} from "@radix-ui/react-dropdown-menu";
 import {DropdownMenuContent, DropdownMenuItem, DropdownMenuSubContent, DropdownMenuSubTrigger} from "../../ui/dropdown-menu";
 import {useNavigate} from "react-router-dom";
-import {baseUrl} from "../../../utils/constent";
+import {apiService, baseUrl} from "../../../utils/constent";
 import moment from "moment";
-import {ApiService} from "../../../utils/ApiService";
 import {useSelector} from "react-redux";
 import {useToast} from "../../ui/use-toast";
 import {Skeleton} from "../../ui/skeleton";
@@ -32,7 +31,6 @@ const status = [
 const perPageLimit = 10
 
 const Articles = () => {
-    const apiService = new ApiService();
     const {theme} = useTheme();
     const {toast} = useToast();
     const navigate = useNavigate();
@@ -187,7 +185,6 @@ const Articles = () => {
         setIsLoadingDelete(true)
         const data = await apiService.deleteArticles(idToDelete)
         const clone = [...articles];
-        debugger
         const index = clone.findIndex((x) => x.id == idToDelete)
         if (data.success) {
             if (index !== -1) {
@@ -201,7 +198,7 @@ const Articles = () => {
             }
             toast({description: data.message,})
         } else {
-            toast({description: data.error, variant: "destructive"})
+            toast({description: data.error.message, variant: "destructive"})
         }
         setIsLoadingDelete(false)
         setOpenDelete(false);
@@ -229,7 +226,7 @@ const Articles = () => {
         if (data.success) {
             toast({description: data.message,});
         } else {
-            toast({description: data.error, variant: "destructive",});
+            toast({description: data.error.message, variant: "destructive",});
         }
     };
 

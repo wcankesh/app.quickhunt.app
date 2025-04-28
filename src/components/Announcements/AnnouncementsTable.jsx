@@ -16,6 +16,8 @@ import EmptyData from "../Comman/EmptyData";
 import {useNavigate} from "react-router";
 import {useLocation} from "react-router-dom";
 import DeleteDialog from "../Comman/DeleteDialog";
+import {Popover, PopoverContent, PopoverTrigger} from "../ui/popover";
+import {Avatar, AvatarFallback} from "../ui/avatar";
 
 const status = [
     {name: "Publish", value: 1, fillColor: "#389E0D", strokeColor: "#389E0D",},
@@ -27,7 +29,7 @@ const status2 = [
     {name: "Draft", value: 4, fillColor: "#CF1322", strokeColor: "#CF1322",},
 ]
 
-const AnnouncementsTable = ({data, isLoading, setSelectedRecord, handleDelete, setAnalyticsObj,isLoadingDelete, currentPage, setCurrentPage, getAllPosts}) => {
+const AnnouncementsTable = ({data, isLoading, handleDelete, isLoadingDelete, getAllPosts}) => {
     const location = useLocation();
     const UrlParams = new URLSearchParams(location.search);
     const getPageNo = UrlParams.get("pageNo");
@@ -54,7 +56,7 @@ const AnnouncementsTable = ({data, isLoading, setSelectedRecord, handleDelete, s
         if (Array.isArray(data)) {
             setAnnouncementData(data.map((item) => ({ ...item, status: item.status ?? 1 })));
         } else {
-            setAnnouncementData([]); // Default to empty array if data is not an array
+            setAnnouncementData([]);
         }
     }, [data]);
 
@@ -91,14 +93,9 @@ const AnnouncementsTable = ({data, isLoading, setSelectedRecord, handleDelete, s
         }
         const data = await apiService.updatePosts(payload, object.id);
         if (data.success) {
-            toast({
-                description: data.message,
-            });
+            toast({description: data.message,});
         } else {
-            toast({
-                description: data.error.message,
-                variant: "destructive",
-            });
+            toast({description: data.error.message, variant: "destructive",});
         }
         getAllPosts();
     };
@@ -203,6 +200,58 @@ const AnnouncementsTable = ({data, isLoading, setSelectedRecord, handleDelete, s
                                                                         )
                                                                     })
                                                                 }
+                                                                {/*<Popover>*/}
+                                                                {/*    <PopoverTrigger asChild>*/}
+                                                                {/*        <Button variant={"ghost hove:none"} className={"p-0 h-[24px]"}>*/}
+                                                                {/*            <div className={"flex justify-between items-center"}>*/}
+                                                                {/*                <div className={"text-sm text-center"}>*/}
+                                                                {/*                    <div className={`flex flex-wrap gap-2`}>*/}
+                                                                {/*                        {*/}
+                                                                {/*                            x?.labels?.slice(0, 1).map((labelsId, i) => (*/}
+                                                                {/*                                <div className={"text-sm font-normal"} key={i}>*/}
+                                                                {/*                                    {labelsId?.name}*/}
+                                                                {/*                                </div>*/}
+                                                                {/*                            ))*/}
+                                                                {/*                        }*/}
+                                                                {/*                    </div>*/}
+                                                                {/*                </div>*/}
+                                                                {/*                {*/}
+                                                                {/*                    (x?.labels?.length > 1) &&*/}
+                                                                {/*                    <div*/}
+                                                                {/*                        className={"update-idea text-sm rounded-full border text-center"}>*/}
+                                                                {/*                        <Avatar>*/}
+                                                                {/*                            <AvatarFallback>+{x?.labels?.length - 1}</AvatarFallback>*/}
+                                                                {/*                        </Avatar>*/}
+                                                                {/*                    </div>*/}
+                                                                {/*                }*/}
+                                                                {/*            </div>*/}
+                                                                {/*        </Button>*/}
+                                                                {/*    </PopoverTrigger>*/}
+                                                                {/*    <PopoverContent className="p-0" align={"start"}>*/}
+                                                                {/*        <div className={""}>*/}
+                                                                {/*            <div className={"py-3 px-4"}>*/}
+                                                                {/*                <h4 className="font-normal leading-none text-sm">{`Topics (${x?.labels?.length})`}</h4>*/}
+                                                                {/*            </div>*/}
+                                                                {/*            <div className="border-t px-4 py-3 space-y-2">*/}
+                                                                {/*                {x.labels && x.labels.length > 0 && (*/}
+                                                                {/*                    <div className="space-y-2">*/}
+                                                                {/*                        {x.labels.map((y, i) => (*/}
+                                                                {/*                            <Badge variant={"outline"} key={i}*/}
+                                                                {/*                                           style={{*/}
+                                                                {/*                                               color: y.colorCode,*/}
+                                                                {/*                                               borderColor: y.colorCode,*/}
+                                                                {/*                                               textTransform: "capitalize"*/}
+                                                                {/*                                           }}*/}
+                                                                {/*                                           className={`h-[20px] py-0 px-2 text-xs rounded-[5px]  font-medium text-[${y.colorCode}] border-[${y.colorCode}] capitalize`}>*/}
+                                                                {/*                                        <span className={"max-w-[85px] truncate text-ellipsis overflow-hidden whitespace-nowrap"}>{y.name}</span>*/}
+                                                                {/*                                    </Badge>*/}
+                                                                {/*                        ))}*/}
+                                                                {/*                    </div>*/}
+                                                                {/*                )}*/}
+                                                                {/*            </div>*/}
+                                                                {/*        </div>*/}
+                                                                {/*    </PopoverContent>*/}
+                                                                {/*</Popover>*/}
                                                             </Fragment>
                                                         </div> : ""}
                                             </TableCell>

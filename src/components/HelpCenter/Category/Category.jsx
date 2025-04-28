@@ -5,15 +5,14 @@ import {Card, CardContent} from "../../ui/card";
 import {DropdownMenu, DropdownMenuTrigger} from "@radix-ui/react-dropdown-menu";
 import {DropdownMenuContent, DropdownMenuItem} from "../../ui/dropdown-menu";
 import {Ellipsis, Plus, X} from "lucide-react";
-import {Sheet, SheetContent, SheetHeader, SheetOverlay} from "../../ui/sheet";
+import {Sheet, SheetContent, SheetHeader} from "../../ui/sheet";
 import moment from 'moment';
 import {useToast} from "../../ui/use-toast";
 import {useTheme} from "../../theme-provider";
 import {useSelector} from "react-redux";
-import {ApiService} from "../../../utils/ApiService";
 import {Skeleton} from "../../ui/skeleton";
 import EmptyData from "../../Comman/EmptyData";
-import {baseUrl} from "../../../utils/constent";
+import {apiService, baseUrl} from "../../../utils/constent";
 import {useNavigate} from "react-router";
 import Pagination from "../../Comman/Pagination";
 import DeleteDialog from "../../Comman/DeleteDialog";
@@ -22,6 +21,7 @@ import {EmptyDataContent} from "../../Comman/EmptyDataContent";
 import CategoryForm from "../../Comman/CategoryForm";
 import {CommSearchBar} from "../../Comman/CommentEditor";
 import {EmptyInCategoryContent} from "../../Comman/EmptyContentForModule";
+import {DialogTitle} from "../../ui/dialog";
 
 const initialState = {
     title: "",
@@ -39,7 +39,6 @@ const initialStateError = {
 const perPageLimit = 10
 
 const Category = () => {
-    const apiService = new ApiService();
     const {theme} = useTheme();
     const {toast} = useToast();
     const navigate = useNavigate();
@@ -83,7 +82,6 @@ const Category = () => {
             search: search,
             page: pageNo,
             limit: perPageLimit,
-
         });
         if (data.success) {
             setCategoryList(data.data);
@@ -216,7 +214,7 @@ const Category = () => {
             toast({description: data.message});
             closeSheetSubCategory()
         } else {
-            toast({description: data?.error, variant: "destructive",});
+            toast({description: data?.error.message, variant: "destructive",});
         }
         setSubCategoryEdit(false);
     };
@@ -261,7 +259,7 @@ const Category = () => {
                 setCategoryList({ rows: clone, total: categoryList.total });
                 toast({description: data.message,});
             } else {
-                toast({description: data.error, variant: "destructive",});
+                toast({description: data.error.message, variant: "destructive",});
             }
         }
         setCategoryEdit(false);
@@ -309,7 +307,7 @@ const Category = () => {
                 }
                 toast({description: data.message});
             } else {
-                toast({description: data.error, variant: "destructive",});
+                toast({description: data.error.message, variant: "destructive",});
             }
         }
         setSubCategoryEdit(false);
@@ -426,7 +424,7 @@ const Category = () => {
             }
             toast({description: data.message,})
         } else {
-            toast({description: data.message, variant: "destructive"})
+            toast({description: data.error.message, variant: "destructive"})
         }
         setIsLoadingDelete(false)
         setOpenDelete(false);
@@ -448,7 +446,7 @@ const Category = () => {
             getAllCategory()
             toast({description: data.message,})
         } else {
-            toast({description: data.error, variant: "destructive"})
+            toast({description: data.error.message, variant: "destructive"})
         }
         setIsLoadingDelete(false)
         setOpenSubDelete(false);
@@ -470,12 +468,11 @@ const Category = () => {
 
             {isSheetOpen && (
                 <Sheet open={isSheetOpen} onOpenChange={isSheetOpen ? closeSheetCategory : openSheetCategory}>
-                    {/*<SheetOverlay className={"inset-0"} />*/}
                     <SheetContent className={"sm:max-w-[662px] p-0"}>
                         <SheetHeader className={"px-3 py-4 lg:px-8 lg:py-[20px] flex flex-row justify-between items-center border-b space-y-0"}>
-                            <h2 className={"text-lg md:text-xl font-normal"}>
+                            <DialogTitle className={"text-lg md:text-xl font-normal"}>
                                 { selectedCategory?.id ? "Update Category" : "Create Category"}
-                            </h2>
+                            </DialogTitle>
                             <span className={"max-w-[24px]"}><X onClick={closeSheetCategory} className={"cursor-pointer m-0"} /></span>
                         </SheetHeader>
                         <div className={"h-[calc(100vh_-_120px)] lg:h-[calc(100vh_-_69px)] overflow-y-auto"}>
@@ -498,12 +495,11 @@ const Category = () => {
 
             {isSheetOpenSub && (
                 <Sheet open={isSheetOpenSub} onOpenChange={isSheetOpenSub ? closeSheetSubCategory : openSheetSubCategory}>
-                    {/*<SheetOverlay className={"inset-0"} />*/}
                     <SheetContent className={"sm:max-w-[662px] p-0"}>
                         <SheetHeader className={"px-3 py-4 lg:px-8 lg:py-[20px] flex flex-row justify-between items-center border-b space-y-0"}>
-                            <h5 className={"text-lg md:text-xl font-normal"}>
+                            <DialogTitle className={"text-lg md:text-xl font-normal"}>
                                 { selectedSubCategory?.id ? "Update Sub Category" : "Create Sub Category"}
-                            </h5>
+                            </DialogTitle>
                             <span className={"max-w-[24px]"}><X onClick={closeSheetSubCategory} className={"cursor-pointer m-0"} /></span>
                         </SheetHeader>
                         <div className={"h-[calc(100vh_-_120px)] lg:h-[calc(100vh_-_69px)] overflow-y-auto"}>
@@ -584,7 +580,7 @@ const Category = () => {
                                                 {
                                                     ["Title", "Articles", "Created At", "Actions"].map((x, i) => {
                                                         return (
-                                                            <TableHead className={`font-medium text-card-foreground px-2 py-[10px] md:px-3 max-w-[300px]`}>{x}</TableHead>
+                                                            <TableHead key={i} className={`font-medium text-card-foreground px-2 py-[10px] md:px-3 max-w-[300px]`}>{x}</TableHead>
                                                         )
                                                     })
                                                 }

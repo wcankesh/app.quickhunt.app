@@ -166,12 +166,12 @@ const AnalyticsViews = () => {
                                                     for this announcement yet</p> : <Fragment>
                                                     {
                                                         (reactionList || []).map((x, index) => {
-                                                            const matchedEmojiObject = (allEmoji || []).find((y) => y.id === x.reaction_id);
+                                                            const matchedEmojiObject = (allEmoji || []).find((y) => y.id === x.reactionId);
                                                             return (
                                                                 <div className={""} key={index}>
                                                                     <div className={"flex flex-row gap-2 items-center"}>
                                                                         {matchedEmojiObject ? <img className={"h-10 w-10"}
-                                                                                                   src={matchedEmojiObject?.emoji_url}/> : Icon?.smileEmoji2}
+                                                                                                   src={matchedEmojiObject?.emojiUrl}/> : Icon?.smileEmoji2}
                                                                         <h5 className={"text-2xl font-medium"}>{x.total}</h5>
                                                                     </div>
                                                                 </div>
@@ -219,8 +219,8 @@ const AnalyticsViews = () => {
                                                                         {/*<div className={"flex flex-row gap-4"}>*/}
                                                                             <div className={"flex flex-col gap-1"}>
                                                                                 <div className={"flex gap-4 items-center"}>
-                                                                                    <h5 className={"text-sm font-medium"}>{x?.customer_name}</h5>
-                                                                                    <p className={"text-muted-foreground text-[10px] font-normal"}>{x?.customer_email_id}</p>
+                                                                                    <h5 className={"text-sm font-medium"}>{x?.name}</h5>
+                                                                                    <p className={"text-muted-foreground text-[10px] font-normal"}>{x?.email}</p>
                                                                                 </div>
                                                                                 <div className={"text-muted-foreground text-xs font-normal"}>
                                                                                     <ReadMoreText className={"text-xs"}

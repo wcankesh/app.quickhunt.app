@@ -12,9 +12,8 @@ import {Calendar} from "../ui/calendar";
 import {useLocation, useNavigate, useParams} from "react-router-dom";
 import {useSelector} from "react-redux";
 import {useTheme} from "../theme-provider";
-import {ApiService} from "../../utils/ApiService";
 import {toast} from "../ui/use-toast";
-import {baseUrl} from "../../utils/constent";
+import {apiService, baseUrl} from "../../utils/constent";
 import {Checkbox} from "../ui/checkbox";
 import {Card, CardContent, CardFooter} from "../ui/card";
 import CommonBreadCrumb from "../Comman/CommonBreadCrumb";
@@ -31,7 +30,6 @@ const UpdateAnnouncement = () => {
     const getPageNo = UrlParams.get("pageNo") || 1;
     const { id } = useParams();
     const {theme} = useTheme();
-    let apiService = new ApiService();
     const navigate = useNavigate();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
@@ -69,14 +67,10 @@ const UpdateAnnouncement = () => {
             setSelectedRecord({
                 ...data.data.data,
                 image: data.data?.data?.featureImage,
-                assignToId: Array.isArray(data.data?.data?.assignToId)
-                    ? data.data?.data?.assignToId
-                    : (data.data?.data?.assignToId || []).length > 0
-                        ? [data.data?.data?.assignToId.toString()]
-                        : [],
+                assignToId: data.data?.data?.assignToId?.toString() || '',
                 publishedAt: data.data?.data?.publishedAt ? moment(data.data?.data?.publishedAt).format('YYYY-MM-DD') : moment(new Date()),
                 expiredAt: data.data?.data?.expiredAt ? moment(data.data?.data?.expiredAt).format('YYYY-MM-DD') : undefined,
-                categoryId: data.data?.data?.category?.categoryId,
+                categoryId: data.data?.data?.categoryId?.toString() || '',
                 labels: data.data?.data?.labels || [],
             });
         }
@@ -287,7 +281,7 @@ const UpdateAnnouncement = () => {
         // } else {
         //     clone.push(value);
         // }
-        setSelectedRecord({...selectedRecord, assignToId: [value]});
+        setSelectedRecord({...selectedRecord, assignToId: value});
     };
 
     const onChangeLabel = (value) => {
@@ -446,25 +440,29 @@ const UpdateAnnouncement = () => {
                                 </div>
                                 <div className={"w-full space-y-1.5"}>
                                     <Label className={"font-normal"}>Assign to</Label>
+                                    {console.log("selectedRecord", selectedRecord)}
+                                    {console.log("selectedRecord?.assignToId", selectedRecord?.assignToId)}
                                     <Select onValueChange={handleValueChange} value={[]}>
                                     {/*<Select onValueChange={handleValueChange} value={selectedRecord?.assignToId?.length > 0 ? selectedRecord.assignToId[0] : undefined}>*/}
                                         <SelectTrigger className={"h-9"}>
                                             <SelectValue className={"text-muted-foreground text-sm"}>
                                                 {
-                                                    selectedRecord?.assignToId?.length > 0 ? (
+                                                    selectedRecord?.assignToId ? (
                                                         <div className={"flex gap-[2px]"}>
-                                                            {
-                                                                Array.isArray(selectedRecord?.assignToId) && (selectedRecord?.assignToId || []).map((x, index) => {
-                                                                    const findObj = memberList.find((y,) => y.userId == x);
-                                                                    return (
-                                                                        <div key={index}
-                                                                             className={`${theme === "dark" ? "text-card bg-accent-foreground" : "bg-muted-foreground/30"} text-sm flex gap-[2px] items-center rounded py-0 px-2`}
-                                                                             onClick={(e) => deleteAssignTo(e, index)}>
-                                                                            {findObj?.firstName ? findObj?.firstName : ''}
-                                                                        </div>
-                                                                    )
-                                                                })
-                                                            }
+                                                            {(() => {
+                                                                const findObj = memberList.find((y) => y.userId == selectedRecord.assignToId);
+                                                                return findObj ? (
+                                                                    <div
+                                                                        className={`${
+                                                                            theme === "dark" ? "text-card bg-accent-foreground" : "bg-muted-foreground/30"
+                                                                        } text-sm flex gap-[2px] items-center rounded py-0 px-2`}
+                                                                    >
+                                                                        {findObj?.firstName ? findObj.firstName : ''}
+                                                                    </div>
+                                                                ) : (
+                                                                    <span className="text-muted-foreground">Select Assign To</span>
+                                                                );
+                                                            })()}
                                                         </div>) : (<span className="text-muted-foreground">Select Assign To</span>)
                                                 }
                                             </SelectValue>
@@ -472,19 +470,19 @@ const UpdateAnnouncement = () => {
                                         <SelectContent>
                                             <SelectGroup>
                                                 {(memberList || []).map((x, i) => (
-                                                    <SelectItem className={"p-2"} key={i} value={x.userId}>
+                                                    <SelectItem className={"p-2"} key={i} value={x.userId.toString()}>
                                                         <div className={"flex gap-2"}>
-                                                            <div onClick={() => handleValueChange(x.userId)}
-                                                                 className="checkbox-icon">
-                                                                {selectedRecord?.assignToId?.includes(x.userId) ?
-                                                                    <Check size={18}/> :
-                                                                    <div className={"h-[18px] w-[18px]"}/>}
+                                                            <div onClick={() => handleValueChange(x.userId.toString())} className="checkbox-icon">
+                                                                {selectedRecord?.assignToId == x.userId ? (
+                                                                    <Check size={18} />
+                                                                ) : (
+                                                                    <div className={"h-[18px] w-[18px]"} />
+                                                                )}
                                                             </div>
                                                             <span>{x.firstName ? x.firstName : ''} {x.lastName ? x.lastName : ''}</span>
                                                         </div>
                                                     </SelectItem>
                                                 ))}
-
                                             </SelectGroup>
                                         </SelectContent>
                                     </Select>

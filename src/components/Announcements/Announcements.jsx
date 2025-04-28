@@ -40,7 +40,6 @@ const Announcements = () => {
 
     const [announcementList, setAnnouncementList] = useState([]);
     const [selectedRecord, setSelectedRecord] = useState({})
-    const [analyticsObj, setAnalyticsObj] = useState({})
     const [filter, setFilter] = useState({...initialStateFilter, projectId: projectDetailsReducer.id});
     const [pageNo, setPageNo] = useState(Number(getPageNo));
     const [openFilterType, setOpenFilterType] = useState('');
@@ -94,14 +93,6 @@ const Announcements = () => {
             navigate(`${baseUrl}/announcements?pageNo=${pageNo}`);
         }
     }, [projectDetailsReducer.id, allStatusAndTypes, pageNo,]);
-
-    useEffect(() => {
-        const urlParams = new URLSearchParams(location.search);
-        const postId = urlParams.get("postId");
-        if(postId){
-            setAnalyticsObj({id: postId})
-        }
-    }, []);
 
     const getAllPosts = async (getFilter = {}) => {
         const payload = {
@@ -169,8 +160,6 @@ const Announcements = () => {
         setPageNo(1);
         getAllPosts(clone);
     };
-
-    const onCloseAnalyticsSheet = () => {setAnalyticsObj({})}
 
     const closeSheet = (record,addRecord) => {
         if (record) {
@@ -373,7 +362,6 @@ const Announcements = () => {
 
             <Card className={"my-6"}>
                 <AnnouncementsTable
-                    setAnalyticsObj={setAnalyticsObj}
                     handleDelete={handleDelete}
                     data={announcementList}
                     setSelectedRecord={setSelectedRecord}

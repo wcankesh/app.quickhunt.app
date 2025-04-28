@@ -19,6 +19,7 @@ import ImageUploader from "../Comman/ImageUploader";
 import {CommentEditor, ImageGallery, SaveCancelButton, UserAvatar} from "../Comman/CommentEditor";
 import {Skeleton} from "../ui/skeleton";
 import {apiService} from "../../utils/constent";
+import {DialogTitle} from "../ui/dialog";
 
 const initialStateError = {
     title: "",
@@ -739,7 +740,9 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                 {/*<SheetOverlay className={"inset-0"}/>*/}
                 <SheetContent className={"lg:max-w-[1101px] md:max-w-[720px] sm:max-w-full p-0"}>
                     <SheetHeader className={"px-4 py-3 md:py-5 lg:px-8 lg:py-[20px] border-b"}>
-                        <X onClick={onCloseBoth} className={"cursor-pointer"}/>
+                        <DialogTitle>
+                            <X onClick={onCloseBoth} className={"cursor-pointer"}/>
+                        </DialogTitle>
                     </SheetHeader>
                     <div className={`grid lg:grid-cols-12 md:grid-cols-1 overflow-auto ${selectedIdea?.comments?.length > 2 ? "h-[calc(100vh_-_100px)]" : "h-[calc(100vh_-_50px)]"} sm:h-[calc(100vh_-_65px)]`}>
                         <div
@@ -922,7 +925,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                                                                 <div
                                                                                                     className={"update-idea text-sm rounded-full text-center"}>
                                                                                                     <UserAvatar
-                                                                                                        userPhoto={x.user_photo}
+                                                                                                        userPhoto={x.userPhoto}
                                                                                                         userName={x.name ? x.name : x?.user_name}
                                                                                                         className="w-[20px] h-[20px]"
                                                                                                     />
@@ -1047,8 +1050,9 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                     <div className={"flex items-center gap-4 md:flex-nowrap flex-wrap"}>
                                                         <div className={"flex items-center gap-2"}>
                                                             <UserAvatar
-                                                                userPhoto={selectedIdea?.user_photo}
+                                                                userPhoto={selectedIdea?.userPhoto}
                                                                 userName={selectedIdea?.name}
+                                                                initialStyle={"text-sm"}
                                                             />
                                                             <div className={"flex items-center"}>
                                                                 {

@@ -239,7 +239,7 @@ const UpdateIdea = () => {
             if(upvoteResponse.success) {
                 toast({description: upvoteResponse.message,});
             } else {
-                toast({description:upvoteResponse.message, variant: "destructive",})
+                toast({description:upvoteResponse.error.message, variant: "destructive",})
             }
             setUserDetailError(initialUserError);
             getIdeaVotes();
