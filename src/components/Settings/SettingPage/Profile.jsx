@@ -7,20 +7,14 @@ import {CircleX, Eye, EyeOff, Loader2, Upload} from "lucide-react";
 import {useSelector, useDispatch} from "react-redux";
 import {userDetailsAction} from "../../../redux/action/UserDetailAction";
 import {toast} from "../../ui/use-toast";
-import {apiService} from "../../../utils/constent";
+import {apiService, DO_SPACES_ENDPOINT} from "../../../utils/constent";
 
 const initialState = {
     id: "",
-    user_browser: null,
-    user_created_date: "",
     email: "",
     firstName: "",
-    user_ip_address: null,
-    user_job_title: "",
     lastName: "",
     profileImage: "",
-    user_status: "",
-    user_updated_date: "",
 }
 
 const initialStateError = {
@@ -198,13 +192,15 @@ const Profile = () => {
             profileImage: userDetails.profileImage,
             deleteImage: userDetails?.deleteImage || '',
         }
-        Object.keys(obj).map((x) => {
-            if (x === "deleteImage" && obj?.profileImage?.name) {
-
+        Object.keys(obj).forEach((key) => {
+            if (key === "deleteImage") {
+                if (obj[key]) {
+                    formData.append(key, obj[key]);
+                }
             } else {
-                formData.append(x, obj[x]);
+                formData.append(key, obj[key]);
             }
-        })
+        });
 
         const data = await apiService.updateLoginUserDetails(formData, userDetailsReducer.id);
         setIsLoading(false);
@@ -256,48 +252,31 @@ const Profile = () => {
                         <div className="flex flex-col justify-center mt-2 relative">
                             {
                                 userDetails?.profileImage ?
-                                    <div>
-                                        {userDetails && userDetails.profileImage && userDetails.profileImage.name ?
-                                            <div
-                                                className={"w-[80px] h-[80px] sm:w-[132px] sm:h-[128px] relative border"}>
-                                                <img
-                                                    className="h-full w-full rounded-md object-cover"
-                                                    src={userDetails && userDetails.profileImage && userDetails.profileImage.name ? URL.createObjectURL(userDetails.profileImage) : userDetails.profileImage}
-                                                    alt=""
-                                                />
-                                                <CircleX
-                                                    size={20}
-                                                    className={`stroke-gray-500 dark:stroke-white cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
-                                                    onClick={() => onDeleteImg('deleteImage', userDetails && userDetails?.profileImage && userDetails.profileImage?.name ? "" : userDetails.profileImage.replace("https://code.quickhunt.app/public/storage/user/", ""))}
-                                                />
-                                            </div> : userDetails.profileImage ?
-                                                <div
-                                                    className={"w-[80px] h-[80px] sm:w-[132px] sm:h-[128px] relative border"}>
-                                                    <img
-                                                        className="h-full w-full rounded-md object-cover"
-                                                        src={userDetails.profileImage}
-                                                        alt=""/>
-                                                    <CircleX
-                                                        size={20}
-                                                        className={`stroke-gray-500 dark:stroke-white cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
-                                                        onClick={() => onDeleteImg('deleteImage', userDetails && userDetails?.profileImage && userDetails.profileImage?.name ? "" : userDetails.profileImage.replace("https://code.quickhunt.app/public/storage/user/", ""))}
-                                                    />
-                                                </div>
-                                                : ''}
+                                    <div className="w-[80px] h-[80px] sm:w-[132px] sm:h-[128px] relative border">
+                                        <img
+                                            className="h-full w-full rounded-md object-cover"
+                                            src={userDetails?.profileImage?.name ? URL.createObjectURL(userDetails.profileImage) : `${DO_SPACES_ENDPOINT}/${userDetails.profileImage}`}
+                                            alt="profile"
+                                        />
+                                        <CircleX
+                                            size={20}
+                                            className="stroke-gray-500 dark:stroke-white cursor-pointer absolute top-0 left-full translate-x-[-50%] translate-y-[-50%] z-10"
+                                            onClick={() => onDeleteImg('deleteImage', userDetails?.profileImage?.name ? "" : userDetails?.profileImage)}
+                                        />
                                     </div> :
                                     <div>
                                         <input
                                             id="pictureInput"
                                             type="file"
                                             className="hidden"
-                                            accept={"profileImage/*"}
+                                            accept="image/*"
                                             onChange={handleFileChange}
                                         />
                                         <label
                                             htmlFor="pictureInput"
-                                            className="flex w-[80px] h-[80px] sm:w-[132px] sm:h-[128px] py-0 justify-center items-center flex-shrink-0 border-dashed border-[1px] border-gray-300 rounded cursor-pointer"
+                                            className="flex w-[80px] h-[80px] sm:w-[132px] sm:h-[128px] justify-center items-center border-dashed border border-gray-300 rounded cursor-pointer"
                                         >
-                                            <Upload className="h-4 w-4 text-muted-foreground"/>
+                                            <Upload className="h-4 w-4 text-muted-foreground" />
                                         </label>
                                     </div>
                             }

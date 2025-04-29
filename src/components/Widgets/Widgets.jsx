@@ -40,7 +40,7 @@ const Widgets = () => {
     const [openDelete, setOpenDelete] = useState(false);
     const [openCopyCode, setOpenCopyCode] = useState(false);
     const [selectedId, setSelectedId] = useState("");
-    const [selectedType, setSelectedType] = useState("");
+    const [selectedType, setSelectedType] = useState("script");
     const [deleteRecord, setDeleteRecord] = useState(null);
     const [pageNo, setPageNo] = useState(Number(getPageNo));
     const [totalRecord, setTotalRecord] = useState(0);
@@ -136,10 +136,9 @@ const Widgets = () => {
         }
     };
 
-    const getCodeCopy = (id, type) => {
+    const getCodeCopy = (id) => {
         setOpenCopyCode(!openCopyCode)
         setSelectedId(id)
-        setSelectedType(type)
     }
 
     const totalPages = Math.ceil(totalRecord / perPageLimit);
@@ -160,17 +159,24 @@ const Widgets = () => {
         });
     };
 
-    const codeString = selectedType === "embed" ? `
-    <div class="quickhunt-widget-embed" Quickhunt_Widget_Key=${selectedId} widget-width="740px" widget-height="460px"></div>
-    <script src="${WIDGET_DOMAIN}/widgetScript.js"></script>
-    ` : `<script>
+    const embedLink = `https://${projectDetailsReducer.domain}/widget/ideas?widget='${selectedId}'`;
+
+    const iFrame = `<iframe src="${embedLink}" style="border: 0px; outline: 0px; width: 450px; height: 400px;"></iframe>`;
+
+    const callback = `window.Quickhunt('${selectedId}')`;
+
+    const embed = `
+    <div class="quickhunt-widget-embed" Quickhunt_Widget_Key='${selectedId}' widget-width="740px" widget-height="460px"></div>
+    <script src="${WIDGET_DOMAIN}/widgetScript.js"></script>`;
+
+    const script = `<script>
     window.Quickhunt_Config = window.Quickhunt_Config || [];
-    window.Quickhunt_Config.push({ Quickhunt_Widget_Key:  ${selectedId}});
+    window.Quickhunt_Config.push({ Quickhunt_Widget_Key: 
+     "${selectedId}"});
 </script>
 <script src="${WIDGET_DOMAIN}/widgetScript.js"></script>`;
-    const embedLink = `https://${projectDetailsReducer.domain}/widget/ideas?widget=${selectedId}`
-    const iFrame = `<iframe src="${embedLink}" style="border: 0px; outline: 0px; width: 450px; height: 400px;"></iframe>`
-    const callback = `window.Quickhunt('${selectedId}')`
+
+    const codeString = selectedType === "script" ? script : selectedType === "embedlink" ? embedLink : selectedType === "iframe" ? iFrame : callback;
 
     return (
         <Fragment>
@@ -193,14 +199,13 @@ const Widgets = () => {
                         onClick={() => getCodeCopy("")}
                         title={"Embed Widget"}
                         description={"Choose how you would like to embed your Widget."}
-                        iFrame={iFrame}
                         codeString={codeString}
-                        callback={callback}
                         handleCopyCode={() => handleCopyCode(codeString)}
-                        embedLink={embedLink}
                         onOpenChange={() => getCodeCopy("")}
                         isCopyLoading={isCopyLoading}
                         isWidget={true}
+                        setSelectedType={setSelectedType}
+                        selectedType={selectedType}
                     />
                 </Fragment>
             }
@@ -277,7 +282,7 @@ const Widgets = () => {
                                                     <TableCell className={" p-2 py-[10px] md:px-3 text-center"}>
                                                         <Button
                                                             className={"py-[6px] px-3 h-auto text-xs font-medium hover:bg-primary"}
-                                                            onClick={() => getCodeCopy(x.id)}>Get code</Button>
+                                                            onClick={() => getCodeCopy(x.sortCode)}>Get code</Button>
                                                     </TableCell>
                                                     <TableCell className={"font-normal p-2 py-[10px] md:px-3"}>
                                                         <div className={"flex justify-center"}>

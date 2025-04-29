@@ -1,15 +1,43 @@
 import React, {Fragment, useEffect, useState} from 'react';
 import {Sheet, SheetContent, SheetHeader, SheetTitle} from "../ui/sheet";
 import {Button} from "../ui/button";
-import {Bell, ChevronsUpDown, CreditCard, Eye, FileText, Loader2, LogOut, Menu, Moon, Plus, Sun, Trash2, User, X} from "lucide-react";
+import {
+    Bell,
+    ChevronsUpDown,
+    CreditCard,
+    Eye,
+    FileText,
+    Loader2,
+    LogOut,
+    Menu,
+    Moon,
+    Plus,
+    Sun,
+    Trash2,
+    User,
+    X
+} from "lucide-react";
 import {Input} from "../ui/input";
-import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger} from "../ui/dropdown-menu";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger
+} from "../ui/dropdown-menu";
 import {useTheme} from "../theme-provider";
-import {baseUrl, getProjectDetails, logout, removeProjectDetails, setProjectDetails} from "../../utils/constent";
+import {
+    apiService,
+    baseUrl,
+    getProjectDetails,
+    logout,
+    removeProjectDetails,
+    setProjectDetails
+} from "../../utils/constent";
 import {useNavigate} from "react-router-dom";
 import {Icon} from "../../utils/Icon";
 import {Avatar, AvatarFallback, AvatarImage} from "../ui/avatar";
-import {ApiService} from "../../utils/ApiService";
 import {Popover, PopoverContent, PopoverTrigger} from "../ui/popover";
 import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList} from "../ui/command";
 import {Label} from "../ui/label";
@@ -31,7 +59,7 @@ const initialState = {
     jobTitle: "",
     lastName: "",
     profileImage: "",
-    status: "",
+    status: "1",
     updatedAt: "",
 }
 
@@ -43,7 +71,7 @@ const initialStateProject = {
     logo: '',
     favicon: '',
     apiKey: '',
-    status: '',
+    status: '1',
     browser: '',
     ipAddress: '',
     domain: ''
@@ -58,7 +86,6 @@ const HeaderBar = ({setIsMobile}) => {
     let navigate = useNavigate();
     const dispatch = useDispatch();
     const {toast} = useToast();
-    let apiSerVice = new ApiService();
     const userDetailsReducer = useSelector(state => state.userDetailsReducer);
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const allProjectReducer = useSelector(state => state.allProjectReducer);
@@ -70,22 +97,24 @@ const HeaderBar = ({setIsMobile}) => {
     const [open, setOpen] = useState(false)
     const [isSheetOpen, setSheetOpen] = useState(false);
     const [scrollingDown, setScrollingDown] = useState(false);
-    const [isOpenDeleteAlert,setIsOpenDeleteAlert]=useState(false);
+    const [isOpenDeleteAlert, setIsOpenDeleteAlert] = useState(false);
     const [isDeleteLoading, setDeleteIsLoading] = useState(false);
     const [isCreateLoading, setIsCreateLoading] = useState(false);
 
-    const viewLink = () => {window.open(`https://${projectDetailsReducer.domain}/ideas`, "_blank")}
+    const viewLink = () => {
+        window.open(`https://${projectDetailsReducer.domain}/ideas`, "_blank")
+    }
 
     const openSheet = () => {
         let length = projectList?.length;
-        if(userDetailsReducer.plan === 0){
-            if(length < 1){
+        if (userDetailsReducer.plan === 0) {
+            if (length < 1) {
                 setSheetOpen(true);
                 onProModal(false)
-            }  else{
+            } else {
                 onProModal(true)
             }
-        } else if(userDetailsReducer.plan === 1){
+        } else if (userDetailsReducer.plan === 1) {
             setSheetOpen(true);
             onProModal(false)
         }
@@ -102,41 +131,41 @@ const HeaderBar = ({setIsMobile}) => {
 
     useEffect(() => {
         getAllProjects()
-       // loginUserDetails()
+        // loginUserDetails()
     }, []);
 
     useEffect(() => {
-        if(projectDetailsReducer.id){
+        if (projectDetailsReducer.id) {
             getAllStatusAndTypes()
         }
-    },[projectDetailsReducer.id])
+    }, [projectDetailsReducer.id])
 
     const getAllStatusAndTypes = async () => {
-        if(projectDetailsReducer.id){
-            const data = await apiSerVice.getAllStatusAndTypes(projectDetailsReducer.id)
-            if(data.success){
+        if (projectDetailsReducer.id) {
+            const data = await apiService.getAllStatusAndTypes(projectDetailsReducer.id)
+            if (data.success) {
                 dispatch(allStatusAndTypesAction({...data.data}));
             }
         }
     }
 
-    const loginUserDetails = async () =>{
-        const data = await apiSerVice.getLoginUserDetails()
-        if(data.status === 200){
+    const loginUserDetails = async () => {
+        const data = await apiService.getLoginUserDetails()
+        if (data.status === 200) {
             dispatch(userDetailsAction({...data.data}))
         }
     }
 
     const getAllProjects = async () => {
-        const data = await apiSerVice.getAllProjects()
+        const data = await apiService.getAllProjects()
         if (data.success) {
-            if(data && data.data && data.data.length > 0){
+            if (data && data.data && data.data.length > 0) {
                 const array = [];
                 let responseObj = data.data[0];
                 if (!getProjectDetails('id')) {
                     setProjectDetails(responseObj);
                     dispatch(projectDetailsAction(responseObj))
-                } else{
+                } else {
                     dispatch(projectDetailsAction(getProjectDetails('')))
                 }
                 dispatch(allProjectAction({projectList: data.data}));
@@ -153,7 +182,7 @@ const HeaderBar = ({setIsMobile}) => {
                 setProjectList(array)
 
             } else {
-                 setSheetOpen(true)
+                setSheetOpen(true)
             }
         }
     }
@@ -177,8 +206,8 @@ const HeaderBar = ({setIsMobile}) => {
     };
 
     const onChangeText = (event) => {
-        const { name, value } = event.target;
-        if(name === "name" || name === 'domain'){
+        const {name, value} = event.target;
+        if (name === "name" || name === 'domain') {
             const cleanDomain = (name) => name.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
             const sanitizedProjectName = cleanDomain(value);
             setCreateProjectDetails({
@@ -236,7 +265,7 @@ const HeaderBar = ({setIsMobile}) => {
             domain
         };
 
-        const data = await apiSerVice.createProjects(payload)
+        const data = await apiService.createProjects(payload)
         setIsCreateLoading(false);
         if (data.success) {
             const clone = [...projectList];
@@ -257,13 +286,13 @@ const HeaderBar = ({setIsMobile}) => {
             closeSheet();
             // setSheetOpen(false)
         } else {
-            toast({variant: "destructive" ,description: data?.error?.message})
+            toast({variant: "destructive", description: data?.error?.message})
         }
         // closeSheet()
     }
 
     const onChangeProject = (value) => {
-        let responseObj = projectList.find((x) =>x.id === value)
+        let responseObj = projectList.find((x) => x.id === value)
         setProjectDetails(responseObj);
         dispatch(projectDetailsAction(responseObj))
         navigate(`${baseUrl}/dashboard`);
@@ -286,13 +315,13 @@ const HeaderBar = ({setIsMobile}) => {
         };
     }, []);
 
-    const deleteAlert =()=>{
+    const deleteAlert = () => {
         setIsOpenDeleteAlert(true);
     }
 
     const onDelete = async () => {
         setDeleteIsLoading(true);
-        const data = await apiSerVice.deleteProjects(projectDetailsReducer.id);
+        const data = await apiService.deleteProjects(projectDetailsReducer.id);
 
         if (data.status === 200) {
             const updatedProjects = allProjectReducer.projectList.filter(
@@ -306,17 +335,17 @@ const HeaderBar = ({setIsMobile}) => {
                 setProjectDetails(null);
                 dispatch(projectDetailsAction(null));
             }
-            dispatch(allProjectAction({ projectList: updatedProjects }));
+            dispatch(allProjectAction({projectList: updatedProjects}));
             setProjectList(updatedProjects);
             setDeleteIsLoading(false);
             setIsOpenDeleteAlert(false);
-            toast({ description: data.message });
+            toast({description: data.message});
             setTimeout(() => {
                 history.push('/');
             }, 2000);
         } else {
             setDeleteIsLoading(false);
-            toast({ variant: 'destructive', description: 'Failed to delete the project.' });
+            toast({variant: 'destructive', description: 'Failed to delete the project.'});
         }
     };
 
@@ -324,22 +353,22 @@ const HeaderBar = ({setIsMobile}) => {
         {
             title: "Profile",
             onClick: (() => navigate(`${baseUrl}/settings/profile`)),
-            icon: <User size={16} />,
+            icon: <User size={16}/>,
         },
         {
             title: "Billing",
             onClick: (() => navigate(`${baseUrl}/pricing-plan`)),
-            icon: <CreditCard size={16} />,
+            icon: <CreditCard size={16}/>,
         },
         {
             title: "Projects",
             onClick: openSheet,
-            icon: <FileText size={16} />,
+            icon: <FileText size={16}/>,
         },
         {
             title: "Logout",
             onClick: onLogout,
-            icon: <LogOut size={16} />,
+            icon: <LogOut size={16}/>,
         },
     ]
 
@@ -385,13 +414,15 @@ const HeaderBar = ({setIsMobile}) => {
                     <div className={"flex gap-3 items-center"}>
 
                         {/*Mobile said bar start */}
-                            <Button variant="outline" size="icon" className="shrink-0 xl:hidden" onClick={() => setIsMobile(true)}>
-                                        <Menu size={20}/>
-                                    </Button>
+                        <Button variant="outline" size="icon" className="shrink-0 xl:hidden"
+                                onClick={() => setIsMobile(true)}>
+                            <Menu size={20}/>
+                        </Button>
                         {/*Mobile said bar End */}
 
                         <div className="flex h-11 items-center hidden xl:block">
-                            <div className={"app-logo cursor-pointer h-[45px]"}  onClick={() => onRedirect("/dashboard")}>
+                            <div className={"app-logo cursor-pointer h-[45px]"}
+                                 onClick={() => onRedirect("/dashboard")}>
                                 {Icon.whiteLogo}
                             </div>
                         </div>
@@ -408,7 +439,8 @@ const HeaderBar = ({setIsMobile}) => {
                                             aria-expanded={open}
                                             className="min-w-[150px] md:w-[222px] h-[36px] justify-between bg-card"
                                         >
-                                            <span className={"max-w-[130px] truncate text-ellipsis overflow-hidden whitespace-nowrap"}>{projectDetailsReducer.id ? projectDetailsReducer.name : "Select project"}</span>
+                                            <span
+                                                className={"max-w-[130px] truncate text-ellipsis overflow-hidden whitespace-nowrap"}>{projectDetailsReducer.id ? projectDetailsReducer.name : "Select project"}</span>
                                             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50"/>
                                         </Button>
                                     </PopoverTrigger>
@@ -437,17 +469,20 @@ const HeaderBar = ({setIsMobile}) => {
                                                                 >
                                                                     {x.name}
                                                                 </span>
-                                                                    {
-                                                                        (userDetailsReducer?.id == x?.user_id) &&
-                                                                    <Trash2 className={"cursor-pointer"} size={16} onClick={deleteAlert}/>
-                                                                    }
+                                                                {
+                                                                    (userDetailsReducer?.id == x?.user_id) &&
+                                                                    <Trash2 className={"cursor-pointer"} size={16}
+                                                                            onClick={deleteAlert}/>
+                                                                }
                                                             </CommandItem>
                                                         </Fragment>
                                                     ))}
-                                                        <div className={"flex gap-2 items-center cursor-pointer py-[6px] px-3"} onClick={openSheet}>
-                                                            <Plus size={16}/>
-                                                            <h4 className={"text-sm font-medium"}>Create Project</h4>
-                                                        </div>
+                                                    <div
+                                                        className={"flex gap-2 items-center cursor-pointer py-[6px] px-3"}
+                                                        onClick={openSheet}>
+                                                        <Plus size={16}/>
+                                                        <h4 className={"text-sm font-medium"}>Create Project</h4>
+                                                    </div>
                                                 </CommandGroup>
                                             </CommandList>
                                         </Command>
@@ -457,10 +492,10 @@ const HeaderBar = ({setIsMobile}) => {
                         </div>
                         <div className={"flex gap-2 md:gap-4 items-center"}>
                             <Button variant="ghost hover:none" size="icon" className={"h-8 w-8"} onClick={viewLink}>
-                                <Eye size={20} className={'stroke-white'} />
+                                <Eye size={20} className={'stroke-white'}/>
                             </Button>
                             <Button variant="ghost hover:none" size="icon" className={"h-8 w-8"}>
-                                <Bell size={20} className={'stroke-white'} />
+                                <Bell size={20} className={'stroke-white'}/>
                             </Button>
                             {/*<Button variant="ghost hover:none" size="icon" className={"h-8 w-8"} onClick={toggleTheme}>*/}
                             {/*    <Moon size={20} className="block dark:hidden stroke-white"/>*/}
@@ -477,16 +512,17 @@ const HeaderBar = ({setIsMobile}) => {
                                         </Avatar>
                                     </Button>
                                 </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end" className={"w-56 rounded-md shadow"}>
+                                <DropdownMenuContent align="end" className={"w-56 rounded-md shadow z-[99999]"}>
                                     <DropdownMenuLabel className={"text-sm font-medium"}>My Account</DropdownMenuLabel>
                                     <DropdownMenuSeparator/>
                                     {
                                         dropDownItem.map((x, i) => (
                                             <DropdownMenuItem key={i}
-                                                className={"text-sm font-normal flex gap-2 cursor-pointer"}
-                                                onClick={x.onClick}
+                                                              className={"text-sm font-normal flex gap-2 cursor-pointer"}
+                                                              onClick={x.onClick}
                                             >
-                                                <span className={`${theme === "dark" ? "profile-menu-icon" : ""}`}>{x.icon}</span>
+                                                <span
+                                                    className={`${theme === "dark" ? "profile-menu-icon" : ""}`}>{x.icon}</span>
                                                 {x.title}
                                             </DropdownMenuItem>
                                         ))
@@ -498,50 +534,54 @@ const HeaderBar = ({setIsMobile}) => {
 
                     {isSheetOpen && (
                         <Sheet open={isSheetOpen} onOpenChange={isSheetOpen ? closeSheet : openSheet}>
-                            {/*<SheetOverlay className={"inset-0"} />*/}
                             <SheetContent className={"sm:max-w-[662px] p-0"}>
-                                <SheetHeader className={"px-4 py-3 md:py-5 lg:px-8 lg:py-[20px] border-b flex flex-row justify-between items-center space-y-0"}>
+                                <SheetHeader
+                                    className={"px-4 py-3 md:py-5 lg:px-8 lg:py-[20px] border-b flex flex-row justify-between items-center space-y-0"}>
                                     <SheetTitle className={"text-xl font-normal flex justify-between items-center"}>
                                         Create New Project
                                     </SheetTitle>
-                                    <span className={"max-w-[24px]"}><X className={"cursor-pointer m-0"} onClick={closeSheet}/></span>
+                                    <span className={"max-w-[24px]"}><X className={"cursor-pointer m-0"}
+                                                                        onClick={closeSheet}/></span>
                                 </SheetHeader>
                                 <div className="overflow-auto h-[calc(100vh_-_69px)]">
-                                <div className="space-y-6 px-4 py-3 md:py-5 lg:px-8 lg:py-[20px]">
-                                    {
-                                        sheetCommInput.map((x, i) => (
-                                            <div className="space-y-1" key={i}>
-                                                <Label htmlFor="name" className="text-right font-normal">{x.title}</Label>
-                                                <Input
-                                                    id={x.name}
-                                                    placeholder={x.placeholder}
-                                                    className={x.className}
-                                                    value={createProjectDetails[x.name]}
-                                                    name={x.name}
-                                                    onChange={onChangeText}
-                                                />
-                                                {
-                                                    formError[x.name] &&
-                                                    <span className="text-destructive text-sm">{formError[x.name]}</span>
-                                                }
-                                            </div>
-                                        ))
-                                    }
-                                <div className={"gap-4 flex sm:justify-start"}>
-                                        <Button
-                                            className={`bg-primary ${theme === "dark" ? "text-card-foreground" : "text-card"} hover:bg-primary w-[129px] font-medium`}
-                                            onClick={onCreateProject} type="submit"
-                                        >
-                                            {isCreateLoading ? <Loader2 className="h-4 w-4 animate-spin"/> : "Create Project"}
-                                        </Button>
-                                        <Button
-                                            className={`${theme === "dark" ? "" : "text-primary"} text-sm font-medium hover:bg-card border border-primary bg-card`}
-                                            type="submit" onClick={onCancel}
-                                        >
-                                            Cancel
-                                        </Button>
-                                </div>
-                                </div>
+                                    <div className="space-y-6 px-4 py-3 md:py-5 lg:px-8 lg:py-[20px]">
+                                        {
+                                            sheetCommInput.map((x, i) => (
+                                                <div className="space-y-1" key={i}>
+                                                    <Label htmlFor="name"
+                                                           className="text-right font-normal">{x.title}</Label>
+                                                    <Input
+                                                        id={x.name}
+                                                        placeholder={x.placeholder}
+                                                        className={x.className}
+                                                        value={createProjectDetails[x.name]}
+                                                        name={x.name}
+                                                        onChange={onChangeText}
+                                                    />
+                                                    {
+                                                        formError[x.name] &&
+                                                        <span
+                                                            className="text-destructive text-sm">{formError[x.name]}</span>
+                                                    }
+                                                </div>
+                                            ))
+                                        }
+                                        <div className={"gap-4 flex sm:justify-start"}>
+                                            <Button
+                                                className={`bg-primary ${theme === "dark" ? "text-card-foreground" : "text-card"} hover:bg-primary w-[129px] font-medium`}
+                                                onClick={onCreateProject} type="submit"
+                                            >
+                                                {isCreateLoading ?
+                                                    <Loader2 className="h-4 w-4 animate-spin"/> : "Create Project"}
+                                            </Button>
+                                            <Button
+                                                className={`${theme === "dark" ? "" : "text-primary"} text-sm font-medium hover:bg-card border border-primary bg-card`}
+                                                type="submit" onClick={onCancel}
+                                            >
+                                                Cancel
+                                            </Button>
+                                        </div>
+                                    </div>
                                 </div>
                             </SheetContent>
                         </Sheet>

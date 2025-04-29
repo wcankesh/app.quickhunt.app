@@ -71,7 +71,7 @@ const AnnouncementWidgetPreview = ({widgetsSetting}) => {
                                     return (
                                         <div key={`announcement_${x.id}`} className={`box-border  ${index != 0 ? 'border-t border-zinc-200' : ''}`}>
                                             {
-                                                (x.featureImage !== '' && widgetsSetting?.announcementImage) &&
+                                                (x.featureImage && widgetsSetting?.announcementImage) &&
                                                 <AspectRatio ratio={10 / 5} className="bg-muted dark:bg-slate-50 rounded-ss-md rounded-se-md mb-1">
                                                     <img src={x.featureImage} alt={x.title} className="w-full h-full object-contain object-center"/>
                                                 </AspectRatio>
@@ -84,7 +84,7 @@ const AnnouncementWidgetPreview = ({widgetsSetting}) => {
                                                     <div className="flex-1 w-full flex flex-wrap gap-4 items-center justify-between">
                                                         <div className="flex-initial w-auto flex items-center gap-2">
                                                             <div className="text-xs leading-5 text-gray-600 font-normal">{x?.contributors[0]?.firstName} {x?.contributors[0]?.lastName}</div>
-                                                            <div className="text-xs leading-5 text-muted-foreground">{getDateFormat(moment(x.publishedAt).format("YYYY-MM-DD HH:MM:SS"))}</div>
+                                                            <div className="text-xs leading-5 text-muted-foreground">{getDateFormat(moment(x.publishedAt).format("YYYY-MM-DD HH:mm:ss"))}</div>
                                                         </div>
                                                         {
                                                             (x?.labels.length || x?.categoryName) ?

@@ -1,52 +1,49 @@
-import React, {useState, useEffect} from 'react';
-import {Card, CardContent, CardHeader, CardTitle, CardFooter, CardDescription} from "../ui/card";
+import React, {useState, useEffect, Fragment} from 'react';
+import {Card, CardContent} from "../ui/card";
 import {Button} from "../ui/button";
 import {useToast} from "../ui/use-toast";
-import {ApiService} from "../../utils/ApiService";
 import {Icon} from "../../utils/Icon";
 import {Avatar, AvatarFallback, AvatarImage} from "../ui/avatar";
 import {Skeleton} from "../ui/skeleton";
-import {baseUrl} from "../../utils/constent";
+import {apiService, baseUrl} from "../../utils/constent";
 import {useNavigate} from "react-router-dom";
-import {User} from "lucide-react";
+import {Loader2, User} from "lucide-react";
 
 const initialState= {
-    domain: '',
-    id: '',
-    project_name: '',
-    user_email_id: '',
-    user_first_name: '',
-    user_last_name: '',
+    name: '',
+    email: '',
+    firstName: '',
+    lastName: '',
     status: '',
 }
 
 const Setup = () => {
-    let apiSerVice = new ApiService();
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get('token');
-    let navigate = useNavigate();
+    const navigate = useNavigate();
     const {toast} = useToast();
 
     const [invitationDetail, setInvitationDetail] = useState(initialState)
     const [isLoading, setIsLoading] = useState(true)
-    const [isTokenDeleted, setIsTokenDeleted] = useState(false);
+    const [forLoading, setForLoading] = useState(null);
 
     useEffect(() => {
         getInvitationDetail()
     }, [])
 
     const getInvitationDetail = async () => {
-        const data = await apiSerVice.getInvitationDetail(token);
-        if (data.status === 200) {
-            if (data.data && Object.keys(data.data).length > 0) {
-                setInvitationDetail({...data.data[0]});
-                setIsLoading(false);
-            } else {
-                setIsTokenDeleted(true);
-                setIsLoading(false);
-            }
-        } else {
-            setIsLoading(false);
+        const data = await apiService.getInvitationDetail(token);
+        setIsLoading(false);
+        if (data.success) {
+            setInvitationDetail({
+                domain: '',
+                profileImage: data?.data?.inviteBy?.profileImage,
+                name: data?.data?.project?.name,
+                email: data?.data?.inviteBy?.email,
+                firstName: data?.data?.inviteBy?.firstName,
+                lastName: data?.data?.inviteBy?.lastName,
+                status: data?.data?.status,
+            })
         }
     };
 
@@ -55,13 +52,14 @@ const Setup = () => {
             status: type,
             token: token,
         }
-        const data = await apiSerVice.join(payload)
-        if(data.status === 200){
-            urlParams.delete('token')
+        setForLoading(type)
+        const data = await apiService.acceptReject(payload)
+        setForLoading(null)
+        if(data.success){
             navigate(`${baseUrl}/dashboard`);
             toast({description: data.message})
         } else {
-            toast({variant: "destructive" ,description: data.message})
+            toast({variant: "destructive" ,description: data?.error?.message})
         }
     }
 
@@ -69,80 +67,74 @@ const Setup = () => {
         <div className={"w-full flex flex-col items-center justify-center p-4 md:px-4 md:py-0 h-[100vh]"}>
             <div className={"max-w-[575px] w-full m-auto"}>
                 <div className={"flex items-center justify-center"}>{Icon.blackLogo}</div>
-                {
-                    !isTokenDeleted &&
-                        <h1 className="scroll-m-20 text-2xl md:text-3xl font-medium text-center lg:text-3xl mb-3.5 mt-6">
-                            You have 1 invite
-                        </h1>
-                }
-                {isTokenDeleted ? (
-                    <Card className={"mt-6"}>
-                        <CardHeader className={"flex flex-row items-center gap-4"}>
-                            <Avatar><AvatarFallback><User/></AvatarFallback></Avatar>
-                            <p>This invitation has been revoked by admin.</p>
-                        </CardHeader>
-                    </Card>
-                ) : (
-                    <div className={"mt-2.5"}>
-                        {isLoading ? (
-                            <Card>
-                                <CardContent className={"p-3 md:p-6 flex justify-between items-center flex-wrap gap-2"}>
-                                    <div className={"flex gap-3 items-center"}>
-                                        <div>
-                                            <Skeleton className="w-[50px] h-[50px] rounded-full" />
-                                        </div>
-                                        <div>
-                                            <Skeleton className="w-56 h-[10px] rounded-full mb-2" />
-                                            <Skeleton className="w-56 h-[10px] rounded-full" />
-                                        </div>
+                <h1 className="scroll-m-20 text-2xl md:text-3xl font-medium text-center lg:text-3xl mb-3.5 mt-6">
+                    You have invite
+                </h1>
+
+                <div className={"mt-2.5"}>
+                    {isLoading ? (
+                        <Card>
+                            <CardContent className={"p-3 md:p-6 flex justify-between items-center flex-wrap gap-2"}>
+                                <div className={"flex gap-3 items-center"}>
+                                    <div>
+                                        <Skeleton className="w-[50px] h-[50px] rounded-full" />
                                     </div>
-                                    <div className={"flex gap-2"}>
-                                        <Skeleton className="w-[70px] h-[30px]" />
-                                        <Skeleton className="w-[70px] h-[30px]" />
+                                    <div>
+                                        <Skeleton className="w-56 h-[10px] rounded-full mb-2" />
+                                        <Skeleton className="w-56 h-[10px] rounded-full" />
                                     </div>
-                                </CardContent>
-                            </Card>
-                        ) : (
-                            <Card>
-                                <CardContent className={"p-3 md:p-6 flex justify-between items-center flex-wrap gap-2"}>
-                                    <div className={"flex gap-3 items-center"}>
+                                </div>
+                                <div className={"flex gap-2"}>
+                                    <Skeleton className="w-[70px] h-[30px]" />
+                                    <Skeleton className="w-[70px] h-[30px]" />
+                                </div>
+                            </CardContent>
+                        </Card>
+                    ) : (
+                        <Card>
+                            <CardContent className={"p-3 md:p-6 flex justify-between items-center flex-wrap gap-2"}>
+                                <div className={"flex gap-3 items-center"}>
+                                    <div>
+                                        <Avatar className={"w-[50px] h-[50px]"}>
+                                            <AvatarImage src={invitationDetail?.profileImage} alt={invitationDetail?.name} />
+                                            <AvatarFallback className={"bg-primary/10 border-primary border text-sm text-primary font-medium"}>
+                                                {(invitationDetail.firstName && invitationDetail.lastName) ? invitationDetail?.name?.substring(0, 1).toUpperCase() : <User size={18}/>}
+                                            </AvatarFallback>
+                                        </Avatar>
+                                    </div>
+                                    {
+                                        (invitationDetail.firstName && invitationDetail.lastName) ?
                                         <div>
-                                            <Avatar className={"w-[50px] h-[50px]"}>
-                                                <AvatarFallback
-                                                    className={"bg-primary/10 border-primary border text-sm text-primary font-medium"}>
-                                                    {invitationDetail?.project_name?.substring(0, 1).toUpperCase()}
-                                                </AvatarFallback>
-                                            </Avatar>
-                                        </div>
-                                        <div>
-                                            <h3 className={"text-sm font-normal mb-1"}>
-                                                {invitationDetail.project_name}
-                                            </h3>
+                                            <h3 className={"text-sm font-normal"}>{invitationDetail.name}</h3>
                                             <p className={"text-xs pb-1"}>{invitationDetail.domain}</p>
                                             <p className={"text-xs text-muted-foreground"}>
-                                                Invited by {invitationDetail.user_first_name}{" "}
-                                                {invitationDetail.user_last_name || ""}.{" "}
-                                                {invitationDetail?.status === 1 ? "Expired in 7 days" : ""}
+                                                Invited by {invitationDetail.firstName}{" "}
+                                                {invitationDetail.lastName || ""}.{" "}
+                                                {invitationDetail?.status == 0 ? "Expired in 7 days" : ""}
                                             </p>
-                                        </div>
-                                    </div>
-                                    {invitationDetail?.status === 1 ? (
-                                        <div className={"flex gap-2"}>
-                                            <Button onClick={() => joinInvite(2)}>Accept</Button>
-                                            <Button variant={"outline"} onClick={() => joinInvite(3)}>Reject</Button>
-                                        </div>
-                                    ) : (
-                                        <div className={"flex gap-2"}>
-                                            <Button disabled>
-                                                {invitationDetail?.status === 2 ? "Accepted" : "Rejected"}
-                                            </Button>
-                                        </div>
-                                    )}
-                                </CardContent>
-                            </Card>
-                        )}
-                    </div>
-                )}
+                                        </div> : <p>This invitation has been revoked by admin.</p>
+                                    }
+                                </div>
+                                <div className="flex gap-2">
+                                    {
+                                        invitationDetail?.status == 0 ?
+                                            <Fragment>
+                                                <Button onClick={forLoading === 2 ? null : () => joinInvite(1)} disabled={forLoading === 1}>
+                                                    {forLoading === 1 && <Loader2 className="mr-2 h-4 w-4 animate-spin"/>} Accept
+                                                </Button>
+
+                                                <Button variant={"destructive"} onClick={forLoading === 1 ? null : () => joinInvite(2)} disabled={forLoading === 2}>
+                                                    {forLoading === 2 && <Loader2 className="mr-2 h-4 w-4 animate-spin"/>} Reject
+                                                </Button>
+                                            </Fragment> : invitationDetail.status == 1 ?
+                                                <Button disabled={invitationDetail.status == 1}>Accepted</Button>
+                                                : invitationDetail.status == 2 ? <Button variant={"destructive"} disabled={invitationDetail.status == 2}>Rejected</Button> : ""
+                                    }
+                                </div>
+                            </CardContent>
+                        </Card>
+                    )}
+                </div>
             </div>
         </div>
     );

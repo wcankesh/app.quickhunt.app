@@ -4,14 +4,13 @@ import { Button } from "../ui/button";
 import { Check } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { userDetailsAction } from "../../redux/action/UserDetailAction";
-import { ApiService } from "../../utils/ApiService";
 import { useToast } from "../ui/use-toast";
+import {apiService} from "../../utils/constent";
 
 const PricingPlans = () => {
     const { theme } = useTheme();
     const dispatch = useDispatch();
     const userDetailsReducer = useSelector(state => state.userDetailsReducer);
-    const apiService = new ApiService();
     const { toast } = useToast();
 
     const [tab, setTab] = useState(userDetailsReducer.subscr_type || 1);
@@ -96,7 +95,7 @@ const PricingPlans = () => {
 
     const manageSub = async () => {
         const data = await apiService.manageSubscription();
-        if (data.status === 200) {
+        if (data.success) {
             window.open(data.url, "top");
             toast({ description: data.message });
         } else {

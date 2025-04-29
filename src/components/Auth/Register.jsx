@@ -65,7 +65,7 @@ const Register = () => {
     };
 
     const onRegister = async () => {
-        const validationErrors = validateForm(companyDetails);
+        const validationErrors = validateForm(companyDetails, 'register');
         if (Object.keys(validationErrors).length > 0) {
             setFormError(validationErrors);
             return;

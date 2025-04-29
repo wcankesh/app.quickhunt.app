@@ -240,9 +240,9 @@ const Roadmap = () => {
                                         <Card onClick={() => openDetailsSheet(y)} className={"mb-3"}>
                                             <CardHeader className={"gap-2 p-2 pb-3"}>
                                                 {
-                                                    y && y?.cover_image &&
+                                                    y && y?.coverImage &&
                                                     <img className="object-center object-cover w-full h-[125px]"
-                                                         src={y?.cover_image} alt={""}/>
+                                                         src={y?.coverImage} alt={""}/>
                                                 }
                                                 <div className={"space-y-1"}>
                                                     <h3 className={"text-sm font-normal m-0"}>{y.title}</h3>

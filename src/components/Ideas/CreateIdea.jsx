@@ -59,7 +59,6 @@ const CreateIdea = ({isOpen, onOpen, onClose, closeCreateIdea, setIdeasList, ide
     }
 
     const onCreateIdea = async () => {
-
         let validationErrors = {};
         Object.keys(ideaDetail).forEach(name => {
             const error = formValidate(name, ideaDetail[name]);
@@ -75,12 +74,10 @@ const CreateIdea = ({isOpen, onOpen, onClose, closeCreateIdea, setIdeasList, ide
         setIsLoading(true)
         let formData = new FormData();
         formData.append('title', ideaDetail.title);
-        // formData.append('slugUrl', ideaDetail.title ? ideaDetail.title.replace(/ /g,"-").replace(/\?/g, "-") :"");
         formData.append('slugUrl', convertToSlug(ideaDetail?.title || ''));
         formData.append('description', ideaDetail.description);
         formData.append('projectId', projectDetailsReducer.id);
         formData.append('boardId', ideaDetail.boardId);
-        // formData.append('topicId', ideaDetail.topicId.join());
         ideaDetail.topicId.forEach(id => {
             formData.append('topicId[]', id);
         });
@@ -88,8 +85,6 @@ const CreateIdea = ({isOpen, onOpen, onClose, closeCreateIdea, setIdeasList, ide
         if(data.success){
             const clone = [...ideasList];
             clone.push(data.data)
-            // const newArray = [data.data].concat(clone)
-            // setIdeasList(newArray);
             setIdeasList(clone);
             setIsLoading(false)
             setIdeaDetail(initialState)
@@ -100,7 +95,6 @@ const CreateIdea = ({isOpen, onOpen, onClose, closeCreateIdea, setIdeasList, ide
             closeCreateIdea()
             navigate(`${baseUrl}/ideas?pageNo=${pageNo}`);
             toast({description: data.message})
-
         } else {
             setIsLoading(false)
             toast({description: data.error, variant: "destructive" })
@@ -115,7 +109,6 @@ const CreateIdea = ({isOpen, onOpen, onClose, closeCreateIdea, setIdeasList, ide
                 } else {
                     return "";
                 }
-
             case "boardId":
                 if (!value || value.toString().trim() === "") {
                     return "Board is required";

@@ -490,7 +490,6 @@ const UpdateIdea = () => {
         const data = await apiService.updateIdea(formData, selectedIdea.id)
         if (data.success) {
             setSelectedIdea({...data.data})
-            // setIdeasList(clone);
             setIsLoading(false)
             setIsEditIdea(false)
             toast({description: data.message})
@@ -504,8 +503,6 @@ const UpdateIdea = () => {
         const files = Array.from(event.target.files);
         if (selectedComment && selectedComment.id) {
             const clone = [...selectedComment.images, ...files];
-            // let old = selectedComment.images && selectedComment.images.length ? [...selectedComment.images] : [];
-            // const newImageClone = [...old, ...files];
             setSelectedComment({
                 ...selectedComment,
                 images: clone,
@@ -517,11 +514,10 @@ const UpdateIdea = () => {
     };
 
     const handleSubCommentUploadImg = (event) => {
-        const files = Array.from(event.target.files); // Convert FileList to array
+        const files = Array.from(event.target.files);
         if (selectedSubComment && selectedSubComment.id && selectedComment && selectedComment.id) {
-            // Ensure images is an array, default to empty array if undefined
             const currentImages = Array.isArray(selectedSubComment.images) ? selectedSubComment.images : [];
-            const clone = [...currentImages, ...files]; // Spread the ensured array
+            const clone = [...currentImages, ...files];
             let selectedSubCommentObj = { ...selectedSubComment, images: clone };
             setSelectedSubComment(selectedSubCommentObj);
             let index = ((selectedComment && selectedComment.reply) || []).findIndex((x) => x.id === selectedSubComment.id);
@@ -553,12 +549,6 @@ const UpdateIdea = () => {
         formData.append(name, value);
         const data = await apiService.updateIdea(formData, selectedIdea.id)
         if (data.success) {
-            // setSelectedIdea({
-            //     ...data.data,
-            //     colorCode: data.data.colorCode,
-            //     roadmapStatusId: data.data.roadmapStatusId,
-            //     title: data.data.title
-            // })
             setIsLoading(false)
             setIsLoadingBug(false)
             setIsLoadingArchive(false)
@@ -575,9 +565,7 @@ const UpdateIdea = () => {
     const onEditComment = (record, index) => {
         setSelectedComment(record);
         setSelectedCommentIndex(index)
-        // setSubCommentTextEditIdx(null);
         setIsEditComment(true)
-
         setDeletedCommentImage([]);
     }
 

@@ -27,35 +27,29 @@ const TabTitle = {
     6: "feature_idea_votes",
 }
 
-const UserActionsList = ({ userActions, sourceTitle, isLoading, selectedTab, isEyeTabActive, onUnreadCheck, setUserActions, projectDetailsReducer}) => {
+const UserActionsList = ({
+                             userActions,
+                             sourceTitle,
+                             isLoading,
+                             isEyeTabActive,
+                         }) => {
     const navigate = useNavigate();
-    const dispatch = useDispatch();
 
     const filteredActions = isEyeTabActive
         ? userActions.filter(action => action?.isRead === 0)
         : userActions;
 
-    // const filteredActions = userActions.filter(action => {
-    //     if (selectedTab === 1) {
-    //         return true;
-    //     }
-    //     return isEyeTabActive ? action?.isRead === 0 : action?.isRead === 1;
-    // });
-
-    // const hasUnreadActions = filteredActions.some(action => action?.isRead === 0);
-    // onUnreadCheck(hasUnreadActions);
-
     if (isLoading || !filteredActions.length) {
         return (
             <div className="divide-y">
                 {isLoading ? (
-                    Array.from({ length: 10 }).map((_, index) => (
+                    Array.from({length: 10}).map((_, index) => (
                         <div key={index} className="px-2 py-[10px] md:px-3 flex justify-between gap-2">
-                            <Skeleton className="rounded-md w-full h-7 bg-muted-foreground/[0.1]" />
+                            <Skeleton className="rounded-md w-full h-7 bg-muted-foreground/[0.1]"/>
                         </div>
                     ))
                 ) : (
-                    <EmptyData />
+                    <EmptyData/>
                 )}
             </div>
         );
@@ -67,12 +61,6 @@ const UserActionsList = ({ userActions, sourceTitle, isLoading, selectedTab, isE
         } else if (source === "post_feedbacks" || source === "post_reactions") {
             navigate(`/announcements/analytic-view?id=${id}`);
         }
-        // const response = await apiService.inboxMarkAllRead({ projectId: projectDetailsReducer.id, id });
-        // if (response.success) {
-        //     const update = (userActions || []).map(action => action.id === id ? { ...action, isRead: 1 } : action);
-        //     setUserActions(update);
-        //     dispatch(inboxMarkReadAction(update));
-        // }
     }
 
     return (
@@ -83,7 +71,9 @@ const UserActionsList = ({ userActions, sourceTitle, isLoading, selectedTab, isE
                         {sourceTitle.map((source, i) => {
                             if (action.source === source.value) {
                                 return (
-                                    <div onClick={() => navigateAction(action?.id, action.source)} className={`px-2 py-[10px] md:px-3 flex gap-4 cursor-pointer last:rounded-b-lg ${action?.isRead === 0 ? "bg-muted/[0.6] hover:bg-card" : "bg-card"}`} key={i}>
+                                    <div onClick={() => navigateAction(action?.id, action.source)}
+                                         className={`px-2 py-[10px] md:px-3 flex gap-4 cursor-pointer last:rounded-b-lg ${action?.isRead === 0 ? "bg-muted/[0.6] hover:bg-card" : "bg-card"}`}
+                                         key={i}>
                                         <div>
                                             <UserAvatar
                                                 userPhoto={action?.userPhoto}
@@ -92,27 +82,33 @@ const UserActionsList = ({ userActions, sourceTitle, isLoading, selectedTab, isE
                                             />
                                         </div>
                                         <div className={"w-full flex flex-wrap justify-between gap-2"}>
-                                        <div className={"flex gap-3"}>
-                                            <div className={"space-y-3"}>
-                                                <div className={`${action?.isRead === 0 ? "font-medium" : "font-normal"} flex flex-wrap gap-2 md:gap-4`}>
-                                                    <h2>{action?.customerFirstName} {action?.customerLastName}</h2>
-                                                    <p className={`flex gap-2 items-center`}><MessageCircleMore size={15} /><span className={`text-muted-foreground`}>{source.title}</span></p>
-                                                </div>
-                                                <div>
-                                                    {source.value === "post_reactions" ? (
-                                                        <div className={"flex items-center gap-2"}>
-                                                            <Avatar className={"rounded-none w-[20px] h-[20px]"}>
-                                                                <AvatarImage src={action.emojiUrl} />
-                                                            </Avatar>
-                                                            <span className={"text-sm text-muted-foreground text-wrap"}>{action.title}</span>
-                                                        </div>
-                                                    ) : (
-                                                        <span className={"text-sm text-muted-foreground text-wrap"}>{action.title}</span>
-                                                    )}
+                                            <div className={"flex gap-3"}>
+                                                <div className={"space-y-3"}>
+                                                    <div
+                                                        className={`${action?.isRead === 0 ? "font-medium" : "font-normal"} flex flex-wrap gap-2 md:gap-4`}>
+                                                        <h2>{action?.customerFirstName} {action?.customerLastName}</h2>
+                                                        <p className={`flex gap-2 items-center`}><MessageCircleMore
+                                                            size={15}/><span
+                                                            className={`text-muted-foreground`}>{source.title}</span>
+                                                        </p>
+                                                    </div>
+                                                    <div>
+                                                        {source.value === "post_reactions" ? (
+                                                            <div className={"flex items-center gap-2"}>
+                                                                <Avatar className={"rounded-none w-[20px] h-[20px]"}>
+                                                                    <AvatarImage src={action.emojiUrl}/>
+                                                                </Avatar>
+                                                                <span
+                                                                    className={"text-sm text-muted-foreground text-wrap"}>{action.title}</span>
+                                                            </div>
+                                                        ) : (
+                                                            <span
+                                                                className={"text-sm text-muted-foreground text-wrap"}>{action.title}</span>
+                                                        )}
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <span className={"text-sm text-muted-foreground"}>
+                                            <span className={"text-sm text-muted-foreground"}>
                                             {action?.createdAt ? moment(action?.createdAt).format('D MMM, YYYY h:mm A') : "-"}
                                         </span>
                                         </div>
@@ -141,13 +137,12 @@ const Inbox = () => {
     const [selectedTab, setSelectedTab] = useState(1);
     const [isEyeTabActive, setIsEyeTabActive] = useState(false);
     const [totalPages, setTotalPages] = useState(0);
-    const [showMarkAllRead, setShowMarkAllRead ] = useState(false);
+    const [showMarkAllRead, setShowMarkAllRead] = useState(false);
 
     useEffect(() => {
-        if(projectDetailsReducer.id){
+        if (projectDetailsReducer.id) {
             getInboxNotification();
         }
-        // navigate(`${baseUrl}/notifications?pageNo=${pageNo}`)
     }, [projectDetailsReducer.id, pageNo, selectedTab, isEyeTabActive])
 
     useEffect(() => {
@@ -168,7 +163,7 @@ const Inbox = () => {
             isRead: isEyeTabActive ? 1 : 0
         }
         const data = await apiService.inboxNotification(payload);
-        if(data.success) {
+        if (data.success) {
             setUserActions(Array.isArray(data.data.data) ? data.data.data : []);
             const totalPage = Math.ceil(data.data.total / perPageLimit);
             setTotalPages(totalPage)
@@ -181,15 +176,18 @@ const Inbox = () => {
     const markAsAllRead = async () => {
         setIsLoading(true);
         const data = await apiService.inboxMarkAllRead({projectId: projectDetailsReducer.id, type: selectedTab});
-        if(data.success) {
+        if (data.success) {
             const updatedActions = userActions.map((action) =>
-                action.source === TabTitle[selectedTab] ? { ...action, isRead: 1 } : selectedTab === 1 ? { ...action, isRead: 1 } : action
+                action.source === TabTitle[selectedTab] ? {...action, isRead: 1} : selectedTab === 1 ? {
+                    ...action,
+                    isRead: 1
+                } : action
             );
             setUserActions(updatedActions);
             dispatch(inboxMarkReadAction(updatedActions));
             toast({description: data.message,});
         } else {
-            toast({description:data.message, variant: "destructive",})
+            toast({description: data?.error?.message, variant: "destructive",})
         }
         setIsLoading(false);
     }
@@ -215,35 +213,40 @@ const Inbox = () => {
     ]
 
     const tabs = [
-        { label: "All", value: 1, icon: <Zap size={18} className={"mr-2"} />,},
-        { label: "Announcement feedback", value: 2, icon: <MessagesSquare size={18} className={"mr-2"} />,},
-        { label: "Announcement reaction", value: 3, icon: <GalleryVerticalEnd size={18} className={"mr-2"} />,},
-        { label: "Create idea", value: 4, icon: <Lightbulb size={18} className={"mr-2"} />,},
-        { label: "Idea comment", value: 5, icon: <MessageSquare size={18} className={"mr-2"} />,},
-        { label: "Idea upvote", value: 6, icon: <Vote size={18} className={"mr-2"} />,},
+        {label: "All", value: 1, icon: <Zap size={18} className={"mr-2"}/>,},
+        {label: "Announcement feedback", value: 2, icon: <MessagesSquare size={18} className={"mr-2"}/>,},
+        {label: "Announcement reaction", value: 3, icon: <GalleryVerticalEnd size={18} className={"mr-2"}/>,},
+        {label: "Create idea", value: 4, icon: <Lightbulb size={18} className={"mr-2"}/>,},
+        {label: "Idea comment", value: 5, icon: <MessageSquare size={18} className={"mr-2"}/>,},
+        {label: "Idea upvote", value: 6, icon: <Vote size={18} className={"mr-2"}/>,},
     ];
 
     return (
         <Fragment>
-            <div className={"container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-3 md:px-4"}>
+            <div
+                className={"container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-3 md:px-4"}>
                 <div className="flex flex-wrap items-center gap-2 justify-between">
                     <div className={"flex flex-col gap-y-0.5"}>
                         <h1 className="text-2xl font-normal flex-initial w-auto">Inbox</h1>
-                        <h5 className={"text-sm text-muted-foreground"}>Track announcement feedback and reactions, and stay updated on ideas, their comments, and upvotes.</h5>
+                        <h5 className={"text-sm text-muted-foreground"}>Track announcement feedback and reactions, and
+                            stay updated on ideas, their comments, and upvotes.</h5>
                     </div>
                     <div className={"flex gap-3"}>
                         {showMarkAllRead && (
-                            <Button variant={"outline"} className={"flex gap-2 items-center"} onClick={markAsAllRead}><Check size={18}/>Mark all as read</Button>
+                            <Button variant={"outline"} className={"flex gap-2 items-center"}
+                                    onClick={markAsAllRead}><Check size={18}/>Mark all as read</Button>
                         )}
                         <TooltipProvider>
                             <Tooltip>
                                 <TooltipTrigger asChild>
-                                    <Button variant="outline" size="icon" onClick={() => setIsEyeTabActive(!isEyeTabActive)} className={"h-9"}>
-                                    { isEyeTabActive ? <EyeOff size={18} /> : <Eye size={18} />}
+                                    <Button variant="outline" size="icon"
+                                            onClick={() => setIsEyeTabActive(!isEyeTabActive)} className={"h-9"}>
+                                        {isEyeTabActive ? <EyeOff size={18}/> : <Eye size={18}/>}
                                     </Button>
                                 </TooltipTrigger>
                                 <TooltipContent side={"bottom"}>
-                                    {isEyeTabActive ? (<p>View all notifications</p>) : (<p>View unread notifications</p>)}
+                                    {isEyeTabActive ? (<p>View all notifications</p>) : (
+                                        <p>View unread notifications</p>)}
                                 </TooltipContent>
                             </Tooltip>
                         </TooltipProvider>
@@ -253,7 +256,8 @@ const Inbox = () => {
                     <CardContent className={"p-0"}>
                         <Tabs defaultValue={1} onValueChange={onTabChange}>
                             <div className={"border-b flex bg-background"}>
-                                <TabsList className="w-full h-auto overflow-x-auto whitespace-nowrap justify-start last:rounded-t-lg">
+                                <TabsList
+                                    className="w-full h-auto overflow-x-auto whitespace-nowrap justify-start last:rounded-t-lg">
                                     {(tabs || []).map((tab, i) => (
                                         <TabsTrigger
                                             key={i}
@@ -269,7 +273,10 @@ const Inbox = () => {
                                 (tabs || []).map((y, i) => (
                                     <TabsContent key={i} value={y.value} className={"mt-0"}>
                                         <div className={"grid grid-cols-1 overflow-auto whitespace-nowrap"}>
-                                            <UserActionsList projectDetailsReducer={projectDetailsReducer} setUserActions={setUserActions} userActions={userActions} sourceTitle={sourceTitle} isLoading={isLoading} selectedTab={selectedTab} isEyeTabActive={isEyeTabActive}/>
+                                            <UserActionsList
+                                                userActions={userActions}
+                                                sourceTitle={sourceTitle} isLoading={isLoading}
+                                                isEyeTabActive={isEyeTabActive}/>
                                         </div>
                                     </TabsContent>
                                 ))

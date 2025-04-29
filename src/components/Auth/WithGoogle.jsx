@@ -1,17 +1,15 @@
 import React, {useEffect, useState} from 'react';
 import {useNavigate} from "react-router-dom";
 import {loadAuth2, loadGapiInsideDOM} from "gapi-script";
-import {apiService, baseUrl, googleClientId, token} from "../../utils/constent";
+import {apiService, baseUrl, GOOGLE_CLIENT_ID, token} from "../../utils/constent";
 import {Icon} from "../../utils/Icon";
 import {Button} from "../ui/button";
-import {ApiService} from "../../utils/ApiService";
 import {useToast} from "../ui/use-toast";
 import {userDetailsAction} from "../../redux/action/UserDetailAction";
 import {useDispatch} from "react-redux";
 
 const WithGoogle = ({title}) => {
     const navigate = useNavigate();
-    let apiSerVice = new ApiService();
     const {toast} = useToast();
     const dispatch = useDispatch();
 
@@ -30,7 +28,7 @@ const WithGoogle = ({title}) => {
 
     const handleGoogleLogin = async () => {
         try {
-            const auth2 = await loadAuth2(gapi, googleClientId, "profile");
+            const auth2 = await loadAuth2(gapi, GOOGLE_CLIENT_ID, "profile");
             const googleUser = await auth2.signIn();
             updateUser(googleUser);
         } catch (error) {
@@ -54,13 +52,13 @@ const WithGoogle = ({title}) => {
             login_type: "2",
         }
         setIsLoading(true);
-        const data = await apiSerVice.login(payload)
+        const data = await apiService.login(payload)
         if (data.token) {
             toast({description: data.message})
             const urlParams = new URLSearchParams(window.location.search);
             const token = urlParams.get('token');
             if (token) {
-                navigate(`${baseUrl}/setup?token=${token}`);
+                navigate(`${baseUrl}/invitation?token=${token}`);
             } else {
                 urlParams.delete('token')
                 if(data?.onboarding == 0){

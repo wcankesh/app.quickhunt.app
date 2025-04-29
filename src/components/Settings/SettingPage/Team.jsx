@@ -171,9 +171,9 @@ const Team = () => {
             //     if (item.id === x.id) {
             //         return {
             //             ...item,
-            //             expire_at: updatedExpirationDate,
-            //             created_at: updatedCreatedAt,
-            //             updated_at: Date.now(),
+            //             expireAt: updatedExpirationDate,
+            //             createdAt: updatedCreatedAt,
+            //             updatedAt: Date.now(),
             //         };
             //     }
             //     return item;
@@ -427,13 +427,13 @@ const Team = () => {
                                                             )}
                                                         </TableCell>
                                                         {/*<TableCell className={"py-[10px] px-[12px]"}>*/}
-                                                        {/*    Expires in {Math.max(moment(x?.expire_at).diff(moment(new Date()), 'days'), 0)} days*/}
+                                                        {/*    Expires in {Math.max(moment(x?.expireAt).diff(moment(new Date()), 'days'), 0)} days*/}
                                                         {/*</TableCell>*/}
-                                                        {/*<TableCell className={"py-[10px] px-[12px]"}>Invited about {moment.utc(x.created_at).local().startOf('seconds').fromNow()}</TableCell>*/}
+                                                        {/*<TableCell className={"py-[10px] px-[12px]"}>Invited about {moment.utc(x.createdAt).local().startOf('seconds').fromNow()}</TableCell>*/}
                                                         <TableCell className={"py-[10px] px-[12px]"}>
                                                             Invited about{" "}
-                                                            {x.updated_at && x.updated_at !== x.createdAt ? (
-                                                                <>{moment.utc(x.updated_at).local().startOf("seconds").fromNow()}</>
+                                                            {x.updatedAt && x.updatedAt !== x.createdAt ? (
+                                                                <>{moment.utc(x.updatedAt).local().startOf("seconds").fromNow()}</>
                                                             ) : (
                                                                 <>{moment.utc(x.createdAt).local().startOf("seconds").fromNow()}</>
                                                             )}

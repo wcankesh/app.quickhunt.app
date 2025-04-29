@@ -9,7 +9,7 @@ import {useNavigate, useParams, useSearchParams} from "react-router-dom";
 import {apiService, baseUrl} from "../../utils/constent";
 import ColorInput from "../Comman/ColorPicker";
 import {Button} from "../ui/button";
-import {toast, useToast} from "../ui/use-toast";
+import {useToast} from "../ui/use-toast";
 import {useSelector} from "react-redux";
 import {ToggleGroup, ToggleGroupItem} from "../ui/toggle-group";
 import WidgetPreview from "./WidgetPreview/WidgetPreview";

@@ -222,14 +222,12 @@ const InAppMessage = () => {
 
     const codeString = `
 <script>
-    window.quickhuntSettings = {
-      name: "",
-      email: "",
-    };
+    window.quickhuntSettings = {name: "", email: "", };
 </script>
 <script>
     window.Quickhunt_In_App_Message_Config = window.Quickhunt_In_App_Message_Config || [];
-    window.Quickhunt_In_App_Message_Config.push({ Quickhunt_In_App_Message_Key:  "${selectedId}"});
+    window.Quickhunt_In_App_Message_Config.push({ Quickhunt_In_App_Message_Key: 
+     "${selectedId}"});
 </script>
 <script src="${WIDGET_DOMAIN}/widgetScript.js"></script>`;
 
@@ -256,6 +254,7 @@ const InAppMessage = () => {
                         title={"In App Message"}
                         description={"Choose how you would like to embed your message."}
                         onClick={() => getCodeCopy("")}
+                        onOpenChange={setOpenCopyCode}
                         codeString={codeString}
                         handleCopyCode={() => handleCopyCode(codeString)}
                     />

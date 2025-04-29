@@ -5,10 +5,10 @@ export const urlParams = new URLSearchParams(window.location.search);
 const TOKEN_KEY = 'token';
 const PROJECT_KEY = 'currentProject';
 
-export const DO_SPACES_ENDPOINT = import.meta.env.VITE_APP_DO_SPACES_ENDPOINT;
-export const googleClientId = import.meta.env.VITE_APP_GOOGLE_CLIENT_ID;
+export const GOOGLE_CLIENT_ID = import.meta.env.VITE_APP_GOOGLE_CLIENT_ID;
 export const BASE_URL_API = import.meta.env.VITE_APP_API_URL;
 export const WIDGET_DOMAIN = import.meta.env.VITE_APP_WIDGET_DOMAIN;
+export const DO_SPACES_ENDPOINT = import.meta.env.VITE_APP_DO_SPACES_ENDPOINT;
 
 export const login = () => {
     localStorage.setItem(TOKEN_KEY, 'TestLogin');
@@ -98,12 +98,9 @@ export const getDateFormat = (date) => {
 };
 
 // formValidation
-export const validateField = (name, value, additionalData = {}) => {
+export const validateField = (name, value, additionalData = {}, type = '') => {
     const getLabel = (fieldName) => {
-        return fieldName
-            .replace(/([A-Z])/g, ' $1')
-            .replace(/_/g, ' ')
-            .replace(/^./, str => str.toUpperCase());
+        return fieldName.replace(/([A-Z])/g, ' $1').replace(/_/g, ' ').replace(/^./, str => str.toUpperCase());
     };
     switch (name) {
         case 'email':
@@ -113,6 +110,7 @@ export const validateField = (name, value, additionalData = {}) => {
             return '';
         case 'password':
             if (!value || value.trim() === '') return 'Password is required';
+            if (value.length < 8 && type === 'register') return "Password must be at least 8 characters.";
             // if (
             //     additionalData?.requireStrongPassword &&
             //     !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(value)
@@ -132,10 +130,10 @@ export const validateField = (name, value, additionalData = {}) => {
     }
 };
 
-export const validateForm = (fields) => {
+export const validateForm = (fields, type) => {
     const errors = {};
     Object.keys(fields).forEach((name) => {
-        const error = validateField(name, fields[name], fields);
+        const error = validateField(name, fields[name], fields, type);
         if (error) errors[name] = error;
     });
     return errors;

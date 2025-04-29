@@ -6,7 +6,5 @@ export const userDetailsAction = (objValues) => {
             type: SET_USER_DETAILS,
             payload: objValues
         }
-
     )
-
 };

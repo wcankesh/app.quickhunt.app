@@ -64,13 +64,31 @@ const GeneralSettings = () => {
 
     const formValidate = (name, value) => {
         switch (name) {
-            case "password":
-                if (value?.trim() === "") return "Password is required";
-                if (
-                    !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(value)
-                )
-                    return "Password must be at least 8 characters with one uppercase letter, one lowercase letter, one number, and one special character";
-                return "";
+            // case "password":
+            //     if (value?.trim() === "") return "Password is required";
+            //     if (
+            //         !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(value)
+            //     )
+            //         return "Password must be at least 8 characters with one uppercase letter, one lowercase letter, one number, and one special character";
+            //     return "";
+            case "announcementTitle":
+                if (!value || value.trim() === "") {
+                    return "Announcement title is required";
+                } else {
+                    return "";
+                }
+            case "roadmapTitle":
+                if (!value || value.trim() === "") {
+                    return "Roadmap title is required";
+                } else {
+                    return "";
+                }
+            case "ideaTitle":
+                if (!value || value.trim() === "") {
+                    return "Idea title is required";
+                } else {
+                    return "";
+                }
             default:
                 return "";
         }
@@ -81,24 +99,24 @@ const GeneralSettings = () => {
             ...generalSettingData,
             [name]: value
         });
-        // setFormError({
-        //     ...formError,
-        //     [name]: formValidate(name, value)
-        // });
+        setFormError({
+            ...formError,
+            [name]: formValidate(name, value)
+        });
     };
 
     const onUpdatePortal = async () => {
-        // let validationErrors = {};
-        // Object.keys(generalSettingData).forEach(name => {
-        //     const error = formValidate(name, generalSettingData[name]);
-        //     if (error && error.length > 0) {
-        //         validationErrors[name] = error;
-        //     }
-        // });
-        // if (Object.keys(validationErrors).length > 0) {
-        //     setFormError(validationErrors);
-        //     return;
-        // }
+        let validationErrors = {};
+        Object.keys(generalSettingData).forEach(name => {
+            const error = formValidate(name, generalSettingData[name]);
+            if (error && error.length > 0) {
+                validationErrors[name] = error;
+            }
+        });
+        if (Object.keys(validationErrors).length > 0) {
+            setFormError(validationErrors);
+            return;
+        }
         setIsSave(true)
         const payload = {
             ...generalSettingData,
@@ -240,13 +258,14 @@ const GeneralSettings = () => {
         <Card className={"divide-y"}>
             <CardHeader className={"gap-1 p-4 sm:px-5 sm:py-4"}>
                 <CardTitle className={"text-xl lg:text-2xl font-normal capitalize"}>General Setting</CardTitle>
-                <CardDescription className={"text-sm text-muted-foreground p-0"}>Give title to your Announcement, Roadmap, Ideas. Set header and global color.</CardDescription>
+                <CardDescription className={"text-sm text-muted-foreground p-0"}>Give title to your Announcement,
+                    Roadmap, Ideas. Set header and global color.</CardDescription>
             </CardHeader>
             <CardContent className={"p-0 divide-y"}>
                 {
                     initialStateFields.map((x, i) => {
                         return (
-                            <div className={"space-y-3 p-4 sm:px-5 sm:py-4"}>
+                            <div className={"space-y-3 p-4 sm:px-5 sm:py-4"} key={i}>
                                 <div className={"flex justify-between items-center gap-2"}>
                                     <h3 className={"font-normal"}>{x.title}</h3>
                                     {
@@ -259,44 +278,52 @@ const GeneralSettings = () => {
                                         </div> : ""
                                     }
                                 </div>
-                                    {
-                                        (generalSettingData?.[x.nameSwitch] === undefined || generalSettingData?.[x.nameSwitch] === 1) ?
-                                            <Fragment>
-                                                <div className={"space-y-3"}>
-                                                    <div className={`${
-                                                        x.title === "Header Color" || x.title === "Global Color"
-                                                            ? "grid grid-cols-2 gap-4"
-                                                            : x.title === "Organization"
+                                {
+                                    (generalSettingData?.[x.nameSwitch] === undefined || generalSettingData?.[x.nameSwitch] === 1) ?
+                                        <Fragment>
+                                            <div className={"space-y-3"}>
+                                                <div className={`${
+                                                    x.title === "Header Color" || x.title === "Global Color"
+                                                        ? "grid grid-cols-2 gap-4"
+                                                        : x.title === "Organization"
                                                             ? "flex gap-4 w-full"
                                                             : "space-y-3 w-full md:w-1/2"
-                                                    }`}>
-                                                        {
-                                                            x.input.map((y, inputIndex) => {
-                                                                return (
-                                                                    <Fragment>
-                                                                        {
-                                                                            y.field === "text" ?
-                                                                                <div className={"space-y-1"}>
-                                                                                    <Label className="text-sm font-normal">{y.label}</Label>
-                                                                                    <Input value={generalSettingData?.[y.name]}
-                                                                                           onChange={(e) => onChange(y.name, e.target.value)}/>
-                                                                                    </div>
-                                                                                : y.field === "checkbox" ?
-                                                                                    <div className="flex items-center gap-4">
-                                                                                        <Checkbox
-                                                                                            id={y.name}
-                                                                                            checked={generalSettingData?.[y.name] === 1}
-                                                                                            onCheckedChange={(checked) => onChange(y.name, checked ? 1 : 0)}
-                                                                                        />
-                                                                                        <label
-                                                                                            htmlFor={y.name}
-                                                                                            className="text-sm text-muted-foreground font-normal"
-                                                                                        >
-                                                                                            {y.label}
-                                                                                        </label>
-                                                                                    </div>
+                                                }`}>
+                                                    {
+                                                        x.input.map((y, inputIndex) => {
+                                                            return (
+                                                                <Fragment key={inputIndex}>
+                                                                    {
+                                                                        y.field === "text" ?
+                                                                            <div className={"space-y-1"}>
+                                                                                <Label className="text-sm font-normal">{y.label}</Label>
+                                                                                <Input
+                                                                                    value={generalSettingData?.[y.name]}
+                                                                                    onChange={(e) => onChange(y.name, e.target.value)}/>
+                                                                                {
+                                                                                    formError[y.name] ?
+                                                                                        <div className="grid gap-2 mt-[4px]">
+                                                                                            <span className="text-red-500 text-sm">{formError[y.name]}</span>
+                                                                                        </div> : ""
+                                                                                }
+                                                                            </div>
+                                                                            : y.field === "checkbox" ?
+                                                                                <div className="flex items-center gap-4">
+                                                                                    <Checkbox
+                                                                                        id={y.name}
+                                                                                        checked={generalSettingData?.[y.name] === 1}
+                                                                                        onCheckedChange={(checked) => onChange(y.name, checked ? 1 : 0)}
+                                                                                    />
+                                                                                    <label
+                                                                                        htmlFor={y.name}
+                                                                                        className="text-sm text-muted-foreground font-normal"
+                                                                                    >
+                                                                                        {y.label}
+                                                                                    </label>
+                                                                                </div>
                                                                                 : y.field === "color" ?
-                                                                                    <div className={"flex items-center gap-3 flex-wrap md:flex-nowrap"}>
+                                                                                    <div
+                                                                                        className={"flex items-center gap-3 flex-wrap md:flex-nowrap"}>
                                                                                         <div className={"widget-color-picker space-y-1 w-full"}>
                                                                                             <Label className={"text-sm font-normal"}>{y.label}</Label>
                                                                                             <ColorInput name={y.name}
@@ -306,12 +333,16 @@ const GeneralSettings = () => {
                                                                                         </div>
                                                                                     </div>
                                                                                     : y.field === "select" ?
-                                                                                        <div className="announce-create-switch flex gap-4">
-                                                                                            {console.log(generalSettingData.timezone)}
-                                                                                            {console.log(timeZoneJson)}
-                                                                                            <Select onValueChange={(value) => onChange('timezone', value)} defaultValue={generalSettingData.timezone} value={generalSettingData.timezone}>
+                                                                                        <div
+                                                                                            className="announce-create-switch flex gap-4">
+                                                                                            <Select
+                                                                                                onValueChange={(value) => onChange('timezone', value)}
+                                                                                                defaultValue={generalSettingData.timezone}
+                                                                                                value={generalSettingData.timezone}>
                                                                                                 <SelectTrigger>
-                                                                                                    <SelectValue placeholder={generalSettingData.timezone} />
+                                                                                                    <SelectValue>
+                                                                                                        {timeZoneJson?.find((tz) => tz.tzCode === generalSettingData.timezone)?.label || generalSettingData.timezone}
+                                                                                                    </SelectValue>
                                                                                                 </SelectTrigger>
                                                                                                 <SelectContent>
                                                                                                     {
@@ -327,32 +358,42 @@ const GeneralSettings = () => {
                                                                                         : y.field === "switch" ?
                                                                                             <Fragment>
                                                                                                 <div className="space-y-3">
-                                                                                                <div className="announce-create-switch flex gap-4">
-                                                                                                    <Switch
-                                                                                                        className="w-[38px] h-[20px]"
-                                                                                                        checked={generalSettingData?.[y.name] === 1}
-                                                                                                        disabled={y.name === "privateMode" ? "" : userDetailsReducer.plan === 0}
-                                                                                                        onCheckedChange={(checked) => onChange(y.name, checked ? 1 : 0)}
-                                                                                                    />
-                                                                                                    <p className="text-sm text-muted-foreground font-normal">{y.label}</p>
-                                                                                                </div>
+                                                                                                    <div
+                                                                                                        className="announce-create-switch flex gap-4">
+                                                                                                        <Switch
+                                                                                                            className="w-[38px] h-[20px]"
+                                                                                                            checked={generalSettingData?.[y.name] === 1}
+                                                                                                            disabled={y.name === "privateMode" ? "" : userDetailsReducer.plan === 0}
+                                                                                                            onCheckedChange={(checked) => onChange(y.name, checked ? 1 : 0)}
+                                                                                                        />
+                                                                                                        <p className="text-sm text-muted-foreground font-normal">{y.label}</p>
+                                                                                                    </div>
                                                                                                     {y.name === "privateMode" && generalSettingData?.privateMode === 1 && (
-                                                                                                        <div className={"w-3/4"}>
-                                                                                                            <Label className="text-sm font-normal">Password</Label>
-                                                                                                            <div className={"relative"}>
-                                                                                                            <Input
-                                                                                                                type={showPassword ? "text" : "password"}
-                                                                                                                value={generalSettingData?.password || ""}
-                                                                                                                placeholder="Enter your password"
-                                                                                                                onChange={(e) => onChange("password", e.target.value)}
-                                                                                                            />
-                                                                                                            <Button
-                                                                                                                className={"absolute top-0 right-0"}
-                                                                                                                variant={"ghost hover:none"}
-                                                                                                                onClick={togglePasswordVisibility}
-                                                                                                            >
-                                                                                                                {generalSettingData?.password ? <Eye size={16} stroke={`${theme === "dark" ? "white" : "black"}`}/> : <EyeOff size={16} stroke={`${theme === "dark" ? "white" : "black"}`}/>}
-                                                                                                            </Button>
+                                                                                                        <div
+                                                                                                            className={"w-3/4"}>
+                                                                                                            <Label
+                                                                                                                className="text-sm font-normal">Password</Label>
+                                                                                                            <div
+                                                                                                                className={"relative"}>
+                                                                                                                <Input
+                                                                                                                    type={showPassword ? "text" : "password"}
+                                                                                                                    value={generalSettingData?.password || ""}
+                                                                                                                    placeholder="Enter your password"
+                                                                                                                    onChange={(e) => onChange("password", e.target.value)}
+                                                                                                                />
+                                                                                                                <Button
+                                                                                                                    className={"absolute top-0 right-0"}
+                                                                                                                    variant={"ghost hover:none"}
+                                                                                                                    onClick={togglePasswordVisibility}
+                                                                                                                >
+                                                                                                                    {generalSettingData?.password ?
+                                                                                                                        <Eye
+                                                                                                                            size={16}
+                                                                                                                            stroke={`${theme === "dark" ? "white" : "black"}`}/> :
+                                                                                                                        <EyeOff
+                                                                                                                            size={16}
+                                                                                                                            stroke={`${theme === "dark" ? "white" : "black"}`}/>}
+                                                                                                                </Button>
                                                                                                                 {/*{*/}
                                                                                                                 {/*    formError.password &&*/}
                                                                                                                 {/*    <span className="text-destructive text-sm">{formError.password}</span>*/}
@@ -362,17 +403,17 @@ const GeneralSettings = () => {
                                                                                                     )}
                                                                                                 </div>
                                                                                             </Fragment>
-                                                                                        : ""
-                                                                        }
-                                                                    </Fragment>
-                                                                )
-                                                            })
-                                                        }
-                                                    </div>
+                                                                                            : ""
+                                                                    }
+                                                                </Fragment>
+                                                            )
+                                                        })
+                                                    }
                                                 </div>
-                                            </Fragment>
-                                            : ""
-                                    }
+                                            </div>
+                                        </Fragment>
+                                        : ""
+                                }
                             </div>
                         )
                     })

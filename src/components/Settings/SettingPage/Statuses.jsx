@@ -357,7 +357,7 @@ const Statuses = () => {
                                 {
                                     ["","Status Name","Status Color","Action"].map((x,i)=>{
                                         return(
-                                            <TableHead className={`px-2 py-[10px] md:px-3 font-normal text-card-foreground dark:text-muted-foreground ${i === 0 ? "w-[48px]" : i === 1 ? "w-2/5" : i === 2 ? "w-2/5" : i === 3 ? "w-2/5" : ""}`}>{x}</TableHead>
+                                            <TableHead key={i} className={`px-2 py-[10px] md:px-3 font-normal text-card-foreground dark:text-muted-foreground ${i === 0 ? "w-[48px]" : i === 1 ? "w-2/5" : i === 2 ? "w-2/5" : i === 3 ? "w-2/5" : ""}`}>{x}</TableHead>
                                         )
                                     })
                                 }
@@ -365,25 +365,23 @@ const Statuses = () => {
                         </TableHeader>
                         <TableBody>
                             {
-                                statusList.length > 0 ? <>
+                                statusList.length > 0 ? <Fragment>
                                 {(statusList || []).map((x, i) => (
                                     <TableRow
                                         id={i}
                                         key={i}
                                         position={i}
                                         data-position={i}
-                                        draggable={isEdit ? false : true}
+                                        draggable={!isEdit}
                                         onDragStart={onDragStart}
                                         onDragOver={isEdit ? null : onDragOver}
                                         onDrop={onDrop}
                                         onDragLeave={onDragLeave}
                                     >
-                                        {/*<TableCell className={`px-[12px] py-[10px] ${(isEdit === i && labelError.title) ? "align-top" : ""}`}><Menu className={"cursor-grab"} size={16}/></TableCell>*/}
                                         <TableCell className={`px-[12px] py-[10px]`}><Menu className={"cursor-grab"} size={16}/></TableCell>
                                         {
                                             isEdit === i ?
                                                 <Fragment>
-                                                    {/*<TableCell className={"py-[8.5px] pl-0 py-[11px]"}>*/}
                                                     <TableCell className={"px-[12px] py-[10px]"}>
                                                         <Input
                                                             className={"bg-card h-9"}
@@ -397,11 +395,7 @@ const Statuses = () => {
                                                         {
                                                             labelError.title ?
                                                                 <div className="grid gap-2 mt-[4px]">
-                                                                    {
-                                                                        labelError.title &&
-                                                                        <span
-                                                                            className="text-red-500 text-sm">{labelError.title}</span>
-                                                                    }
+                                                                    <span className="text-red-500 text-sm">{labelError.title}</span>
                                                                 </div> : ""
                                                         }
                                                     </TableCell>
@@ -472,7 +466,7 @@ const Statuses = () => {
                                         }
                                     </TableRow>
                                 ))}
-                            </> :
+                            </Fragment> :
                                     <TableRow>
                                         <TableCell colSpan={6}>
                                             <EmptyData />

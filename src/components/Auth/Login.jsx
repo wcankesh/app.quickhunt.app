@@ -78,7 +78,7 @@ const Login = () => {
             const urlParams = new URLSearchParams(window.location.search);
             const token = urlParams.get('token');
             if (token) {
-                navigate(`${baseUrl}/setup?token=${token}`);
+                navigate(`${baseUrl}/invitation?token=${token}`);
             } else {
                 urlParams.delete('token')
                 if(data?.data?.onboarding == 0){

@@ -35,7 +35,7 @@ function App() {
                         <Route path={`${baseUrl}/`} element={<Navigate to={`${baseUrl}/dashboard`} replace/>}/>
                     </Route>
                     <Route path={`${baseUrl}/project`} element={<Project/>}/>
-                    <Route path={`${baseUrl}/setup`} element={<Setup/>}/>
+                    <Route path={`${baseUrl}/invitation`} element={<Setup/>}/>
                 </Route>
                 <Route element={<ThemeProvider defaultTheme="system" storageKey="vite-ui-theme"><PublicRoutes/></ThemeProvider>}>
                     <Route path={`${baseUrl}/register`} element={<Register/>}/>

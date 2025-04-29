@@ -41,15 +41,12 @@ const RestPassword = () => {
     };
 
     const formValidate = (name, value) => {
-        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-
+        // const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
         switch (name) {
             case "password":
                 if (value.trim() === "") return "Password is required";
-                if (
-                    !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(value)
-                )
-                    return "Password must be at least 8 characters with one uppercase letter, one lowercase letter, one number, and one special character";
+                if (value.length < 8) return "Password must be at least 8 characters.";
+                // if (!passwordRegex.test(value)) return "Password must be at least 8 characters with one uppercase letter, one lowercase letter, one number, and one special character";
                 return "";
             case "confirmPassword":
                 if (value.trim() === "") return "Confirm Password is required";

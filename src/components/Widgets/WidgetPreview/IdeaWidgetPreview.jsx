@@ -7,6 +7,7 @@ import {Icon} from "../../../utils/Icon";
 import ReadMoreText from "../../Comman/ReadMoreText";
 import {apiService, cleanQuillHtml, getDateFormat} from "../../../utils/constent";
 import {useSelector} from "react-redux";
+import moment from "moment";
 
 const IdeaWidgetPreview = ({widgetsSetting}) => {
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
@@ -103,7 +104,9 @@ const IdeaWidgetPreview = ({widgetsSetting}) => {
                                                                 <div
                                                                     className="text-xs text-gray-600 font-normal">{idea.name}</div>
                                                                 <div
-                                                                    className="text-xs text-muted-foreground">{getDateFormat(idea.createdAt)}</div>
+                                                                    className="text-xs text-muted-foreground">
+                                                                    {getDateFormat(moment(idea.createdAt).format("YYYY-MM-DD HH:mm:ss"))}
+                                                                </div>
                                                             </div>
                                                             {idea.roadmapStatusId && <span style={{
                                                                 borderColor: idea.roadmapColor,

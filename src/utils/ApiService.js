@@ -206,7 +206,7 @@ export class ApiService {
         return await this.getData(`${baseUrlApi}/invited-user/get-invitation-detail?token=${token}`,)
     }
 
-    async join(payload) {
+    async acceptReject(payload) {
         return await this.postData(`${baseUrlApi}/invited-user/accept-Reject`, payload)
     }
 
