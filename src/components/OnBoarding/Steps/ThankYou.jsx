@@ -40,7 +40,7 @@ const ThankYou = () => {
             </div>
             <div className={"space-y-8"}>
                 <p className={"text-sm"}>Follow us on social media for the latest updates and tips!</p>
-                <div className={"flex justify-center gap-[56px]"}>
+                <div className={"flex flex-wrap justify-center gap-10 md:gap-[56px]"}>
                     {socialLinks.map((link, index) => (
                         <Button
                             key={index}

@@ -482,7 +482,7 @@ const Articles = () => {
                 </Card>
             </div>
             {
-                (isLoading || !emptyContentBlock || filter) ? "" :
+                (isLoading || !emptyContentBlock) ? "" :
                     <EmptyDataContent data={EmptyInArticlesContent} onClose={() => emptyContent(false)} setSheetOpenCreate={handleCreateClick}/>
             }
         </div>

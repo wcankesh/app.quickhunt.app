@@ -295,8 +295,6 @@ const UpdateAnnouncement = () => {
         setSelectedRecord({...selectedRecord, labels: clone});
     }
 
-    const deleteAssignTo = (e, index) => {e.stopPropagation();}
-
     const links = [
         { label: 'Announcement', path: `/announcements?pageNo=${getPageNo}` }
     ];
@@ -316,7 +314,7 @@ const UpdateAnnouncement = () => {
                 />
                 <div className={"flex items-center gap-4"}>
                     <Button variant="outline" className={"w-9 h-9"} size="icon"
-                            onClick={() => commonToggle("post_pin_to_top", selectedRecord.post_pin_to_top === 1 ? 0 : 1)}
+                            onClick={() => commonToggle("pinTop", selectedRecord.pinTop === 1 ? 0 : 1)}
                     >
                         {
                             selectedRecord.pinTop === 1 ?
@@ -440,8 +438,6 @@ const UpdateAnnouncement = () => {
                                 </div>
                                 <div className={"w-full space-y-1.5"}>
                                     <Label className={"font-normal"}>Assign to</Label>
-                                    {console.log("selectedRecord", selectedRecord)}
-                                    {console.log("selectedRecord?.assignToId", selectedRecord?.assignToId)}
                                     <Select onValueChange={handleValueChange} value={[]}>
                                     {/*<Select onValueChange={handleValueChange} value={selectedRecord?.assignToId?.length > 0 ? selectedRecord.assignToId[0] : undefined}>*/}
                                         <SelectTrigger className={"h-9"}>

@@ -193,7 +193,7 @@ const ArticleDetail = () => {
             setArticleList(articleList)
             toast({description: data.message,});
         } else {
-            toast({description: data.error, variant: "destructive",});
+            toast({description: data.error.message, variant: "destructive",});
         }
         setLoad('');
     }
@@ -365,9 +365,7 @@ const ArticleDetail = () => {
         );
     };
 
-    const links = [
-        { label: 'Article', path: `/help/article` }
-    ];
+    const links = [{ label: 'Article', path: `/help/article` }];
 
     return (
         <Fragment>

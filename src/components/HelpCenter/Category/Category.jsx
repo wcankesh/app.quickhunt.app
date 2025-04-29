@@ -475,7 +475,8 @@ const Category = () => {
                             </DialogTitle>
                             <span className={"max-w-[24px]"}><X onClick={closeSheetCategory} className={"cursor-pointer m-0"} /></span>
                         </SheetHeader>
-                        <div className={"h-[calc(100vh_-_120px)] lg:h-[calc(100vh_-_69px)] overflow-y-auto"}>
+                        {/*<div className={"h-[calc(100vh_-_120px)] lg:h-[calc(100vh_-_69px)] overflow-y-auto"}>*/}
+                        <div className={"h-[calc(100vh_-_61px)] overflow-y-auto"}>
                             <CategoryForm
                                 selectedData={selectedCategory}
                                 setSelectedData={setSelectedCategory}
@@ -502,7 +503,8 @@ const Category = () => {
                             </DialogTitle>
                             <span className={"max-w-[24px]"}><X onClick={closeSheetSubCategory} className={"cursor-pointer m-0"} /></span>
                         </SheetHeader>
-                        <div className={"h-[calc(100vh_-_120px)] lg:h-[calc(100vh_-_69px)] overflow-y-auto"}>
+                        {/*<div className={"h-[calc(100vh_-_120px)] lg:h-[calc(100vh_-_69px)] overflow-y-auto"}>*/}
+                        <div className={"h-[calc(100vh_-_61px)] overflow-y-auto"}>
                             <CategoryForm
                                 selectedData={selectedSubCategory}
                                 setSelectedData={setSelectedSubCategory}

@@ -4,10 +4,8 @@ import {Input} from "../ui/input";
 import ReactQuillEditor from "./ReactQuillEditor";
 import {CircleX, Loader2, Upload} from "lucide-react";
 import {Button} from "../ui/button";
-import {useTheme} from "../theme-provider";
 
 const CategoryForm = ({ selectedData, setSelectedData, formError, setFormError, handleImageUpload, handleSubmit, isLoading, closeSheet, saveTitle, className }) => {
-    const {theme} = useTheme();
     const handleOnChange = (name, value) => {
         setSelectedData({ ...selectedData, [name]: value });
         setFormError(formError => ({

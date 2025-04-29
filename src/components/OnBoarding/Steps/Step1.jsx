@@ -1,14 +1,10 @@
 import React, {Fragment} from 'react';;
 import {Button} from "../../ui/button";
-import {useNavigate} from "react-router-dom";
-import {baseUrl} from "../../../utils/constent";
 
 const Step1 = ({setStep}) => {
-    let navigate = useNavigate();
 
     const onStep = (stepCount) => {
         setStep(stepCount)
-        // navigate(`${baseUrl}/on-boarding`)
     }
 
     return (

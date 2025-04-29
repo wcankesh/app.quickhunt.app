@@ -66,8 +66,8 @@ const AnalyticsViews = () => {
         const data = await apiService.getFeedback(postId);
         if (data.success) {
             setFeedbackList(data.data.data);
-            setTotalFeedback(data.total);
-            setTotalRecord(data.total);
+            setTotalFeedback(data.data.total);
+            setTotalRecord(data.data.total);
         }
         setIsLoadingFeedBack(false);
         setIsLoading(false);
@@ -213,18 +213,17 @@ const AnalyticsViews = () => {
                                                         received for this announcement yet</p> :
                                                     <div>
                                                         {
-                                                            (feedbackList || []).map((x) => {
+                                                            (feedbackList || []).map((x, i) => {
                                                                 return (
-                                                                    <div key={x.id} className={"py-4 first:pt-0 border-b"}>
+                                                                    <div key={i} className={"py-4 first:pt-0 border-b"}>
                                                                         {/*<div className={"flex flex-row gap-4"}>*/}
                                                                             <div className={"flex flex-col gap-1"}>
                                                                                 <div className={"flex gap-4 items-center"}>
-                                                                                    <h5 className={"text-sm font-medium"}>{x?.name}</h5>
-                                                                                    <p className={"text-muted-foreground text-[10px] font-normal"}>{x?.email}</p>
+                                                                                    <h5 className={"text-sm font-medium"}>{x?.user.firstName} {x?.user.lastName}</h5>
+                                                                                    <p className={"text-muted-foreground text-[10px] font-normal"}>{x?.user.email}</p>
                                                                                 </div>
                                                                                 <div className={"text-muted-foreground text-xs font-normal"}>
-                                                                                    <ReadMoreText className={"text-xs"}
-                                                                                                  html={x.feedback}/>
+                                                                                    <ReadMoreText className={"text-xs"} html={x.feedback}/>
                                                                                 </div>
                                                                             </div>
                                                                         {/*</div>*/}

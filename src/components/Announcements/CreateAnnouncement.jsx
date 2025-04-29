@@ -358,7 +358,8 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
                         <span className={"max-w-6"}><X onClick={onClose} className={"cursor-pointer"}/></span>
                     </div>
                 </SheetHeader>
-                <div className={"h-[calc(100vh_-_120px)] lg:h-[calc(100vh_-_69px)] overflow-y-auto"}>
+                {/*<div className={"h-[calc(100vh_-_120px)] lg:h-[calc(100vh_-_69px)] overflow-y-auto"}>*/}
+                <div className={"h-[calc(100vh_-_61px)] overflow-y-auto"}>
                     <div className={"px-3 py-6 lg:px-8 border-b"}>
                         <div className={"flex flex-col gap-6"}>
                             {

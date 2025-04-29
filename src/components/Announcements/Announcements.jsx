@@ -5,7 +5,6 @@ import {ChevronLeft, Circle, Filter, Plus, X} from "lucide-react";
 import CreateAnnouncement from "./CreateAnnouncement";
 import {useTheme} from "../theme-provider";
 import {useSelector} from "react-redux";
-import {ApiService} from "../../utils/ApiService";
 import {Card} from "../ui/card";
 import {toast} from "../ui/use-toast";
 import {Popover, PopoverTrigger} from "@radix-ui/react-popover";
@@ -13,7 +12,7 @@ import {PopoverContent} from "../ui/popover";
 import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList} from "../ui/command";
 import {Badge} from "../ui/badge";
 import {useLocation, useNavigate} from "react-router-dom";
-import {baseUrl} from "../../utils/constent";
+import {apiService, baseUrl} from "../../utils/constent";
 import Pagination from "../Comman/Pagination";
 import {RadioGroup, RadioGroupItem} from "../ui/radio-group";
 import {EmptyDataContent} from "../Comman/EmptyDataContent";
@@ -34,7 +33,6 @@ const Announcements = () => {
     const UrlParams = new URLSearchParams(location.search);
     const getPageNo = UrlParams.get("pageNo") || 1;
     const getNavOpenSheet = UrlParams.get("opensheet") || false;
-    const apiService = new ApiService();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
 
@@ -196,15 +194,10 @@ const Announcements = () => {
             } else {
                 getAllPosts();
             }
-            toast({
-                description: data.message,
-            })
+            toast({description: data.message,})
         } else {
             setIsLoadingDelete(false)
-            toast({
-                description: data.error.message,
-                variant: "destructive"
-            })
+            toast({description: data.error.message, variant: "destructive"})
         }
     }
 
