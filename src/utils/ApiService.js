@@ -290,7 +290,7 @@ export class ApiService {
     }
 
     async deleteProjects(id) {
-        return await this.deleteData(`${baseUrlApi}/projects/${id}`)
+        return await this.deleteData(`${baseUrlApi}/project/delete-project?id=${id}`)
     }
 
     /* ---------- Inbox api ---------- */
@@ -303,8 +303,8 @@ export class ApiService {
     }
 
     /* ---------- Users api ---------- */
-    async getAllUsers (id){
-        return await this.getData(`${baseUrlApi}/customer-auth/get-all?projectId=${id}`)
+    async getAllUsers (payload){
+        return await this.getData(`${baseUrlApi}/customer-auth/get-all?${qs.stringify(payload)}`)
     }
 
     async getSingleUser(id) {
@@ -316,7 +316,7 @@ export class ApiService {
     }
 
     async userManualUpVote(payload) {
-        return await this.postData(`${baseUrlApi}/customerAuth/vote`, payload)
+        return await this.postData(`${baseUrlApi}/customer-auth/vote`, payload)
     }
 
     async userAction(payload) {

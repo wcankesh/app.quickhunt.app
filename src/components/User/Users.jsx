@@ -219,10 +219,11 @@ const Users = () => {
     const getAllUsers = async () => {
         setIsLoading(true);
         const payload = {
+            projectId: projectDetailsReducer.id,
             page: pageNo,
             limit: perPageLimit
         }
-        const data = await apiService.getAllUsers(projectDetailsReducer.id, payload);
+        const data = await apiService.getAllUsers(payload);
         if (data.success) {
             setCustomerList(data.data);
             setTotalRecord(data?.data.total);

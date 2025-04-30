@@ -125,43 +125,40 @@ const Ideas = () => {
         }
     }
 
-    const ideaSearch = async (payload) => {
-        setLoad('search')
-        const data = await apiService.ideaSearch(payload)
-        if (data.success) {
-            setIdeasList(data.data.data)
-            setTotalRecord(data.data.total)
-            setPageNo(payload.page)
-            setLoad('')
-        } else {
-            setLoad('')
-        }
-    }
-
     const throttledDebouncedSearch = useCallback(
         debounce((value) => {
-            const updatedFilter = {
-                ...filter,
-                projectId: projectDetailsReducer.id,
-                search: value,
-                page: 1,
-            };
-            setFilter(updatedFilter);
-            getAllIdea(updatedFilter);
+            const trimmedValue = value.trim();
+            if (trimmedValue || value === '') {
+                const updatedFilter = {
+                    ...filter,
+                    projectId: projectDetailsReducer.id,
+                    search: trimmedValue,
+                    page: 1,
+                };
+                setFilter(updatedFilter);
+                getAllIdea(updatedFilter);
+            }
         }, 500),
-        []
+        [filter, projectDetailsReducer.id]
     );
 
     const onChangeSearch = (e) => {
         const value = e.target.value;
-        setFilter( { ...filter, search: value });
-        throttledDebouncedSearch(value)
+        const trimmedValue = value.trim();
+        if (trimmedValue || value === '') {
+            setFilter(prev => ({ ...prev, search: value }));
+            throttledDebouncedSearch(value);
+        }
     };
 
     const clearSearchFilter = () => {
-        setFilter(prev => ({ ...prev, search: '' }));
-        setPageNo(1);
-        getAllIdea('', filter.search);
+        const updatedFilter = {
+            ...filter,
+            search: '',
+            page: 1,
+        };
+        setFilter(updatedFilter);
+        getAllIdea(updatedFilter);
     };
 
     const openDetailsSheet = (record) => {

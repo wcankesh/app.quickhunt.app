@@ -3,11 +3,11 @@ import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} f
 import {Label} from "../../ui/label";
 import {Input} from "../../ui/input";
 import {Button} from "../../ui/button";
-import {ApiService} from "../../../utils/ApiService";
 import {useDispatch, useSelector} from "react-redux"
 import {toast} from "../../ui/use-toast";
 import {Loader2} from "lucide-react";
 import {allStatusAndTypesAction} from "../../../redux/action/AllStatusAndTypesAction";
+import {apiService} from "../../../utils/constent";
 
 const initialState = {
     facebook:"",
@@ -19,7 +19,6 @@ const initialState = {
 }
 
 const Social = () => {
-    let apiService = new ApiService();
     const dispatch = useDispatch();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
@@ -34,92 +33,36 @@ const Social = () => {
         }
     },[allStatusAndTypes]);
 
-    // const onChange =(e)=>{
-    //     setSocialLink({...socialLink,[e.target.name]:e.target.value});
-    //     setFormError(formError => ({
-    //         ...formError,
-    //         [e.target.name]: ""
-    //     }));
-    // };
-
     const onChange = (e) => {
         const { name, value } = e.target;
-        const newValue = value.trim() === "" ? null : value;
+        const trimmedValue = value.trim();
         setSocialLink((prevState) => ({
             ...prevState,
-            [name]: newValue
+            [name]: trimmedValue === "" ? "" : value,
         }));
-
-        const error = formValidate(name, newValue);
+        const error = formValidate(name, trimmedValue === "" ? "" : value);
         setFormError((prevError) => ({
             ...prevError,
-            [name]: error
+            [name]: error,
         }));
     };
 
     const urlRegex =/^https:\/\/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-z]{2,63}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)$/
     const formValidate = (name, value) => {
-        switch (name) {
-            case "facebook":
-                if (value && !value.match(urlRegex)) {
-                    return "Enter a valid facebook account link";
-                } else {
-                    return "";
-                }
-            case "twitter":
-                if (value && !value.match(urlRegex)) {
-                    return "Enter a valid twitter account link";
-                } else {
-                    return "";
-                }
-            case "linkedin":
-                if (value && !value.match(urlRegex)) {
-                    return "Enter a valid linkedin account link";
-                } else {
-                    return "";
-                }
-            case "youtube":
-                if (value && !value.match(urlRegex)) {
-                    return "Enter a valid youtube account link";
-                } else {
-                    return "";
-                }
-            case "instagram":
-                if (value && !value.match(urlRegex)) {
-                    return "Enter a valid instagram account link";
-                } else {
-                    return "";
-                }
-            case "github":
-                if (value && !value.match(urlRegex)) {
-                    return "Enter a valid github account link";
-                } else {
-                    return "";
-                }
-            default: {
-                return "";
-            }
+        if (value === "") return "";
+        const platformNames = {
+            facebook: "facebook",
+            twitter: "twitter",
+            linkedin: "linkedin",
+            youtube: "youtube",
+            instagram: "instagram",
+            github: "github"
+        };
+        if (platformNames[name] && !urlRegex.test(value)) {
+            return `Enter a valid ${platformNames[name]} account link`;
         }
+        return "";
     };
-
-    // const onBlur = (event) => {
-    //     const {name, value} = event.target;
-    //     setFormError({
-    //         ...formError,
-    //         [name]: formValidate(name, value)
-    //     });
-    // };
-
-    const onBlur = (event) => {
-        const { name, value } = event.target;
-        const error = formValidate(name, value);
-
-        setFormError((prevError) => ({
-            ...prevError,
-            [name]: error
-        }));
-    };
-
 
     const onUpdateSocialSetting = async () => {
         if (!socialLink) return;
@@ -150,15 +93,20 @@ const Social = () => {
             toast({description: data.message,});
             delete payload.projectId;
             dispatch(allStatusAndTypesAction({...allStatusAndTypes, social: payload}));
-
         } else {
             setIsSave(false);
-            toast({
-                description:data?.error.message,
-                variant: "destructive"
-            })
+            toast({description:data?.error.message, variant: "destructive"})
         }
     }
+
+    const socialLinksConfig = [
+        { id: "facebook", label: "Facebook", placeholder: "https://facebook.com/" },
+        { id: "twitter", label: "Twitter ( X )", placeholder: "https://x.com/" },
+        { id: "linkedin", label: "Linkedin", placeholder: "https://linkedin.com/" },
+        { id: "youtube", label: "YouTube", placeholder: "https://youtube.com/" },
+        { id: "instagram", label: "Instagram", placeholder: "https://instagram.com/" },
+        { id: "github", label: "GitHub", placeholder: "https://github.com/" },
+    ]
 
     return (
         <Card className={"divide-y"}>
@@ -168,41 +116,25 @@ const Social = () => {
             </CardHeader>
             <CardContent className={"p-0"}>
                 <div className={"p-4 sm:px-5 sm:py-4"}>
-                    <div className="grid w-full gap-1.5">
-                        <Label htmlFor="facebook" className={" font-normal"}>Facebook</Label>
-                        <Input value={socialLink?.facebook} onBlur={onBlur} onChange={onChange} name="facebook" placeholder={"https://facebook.com/"} type="text" id="facebook" className={"h-9"}/>
-                        {formError.facebook && <span className="text-destructive text-sm mt-1">{formError.facebook}</span>}
-                    </div>
-
-                    <div className="w-full mt-4 gap-1.5">
-                        <Label htmlFor="twitter" className={" font-normal"}>Twitter ( X )</Label>
-                        <Input value={socialLink?.twitter} onChange={onChange} name="twitter" placeholder={"https://x.com/"} type="text" id="twitter" className={"h-9"}/>
-                        {formError.twitter && <span className="text-destructive text-sm mt-1">{formError.twitter}</span>}
-                    </div>
-
-                    <div className="grid w-full mt-4 gap-1.5">
-                        <Label htmlFor="linkedin" className={" font-normal"}>Linkedin</Label>
-                        <Input value={socialLink?.linkedin} onChange={onChange} name="linkedin" placeholder={"https://linkedin.com/"} type="text" id="linkedin" className={"h-9"}/>
-                        {formError.linkedin && <span className="text-destructive text-sm mt-1">{formError.linkedin}</span>}
-                    </div>
-
-                    <div className="grid w-full mt-4 gap-1.5">
-                        <Label htmlFor="youtube" className={" font-normal"}>YouTube</Label>
-                        <Input value={socialLink?.youtube} onChange={onChange} name="youtube" placeholder={"https://youtube.com/"} type="text" id="youtube" className={"h-9"}/>
-                        {formError.youtube && <span className="text-destructive text-sm mt-1">{formError.youtube}</span>}
-                    </div>
-
-                    <div className="grid w-full mt-4 gap-1.5">
-                        <Label htmlFor="instagram" className={" font-normal"}>Instagram</Label>
-                        <Input value={socialLink?.instagram} onChange={onChange} name="instagram" placeholder={"https://instagram.com/"} type="text" id="instagram" className={"h-9"}/>
-                        {formError.instagram && <span className="text-destructive text-sm mt-1">{formError.instagram}</span>}
-                    </div>
-
-                    <div className="grid w-full mt-4 gap-1.5">
-                        <Label htmlFor="github" className={" font-normal"}>GitHub</Label>
-                        <Input value={socialLink?.github} onChange={onChange} name="github" placeholder={"https://github.com/"} type="text" id="github" className={"h-9"}/>
-                        {formError.github && <span className="text-destructive text-sm mt-1">{formError.github}</span>}
-                    </div>
+                    {
+                        socialLinksConfig.map(({ id, label, placeholder }, index) => (
+                            <div key={id} className={`grid w-full ${index !== 0 ? "mt-4" : ""} gap-1.5`}>
+                                <Label htmlFor={id} className="font-normal">{label}</Label>
+                                <Input
+                                    value={socialLink?.[id]}
+                                    onChange={onChange}
+                                    name={id}
+                                    placeholder={placeholder}
+                                    type="text"
+                                    id={id}
+                                    className="h-9"
+                                />
+                                {formError?.[id] && (
+                                    <span className="text-destructive text-sm mt-1">{formError[id]}</span>
+                                )}
+                            </div>
+                        ))
+                    }
                 </div>
             </CardContent>
             <CardFooter className={"p-4 sm:px-5 sm:py-4 justify-end"}>
