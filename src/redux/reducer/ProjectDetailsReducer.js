@@ -12,7 +12,6 @@ const initialState = {
     ipAddress: "",
     languageId: "",
     logo: null,
-    project_modified_date: "",
     name: "",
     status: "",
     timezoneId: "",

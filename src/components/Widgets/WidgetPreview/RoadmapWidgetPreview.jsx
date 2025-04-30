@@ -3,7 +3,7 @@ import {Card} from "../../ui/card";
 import {Skeleton} from "../../ui/skeleton";
 import {AspectRatio} from "@radix-ui/react-aspect-ratio";
 import {useSelector} from "react-redux";
-import {apiService} from "../../../utils/constent";
+import {apiService, DO_SPACES_ENDPOINT} from "../../../utils/constent";
 
 const RoadmapWidgetPreview = ({widgetsSetting}) => {
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
@@ -90,10 +90,10 @@ const RoadmapWidgetPreview = ({widgetsSetting}) => {
                                                                             className={`cursor-pointer w-[320px] ${cardClass}`}
                                                                             key={`roadmap_idea_${idea.id}`}>
                                                                             {
-                                                                                (idea.coverImage !== '' && widgetsSetting.roadmapImage) &&
+                                                                                (idea.coverImage && widgetsSetting.roadmapImage) &&
                                                                                 <AspectRatio ratio={10 / 5}
                                                                                              className={`bg-muted rounded-ss-md rounded-se-md mb-1 ${cardClass}`}>
-                                                                                    <img src={idea.coverImage} alt={idea.title}
+                                                                                    <img src={`${DO_SPACES_ENDPOINT}/${idea.coverImage}`} alt={idea.title}
                                                                                          className="w-full h-full object-contain object-center"/>
                                                                                 </AspectRatio>
                                                                             }

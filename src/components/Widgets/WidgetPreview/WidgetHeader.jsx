@@ -2,6 +2,7 @@ import React from 'react';
 import {Icon} from "../../../utils/Icon";
 import {useSelector} from "react-redux";
 import {Button} from "../../ui/button";
+import {DO_SPACES_ENDPOINT} from "../../../utils/constent";
 
 const WidgetHeader = ({widgetsSetting, selected, setSelected}) => {
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
@@ -48,11 +49,10 @@ const WidgetHeader = ({widgetsSetting, selected, setSelected}) => {
                     widgetsSetting?.hideHeader ?
                         <div className="flex items-center gap-4 justify-between pt-3 pb-4">
                             <div className="inline-block align-middle cursor-pointer">
-
                                 {
                                     (projectDetailsReducer && projectDetailsReducer?.logo) ? (
                                         <img
-                                            src={projectDetailsReducer.logo}
+                                            src={`${DO_SPACES_ENDPOINT}/${projectDetailsReducer.logo}`}
                                             alt={projectDetailsReducer?.name}
                                             className="max-h-10"
                                         />
@@ -62,7 +62,6 @@ const WidgetHeader = ({widgetsSetting, selected, setSelected}) => {
                                         </span>
                                     )
                                 }
-
                             </div>
                             <div className="flex flex-wrap gap-2">
                                 <div className={`gap-2 flex`}>
@@ -76,8 +75,6 @@ const WidgetHeader = ({widgetsSetting, selected, setSelected}) => {
                                         color: widgetsSetting?.headerBtnTextColor
                                     }}>Sign up</Button>
                                 </div>
-
-
                             </div>
                         </div> : ''
                 }

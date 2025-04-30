@@ -2,7 +2,7 @@ import React,{useState, useEffect, Fragment} from 'react';
 import {Card} from "../../ui/card";
 import {Skeleton} from "../../ui/skeleton";
 import {AspectRatio} from "../../ui/aspect-ratio";
-import {apiService, getDateFormat} from "../../../utils/constent";
+import {apiService, DO_SPACES_ENDPOINT, getDateFormat} from "../../../utils/constent";
 import moment from "moment";
 import {Badge} from "../../ui/badge";
 import {Accordion, AccordionContent, AccordionItem, AccordionTrigger,} from "../../ui/accordion"
@@ -73,7 +73,7 @@ const AnnouncementWidgetPreview = ({widgetsSetting}) => {
                                             {
                                                 (x.featureImage && widgetsSetting?.announcementImage) &&
                                                 <AspectRatio ratio={10 / 5} className="bg-muted dark:bg-slate-50 rounded-ss-md rounded-se-md mb-1">
-                                                    <img src={x.featureImage} alt={x.title} className="w-full h-full object-contain object-center"/>
+                                                    <img src={`${DO_SPACES_ENDPOINT}/${x.featureImage}`} alt={x.title} className="w-full h-full object-contain object-center"/>
                                                 </AspectRatio>
                                             }
                                             <div className="p-3">

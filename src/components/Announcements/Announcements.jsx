@@ -21,9 +21,7 @@ import {CommSearchBar} from "../Comman/CommentEditor";
 import {EmptyAnnounceContent} from "../Comman/EmptyContentForModule";
 
 const initialStateFilter = {labels: "", status: "", search:""}
-
 const perPageLimit = 10;
-
 const status = [{label: "Published", value: 1}, {label: "Scheduled", value: 2}, {label: "Draft", value: 4},];
 
 const Announcements = () => {
@@ -58,28 +56,6 @@ const Announcements = () => {
             openSheet();
         }
     }, [getNavOpenSheet])
-
-    // useEffect(() => {
-    //         if(filter.labels || filter.status || filter.search || isFilter){
-    //             getAllPosts({
-    //                 projectId: projectDetailsReducer.id,
-    //                 page: pageNo,
-    //                 limit: perPageLimit,
-    //                 search: filter.search,
-    //                 labels: filter.labels,
-    //                 status: filter.status
-    //             });
-    //         } else {
-    //             if(!isFilter && projectDetailsReducer.id){
-    //                 getAllPosts()
-    //             }
-    //         }
-    //     if(getNavOpenSheet) {
-    //         navigate(`${baseUrl}/announcements?opensheet=${getNavOpenSheet}&pageNo=${pageNo}`);
-    //     } else {
-    //         navigate(`${baseUrl}/announcements?pageNo=${pageNo}`);
-    //     }
-    // }, [projectDetailsReducer.id, allStatusAndTypes, pageNo, filter]);
 
     useEffect(() => {
         if(projectDetailsReducer.id){
@@ -229,7 +205,6 @@ const Announcements = () => {
                 onOpen={openSheet}
                 onClose={closeSheet}
                 getAllPosts={getAllPosts}
-                selectedRecord={selectedRecord}
                 setSelectedRecord={setSelectedRecord}
                 announcementList={announcementList}
                 setAnnouncementList={setAnnouncementList}
@@ -369,7 +344,7 @@ const Announcements = () => {
                             totalPages={totalPages}
                             isLoading={isLoading}
                             handlePaginationClick={handlePaginationClick}
-                            theme={"light"} // or "dark"
+                            theme={"light"}
                             stateLength={announcementList?.length}
                         /> : ""
                 }

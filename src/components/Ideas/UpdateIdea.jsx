@@ -8,7 +8,7 @@ import {Avatar, AvatarFallback} from "../ui/avatar";
 import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "../ui/select";
 import {Popover, PopoverContent, PopoverTrigger} from "../ui/popover";
 import {Textarea} from "../ui/textarea";
-import {Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger} from "../ui/dialog";
+import {Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,} from "../ui/dialog";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "../ui/tabs";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "../ui/table";
 import {useTheme} from "../theme-provider";
@@ -22,13 +22,20 @@ import {useLocation, useParams} from "react-router-dom";
 import {Skeleton} from "../ui/skeleton";
 import CommonBreadCrumb from "../Comman/CommonBreadCrumb";
 import ImageUploader from "../Comman/ImageUploader";
-import {ActionButtons, CommentEditor, SaveCancelButton, StatusButtonGroup, UploadButton, UserAvatar} from "../Comman/CommentEditor";
+import {
+    ActionButtons,
+    CommentEditor,
+    SaveCancelButton,
+    StatusButtonGroup,
+    UploadButton,
+    UserAvatar
+} from "../Comman/CommentEditor";
 import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList} from "../ui/command";
 import {debounce} from "lodash";
 import EmptyData from "../Comman/EmptyData";
 import Pagination from "../Comman/Pagination";
 import {inboxMarkReadAction} from "../../redux/action/InboxMarkReadAction";
-import {apiService} from "../../utils/constent";
+import {apiService, DO_SPACES_ENDPOINT, handleImageOpen} from "../../utils/constent";
 
 const perPageLimit = 10
 
@@ -51,7 +58,7 @@ const initialStateUser = {
     firstSeen: '',
     lastSeen: '',
     browser: '',
-    ipAddress : '',
+    ipAddress: '',
 }
 
 const UpdateIdea = () => {
@@ -60,7 +67,7 @@ const UpdateIdea = () => {
     const getPageNo = UrlParams.get("pageNo") || 1;
     const {theme} = useTheme()
     const {toast} = useToast();
-    const { id } = useParams();
+    const {id} = useParams();
     const dispatch = useDispatch();
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
@@ -82,10 +89,7 @@ const UpdateIdea = () => {
     const [subCommentText, setSubCommentText] = useState("")
     const [subCommentTextEditIdx, setSubCommentTextEditIdx] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
-    const [isLoadingVoteListPage, setIsLoadingVoteListPage] = useState(false);
     const [isLoadingIdeaVoteList, setIsLoadingIdeaVoteList] = useState(false);
-    const [isLoadingAddUser, setIsLoadingAddUser] = useState(false);
-    const [isLoadingVoteDelete, setIsLoadingVoteDelete] = useState(false);
     const [isLoadingCreateIdea, setIsLoadingCreateIdea] = useState(false);
     const [isLoadingArchive, setIsLoadingArchive] = useState(false);
     const [isLoadingBug, setIsLoadingBug] = useState(false);
@@ -104,13 +108,11 @@ const UpdateIdea = () => {
     const [ideasVoteList, setIdeasVoteList] = useState([]);
     const [getAllUsersList, setGetAllUsersList] = useState([]);
     const [addUserDialog, setAddUserDialog] = useState({addUser: false, viewUpvote: false});
+    const listRef = useRef(null);
 
     const openDialogs = (name, value) => {
         setAddUserDialog(prev => ({...prev, [name]: value}));
         handlePopoverOpenChange();
-        // if (!value){
-        //     getSingleIdea();
-        // }
     }
 
     const handlePopoverOpenChange = (isOpen) => {
@@ -118,11 +120,11 @@ const UpdateIdea = () => {
             setGetAllUsersList([]);
             setUsersDetails(initialStateUser);
             setUserDetailError(initialUserError)
-            setFilter({ search: '', projectId: null });
+            setFilter({search: '', projectId: null});
         }
     };
 
-    const getIdeaVotes = async (type = '',clone = []) => {
+    const getIdeaVotes = async (type = '', clone = []) => {
         setIsLoadingIdeaVoteList(true);
         const payload = {
             ideaId: selectedIdea.id,
@@ -130,20 +132,22 @@ const UpdateIdea = () => {
             limit: perPageLimit
         }
         const data = await apiService.getIdeaVote(payload)
-        if(data.success) {
-            setIdeasVoteList(data.data)
+        if (data.success) {
+            setIdeasVoteList(data.data.data)
             setTotalRecord(data.data.total)
-            setSelectedIdea({...selectedIdea, vote: data.total, voteLists: type === 'delete' ? pageNo === 1 ? clone : selectedIdea.voteLists : type === 'add' ? [...data.data] : [...selectedIdea.voteLists]})
-            // setSelectedIdea({...selectedIdea, vote: data.total})
+            setSelectedIdea({
+                ...selectedIdea,
+                vote: data.data.total,
+                voteLists: type === 'delete' ? pageNo === 1 ? clone : selectedIdea.voteLists : type === 'add' ? [...data.data.data] : [...selectedIdea.voteLists]
+            })
             setIsLoadingIdeaVoteList(false);
         }
     }
-
     useEffect(() => {
-        if(addUserDialog.viewUpvote){
+        if (addUserDialog.viewUpvote) {
             getIdeaVotes()
         }
-    },[addUserDialog.viewUpvote, pageNo])
+    }, [addUserDialog.viewUpvote, pageNo])
 
     const totalPages = Math.ceil(totalRecord / perPageLimit);
 
@@ -163,7 +167,7 @@ const UpdateIdea = () => {
         }
     }, [projectDetailsReducer.id, allStatusAndTypes, getPageNo]);
 
-    const getAllUsers = async (value,projectId) => {
+    const getAllUsers = async (value, projectId) => {
         const payload = {
             projectId: projectId,
             search: value,
@@ -174,21 +178,26 @@ const UpdateIdea = () => {
         }
     };
 
+    const handleSearchChange = (value) => {
+        const trimmedValue = value.trim();
+        if (trimmedValue || value === '') {
+            setFilter(prev => ({
+                ...prev,
+                search: value,
+                projectId: projectDetailsReducer.id
+            }));
+            throttledDebouncedSearch(trimmedValue, projectDetailsReducer.id);
+        }
+    };
+
     const throttledDebouncedSearch = useCallback(
         debounce((value, projectId) => {
-            getAllUsers(value, projectId);
+            if (value || value === '') {
+                getAllUsers(value, projectId);
+            }
         }, 500),
         []
     );
-
-    const handleSearchChange = (value) => {
-        setFilter((prevFilter) => ({
-            ...prevFilter,
-            search: value,
-            projectId: projectDetailsReducer.id,
-        }));
-        throttledDebouncedSearch(value, projectDetailsReducer.id);
-    };
 
     const addUser = async () => {
         let validationErrors = {};
@@ -208,46 +217,51 @@ const UpdateIdea = () => {
             projectId: projectDetailsReducer.id,
             firstSeen: new Date(),
             lastSeen: new Date(),
-        }
-        const data = await apiService.createUsers(payload)
-        if(data.success) {
-            const newUser  = {
+        };
+        const data = await apiService.createUsers(payload);
+        setIsLoading(false);
+        if (data.success) {
+            const newUser = {
                 id: data.data.id,
                 name: data.data.name,
-                // customer_first_name: null,
                 email: data.data.email,
-                profileimage: null,
+                profileImage: null,
             };
-            // const clone = [...ideasVoteList];
-            const clone = Array.isArray(ideasVoteList) ? [...ideasVoteList] : [];
-            const filterEmail = clone.some((x) => x.email === newUser.email)
-            if(filterEmail) {
-                toast({description: "User with this email already exist.", variant: "destructive",})
-            } else {
-                // clone.unshift(newUser);
-            }
-            setIdeasVoteList(clone);
-            setPageNo(1);
+            setIdeasVoteList(prev => {
+                const clone = [...prev];
+                const filterEmail = clone.some(x => x.email === newUser.email);
+                if (filterEmail) {
+                    toast({description: "User with this email already exists.", variant: "destructive"});
+                    return prev;
+                }
+                return [newUser, ...clone];
+            });
             setSelectedIdea(prev => ({
                 ...prev,
-                voteLists: clone
+                vote: prev.vote + 1,
+                voteLists: [newUser, ...(prev.voteLists || [])]
             }));
             const upvoteResponse = await apiService.userManualUpVote({
                 ideaId: selectedIdea.id,
                 userId: data.data.id,
             });
-            if(upvoteResponse.success) {
-                toast({description: upvoteResponse.message,});
+            if (upvoteResponse.success) {
+                toast({description: upvoteResponse.message});
+                await getIdeaVotes('add');
             } else {
-                toast({description:upvoteResponse.error.message, variant: "destructive",})
+                setIdeasVoteList(prev => prev.filter(x => x.id !== newUser.id));
+                setSelectedIdea(prev => ({
+                    ...prev,
+                    vote: prev.vote - 1,
+                    voteLists: prev.voteLists.filter(x => x.id !== newUser.id)
+                }));
+                toast({description: upvoteResponse.error.message, variant: "destructive"});
             }
             setUserDetailError(initialUserError);
-            getIdeaVotes();
+            openDialogs("addUser", false);
         } else {
-            toast({description:data.error.message, variant: "destructive",})
+            toast({description: data.error.message, variant: "destructive"});
         }
-            setIsLoading(false);
-        openDialogs("addUser", false);
     };
 
     const onDeleteUser = async (id, index) => {
@@ -260,9 +274,9 @@ const UpdateIdea = () => {
             ideaId: selectedIdea.id
         }
         const data = await apiService.removeUserVote(payload)
-        let clone = Array.isArray(ideasVoteList) ? [...ideasVoteList] : [];
-        if(data.success) {
-            clone.splice(index,1);
+        let clone = [...ideasVoteList];
+        if (data.success) {
+            clone.splice(index, 1);
             setIdeasVoteList(clone);
             toast({description: data.message});
             const filterData = (selectedIdea?.voteLists || []).filter((x) => x.id !== id)
@@ -285,13 +299,13 @@ const UpdateIdea = () => {
     };
 
     const handleUserClick = async (user) => {
-        const selectedUser = getAllUsersList.find((u) => u.name === user.name);
+        const selectedUser = getAllUsersList?.customers?.find((u) => u.name === user.name);
         if (selectedUser) {
             const updatedVoteList = [...ideasVoteList];
             const existingUserIndex = updatedVoteList.findIndex((u) => u.name === selectedUser.name);
 
             if (existingUserIndex !== -1) {
-                toast({ description: "User  already exists in the upvote list.", variant: "destructive" });
+                toast({description: "User already exists in the upvote list.", variant: "destructive"});
                 return;
             }
 
@@ -299,7 +313,7 @@ const UpdateIdea = () => {
                 const newUserPayload = {
                     name: selectedUser.name,
                     id: '',
-                    profileimage: '',
+                    profileImage: '',
                     email: selectedUser.email,
                 };
                 updatedVoteList.push(newUserPayload);
@@ -307,11 +321,11 @@ const UpdateIdea = () => {
                     ideaId: selectedIdea.id,
                     userId: selectedUser.id,
                 });
-                if(upvoteResponse.status === 200) {
+                if (upvoteResponse.success) {
                     toast({description: upvoteResponse.message,});
                     setPageNo(1);
                 } else {
-                    toast({description:upvoteResponse.message, variant: "destructive",})
+                    toast({description: upvoteResponse?.error?.message, variant: "destructive",})
                 }
             } else {
                 updatedVoteList.splice(existingUserIndex, 1);
@@ -321,12 +335,12 @@ const UpdateIdea = () => {
         }
     };
 
-    const listRef = useRef(null);
     const handleWheelScroll = (event) => {
         if (listRef.current) {
             listRef.current.scrollTop += event.deltaY;
         }
     };
+
     const handleTouchScroll = (e) => {
         e.stopPropagation();
     };
@@ -336,11 +350,13 @@ const UpdateIdea = () => {
         const data = await apiService.getSingleIdea(id);
         if (data.success) {
             setIsLoading(false)
-            const ideaData = {...data.data, isRead: 1,
+            const ideaData = {
+                ...data.data, isRead: 1,
                 comments: data.data.comments.map(comment => ({
                     ...comment,
                     isRead: 1
-                }))}
+                }))
+            }
             setSelectedIdea(ideaData)
             setOldSelectedIdea(ideaData)
             const updateInbox = inboxMarkReadReducer.map(item => {
@@ -349,9 +365,7 @@ const UpdateIdea = () => {
                 }
                 return item;
             });
-
             dispatch(inboxMarkReadAction(updateInbox));
-
         }
     }
 
@@ -380,7 +394,7 @@ const UpdateIdea = () => {
                 };
                 const data = await apiService.giveVote(payload);
                 if (data.success) {
-                    const clone = { ...selectedIdea };
+                    const clone = {...selectedIdea};
                     let newVoteCount = clone.vote;
                     newVoteCount = type == 1 ? newVoteCount + 1 : newVoteCount >= 1 ? newVoteCount - 1 : 0;
                     let voteLists = [...clone.voteLists];
@@ -398,13 +412,13 @@ const UpdateIdea = () => {
                         userVote: type === 1,
                         voteLists: voteLists
                     });
-                    toast({ description: data.message });
+                    toast({description: data.message});
                 } else {
-                    toast({ variant: "destructive", description: data.error });
+                    toast({variant: "destructive", description: data.error?.message});
                 }
             }
         } else {
-            toast({ variant: "destructive", description: "You can't vote on admin-created ideas" });
+            toast({variant: "destructive", description: "You can't vote on admin-created ideas"});
         }
     }
 
@@ -449,7 +463,7 @@ const UpdateIdea = () => {
             ...comment,
             showReply: i === index ? !comment.showReply : false,
         }));
-        setSelectedIdea({ ...selectedIdea, comments: updatedComments });
+        setSelectedIdea({...selectedIdea, comments: updatedComments});
         if (updatedComments[index].showReply) {
             setSubCommentTextEditIdx(index);
             setSubCommentText("");
@@ -518,13 +532,13 @@ const UpdateIdea = () => {
         if (selectedSubComment && selectedSubComment.id && selectedComment && selectedComment.id) {
             const currentImages = Array.isArray(selectedSubComment.images) ? selectedSubComment.images : [];
             const clone = [...currentImages, ...files];
-            let selectedSubCommentObj = { ...selectedSubComment, images: clone };
+            let selectedSubCommentObj = {...selectedSubComment, images: clone};
             setSelectedSubComment(selectedSubCommentObj);
             let index = ((selectedComment && selectedComment.reply) || []).findIndex((x) => x.id === selectedSubComment.id);
             if (index !== -1) {
                 const cloneReplay = [...selectedComment.reply];
                 cloneReplay[index] = selectedSubCommentObj;
-                setSelectedComment({ ...selectedComment, reply: cloneReplay });
+                setSelectedComment({...selectedComment, reply: cloneReplay});
             }
         } else {
             setSubCommentFiles([...subCommentFiles, ...files]);
@@ -589,7 +603,7 @@ const UpdateIdea = () => {
 
             const imageToDelete = cloneImages[index];
             if (typeof imageToDelete === 'string') {
-                cloneDeletedImages.push(imageToDelete.replace('https://code.quickhunt.app/public/storage/feature_idea/', ''));
+                cloneDeletedImages.push(imageToDelete);
             } else if (imageToDelete instanceof File) {
             }
 
@@ -613,7 +627,7 @@ const UpdateIdea = () => {
         if (isOld) {
             const cloneImages = [...selectedSubComment.images];
             const cloneDeletedImages = [...deletedSubCommentImage];
-            cloneDeletedImages.push(cloneImages[index].replace('https://code.quickhunt.app/public/storage/feature_idea/', ''));
+            cloneDeletedImages.push(cloneImages[index]);
             cloneImages.splice(index, 1);
             setSelectedSubComment({
                 ...selectedSubComment,
@@ -639,24 +653,22 @@ const UpdateIdea = () => {
             }
         }
         // for (let i = 0; i < deletedCommentImage.length; i++) {
-        //     formData.append(`removeImages[${i}]`, deletedCommentImage[i].replace('https://code.quickhunt.app/public/storage/feature_idea/', ''));
+        //     formData.append(`removeImages[${i}]`, deletedCommentImage[i]);
         // }
         // Filter deletedCommentImage to only include images not present in current selectedComment.images
         const currentImageFilenames = selectedComment?.images.map(img => {
             if (typeof img === 'string') {
-                return img.replace('https://code.quickhunt.app/public/storage/feature_idea/', '');
+                return img;
             } else if (img instanceof File) {
                 return img.name; // Use the filename of the File object
             }
             return ''; // Default case
         });
 
-        // Filter deletedCommentImage to only include images not in currentImageFilenames
         const validDeletedImages = deletedCommentImage.filter(deletedImg => {
             return !currentImageFilenames.includes(deletedImg);
         });
 
-        // Append only valid deletions
         for (let i = 0; i < validDeletedImages.length; i++) {
             formData.append(`removeImages[${i}]`, validDeletedImages[i]);
         }
@@ -666,8 +678,7 @@ const UpdateIdea = () => {
         setIsSaveUpdateComment(false)
         if (data.success) {
             let updatedImages = Array.isArray(data.data.images) ? data.data.images : [];
-            let obj = { ...selectedComment, images: updatedImages };
-            // let obj = {...selectedComment, images: data.data.images, newImage: []} // old code line
+            let obj = {...selectedComment, images: updatedImages};
             const cloneComment = [...selectedIdea.comments];
             cloneComment[selectedCommentIndex] = obj;
             let selectedIdeaObj = {...selectedIdea, comments: cloneComment}
@@ -691,7 +702,7 @@ const UpdateIdea = () => {
             }
         }
         for (let i = 0; i < deletedSubCommentImage.length; i++) {
-            formData.append(`removeImages[${i}]`, deletedSubCommentImage[i].replace('https://code.quickhunt.app/public/storage/feature_idea/', ''));
+            formData.append(`removeImages[${i}]`, deletedSubCommentImage[i]);
         }
         formData.append('comment', selectedSubComment.comment);
         const data = await apiService.updateComment(selectedSubComment.id, formData)
@@ -798,26 +809,6 @@ const UpdateIdea = () => {
         }));
     }
 
-    const formValidateCr = (name, value) => {
-        switch (name) {
-            case "title":
-                if (!value || value.trim() === "") {
-                    return "Title is required";
-                } else {
-                    return "";
-                }
-            case "boardId":
-                if (!value || value?.toString()?.trim() === "") {
-                    return "Board is required";
-                } else {
-                    return "";
-                }
-            default: {
-                return "";
-            }
-        }
-    };
-
     const onCreateIdea = async () => {
         let validationErrors = {};
         Object.keys(selectedIdea).forEach(name => {
@@ -835,34 +826,30 @@ const UpdateIdea = () => {
         let topics = [];
 
         (selectedIdea.tags || []).map((x) => {
-                topics.push(x.id)
+            topics.push(x.id)
         })
         formData.append('title', selectedIdea.title);
         formData.append('boardId', selectedIdea.boardId);
         formData.append('slugUrl', selectedIdea.title ? selectedIdea.title.replace(/ /g, "-").replace(/\?/g, "-") : "");
-        // formData.append('description', selectedIdea.description?.trim() === '' ? "" : selectedIdea.description);
         formData.append('description', selectedIdea.description ? selectedIdea.description : "");
-        // formData.append('tags', topics.join(","));
         topics.forEach(id => {
             formData.append('topicId[]', id);
         });
 
-        // Handle image resizing/compression here
         if (selectedIdea.image) {
-            const resizedImage = await resizeImage(selectedIdea.image); // Implement this function to resize/compress
+            const resizedImage = await resizeImage(selectedIdea.image);
             formData.append('image', resizedImage);
         }
 
         const data = await apiService.updateIdea(formData, selectedIdea.id)
         if (data.success) {
-            // setSelectedIdea({...selectedIdea})
             setOldSelectedIdea({...selectedIdea})
             setIsEditIdea(false)
             toast({description: data.message})
         } else {
             toast({description: data.message, variant: "destructive"})
         }
-            setIsLoadingCreateIdea(false)
+        setIsLoadingCreateIdea(false)
     }
 
     const resizeImage = (file) => {
@@ -922,9 +909,7 @@ const UpdateIdea = () => {
         setSubCommentFiles(clone)
     }
 
-    const handleImageClick = (imageSrc) => {window.open(imageSrc, '_blank');};
-
-    const links = [{ label: 'Ideas', path: `/ideas?pageNo=${getPageNo}` }];
+    const links = [{label: 'Ideas', path: `/ideas?pageNo=${getPageNo}`}];
 
     const handleSubCommentTextChange = (e, index) => {
         const newSubCommentText = [...subCommentText];
@@ -940,23 +925,28 @@ const UpdateIdea = () => {
                     <DialogContent className={"max-w-[576px]"}>
                         <DialogHeader className={"flex-row gap-2 justify-between space-y-0 items-center"}>
                             <DialogTitle>Add new user</DialogTitle>
-                            <span className={"max-w-[24px]"}><X className={"cursor-pointer m-0"} onClick={() => openDialogs("addUser", false)}/></span>
+                            <span className={"max-w-[24px]"}><X className={"cursor-pointer m-0"}
+                                                                onClick={() => openDialogs("addUser", false)}/></span>
                         </DialogHeader>
                         <div className="space-y-2">
                             <div className="space-y-1">
                                 <Label htmlFor="name" className="font-normal">Email</Label>
-                                <Input id="name" value={usersDetails.email} name="email" onChange={onChangeText} placeholder="Enter upvoter email" className="col-span-3" />
-                                {userDetailError.email && <span className="text-red-500 text-sm">{userDetailError.email}</span>}
+                                <Input id="name" value={usersDetails.email} name="email" onChange={onChangeText}
+                                       placeholder="Enter upvoter email" className="col-span-3"/>
+                                {userDetailError.email &&
+                                <span className="text-red-500 text-sm">{userDetailError.email}</span>}
                             </div>
                             <div className="space-y-1">
                                 <Label htmlFor="username" className="font-normal">Name</Label>
-                                <Input id="username" value={usersDetails.name} name="name" onChange={onChangeText} placeholder="Enter upvoter name" className="col-span-3" />
-                                {userDetailError.name && <span className="text-red-500 text-sm">{userDetailError.name}</span>}
+                                <Input id="username" value={usersDetails.name} name="name" onChange={onChangeText}
+                                       placeholder="Enter upvoter name" className="col-span-3"/>
+                                {userDetailError.name &&
+                                <span className="text-red-500 text-sm">{userDetailError.name}</span>}
                             </div>
                         </div>
                         <DialogFooter>
                             <Button className={"font-medium w-[83px]"} onClick={addUser}>
-                                {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Add User"}
+                                {isLoading ? <Loader2 className="h-4 w-4 animate-spin"/> : "Add User"}
                             </Button>
                         </DialogFooter>
                     </DialogContent>
@@ -964,137 +954,149 @@ const UpdateIdea = () => {
             }
             {
                 (addUserDialog.viewUpvote) &&
-                    <Dialog open={addUserDialog.viewUpvote} onOpenChange={(value) => openDialogs("viewUpvote", value)}>
-                        <DialogContent className={"max-w-[1022px] p-0 gap-0"}>
-                            <DialogHeader className={"flex-row justify-between gap-2 p-3 lg:p-6 space-y-0"}>
-                                <div className={"flex flex-col gap-2"}>
-                                    <DialogTitle className={"font-medium"}>View & add upvoters</DialogTitle>
-                                    <DialogDescription>
-                                        Upvoters will receive notifications by email when you make changes to the post.
-                                    </DialogDescription>
-                                </div>
-                                <span className={"max-w-[24px]"}><X className={"cursor-pointer m-0"} onClick={() => openDialogs("viewUpvote", false)}/></span>
-                            </DialogHeader>
-                            <div className={"overflow-y-auto h-full flex-1"}>
-                                <Table>
-                                    <TableHeader className={`bg-muted`}>
-                                        <TableRow>
-                                            {['Name', 'Email', "Action"].map((x, i) => {
-                                                const icons = [<User className="w-4 h-4" />, <Mail className="w-4 h-4" />];
+                <Dialog open={addUserDialog.viewUpvote} onOpenChange={(value) => openDialogs("viewUpvote", value)}>
+                    <DialogContent className={"max-w-[1022px] p-0 gap-0"}>
+                        <DialogHeader className={"flex-row justify-between gap-2 p-3 lg:p-6 space-y-0"}>
+                            <div className={"flex flex-col gap-2"}>
+                                <DialogTitle className={"font-medium"}>View & add upvoters</DialogTitle>
+                                <DialogDescription>
+                                    Upvoters will receive notifications by email when you make changes to the post.
+                                </DialogDescription>
+                            </div>
+                            <span className={"max-w-[24px]"}><X className={"cursor-pointer m-0"}
+                                                                onClick={() => openDialogs("viewUpvote", false)}/></span>
+                        </DialogHeader>
+                        <div className={"overflow-y-auto h-full flex-1"}>
+                            <Table>
+                                <TableHeader className={`bg-muted`}>
+                                    <TableRow>
+                                        {['Name', 'Email', "Action"].map((x, i) => {
+                                            const icons = [<User className="w-4 h-4"/>, <Mail className="w-4 h-4"/>];
+                                            return (
+                                                <TableHead
+                                                    className={`font-medium text-card-foreground px-2 py-[10px] md:px-3 ${
+                                                        i > 0 ? 'max-w-[140px] truncate text-ellipsis overflow-hidden whitespace-nowrap' : ''
+                                                    }`}
+                                                    key={i}
+                                                >
+                                                    <div
+                                                        className={`flex gap-2 items-center ${i === 2 ? "justify-center" : ""}`}>
+                                                        {icons[i]}
+                                                        {x}
+                                                    </div>
+                                                </TableHead>
+                                            );
+                                        })}
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody className={"overflow-y-auto"}>
+                                    {
+                                        isLoadingIdeaVoteList ? (
+                                            [...Array(10)].map((_, index) => {
                                                 return (
-                                                    <TableHead
-                                                        className={`font-medium text-card-foreground px-2 py-[10px] md:px-3 ${
-                                                            i > 0 ? 'max-w-[140px] truncate text-ellipsis overflow-hidden whitespace-nowrap' : ''
-                                                        }`}
-                                                        key={i}
-                                                    >
-                                                        <div className={`flex gap-2 items-center ${i === 2 ? "justify-center" : ""}`}>
-                                                            {icons[i]}
-                                                            {x}
-                                                        </div>
-                                                    </TableHead>
-                                                );
-                                            })}
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody className={"overflow-y-auto"}>
-                                        {
-                                            isLoadingIdeaVoteList ? (
-                                                [...Array(10)].map((_, index) => {
+                                                    <TableRow key={index}>
+                                                        {
+                                                            [...Array(3)].map((_, i) => {
+                                                                return (
+                                                                    <TableCell key={i}
+                                                                               className={"px-2 py-[10px] md:px-3"}>
+                                                                        <Skeleton className={"rounded-md w-full h-7"}/>
+                                                                    </TableCell>
+                                                                )
+                                                            })
+                                                        }
+                                                    </TableRow>
+                                                )
+                                            })
+                                        ) : (ideasVoteList?.length > 0) ? <>
+                                            {
+                                                (ideasVoteList || []).map((x, index) => {
                                                     return (
-                                                        <TableRow key={index}>
-                                                            {
-                                                                [...Array(3)].map((_, i) => {
-                                                                    return (
-                                                                        <TableCell key={i} className={"px-2 py-[10px] md:px-3"}>
-                                                                            <Skeleton className={"rounded-md w-full h-7"}/>
-                                                                        </TableCell>
-                                                                    )
-                                                                })
-                                                            }
+                                                        <TableRow key={index} className={"font-normal"}>
+                                                            <TableCell
+                                                                className={`px-2 py-[10px] md:px-3 max-w-[140px] cursor-pointer truncate text-ellipsis overflow-hidden whitespace-nowrap`}>{x.name ? x.name : "-"}</TableCell>
+                                                            <TableCell
+                                                                className={`px-2 py-[10px] md:px-3 max-w-[140px] cursor-pointer truncate text-ellipsis overflow-hidden whitespace-nowrap`}>{x?.email ? x?.email : "-"}</TableCell>
+                                                            <TableCell className={`px-2 py-[10px] md:px-3 text-center`}>
+                                                                <Button onClick={() => onDeleteUser(x.id, index)}
+                                                                        variant={"outline hover:bg-transparent"}
+                                                                        className={`p-1 border w-[30px] h-[30px]`}>
+                                                                    <Trash2 size={16}/>
+                                                                </Button>
+                                                            </TableCell>
                                                         </TableRow>
                                                     )
                                                 })
-                                            ) : (ideasVoteList?.data?.length > 0) ? <>
-                                                {
-                                                    (ideasVoteList || []).data.map((x,index)=>{
-                                                        return(
-                                                            <TableRow key={index} className={"font-normal"}>
-                                                                <TableCell className={`px-2 py-[10px] md:px-3 max-w-[140px] cursor-pointer truncate text-ellipsis overflow-hidden whitespace-nowrap`}>{x.name ? x.name : "-"}</TableCell>
-                                                                <TableCell className={`px-2 py-[10px] md:px-3 max-w-[140px] cursor-pointer truncate text-ellipsis overflow-hidden whitespace-nowrap`}>{x?.email ? x?.email : "-"}</TableCell>
-                                                                <TableCell className={`px-2 py-[10px] md:px-3 text-center`}>
-                                                                    <Button onClick={() => onDeleteUser(x.id,index)} variant={"outline hover:bg-transparent"} className={`p-1 border w-[30px] h-[30px]`}>
-                                                                        <Trash2 size={16}/>
-                                                                    </Button>
-                                                                </TableCell>
-                                                            </TableRow>
-                                                        )
-                                                    })
-                                                }
-                                            </> : <TableRow>
-                                                <TableCell colSpan={6}>
-                                                    <EmptyData/>
-                                                </TableCell>
-                                            </TableRow>
-                                        }
-                                    </TableBody>
-                                </Table>
-                                {
-                                    ideasVoteList?.data?.length > 0 ?
-                                        <Pagination
-                                            pageNo={pageNo}
-                                            totalPages={totalPages}
-                                            isLoading={isLoading}
-                                            handlePaginationClick={handlePaginationClick}
-                                            stateLength={ideasVoteList?.data?.length}
-                                        /> : ""
-                                }
-                            </div>
-                            <DialogFooter className={"p-3 lg:p-6 gap-3 border-t"}>
-                                <Button
-                                    variant={"outline hover:none"}
-                                    className={"font-medium border bg-muted-foreground/5"}
-                                    onClick={() => {
-                                        const recipients = selectedIdea?.voteLists?.map((x) => x.email).join(",");
-                                        window.location.href = `mailto:${recipients}`;
-                                    }}
-                                >
-                                    <Mail size={18} className={"mr-2"} strokeWidth={2} />Email all upvoters
-                                </Button>
-                                <Popover onOpenChange={handlePopoverOpenChange}>
-                                    <PopoverTrigger asChild>
-                                        <Button role="combobox" className={"font-medium"}><CirclePlus size={18} className={"mr-2"} strokeWidth={2} /> Add new upvoter</Button>
-                                    </PopoverTrigger>
-                                    <PopoverContent className="w-[200px] p-0">
-                                        <Command>
-                                            <CommandInput placeholder="Search users..." name={"search"} value={filter?.search} onValueChange={handleSearchChange}/>
-                                            <CommandList ref={listRef} onWheel={handleWheelScroll} onTouchMove={handleTouchScroll}>
-                                                <CommandEmpty>No User found.</CommandEmpty>
-                                                    <CommandGroup className={"p-0"}>
-                                                        {getAllUsersList.length > 0 && (getAllUsersList || []).map((x, i) => {
-                                                            return (
-                                                                <Fragment key={i}>
-                                                                    <CommandItem value={x.name}>
-                                                                        <span className={"flex justify-between items-center w-full text-sm font-medium cursor-pointer"}
+                                            }
+                                        </> : <TableRow>
+                                            <TableCell colSpan={6}>
+                                                <EmptyData/>
+                                            </TableCell>
+                                        </TableRow>
+                                    }
+                                </TableBody>
+                            </Table>
+                            {
+                                ideasVoteList?.length > 0 ?
+                                    <Pagination
+                                        pageNo={pageNo}
+                                        totalPages={totalPages}
+                                        isLoading={isLoading}
+                                        handlePaginationClick={handlePaginationClick}
+                                        stateLength={ideasVoteList?.length}
+                                    /> : ""
+                            }
+                        </div>
+                        <DialogFooter className={"p-3 lg:p-6 gap-3 border-t"}>
+                            <Button
+                                variant={"outline hover:none"}
+                                className={"font-medium border bg-muted-foreground/5"}
+                                onClick={() => {
+                                    const recipients = selectedIdea?.voteLists?.map((x) => x.email).join(",");
+                                    window.location.href = `mailto:${recipients}`;
+                                }}
+                            >
+                                <Mail size={18} className={"mr-2"} strokeWidth={2}/>Email all upvoters
+                            </Button>
+                            <Popover onOpenChange={handlePopoverOpenChange}>
+                                <PopoverTrigger asChild>
+                                    <Button role="combobox" className={"font-medium"}><CirclePlus size={18} className={"mr-2"} strokeWidth={2}/> Add new upvoter</Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-[200px] p-0">
+                                    <Command>
+                                        <CommandInput placeholder="Search users..." name={"search"}
+                                                      value={filter?.search} onValueChange={handleSearchChange}/>
+                                        <CommandList ref={listRef} onWheel={handleWheelScroll}
+                                                     onTouchMove={handleTouchScroll}>
+                                            <CommandEmpty>No User found.</CommandEmpty>
+                                            <CommandGroup className={"p-0"}>
+                                                {getAllUsersList?.customers?.length > 0 && (getAllUsersList?.customers || []).map((x, i) => {
+                                                    return (
+                                                        <Fragment key={i}>
+                                                            <CommandItem value={x.name}>
+                                                                        <span
+                                                                            className={"flex justify-between items-center w-full text-sm font-medium cursor-pointer"}
                                                                             onClick={() => handleUserClick(x)}
                                                                         >
                                                                             {x.name}
                                                                         </span>
-                                                                    </CommandItem>
-                                                                </Fragment>
-                                                            )
-                                                        })}
-                                                    </CommandGroup>
-                                                <div className={"border-t"}>
-                                                    <Button variant="ghost" className={"w-full font-medium"} onClick={() => openDialogs("addUser", true)}><CirclePlus size={16} className={"mr-2"}/>Add a brand new user</Button>
-                                                </div>
-                                            </CommandList>
-                                        </Command>
-                                    </PopoverContent>
-                                </Popover>
-                            </DialogFooter>
-                        </DialogContent>
-                    </Dialog>
+                                                            </CommandItem>
+                                                        </Fragment>
+                                                    )
+                                                })}
+                                            </CommandGroup>
+                                            <div className={"border-t"}>
+                                                <Button variant="ghost" className={"w-full font-medium"}
+                                                        onClick={() => openDialogs("addUser", true)}><CirclePlus
+                                                    size={16} className={"mr-2"}/>Add a brand new user</Button>
+                                            </div>
+                                        </CommandList>
+                                    </Command>
+                                </PopoverContent>
+                            </Popover>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
             }
             <div className={"px-4 py-3 lg:p-6 border-b"}>
                 <CommonBreadCrumb
@@ -1108,7 +1110,8 @@ const UpdateIdea = () => {
                     <div className={"border-b py-4 px-6 flex flex-col gap-3"}>
                         <div className={"flex flex-col gap-1"}>
                             <h3 className={"text-sm font-normal"}>Status</h3>
-                            <p className={"text-muted-foreground text-xs font-normal"}>Apply a status to Manage this idea on roadmap.</p>
+                            <p className={"text-muted-foreground text-xs font-normal"}>Apply a status to Manage this
+                                idea on roadmap.</p>
                         </div>
                         <div className={"flex flex-col "}>
                             <RadioGroup
@@ -1136,7 +1139,7 @@ const UpdateIdea = () => {
                             <div className="w-[282px] h-[128px] flex gap-1">
                                 <ImageUploader
                                     image={selectedIdea?.coverImage}
-                                    onDelete={() => onChangeStatus('removeCoverImage', selectedIdea && selectedIdea?.coverImage && selectedIdea.coverImage?.name ? "" : [selectedIdea.coverImage.replace("https://code.quickhunt.app/public/storage/feature_idea/", "")])}
+                                    onDelete={() => onChangeStatus('removeCoverImage', selectedIdea && selectedIdea?.coverImage && selectedIdea.coverImage?.name ? "" : [selectedIdea.coverImage])}
                                     onUpload={handleFeatureImgUpload}
                                     altText="Cover Image"
                                 />
@@ -1206,7 +1209,8 @@ const UpdateIdea = () => {
                                         <Label htmlFor="description" className={"font-normal"}>Description</Label>
                                         <ReactQuillEditor value={selectedIdea.description} name={"description"}
                                                           onChange={onChangeText}/>
-                                        {formError.description && <span className="text-red-500 text-sm">{formError.description}</span>}
+                                        {formError.description &&
+                                        <span className="text-red-500 text-sm">{formError.description}</span>}
                                     </div>
                                     <div className={"space-y-2"}>
                                         <Label className={"font-normal"}>Choose Board for this Idea</Label>
@@ -1237,7 +1241,8 @@ const UpdateIdea = () => {
                                                 </SelectGroup>
                                             </SelectContent>
                                         </Select>
-                                        {formError.boardId && <span className="text-red-500 text-sm">{formError.boardId}</span>}
+                                        {formError.boardId &&
+                                        <span className="text-red-500 text-sm">{formError.boardId}</span>}
                                     </div>
                                 </div>
                                 <div className={"px-4 py-3 lg:py-6 lg:px-8 border-b space-y-2"}>
@@ -1255,7 +1260,8 @@ const UpdateIdea = () => {
                                                                 return (
                                                                     <div key={index}
                                                                          className={`text-xs flex gap-[2px] ${theme === "dark" ? "text-card" : ""} bg-slate-300 items-center rounded py-0 px-2`}>
-                                                                <span className={"max-w-[85px] truncate text-ellipsis overflow-hidden whitespace-nowrap"}>
+                                                                <span
+                                                                    className={"max-w-[85px] truncate text-ellipsis overflow-hidden whitespace-nowrap"}>
                                                                     {findObj?.title}
                                                                 </span>
                                                                     </div>
@@ -1277,7 +1283,8 @@ const UpdateIdea = () => {
                                                                     <div onClick={() => handleChangeTopic(x.id)}
                                                                          className="checkbox-icon">
                                                                         {(selectedIdea.tags.map((x) => x.id) || []).includes(x.id) ?
-                                                                            <Check size={18}/> : <div className={"h-[18px] w-[18px]"}/>}
+                                                                            <Check size={18}/> :
+                                                                            <div className={"h-[18px] w-[18px]"}/>}
                                                                     </div>
                                                                     <span>{x.title ? x.title : ""}</span>
                                                                 </div>
@@ -1299,14 +1306,15 @@ const UpdateIdea = () => {
                             <Fragment>
                                 <div className={"px-4 py-3 lg:py-6 lg:px-8"}>
                                     <div className={"flex flex-col gap-6"}>
-                                        <div className={"flex justify-between items-center gap-4 md:flex-nowrap flex-wrap"}>
+                                        <div
+                                            className={"flex justify-between items-center gap-4 md:flex-nowrap flex-wrap"}>
                                             {
                                                 isLoading ?
                                                     <div className={"flex gap-2 items-center"}>
-                                                        <Skeleton className="w-[30px] h-[30px] rounded-full" />
-                                                        <Skeleton className="w-[30px] h-[30px] rounded-full" />
+                                                        <Skeleton className="w-[30px] h-[30px] rounded-full"/>
+                                                        <Skeleton className="w-[30px] h-[30px] rounded-full"/>
                                                     </div>
-                                                        :
+                                                    :
                                                     <div className={"flex gap-2 items-center"}>
                                                         <Button
                                                             className={"p-[7px] bg-white shadow border hover:bg-white w-[30px] h-[30px]"}
@@ -1320,15 +1328,17 @@ const UpdateIdea = () => {
                                                             selectedIdea && selectedIdea?.voteLists && selectedIdea?.voteLists.length ?
                                                                 <Popover>
                                                                     <PopoverTrigger asChild>
-                                                                        <Button variant={"ghost hover-none"} className={"rounded-full p-0 h-[24px]"}>
+                                                                        <Button variant={"ghost hover-none"}
+                                                                                className={"rounded-full p-0 h-[24px]"}>
                                                                             {
                                                                                 (selectedIdea?.voteLists.slice(0, 1) || []).map((x, i) => {
                                                                                     return (
                                                                                         <div className={"flex"} key={i}>
                                                                                             <div className={"relative"}>
-                                                                                                <div className={"update-idea text-sm rounded-full text-center"}>
+                                                                                                <div
+                                                                                                    className={"update-idea text-sm rounded-full text-center"}>
                                                                                                     <UserAvatar
-                                                                                                        userPhoto={x?.userphoto}
+                                                                                                        userPhoto={x?.profileImage}
                                                                                                         userName={x?.name ? x?.name : x?.username}
                                                                                                         className="w-[20px] h-[20px]"
                                                                                                         initialStyle={"text-sm"}
@@ -1337,8 +1347,11 @@ const UpdateIdea = () => {
                                                                                             </div>
                                                                                             {
                                                                                                 (selectedIdea?.voteLists.length > 1) &&
-                                                                                                <div className={"update-idea text-sm rounded-full text-center ml-[-5px]"}>
-                                                                                                    <Avatar><AvatarFallback>+{selectedIdea?.voteLists.length - 1}</AvatarFallback></Avatar>
+                                                                                                <div
+                                                                                                    className={"update-idea text-sm rounded-full text-center ml-[-5px]"}>
+                                                                                                    <Avatar>
+                                                                                                        <AvatarFallback>+{selectedIdea?.voteLists.length - 1}</AvatarFallback>
+                                                                                                    </Avatar>
                                                                                                 </div>
                                                                                             }
                                                                                         </div>
@@ -1349,19 +1362,26 @@ const UpdateIdea = () => {
                                                                     </PopoverTrigger>
                                                                     <PopoverContent className="p-0" align={"start"}>
                                                                         <div>
-                                                                            <div className={" flex gap-2 justify-between items-center py-3 px-4"}>
+                                                                            <div
+                                                                                className={" flex gap-2 justify-between items-center py-3 px-4"}>
                                                                                 <h4 className="font-normal text-sm">{`Voters (${selectedIdea?.voteLists.length})`}</h4>
-                                                                                <Button variant={"link"} className={"h-auto p-0 text-card-foreground font-normal text-sm"} onClick={() => openDialogs("viewUpvote", true)}>View upvoters</Button>
+                                                                                <Button variant={"link"}
+                                                                                        className={"h-auto p-0 text-card-foreground font-normal text-sm"}
+                                                                                        onClick={() => openDialogs("viewUpvote", true)}>View
+                                                                                    upvoters</Button>
                                                                             </div>
-                                                                            <div className="border-t px-4 py-3 space-y-2 max-h-[300px] overflow-y-auto">
+                                                                            <div
+                                                                                className="border-t px-4 py-3 space-y-2 max-h-[300px] overflow-y-auto">
                                                                                 {
                                                                                     (selectedIdea?.voteLists || []).map((x, i) => {
                                                                                         return (
-                                                                                            <div className={"flex gap-2"} key={i}>
+                                                                                            <div
+                                                                                                className={"flex gap-2"}
+                                                                                                key={i}>
                                                                                                 <div
                                                                                                     className={"update-idea text-sm rounded-full text-center"}>
                                                                                                     <UserAvatar
-                                                                                                        userPhoto={x?.userphoto}
+                                                                                                        userPhoto={x?.profileImage}
                                                                                                         userName={x?.name ? x?.name : x?.username}
                                                                                                         className="w-[20px] h-[20px]"
                                                                                                         initialStyle={"text-sm"}
@@ -1388,8 +1408,7 @@ const UpdateIdea = () => {
                                                             {
                                                                 selectedIdea?.createdBy === 1 ?
                                                                     <Skeleton
-                                                                        className="w-[30px] h-[30px] rounded-full"/>
-                                                                    : ""
+                                                                        className="w-[30px] h-[30px] rounded-full"/> : ""
                                                             }
                                                             <Skeleton className="w-[30px] h-[30px] rounded-full"/>
                                                         </div>
@@ -1416,11 +1435,12 @@ const UpdateIdea = () => {
                                                                                           onClick={() => onChangeStatus("pinToTop", selectedIdea?.pinToTop === 0 ? 1 : 0)}>
                                                                             {selectedIdea?.pinToTop == 0 ? "Pinned" : "Unpinned"}
                                                                         </DropdownMenuItem>
-                                                                        <DropdownMenuItem className={"cursor-pointer capitalize"}
-                                                                                          onClick={() => onChangeStatus(
-                                                                                              "isActive",
-                                                                                              selectedIdea?.isActive === false
-                                                                                          )}>
+                                                                        <DropdownMenuItem
+                                                                            className={"cursor-pointer capitalize"}
+                                                                            onClick={() => onChangeStatus(
+                                                                                "isActive",
+                                                                                selectedIdea?.isActive === false
+                                                                            )}>
                                                                             {selectedIdea?.isActive === false ? "Convert to Idea" : "Mark as bug"}
                                                                         </DropdownMenuItem>
                                                                         <DropdownMenuItem className={"cursor-pointer"}
@@ -1462,30 +1482,24 @@ const UpdateIdea = () => {
                                         {
                                             isLoading ?
                                                 <div className={"flex flex-col gap-4"}>
-                                                    <Skeleton className="h-4 " />
+                                                    <Skeleton className="h-4 "/>
                                                     <div className={"space-y-1"}>
-                                                        <Skeleton className="h-4 " />
-                                                        <Skeleton className="h-4 " />
+                                                        <Skeleton className="h-4 "/>
+                                                        <Skeleton className="h-4 "/>
                                                     </div>
                                                 </div> :
                                                 <div className={"flex flex-col gap-4"}>
                                                     <div className={"flex items-center gap-2"}>
                                                         <h2 className={"text-xl font-normal"}>{selectedIdea?.title}</h2>
                                                     </div>
-                                                    {/*{*/}
-                                                    {/*    cleanQuillHtml(selectedIdea?.description) ?*/}
-                                                    {/*        <div*/}
-                                                    {/*            className={`description-container text-sm ${theme === "dark" ? "" : "text-muted-foreground" }`}*/}
-                                                    {/*            dangerouslySetInnerHTML={{ __html: selectedIdea?.description }}*/}
-                                                    {/*        /> : null*/}
-                                                    {/*}*/}
-                                                    <DisplayReactQuill value={selectedIdea.description} />
+                                                    <DisplayReactQuill value={selectedIdea.description}/>
                                                 </div>
                                         }
                                         {
                                             isLoading ?
                                                 <div className={"flex gap-2 flex-wrap"}>
-                                                    <Skeleton className="w-[50px] h-[50px] md:w-[100px] md:h-[100px] border p-[3px] relative" />
+                                                    <Skeleton
+                                                        className="w-[50px] h-[50px] md:w-[100px] md:h-[100px] border p-[3px] relative"/>
                                                 </div>
                                                 :
                                                 <Fragment>
@@ -1497,23 +1511,17 @@ const UpdateIdea = () => {
                                                                         (selectedIdea?.images || []).map((x, i) => {
                                                                                 return (
                                                                                     <Fragment key={i}>
-                                                                                        {
-                                                                                            x && x.name ?
-                                                                                                <div
-                                                                                                    className="w-[50px] h-[50px] md:w-[100px] md:h-[100px] border p-[3px] relative"
-                                                                                                    onClick={() => handleImageClick(URL.createObjectURL(x))}
-                                                                                                >
-                                                                                                    <img className={"upload-img cursor-pointer"}
-                                                                                                         src={x && x.name ? URL.createObjectURL(x) : x}
-                                                                                                         alt=""/>
-                                                                                                </div> : x ?
-                                                                                                <div
-                                                                                                    className="w-[50px] h-[50px] md:w-[100px] md:h-[100px] border p-[3px] relative"
-                                                                                                    onClick={() => handleImageClick(x)}
-                                                                                                >
-                                                                                                    <img className={"upload-img cursor-pointer"} src={x} alt=""/>
-                                                                                                </div>
-                                                                                                : ""
+                                                                                        {x &&
+                                                                                        <div
+                                                                                            className="w-[50px] h-[50px] md:w-[100px] md:h-[100px] border p-[3px] relative"
+                                                                                            onClick={() => handleImageOpen(x.name ? URL.createObjectURL(x) : x)}
+                                                                                        >
+                                                                                            <img
+                                                                                                className="upload-img cursor-pointer"
+                                                                                                src={x.name ? URL.createObjectURL(x) : `${DO_SPACES_ENDPOINT}/${x}`}
+                                                                                                alt=""
+                                                                                            />
+                                                                                        </div>
                                                                                         }
                                                                                     </Fragment>
                                                                                 )
@@ -1531,30 +1539,31 @@ const UpdateIdea = () => {
                                                         isLoading ? (
                                                             <Fragment>
                                                                 <Skeleton className="w-[20px] h-[20px] rounded-lg"/>
-                                                                <div className={"flex items-center"}><Skeleton className="w-[50px] h-[20px]" /></div>
+                                                                <div className={"flex items-center"}><Skeleton
+                                                                    className="w-[50px] h-[20px]"/></div>
                                                             </Fragment>
                                                         ) : (
                                                             <Fragment>
                                                                 <UserAvatar initialStyle={"text-sm"}
-                                                                    userPhoto={selectedIdea?.profileImage}
-                                                                    userName={selectedIdea?.ideaUser?.firstName + ' ' + selectedIdea?.ideaUser?.lastName}
+                                                                            userPhoto={selectedIdea?.ideaUser?.profileImage}
+                                                                            userName={selectedIdea?.ideaUser?.firstName + ' ' + selectedIdea?.ideaUser?.lastName}
                                                                 />
                                                                 <div className={"flex items-center"}>
-                                                                <Fragment>
-                                                                    <h4 className={"text-sm font-normal"}>{selectedIdea?.ideaUser?.firstName + ' ' + selectedIdea?.ideaUser?.lastName}</h4>
-                                                                    <p className={"text-sm font-normal flex items-center text-muted-foreground"}>
-                                                                        <Dot size={20}
-                                                                             className={"fill-text-card-foreground stroke-text-card-foreground"}/>
-                                                                        {moment(selectedIdea?.createdAt).format('D MMM')}
-                                                                    </p>
-                                                                </Fragment>
+                                                                    <Fragment>
+                                                                        <h4 className={"text-sm font-normal"}>{selectedIdea?.ideaUser?.firstName + ' ' + selectedIdea?.ideaUser?.lastName}</h4>
+                                                                        <p className={"text-sm font-normal flex items-center text-muted-foreground"}>
+                                                                            <Dot size={20}
+                                                                                 className={"fill-text-card-foreground stroke-text-card-foreground"}/>
+                                                                            {moment(selectedIdea?.createdAt).format('D MMM')}
+                                                                        </p>
+                                                                    </Fragment>
                                                                 </div>
                                                             </Fragment>
                                                         )
                                                     }
                                                 </div>
                                                 {
-                                                    isLoading ? <Skeleton className={"w-[224px] h-[24px] px-3 py-1"} /> :
+                                                    isLoading ? <Skeleton className={"w-[224px] h-[24px] px-3 py-1"}/> :
                                                         <Select
                                                             onValueChange={(value) => onChangeStatus('roadmapStatusId', value)}
                                                             value={selectedIdea?.roadmapStatusId}
@@ -1592,11 +1601,12 @@ const UpdateIdea = () => {
                                         </div>
 
                                         <div className="w-full space-y-1.5 lg:hidden">
-                                            <Label htmlFor="picture" className={"font-normal capitalize"}>Featured image</Label>
+                                            <Label htmlFor="picture" className={"font-normal capitalize"}>Featured
+                                                image</Label>
                                             <div className="w-[282px] h-[128px] flex gap-1">
                                                 <ImageUploader
                                                     image={selectedIdea?.coverImage}
-                                                    onDelete={() => onChangeStatus('removeCoverImage', selectedIdea && selectedIdea?.coverImage && selectedIdea.coverImage?.name ? "" : [selectedIdea.coverImage.replace("https://code.quickhunt.app/public/storage/feature_idea/", "")])}
+                                                    onDelete={() => onChangeStatus('removeCoverImage', selectedIdea && selectedIdea?.coverImage && selectedIdea.coverImage?.name ? "" : [selectedIdea.coverImage])}
                                                     onUpload={handleFeatureImgUpload}
                                                     altText="Cover Image"
                                                 />
@@ -1607,19 +1617,20 @@ const UpdateIdea = () => {
                                             isLoading ?
                                                 <div className={"flex flex-col gap-2"}>
                                                     <div className="w-full flex flex-col gap-2">
-                                                        <Skeleton className={"w-[100px] h-[20px]"} />
-                                                        <Skeleton className={"w-full h-[80px]"} />
+                                                        <Skeleton className={"w-[100px] h-[20px]"}/>
+                                                        <Skeleton className={"w-full h-[80px]"}/>
                                                     </div>
                                                     <div className={"flex justify-end gap-2 items-center"}>
-                                                        <Skeleton className={"w-[36px] h-[36px]"} />
-                                                        <Skeleton className={"w-[128px] h-[36px]"} />
+                                                        <Skeleton className={"w-[36px] h-[36px]"}/>
+                                                        <Skeleton className={"w-[128px] h-[36px]"}/>
                                                     </div>
                                                 </div>
                                                 :
                                                 <div className={"flex flex-col gap-2"}>
                                                     <div className="w-full flex flex-col gap-2">
-                                                        <Label htmlFor="message" className={"font-normal capitalize"}>Add comment</Label>
-                                                        <>
+                                                        <Label htmlFor="message" className={"font-normal capitalize"}>Add
+                                                            comment</Label>
+                                                        <Fragment>
                                                             <Textarea
                                                                 placeholder="Start writing..."
                                                                 id="message"
@@ -1632,34 +1643,22 @@ const UpdateIdea = () => {
                                                                         {
                                                                             (commentFiles || []).map((x, i) => {
                                                                                 return (
-                                                                                    <Fragment>
-                                                                                        {
-                                                                                            x && x.name ?
-                                                                                                <div
-                                                                                                    className={"w-[50px] h-[50px] md:w-[100px] md:h-[100px] relative border p-[3px]"}>
-                                                                                                    <img
-                                                                                                        className={"upload-img"}
-                                                                                                        src={x && x.name ? URL.createObjectURL(x) : x}
-                                                                                                        alt=""/>
-                                                                                                    <CircleX
-                                                                                                        size={20}
-                                                                                                        className={`stroke-gray-500 dark:stroke-white cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
-                                                                                                        onClick={() => onDeleteImageComment(i, false)}
-                                                                                                    />
-                                                                                                </div> : x ?
-                                                                                                <div
-                                                                                                    className={"w-[50px] h-[50px] md:w-[100px] md:h-[100px] relative border p-[3px]"}>
-                                                                                                    <img
-                                                                                                        className={"upload-img"}
-                                                                                                        src={x}
-                                                                                                        alt={x}/>
-                                                                                                    <CircleX
-                                                                                                        size={20}
-                                                                                                        className={`stroke-gray-500 dark:stroke-white cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
-                                                                                                        onClick={() => onDeleteImageComment(i, false)}
-                                                                                                    />
-                                                                                                </div> : ''
-                                                                                        }
+                                                                                    <Fragment key={i}>
+                                                                                        {x && (
+                                                                                            <div
+                                                                                                className="w-[50px] h-[50px] md:w-[100px] md:h-[100px] relative border p-[3px]">
+                                                                                                <img
+                                                                                                    className="upload-img"
+                                                                                                    src={x.name ? URL.createObjectURL(x) : `${DO_SPACES_ENDPOINT}/${x}`}
+                                                                                                    alt={x.name || x}
+                                                                                                />
+                                                                                                <CircleX
+                                                                                                    size={20}
+                                                                                                    className="stroke-gray-500 dark:stroke-white cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10"
+                                                                                                    onClick={() => onDeleteImageComment(i, false)}
+                                                                                                />
+                                                                                            </div>
+                                                                                        )}
                                                                                     </Fragment>
                                                                                 )
                                                                             })
@@ -1667,20 +1666,11 @@ const UpdateIdea = () => {
                                                                     </div>
                                                                     : ""
                                                             }
-                                                        </>
-                                                        {/*}*/}
+                                                        </Fragment>
                                                     </div>
-                                                    <div className={"flex justify-between gap-1"}>
-                                                        <div className="flex items-center space-x-2">
-                                                            {/*<Switch id="airplane-mode"*/}
-                                                            {/*        onCheckedChange={handlePrivateNote}/>*/}
-                                                            {/*<Label htmlFor="airplane-mode"*/}
-                                                            {/*       className={"text-sm font-normal"}>Private*/}
-                                                            {/*    note</Label>*/}
-                                                        </div>
+                                                    <div className={"flex justify-end gap-1"}>
                                                         <div className={"flex gap-2 items-center"}>
                                                             <div className="p-2 max-w-sm relative w-[36px] h-[36px]">
-
                                                                 <input
                                                                     id="commentFile"
                                                                     type="file"
@@ -1693,7 +1683,6 @@ const UpdateIdea = () => {
                                                                 >
                                                                     <Paperclip size={16} className={"stroke-primary"}/>
                                                                 </label>
-
                                                             </div>
                                                             <Button
                                                                 className={"w-[117px] text-sm font-medium"}
@@ -1714,30 +1703,37 @@ const UpdateIdea = () => {
                                 <div className={"tabs"}>
                                     <Tabs defaultValue="comment">
                                         <div className={"px-4 lg:px-8"}>
-                                            <TabsList className={"bg-transparent border-b-2 border-b-primary rounded-none"}>
+                                            <TabsList
+                                                className={"bg-transparent border-b-2 border-b-primary rounded-none"}>
                                                 <TabsTrigger className={"ideas-tab-comm-bgCol"} value="comment">Comment</TabsTrigger>
                                             </TabsList>
                                         </div>
 
                                         {
                                             selectedIdea?.comments?.length > 0 &&
-                                            <TabsContent value="comment" className={`${theme === "dark" ? "" : "bg-muted"} pb-5`}>
+                                            <TabsContent value="comment"
+                                                         className={`${theme === "dark" ? "" : "bg-muted"} pb-5`}>
                                                 {
                                                     selectedIdea && selectedIdea?.comments && selectedIdea?.comments.length > 0 ?
                                                         (selectedIdea?.comments || []).map((x, i) => {
                                                             return (
-                                                                <Fragment>
-                                                                    <div className={"flex gap-2 p-4 lg:px-8 border-b last:border-b-0"}>
+                                                                <Fragment key={i}>
+                                                                    <div
+                                                                        className={"flex gap-2 p-4 lg:px-8 border-b last:border-b-0"}>
                                                                         <div>
-                                                                            <div className={"update-idea text-sm rounded-full text-center"}>
+                                                                            <div
+                                                                                className={"update-idea text-sm rounded-full text-center"}>
                                                                                 <UserAvatar
                                                                                     userPhoto={x?.profileImage}
                                                                                     userName={x?.name && x.name !== "null" ? x.name : x?.userName}
+                                                                                    initialStyle={"text-sm"}
                                                                                 />
                                                                             </div>
                                                                         </div>
-                                                                        <div className={"w-full flex flex-col space-y-3"}>
-                                                                            <div className={"flex gap-1 flex-wrap justify-between"}>
+                                                                        <div
+                                                                            className={"w-full flex flex-col space-y-3"}>
+                                                                            <div
+                                                                                className={"flex gap-1 flex-wrap justify-between"}>
                                                                                 <div className={"flex items-start"}>
                                                                                     <h4 className={"text-sm font-normal"}>{x?.name && x.name !== "null" ? x.name : x?.userName}</h4>
                                                                                     <p className={"text-sm font-normal flex items-center text-muted-foreground"}>
@@ -1755,21 +1751,6 @@ const UpdateIdea = () => {
                                                                                                     onEdit={() => onEditComment(x, i)}
                                                                                                     onDelete={() => deleteComment(x.id, i)}
                                                                                                 />
-                                                                                                // <>
-                                                                                                //     <Button
-                                                                                                //     variant={"outline"}
-                                                                                                //     className={"w-[30px] h-[30px] p-1"}
-                                                                                                //     onClick={() => onEditComment(x, i)}
-                                                                                                // >
-                                                                                                //     <Pencil className={"w-[16px] h-[16px]"}/>
-                                                                                                // </Button>
-                                                                                                //     <Button
-                                                                                                //         variant={"outline"}
-                                                                                                //         className={"w-[30px] h-[30px] p-1"}
-                                                                                                //         onClick={() => deleteComment(x.id, i)}
-                                                                                                //     >
-                                                                                                //         <Trash2 className={"w-[16px] h-[16px]"}/>
-                                                                                                //     </Button></>
                                                                                                 : ""
                                                                                     }
                                                                                 </div>
@@ -1786,15 +1767,18 @@ const UpdateIdea = () => {
                                                                                                 onCancelComment={onCancelComment}
                                                                                                 onDeleteImage={(i) => onDeleteCommentImage(i, true)}
                                                                                                 onImageUpload={handleAddCommentImg}
-                                                                                                onCommentChange={(e) => setSelectedComment({...selectedComment, comment: e.target.value})}
+                                                                                                onCommentChange={(e) => setSelectedComment({
+                                                                                                    ...selectedComment,
+                                                                                                    comment: e.target.value
+                                                                                                })}
                                                                                                 isSaving={isSaveUpdateComment}
                                                                                                 idImageUpload={"selectedCommentImg"}
                                                                                             /> :
-                                                                                                <CommentEditor
-                                                                                                    comment={x.comment}
-                                                                                                    images={x.images}
-                                                                                                    onImageClick={(img) => handleImageClick(img)}
-                                                                                                />
+                                                                                            <CommentEditor
+                                                                                                comment={x.comment}
+                                                                                                images={x.images}
+                                                                                                onImageClick={(img) => handleImageOpen(img)}
+                                                                                            />
                                                                                     }
                                                                                 </Fragment>
                                                                             </div>
@@ -1840,13 +1824,17 @@ const UpdateIdea = () => {
                                                                                                             <div>
                                                                                                                 <div
                                                                                                                     className={"update-idea text-sm rounded-full text-center"}>
-                                                                                                                    <UserAvatar userPhoto={y.profileimage} userName={y?.name && y.name !== "null" ? y.name : y?.userName}/>
+                                                                                                                    <UserAvatar
+                                                                                                                        userPhoto={y.profileImage} initialStyle={"text-sm"}
+                                                                                                                        userName={y?.name && y.name !== "null" ? y.name : y?.userName}/>
                                                                                                                 </div>
                                                                                                             </div>
                                                                                                             <div
                                                                                                                 className={"w-full space-y-2"}>
-                                                                                                                <div className={"flex justify-between"}>
-                                                                                                                    <div className={"flex items-start"}>
+                                                                                                                <div
+                                                                                                                    className={"flex justify-between"}>
+                                                                                                                    <div
+                                                                                                                        className={"flex items-start"}>
                                                                                                                         <h4 className={"text-sm font-normal"}>{y?.name && y.name !== "null" ? y.name : y?.userName}</h4>
                                                                                                                         <p className={"text-sm font-normal flex items-center text-muted-foreground"}>
                                                                                                                             <Dot
@@ -1863,23 +1851,7 @@ const UpdateIdea = () => {
                                                                                                                                     onEdit={() => onEditSubComment(x, y, i, j)}
                                                                                                                                     onDelete={() => deleteSubComment(y.id, x, i, j)}
                                                                                                                                 />
-                                                                                                                                // <div
-                                                                                                                                //     className="flex gap-2">
-                                                                                                                                //     <Button
-                                                                                                                                //         variant={"outline"}
-                                                                                                                                //         className={"w-[30px] h-[30px] p-1"}
-                                                                                                                                //         onClick={() => onEditSubComment(x, y, i, j)}>
-                                                                                                                                //         <Pencil className={"w-[16px] h-[16px]"}/>
-                                                                                                                                //     </Button>
-                                                                                                                                //     <Button
-                                                                                                                                //         variant={"outline"}
-                                                                                                                                //         className={"w-[30px] h-[30px] p-1"}
-                                                                                                                                //         onClick={() => deleteSubComment(y.id, x, i, j)}>
-                                                                                                                                //         <Trash2
-                                                                                                                                //             className={"w-[16px] h-[16px]"}/>
-                                                                                                                                //     </Button>
-                                                                                                                                // </div>
-                                                                                                                        : ''
+                                                                                                                                : ''
                                                                                                                     }
                                                                                                                 </div>
                                                                                                                 <div>
@@ -1901,7 +1873,7 @@ const UpdateIdea = () => {
                                                                                                                             <CommentEditor
                                                                                                                                 comment={y.comment}
                                                                                                                                 images={y.images}
-                                                                                                                                onImageClick={(img) => handleImageClick(img)}
+                                                                                                                                onImageClick={(img) => handleImageOpen(img)}
                                                                                                                             />
                                                                                                                     }
                                                                                                                 </div>
@@ -1911,13 +1883,14 @@ const UpdateIdea = () => {
                                                                                                 )
                                                                                             })
                                                                                         }
+
                                                                                         <div
                                                                                             className={"space-y-2"}>
                                                                                             {
                                                                                                 subCommentTextEditIdx === i &&
-                                                                                            <Textarea
-                                                                                                value={subCommentText[i] || ""}
-                                                                                                onChange={(e) => handleSubCommentTextChange(e, i)}/>
+                                                                                                <Textarea
+                                                                                                    value={subCommentText[i] || ""}
+                                                                                                    onChange={(e) => handleSubCommentTextChange(e, i)}/>
                                                                                             }
                                                                                             {
                                                                                                 subCommentFiles && subCommentFiles.length ?
@@ -1926,33 +1899,23 @@ const UpdateIdea = () => {
                                                                                                         {
                                                                                                             (subCommentFiles || []).map((z, i) => {
                                                                                                                 return (
-                                                                                                                    <div key={i}>
-                                                                                                                        {
-                                                                                                                            z && z.name ?
-                                                                                                                                <div
-                                                                                                                                    className={"w-[50px] h-[50px] md:w-[100px] md:h-[100px] relative border p-[3px]"}>
-                                                                                                                                    <img
-                                                                                                                                        className={"upload-img"}
-                                                                                                                                        src={z && z.name ? URL.createObjectURL(z) : z}/>
-                                                                                                                                    <CircleX
-                                                                                                                                        size={20}
-                                                                                                                                        className={`stroke-gray-500 dark:stroke-white cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
-                                                                                                                                        onClick={() => onDeleteSubCommentImageOld(i, false)}
-                                                                                                                                    />
-                                                                                                                                </div> : z ?
-                                                                                                                                <div
-                                                                                                                                    className={"w-[50px] h-[50px] md:w-[100px] md:h-[100px] relative border p-[3px]"}>
-                                                                                                                                    <img
-                                                                                                                                        className={"upload-img"}
-                                                                                                                                        src={z}
-                                                                                                                                        alt={z}/>
-                                                                                                                                    <CircleX
-                                                                                                                                        size={20}
-                                                                                                                                        className={`stroke-gray-500 dark:stroke-white cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
-                                                                                                                                        onClick={() => onDeleteSubCommentImageOld(i, false)}
-                                                                                                                                    />
-                                                                                                                                </div> : ''
-                                                                                                                        }
+                                                                                                                    <div
+                                                                                                                        key={i}>
+                                                                                                                        {z && (
+                                                                                                                            <div
+                                                                                                                                className="w-[50px] h-[50px] md:w-[100px] md:h-[100px] relative border p-[3px]">
+                                                                                                                                <img
+                                                                                                                                    className="upload-img"
+                                                                                                                                    src={z.name ? URL.createObjectURL(z) : `${DO_SPACES_ENDPOINT}/${z}`}
+                                                                                                                                    alt={z.name || z}
+                                                                                                                                />
+                                                                                                                                <CircleX
+                                                                                                                                    size={20}
+                                                                                                                                    className="stroke-gray-500 dark:stroke-white cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10"
+                                                                                                                                    onClick={() => onDeleteSubCommentImageOld(i, false)}
+                                                                                                                                />
+                                                                                                                            </div>
+                                                                                                                        )}
                                                                                                                     </div>
                                                                                                                 )
                                                                                                             })
@@ -1960,40 +1923,20 @@ const UpdateIdea = () => {
                                                                                                     </div> : ""
                                                                                             }
                                                                                             {
-                                                                                                    subCommentTextEditIdx === i &&
+                                                                                                subCommentTextEditIdx === i &&
                                                                                                 <div
                                                                                                     className={"flex gap-2"}>
                                                                                                     <Button
                                                                                                         className={`${isSaveSubComment === true ? "py-2 px-6" : "py-2 px-6"} w-[86px] h-[30px] text-sm font-medium`}
                                                                                                         disabled={(!subCommentText[i] || subCommentText[i].trim() === "")}
-                                                                                                        onClick={() => {
-                                                                                                            onCreateSubComment(x, i)
-                                                                                                        }}
+                                                                                                        onClick={() => {onCreateSubComment(x, i)}}
                                                                                                     >
                                                                                                         {
                                                                                                             isSaveSubComment && subCommentTextEditIdx === i ?
-                                                                                                                <Loader2
-                                                                                                                    size={16}
-                                                                                                                    className="animate-spin"/> : "Reply"
+                                                                                                                <Loader2 size={16} className="animate-spin"/> : "Reply"
                                                                                                         }
                                                                                                     </Button>
                                                                                                     <UploadButton onChange={handleSubCommentUploadImg}/>
-                                                                                                    {/*<div className="p-2 max-w-sm relative w-[36px]">*/}
-                                                                                                    {/*    <Input*/}
-                                                                                                    {/*        id="commentFileInput"*/}
-                                                                                                    {/*        type="file"*/}
-                                                                                                    {/*        className="hidden"*/}
-                                                                                                    {/*        onChange={handleSubCommentUploadImg}*/}
-                                                                                                    {/*        accept={"image/*"}*/}
-                                                                                                    {/*    />*/}
-                                                                                                    {/*    <label*/}
-                                                                                                    {/*        htmlFor="commentFileInput"*/}
-                                                                                                    {/*        className="absolute inset-0 flex items-center justify-center bg-white border border-primary rounded cursor-pointer">*/}
-                                                                                                    {/*        <Paperclip*/}
-                                                                                                    {/*            size={16}*/}
-                                                                                                    {/*            className={"stroke-primary"}/>*/}
-                                                                                                    {/*    </label>*/}
-                                                                                                    {/*</div>*/}
                                                                                                 </div>
                                                                                             }
                                                                                         </div>
@@ -2008,7 +1951,6 @@ const UpdateIdea = () => {
                                                 }
                                             </TabsContent>
                                         }
-
                                     </Tabs>
                                 </div>
                             </Fragment>

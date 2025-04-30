@@ -47,7 +47,12 @@ export const isLogin = () => {
     return !!localStorage.getItem(TOKEN_KEY);
 }
 
-// Check if the token is about to expire (within the next minute)
+export const handleImageOpen = (imageSrc) => {
+    const isBlobUrl = typeof imageSrc === 'string' && imageSrc.startsWith('blob:');
+    const src = isBlobUrl ? imageSrc : `${DO_SPACES_ENDPOINT}/${imageSrc}`;
+    window.open(src, '_blank');
+};
+
 export const isTokenAboutToExpire = () => {
     const token = localStorage.getItem(TOKEN_KEY);
     // if (!token) return true;
@@ -149,6 +154,13 @@ export const onKeyFire = (event, onCallback) => {
 export const cleanQuillHtml = (htmlString) => {
     if (!htmlString) return ''; // Handle null or undefined cases
     return htmlString.replace(/<p><br\s*\/?><\/p>/g, '').trim();
+};
+
+export const isEmpty = (value) => {
+    return (
+        value === null || value === undefined ||
+        (typeof value === 'string' && value.trim() === '')
+    );
 };
 
 export const timeZoneJson = [

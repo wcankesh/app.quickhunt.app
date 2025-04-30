@@ -15,12 +15,12 @@ const Reactions = () => {
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
 
     const renderItem = (x, i) => {
-        const emoji = allStatusAndTypes.emoji.find((e) => e.id === x.reaction_id) || { emoji_url: "" };
+        const emoji = allStatusAndTypes.emoji.find((e) => e.id === x.reactionId) || { emojiUrl: "" };
         return (
             <CardContent key={i} className="p-2 sm:p-3 lg:p-6 border-b">
                 <div className="flex gap-4">
                     <Avatar className="w-[35px] h-[35px]">
-                        <AvatarImage src={emoji.emoji_url} />
+                        <AvatarImage src={emoji.emojiUrl} />
                     </Avatar>
                     <div className="flex flex-col gap-1">
                         <div className="flex gap-1 items-center">
@@ -32,7 +32,7 @@ const Reactions = () => {
                             </h4>
                             <p className="text-xs font-medium text-muted-foreground">Reacted To</p>
                         </div>
-                        <p className="text-xs font-semibold text-foreground">"{x.post_title}"</p>
+                        <p className="text-xs font-semibold text-foreground">"{x.postTitle}"</p>
                     </div>
                 </div>
             </CardContent>

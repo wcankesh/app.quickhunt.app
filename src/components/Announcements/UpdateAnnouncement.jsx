@@ -13,7 +13,7 @@ import {useLocation, useNavigate, useParams} from "react-router-dom";
 import {useSelector} from "react-redux";
 import {useTheme} from "../theme-provider";
 import {toast} from "../ui/use-toast";
-import {apiService, baseUrl} from "../../utils/constent";
+import {apiService, baseUrl, DO_SPACES_ENDPOINT} from "../../utils/constent";
 import {Checkbox} from "../ui/checkbox";
 import {Card, CardContent, CardFooter} from "../ui/card";
 import CommonBreadCrumb from "../Comman/CommonBreadCrumb";
@@ -519,26 +519,19 @@ const UpdateAnnouncement = () => {
                                     <div className="w-[282px] h-[128px] flex gap-1 items-stretch">
                                         {selectedRecord?.image ? (
                                             <div className="h-full">
-                                                {selectedRecord?.image.name ? (
+                                                {selectedRecord?.image && (
                                                     <div className="w-[282px] h-[128px] relative border p-[5px]">
                                                         <img
                                                             className="upload-img h-full"
-                                                            src={URL.createObjectURL(selectedRecord?.image)}
+                                                            src={selectedRecord.image.name ? URL.createObjectURL(selectedRecord.image) : `${DO_SPACES_ENDPOINT}/${selectedRecord.image}`}
                                                             alt=""
                                                         />
                                                         <CircleX
                                                             size={20}
-                                                            className={`stroke-gray-500 dark:stroke-white cursor-pointer absolute top-0 left-full transform -translate-x-1/2 -translate-y-1/2 z-10`}
-                                                            onClick={() => onDeleteImg('deleteImage', selectedRecord?.image?.name ? "" : selectedRecord?.image?.replace("https://code.quickhunt.app/public/storage/post/", ""))}
-                                                        />
-                                                    </div>
-                                                ) : (
-                                                    <div className="w-[282px] h-[128px] relative border p-[5px]">
-                                                        <img className="upload-img h-full" src={selectedRecord?.image} alt="" />
-                                                        <CircleX
-                                                            size={20}
-                                                            className={`stroke-gray-500 dark:stroke-white cursor-pointer absolute top-0 left-full transform -translate-x-1/2 -translate-y-1/2 z-10`}
-                                                            onClick={() => onDeleteImg('deleteImage', selectedRecord?.image?.name ? "" : selectedRecord?.image?.replace("https://code.quickhunt.app/public/storage/post/", ""))}
+                                                            className="stroke-gray-500 dark:stroke-white cursor-pointer absolute top-0 left-full transform -translate-x-1/2 -translate-y-1/2 z-10"
+                                                            onClick={() =>
+                                                                onDeleteImg('deleteImage', selectedRecord.image.name ? '' : selectedRecord.image)
+                                                            }
                                                         />
                                                     </div>
                                                 )}

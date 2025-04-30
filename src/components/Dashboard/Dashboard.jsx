@@ -10,7 +10,7 @@ import ReadMoreText from "../Comman/ReadMoreText";
 import {DateRangePicker, formatDate, getPresetRange, PRESETS} from "../ui/date-range-picker";
 import {Button} from "../ui/button";
 import {useNavigate} from "react-router-dom";
-import {apiService, baseUrl} from "../../utils/constent";
+import {apiService, baseUrl, DO_SPACES_ENDPOINT} from "../../utils/constent";
 import {Badge} from "../ui/badge";
 import {UserAvatar} from "../Comman/CommentEditor";
 
@@ -310,7 +310,6 @@ export function Dashboard() {
                             </div>
                             <div className={"p-6 py-3 text-end border-t"}>
                                 <Button variant={"ghost hover:none"} className={"p-0 h-auto text-primary font-medium"}
-                                        // onClick={() => navigate(`${baseUrl}/dashboard/comments?pageNo=2`)}>
                                         onClick={() => navigate(`${baseUrl}/dashboard/comments`)}>
                                     See All
                                 </Button>
@@ -328,12 +327,12 @@ export function Dashboard() {
                                     ) : (
                                         (chartList.reactions && chartList.reactions.length > 0) ? (
                                             (chartList.reactions || []).map((x, i) => {
-                                                const emoji = allStatusAndTypes.emoji.find((e) => e.id === x.reactionId) || {emoji_url: ""};
+                                                const emoji = allStatusAndTypes.emoji.find((e) => e.id === x.reactionId) || {emojiUrl: ""};
                                                 return (
                                                     <Fragment key={i}>
                                                         <CardContent className={"py-2.5 px-6 border-b last:border-b-0"}>
                                                             <div className={"flex gap-4"}>
-                                                                <UserAvatar className={`rounded-none w-[35px] h-[35px]`} userPhoto={emoji.emoji_url} />
+                                                                <UserAvatar className={`rounded-none w-[35px] h-[35px]`} userPhoto={emoji.emojiUrl} />
                                                                 <div className={"flex flex-col gap-1"}>
                                                                     <div className="flex gap-1 items-center">
                                                                         <h4

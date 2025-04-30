@@ -29,7 +29,7 @@ import {
 import {useTheme} from "../theme-provider";
 import {
     apiService,
-    baseUrl,
+    baseUrl, DO_SPACES_ENDPOINT,
     getProjectDetails,
     logout,
     removeProjectDetails,
@@ -131,7 +131,6 @@ const HeaderBar = ({setIsMobile}) => {
 
     useEffect(() => {
         getAllProjects()
-        // loginUserDetails()
     }, []);
 
     useEffect(() => {
@@ -146,13 +145,6 @@ const HeaderBar = ({setIsMobile}) => {
             if (data.success) {
                 dispatch(allStatusAndTypesAction({...data.data}));
             }
-        }
-    }
-
-    const loginUserDetails = async () => {
-        const data = await apiService.getLoginUserDetails()
-        if (data.status === 200) {
-            dispatch(userDetailsAction({...data.data}))
         }
     }
 
@@ -180,7 +172,6 @@ const HeaderBar = ({setIsMobile}) => {
                     array.push(obj);
                 })
                 setProjectList(array)
-
             } else {
                 setSheetOpen(true)
             }
@@ -505,10 +496,8 @@ const HeaderBar = ({setIsMobile}) => {
                                 <DropdownMenuTrigger asChild>
                                     <Button variant="secondary" size="icon" className="rounded-full w-[30px] h-[30px]">
                                         <Avatar className={"w-[30px] h-[30px]"}>
-                                            <AvatarImage src={userDetails.profileImage}
-                                                         alt={userDetails && userDetails?.firstName?.substring(0, 1)?.toUpperCase() && userDetails?.lastName?.substring(0, 1)?.toUpperCase()}
-                                            />
-                                            <AvatarFallback>{userDetails?.firstName?.substring(0, 1)?.toUpperCase()}{userDetails?.lastName?.substring(0, 1)?.toUpperCase()}</AvatarFallback>
+                                            <AvatarImage src={userDetails.profileImage ? `${DO_SPACES_ENDPOINT}/${userDetails.profileImage}` : null} alt={`${userDetails && userDetails?.firstName?.substring(0, 1)?.toUpperCase()}${userDetails?.lastName?.substring(0, 1)?.toUpperCase()}`}/>
+                                            <AvatarFallback>{userDetails?.firstName?.substring(0, 1)?.toUpperCase()} {userDetails?.lastName?.substring(0, 1)?.toUpperCase()}</AvatarFallback>
                                         </Avatar>
                                     </Button>
                                 </DropdownMenuTrigger>

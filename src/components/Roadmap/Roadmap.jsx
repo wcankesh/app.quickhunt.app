@@ -11,7 +11,7 @@ import {useToast} from "../ui/use-toast";
 import {commonLoad} from "../Comman/CommSkel";
 import {EmptyDataContent} from "../Comman/EmptyDataContent";
 import {EmptyRoadmapContent} from "../Comman/EmptyContentForModule";
-import {apiService} from "../../utils/constent";
+import {apiService, DO_SPACES_ENDPOINT} from "../../utils/constent";
 
 const loading = {
     columns: Array.from({ length: 5 }, (_, index) => ({
@@ -242,7 +242,7 @@ const Roadmap = () => {
                                                 {
                                                     y && y?.coverImage &&
                                                     <img className="object-center object-cover w-full h-[125px]"
-                                                         src={y?.coverImage} alt={""}/>
+                                                         src={`${DO_SPACES_ENDPOINT}/${y?.coverImage}`} alt={""}/>
                                                 }
                                                 <div className={"space-y-1"}>
                                                     <h3 className={"text-sm font-normal m-0"}>{y.title}</h3>

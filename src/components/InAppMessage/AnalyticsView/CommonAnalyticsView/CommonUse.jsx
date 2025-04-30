@@ -12,7 +12,7 @@ import { Button } from "../../../ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger, DialogClose } from "../../../ui/dialog";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "../../../ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
-import {DO_SPACES_ENDPOINT} from "../../../../utils/constent";
+import {DO_SPACES_ENDPOINT, handleImageOpen} from "../../../../utils/constent";
 
 export const AnalyticsLayout = ({ links, currentPage, children }) => {
     return (
@@ -169,8 +169,8 @@ export const ImageCarouselCell = ({ files }) => {
     const plugin = React.useRef(Autoplay({ delay: 2000, stopOnInteraction: true }));
     if (!Array.isArray(files) || files.length === 0) return "-";
     return files.length > 1 ? (
-        <>
-            <div onClick={() => window.open(`${DO_SPACES_ENDPOINT}/${files[0]}`, '_blank')} className="inline-block">
+        <Fragment>
+            <div onClick={() => handleImageOpen(files[0], '_blank')} className="inline-block">
                 <img className="h-6 w-6 cursor-pointer" src={`${DO_SPACES_ENDPOINT}/${files[0]}`} alt="file-0" />
             </div>
             <Dialog>
@@ -190,7 +190,7 @@ export const ImageCarouselCell = ({ files }) => {
                                 {files.map((src, index) => (
                                     <CarouselItem key={index} className="max-w-[706px] w-full shrink-0 grow pl-4">
                                         <div className="h-[500px] flex items-center justify-center overflow-hidden">
-                                            <img onClick={() => window.open(`${DO_SPACES_ENDPOINT}/${src}`, '_blank')} className="w-full h-full object-contain cursor-pointer" src={`${DO_SPACES_ENDPOINT}/${src}`} alt={`Carousel image ${index + 1}`} />
+                                            <img onClick={() => handleImageOpen(src, '_blank')} className="w-full h-full object-contain cursor-pointer" src={`${DO_SPACES_ENDPOINT}/${src}`} alt={`Carousel image ${index + 1}`} />
                                         </div>
                                     </CarouselItem>
                                 ))}
@@ -206,11 +206,11 @@ export const ImageCarouselCell = ({ files }) => {
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
-        </>
+        </Fragment>
     ) : (
         files.map((fileUrl, index) => (
-            <div key={index} onClick={() => window.open(fileUrl, '_blank')} className="inline-block">
-                <img className="h-6 w-6 cursor-pointer" src={fileUrl} alt={`file-${index}`} />
+            <div key={index} onClick={() => handleImageOpen(fileUrl, '_blank')} className="inline-block">
+                <img className="h-6 w-6 cursor-pointer" src={`${DO_SPACES_ENDPOINT}/${fileUrl}`} alt={`file-${index}`} />
             </div>
         ))
     );

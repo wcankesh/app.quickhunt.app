@@ -18,7 +18,7 @@ import ReactQuillEditor from "../Comman/ReactQuillEditor";
 import ImageUploader from "../Comman/ImageUploader";
 import {CommentEditor, ImageGallery, SaveCancelButton, UserAvatar} from "../Comman/CommentEditor";
 import {Skeleton} from "../ui/skeleton";
-import {apiService} from "../../utils/constent";
+import {apiService, DO_SPACES_ENDPOINT, handleImageOpen} from "../../utils/constent";
 import {DialogTitle} from "../ui/dialog";
 
 const initialStateError = {
@@ -28,19 +28,15 @@ const initialStateError = {
     coverImage: "",
 }
 
-const pathUrl = "https://code.quickhunt.app/public/storage/feature_idea/";
-
 const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedIdea, setSelectedRoadmap, selectedRoadmap, roadmapList, setRoadmapList, originalIdea, setOriginalIdea}) => {
     const {theme} = useTheme()
     const {toast} = useToast()
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
 
-    const [isLoadingSidebar, setIsLoadingSidebar] = useState('');
     const [commentText, setCommentText] = useState("")
     const [subCommentText, setSubCommentText] = useState("")
     const [subCommentTextEditIdx, setSubCommentTextEditIdx] = useState(null);
-    const [description, setDescription] = useState("");
     const [topicLists, setTopicLists] = useState([]);
     const [commentFiles, setCommentFiles] = useState([])
     const [subCommentFiles, setSubCommentFiles] = useState([])
@@ -64,13 +60,12 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
     useEffect(() => {
         if (projectDetailsReducer.id) {
             setTopicLists(allStatusAndTypes.topics)
-            setDescription(selectedIdea?.description)
             setRoadmapStatus(allStatusAndTypes.roadmapStatus)
         }
     }, [projectDetailsReducer.id, allStatusAndTypes]);
 
     const handleChangeTopic = (id) => {
-        const clone = [...selectedIdea?.tags];
+        const clone = [...selectedIdea?.topic];
         const index = clone.findIndex(item => item.id === id);
         if (index !== -1) {
             clone.splice(index, 1);
@@ -80,7 +75,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                 clone.push(topicToAdd);
             }
         }
-        setSelectedIdea({...selectedIdea, tags: clone});
+        setSelectedIdea({...selectedIdea, topic: clone});
     };
 
     const giveVote = async (type) => {
@@ -105,15 +100,15 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                             newVoteCount = type === 1 ? newVoteCount + 1 : newVoteCount >= 1 ? newVoteCount - 1 : 0;
                             clone[index].vote = newVoteCount;
                             clone[index].userVote = type;
-                            let voteList = [...clone[index].voteList];
+                            let voteLists = [...clone[index].voteLists];
                             if (type === 1) {
-                                voteList.push(data.data)
-                                clone[index].voteList = voteList;
+                                voteLists.push(data.data)
+                                clone[index].voteLists = voteLists;
                             } else {
-                                let voteIndex = voteList.findIndex((x) => (x.name || x?.firstname) == (data.data.name || data.data?.firstname));
+                                let voteIndex = voteLists.findIndex((x) => (x.name || x?.firstname) == (data.data.name || data.data?.firstname));
                                 if (voteIndex !== -1) {
-                                    voteList.splice(voteIndex, 1)
-                                    clone[index].voteList = voteList;
+                                    voteLists.splice(voteIndex, 1)
+                                    clone[index].voteLists = voteLists;
                                 }
                             }
                             cloneRoadmap[roadmapIndex] = {...cloneRoadmap[roadmapIndex], ideas: clone, cards: clone};
@@ -304,7 +299,6 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
     };
 
     const onChangeStatus = async (name, value) => {
-        setIsLoadingSidebar(name);
         setSelectedIdea({...selectedIdea, [name]: value})
         if (name === "removeCoverImage") {
             setSelectedIdea({...selectedIdea, coverImage: ""})
@@ -373,17 +367,14 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
             setRoadmapList({columns: cloneRoadmap});
             setIsLoading(false)
             setIsEditIdea(false)
-            setIsLoadingSidebar('');
             toast({description: data.message})
         } else {
             setIsLoading(false)
-            setIsLoadingSidebar('');
             toast({variant: "destructive", description: data?.error?.message})
         }
     }
 
     const onEditComment = (record, index) => {
-        // setSelectedComment(record);
         setSelectedComment({ ...record, images: record.images || [] });
         setSelectedCommentIndex(index)
         setIsEditComment(true)
@@ -425,7 +416,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
         if (isServerImage) {
             const cloneDeletedImages = [...deletedCommentImage];
             cloneDeletedImages.push(
-                cloneImages[index].replace(pathUrl, '')
+                cloneImages[index]
             );
             cloneImages.splice(index, 1);
             setDeletedCommentImage(cloneDeletedImages);
@@ -442,7 +433,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
         if (isOld) {
             const cloneImages = [...selectedSubComment.images];
             const cloneDeletedImages = [...deletedSubCommentImage];
-            cloneDeletedImages.push(cloneImages[index].replace('https://code.quickhunt.app/public/storage/feature_idea/', ''));
+            cloneDeletedImages.push(cloneImages[index]);
             cloneImages.splice(index, 1);
             setSelectedSubComment({
                 ...selectedSubComment,
@@ -468,7 +459,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
             }
         }
         for (let i = 0; i < deletedCommentImage.length; i++) {
-            formData.append(`removeImages[${i}]`, deletedCommentImage[i].replace('https://code.quickhunt.app/public/storage/feature_idea/', ''));
+            formData.append(`removeImages[${i}]`, deletedCommentImage[i]);
         }
 
         formData.append('comment', selectedComment.comment);
@@ -510,7 +501,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
             }
         }
         for (let i = 0; i < deletedSubCommentImage.length; i++) {
-            formData.append(`removeImages[${i}]`, deletedSubCommentImage[i].replace('https://code.quickhunt.app/public/storage/feature_idea/', ''));
+            formData.append(`removeImages[${i}]`, deletedSubCommentImage[i]);
         }
         formData.append('comment', selectedSubComment.comment);
         const data = await apiService.updateComment(selectedSubComment.id, formData)
@@ -635,12 +626,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
 
     const handleUpdate = (event) => {
         const {value} = event.target;
-        // setDescription(value);
         setSelectedIdea(selectedIdea => ({...selectedIdea, description: value}));
-        // setFormError(formError => ({
-        //     ...formError,
-        //     description: formValidate("description", value)
-        // }));
     };
 
     const onUpdateIdea = async () => {
@@ -659,15 +645,13 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
         let formData = new FormData();
         let topics = [];
 
-        (selectedIdea?.tags || []).map((x) => {
+        (selectedIdea?.topic || []).map((x) => {
             topics.push(x.id)
         })
         formData.append('title', selectedIdea?.title);
         formData.append('boardId', selectedIdea.boardId);
         formData.append('slugUrl', selectedIdea?.title ? selectedIdea?.title.replace(/ /g, "-").replace(/\?/g, "-") : "");
-        // formData.append('description', selectedIdea?.description?.trim() === '' ? "" : selectedIdea?.description);
         formData.append('description', selectedIdea.description ? selectedIdea.description : "");
-        // formData.append('tags', topics.join(","));
         topics.forEach(id => {
             formData.append('topicId[]', id);
         });
@@ -679,12 +663,12 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                 const ideaIndex = cloneRoadmap[roadmapIndex].ideas.findIndex((x) => x.id === selectedIdea?.id);
                 if (ideaIndex !== -1) {
                     cloneRoadmap[roadmapIndex].ideas[ideaIndex] = { ...data.data };
-                    cloneRoadmap[roadmapIndex].cards = [...cloneRoadmap[roadmapIndex].ideas]; // Synchronize cards with ideas
+                    cloneRoadmap[roadmapIndex].cards = [...cloneRoadmap[roadmapIndex].ideas];
                 }
             }
             setRoadmapList({ columns: cloneRoadmap });
-
             setSelectedIdea({...data.data})
+            setOriginalIdea({...data.data})
             setIsEditIdea(false)
             setIsLoadingCreateIdea(false)
             toast({description: data.message})
@@ -698,7 +682,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
 
     const handleOnUpdateCancel = () => {
         setFormError(initialStateError);
-        setSelectedIdea(originalIdea);
+        setSelectedIdea({...originalIdea});
         setIsEditIdea(false);
     }
 
@@ -719,14 +703,11 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
         setIsEditIdea(false)
         setCommentText("")
         setSubCommentText("")
-
         setSelectedComment(null);
         setSelectedCommentIndex(null)
         setSelectedSubComment(null)
         setSelectedSubCommentIndex(null)
     }
-
-    const handleImageClick = (imageSrc) => {window.open(imageSrc, '_blank');};
 
     const handleSubCommentTextChange = (e, index) => {
         const newSubCommentText = [...subCommentText];
@@ -737,7 +718,6 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
     return (
         <Fragment>
             <Sheet open={isOpen} onOpenChange={isOpen ? onCloseBoth : onOpen}>
-                {/*<SheetOverlay className={"inset-0"}/>*/}
                 <SheetContent className={"lg:max-w-[1101px] md:max-w-[720px] sm:max-w-full p-0"}>
                     <SheetHeader className={"px-4 py-3 md:py-5 lg:px-8 lg:py-[20px] border-b"}>
                         <DialogTitle>
@@ -750,9 +730,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                             <div className={"border-b py-4 pl-8 pr-6 flex flex-col gap-3"}>
                                 <div className={"flex flex-col gap-1"}>
                                     <h3 className={"text-sm font-normal"}>Status</h3>
-                                    <p className={"text-muted-foreground text-xs font-normal"}>Apply a status to Manage
-                                        this
-                                        idea on roadmap.</p>
+                                    <p className={"text-muted-foreground text-xs font-normal"}>Apply a status to Manage this idea on roadmap.</p>
                                 </div>
                                 <div className={"flex flex-col "}>
                                     <RadioGroup
@@ -780,7 +758,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                     <div className="w-[282px] h-[128px] flex gap-1">
                                         <ImageUploader
                                             image={selectedIdea?.coverImage}
-                                            onDelete={() => onChangeStatus('removeCoverImage', selectedIdea && selectedIdea?.coverImage && selectedIdea?.coverImage?.name ? "" : [selectedIdea?.coverImage.replace("https://code.quickhunt.app/public/storage/feature_idea/", "")])}
+                                            onDelete={() => onChangeStatus('removeCoverImage', selectedIdea && selectedIdea?.coverImage && selectedIdea?.coverImage?.name ? "" : [selectedIdea?.coverImage])}
                                             onUpload={handleFeatureImgUpload}
                                             altText="Cover Image"
                                         />
@@ -808,7 +786,6 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                 <Label htmlFor="message" className={"font-normal"}>Description</Label>
                                                 <ReactQuillEditor value={selectedIdea?.description} name={"description"}
                                                                   onChange={handleUpdate}/>
-                                                {/*{formError.description && <span className="text-red-500 text-sm">{formError.description}</span>}*/}
                                             </div>
                                             <div className={"space-y-2"}>
                                                 <Label className={"font-normal"}>Choose Board for this Idea</Label>
@@ -846,12 +823,12 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                         <div className={"px-4 py-3 lg:py-6 lg:px-8 border-b space-y-2"}>
                                             <Label className={"font-normal"}>Choose Topics for this Idea (optional)</Label>
                                             <Select onValueChange={handleChangeTopic}
-                                                    value={selectedIdea?.tags.map(x => x.id)}>
+                                                    value={selectedIdea?.topic.map(x => x.id)}>
                                                 <SelectTrigger>
                                                     <SelectValue className={"text-muted-foreground text-sm"}
                                                                  placeholder="Assign to">
                                                         <div className={"flex gap-[2px]"}>
-                                                            {(selectedIdea?.tags || []).map((x, index) => {
+                                                            {(selectedIdea?.topic || []).map((x, index) => {
                                                                 const findObj = (topicLists || []).find((y) => y.id === x?.id);
                                                                 return (
                                                                     <div key={index}
@@ -862,7 +839,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                                     </div>
                                                                 );
                                                             })}
-                                                            {(selectedIdea?.tags || []).length > 2}
+                                                            {(selectedIdea?.topic || []).length > 2}
                                                         </div>
                                                     </SelectValue>
                                                 </SelectTrigger>
@@ -875,7 +852,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                                         <div className={"flex gap-2"}>
                                                                             <div onClick={() => handleChangeTopic(x.id)}
                                                                                  className="checkbox-icon">
-                                                                                {(selectedIdea?.tags.map((x) => x.id) || []).includes(x.id) ?
+                                                                                {(selectedIdea?.topic.map((x) => x.id) || []).includes(x.id) ?
                                                                                     <Check size={18}/> : <div className={"h-[18px] w-[18px]"}/>}
                                                                             </div>
                                                                             <span>{x.title ? x.title : ""}</span>
@@ -910,13 +887,13 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                         </Button>
                                                         <p className={"text-xl font-normal"}>{selectedIdea?.vote}</p>
                                                         {
-                                                            selectedIdea && selectedIdea?.voteList && selectedIdea?.voteList.length ?
+                                                            selectedIdea && selectedIdea?.voteLists && selectedIdea?.voteLists.length ?
                                                                 <Popover>
                                                                     <PopoverTrigger asChild>
                                                                         <Button variant="ghost hover-none"
                                                                                 className={"rounded-full p-0 h-[24px]"}>
                                                                             {
-                                                                                (selectedIdea.voteList.slice(0, 1) || []).map((x, i) => {
+                                                                                (selectedIdea.voteLists.slice(0, 1) || []).map((x, i) => {
                                                                                     return (
                                                                                         <div className={"flex"}
                                                                                              key={i}>
@@ -925,17 +902,18 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                                                                 <div
                                                                                                     className={"update-idea text-sm rounded-full text-center"}>
                                                                                                     <UserAvatar
-                                                                                                        userPhoto={x.userPhoto}
-                                                                                                        userName={x.name ? x.name : x?.user_name}
+                                                                                                        userPhoto={x.profileImage}
+                                                                                                        userName={x.name ? x.name : x?.username}
                                                                                                         className="w-[20px] h-[20px]"
+                                                                                                        initialStyle={"text-sm"}
                                                                                                     />
                                                                                                 </div>
                                                                                             </div>
                                                                                             {
-                                                                                                (selectedIdea?.voteList.length > 1) &&
+                                                                                                (selectedIdea?.voteLists.length > 1) &&
                                                                                                 <div
                                                                                                     className={"update-idea text-sm rounded-full border text-center ml-[-5px]"}>
-                                                                                                    <Avatar><AvatarFallback>+{selectedIdea?.voteList.length - 1}</AvatarFallback></Avatar>
+                                                                                                    <Avatar><AvatarFallback>+{selectedIdea?.voteLists.length - 1}</AvatarFallback></Avatar>
                                                                                                 </div>
                                                                                             }
                                                                                         </div>
@@ -947,20 +925,21 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                                     <PopoverContent className="p-0" align={"start"}>
                                                                         <div>
                                                                             <div className="py-3 px-4">
-                                                                                <h4 className="font-normal leading-none text-sm">{`Voters (${selectedIdea?.voteList.length})`}</h4>
+                                                                                <h4 className="font-normal leading-none text-sm">{`Voters (${selectedIdea?.voteLists.length})`}</h4>
                                                                             </div>
                                                                             <div
                                                                                 className="border-t px-4 py-3 space-y-2">
                                                                                 {
-                                                                                    (selectedIdea?.voteList || []).map((x, i) => {
+                                                                                    (selectedIdea?.voteLists || []).map((x, i) => {
                                                                                         return (
                                                                                             <div className={"flex gap-2"} key={i}>
                                                                                                 <div
                                                                                                     className={"update-idea text-sm rounded-full text-center"}>
                                                                                                     <UserAvatar
-                                                                                                        userPhoto={x.userphoto}
+                                                                                                        userPhoto={x.profileImage}
                                                                                                         userName={x?.name ? x?.name : x?.username}
                                                                                                         className="w-[20px] h-[20px]"
+                                                                                                        initialStyle={"text-sm"}
                                                                                                     />
                                                                                                 </div>
                                                                                                 <h4 className={"text-sm font-normal"}>{x?.name ? x?.name : x?.username}</h4>
@@ -986,24 +965,6 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                                     <Pencil size={16}/>
                                                                 </Button> : ""
                                                         }
-
-                                                        {/*<Button*/}
-                                                        {/*    variant={"outline"}*/}
-                                                        {/*    className={`w-[30px] h-[30px] p-1`}*/}
-                                                        {/*    onClick={() => onChangeStatus("pin_to_top", selectedIdea?.pin_to_top === 0 ? 1 : 0)}*/}
-                                                        {/*>*/}
-                                                        {/*    {selectedIdea?.pin_to_top == 0 ?*/}
-                                                        {/*        <Pin size={16}/> :*/}
-                                                        {/*        <Pin size={16} className={`${theme === "dark" ? "fill-card-foreground" : "fill-card-foreground"}`}/>}*/}
-                                                        {/*</Button>*/}
-                                                        {/*<Button*/}
-                                                        {/*    variant={"outline"}*/}
-                                                        {/*    className={"w-[30px] h-[30px] p-1"}*/}
-                                                        {/*    onClick={deleteIdea}*/}
-                                                        {/*    loading={isLoadingSidebar === "delete"}*/}
-                                                        {/*>*/}
-                                                        {/*    <Trash2 className={"w-[16px] h-[16px]"}/>*/}
-                                                        {/*</Button>*/}
                                                     </div>
                                                 </div>
                                                 <div className={"flex flex-col gap-4"}>
@@ -1022,24 +983,18 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                                 (selectedIdea?.images || []).map((x, i) => {
                                                                         return (
                                                                             <Fragment>
-                                                                                {
-                                                                                    x && x.name ?
-                                                                                        <div
-                                                                                            className="w-[50px] h-[50px] md:w-[100px] md:h-[100px] border p-[3px] relative"
-                                                                                            onClick={() => handleImageClick(URL.createObjectURL(x))}
-                                                                                        >
-                                                                                            <img className={"upload-img cursor-pointer"}
-                                                                                                 src={x && x.name ? URL.createObjectURL(x) : x}
-                                                                                                 alt=""/>
-                                                                                        </div> : x ?
-                                                                                        <div
-                                                                                            className="w-[50px] h-[50px] md:w-[100px] md:h-[100px] border p-[3px] relative"
-                                                                                            onClick={() => handleImageClick(x)}
-                                                                                        >
-                                                                                            <img className={"upload-img cursor-pointer"}
-                                                                                                 src={x} alt=""/>
-                                                                                        </div> : ""
-                                                                                }
+                                                                                {x && (
+                                                                                    <div
+                                                                                        className="w-[50px] h-[50px] md:w-[100px] md:h-[100px] border p-[3px] relative"
+                                                                                        onClick={() => handleImageOpen(x.name ? URL.createObjectURL(x) : x)}
+                                                                                    >
+                                                                                        <img
+                                                                                            className="upload-img cursor-pointer"
+                                                                                            src={x.name ? URL.createObjectURL(x) : `${DO_SPACES_ENDPOINT}/${x}`}
+                                                                                            alt=""
+                                                                                        />
+                                                                                    </div>
+                                                                                )}
                                                                             </Fragment>
                                                                         )
                                                                     }
@@ -1050,7 +1005,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                     <div className={"flex items-center gap-4 md:flex-nowrap flex-wrap"}>
                                                         <div className={"flex items-center gap-2"}>
                                                             <UserAvatar
-                                                                userPhoto={selectedIdea?.userPhoto}
+                                                                userPhoto={selectedIdea?.profileImage}
                                                                 userName={selectedIdea?.name}
                                                                 initialStyle={"text-sm"}
                                                             />
@@ -1115,7 +1070,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
 
                                                         <ImageUploader
                                                             image={selectedIdea?.coverImage}
-                                                            onDelete={() => onChangeStatus('removeCoverImage', selectedIdea && selectedIdea?.coverImage && selectedIdea?.coverImage?.name ? "" : [selectedIdea?.coverImage.replace("https://code.quickhunt.app/public/storage/feature_idea/", "")])}
+                                                            onDelete={() => onChangeStatus('removeCoverImage', selectedIdea && selectedIdea?.coverImage && selectedIdea?.coverImage?.name ? "" : [selectedIdea?.coverImage])}
                                                             onUpload={handleFeatureImgUpload}
                                                             altText="Cover Image"
 
@@ -1151,63 +1106,12 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                                         commentFiles={commentFiles}
                                                                         onDeleteImageComment={onDeleteImageComment}
                                                                     />
-                                                                    {/*{*/}
-                                                                    {/*    commentFiles && commentFiles.length ?*/}
-                                                                    {/*        <div*/}
-                                                                    {/*            className={"flex flex-wrap gap-3 mt-1"}>*/}
-                                                                    {/*            {*/}
-                                                                    {/*                (commentFiles || []).map((x, i) => {*/}
-                                                                    {/*                    return (*/}
-                                                                    {/*                        <Fragment>*/}
-                                                                    {/*                            {*/}
-                                                                    {/*                                x && x.name ?*/}
-                                                                    {/*                                    <div*/}
-                                                                    {/*                                        className={"w-[50px] h-[50px] md:w-[100px] md:h-[100px] relative border p-[3px]"}>*/}
-                                                                    {/*                                        <img*/}
-                                                                    {/*                                            className={"upload-img"}*/}
-                                                                    {/*                                            src={x && x.name ? URL.createObjectURL(x) : x}*/}
-                                                                    {/*                                            alt=""/>*/}
-                                                                    {/*                                        <CircleX*/}
-                                                                    {/*                                            size={20}*/}
-                                                                    {/*                                            className={`light:text-muted-foreground dark:text-card cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}*/}
-                                                                    {/*                                            onClick={() => onDeleteImageComment(i, false)}*/}
-                                                                    {/*                                        />*/}
-                                                                    {/*                                    </div> : x ?*/}
-                                                                    {/*                                    <div*/}
-                                                                    {/*                                        className={"w-[50px] h-[50px] md:w-[100px] md:h-[100px] relative border p-[3px]"}>*/}
-                                                                    {/*                                        <img*/}
-                                                                    {/*                                            className={"upload-img"}*/}
-                                                                    {/*                                            src={x}*/}
-                                                                    {/*                                            alt={x}/>*/}
-                                                                    {/*                                        <CircleX*/}
-                                                                    {/*                                            size={20}*/}
-                                                                    {/*                                            className={`light:text-muted-foreground dark:text-card cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}*/}
-                                                                    {/*                                            onClick={() => onDeleteImageComment(i, false)}*/}
-                                                                    {/*                                        />*/}
-                                                                    {/*                                    </div> : ''*/}
-                                                                    {/*                            }*/}
-                                                                    {/*                        </Fragment>*/}
-                                                                    {/*                    )*/}
-                                                                    {/*                })*/}
-                                                                    {/*            }*/}
-                                                                    {/*        </div>*/}
-                                                                    {/*        : ""*/}
-                                                                    {/*}*/}
                                                                 </>
-                                                                {/*}*/}
                                                             </div>
-                                                            <div className={"flex justify-between gap-1"}>
-                                                                <div className="flex items-center space-x-2">
-                                                                    {/*<Switch id="airplane-mode"*/}
-                                                                    {/*        onCheckedChange={handlePrivateNote}/>*/}
-                                                                    {/*<Label htmlFor="airplane-mode"*/}
-                                                                    {/*       className={"text-sm font-normal"}>Private*/}
-                                                                    {/*    note</Label>*/}
-                                                                </div>
+                                                            <div className={"flex justify-end gap-1"}>
                                                                 <div className={"flex gap-2 items-center"}>
                                                                     <div
                                                                         className="p-2 max-w-sm relative w-[36px] h-[36px]">
-
                                                                         <input
                                                                             id="commentFile"
                                                                             type="file"
@@ -1262,6 +1166,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                                                     <UserAvatar
                                                                                         userPhoto={x?.profileImage}
                                                                                         userName={x?.name && x.name !== "null" ? x.name : x?.userName}
+                                                                                        initialStyle={"text-sm"}
                                                                                     />
                                                                                 </div>
                                                                                 <div
@@ -1316,7 +1221,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                                                                     <CommentEditor
                                                                                                         comment={x.comment}
                                                                                                         images={x.images}
-                                                                                                        onImageClick={(img) => handleImageClick(img)}
+                                                                                                        onImageClick={(img) => handleImageOpen(img)}
                                                                                                     />
                                                                                             }
                                                                                         </Fragment>
@@ -1361,8 +1266,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                                                                                     <div>
                                                                                                                         <div
                                                                                                                             className={"update-idea text-sm rounded-full text-center"}>
-                                                                                                                            <UserAvatar userPhoto={y.profileimage} userName={y?.name && y.name !== "null" ? y.name : y?.userName}/>
-                                                                                                                            {/*<UserAvatar userName={selectedIdea?.name ? selectedIdea?.name : selectedIdea?.user_name}/>*/}
+                                                                                                                            <UserAvatar userPhoto={y.profileImage} userName={y?.name && y.name !== "null" ? y.name : y?.userName} initialStyle={"text-sm"}/>
                                                                                                                         </div>
                                                                                                                     </div>
                                                                                                                     <div
@@ -1414,7 +1318,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                                                                                                 <CommentEditor
                                                                                                                                     comment={y.comment}
                                                                                                                                     images={y.images}
-                                                                                                                                    onImageClick={(img) => handleImageClick(img)}
+                                                                                                                                    onImageClick={(img) => handleImageOpen(img)}
                                                                                                                                 />
                                                                                                                         }
                                                                                                                     </div>
@@ -1435,33 +1339,21 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                                                                                 {
                                                                                                                     (subCommentFiles || []).map((z, i) => {
                                                                                                                         return (
-                                                                                                                            <Fragment>
-                                                                                                                                {
-                                                                                                                                    z && z.name ?
-                                                                                                                                        <div
-                                                                                                                                            className={"w-[50px] h-[50px] md:w-[100px] md:h-[100px] relative border p-[3px]"}>
-                                                                                                                                            <img
-                                                                                                                                                className={"upload-img"}
-                                                                                                                                                src={z && z.name ? URL.createObjectURL(z) : z}/>
-                                                                                                                                            <CircleX
-                                                                                                                                                size={20}
-                                                                                                                                                className={`stroke-gray-500 dark:stroke-white cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
-                                                                                                                                                onClick={() => onDeleteSubCommentImageOld(i, false)}
-                                                                                                                                            />
-                                                                                                                                        </div> : z ?
-                                                                                                                                        <div
-                                                                                                                                            className={"w-[50px] h-[50px] md:w-[100px] md:h-[100px] relative border p-[3px]"}>
-                                                                                                                                            <img
-                                                                                                                                                className={"upload-img"}
-                                                                                                                                                src={z}
-                                                                                                                                                alt={z}/>
-                                                                                                                                            <CircleX
-                                                                                                                                                size={20}
-                                                                                                                                                className={`stroke-gray-500 dark:stroke-white cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
-                                                                                                                                                onClick={() => onDeleteSubCommentImageOld(i, false)}
-                                                                                                                                            />
-                                                                                                                                        </div> : ''
-                                                                                                                                }
+                                                                                                                            <Fragment key={i}>
+                                                                                                                                {z && (
+                                                                                                                                    <div className="w-[50px] h-[50px] md:w-[100px] md:h-[100px] relative border p-[3px]">
+                                                                                                                                        <img
+                                                                                                                                            className="upload-img"
+                                                                                                                                            src={z.name ? URL.createObjectURL(z) : `${DO_SPACES_ENDPOINT}/${z}`}
+                                                                                                                                            alt={z.name || ""}
+                                                                                                                                        />
+                                                                                                                                        <CircleX
+                                                                                                                                            size={20}
+                                                                                                                                            className="stroke-gray-500 dark:stroke-white cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10"
+                                                                                                                                            onClick={() => onDeleteSubCommentImageOld(i, false)}
+                                                                                                                                        />
+                                                                                                                                    </div>
+                                                                                                                                )}
                                                                                                                             </Fragment>
                                                                                                                         )
                                                                                                                     })

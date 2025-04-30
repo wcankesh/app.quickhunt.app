@@ -1,6 +1,6 @@
 import React from 'react';
 import {useNavigate} from "react-router-dom";
-import {baseUrl} from "../../utils/constent";
+import {baseUrl, DO_SPACES_ENDPOINT} from "../../utils/constent";
 import {CardContent} from "../ui/card";
 import {commonLoad} from "../Comman/CommSkel";
 import {Avatar, AvatarFallback, AvatarImage} from "../ui/avatar";
@@ -25,11 +25,8 @@ const Comments = () => {
                     }}
                 >
                     <Avatar className="w-[20px] h-[20px]">
-                        {x.user_photo ? (
-                            <AvatarImage src={x.user_photo} alt="" />
-                        ) : (
-                            <AvatarFallback>{x.customerName?.substring(0, 1).toUpperCase()}</AvatarFallback>
-                        )}
+                        <AvatarImage src={x.userPhoto ? `${DO_SPACES_ENDPOINT}/${x.userPhoto}` : null} alt="" />
+                        <AvatarFallback>{x.customerName?.substring(0, 1).toUpperCase()}</AvatarFallback>
                     </Avatar>
                     <div className="flex items-center flex-wrap gap-1 md:gap-2">
                         <h4 className="text-sm font-semibold">{x.customerName}</h4>

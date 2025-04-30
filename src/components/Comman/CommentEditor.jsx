@@ -7,6 +7,7 @@ import {useTheme} from "../theme-provider";
 import {Avatar, AvatarFallback, AvatarImage} from "../ui/avatar";
 import {Icon} from "../../utils/Icon";
 import {Label} from "../ui/label";
+import {DO_SPACES_ENDPOINT} from "../../utils/constent";
 
 export const CommentEditor = ({isEditMode, comment, images = [], onUpdateComment, onCancelComment, onDeleteImage, onImageClick, onImageUpload, onCommentChange, isSaving, idImageUpload = '',}) => {
     const imageArray = Array.isArray(images) ? images : [];
@@ -37,33 +38,20 @@ export const CommentEditor = ({isEditMode, comment, images = [], onUpdateComment
                             {imageArray.map((img, index) => {
                                 return (
                                     <Fragment key={index}>
-                                        {
-                                            img && img?.name ?
-                                                <div className="w-[50px] h-[50px] md:w-[100px] md:h-[100px] relative border p-[3px]">
-                                                    <img
-                                                        className="upload-img"
-                                                        src={img?.name ? URL.createObjectURL(img) : img}
-                                                        alt=""
-                                                    />
-                                                    <CircleX
-                                                        size={20}
-                                                        className={`stroke-gray-500 dark:stroke-white cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
-                                                        onClick={() => onDeleteImage(index, !!img.name)}
-                                                    />
-                                                </div> :
-                                                <div className="w-[50px] h-[50px] md:w-[100px] md:h-[100px] relative border p-[3px]">
-                                                    <img
-                                                        className="upload-img"
-                                                        src={img?.name ? URL.createObjectURL(img) : img}
-                                                        alt=""
-                                                    />
-                                                    <CircleX
-                                                        size={20}
-                                                        className={`stroke-gray-500 dark:stroke-white cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
-                                                        onClick={() => onDeleteImage(index, !!img.name)}
-                                                    />
-                                                </div>
-                                        }
+                                        {img && (
+                                            <div className="w-[50px] h-[50px] md:w-[100px] md:h-[100px] relative border p-[3px]">
+                                                <img
+                                                    className="upload-img"
+                                                    src={img.name ? URL.createObjectURL(img) : `${DO_SPACES_ENDPOINT}/${img}`}
+                                                    alt=""
+                                                />
+                                                <CircleX
+                                                    size={20}
+                                                    className="stroke-gray-500 dark:stroke-white cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10"
+                                                    onClick={() => onDeleteImage(index, !!img.name)}
+                                                />
+                                            </div>
+                                        )}
                                     </Fragment>
                                 )
                             })}
@@ -107,7 +95,7 @@ export const CommentEditor = ({isEditMode, comment, images = [], onUpdateComment
                                     className="w-[50px] h-[50px] md:w-[100px] md:h-[100px] border p-[3px]"
                                     onClick={() => onImageClick(img)}
                                 >
-                                    <img className="upload-img cursor-pointer" src={img} alt=""/>
+                                    <img className="upload-img cursor-pointer" src={`${DO_SPACES_ENDPOINT}/${img}`} alt=""/>
                                 </div>
                             )
                         })}
@@ -127,12 +115,9 @@ export const UserAvatar = ({ userPhoto, userName, className, style, initialStyle
             .join("")
         : "";
     return (
-        <Avatar className={`w-[24px] h-[24px] ${className} ${style}`}>
-            {/*{userPhoto ? (*/}
-                <AvatarImage src={userPhoto} alt={initials || "User"} />
-            {/*) : (*/}
-                <AvatarFallback style={avatarFallbackInlineStyle} className={`${initialStyle} border`}>{initials || "U"}</AvatarFallback>
-            {/*)}*/}
+        <Avatar className={`w-[24px] h-[24px] ${className||''} ${style}`}>
+            <AvatarImage src={userPhoto?.includes("https://cdn.jsdelivr.net/") ? userPhoto : userPhoto ? `${DO_SPACES_ENDPOINT}/${userPhoto}` : null} alt={initials || "User"} />
+            <AvatarFallback style={avatarFallbackInlineStyle} className={`${initialStyle || ''} border`}>{initials || "U"}</AvatarFallback>
         </Avatar>
     );
 };
@@ -182,8 +167,8 @@ export const ImageUploader = ({ stateDetails, onDeleteImg, handleFileChange }) =
     const hasImage = stateDetails?.image;
 
     const handleDelete = () => {
-        const imageName = hasImage && stateDetails.image.name ? "" : stateDetails.image.replace("https://code.quickhunt.app/public/storage/post/", "");
-        onDeleteImg('delete_image', imageName);
+        const imageName = hasImage && stateDetails.image.name ? "" : stateDetails.image;
+        onDeleteImg('deleteImage', imageName);
     };
 
     return (
@@ -192,7 +177,7 @@ export const ImageUploader = ({ stateDetails, onDeleteImg, handleFileChange }) =
                 <div className={"w-[282px] h-[128px] relative border p-[5px]"}>
                     <img
                         className={"upload-img"}
-                        src={hasImage && stateDetails.image.name ? URL.createObjectURL(stateDetails.image) : stateDetails.image}
+                        src={hasImage && stateDetails.image.name ? URL.createObjectURL(stateDetails.image) : `${DO_SPACES_ENDPOINT}/${stateDetails.image}`}
                         alt=""
                     />
                     <CircleX
@@ -232,33 +217,20 @@ export const ImageGallery = ({ commentFiles, onDeleteImageComment }) => {
         <div className={"flex flex-wrap gap-3 mt-1"}>
             {commentFiles.map((file, index) => (
                 <Fragment key={index}>
-                    {file && file.name ? (
-                        <div className={"w-[50px] h-[50px] md:w-[100px] md:h-[100px] relative border p-[3px]"}>
+                    {file && (
+                        <div className="w-[50px] h-[50px] md:w-[100px] md:h-[100px] relative border p-[3px]">
                             <img
-                                className={"upload-img"}
-                                src={URL.createObjectURL(file)}
-                                alt={file.name}
+                                className="upload-img"
+                                src={file.name ? URL.createObjectURL(file) : `${DO_SPACES_ENDPOINT}/${file}`}
+                                alt={file.name || 'uploaded image'}
                             />
                             <CircleX
                                 size={20}
-                                className={`stroke-gray-500 dark:stroke-white cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
+                                className="stroke-gray-500 dark:stroke-white cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10"
                                 onClick={() => onDeleteImageComment(index, false)}
                             />
                         </div>
-                    ) : file ? (
-                        <div className={"w-[50px] h-[50px] md:w-[100px] md:h-[100px] relative border p-[3px]"}>
-                            <img
-                                className={"upload-img"}
-                                src={file}
-                                alt={file}
-                            />
-                            <CircleX
-                                size={20}
-                                className={`stroke-gray-500 dark:stroke-white cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}
-                                onClick={() => onDeleteImageComment(index, false)}
-                            />
-                        </div>
-                    ) : null}
+                    )}
                 </Fragment>
             ))}
         </div>
@@ -308,7 +280,7 @@ export const FileUpload = ({ label, id, file, onDelete, onChange, error }) => (
                 <div className="h-[50px] w-[50px] relative border rounded-lg">
                     <img
                         className="h-full w-full rounded-md object-cover"
-                        src={file.name ? URL.createObjectURL(file) : file}
+                        src={file.name ? URL.createObjectURL(file) : `${DO_SPACES_ENDPOINT}/${file}`}
                         alt=""
                     />
                     <CircleX

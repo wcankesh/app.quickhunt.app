@@ -6,7 +6,7 @@ import {Card, CardContent, CardFooter} from "../ui/card";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem,} from "../ui/dropdown-menu";
 import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "../ui/select";
 import {useTheme} from "../theme-provider";
-import {apiService, getProjectDetails} from "../../utils/constent";
+import {apiService} from "../../utils/constent";
 import moment from "moment";
 import {toast} from "../ui/use-toast";
 import ReadMoreText from "../Comman/ReadMoreText";

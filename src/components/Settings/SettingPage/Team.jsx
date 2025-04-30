@@ -18,7 +18,7 @@ import {toast} from "../../ui/use-toast";
 import {Skeleton} from "../../ui/skeleton";
 import EmptyData from "../../Comman/EmptyData";
 import DeleteDialog from "../../Comman/DeleteDialog";
-import {apiService} from "../../../utils/constent";
+import {apiService, DO_SPACES_ENDPOINT} from "../../../utils/constent";
 
 const initialState = {
     email: "",
@@ -75,19 +75,18 @@ const Team = () => {
     }
 
     const openSheet = () => {
-        // let length = memberList?.length;
-        // if(userDetailsReducer.plan === 0){
-        //     if(length < 1){
-        //         setSheetOpen(true)
-        //         onProModal(false)
-        //     }  else{
-        //         onProModal(true)
-        //     }
-        // } else if(userDetailsReducer.plan === 1){
-        //     setSheetOpen(true)
-        //     onProModal(false)
-        // }
-        setSheetOpen(true)
+        let length = memberList?.length;
+        if(userDetailsReducer.plan === 0){
+            if(length < 1){
+                setSheetOpen(true)
+                onProModal(false)
+            }  else{
+                onProModal(true)
+            }
+        } else if(userDetailsReducer.plan === 1){
+            setSheetOpen(true)
+            onProModal(false)
+        }
     };
 
     const closeSheet = () => {
@@ -333,7 +332,7 @@ const Team = () => {
                                                                         <div className={"flex gap-2 items-center"}>
                                                                             <Avatar className={"w-[30px] h-[30px]"}>
                                                                                 <AvatarImage
-                                                                                    src={x?.profileImage}
+                                                                                    src={x?.profileImage ? `${DO_SPACES_ENDPOINT}/${x?.profileImage}` : null}
                                                                                     alt={x && x?.firstName?.substring(0, 1)?.toUpperCase() && x?.lastName?.substring(0, 1)?.toUpperCase()}
                                                                                 />
                                                                                 <AvatarFallback

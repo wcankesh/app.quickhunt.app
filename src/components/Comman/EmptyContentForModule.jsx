@@ -17,9 +17,9 @@ export const EmptyIdeaContent = [
     createContent("Create Board", "Visually manage your ideas with boards like 'Feature Request' or 'Bug Reports' to track progress and prioritize tasks.", [createButton("Create Board", { navigateTo: `${baseUrl}/settings/board` })]),
     createContent("Create Widget", "Add a widget to display your ideas on your website with options like embed, popover, modal, or sidebar.", [createButton("Create Widget", { navigateTo: `${baseUrl}/widget/type` })]),
     createContent("Create Feedback", "Share your ideas via in-app messages and let users upvote and comment to refine and improve your suggestions.", [createButton("Create In-App Message", { navigateTo: `${baseUrl}/app-message/type` })]),
-    createContent("Explore Examples", "See how platforms like Utterbond, Webform, and Rivyo manage customer feedback efficiently and effortlessly.", [
+    createContent("Explore Examples", "See how platforms like Utterbond, Rebolt, and Rivyo manage customer feedback efficiently and effortlessly.", [
         createButton("Utterbond", { redirect: "https://utterbond.quickhunt.app/ideas" }),
-        createButton("Webform", { redirect: "https://webform.quickhunt.app/ideas" }),
+        createButton("Rebolt", { redirect: "https://rebolt.quickhunt.app/ideas" }),
         createButton("Rivyo", { redirect: "https://rivyo.quickhunt.app/ideas" }),
     ]),
 ];
@@ -30,9 +30,9 @@ export const EmptyRoadmapContent = [
     createContent("Turn Ideas into a Roadmap", "Easily transform shared ideas into actionable roadmap items to plan and showcase your product's future.", [createButton("Move Ideas to Roadmap", { navigateTo: `${baseUrl}/ideas` })]),
     createContent("Create Widget", "Add a widget to display your Roadmap on your website with options like embed, popover, modal, or sidebar.", [createButton("Create Widget", { navigateTo: `${baseUrl}/widget/type` })]),
     createContent("Create Announcement", "Share updates or milestones from your roadmap with users to keep them engaged and in the loop.", [createButton("Create Announcement", { navigateTo: `${baseUrl}/announcements?opensheet=open` })]),
-    createContent("Explore Examples", "Discover how platforms like Utterbond, Webform, and Rivyo effectively manage their roadmaps.", [
+    createContent("Explore Examples", "Discover how platforms like Utterbond, Rebolt, and Rivyo effectively manage their roadmaps.", [
         createButton("Utterbond", { redirect: "https://utterbond.quickhunt.app/roadmap" }),
-        createButton("Webform", { redirect: "https://webform.quickhunt.app/roadmap" }),
+        createButton("Rebolt", { redirect: "https://rebolt.quickhunt.app/roadmap" }),
         createButton("Rivyo", { redirect: "https://rivyo.quickhunt.app/roadmap" }),
     ]),
 ];
@@ -43,9 +43,9 @@ export const EmptyAnnounceContent = [
     createContent("Create Categories", "Group your announcements into categories such as 'Product Updates,' 'Feature Launches,' or 'Changelog' to help users find relevant information quickly.", [createButton("Create Categories", { navigateTo: `${baseUrl}/settings/categories` })]),
     createContent("Add Emoji", "Make your announcements more engaging by adding emojis to highlight key updates or set the tone for your message.", [createButton("Add Emojis", { navigateTo: `${baseUrl}/settings/emoji` })]),
     createContent("Create In-App Message", "Share announcements directly with users through in-app messages to ensure they stay informed about important updates.", [createButton("Create In-App Message", { navigateTo: `${baseUrl}/app-message/type` })]),
-    createContent("Explore Examples", "See how platforms like Utterbond, Webform, and Rivyo efficiently share announcements to keep their users informed.", [
+    createContent("Explore Examples", "See how platforms like Utterbond, Rebolt, and Rivyo efficiently share announcements to keep their users informed.", [
         createButton("Utterbond", { redirect: "https://utterbond.quickhunt.app/announcements" }),
-        createButton("Webform", { redirect: "https://webform.quickhunt.app/announcements" }),
+        createButton("Rebolt", { redirect: "https://rebolt.quickhunt.app/announcements" }),
         createButton("Rivyo", { redirect: "https://rivyo.quickhunt.app/announcements" }),
     ]),
 ];

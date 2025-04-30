@@ -70,7 +70,9 @@ const Ideas = () => {
     const [deleteRecord, setDeleteRecord] = useState(null);
     const [emptyContentBlock, setEmptyContentBlock] = useState(true);
 
-    const emptyContent = (status) => {setEmptyContentBlock(status);};
+    const emptyContent = (status) => {
+        setEmptyContentBlock(status);
+    };
 
     const openCreateIdea = () => {
         setSheetOpenCreate(true)
@@ -78,25 +80,30 @@ const Ideas = () => {
     };
 
     useEffect(() => {
-        if(getNavOpenSheet === "open"){
+        if (getNavOpenSheet === "open") {
             openCreateIdea();
         }
     }, [getNavOpenSheet])
 
-    const closeCreateIdea = () => {setSheetOpenCreate(false)};
+    const closeCreateIdea = () => {
+        setSheetOpenCreate(false)
+    };
 
     useEffect(() => {
-        if(projectDetailsReducer.id){
+        if (projectDetailsReducer.id) {
             getAllIdea(filter);
         }
-        setTopicLists( allStatusAndTypes.topics)
+    }, [projectDetailsReducer.id])
+
+    useEffect(() => {
+        setTopicLists(allStatusAndTypes.topics)
         setRoadmapStatus(allStatusAndTypes.roadmapStatus)
-        if(getNavOpenSheet) {
+        if (getNavOpenSheet) {
             navigate(`${baseUrl}/ideas?opensheet=${getNavOpenSheet}&pageNo=${pageNo}`);
         } else {
             navigate(`${baseUrl}/ideas?pageNo=${pageNo}`);
         }
-    }, [projectDetailsReducer.id, pageNo, allStatusAndTypes])
+    }, [pageNo, allStatusAndTypes])
 
     const getAllIdea = async (getFilter = {}) => {
         setLoad('list');
@@ -146,7 +153,7 @@ const Ideas = () => {
         const value = e.target.value;
         const trimmedValue = value.trim();
         if (trimmedValue || value === '') {
-            setFilter(prev => ({ ...prev, search: value }));
+            setFilter(prev => ({...prev, search: value}));
             throttledDebouncedSearch(value);
         }
     };
@@ -250,14 +257,14 @@ const Ideas = () => {
                         clone[index].vote = newVoteCount;
                         clone[index].userVote = type == 1;
                         setIdeasList(clone);
-                        toast({ description: data.message });
+                        toast({description: data.message});
                     }
                 } else {
-                    toast({ variant: "destructive", description: data.error });
+                    toast({variant: "destructive", description: data.error});
                 }
             }
         } else {
-            toast({ variant: "destructive", description: "You can't vote on admin-created ideas" });
+            toast({variant: "destructive", description: "You can't vote on admin-created ideas"});
         }
     }
 
@@ -344,7 +351,8 @@ const Ideas = () => {
                     deleteRecord={deleteRecord}
                 />
             }
-            <div className={"container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-3 md:px-4"}>
+            <div
+                className={"container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-3 md:px-4"}>
 
                 {
                     isSheetOpenCreate &&
@@ -363,7 +371,8 @@ const Ideas = () => {
                 <div className="flex flex-wrap items-center gap-2 justify-between">
                     <div className={"flex flex-col flex-1 gap-y-0.5"}>
                         <h1 className="text-2xl font-normal flex-initial w-auto">Ideas ({totalRecord})</h1>
-                        <p className={"text-sm text-muted-foreground"}>Create and display your ideas on your website and encourage users to upvote and comment with their feedback.</p>
+                        <p className={"text-sm text-muted-foreground"}>Create and display your ideas on your website and
+                            encourage users to upvote and comment with their feedback.</p>
                     </div>
                     <div className="w-full lg:w-auto flex sm:flex-nowrap flex-wrap gap-2 items-center">
                         <div className={"flex gap-2 items-center w-full lg:w-auto"}>
@@ -382,7 +391,8 @@ const Ideas = () => {
                                 className="w-full p-0"
                             >
                                 <PopoverTrigger asChild>
-                                    <Button variant="outline" size="icon" className={"w-9 h-9 "}><Filter fill="true" className='w-4 -h4' /></Button>
+                                    <Button variant="outline" size="icon" className={"w-9 h-9 "}><Filter fill="true"
+                                                                                                         className='w-4 -h4'/></Button>
                                 </PopoverTrigger>
                                 <PopoverContent className="w-full p-0" align='end'>
                                     <Command className="w-full">
@@ -391,27 +401,31 @@ const Ideas = () => {
                                             <CommandEmpty>No filter found.</CommandEmpty>
                                             {
                                                 openFilterType === 'tagId' ? <CommandGroup>
-                                                    <CommandItem onSelect={() => {setOpenFilterType('')}} className={"p-0 flex gap-2 items-center cursor-pointer p-1"}>
-                                                        <ChevronLeft className="mr-2 h-4 w-4" />
-                                                        <span className={"flex-1 w-full text-sm font-normal cursor-pointer flex gap-2 items-center"}>
+                                                    <CommandItem onSelect={() => {
+                                                        setOpenFilterType('')
+                                                    }} className={"p-0 flex gap-2 items-center cursor-pointer p-1"}>
+                                                        <ChevronLeft className="mr-2 h-4 w-4"/>
+                                                        <span
+                                                            className={"flex-1 w-full text-sm font-normal cursor-pointer flex gap-2 items-center"}>
                                                             Back
                                                         </span>
                                                     </CommandItem>
                                                     {(topicLists || []).map((x, i) => {
                                                         return (
-                                                            <CommandItem key={i} value={x.id} className={"p-0 flex gap-1 items-center cursor-pointer"}>
+                                                            <CommandItem key={i} value={x.id}
+                                                                         className={"p-0 flex gap-1 items-center cursor-pointer"}>
                                                                 <Checkbox
                                                                     className={'m-2'}
                                                                     checked={filter.tagId.includes(x.id)}
                                                                     onClick={() => {
-                                                                        handleChange({name: "tagId" , value: x.id});
+                                                                        handleChange({name: "tagId", value: x.id});
                                                                         setOpenFilter(true);
                                                                         setOpenFilterType('tagId');
                                                                     }}
                                                                 />
                                                                 <span
                                                                     onClick={() => {
-                                                                        handleChange({name: "tagId" , value: x.id});
+                                                                        handleChange({name: "tagId", value: x.id});
                                                                         setOpenFilter(true);
                                                                         setOpenFilterType('tagId');
                                                                     }}
@@ -424,33 +438,44 @@ const Ideas = () => {
                                                     })}
                                                 </CommandGroup> : openFilterType === 'roadmapStatusId' ?
                                                     <CommandGroup>
-                                                        <CommandItem onSelect={() => {setOpenFilterType('')}} className={"p-0 flex gap-2 items-center cursor-pointer p-1"}>
-                                                            <ChevronLeft className="mr-2 h-4 w-4" />
-                                                            <span className={"flex-1 w-full text-sm font-normal cursor-pointer flex gap-2 items-center"}>
+                                                        <CommandItem onSelect={() => {
+                                                            setOpenFilterType('')
+                                                        }} className={"p-0 flex gap-2 items-center cursor-pointer p-1"}>
+                                                            <ChevronLeft className="mr-2 h-4 w-4"/>
+                                                            <span
+                                                                className={"flex-1 w-full text-sm font-normal cursor-pointer flex gap-2 items-center"}>
                                                                 Back
                                                             </span>
                                                         </CommandItem>
                                                         {(roadmapStatus || []).map((x, i) => {
                                                             return (
-                                                                <CommandItem key={i} value={x.value} className={"p-0 flex gap-1 items-center cursor-pointer"}>
+                                                                <CommandItem key={i} value={x.value}
+                                                                             className={"p-0 flex gap-1 items-center cursor-pointer"}>
                                                                     <Checkbox
                                                                         className={'m-2'}
                                                                         checked={filter.roadmapStatusId.includes(x.id)}
                                                                         onClick={() => {
-                                                                            handleChange({name: "roadmapStatusId" , value: x.id});
+                                                                            handleChange({
+                                                                                name: "roadmapStatusId",
+                                                                                value: x.id
+                                                                            });
                                                                             setOpenFilter(true);
                                                                             setOpenFilterType('roadmapStatusId');
                                                                         }}
                                                                     />
                                                                     <span
                                                                         onClick={() => {
-                                                                            handleChange({name: "roadmapStatusId" , value: x.id});
+                                                                            handleChange({
+                                                                                name: "roadmapStatusId",
+                                                                                value: x.id
+                                                                            });
                                                                             setOpenFilter(true);
                                                                             setOpenFilterType('roadmapStatusId');
                                                                         }}
                                                                         className={"flex-1 w-full text-sm font-normal cursor-pointer flex gap-2 items-center capitalize"}
                                                                     >
-                                                                    <span className={"w-2.5 h-2.5 rounded-full"} style={{backgroundColor: x.colorCode}}/>
+                                                                    <span className={"w-2.5 h-2.5 rounded-full"}
+                                                                          style={{backgroundColor: x.colorCode}}/>
                                                                         {x.title}
                                                                 </span>
                                                                 </CommandItem>
@@ -458,14 +483,18 @@ const Ideas = () => {
                                                         })}
                                                     </CommandGroup> : openFilterType === 'status' ?
                                                         <CommandGroup>
-                                                            <CommandItem onSelect={() => { setOpenFilterType('') }} className={"p-0 flex gap-2 items-center cursor-pointer p-1"}>
-                                                                <ChevronLeft className="mr-2 h-4 w-4" />
-                                                                <span className={"flex-1 w-full text-sm font-normal cursor-pointer flex gap-2 items-center"}>Back</span>
+                                                            <CommandItem onSelect={() => {
+                                                                setOpenFilterType('')
+                                                            }}
+                                                                         className={"p-0 flex gap-2 items-center cursor-pointer p-1"}>
+                                                                <ChevronLeft className="mr-2 h-4 w-4"/>
+                                                                <span
+                                                                    className={"flex-1 w-full text-sm font-normal cursor-pointer flex gap-2 items-center"}>Back</span>
                                                             </CommandItem>
                                                             <RadioGroup
                                                                 value={filter.status}
                                                                 onValueChange={(value) => {
-                                                                    handleChange({ name: "status", value });
+                                                                    handleChange({name: "status", value});
                                                                     setOpenFilter(true);
                                                                     setOpenFilterType('status');
                                                                 }}
@@ -473,16 +502,20 @@ const Ideas = () => {
                                                             >
                                                                 {(filterByStatus || []).map((x, i) => {
                                                                     return (
-                                                                        <CommandItem key={i} value={x.value} className={"p-0 flex gap-1 items-center cursor-pointer"}>
+                                                                        <CommandItem key={i} value={x.value}
+                                                                                     className={"p-0 flex gap-1 items-center cursor-pointer"}>
                                                                             <RadioGroupItem
                                                                                 id={x.value}
                                                                                 value={x.value}
                                                                                 className="m-2"
-                                                                                checked={filter[x.value] == 1}
+                                                                                checked={x.value === 'isActive' ? filter[x.value] === false : filter[x.value]}
                                                                             />
                                                                             <span
                                                                                 onClick={() => {
-                                                                                    handleChange({ name: "status", value: x.value });
+                                                                                    handleChange({
+                                                                                        name: "status",
+                                                                                        value: x.value
+                                                                                    });
                                                                                     setOpenFilter(true);
                                                                                     setOpenFilterType('status');
                                                                                 }}
@@ -495,13 +528,22 @@ const Ideas = () => {
                                                             </RadioGroup>
                                                         </CommandGroup> :
                                                         <CommandGroup>
-                                                            <CommandItem onSelect={() => {setOpenFilterType('status');}}>
-                                                                <span className={"text-sm font-normal cursor-pointer"}>Status</span>
-                                                            </CommandItem>  <CommandItem onSelect={() => {setOpenFilterType('tagId');}}>
-                                                            <span className={"text-sm font-normal cursor-pointer"}>Topics</span>
+                                                            <CommandItem onSelect={() => {
+                                                                setOpenFilterType('status');
+                                                            }}>
+                                                                <span
+                                                                    className={"text-sm font-normal cursor-pointer"}>Status</span>
+                                                            </CommandItem> <CommandItem onSelect={() => {
+                                                            setOpenFilterType('tagId');
+                                                        }}>
+                                                            <span
+                                                                className={"text-sm font-normal cursor-pointer"}>Topics</span>
                                                         </CommandItem>
-                                                            <CommandItem onSelect={() => {setOpenFilterType('roadmapStatusId');}}>
-                                                                <span className={"text-sm font-normal cursor-pointer"}>Roadmap</span>
+                                                            <CommandItem onSelect={() => {
+                                                                setOpenFilterType('roadmapStatusId');
+                                                            }}>
+                                                                <span
+                                                                    className={"text-sm font-normal cursor-pointer"}>Roadmap</span>
                                                             </CommandItem>
                                                         </CommandGroup>
                                             }
@@ -510,17 +552,23 @@ const Ideas = () => {
                                 </PopoverContent>
                             </Popover>
                         </div>
-                        <Button className={"gap-2 font-medium hover:bg-primary"} onClick={openCreateIdea}><Plus size={20} strokeWidth={3}/><span className={"text-xs md:text-sm font-medium"}>Create Idea</span></Button>
+                        <Button className={"gap-2 font-medium hover:bg-primary"} onClick={openCreateIdea}><Plus
+                            size={20} strokeWidth={3}/><span
+                            className={"text-xs md:text-sm font-medium"}>Create Idea</span></Button>
                     </div>
                 </div>
                 {
-                    (filter?.tagId?.length > 0 || filter?.roadmapStatusId?.length > 0 || filter?.isArchive || filter?.isActive === false) && <div className="flex flex-wrap gap-2 my-6">
+                    (filter?.tagId?.length > 0 || filter?.roadmapStatusId?.length > 0 || filter?.isArchive || filter?.isActive === false) &&
+                    <div className="flex flex-wrap gap-2 my-6">
                         {
-                            (filter.tagId || []).map((data,index) =>{
+                            (filter.tagId || []).map((data) => {
                                 const findTopic = (topicLists || []).find((tagId) => tagId.id === data);
-                                return(
-                                    <Badge key={`selected-${findTopic.id}`} variant="outline" className="rounded p-0 font-medium"><span className="px-3 py-1.5 border-r">{findTopic.title}</span>
-                                        <span className="w-7 h-7 flex items-center justify-center cursor-pointer" onClick={() => handleChange({name: "tagId" , value: data})}>
+                                return (
+                                    <Badge key={`selected-${findTopic.id}`} variant="outline"
+                                           className="rounded p-0 font-medium"><span
+                                        className="px-3 py-1.5 border-r">{findTopic.title}</span>
+                                        <span className="w-7 h-7 flex items-center justify-center cursor-pointer"
+                                              onClick={() => handleChange({name: "tagId", value: data})}>
                                                 <X className='w-4 h-4'/>
                                             </span>
                                     </Badge>
@@ -528,15 +576,18 @@ const Ideas = () => {
                             })
                         }
                         {
-                            (filter.roadmapStatusId || []).map((data,index) =>{
+                            (filter.roadmapStatusId || []).map((data, index) => {
                                 const findRoadmap = (roadmapStatus || []).find((roadmapStatusId) => roadmapStatusId.id === data);
-                                return(
-                                    <Badge key={`selected-${findRoadmap.id}`} variant="outline" className="rounded p-0 font-medium">
+                                return (
+                                    <Badge key={`selected-${findRoadmap.id}`} variant="outline"
+                                           className="rounded p-0 font-medium">
                                             <span className="px-3 py-1.5 border-r flex gap-2 items-center">
-                                                <span className={"w-2.5 h-2.5  rounded-full"} style={{backgroundColor: findRoadmap.colorCode}}/>
+                                                <span className={"w-2.5 h-2.5  rounded-full"}
+                                                      style={{backgroundColor: findRoadmap.colorCode}}/>
                                                 {findRoadmap.title}
                                             </span>
-                                        <span className="w-7 h-7 flex items-center justify-center cursor-pointer" onClick={() => handleChange({name: "roadmapStatusId" , value: data})}>
+                                        <span className="w-7 h-7 flex items-center justify-center cursor-pointer"
+                                              onClick={() => handleChange({name: "roadmapStatusId", value: data})}>
                                                 <X className='w-4 h-4'/>
                                             </span>
                                     </Badge>
@@ -545,18 +596,22 @@ const Ideas = () => {
                         }
                         {
                             filter.isArchive &&
-                            <Badge key={`selected-${filter.isArchive}`} variant="outline" className="rounded p-0 font-medium">
+                            <Badge key={`selected-${filter.isArchive}`} variant="outline"
+                                   className="rounded p-0 font-medium">
                                 <span className="px-3 py-1.5 border-r">Archived</span>
-                                <span className="w-7 h-7 flex items-center justify-center cursor-pointer" onClick={() =>  handleChange({name: "status" , value: "isArchive"})}>
+                                <span className="w-7 h-7 flex items-center justify-center cursor-pointer"
+                                      onClick={() => handleChange({name: "status", value: "isArchive"})}>
                                         <X className='w-4 h-4'/>
                                     </span>
                             </Badge>
                         }
                         {
                             filter.isActive === false &&
-                            <Badge key={`selected-${filter.isActive === false}`} variant="outline" className="rounded p-0 font-medium">
+                            <Badge key={`selected-${filter.isActive === false}`} variant="outline"
+                                   className="rounded p-0 font-medium">
                                 <span className="px-3 py-1.5 border-r">Bugs</span>
-                                <span className="w-7 h-7 flex items-center justify-center cursor-pointer" onClick={() =>  handleChange({name: "status" , value: "isActive"})}>
+                                <span className="w-7 h-7 flex items-center justify-center cursor-pointer"
+                                      onClick={() => handleChange({name: "status", value: "isActive"})}>
                                         <X className='w-4 h-4'/>
                                     </span>
                             </Badge>
@@ -579,13 +634,15 @@ const Ideas = () => {
                                                             variant={"outline"}
                                                             onClick={() => giveVote(x, 1)}
                                                         >
-                                                            <ArrowBigUp size={15} className={"fill-primary stroke-primary"}/>
+                                                            <ArrowBigUp size={15}
+                                                                        className={"fill-primary stroke-primary"}/>
                                                         </Button>
                                                         <p className={"text-base md:text-xl font-normal"}>{x.vote}</p>
                                                     </div>
                                                     <div className={"flex flex-col w-full gap-3 max-w-[1045px]"}>
                                                         <div className={"flex flex-col gap-3"}>
-                                                            <div className={"flex flex-wrap items-center justify-between gap-3"}>
+                                                            <div
+                                                                className={"flex flex-wrap items-center justify-between gap-3"}>
                                                                 <div
                                                                     className={"flex flex-wrap items-center gap-1 cursor-pointer xl:gap-3"}
                                                                     onClick={() => openDetailsSheet(x)}
@@ -594,7 +651,8 @@ const Ideas = () => {
                                                                     <div className={"flex gap-2 items-center"}>
                                                                         <h4 className={"text-xs font-normal text-muted-foreground"}>{x.name ? x.name : x?.userName}</h4>
                                                                         <p className={"text-xs font-normal flex items-center text-muted-foreground"}>
-                                                                            <Dot size={20} className={"fill-text-card-foreground stroke-text-card-foreground"}/>
+                                                                            <Dot size={20}
+                                                                                 className={"fill-text-card-foreground stroke-text-card-foreground"}/>
                                                                             {moment(x.createdAt).format('D MMM')}
                                                                         </p>
                                                                     </div>
@@ -602,7 +660,8 @@ const Ideas = () => {
                                                                         className={"flex items-center gap-1 sm:gap-2 cursor-pointer"}
                                                                         onClick={() => openDetailsSheet(x)}
                                                                     >
-                                                                        <span><MessageCircleMore size={16} className={"stroke-primary"}/></span>
+                                                                        <span><MessageCircleMore size={16}
+                                                                                                 className={"stroke-primary"}/></span>
                                                                         <p className={"text-base font-normal"}>
                                                                             {x?.commentCount}
                                                                         </p>
@@ -613,13 +672,19 @@ const Ideas = () => {
                                                                         (x && x?.tags && x?.tags?.length) ? (
                                                                             <Popover>
                                                                                 <PopoverTrigger asChild>
-                                                                                    <Button variant={"ghost hove:none"} className={"p-0 h-[24px]"}>
-                                                                                        <div className={"flex justify-between items-center"}>
-                                                                                            <div className={"text-sm text-center"}>
-                                                                                                <div className={`flex flex-wrap gap-2`}>
+                                                                                    <Button variant={"ghost hove:none"}
+                                                                                            className={"p-0 h-[24px]"}>
+                                                                                        <div
+                                                                                            className={"flex justify-between items-center"}>
+                                                                                            <div
+                                                                                                className={"text-sm text-center"}>
+                                                                                                <div
+                                                                                                    className={`flex flex-wrap gap-2`}>
                                                                                                     {
                                                                                                         x?.tags?.slice(0, 1).map((tagId, i) => (
-                                                                                                            <div className={"text-sm font-normal"} key={i}>
+                                                                                                            <div
+                                                                                                                className={"text-sm font-normal"}
+                                                                                                                key={i}>
                                                                                                                 {tagId?.title}
                                                                                                             </div>
                                                                                                         ))
@@ -638,16 +703,21 @@ const Ideas = () => {
                                                                                         </div>
                                                                                     </Button>
                                                                                 </PopoverTrigger>
-                                                                                <PopoverContent className="p-0" align={"start"}>
+                                                                                <PopoverContent className="p-0"
+                                                                                                align={"start"}>
                                                                                     <div className={""}>
                                                                                         <div className={"py-3 px-4"}>
                                                                                             <h4 className="font-normal leading-none text-sm">{`Topics (${x?.tags?.length})`}</h4>
                                                                                         </div>
-                                                                                        <div className="border-t px-4 py-3 space-y-2">
+                                                                                        <div
+                                                                                            className="border-t px-4 py-3 space-y-2">
                                                                                             {x.tags && x.tags.length > 0 && (
-                                                                                                <div className="space-y-2">
+                                                                                                <div
+                                                                                                    className="space-y-2">
                                                                                                     {x.tags.map((y, i) => (
-                                                                                                        <div className="text-sm font-normal" key={i}>
+                                                                                                        <div
+                                                                                                            className="text-sm font-normal"
+                                                                                                            key={i}>
                                                                                                             {y?.title}
                                                                                                         </div>
                                                                                                     ))}
@@ -662,9 +732,11 @@ const Ideas = () => {
                                                                     <Select
                                                                         onValueChange={(value) => handleStatusUpdate("roadmapStatusId", value, i, x)}
                                                                         value={x.roadmapStatusId !== "" ? x.roadmapStatusId : null}>
-                                                                        <SelectTrigger className="md:w-[200px] w-[170px] h-8 bg-card">
+                                                                        <SelectTrigger
+                                                                            className="md:w-[200px] w-[170px] h-8 bg-card">
                                                                             <SelectValue>
-                                                                                {x.roadmapStatusId ?  <div className="flex items-center gap-2">
+                                                                                {x.roadmapStatusId ? <div
+                                                                                    className="flex items-center gap-2">
                                                                                     <Circle
                                                                                         fill={
                                                                                             allStatusAndTypes.roadmapStatus.find((status) => status.id === x.roadmapStatusId)?.colorCode
@@ -674,7 +746,8 @@ const Ideas = () => {
                                                                                         }
                                                                                         className="w-[10px] h-[10px]"
                                                                                     />
-                                                                                    <span className={"max-w-[100px] truncate text-ellipsis overflow-hidden whitespace-nowrap"}>{allStatusAndTypes.roadmapStatus.find((status) => status.id === x.roadmapStatusId)?.title ?? "No status"}</span>
+                                                                                    <span
+                                                                                        className={"max-w-[100px] truncate text-ellipsis overflow-hidden whitespace-nowrap"}>{allStatusAndTypes.roadmapStatus.find((status) => status.id === x.roadmapStatusId)?.title ?? "No status"}</span>
                                                                                 </div> : (
                                                                                     <span className="text-gray-500">No status</span>
                                                                                 )}
@@ -683,7 +756,10 @@ const Ideas = () => {
                                                                         <SelectContent>
                                                                             <SelectGroup>
                                                                                 <SelectItem value={null}>
-                                                                                    <div className={"flex items-center gap-2"}>No status</div>
+                                                                                    <div
+                                                                                        className={"flex items-center gap-2"}>No
+                                                                                        status
+                                                                                    </div>
                                                                                 </SelectItem>
                                                                                 {
                                                                                     (allStatusAndTypes.roadmapStatus || []).map((x, i) => {
@@ -724,7 +800,8 @@ const Ideas = () => {
                                                                             Archive
                                                                         </Badge>
                                                                     }
-                                                                    {x.pinToTop == 1 && <Pin size={16} className={`fill-card-foreground`}/>}
+                                                                    {x.pinToTop == 1 &&
+                                                                    <Pin size={16} className={`fill-card-foreground`}/>}
                                                                     <DropdownMenu>
                                                                         <DropdownMenuTrigger>
                                                                             <Ellipsis size={16}/>
@@ -750,9 +827,12 @@ const Ideas = () => {
                                                                     </DropdownMenu>
                                                                 </div>
                                                             </div>
-                                                            <div className={"description-container text-sm text-muted-foreground"}>
+                                                            <div
+                                                                className={"description-container text-sm text-muted-foreground"}>
                                                                 {
-                                                                    <DisplayReactQuill value={x.description} /> ? <ReadMoreText html={x.description} maxLength={300}/> : null
+                                                                    <DisplayReactQuill value={x.description}/> ?
+                                                                        <ReadMoreText html={x.description}
+                                                                                      maxLength={300}/> : null
                                                                 }
                                                             </div>
                                                         </div>
@@ -779,7 +859,8 @@ const Ideas = () => {
                 </Card>
                 {
                     (load === "search" || load === "list" || !emptyContentBlock) ? "" :
-                        <EmptyDataContent data={EmptyIdeaContent} onClose={() => emptyContent(false)} setSheetOpenCreate={openCreateIdea}/>
+                        <EmptyDataContent data={EmptyIdeaContent} onClose={() => emptyContent(false)}
+                                          setSheetOpenCreate={openCreateIdea}/>
                 }
             </div>
         </Fragment>

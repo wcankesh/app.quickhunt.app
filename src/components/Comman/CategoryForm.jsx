@@ -4,6 +4,7 @@ import {Input} from "../ui/input";
 import ReactQuillEditor from "./ReactQuillEditor";
 import {CircleX, Loader2, Upload} from "lucide-react";
 import {Button} from "../ui/button";
+import {DO_SPACES_ENDPOINT} from "../../utils/constent";
 
 const CategoryForm = ({ selectedData, setSelectedData, formError, setFormError, handleImageUpload, handleSubmit, isLoading, closeSheet, saveTitle, className }) => {
     const handleOnChange = (name, value) => {
@@ -61,7 +62,7 @@ const CategoryForm = ({ selectedData, setSelectedData, formError, setFormError, 
                             <div className={"w-[282px] h-[128px] relative border p-[5px]"}>
                                 <img
                                     className={"upload-img"}
-                                    src={selectedData?.image?.name ? URL.createObjectURL(selectedData?.image) : selectedData?.image}
+                                    src={selectedData?.image?.name ? URL.createObjectURL(selectedData?.image) : `${DO_SPACES_ENDPOINT}/${selectedData?.image}`}
                                     alt=""
                                 />
                                 <CircleX

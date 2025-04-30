@@ -318,7 +318,7 @@ const Category = () => {
         const updatedData = {
             ...data,
             deleteImage: data?.image
-                ? data.image.replace("https://code.quickhunt.app/public/storage/post/", "")
+                ? data.image
                 : ""
         };
         setSelectedCategory(id ? updatedData : initialState);
@@ -330,7 +330,7 @@ const Category = () => {
         const updatedData = {
             ...data,
             deleteImage: data?.image
-                ? data.image.replace("https://code.quickhunt.app/public/storage/post/", "")
+                ? data.image
                 : ""
         };
         setSelectedSubCategory(id ? updatedData : initialState);

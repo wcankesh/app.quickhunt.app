@@ -1,6 +1,6 @@
 import React, {useEffect, useState, Fragment} from 'react';
 import {Sheet, SheetContent, SheetHeader, SheetTitle,} from "../ui/sheet";
-import {CalendarIcon, Check, Circle, Pin, X, Loader2, CircleX, Upload} from "lucide-react";
+import {CalendarIcon, Check, Circle, Pin, X, Loader2} from "lucide-react";
 import {Label} from "../ui/label";
 import {Input} from "../ui/input";
 import {Button} from "../ui/button";
@@ -26,8 +26,6 @@ const initialState = {
     pinTop: 0,
     expiredBoolean: 0,
     expiredAt: undefined,
-    // post_browser: '',
-    // post_ip_address: '',
     categoryId: "",
     labelId: [],
     image: '',
@@ -38,7 +36,7 @@ const initialStateError = {
     slug: "",
 }
 
-const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPosts, announcementList}) => {
+const CreateAnnouncement = ({isOpen, onOpen, onClose, getAllPosts, announcementList}) => {
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
     const userDetailsReducer = useSelector(state => state.userDetailsReducer);
@@ -183,10 +181,6 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
             }));
         }
         setChangeLogDetails(updatedDetails);
-        // setFormError((formError) => ({
-        //     ...formError,
-        //     [name]: formValidate(name, value)
-        // }));
     };
 
     const onChangeCategory = (selectedItems) => {
@@ -197,31 +191,15 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
         setChangeLogDetails({...changeLogDetails, [name]: value})
     }
 
-    // const onDateChange = (name, date) => {
-    //     if (date) {
-    //         let obj = {...changeLogDetails, [name]: date};
-    //         if (name === "publishedAt") {
-    //             if (date > new Date()) {
-    //                 obj = {...obj, post_status: 2}
-    //             } else {
-    //                 obj = {...obj, post_status: 1}
-    //             }
-    //         }
-    //         setChangeLogDetails(obj);
-    //         setPopoverOpen(false);
-    //         setPopoverOpenExpired(false);
-    //     }
-    // };
-
     const onDateChange = (name, date) => {
         if (date) {
             const formattedDate = new Date(date);
             let obj = { ...changeLogDetails, [name]: formattedDate };
             if (name === "publishedAt") {
                 if (formattedDate > new Date()) {
-                    obj = { ...obj, status: 2 }; // Future date
+                    obj = { ...obj, status: 2 };
                 } else {
-                    obj = { ...obj, status: 1 }; // Past or current date
+                    obj = { ...obj, status: 1 };
                 }
             }
             setChangeLogDetails(obj);
@@ -247,7 +225,7 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
             return;
         }
 
-        const isSlugTaken = (announcementList.data || []).some(x => x.slug === changeLogDetails.slug);
+        const isSlugTaken = (announcementList || []).some(x => x.slug === changeLogDetails.slug);
         if (isSlugTaken) {
             toast({description: "The post slug url has already been taken.", variant: "destructive",});
             return;
@@ -304,13 +282,6 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
     }
 
     const handleValueChange = (value) => {
-        // const clone = [...changeLogDetails.assignToId]
-        // const index = clone.indexOf(value);
-        // if (index > -1) {
-        //     clone.splice(index, 1);
-        // } else {
-        //     clone.push(value);
-        // }
         setChangeLogDetails({...changeLogDetails, assignToId: [value]});
     };
 
@@ -358,7 +329,6 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
                         <span className={"max-w-6"}><X onClick={onClose} className={"cursor-pointer"}/></span>
                     </div>
                 </SheetHeader>
-                {/*<div className={"h-[calc(100vh_-_120px)] lg:h-[calc(100vh_-_69px)] overflow-y-auto"}>*/}
                 <div className={"h-[calc(100vh_-_61px)] overflow-y-auto"}>
                     <div className={"px-3 py-6 lg:px-8 border-b"}>
                         <div className={"flex flex-col gap-6"}>
@@ -532,7 +502,6 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
                                             variant={"outline"}
                                             className={"justify-between hover:bg-card text-left font-normal d-flex px-3 h-9 text-muted-foreground hover:text-muted-foreground bg-card"}
                                         >
-                                            {/*{moment(changeLogDetails.publishedAt).format("LL")}*/}
                                             {changeLogDetails.publishedAt
                                                 ? moment(changeLogDetails.publishedAt).format("LL")
                                                 : "Select Date"}
@@ -568,49 +537,6 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
                                     onDeleteImg={onDeleteImg}
                                     handleFileChange={handleFileChange}
                                 />
-                                {/*{*/}
-                                {/*    changeLogDetails?.image ?*/}
-                                {/*        <div>*/}
-                                {/*            {changeLogDetails && changeLogDetails.image && changeLogDetails.image.name ?*/}
-                                {/*                <div className={"w-[282px] h-[128px] relative border p-[5px]"}>*/}
-                                {/*                    <img*/}
-                                {/*                        className={"upload-img"}*/}
-                                {/*                        src={changeLogDetails && changeLogDetails.image && changeLogDetails.image.name ? URL.createObjectURL(changeLogDetails.image) : changeLogDetails.image}*/}
-                                {/*                        alt=""*/}
-                                {/*                    />*/}
-                                {/*                    <CircleX*/}
-                                {/*                        size={20}*/}
-                                {/*                        className={`light:text-muted-foreground dark:text-card cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}*/}
-                                {/*                        onClick={() => onDeleteImg('deleteImage', changeLogDetails && changeLogDetails?.image && changeLogDetails.image?.name ? "" : changeLogDetails.image.replace("https://code.quickhunt.app/public/storage/post/", ""))}*/}
-                                {/*                    />*/}
-                                {/*                </div> :*/}
-                                {/*                <div className={"w-[282px] h-[128px] relative border p-[5px]"}>*/}
-                                {/*                    <img className={"upload-img"} src={changeLogDetails.image}*/}
-                                {/*                         alt=""/>*/}
-                                {/*                    <CircleX*/}
-                                {/*                        size={20}*/}
-                                {/*                        className={`light:text-muted-foreground dark:text-card cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10`}*/}
-                                {/*                        onClick={() => onDeleteImg('deleteImage', changeLogDetails && changeLogDetails?.image && changeLogDetails.image?.name ? "" : changeLogDetails.image.replace("https://code.quickhunt.app/public/storage/post/", ""))}*/}
-                                {/*                    />*/}
-                                {/*                </div>*/}
-                                {/*            }*/}
-                                {/*        </div> :*/}
-                                {/*        <div>*/}
-                                {/*            <input*/}
-                                {/*                id="pictureInput"*/}
-                                {/*                type="file"*/}
-                                {/*                className="hidden"*/}
-                                {/*                accept={"image/*"}*/}
-                                {/*                onChange={handleFileChange}*/}
-                                {/*            />*/}
-                                {/*            <label*/}
-                                {/*                htmlFor="pictureInput"*/}
-                                {/*                className="border-dashed w-[282px] h-[128px] py-[52px] flex items-center justify-center bg-muted border border-muted-foreground rounded cursor-pointer"*/}
-                                {/*            >*/}
-                                {/*                <Upload className="h-4 w-4 text-muted-foreground" />*/}
-                                {/*            </label>*/}
-                                {/*        </div>*/}
-                                {/*}*/}
                             </div>
                             {formError.image && <div className={"text-xs text-destructive"}>{formError.image}</div>}
                         </div>
@@ -644,12 +570,8 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, selectedRecord, getAllPost
                                                     mode="single"
                                                     showOutsideDays={false}
                                                     captionLayout="dropdown"
-                                                    // selected={changeLogDetails.expiredAt}
                                                     selected={changeLogDetails?.expiredAt ? new Date(changeLogDetails.expiredAt) : null}
                                                     onSelect={(date) => onDateChange("expiredAt", date)}
-                                                    // startMonth={new Date(2024, 0)}
-                                                    // endMonth={new Date(2050, 12)}
-
                                                     endMonth={new Date(2050, 12)}
                                                     startMonth={publishDate || new Date()}
                                                     disabled={isDateDisabled}

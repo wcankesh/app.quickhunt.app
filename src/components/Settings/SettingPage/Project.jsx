@@ -11,7 +11,6 @@ import {apiService, DO_SPACES_ENDPOINT, setProjectDetails} from "../../../utils/
 import {toast} from "../../ui/use-toast";
 import {CircleX, Loader2} from "lucide-react";
 import DeleteDialog from "../../Comman/DeleteDialog";
-import {useNavigate} from "react-router-dom";
 
 const initialState = {
     name: '',
@@ -34,7 +33,6 @@ const initialStateError = {
 
 const Project = () => {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const allProjectReducer = useSelector(state => state.allProjectReducer);
     const userDetailsReducer = useSelector(state => state.userDetailsReducer);
@@ -200,8 +198,6 @@ const Project = () => {
         }
         setOpenDelete(false);
     }
-
-    console.log(allProjectReducer.projectList)
 
     return (
         <Card>

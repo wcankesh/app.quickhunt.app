@@ -6,7 +6,5 @@ export const projectDetailsAction = (objValues) => {
             type: SET_PROJECT_DETAILS,
             payload: objValues
         }
-
     )
-
 };
