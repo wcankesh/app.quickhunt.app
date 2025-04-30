@@ -95,7 +95,7 @@ const Roadmap = () => {
         if (data.success) {
            // toast({ description: data.message });
         } else {
-            toast({ variant: "destructive", description: data.message });
+            toast({ variant: "destructive", description: data?.error?.message });
         }
     };
 

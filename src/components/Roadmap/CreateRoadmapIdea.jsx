@@ -19,8 +19,16 @@ const initialStateError = {
     boardId: ""
 }
 
-const CreateRoadmapIdea = ({isOpen, onOpen, onClose, closeCreateIdea, selectedRoadmap, roadmapList, setRoadmapList,}) => {
-    const { toast } = useToast()
+const CreateRoadmapIdea = ({
+                               isOpen,
+                               onOpen,
+                               onClose,
+                               closeCreateIdea,
+                               selectedRoadmap,
+                               roadmapList,
+                               setRoadmapList,
+                           }) => {
+    const {toast} = useToast()
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
 
@@ -30,7 +38,7 @@ const CreateRoadmapIdea = ({isOpen, onOpen, onClose, closeCreateIdea, selectedRo
     const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
-        if(projectDetailsReducer.id){
+        if (projectDetailsReducer.id) {
             setTopicLists(allStatusAndTypes.topics)
             setIdeaDetail({...initialState, boardId: allStatusAndTypes?.boards[0]?.id})
         }
@@ -44,7 +52,7 @@ const CreateRoadmapIdea = ({isOpen, onOpen, onClose, closeCreateIdea, selectedRo
         } else {
             clone.push(id);
         }
-        setIdeaDetail({ ...ideaDetail, topicId: clone });
+        setIdeaDetail({...ideaDetail, topicId: clone});
     };
 
     const onCreateIdea = async () => {
@@ -63,34 +71,30 @@ const CreateRoadmapIdea = ({isOpen, onOpen, onClose, closeCreateIdea, selectedRo
         setIsLoading(true)
         let formData = new FormData();
         formData.append('title', ideaDetail.title);
-        formData.append('slugUrl', ideaDetail.title ? ideaDetail.title.replace(/ /g,"-").replace(/\?/g, "-") :"");
+        formData.append('slugUrl', ideaDetail.title ? ideaDetail.title.replace(/ /g, "-").replace(/\?/g, "-") : "");
         formData.append('description', ideaDetail.description);
         formData.append('projectId', projectDetailsReducer.id);
         formData.append('boardId', ideaDetail.boardId);
-        // formData.append('topicId', ideaDetail.topicId.join());
         ideaDetail.topicId.forEach(id => {
             formData.append('topicId[]', id);
         });
         formData.append('roadmapStatusId', selectedRoadmap && selectedRoadmap ? selectedRoadmap : "");
         const data = await apiService.createIdea(formData)
-        if(data.success){
+        setIsLoading(false)
+        if (data.success) {
             let cloneRoadmap = [...roadmapList.columns];
-            // cloneRoadmap.push(data.data);
             const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap);
-            if(roadmapIndex !== -1) {
+            if (roadmapIndex !== -1) {
                 const cloneIdea = [...cloneRoadmap[roadmapIndex].ideas];
                 cloneIdea.unshift(data.data);
                 cloneRoadmap[roadmapIndex] = {...cloneRoadmap[roadmapIndex], ideas: cloneIdea, cards: cloneIdea}
             }
-            setIsLoading(false)
             setIdeaDetail(initialState)
             setRoadmapList({columns: cloneRoadmap});
-            // closeCreateIdea()
             onClose()
             toast({description: data.message})
         } else {
-            setIsLoading(false)
-            toast({description: data.message,variant: "destructive" })
+            toast({description: data?.error?.message, variant: "destructive"})
         }
     }
 

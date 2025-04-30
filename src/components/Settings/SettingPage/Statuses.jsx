@@ -135,7 +135,7 @@ const Statuses = () => {
         } else {
             setIsSave(false)
             toast({
-                description:data?.message,
+                description:data?.error?.message,
                 variant: "destructive",
             })
         }
@@ -304,12 +304,7 @@ const Statuses = () => {
                 toast({
                     description:data.message
                 })
-            } else if(data.status === 201){
-                toast({
-                    description:data.message,
-                    variant: "destructive"
-                });
-            } else {
+            }else {
                 toast({
                     description:data?.error.message,
                     variant: "destructive"

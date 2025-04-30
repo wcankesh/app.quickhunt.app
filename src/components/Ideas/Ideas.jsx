@@ -260,7 +260,7 @@ const Ideas = () => {
                         toast({description: data.message});
                     }
                 } else {
-                    toast({variant: "destructive", description: data.error});
+                    toast({variant: "destructive", description: data?.error?.message});
                 }
             }
         } else {
@@ -328,7 +328,7 @@ const Ideas = () => {
                 setDeleteRecord(null)
                 toast({description: data.message});
             } else {
-                toast({variant: "destructive", description: data.message});
+                toast({variant: "destructive", description: data?.error?.message});
             }
         }
     };

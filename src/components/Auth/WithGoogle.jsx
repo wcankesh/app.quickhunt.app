@@ -79,7 +79,7 @@ const WithGoogle = ({title}) => {
             setIsLoading(false)
         } else {
             setIsLoading(false)
-            toast({variant: "destructive", description: data.message})
+            toast({variant: "destructive", description: data?.error?.message})
             signOut()
         }
     };

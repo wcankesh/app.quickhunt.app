@@ -82,11 +82,11 @@ const CreateIdea = ({isOpen, onOpen, onClose, closeCreateIdea, setIdeasList, ide
             formData.append('topicId[]', id);
         });
         const data = await apiService.createIdea(formData)
+        setIsLoading(false)
         if(data.success){
             const clone = [...ideasList];
             clone.push(data.data)
             setIdeasList(clone);
-            setIsLoading(false)
             setIdeaDetail(initialState)
             const cloneInbox = [...inboxMarkReadReducer];
             cloneInbox.push({...data.data, isRead: 1})
@@ -96,8 +96,7 @@ const CreateIdea = ({isOpen, onOpen, onClose, closeCreateIdea, setIdeasList, ide
             navigate(`${baseUrl}/ideas?pageNo=${pageNo}`);
             toast({description: data.message})
         } else {
-            setIsLoading(false)
-            toast({description: data.error, variant: "destructive" })
+            toast({description: data?.error?.message, variant: "destructive"})
         }
     }
 

@@ -313,13 +313,10 @@ const Users = () => {
             limit: perPageLimit
         }
         const data = await apiService.userAction(payload);
+        setIsLoadingUserDetail(false)
         if(data.success) {
             setUserActions(Array.isArray(data.data) ? data.data : []);
             setTotalRecordAction(data.data.total)
-            // toast({description: data.message,});
-            setIsLoadingUserDetail(false)
-        } else {
-            // toast({description:data.message, variant: "destructive",})
         }
     }
 

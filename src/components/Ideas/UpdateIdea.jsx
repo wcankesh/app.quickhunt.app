@@ -293,7 +293,7 @@ const UpdateIdea = () => {
                 await getIdeaVotes('delete', clone);
             }
         } else {
-            toast({description: data.message, variant: "destructive",});
+            toast({description: data?.error?.message, variant: "destructive",});
         }
         setIsLoading(false);
     };
@@ -572,7 +572,7 @@ const UpdateIdea = () => {
             setIsLoading(false)
             setIsLoadingBug(false)
             setIsLoadingArchive(false)
-            toast({variant: "destructive", description: data.message})
+            toast({variant: "destructive", description: data?.error?.message})
         }
     }
 
