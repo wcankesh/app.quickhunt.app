@@ -36,7 +36,7 @@ const Announcements = () => {
 
     const [announcementList, setAnnouncementList] = useState([]);
     const [selectedRecord, setSelectedRecord] = useState({})
-    const [filter, setFilter] = useState({...initialStateFilter, projectId: projectDetailsReducer.id});
+    const [filter, setFilter] = useState({...initialStateFilter});
     const [pageNo, setPageNo] = useState(Number(getPageNo));
     const [openFilterType, setOpenFilterType] = useState('');
     const [openFilter, setOpenFilter] = useState('');
@@ -97,14 +97,13 @@ const Announcements = () => {
         debounce((value) => {
             const updatedFilter = {
                 ...filter,
-                projectId: projectDetailsReducer.id,
                 search: value,
                 page: 1,
             };
             setFilter(updatedFilter);
             getAllPosts(updatedFilter);
         }, 500),
-        []
+        [projectDetailsReducer.id]
     );
 
     const onChangeSearch = (e) => {

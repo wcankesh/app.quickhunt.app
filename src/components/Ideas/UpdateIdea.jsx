@@ -354,7 +354,12 @@ const UpdateIdea = () => {
                 ...data.data, isRead: 1,
                 comments: data.data.comments.map(comment => ({
                     ...comment,
-                    isRead: 1
+                    isRead: 1,
+                    isEdited: false,
+                    reply: comment.reply ? comment.reply.map(subComment => ({
+                        ...subComment,
+                        isEdited: false
+                    })) : []
                 }))
             }
             setSelectedIdea(ideaData)
@@ -370,7 +375,7 @@ const UpdateIdea = () => {
     }
 
     const handleChangeTopic = (id) => {
-        const clone = [...selectedIdea.tags];
+        const clone = [...selectedIdea.topic];
         const index = clone.findIndex(item => item.id === id);
         if (index !== -1) {
             clone.splice(index, 1);
@@ -380,7 +385,7 @@ const UpdateIdea = () => {
                 clone.push(topicToAdd);
             }
         }
-        setSelectedIdea({...selectedIdea, tags: clone});
+        setSelectedIdea({...selectedIdea, topic: clone});
     };
 
     const giveVote = async (type) => {
@@ -515,14 +520,18 @@ const UpdateIdea = () => {
 
     const handleAddCommentImg = (event) => {
         const files = Array.from(event.target.files);
+        const validFiles = files.filter(file => file.size <= 5 * 1024 * 1024);
+        if (validFiles.length < files.length) {
+            toast({variant: "destructive", description: 'File exceeded the 5MB limit.'})
+        }
         if (selectedComment && selectedComment.id) {
-            const clone = [...selectedComment.images, ...files];
+            const clone = [...selectedComment.images, ...validFiles];
             setSelectedComment({
                 ...selectedComment,
                 images: clone,
             });
         } else {
-            setCommentFiles([...commentFiles, ...files]);
+            setCommentFiles(prev => [...prev, ...validFiles]);
         }
         event.target.value = "";
     };
@@ -678,7 +687,7 @@ const UpdateIdea = () => {
         setIsSaveUpdateComment(false)
         if (data.success) {
             let updatedImages = Array.isArray(data.data.images) ? data.data.images : [];
-            let obj = {...selectedComment, images: updatedImages};
+            let obj = {...selectedComment, images: updatedImages, isEdited: true};
             const cloneComment = [...selectedIdea.comments];
             cloneComment[selectedCommentIndex] = obj;
             let selectedIdeaObj = {...selectedIdea, comments: cloneComment}
@@ -710,7 +719,7 @@ const UpdateIdea = () => {
             const commentIndex = ((selectedIdea.comments) || []).findIndex((x) => x.id === selectedComment.id);
             if (commentIndex !== -1) {
                 const cloneComment = [...selectedIdea.comments];
-                cloneComment[commentIndex].reply[selectedSubCommentIndex] = data.data;
+                cloneComment[commentIndex].reply[selectedSubCommentIndex] = {...data.data, isEdited: true};
                 let selectedIdeaObj = {...selectedIdea, comments: cloneComment}
                 setSelectedIdea(selectedIdeaObj)
             }
@@ -722,7 +731,7 @@ const UpdateIdea = () => {
             setIsSaveUpdateSubComment(false)
             toast({description: data.message})
         } else {
-            toast({variant: "destructive", description: data.message})
+            toast({variant: "destructive", description: data?.error?.message})
             setIsSaveUpdateSubComment(false)
         }
     }
@@ -823,18 +832,18 @@ const UpdateIdea = () => {
         }
         setIsLoadingCreateIdea(true)
         let formData = new FormData();
-        let topics = [];
+        let topics = (selectedIdea.topic || []).map(x => x.id).filter(id => id != null);
 
-        (selectedIdea.tags || []).map((x) => {
-            topics.push(x.id)
-        })
         formData.append('title', selectedIdea.title);
         formData.append('boardId', selectedIdea.boardId);
         formData.append('slugUrl', selectedIdea.title ? selectedIdea.title.replace(/ /g, "-").replace(/\?/g, "-") : "");
         formData.append('description', selectedIdea.description ? selectedIdea.description : "");
-        topics.forEach(id => {
-            formData.append('topicId[]', id);
-        });
+
+        if (topics.length > 0) {
+            topics.forEach(id => formData.append('topicId[]', id));
+        } else {
+            formData.append('topicId[]', '');
+        }
 
         if (selectedIdea.image) {
             const resizedImage = await resizeImage(selectedIdea.image);
@@ -937,8 +946,8 @@ const UpdateIdea = () => {
                                 <span className="text-red-500 text-sm">{userDetailError.email}</span>}
                             </div>
                             <div className="space-y-1">
-                                <Label htmlFor="username" className="font-normal">Name</Label>
-                                <Input id="username" value={usersDetails.name} name="name" onChange={onChangeText}
+                                <Label htmlFor="userName" className="font-normal">Name</Label>
+                                <Input id="userName" value={usersDetails.name} name="name" onChange={onChangeText}
                                        placeholder="Enter upvoter name" className="col-span-3"/>
                                 {userDetailError.name &&
                                 <span className="text-red-500 text-sm">{userDetailError.name}</span>}
@@ -1247,15 +1256,15 @@ const UpdateIdea = () => {
                                 </div>
                                 <div className={"px-4 py-3 lg:py-6 lg:px-8 border-b space-y-2"}>
                                     <Label className={"font-normal"}>Choose Topics for this Idea (optional)</Label>
-                                    <Select onValueChange={handleChangeTopic} value={selectedIdea.tags.map(x => x.id)}>
+                                    <Select onValueChange={handleChangeTopic} value={selectedIdea.topic.map(x => x.id)}>
                                         <SelectTrigger className="bg-card">
                                             <SelectValue className={"text-muted-foreground text-sm"}>
                                                 <div className={"flex gap-[2px]"}>
                                                     {
-                                                        (selectedIdea.tags || []).length === 0 ? (
-                                                            <span className={"text-muted-foreground"}>Select tags</span>
+                                                        (selectedIdea.topic || []).length === 0 ? (
+                                                            <span className={"text-muted-foreground"}>Select topic</span>
                                                         ) : (
-                                                            (selectedIdea.tags || []).map((x, index) => {
+                                                            (selectedIdea.topic || []).map((x, index) => {
                                                                 const findObj = (topicLists || []).find((y) => y.id === x?.id);
                                                                 return (
                                                                     <div key={index}
@@ -1269,7 +1278,7 @@ const UpdateIdea = () => {
                                                             })
                                                         )
                                                     }
-                                                    {(selectedIdea.tags || []).length > 2}
+                                                    {(selectedIdea.topic || []).length > 2}
                                                 </div>
                                             </SelectValue>
                                         </SelectTrigger>
@@ -1282,7 +1291,7 @@ const UpdateIdea = () => {
                                                                 <div className={"flex gap-2"}>
                                                                     <div onClick={() => handleChangeTopic(x.id)}
                                                                          className="checkbox-icon">
-                                                                        {(selectedIdea.tags.map((x) => x.id) || []).includes(x.id) ?
+                                                                        {(selectedIdea.topic.map((x) => x.id) || []).includes(x.id) ?
                                                                             <Check size={18}/> :
                                                                             <div className={"h-[18px] w-[18px]"}/>}
                                                                     </div>
@@ -1339,7 +1348,7 @@ const UpdateIdea = () => {
                                                                                                     className={"update-idea text-sm rounded-full text-center"}>
                                                                                                     <UserAvatar
                                                                                                         userPhoto={x?.profileImage}
-                                                                                                        userName={x?.name ? x?.name : x?.username}
+                                                                                                        userName={x?.name ? x?.name : x?.userName}
                                                                                                         className="w-[20px] h-[20px]"
                                                                                                         initialStyle={"text-sm"}
                                                                                                     />
@@ -1382,12 +1391,12 @@ const UpdateIdea = () => {
                                                                                                     className={"update-idea text-sm rounded-full text-center"}>
                                                                                                     <UserAvatar
                                                                                                         userPhoto={x?.profileImage}
-                                                                                                        userName={x?.name ? x?.name : x?.username}
+                                                                                                        userName={x?.name ? x?.name : x?.userName}
                                                                                                         className="w-[20px] h-[20px]"
                                                                                                         initialStyle={"text-sm"}
                                                                                                     />
                                                                                                 </div>
-                                                                                                <h4 className={"text-sm font-normal"}>{x?.name ? x?.name : x?.username}</h4>
+                                                                                                <h4 className={"text-sm font-normal"}>{x?.name ? x?.name : x?.userName}</h4>
                                                                                             </div>
                                                                                         )
                                                                                     })
@@ -1545,12 +1554,12 @@ const UpdateIdea = () => {
                                                         ) : (
                                                             <Fragment>
                                                                 <UserAvatar initialStyle={"text-sm"}
-                                                                            userPhoto={selectedIdea?.ideaUser?.profileImage}
-                                                                            userName={selectedIdea?.ideaUser?.firstName + ' ' + selectedIdea?.ideaUser?.lastName}
+                                                                            userPhoto={selectedIdea?.profileImage}
+                                                                            userName={selectedIdea?.name ? selectedIdea?.name : selectedIdea?.userName}
                                                                 />
                                                                 <div className={"flex items-center"}>
                                                                     <Fragment>
-                                                                        <h4 className={"text-sm font-normal"}>{selectedIdea?.ideaUser?.firstName + ' ' + selectedIdea?.ideaUser?.lastName}</h4>
+                                                                        <h4 className={"text-sm font-normal"}>{selectedIdea?.name ? selectedIdea?.name : selectedIdea?.userName}</h4>
                                                                         <p className={"text-sm font-normal flex items-center text-muted-foreground"}>
                                                                             <Dot size={20}
                                                                                  className={"fill-text-card-foreground stroke-text-card-foreground"}/>
@@ -1740,6 +1749,7 @@ const UpdateIdea = () => {
                                                                                         <Dot size={20}
                                                                                              className={"fill-text-card-foreground stroke-text-card-foreground"}/>
                                                                                         {moment.utc(x?.createdAt).local().startOf('seconds').fromNow()}
+                                                                                        {x.isEdited && <span className={"text-sm font-normal text-muted-foreground ml-1"}>(Edited)</span>}
                                                                                     </p>
                                                                                 </div>
                                                                                 <div className={"flex gap-2"}>
@@ -1790,9 +1800,7 @@ const UpdateIdea = () => {
                                                                                         <Button
                                                                                             className="p-0 text-sm h-auto font-medium text-primary"
                                                                                             variant={"ghost hover-none"}
-                                                                                            onClick={() => {
-                                                                                                onShowSubComment(i)
-                                                                                            }}
+                                                                                            onClick={() => {onShowSubComment(i)}}
                                                                                             key={`comment-nested-reply-to-${i}`}
                                                                                         >
                                                                                             Reply
@@ -1802,8 +1810,7 @@ const UpdateIdea = () => {
                                                                                             onClick={() => onShowSubComment(i)}
                                                                                         >
                                                                                                     <span>
-                                                                                                        <MessageCircleMore
-                                                                                                            className={"stroke-primary w-[16px] h-[16px]"}/>
+                                                                                                        <MessageCircleMore className={"stroke-primary w-[16px] h-[16px]"}/>
                                                                                                     </span>
                                                                                             <p className={"text-base font-normal"}>
                                                                                                 {x?.reply?.length}
@@ -1841,6 +1848,7 @@ const UpdateIdea = () => {
                                                                                                                                 size={20}
                                                                                                                                 className={"fill-text-card-foreground stroke-text-card-foreground"}/>
                                                                                                                             {moment.utc(x.createdAt).local().startOf('seconds').fromNow()}
+                                                                                                                            {x.isEdited && <span className={"text-sm font-normal text-muted-foreground ml-1"}>(Edited)</span>}
                                                                                                                         </p>
                                                                                                                     </div>
                                                                                                                     {
@@ -1929,7 +1937,7 @@ const UpdateIdea = () => {
                                                                                                     <Button
                                                                                                         className={`${isSaveSubComment === true ? "py-2 px-6" : "py-2 px-6"} w-[86px] h-[30px] text-sm font-medium`}
                                                                                                         disabled={(!subCommentText[i] || subCommentText[i].trim() === "")}
-                                                                                                        onClick={() => {onCreateSubComment(x, i)}}
+                                                                                                        onClick={() => onCreateSubComment(x, i)}
                                                                                                     >
                                                                                                         {
                                                                                                             isSaveSubComment && subCommentTextEditIdx === i ?

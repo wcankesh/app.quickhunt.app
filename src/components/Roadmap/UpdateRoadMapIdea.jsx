@@ -1,7 +1,19 @@
 import React, {Fragment, useEffect, useState} from 'react';
 import {Sheet, SheetContent, SheetHeader} from "../ui/sheet";
 import {Button} from "../ui/button";
-import {ArrowBigUp, Check, Circle, CircleX, Dot, Loader2, MessageCircleMore, Paperclip, Pencil, Trash2, X} from "lucide-react";
+import {
+    ArrowBigUp,
+    Check,
+    Circle,
+    CircleX,
+    Dot,
+    Loader2,
+    MessageCircleMore,
+    Paperclip,
+    Pencil,
+    Trash2,
+    X
+} from "lucide-react";
 import {RadioGroup, RadioGroupItem} from "../ui/radio-group";
 import {Label} from "../ui/label";
 import {Input} from "../ui/input";
@@ -115,7 +127,6 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                         }
                     }
                     setRoadmapList({columns: cloneRoadmap})
-
                     toast({description: data.message})
                 } else {
                     toast({variant: "destructive", description: data?.error?.message})
@@ -189,7 +200,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
     };
 
     const onCreateSubComment = async (record, index) => {
-        setIsSaveSubComment(true)
+        setIsSaveSubComment(true);
         let formData = new FormData();
         for (let i = 0; i < subCommentFiles.length; i++) {
             formData.append(`images`, subCommentFiles[i]);
@@ -197,37 +208,40 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
         formData.append('comment', subCommentText);
         formData.append('ideaId', selectedIdea?.id);
         formData.append('parentId', record.id);
-        const data = await apiService.createComment(formData)
+        const data = await apiService.createComment(formData);
+        setIsSaveSubComment(false);
         if (data.success) {
-
             let cloneRoadmap = [...roadmapList.columns];
             const roadmapIndex = cloneRoadmap.findIndex((x) => x.id === selectedRoadmap?.id);
             if (roadmapIndex !== -1) {
                 const ideaIndex = cloneRoadmap[roadmapIndex].ideas.findIndex((x) => x.id === selectedIdea?.id);
-
                 if (ideaIndex !== -1) {
-                    let cloneIdeas = [cloneRoadmap[roadmapIndex].ideas];
-                    let cloneIdea = {...cloneRoadmap[roadmapIndex].ideas[ideaIndex]};
-                    const cloneComments = cloneIdea && cloneIdea?.comments ? [...cloneIdea?.comments] : [];
-                    const cloneSubComment = [...cloneComments[index]?.reply] || [];
-                    cloneSubComment.push(data.data)
+                    let cloneIdeas = [ ...cloneRoadmap[roadmapIndex].ideas ];
+                    let cloneIdea = { ...cloneRoadmap[roadmapIndex].ideas[ideaIndex] };
+                    const cloneComments = cloneIdea?.comments ? [ ...cloneIdea.comments ] : [];
+                    const wasShowReplyOpen = selectedIdea.comments[index]?.showReply;
+                    const cloneSubComment = [ ...(cloneComments[index]?.reply || []) ];
+                    cloneSubComment.push(data.data);
                     cloneComments[index]["reply"] = cloneSubComment;
-                    cloneIdea = {...cloneIdea, comments: cloneComments};
+                    cloneComments[index]["showReply"] = wasShowReplyOpen;
+                    cloneIdea = { ...cloneIdea, comments: cloneComments };
                     cloneIdeas[ideaIndex] = cloneIdea;
-                    setSelectedIdea(cloneIdea)
-                    cloneRoadmap[roadmapIndex] = {...cloneRoadmap[roadmapIndex], ideas: cloneIdeas, cards: cloneIdeas}
+                    cloneRoadmap[roadmapIndex] = {
+                        ...cloneRoadmap[roadmapIndex],
+                        ideas: cloneIdeas,
+                        cards: cloneIdeas
+                    };
+                    setSelectedIdea(cloneIdea);
+                    setRoadmapList({ columns: cloneRoadmap });
                 }
             }
-            setRoadmapList({columns: cloneRoadmap});
             setSubCommentText('');
-            setSubCommentFiles([])
-            setIsSaveSubComment(false)
-            toast({description: data.message})
+            setSubCommentFiles([]);
+            toast({ description: data.message });
         } else {
-            setIsSaveSubComment(false)
-            toast({variant: "destructive", description: data?.error?.message})
+            toast({ variant: "destructive", description: data?.error?.message });
         }
-    }
+    };
 
     const handleFeatureImgUpload = async (event) => {
         const file = event.target?.files[0];
@@ -492,6 +506,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
             setIsSaveUpdateComment(false)
         }
     }
+
     const onUpdateSubComment = async () => {
         setIsSaveUpdateSubComment(true)
         let formData = new FormData();
@@ -1366,7 +1381,6 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                                                                             className={"flex gap-2"}>
                                                                                                             <Button
                                                                                                                 className={`w-[86px] h-[30px] text-sm font-medium`}
-                                                                                                                // disabled={subCommentText.trim() === "" || subCommentText === ""}
                                                                                                                 disabled={(!subCommentText[i] || subCommentText[i].trim() === "")}
                                                                                                                 onClick={() => onCreateSubComment(x, i)}
                                                                                                             >

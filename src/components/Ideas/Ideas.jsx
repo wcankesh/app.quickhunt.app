@@ -54,11 +54,10 @@ const Ideas = () => {
     const {toast} = useToast()
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
-
     const [ideasList, setIdeasList] = useState([]);
     const [topicLists, setTopicLists] = useState([]);
     const [roadmapStatus, setRoadmapStatus] = useState([]);
-    const [filter, setFilter] = useState({...initialStateFilter, projectId: projectDetailsReducer.id});
+    const [filter, setFilter] = useState({...initialStateFilter});
     const [openFilter, setOpenFilter] = useState('');
     const [openFilterType, setOpenFilterType] = useState('');
     const [pageNo, setPageNo] = useState(Number(getPageNo));
@@ -90,12 +89,6 @@ const Ideas = () => {
     };
 
     useEffect(() => {
-        if (projectDetailsReducer.id) {
-            getAllIdea(filter);
-        }
-    }, [projectDetailsReducer.id])
-
-    useEffect(() => {
         setTopicLists(allStatusAndTypes.topics)
         setRoadmapStatus(allStatusAndTypes.roadmapStatus)
         if (getNavOpenSheet) {
@@ -104,6 +97,12 @@ const Ideas = () => {
             navigate(`${baseUrl}/ideas?pageNo=${pageNo}`);
         }
     }, [pageNo, allStatusAndTypes])
+
+    useEffect(() => {
+        if (projectDetailsReducer.id) {
+            getAllIdea(filter);
+        }
+    }, [projectDetailsReducer.id])
 
     const getAllIdea = async (getFilter = {}) => {
         setLoad('list');
@@ -138,15 +137,13 @@ const Ideas = () => {
             if (trimmedValue || value === '') {
                 const updatedFilter = {
                     ...filter,
-                    projectId: projectDetailsReducer.id,
                     search: trimmedValue,
                     page: 1,
                 };
-                setFilter(updatedFilter);
                 getAllIdea(updatedFilter);
             }
         }, 500),
-        [filter, projectDetailsReducer.id]
+        [projectDetailsReducer.id]
     );
 
     const onChangeSearch = (e) => {
@@ -184,13 +181,11 @@ const Ideas = () => {
             )
         );
         navigate(`${baseUrl}/ideas/${record.id}`)
-        // navigate(`${baseUrl}/ideas/${record.id}?pageNo=${getPageNo}`)
     };
 
     const handleChange = (e) => {
         let payload = {
             ...filter,
-            projectId: projectDetailsReducer.id,
             page: 1,
             limit: perPageLimit,
         };
@@ -295,14 +290,24 @@ const Ideas = () => {
                     (filter.isArchive && clone[index]?.isArchive === false);
                 if (removeStatus) {
                     clone.splice(index, 1);
-                    setTotalRecord(clone.length)
+                    setTotalRecord(clone.length);
                 }
+                setIdeasList(clone);
             } else if (name === "roadmapStatusId") {
                 clone[index].roadmapStatusId = value;
+                let filteredClone = [];
+                if (filter.roadmapStatusId) {
+                    filteredClone = clone.filter(item =>
+                        filter.roadmapStatusId.includes(item.roadmapStatusId)
+                    );
+                } else {
+                    filteredClone = clone.filter(item =>
+                        item.roadmapStatusId == filter.roadmapStatusId
+                    );
+                }
+                setIdeasList(filteredClone);
+                setTotalRecord(filteredClone.length);
             }
-            setIdeasList(clone);
-            // let payload = {...filter, projectId: projectDetailsReducer.id, page: pageNo, limit: perPageLimit}
-            // ideaSearch(payload)
             toast({description: data.message});
         } else {
             toast({variant: "destructive", description: data?.error?.message});
@@ -391,14 +396,13 @@ const Ideas = () => {
                                 className="w-full p-0"
                             >
                                 <PopoverTrigger asChild>
-                                    <Button variant="outline" size="icon" className={"w-9 h-9 "}><Filter fill="true"
-                                                                                                         className='w-4 -h4'/></Button>
+                                    <Button variant="outline" size="icon" className={"w-9 h-9 "}><Filter fill="true" className='w-4 -h4'/></Button>
                                 </PopoverTrigger>
                                 <PopoverContent className="w-full p-0" align='end'>
                                     <Command className="w-full">
-                                        <CommandInput placeholder="Search filter..."/>
-                                        <CommandList className="w-full">
-                                            <CommandEmpty>No filter found.</CommandEmpty>
+                                        {/*<CommandInput placeholder="Search filter..."/>*/}
+                                        <CommandList className="w-full min-w-[250px]">
+                                            {/*<CommandEmpty>No filter found.</CommandEmpty>*/}
                                             {
                                                 openFilterType === 'tagId' ? <CommandGroup>
                                                     <CommandItem onSelect={() => {
@@ -703,8 +707,7 @@ const Ideas = () => {
                                                                                         </div>
                                                                                     </Button>
                                                                                 </PopoverTrigger>
-                                                                                <PopoverContent className="p-0"
-                                                                                                align={"start"}>
+                                                                                <PopoverContent className="p-0" align={"start"}>
                                                                                     <div className={""}>
                                                                                         <div className={"py-3 px-4"}>
                                                                                             <h4 className="font-normal leading-none text-sm">{`Topics (${x?.tags?.length})`}</h4>
@@ -756,16 +759,12 @@ const Ideas = () => {
                                                                         <SelectContent>
                                                                             <SelectGroup>
                                                                                 <SelectItem value={null}>
-                                                                                    <div
-                                                                                        className={"flex items-center gap-2"}>No
-                                                                                        status
-                                                                                    </div>
+                                                                                    <div className={"flex items-center gap-2"}>No status</div>
                                                                                 </SelectItem>
                                                                                 {
                                                                                     (allStatusAndTypes.roadmapStatus || []).map((x, i) => {
                                                                                         return (
-                                                                                            <SelectItem key={i}
-                                                                                                        value={x.id}>
+                                                                                            <SelectItem key={i} value={x.id}>
                                                                                                 <div
                                                                                                     className={"flex capitalize items-center gap-2 truncate text-ellipsis overflow-hidden whitespace-nowrap"}>
                                                                                                     <Circle
