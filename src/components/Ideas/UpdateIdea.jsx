@@ -1749,7 +1749,7 @@ const UpdateIdea = () => {
                                                                                         <Dot size={20}
                                                                                              className={"fill-text-card-foreground stroke-text-card-foreground"}/>
                                                                                         {moment.utc(x?.createdAt).local().startOf('seconds').fromNow()}
-                                                                                        {x.isEdited && <span className={"text-sm font-normal text-muted-foreground ml-1"}>(Edited)</span>}
+                                                                                        {x.isEdited && <span className={"text-sm font-normal text-muted-foreground ml-1"}>(edited)</span>}
                                                                                     </p>
                                                                                 </div>
                                                                                 <div className={"flex gap-2"}>
@@ -1847,8 +1847,8 @@ const UpdateIdea = () => {
                                                                                                                             <Dot
                                                                                                                                 size={20}
                                                                                                                                 className={"fill-text-card-foreground stroke-text-card-foreground"}/>
-                                                                                                                            {moment.utc(x.createdAt).local().startOf('seconds').fromNow()}
-                                                                                                                            {x.isEdited && <span className={"text-sm font-normal text-muted-foreground ml-1"}>(Edited)</span>}
+                                                                                                                            {moment.utc(y.createdAt).local().startOf('seconds').fromNow()}
+                                                                                                                            {y.isEdited && <span className={"text-sm font-normal text-muted-foreground ml-1"}>(edited)</span>}
                                                                                                                         </p>
                                                                                                                     </div>
                                                                                                                     {

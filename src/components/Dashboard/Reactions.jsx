@@ -26,7 +26,7 @@ const Reactions = () => {
                         <div className="flex gap-1 items-center">
                             <h4
                                 className="text-sm font-semibold cursor-pointer"
-                                onClick={() => navigate(`${baseUrl}/announcements/analytic-view?postId=${x.postId}`)}
+                                onClick={() => navigate(`${baseUrl}/announcements/analytic-view?id=${x.postId}`)}
                             >
                                 {x.customerName}
                             </h4>

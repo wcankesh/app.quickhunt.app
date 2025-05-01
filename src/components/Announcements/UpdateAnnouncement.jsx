@@ -22,6 +22,7 @@ const initialStateError = {
     title: "",
     description: "",
     slugUrl: "",
+    categoryId: ""
 }
 
 const UpdateAnnouncement = () => {
@@ -43,6 +44,7 @@ const UpdateAnnouncement = () => {
     const [isLoad, setIsLoad] = useState('')
     const [popoverOpen, setPopoverOpen] = useState(false);
     const [popoverOpenExpired, setPopoverOpenExpired] = useState(false);
+    const [oldSelectedAnnouncement, setOldSelectedAnnouncement] = useState({});
 
     useEffect(() => {
         if (projectDetailsReducer.id) {
@@ -64,7 +66,7 @@ const UpdateAnnouncement = () => {
     const getSinglePosts = async () => {
         const data = await apiService.getSinglePosts(id);
         if (data.success) {
-            setSelectedRecord({
+            const obj = {
                 ...data.data.data,
                 image: data.data?.data?.featureImage,
                 assignToId: data.data?.data?.assignToId?.toString() || '',
@@ -72,7 +74,9 @@ const UpdateAnnouncement = () => {
                 expiredAt: data.data?.data?.expiredAt ? moment(data.data?.data?.expiredAt).format('YYYY-MM-DD') : undefined,
                 categoryId: data.data?.data?.categoryId?.toString() || '',
                 labels: data.data?.data?.labels || [],
-            });
+            }
+            setSelectedRecord(obj);
+            setOldSelectedAnnouncement(obj);
         }
         // setPreviewImage(selectedRecord.featureImage);
     }
@@ -135,6 +139,12 @@ const UpdateAnnouncement = () => {
                 } else {
                     return "";
                 }
+            // case "categoryId":
+            //     if (!value || value.trim() === "" || value === "null") {
+            //         return "Category is required.";
+            //     } else {
+            //         return "";
+            //     }
             default: {
                 return "";
             }
@@ -186,7 +196,12 @@ const UpdateAnnouncement = () => {
     };
 
     const onChangeCategory = (selectedItems) => {
-        setSelectedRecord({...selectedRecord, categoryId: selectedItems === null ? "" : selectedItems})
+        const categoryId = selectedItems === null ? "" : selectedItems;
+        setSelectedRecord({...selectedRecord, categoryId});
+        setFormError((formError) => ({
+            ...formError,
+            categoryId: formValidate("categoryId", categoryId)
+        }));
     }
 
     const commonToggle = (name, value) => {
@@ -221,6 +236,10 @@ const UpdateAnnouncement = () => {
                 validationErrors[name] = error;
             }
         });
+        // const categoryError = formValidate("categoryId", selectedRecord.categoryId);
+        // if (categoryError) {
+        //     validationErrors.categoryId = categoryError;
+        // }
         if (Object.keys(validationErrors).length > 0) {
             setFormError(validationErrors);
             return;
@@ -235,9 +254,8 @@ const UpdateAnnouncement = () => {
 
         setIsLoad(loader)
         let formData = new FormData();
-        // formData.append("projectId", projectDetailsReducer.id);
         Object.keys(selectedRecord).map((x) => {
-            if (x !== "labels") {
+            if (x !== "labelId") {
                 if (x === "assignToId") {
                     formData.append(x, selectedRecord[x]);
                 } else if (x === "slugUrl") {
@@ -257,13 +275,22 @@ const UpdateAnnouncement = () => {
 
         })
 
-        for (let i = 0; i < selectedRecord?.labels?.length; i++) {
-            formData.append('labels[]', selectedRecord?.labels[i]);
+        if (selectedRecord?.labels && Array.isArray(selectedRecord.labels)) {
+            if (selectedRecord.labels.length > 0) {
+                selectedRecord.labels.forEach((label) => {
+                    formData.append("labelId[]", label);
+                });
+            } else {
+                formData.append("labelId[]", "");
+            }
+        } else {
+            formData.append("labelId[]", "");
         }
 
         const data = await apiService.updatePosts(formData, selectedRecord?.id)
         if (data.success) {
             setSelectedRecord(selectedRecord)
+            setOldSelectedAnnouncement(selectedRecord)
             setIsLoad('')
             toast({description: data.message,});
 
@@ -295,14 +322,18 @@ const UpdateAnnouncement = () => {
         setSelectedRecord({...selectedRecord, labels: clone});
     }
 
-    const links = [
-        { label: 'Announcement', path: `/announcements?pageNo=${getPageNo}` }
-    ];
+    const links = [{ label: 'Announcement', path: `/announcements?pageNo=${getPageNo}` }];
 
     const publishDate = selectedRecord?.publishedAt ? new Date(selectedRecord.publishedAt) : null;
     const isDateDisabled = (date) => {
         return publishDate && date < publishDate;
     };
+
+    const handleOnCreateCancel = () => {
+        setSelectedRecord(oldSelectedAnnouncement);
+        setFormError(initialStateError);
+        navigate(`${baseUrl}/announcements?pageNo=${getPageNo}`)
+    }
 
     return (
         <div className={"container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-3 md:px-4"}>
@@ -347,14 +378,14 @@ const UpdateAnnouncement = () => {
                         <div className={"flex gap-4"}>
                             <div className="w-full flex flex-col gap-4">
                                 <div className="w-full flex flex-col gap-2">
-                                    <Label htmlFor="title" className={"font-normal"}>Title</Label>
+                                    <Label htmlFor="title" className={"font-normal after:ml-0.5 after:content-['*'] after:text-destructive"}>Title</Label>
                                     <Input type="text" id="title" className={"h-9"} name={"title"}
                                            value={selectedRecord.title} onChange={onChangeText}/>
                                     {formError.title &&
                                     <span className="text-sm text-red-500">{formError.title}</span>}
                                 </div>
                                 <div className="w-full flex flex-col gap-2">
-                                    <Label htmlFor="link" className={"font-normal"}>Permalink / Slug</Label>
+                                    <Label htmlFor="link" className={"font-normal after:ml-0.5 after:content-['*'] after:text-destructive"}>Permalink / Slug</Label>
                                     <Input type="text" className={"h-9"} id="link" name={"slugUrl"}
                                            value={selectedRecord.slugUrl} onChange={onChangeText}/>
                                     <p className={"text-sm font-normal text-muted-foreground break-words"}>This release will
@@ -366,7 +397,7 @@ const UpdateAnnouncement = () => {
                                     <span className="text-sm text-red-500">{formError?.slugUrl}</span>}
                                 </div>
                                 <div className="w-full flex flex-col gap-2">
-                                    <Label htmlFor="description" className={"font-normal"}>Description</Label>
+                                    <Label htmlFor="description" className={"font-normal after:ml-0.5 after:content-['*'] after:text-destructive"}>Description</Label>
                                     <ReactQuillEditor className={"min-h-[145px] h-full"} value={selectedRecord.description} onChange={onChangeText}
                                                       name={"description"}/>
                                     {formError.description && <span className="text-sm text-red-500">{formError.description}</span>}
@@ -484,7 +515,7 @@ const UpdateAnnouncement = () => {
                                     </Select>
                                 </div>
                                 <div className={"w-full space-y-1.5"}>
-                                    <Label className={"font-normal"}>Category</Label>
+                                    <Label className={"font-normal after:ml-0.5 after:content-['*'] after:text-destructive"}>Category</Label>
                                     <Select
                                         value={selectedRecord && selectedRecord?.categoryId && selectedRecord?.categoryId?.toString()}
                                         onValueChange={onChangeCategory}>
@@ -511,6 +542,7 @@ const UpdateAnnouncement = () => {
                                             </SelectGroup>
                                         </SelectContent>
                                     </Select>
+                                    {/*{formError.categoryId && <span className="text-sm text-red-500">{formError.categoryId}</span>}*/}
                                 </div>
                             </div>
                             <div className="w-full flex flex-col gap-4 items-stretch h-full">
@@ -654,7 +686,7 @@ const UpdateAnnouncement = () => {
                     >
                         {isLoad === 'bottom' ? <Loader2 className="h-4 w-4 animate-spin"/> : "Update Post"}
                     </Button>
-                    <Button onClick={() => navigate(`${baseUrl}/announcements?pageNo=${getPageNo}`)} variant={"outline "}
+                    <Button onClick={handleOnCreateCancel} variant={"outline "}
                             className={`border border-primary text-sm font-medium ${theme === "dark" ? "" : "text-primary"}`}>Cancel</Button>
                 </CardFooter>
             </Card>

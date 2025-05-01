@@ -34,6 +34,7 @@ const initialStateError = {
     title: "",
     description: "",
     slug: "",
+    categoryId: ""
 }
 
 const CreateAnnouncement = ({isOpen, onOpen, onClose, getAllPosts, announcementList}) => {
@@ -120,6 +121,12 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, getAllPosts, announcementL
                 } else {
                     return "";
                 }
+            // case "categoryId":
+            //     if (!value || value.trim() === "" || value === "null") {
+            //         return "Category is required.";
+            //     } else {
+            //         return "";
+            //     }
             default: {
                 return "";
             }
@@ -183,8 +190,17 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, getAllPosts, announcementL
         setChangeLogDetails(updatedDetails);
     };
 
-    const onChangeCategory = (selectedItems) => {
+    const onChangeCategorys = (selectedItems) => {
         setChangeLogDetails({...changeLogDetails, categoryId: selectedItems === null ? "" : selectedItems})
+    }
+
+    const onChangeCategory = (selectedItems) => {
+        const categoryId = selectedItems === null ? "" : selectedItems;
+        setChangeLogDetails({...changeLogDetails, categoryId});
+        // setFormError((formError) => ({
+        //     ...formError,
+        //     categoryId: formValidate("categoryId", categoryId)
+        // }));
     }
 
     const commonToggle = (name, value) => {
@@ -220,6 +236,10 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, getAllPosts, announcementL
         if (imageError) {
             validationErrors['image'] = imageError;
         }
+        // const categoryError = formValidate("categoryId", changeLogDetails.categoryId);
+        // if (categoryError) {
+        //     validationErrors.categoryId = categoryError;
+        // }
         if (Object.keys(validationErrors).length > 0) {
             setFormError(validationErrors);
             return;
@@ -336,7 +356,7 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, getAllPosts, announcementL
                                 commInput.map((x, i) => (
                                     <Fragment key={i}>
                                         <div className="w-full flex flex-col gap-2">
-                                            <Label htmlFor="title" className={"font-normal"}>{x.title}</Label>
+                                            <Label htmlFor="title" className={"font-normal after:ml-0.5 after:content-['*'] after:text-destructive"}>{x.title}</Label>
                                             <Input type="text" id={x.name} className={"h-9"} name={x.name} placeholder={`${x.name === "title" ? "Enter your title..." : "Enter your slug url..."}`}
                                                    value={changeLogDetails[x.name]} onChange={onChangeText}/>
                                             {
@@ -355,7 +375,7 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, getAllPosts, announcementL
                                 ))
                             }
                             <div className="w-full flex flex-col gap-2">
-                                <Label htmlFor="description" className={"font-normal"}>Description</Label>
+                                <Label htmlFor="description" className={"font-normal after:ml-0.5 after:content-['*'] after:text-destructive"}>Description</Label>
                                 <ReactQuillEditor className={"min-h-[145px] h-full"} value={changeLogDetails.description} onChange={onChangeText}
                                                   name={"description"}/>
                                 {formError.description && <span className="text-sm text-destructive">{formError.description}</span>}
@@ -466,7 +486,7 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, getAllPosts, announcementL
                         </div>
                         <div className={"flex flex-wrap md:flex-nowrap gap-4 items-start"}>
                             <div className={"flex flex-col w-full gap-2 md:max-w-[288px]"}>
-                                <Label htmlFor="label" className={"font-normal"}>Category</Label>
+                                <Label htmlFor="label" className={"font-normal after:ml-0.5 after:content-['*'] after:text-destructive"}>Category</Label>
                                 <Select
                                     value={changeLogDetails && changeLogDetails.categoryId && changeLogDetails.categoryId.toString()}
                                     onValueChange={onChangeCategory}>
@@ -492,6 +512,7 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, getAllPosts, announcementL
                                         </SelectGroup>
                                     </SelectContent>
                                 </Select>
+                                {/*{formError.categoryId && <span className="text-sm text-red-500">{formError.categoryId}</span>}*/}
                             </div>
                             <div className="flex flex-col w-full gap-2 md:max-w-[288px]">
                                 <Label htmlFor="date" className={"font-normal"}>Published at</Label>

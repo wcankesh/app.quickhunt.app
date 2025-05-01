@@ -219,7 +219,7 @@ const AnalyticsViews = () => {
                                                                         {/*<div className={"flex flex-row gap-4"}>*/}
                                                                             <div className={"flex flex-col gap-1"}>
                                                                                 <div className={"flex gap-4 items-center"}>
-                                                                                    <h5 className={"text-sm font-medium"}>{x?.user.firstName} {x?.user.lastName}</h5>
+                                                                                    <h5 className={"text-sm font-medium"}>{x?.user.name ? x?.user.name : x?.user.firstName + "" + x?.user.lastName}</h5>
                                                                                     <p className={"text-muted-foreground text-[10px] font-normal"}>{x?.user.email}</p>
                                                                                 </div>
                                                                                 <div className={"text-muted-foreground text-xs font-normal"}>

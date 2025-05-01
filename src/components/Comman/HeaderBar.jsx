@@ -497,7 +497,7 @@ const HeaderBar = ({setIsMobile}) => {
                                     <Button variant="secondary" size="icon" className="rounded-full w-[30px] h-[30px]">
                                         <Avatar className={"w-[30px] h-[30px]"}>
                                             <AvatarImage src={userDetails.profileImage ? `${DO_SPACES_ENDPOINT}/${userDetails.profileImage}` : null} alt={`${userDetails && userDetails?.firstName?.substring(0, 1)?.toUpperCase()}${userDetails?.lastName?.substring(0, 1)?.toUpperCase()}`}/>
-                                            <AvatarFallback>{userDetails?.firstName?.substring(0, 1)?.toUpperCase()} {userDetails?.lastName?.substring(0, 1)?.toUpperCase()}</AvatarFallback>
+                                            <AvatarFallback>{userDetails?.firstName?.substring(0, 1)?.toUpperCase()}{userDetails?.lastName?.substring(0, 1)?.toUpperCase()}</AvatarFallback>
                                         </Avatar>
                                     </Button>
                                 </DropdownMenuTrigger>

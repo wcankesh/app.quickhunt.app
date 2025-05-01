@@ -68,7 +68,7 @@ const Announcements = () => {
         }
     }, [projectDetailsReducer.id, allStatusAndTypes, pageNo,]);
 
-    const getAllPosts = async (getFilter = {}) => {
+    const getAllPosts = async (getFilter = filter) => {
         const payload = {
             projectId: projectDetailsReducer.id,
             page: pageNo,
@@ -95,21 +95,27 @@ const Announcements = () => {
 
     const throttledDebouncedSearch = useCallback(
         debounce((value) => {
-            const updatedFilter = {
-                ...filter,
-                search: value,
-                page: 1,
-            };
-            setFilter(updatedFilter);
-            getAllPosts(updatedFilter);
+            const trimmedValue = value.trim();
+                if (trimmedValue || value === '') {
+                    const updatedFilter = {
+                        ...filter,
+                        search: value,
+                        page: 1,
+                    };
+                    setFilter(updatedFilter);
+                    getAllPosts(updatedFilter);
+                }
         }, 500),
         [projectDetailsReducer.id]
     );
 
     const onChangeSearch = (e) => {
         const value = e.target.value;
-        setFilter( { ...filter, search: value });
-        throttledDebouncedSearch(value)
+        const trimmedValue = value.trim();
+        if (trimmedValue || value === '') {
+            setFilter(prev => ({...prev, search: value}));
+            throttledDebouncedSearch(value);
+        }
     };
 
     const filterPosts = async (event) => {
@@ -128,7 +134,9 @@ const Announcements = () => {
     }
 
     const clearSearchFilter = () => {
-        const clone = {...filter, search: ''}
+        const clone = {...filter,
+            search: '',
+            page: 1,}
         setFilter(clone);
         setPageNo(1);
         getAllPosts(clone);
@@ -139,11 +147,14 @@ const Announcements = () => {
             const updatedItems = announcementList.map((x) => x.id === record.id ? {...x, ...record, status: record.status} : x);
             setAnnouncementList(updatedItems);
             setSelectedRecord({});
+            getAllPosts(filter);
         } else if (addRecord) {
             const clone = [...announcementList];
             clone.unshift(addRecord);
             setAnnouncementList(clone);
             setSelectedRecord({});
+            setPageNo(1);
+            getAllPosts(filter);
         }
         else {
             setSelectedRecord({});
@@ -166,9 +177,8 @@ const Announcements = () => {
             if (clone.length === 0 && pageNo > 1) {
                 navigate(`${baseUrl}/announcements?pageNo=${pageNo - 1}`);
                 setPageNo((prev) => prev - 1);
-            } else {
-                getAllPosts();
             }
+                getAllPosts();
             toast({description: data.message,})
         } else {
             setIsLoadingDelete(false)
@@ -232,10 +242,10 @@ const Announcements = () => {
                                     <Button className={"h-9 w-9"} size={"icon"} variant="outline"><Filter fill="true" className='w-4 -h4' /></Button>
                                 </PopoverTrigger>
                                 <PopoverContent className="w-full p-0" align={"end"}>
-                                    <Command className="w-full">
-                                        <CommandInput placeholder="Search filter..."/>
+                                    <Command className="w-full min-w-[250px]">
+                                        {/*<CommandInput placeholder="Search filter..."/>*/}
                                         <CommandList className="w-full">
-                                            <CommandEmpty>No filter found.</CommandEmpty>
+                                            {/*<CommandEmpty>No filter found.</CommandEmpty>*/}
                                             {
                                                 openFilterType === 'status' ?
                                                     <CommandGroup className={"w-full"}>

@@ -78,28 +78,28 @@ const UserActionsList = ({ userActions, setCustomerList, sourceTitle, isLoadingU
 
     return (
         <div className={"divide-y"}>
-            {(userActions || []).map((action, index) => {
+            {(userActions || []).map((x, index) => {
                 return (
                     <Fragment key={index}>
-                        {sourceTitle.map((source, i) => {
-                            if (action.source === source.value) {
+                        {sourceTitle.map((y, i) => {
+                            if (x.source === y.value) {
                                 return (
-                                    <div onClick={() => navigateAction(action?.id, action.source)} className={"px-2 py-[10px] md:px-3 flex flex-wrap justify-between gap-2 cursor-pointer"} key={i}>
+                                    <div onClick={() => navigateAction(x?.id, x.source)} className={"px-2 py-[10px] md:px-3 flex flex-wrap justify-between gap-2 cursor-pointer"} key={i}>
                                         <div className={"space-y-3"}>
-                                            <h2 className={"font-medium"}>{source.title}</h2>
-                                            {source.value === "post_reactions" ? (
+                                            <h2 className={"font-medium"}>{y.title}</h2>
+                                            {y.value === "post_reactions" ? (
                                                 <div className={"flex items-center gap-2"}>
                                                     <Avatar className={"rounded-none w-[20px] h-[20px]"}>
-                                                        <AvatarImage src={action.emoji_url} />
+                                                        <AvatarImage src={x.emojiUrl} />
                                                     </Avatar>
-                                                    <span className={"text-sm text-wrap text-muted-foreground"}>{action.title}</span>
+                                                    <span className={"text-sm text-wrap text-muted-foreground"}>{x.title}</span>
                                                 </div>
                                             ) : (
-                                                <span className={"text-sm text-wrap text-muted-foreground"}>{action.title}</span>
+                                                <span className={"text-sm text-wrap text-muted-foreground"}>{x.title}</span>
                                             )}
                                         </div>
                                         <span className={"text-sm text-muted-foreground"}>
-                                            {action?.created_at ? moment(action?.created_at).format('D MMM, YYYY') : "-"}
+                                            {x?.createdAt ? moment(x?.createdAt).format('D MMM, YYYY') : "-"}
                                         </span>
                                     </div>
                                 );
@@ -315,7 +315,7 @@ const Users = () => {
         const data = await apiService.userAction(payload);
         setIsLoadingUserDetail(false)
         if(data.success) {
-            setUserActions(Array.isArray(data.data) ? data.data : []);
+            setUserActions(Array.isArray(data.data.data) ? data.data.data : []);
             setTotalRecordAction(data.data.total)
         }
     }
@@ -468,7 +468,8 @@ const Users = () => {
                                 {
                                     (tabs || []).map((y, i) => (
                                         <TabsContent key={i} value={y.value} className={"mt-0"}>
-                                            <div className={"grid grid-cols-1 overflow-auto whitespace-nowrap h-[calc(100vh_-_245px)] md:h-[calc(100vh_-_193px)] lg:h-[calc(100vh_-_204px)]"}>
+                                            {/*<div className={"grid grid-cols-1 overflow-auto whitespace-nowrap h-[calc(100vh_-_245px)] md:h-[calc(100vh_-_193px)] lg:h-[calc(100vh_-_204px)]"}>*/}
+                                            <div className={"grid grid-cols-1 overflow-auto whitespace-nowrap h-[calc(100vh_-_197px)] md:h-[calc(100vh_-_193px)] lg:h-[calc(100vh_-_204px)]"}>
                                                 {
                                                     y.value === "details" ? y.component :
                                                         <UserActionsList

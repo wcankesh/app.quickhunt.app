@@ -141,7 +141,7 @@ export function Dashboard() {
     useEffect(() => {
         checkPreset()
     }, [state])
-
+    console.log("chartList", chartList)
     const programAnalytics = [
         {
             id: 1,
@@ -337,14 +337,14 @@ export function Dashboard() {
                                                                     <div className="flex gap-1 items-center">
                                                                         <h4
                                                                             className="text-sm font-medium cursor-pointer"
-                                                                            onClick={() => navigate(`${baseUrl}/announcements/analytic-view?postId=${x.postId}`)}
+                                                                            onClick={() => navigate(`${baseUrl}/announcements/analytic-view?id=${x.postId}`)}
                                                                         >{x.customerName}</h4>
                                                                         <p className="text-xs text-muted-foreground">Reacted
                                                                             To</p>
                                                                     </div>
                                                                     <p
                                                                         className="text-xs font-medium text-foreground cursor-pointer"
-                                                                        onClick={() => navigate(`${baseUrl}/announcements/analytic-view?postId=${x.postId}`)}
+                                                                        onClick={() => navigate(`${baseUrl}/announcements/analytic-view?id=${x.postId}`)}
                                                                     >"{x.title}"</p>
                                                                 </div>
                                                             </div>

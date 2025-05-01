@@ -17,7 +17,7 @@ const initialColumnList = [
     {columnName: "Description", id: "description"},
     {columnName: "Board", id: "board"},
     {columnName: "Vote", id: "vote"},
-    {columnName: "Status", id: "roadmapId"},
+    {columnName: "Status (Roadmap)", id: "roadmapId"},
     {columnName: "Images", id: "images"},
     {columnName: "Created At", id: "createdAt"},
     {columnName: "Author Name", id: "authorName"},
@@ -41,6 +41,8 @@ const ImportIdea = () => {
         const [selectedCSVFile, setSelectedCSVFile] = useState(null);
         const [isLoading, setIsLoading] = useState(false);
         const [isDirectImport, setIsDirectImport] = useState(true);
+
+    console.log("allStatusAndTypes.roadmapStatus", allStatusAndTypes.roadmapStatus)
 
         const handleFileUpload = async (e) => {
             const file = e.target.files[0];
