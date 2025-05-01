@@ -40,9 +40,9 @@ const Project = () => {
     const [createProjectDetails, setCreateProjectDetails] = useState(initialState);
     const [formError, setFormError] = useState(initialStateError);
     const [isSave, setIsSave] = useState(false);
-    const [isDel, setIsDel] = useState(false);
     const [openDelete, setOpenDelete] = useState(false);
     const [isLoadingDelete, setIsLoadingDelete] = useState(false);
+    const userProjectCount = allProjectReducer?.projectList?.filter(x => x.userId == userDetailsReducer?.id)
 
     useEffect(() => {
         if (projectDetailsReducer.id) {
@@ -158,7 +158,6 @@ const Project = () => {
                 formData.append(key, createProjectDetails[key] || '');
             }
         })
-
         setIsSave(true)
         const data = await apiService.updateProjects(formData, projectDetailsReducer.id)
         setIsSave(false)
@@ -173,17 +172,16 @@ const Project = () => {
 
     const deleteAlert = () => {
         setOpenDelete(true);
-        setIsDel(true);
     }
 
     const closeDialog = () => {
         setOpenDelete(false);
-        setIsDel(false);
     }
 
     const onDelete = async () => {
         setIsLoadingDelete(true);
         const data = await apiService.deleteProjects(projectDetailsReducer.id)
+        setIsLoadingDelete(false);
         if (data.success) {
             const cloneProject = [...allProjectReducer.projectList]
             const index = cloneProject.findIndex((x) => x.id === projectDetailsReducer.id)
@@ -193,8 +191,9 @@ const Project = () => {
                 dispatch(projectDetailsAction(cloneProject[0]))
                 dispatch(allProjectAction({projectList: cloneProject}))
             }
-            setIsDel(false);
             toast({title: "Project delete successfully"})
+        } else {
+            toast({description: data.error?.message, variant: "destructive"})
         }
         setOpenDelete(false);
     }
@@ -339,11 +338,11 @@ const Project = () => {
             </CardContent>
             <CardFooter className={"p-4 sm:px-5 sm:py-4 flex flex-wrap justify-end sm:justify-end gap-4"}>
                 {
-                    (userDetailsReducer?.id == createProjectDetails?.userId) &&
+                    (userDetailsReducer?.id == createProjectDetails?.userId && userProjectCount > 1) &&
                     <Button
                         variant={"outline hover:bg-transparent"} onClick={deleteAlert}
                         className={`text-sm font-medium border w-[115px] text-destructive border-destructive capitalize`}
-                    >{isDel ? <Loader2 className="h-4 w-4 animate-spin"/> : "Delete project"}</Button>
+                    >Delete project</Button>
                 }
                 <Button
                     className={`w-[119px] text-sm font-medium hover:bg-primary capitalize`}

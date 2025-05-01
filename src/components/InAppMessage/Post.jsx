@@ -20,7 +20,7 @@ import Marker from "@editorjs/marker";
 import InlineCode from "@editorjs/inline-code";
 import {PopoverTrigger} from "@radix-ui/react-popover";
 import {Popover, PopoverContent} from "../ui/popover";
-import {BASE_URL_API} from "../../utils/constent";
+import {BASE_URL_API, DO_SPACES_ENDPOINT} from "../../utils/constent";
 
 const Post = ({inAppMsgSetting, setInAppMsgSetting, isLoading}) => {
     const editorCore = useRef(null);
@@ -150,10 +150,10 @@ const Post = ({inAppMsgSetting, setInAppMsgSetting, isLoading}) => {
                 <CardHeader className={"p-4 pt-0"}>
                     {
                         (inAppMsgSetting.showSender && inAppMsgSetting.from) ?
-                            <div className={"pt-0 flex flex-row gap-2"}>
+                            <div className={"pt-0 flex flex-row gap-2 items-center"}>
                                 <Avatar className={"w-[32px] h-[32px]"}>
-                                    <AvatarImage src={userDetailsReducer?.profileImage}
-                                                 alt={`${userDetailsReducer?.firstName} ${userDetailsReducer?.lastName}`}/>
+                                    <AvatarImage src={userDetailsReducer?.profileImage ? `${DO_SPACES_ENDPOINT}/${userDetailsReducer?.profileImage}` : null}
+                                                 alt={`${userDetailsReducer?.firstName}${userDetailsReducer?.lastName}`}/>
                                     <AvatarFallback
                                         className={`${theme === "dark" ? "bg-card-foreground text-card" : ""} text-xs`}>
                                         {userDetailsReducer?.firstName?.substring(0, 1)}
@@ -176,8 +176,7 @@ const Post = ({inAppMsgSetting, setInAppMsgSetting, isLoading}) => {
                         <div className={""}>
                             <div className={"flex flex-row gap-3 items-center text-xs"}>
                                 <MessageCircleMore size={20} stroke={inAppMsgSetting?.iconColor}/>
-                                <h5 className={"font-normal"} style={{color: inAppMsgSetting.textColor}}>Write a
-                                    reply...</h5>
+                                <h5 className={"font-normal"} style={{color: inAppMsgSetting.textColor}}>Write a reply...</h5>
                             </div>
                         </div>
                         <div className={"flex gap-3 items-center"}>

@@ -70,7 +70,7 @@ const Domain = () => {
                 isLogin: settingData.isLogin,
             }
             const data = await apiService.updatePortalSetting(settingData.id, payload)
-            if(data.status === 200){
+            if(data.success){
                 setIsSave(false)
                 toast({description:"Domain update successfully"})
             } else {

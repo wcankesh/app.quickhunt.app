@@ -9,7 +9,7 @@ import {useTheme} from "../theme-provider";
 import {Skeleton} from "../ui/skeleton";
 import {Badge} from "../ui/badge";
 import {useNavigate, useSearchParams} from "react-router-dom";
-import {baseUrl, WIDGET_DOMAIN} from "../../utils/constent";
+import {baseUrl, DO_SPACES_ENDPOINT, WIDGET_DOMAIN} from "../../utils/constent";
 import {ApiService} from "../../utils/ApiService";
 import {useSelector} from "react-redux";
 import EmptyData from "../Comman/EmptyData";
@@ -443,12 +443,12 @@ const InAppMessage = () => {
                                                                 <TableCell className={`px-2 py-[10px] md:px-3`}>
                                                                     <div
                                                                         className={"flex items-center gap-2 justify-center"}>
-                                                                        {sender ? (
+                                                                        {x?.showSender && sender ? (
                                                                             <Fragment>
                                                                                 <Avatar className={"w-[20px] h-[20px]"}>
                                                                                     <AvatarImage
-                                                                                        src={sender.profileImage}
-                                                                                        alt={`${sender?.firstName} ${sender?.lastName}`}/>
+                                                                                        src={sender.profileImage ? `${DO_SPACES_ENDPOINT}/${sender.profileImage}` : null}
+                                                                                        alt={`${sender?.firstName}${sender?.lastName}`}/>
                                                                                     <AvatarFallback>{sender?.firstName?.substring(0, 1)}</AvatarFallback>
                                                                                 </Avatar>
                                                                                 <p className={"font-normal"}>{`${sender?.firstName} ${sender?.lastName}`}</p>

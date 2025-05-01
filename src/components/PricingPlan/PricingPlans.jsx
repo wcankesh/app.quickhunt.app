@@ -47,7 +47,7 @@ const PricingPlans = () => {
         setLoading(price);
         if(price === ""){
             const data = await apiService.cancelPlan()
-            if (data.status === 200) {
+            if (data.success) {
                 dispatch(userDetailsAction({ ...data.data.user_detail }));
                 toast({ description: data.message });
             } else {
@@ -57,7 +57,7 @@ const PricingPlans = () => {
         } else {
             if (userDetailsReducer.plan === id && userDetailsReducer.final_expiration_time !== "") {
                 const data = await apiService.resubscribe({ plan: id, subscr_type: tab });
-                if (data.status === 200) {
+                if (data.success) {
                     setLoading("");
                     dispatch(userDetailsAction({ ...data.data.user_detail }));
                     toast({ description: data.message });
@@ -68,7 +68,7 @@ const PricingPlans = () => {
             } else {
                 if (userDetailsReducer.plan === 0) {
                     const data = await apiService.checkout({ plan: id, subscr_type: tab });
-                    if (data.status === 200) {
+                    if (data.success) {
                         window.open(data.url, "_self");
                         setLoading("");
                     } else {
@@ -76,11 +76,11 @@ const PricingPlans = () => {
                     }
                 } else {
                     const data = await apiService.upcomingInvoice({ plan: id, subscr_type: tab });
-                    if (data.status === 201) {
+                    if (data.success) {
                         setLoading("");
                     } else {
                         const res = await apiService.changePlan({ plan: id, subscr_type: tab });
-                        if (res.status === 436) {
+                        if (res.success) {
                             toast({ description: data.message });
                             setLoading("");
                         } else {

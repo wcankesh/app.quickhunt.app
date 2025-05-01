@@ -14,6 +14,7 @@ import {PopoverTrigger} from "@radix-ui/react-popover";
 import EmojiPicker from "emoji-picker-react";
 import {Select, SelectValue} from "@radix-ui/react-select";
 import {SelectContent, SelectItem, SelectTrigger} from "../ui/select";
+import {DO_SPACES_ENDPOINT} from "../../utils/constent";
 
 const Surveys = ({inAppMsgSetting, setInAppMsgSetting, selectedStepIndex, setSelectedStepIndex, setSelectedStep, selectedStep, isLoading}) => {
     const {theme} = useTheme();
@@ -233,11 +234,10 @@ const Surveys = ({inAppMsgSetting, setInAppMsgSetting, selectedStepIndex, setSel
                                                 {
                                                     (inAppMsgSetting.showSender && inAppMsgSetting.from) ?
                                                         <Avatar className={"w-[32px] h-[32px]"}>
-                                                            <AvatarImage src={userDetailsReducer?.profileImage} alt={`${userDetailsReducer?.firstName} ${userDetailsReducer?.lastName}`}/>
+                                                            <AvatarImage src={userDetailsReducer?.profileImage ? `${DO_SPACES_ENDPOINT}/${userDetailsReducer?.profileImage}` : null} alt={`${userDetailsReducer?.firstName}${userDetailsReducer?.lastName}`}/>
                                                             <AvatarFallback
                                                                 className={`${theme === "dark" ? "bg-card-foreground text-card" : ""} text-xs`}>
-                                                                {userDetailsReducer?.firstName?.substring(0, 1)}
-                                                                {userDetailsReducer?.lastName?.substring(0, 1)}
+                                                                {userDetailsReducer?.firstName?.substring(0, 1)}{userDetailsReducer?.lastName?.substring(0, 1)}
                                                             </AvatarFallback>
                                                         </Avatar> : <div>&nbsp;</div>
                                                 }

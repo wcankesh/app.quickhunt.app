@@ -64,13 +64,18 @@ const GeneralSettings = () => {
 
     const formValidate = (name, value) => {
         switch (name) {
-            // case "password":
-            //     if (value?.trim() === "") return "Password is required";
-            //     if (
-            //         !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(value)
-            //     )
-            //         return "Password must be at least 8 characters with one uppercase letter, one lowercase letter, one number, and one special character";
-            //     return "";
+            case "password":
+                if (generalSettingData?.privateMode === 1) {
+                    if (!value || value.trim() === "") {
+                        return "Password is required";
+                    }
+                    // if (
+                    //     !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(value)
+                    // ) {
+                    //     return "Password must be at least 8 characters with one uppercase letter, one lowercase letter, one number, and one special character";
+                    // }
+                }
+                return "";
             case "announcementTitle":
                 if (!value || value.trim() === "") {
                     return "Announcement title is required";
@@ -95,14 +100,22 @@ const GeneralSettings = () => {
     };
 
     const onChange = (name, value) => {
-        setGeneralSettingData({
+        let updatedData = {
             ...generalSettingData,
             [name]: value
-        });
-        setFormError({
-            ...formError,
-            [name]: formValidate(name, value)
-        });
+        };
+        let updatedErrors = { ...formError };
+        if (name === "privateMode" && value === 0) {
+            updatedData.password = "";
+            updatedErrors.password = "";
+        }
+        if (name === "password" && generalSettingData.privateMode !== 1) {
+            updatedErrors[name] = "";
+        } else {
+            updatedErrors[name] = formValidate(name, value);
+        }
+        setGeneralSettingData(updatedData);
+        setFormError(updatedErrors);
     };
 
     const onUpdatePortal = async () => {
@@ -296,14 +309,17 @@ const GeneralSettings = () => {
                                                                     {
                                                                         y.field === "text" ?
                                                                             <div className={"space-y-1"}>
-                                                                                <Label className="text-sm font-normal">{y.label}</Label>
+                                                                                <Label
+                                                                                    className="text-sm font-normal">{y.label}</Label>
                                                                                 <Input
                                                                                     value={generalSettingData?.[y.name]}
                                                                                     onChange={(e) => onChange(y.name, e.target.value)}/>
                                                                                 {
                                                                                     formError[y.name] ?
-                                                                                        <div className="grid gap-2 mt-[4px]">
-                                                                                            <span className="text-red-500 text-sm">{formError[y.name]}</span>
+                                                                                        <div
+                                                                                            className="grid gap-2 mt-[4px]">
+                                                                                            <span
+                                                                                                className="text-red-500 text-sm">{formError[y.name]}</span>
                                                                                         </div> : ""
                                                                                 }
                                                                             </div>
@@ -324,8 +340,10 @@ const GeneralSettings = () => {
                                                                                 : y.field === "color" ?
                                                                                     <div
                                                                                         className={"flex items-center gap-3 flex-wrap md:flex-nowrap"}>
-                                                                                        <div className={"widget-color-picker space-y-1 w-full"}>
-                                                                                            <Label className={"text-sm font-normal"}>{y.label}</Label>
+                                                                                        <div
+                                                                                            className={"widget-color-picker space-y-1 w-full"}>
+                                                                                            <Label
+                                                                                                className={"text-sm font-normal"}>{y.label}</Label>
                                                                                             <ColorInput name={y.name}
                                                                                                         value={generalSettingData?.[y.name]}
                                                                                                         onChange={(value) => onChange(y.name, value?.clr)}
@@ -348,7 +366,9 @@ const GeneralSettings = () => {
                                                                                                     {
                                                                                                         (timeZoneJson || []).map((x, i) => {
                                                                                                             return (
-                                                                                                                <SelectItem key={i} value={x.tzCode}>{x.label}</SelectItem>
+                                                                                                                <SelectItem
+                                                                                                                    key={i}
+                                                                                                                    value={x.tzCode}>{x.label}</SelectItem>
                                                                                                             )
                                                                                                         })
                                                                                                     }
@@ -372,7 +392,7 @@ const GeneralSettings = () => {
                                                                                                         <div
                                                                                                             className={"w-3/4"}>
                                                                                                             <Label
-                                                                                                                className="text-sm font-normal">Password</Label>
+                                                                                                                className="text-sm font-normal after:ml-0.5 after:content-['*'] after:text-destructive">Password</Label>
                                                                                                             <div
                                                                                                                 className={"relative"}>
                                                                                                                 <Input
@@ -386,7 +406,7 @@ const GeneralSettings = () => {
                                                                                                                     variant={"ghost hover:none"}
                                                                                                                     onClick={togglePasswordVisibility}
                                                                                                                 >
-                                                                                                                    {generalSettingData?.password ?
+                                                                                                                    {showPassword ?
                                                                                                                         <Eye
                                                                                                                             size={16}
                                                                                                                             stroke={`${theme === "dark" ? "white" : "black"}`}/> :
@@ -394,10 +414,11 @@ const GeneralSettings = () => {
                                                                                                                             size={16}
                                                                                                                             stroke={`${theme === "dark" ? "white" : "black"}`}/>}
                                                                                                                 </Button>
-                                                                                                                {/*{*/}
-                                                                                                                {/*    formError.password &&*/}
-                                                                                                                {/*    <span className="text-destructive text-sm">{formError.password}</span>*/}
-                                                                                                                {/*}*/}
+                                                                                                                {
+                                                                                                                    formError.password &&
+                                                                                                                    <span
+                                                                                                                        className="text-destructive text-sm">{formError.password}</span>
+                                                                                                                }
                                                                                                             </div>
                                                                                                         </div>
                                                                                                     )}

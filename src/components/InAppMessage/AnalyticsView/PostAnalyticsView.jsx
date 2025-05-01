@@ -97,7 +97,7 @@ const PostAnalyticsView = () => {
                 <AnalyticsSummary analyticsViews={analyticsViews} isLoading={isLoading} />
                 <AnalyticsLineChart
                     title="How did that change over time?"
-                    data={analytics?.charts}
+                    data={analytics?.chart}
                     isLoading={isLoading}
                     chartConfig={{ y: { label: "View", color: "#7c3aed" } }}
                     dataKeys={["y"]}

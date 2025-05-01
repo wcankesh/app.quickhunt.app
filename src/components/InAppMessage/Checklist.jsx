@@ -10,6 +10,7 @@ import {Avatar, AvatarFallback, AvatarImage} from "../ui/avatar";
 import {useSelector} from "react-redux";
 import Editor from "../Comman/Editor";
 import {Collapsible, CollapsibleContent, CollapsibleTrigger,} from "../ui/collapsible"
+import {DO_SPACES_ENDPOINT} from "../../utils/constent";
 
 const checklists = ({
                         inAppMsgSetting,
@@ -88,16 +89,11 @@ const checklists = ({
             ...prev,
             checklists: prev.checklists.map((x, i) => {
                 if (i === id) {
-                    return {...x, description: newData.blocks}; // Return the updated object
+                    return {...x, description: newData.blocks};
                 }
-                return {...x}; // Return the unchanged object
+                return {...x};
             }),
         }));
-        // setEditorsData((prev) =>
-        //     prev.map((editor) =>
-        //         editor.id === id ? { ...editor, content: newData } : editor
-        //     )
-        // );
     };
 
     return (
@@ -123,13 +119,12 @@ const checklists = ({
                         {
                             inAppMsgSetting.from ? <div className={"pt-0 flex flex-row gap-2 items-center"}>
                                 <Avatar className={"w-[32px] h-[32px]"}>
-                                    <AvatarImage src={userDetailsReducer?.profileImage}
-                                                 alt={`${userDetailsReducer?.firstName} ${userDetailsReducer?.lastName}`}/>
+                                    <AvatarImage src={userDetailsReducer?.profileImage ? `${DO_SPACES_ENDPOINT}/${userDetailsReducer?.profileImage}` : null}
+                                                 alt={`${userDetailsReducer?.firstName}${userDetailsReducer?.lastName}`}/>
                                     <AvatarFallback
                                         className={`${theme === "dark" ? "bg-card-foreground text-card" : ""} text-xs`}
                                         style={{color: inAppMsgSetting.textColor}}>
-                                        {userDetailsReducer?.firstName?.substring(0, 1)}
-                                        {userDetailsReducer?.lastName?.substring(0, 1)}
+                                        {userDetailsReducer?.firstName?.substring(0, 1)}{userDetailsReducer?.lastName?.substring(0, 1)}
                                     </AvatarFallback>
                                 </Avatar>
                                 <div className={"flex flex-row gap-1"}>

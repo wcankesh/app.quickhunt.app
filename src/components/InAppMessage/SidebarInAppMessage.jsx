@@ -16,35 +16,29 @@ import {useToast} from "../ui/use-toast";
 import {useNavigate} from "react-router-dom";
 import {Checkbox} from "../ui/checkbox";
 
-const initialStateError = {
-    startAt: undefined,
-    endAt: undefined,
-    from: "",
-}
-
 const SidebarInAppMessage = ({
                                  type,
                                  inAppMsgSetting,
                                  setInAppMsgSetting,
                                  id,
                                  selectedStepIndex,
-                                 setSelectedStepIndex,
+                                 formValidate,
                                  selectedStep,
-                                 setSelectedStep
+                                 setSelectedStep,
+                                 createMessage ,
+                                 onUpdateMessage,
+                                 formError, setFormError
                              }) => {
     const {toast} = useToast();
     const navigate = useNavigate();
-    const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
-
     const [isLoading, setIsLoading] = useState(false);
     const [date, setDate] = useState([new Date(), addDays(new Date(), 4)]);
-    const [formError, setFormError] = useState(initialStateError);
 
     const onChange = (name, value) => {
         const update = {...inAppMsgSetting, [name]: value}
-        if (name === "showSender" && value === true) {
-            update.from = "";
+        if (name === "showSender" && value === false) {
+            update.from = null;
         }
         setInAppMsgSetting(update);
         setFormError(formError => ({
@@ -121,136 +115,6 @@ const SidebarInAppMessage = ({
         }));
     };
 
-    const formValidate = (name, value) => {
-        const trimmedValue = typeof value === "string" ? value.trim() : String(value || "").trim();
-        switch (name) {
-            case "from":
-                if (inAppMsgSetting.showSender && !value) {
-                    return "Sender is required.";
-                }
-                return "";
-            case "startAt":
-                if (!trimmedValue) {
-                    return "Start Date is required.";
-                }
-                return "";
-            // case "startTime":
-            //     if (!trimmedValue) {
-            //         return "Start Time is required.";
-            //     }
-            //     const startTimeFormat = /^([01]?[0-9]|2[0-3]):([0-5]?[0-9])$/;
-            //     if (!startTimeFormat.test(trimmedValue)) {
-            //         return "Start Time must be in HH:mm format.";
-            //     }
-            //     return "";
-            // case "endTime":
-            //     if (!trimmedValue) {
-            //         return "End Time is required.";
-            //     }
-            //     const endTimeFormat = /^([01]?[0-9]|2[0-3]):([0-5]?[0-9])$/;
-            //     if (!endTimeFormat.test(trimmedValue)) {
-            //         return "End Time must be in HH:mm format.";
-            //     }
-            //     return "";
-            default:
-                return "";
-        }
-    };
-
-    const createMessage = async () => {
-
-        let validationErrors = {};
-        Object.keys(inAppMsgSetting).forEach(name => {
-            const error = formValidate(name, inAppMsgSetting[name]);
-            if (error && error.length > 0) {
-                validationErrors[name] = error;
-            }
-        });
-
-        // if (inAppMsgSetting.showSender && !inAppMsgSetting.from) {
-        //     validationErrors["from"] = "Please select a member.";
-        // }
-
-        if (Object.keys(validationErrors).length > 0) {
-            setFormError(validationErrors);
-            return;
-        }
-
-        setIsLoading(true)
-        const startAt = inAppMsgSetting?.startAt
-            ? moment(inAppMsgSetting.startAt).format('YYYY-MM-DD HH:mm:ss')
-            : null;
-
-        const endAt = inAppMsgSetting?.endAt && moment(inAppMsgSetting.endAt).isValid()
-            ? moment(inAppMsgSetting.endAt).format('YYYY-MM-DD HH:mm:ss')
-            : null;
-        const payload = {
-            ...inAppMsgSetting,
-            startAt: startAt,
-            endAt: endAt,
-            projectId: projectDetailsReducer.id,
-            type: type
-        }
-        const data = await apiService.createInAppMessage(payload);
-        setIsLoading(false);
-        if (data.success) {
-            toast({description: data.message})
-            if (id === "new") {
-                navigate(`${baseUrl}/app-message`)
-            }
-        } else {
-            toast({variant: "destructive", description: data.error.message})
-        }
-    }
-
-    const onUpdateMessage = async () => {
-
-        let validationErrors = {};
-        Object.keys(inAppMsgSetting).forEach(name => {
-            const error = formValidate(name, inAppMsgSetting[name]);
-            if (error && error.length > 0) {
-                validationErrors[name] = error;
-            }
-        });
-
-        // f (inAppMsgSetting.showSender && !inAppMsgSetting.from) {
-        //     validationErrors["from"] = "Please select a member.";
-        // }i
-
-        if (Object.keys(validationErrors).length > 0) {
-            setFormError(validationErrors);
-            return;
-        }
-
-        if (inAppMsgSetting.type == "3") {
-            if (inAppMsgSetting.steps.filter((x) => x.isActive && x.questionType !== 8).length <= 0) {
-                toast({variant: "destructive", description: "Add minimum 1 step"})
-                return
-            }
-        }
-        const startAt = inAppMsgSetting?.startAt
-            ? moment(inAppMsgSetting.startAt).format('YYYY-MM-DD HH:mm:ss')
-            : null;
-
-        const endAt = inAppMsgSetting?.endAt && moment(inAppMsgSetting.endAt).isValid()
-            ? moment(inAppMsgSetting.endAt).format('YYYY-MM-DD HH:mm:ss')
-            : null;
-        setIsLoading(true)
-        const payload = {
-            ...inAppMsgSetting,
-            startAt: startAt,
-            endAt: endAt,
-            type: type,
-        }
-        const data = await apiService.updateInAppMessage(payload, inAppMsgSetting.id)
-        setIsLoading(false)
-        if (data.success) {
-            toast({description: data.message})
-        } else {
-            toast({variant: "destructive", description: data.error.message})
-        }
-    }
-
     const updateStepRecord = (record) => {
         let clone = [...inAppMsgSetting.steps];
         clone[selectedStepIndex] = record;
@@ -324,7 +188,7 @@ const SidebarInAppMessage = ({
                     {
                         inAppMsgSetting.showSender &&
                         <div className="grid w-full items-center gap-1.5">
-                            <Label className={"font-normal"}>From</Label>
+                            <Label className={"font-normal after:ml-0.5 after:content-['*'] after:text-destructive"}>From</Label>
                             <Select
                                 value={Number(inAppMsgSetting.from)}
                                 name={"from"}
@@ -360,7 +224,7 @@ const SidebarInAppMessage = ({
                             </Select>
 
                             {(inAppMsgSetting.showSender && formError?.from) && (
-                                <p className="text-red-500 text-sm mt-1">{formError.from}</p>
+                                <p className="text-red-500 text-sm">{formError.from}</p>
                             )}
                         </div>
                     }
@@ -480,7 +344,7 @@ const SidebarInAppMessage = ({
                         </Fragment>
                     }
                     {
-                        type === "2" && inAppMsgSetting.actionType != 0 &&
+                        type === "2" && (inAppMsgSetting.actionType == 2 || inAppMsgSetting.actionType == 3) &&
                         <div className="grid w-full items-center gap-1.5">
                             <div className="flex items-center gap-2">
                                 <Checkbox id="isBannerCloseButton"

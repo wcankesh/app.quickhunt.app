@@ -10,7 +10,14 @@ import Post from "./Post";
 import Banners from "./Banners";
 import Surveys from "./Surveys";
 import Checklist from "./Checklist";
-import {Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator} from "../ui/breadcrumb";
+import {
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList,
+    BreadcrumbPage,
+    BreadcrumbSeparator
+} from "../ui/breadcrumb";
 import SidebarInAppMessage from "./SidebarInAppMessage";
 import {useToast} from "../ui/use-toast";
 import {Skeleton} from "../ui/skeleton";
@@ -125,6 +132,12 @@ const checkListObj = {
     checklistId: ""
 }
 
+const initialStateError = {
+    startAt: undefined,
+    endAt: undefined,
+    from: "",
+}
+
 const UpdateInAppMessage = () => {
     const {toast} = useToast()
     const navigate = useNavigate();
@@ -138,6 +151,7 @@ const UpdateInAppMessage = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [selectedStep, setSelectedStep] = useState(null);
     const [isSave, setIsSave] = useState(false);
+    const [formError, setFormError] = useState(initialStateError);
 
     const renderContent = (type) => {
         switch (type) {
@@ -152,7 +166,8 @@ const UpdateInAppMessage = () => {
                                 )
                             })}
                     </Fragment>
-                    : <Post inAppMsgSetting={inAppMsgSetting} setInAppMsgSetting={setInAppMsgSetting} isLoading={isLoading}/>;
+                    : <Post inAppMsgSetting={inAppMsgSetting} setInAppMsgSetting={setInAppMsgSetting}
+                            isLoading={isLoading}/>;
             case "2":
                 return isLoading ? <Fragment>
                         {
@@ -164,7 +179,8 @@ const UpdateInAppMessage = () => {
                                 )
                             })}
                     </Fragment>
-                    : <Banners inAppMsgSetting={inAppMsgSetting} setInAppMsgSetting={setInAppMsgSetting} isLoading={isLoading}/>;
+                    : <Banners inAppMsgSetting={inAppMsgSetting} setInAppMsgSetting={setInAppMsgSetting}
+                               isLoading={isLoading}/>;
             case "3":
                 return isLoading ? <Fragment>
                         {
@@ -206,7 +222,6 @@ const UpdateInAppMessage = () => {
                 ...prevState,
                 title: `${type === "1" ? "Post" : type === "2" ? "Banner" : type === "3" ? "Survey" : "Checklist"} in app message`,
                 reactions: type === "1" ? reactionPost : type === "2" ? reactionBanner : [],
-                // bodyText: type === "1" ? { blocks: [{type: "paragraph", data: {text: "Hey"}}]} : "",
                 bodyText: type === "1"
                     ? JSON.stringify({
                         blocks: [{type: "paragraph", data: {text: "Hey"}}]
@@ -246,26 +261,57 @@ const UpdateInAppMessage = () => {
         }
     }
 
+    const formValidate = (name, value) => {
+        const trimmedValue = typeof value === "string" ? value.trim() : String(value || "").trim();
+        switch (name) {
+            case "from":
+                if (inAppMsgSetting.showSender && !value) {
+                    return "Sender is required.";
+                }
+                return "";
+            case "startAt":
+                if (!trimmedValue) {
+                    return "Start Date is required.";
+                }
+                return "";
+            default:
+                return "";
+        }
+    };
+
     const createMessage = async () => {
         if (type == "3") {
             const activeSteps = inAppMsgSetting.steps.filter((x) => x.isActive && x.questionType !== 8);
             if (activeSteps.length <= 0) {
-                toast({ variant: "destructive", description: "Add minimum 1 step" });
+                toast({variant: "destructive", description: "Add minimum 1 step"});
                 return;
             }
             for (const step of activeSteps) {
                 if (step.questionType === 5) {
                     if (!step.options || step.options.length === 0) {
-                        toast({ variant: "destructive", description: "At least one option is required." });
+                        toast({variant: "destructive", description: "At least one option is required."});
                         return;
                     }
                     const hasEmptyTitle = step.options.some(opt => !opt.title?.trim());
                     if (hasEmptyTitle) {
-                        toast({ variant: "destructive", description: "Option cannot be empty." });
+                        toast({variant: "destructive", description: "Option cannot be empty."});
                         return;
                     }
                 }
             }
+        }
+
+        let validationErrors = {};
+        Object.keys(inAppMsgSetting).forEach(name => {
+            const error = formValidate(name, inAppMsgSetting[name]);
+            if (error && error.length > 0) {
+                validationErrors[name] = error;
+            }
+        });
+
+        if (Object.keys(validationErrors).length > 0) {
+            setFormError(validationErrors);
+            return;
         }
 
         const startAt = inAppMsgSetting?.startAt
@@ -283,6 +329,7 @@ const UpdateInAppMessage = () => {
             projectId: projectDetailsReducer.id,
             type: type
         }
+
         setIsSave(true)
         const data = await apiService.createInAppMessage(payload);
         setIsSave(false);
@@ -300,22 +347,35 @@ const UpdateInAppMessage = () => {
         if (type == "3") {
             const activeSteps = inAppMsgSetting.steps.filter((x) => x.isActive && x.questionType !== 8);
             if (activeSteps.length <= 0) {
-                toast({ variant: "destructive", description: "Add minimum 1 step" });
+                toast({variant: "destructive", description: "Add minimum 1 step"});
                 return;
             }
             for (const step of activeSteps) {
                 if (step.questionType === 5) {
                     if (!step.options || step.options.length === 0) {
-                        toast({ variant: "destructive", description: "At least one option is required." });
+                        toast({variant: "destructive", description: "At least one option is required."});
                         return;
                     }
                     const hasEmptyTitle = step.options.some(opt => !opt.title?.trim());
                     if (hasEmptyTitle) {
-                        toast({ variant: "destructive", description: "Option cannot be empty." });
+                        toast({variant: "destructive", description: "Option cannot be empty."});
                         return;
                     }
                 }
             }
+        }
+
+        let validationErrors = {};
+        Object.keys(inAppMsgSetting).forEach(name => {
+            const error = formValidate(name, inAppMsgSetting[name]);
+            if (error && error.length > 0) {
+                validationErrors[name] = error;
+            }
+        });
+
+        if (Object.keys(validationErrors).length > 0) {
+            setFormError(validationErrors);
+            return;
         }
 
         setIsSave(true)
@@ -400,7 +460,9 @@ const UpdateInAppMessage = () => {
                     <SidebarInAppMessage id={id} type={type} inAppMsgSetting={inAppMsgSetting}
                                          setInAppMsgSetting={setInAppMsgSetting} selectedStepIndex={selectedStepIndex}
                                          setSelectedStepIndex={setSelectedStepIndex} selectedStep={selectedStep}
-                                         setSelectedStep={setSelectedStep}/>
+                                         setSelectedStep={setSelectedStep} formValidate={formValidate}
+                                         formError={formError} setFormError={setFormError} createMessage={createMessage}
+                                         onUpdateMessage={onUpdateMessage}/>
                 </div>
                 <div className={"bg-muted w-full h-[100vh] md:h-full overflow-y-auto"}>
                     <Card className={`my-6 mx-4 rounded-md px-4 pt-6 pb-8 h-[calc(100%_-_48px)] `}>

@@ -8,6 +8,7 @@ import {Popover, PopoverContent} from "../ui/popover";
 import {PopoverTrigger} from "@radix-ui/react-popover";
 import {Button} from "../ui/button";
 import EmojiPicker from "emoji-picker-react";
+import {DO_SPACES_ENDPOINT} from "../../utils/constent";
 
 const Banners = ({inAppMsgSetting, setInAppMsgSetting}) => {
     const {theme} = useTheme();
@@ -71,11 +72,10 @@ const Banners = ({inAppMsgSetting, setInAppMsgSetting}) => {
                     {
                         (inAppMsgSetting.showSender && inAppMsgSetting.from) &&
                         <Avatar className={"w-[32px] h-[32px]"}>
-                            <AvatarImage src={userDetailsReducer?.profileImage} alt={`${userDetailsReducer?.firstName} ${userDetailsReducer?.lastName}`}/>
+                            <AvatarImage src={userDetailsReducer?.profileImage ? `${DO_SPACES_ENDPOINT}/${userDetailsReducer?.profileImage}` : null} alt={`${userDetailsReducer?.firstName}${userDetailsReducer?.lastName}`}/>
                             <AvatarFallback
                                 className={`${theme === "dark" ? "bg-card-foreground text-card" : ""} text-xs`}>
-                                {userDetailsReducer?.firstName?.substring(0, 1)}
-                                {userDetailsReducer?.lastName?.substring(0, 1)}
+                                {userDetailsReducer?.firstName?.substring(0, 1)}{userDetailsReducer?.lastName?.substring(0, 1)}
                             </AvatarFallback>
                         </Avatar>
                     }

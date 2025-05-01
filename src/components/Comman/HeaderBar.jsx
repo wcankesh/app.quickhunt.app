@@ -45,7 +45,6 @@ import {useDispatch, useSelector} from "react-redux";
 import {useToast} from "../ui/use-toast";
 import {projectDetailsAction} from "../../redux/action/ProjectDetailsAction";
 import {allProjectAction} from "../../redux/action/AllProjectAction";
-import {userDetailsAction} from "../../redux/action/UserDetailAction";
 import {allStatusAndTypesAction} from "../../redux/action/AllStatusAndTypesAction";
 import DeleteDialog from "./DeleteDialog";
 
@@ -99,7 +98,10 @@ const HeaderBar = ({setIsMobile}) => {
     const [scrollingDown, setScrollingDown] = useState(false);
     const [isOpenDeleteAlert, setIsOpenDeleteAlert] = useState(false);
     const [isDeleteLoading, setDeleteIsLoading] = useState(false);
+    const [deleteProjectId, setDeleteProjectId] = useState(null);
     const [isCreateLoading, setIsCreateLoading] = useState(false);
+
+    const userProjectCount = projectList?.filter(p => p.userId == userDetailsReducer?.id).length || 0;
 
     const viewLink = () => {
         window.open(`https://${projectDetailsReducer.domain}/ideas`, "_blank")
@@ -275,11 +277,9 @@ const HeaderBar = ({setIsMobile}) => {
             setCreateProjectDetails(initialStateProject)
             navigate(`${baseUrl}/dashboard`);
             closeSheet();
-            // setSheetOpen(false)
         } else {
             toast({variant: "destructive", description: data?.error?.message})
         }
-        // closeSheet()
     }
 
     const onChangeProject = (value) => {
@@ -306,18 +306,18 @@ const HeaderBar = ({setIsMobile}) => {
         };
     }, []);
 
-    const deleteAlert = () => {
+    const deleteAlert = (proId) => {
         setIsOpenDeleteAlert(true);
+        setDeleteProjectId(proId)
     }
 
     const onDelete = async () => {
+        if (!deleteProjectId) return;
         setDeleteIsLoading(true);
-        const data = await apiService.deleteProjects(projectDetailsReducer.id);
-
-        if (data.status === 200) {
-            const updatedProjects = allProjectReducer.projectList.filter(
-                (project) => project.id !== projectDetailsReducer.id
-            );
+        const data = await apiService.deleteProjects(deleteProjectId);
+        setDeleteIsLoading(false);
+        if (data.success) {
+            const updatedProjects = allProjectReducer.projectList.filter((project) => project.id != deleteProjectId);
             const nextProject = updatedProjects[0] || null;
             if (nextProject) {
                 setProjectDetails(nextProject);
@@ -328,15 +328,11 @@ const HeaderBar = ({setIsMobile}) => {
             }
             dispatch(allProjectAction({projectList: updatedProjects}));
             setProjectList(updatedProjects);
-            setDeleteIsLoading(false);
             setIsOpenDeleteAlert(false);
+            setDeleteProjectId(null)
             toast({description: data.message});
-            setTimeout(() => {
-                history.push('/');
-            }, 2000);
         } else {
-            setDeleteIsLoading(false);
-            toast({variant: 'destructive', description: 'Failed to delete the project.'});
+            toast({variant: 'destructive', description: data.error?.message});
         }
     };
 
@@ -399,18 +395,13 @@ const HeaderBar = ({setIsMobile}) => {
                 />
             }
 
-            {/*<div className={"w-full p-3 pr-0 lg:py-3"}>*/}
             <div className={"w-full flex justify-between xl:justify-end items-center h-[56px] px-3"}>
                 <div className={"flex justify-between items-center w-full h-full gap-2"}>
                     <div className={"flex gap-3 items-center"}>
-
-                        {/*Mobile said bar start */}
                         <Button variant="outline" size="icon" className="shrink-0 xl:hidden"
                                 onClick={() => setIsMobile(true)}>
                             <Menu size={20}/>
                         </Button>
-                        {/*Mobile said bar End */}
-
                         <div className="flex h-11 items-center hidden xl:block">
                             <div className={"app-logo cursor-pointer h-[45px]"}
                                  onClick={() => onRedirect("/dashboard")}>
@@ -441,16 +432,13 @@ const HeaderBar = ({setIsMobile}) => {
                                             <CommandList>
                                                 <CommandEmpty>No project found.</CommandEmpty>
                                                 <CommandGroup>
-                                                    {(projectList || []).map((x, i) => (
-                                                        <Fragment key={i}>
-                                                            <CommandItem
-                                                                className={`${projectDetailsReducer.id === x.id ? `${theme === "dark" ? "text-card-foreground  hov-primary-dark" : "text-card hov-primary"} bg-primary` : 'bg-card'} gap-0.5`}
-                                                                value={x.id}
-                                                                // onSelect={() => {
-                                                                //     onChangeProject(x.id);
-                                                                //     setOpen(false)
-                                                                // }}
-                                                            >
+                                                    {(projectList || []).map((x, i) => {
+                                                        return (
+                                                            <Fragment key={i}>
+                                                                <CommandItem
+                                                                    className={`${projectDetailsReducer.id === x.id ? `${theme === "dark" ? "text-card-foreground  hov-primary-dark" : "text-card hov-primary"} bg-primary` : 'bg-card'} gap-0.5`}
+                                                                    value={x.id}
+                                                                >
                                                                 <span
                                                                     className={"w-full text-sm font-medium cursor-pointer max-w-[159px] truncate text-ellipsis overflow-hidden whitespace-nowrap"}
                                                                     onClick={() => {
@@ -460,14 +448,14 @@ const HeaderBar = ({setIsMobile}) => {
                                                                 >
                                                                     {x.name}
                                                                 </span>
-                                                                {
-                                                                    (userDetailsReducer?.id == x?.user_id) &&
-                                                                    <Trash2 className={"cursor-pointer"} size={16}
-                                                                            onClick={deleteAlert}/>
-                                                                }
-                                                            </CommandItem>
-                                                        </Fragment>
-                                                    ))}
+                                                                    {(userDetailsReducer?.id == x?.userId && userProjectCount > 1) && (
+                                                                        <Trash2 className={"cursor-pointer"} size={16}
+                                                                                onClick={() => deleteAlert(x.id)}/>
+                                                                    )}
+                                                                </CommandItem>
+                                                            </Fragment>
+                                                        )
+                                                    })}
                                                     <div
                                                         className={"flex gap-2 items-center cursor-pointer py-[6px] px-3"}
                                                         onClick={openSheet}>
@@ -496,7 +484,9 @@ const HeaderBar = ({setIsMobile}) => {
                                 <DropdownMenuTrigger asChild>
                                     <Button variant="secondary" size="icon" className="rounded-full w-[30px] h-[30px]">
                                         <Avatar className={"w-[30px] h-[30px]"}>
-                                            <AvatarImage src={userDetails.profileImage ? `${DO_SPACES_ENDPOINT}/${userDetails.profileImage}` : null} alt={`${userDetails && userDetails?.firstName?.substring(0, 1)?.toUpperCase()}${userDetails?.lastName?.substring(0, 1)?.toUpperCase()}`}/>
+                                            <AvatarImage
+                                                src={userDetails.profileImage ? `${DO_SPACES_ENDPOINT}/${userDetails.profileImage}` : null}
+                                                alt={`${userDetails && userDetails?.firstName?.substring(0, 1)?.toUpperCase()}${userDetails?.lastName?.substring(0, 1)?.toUpperCase()}`}/>
                                             <AvatarFallback>{userDetails?.firstName?.substring(0, 1)?.toUpperCase()}{userDetails?.lastName?.substring(0, 1)?.toUpperCase()}</AvatarFallback>
                                         </Avatar>
                                     </Button>

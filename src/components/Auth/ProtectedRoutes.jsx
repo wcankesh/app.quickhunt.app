@@ -114,7 +114,7 @@ export default ProtectedRoutes;
 //     }, [Token])
 //     const loginUserDetails = async () =>{
 //         const data = await apiService.getLoginUserDetails()
-//         if(data.status === 200){
+//         if(data.success){
 //             window.quickhuntSettings = {
 //                 name: `${data.data.firstName} ${data.data.lastName}`,
 //                 email: data.data.email,
