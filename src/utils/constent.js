@@ -64,6 +64,38 @@ export const isTokenAboutToExpire = () => {
     return Date.now() >= exp * 1000;
 };
 
+export  const extractImageFilename = (url) => {
+    const match = url.match(/(img-[\w.-]+\.(jpg|jpeg|png|gif|jfif|webp))/i);
+    return match ? match[1] : url;
+};
+
+export const fileUploaderOnEditor = ({ uploadFolder, moduleName }) => {
+    return {
+        uploadByFile: async (file) => {
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('uploadFolder', uploadFolder);
+            formData.append('moduleName', moduleName);
+
+            const res = await fetch(`${BASE_URL_API}/media/upload`, {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${token()}`,
+                },
+                body: formData,
+            });
+
+            const result = await res.json();
+
+            return {
+                success: 1,
+                file: {
+                    url: `${DO_SPACES_ENDPOINT}/${result?.data?.uploadPath}/${result?.data?.imageUrl}`,
+                },
+            };
+        }
+    };
+};
 
 export const apiService = new ApiService();
 

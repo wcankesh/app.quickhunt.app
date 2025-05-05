@@ -10,7 +10,7 @@ import ReadMoreText from "../Comman/ReadMoreText";
 import {DateRangePicker, formatDate, getPresetRange, PRESETS} from "../ui/date-range-picker";
 import {Button} from "../ui/button";
 import {useNavigate} from "react-router-dom";
-import {apiService, baseUrl, DO_SPACES_ENDPOINT} from "../../utils/constent";
+import {apiService, baseUrl} from "../../utils/constent";
 import {Badge} from "../ui/badge";
 import {UserAvatar} from "../Comman/CommentEditor";
 
@@ -141,7 +141,7 @@ export function Dashboard() {
     useEffect(() => {
         checkPreset()
     }, [state])
-    console.log("chartList", chartList)
+
     const programAnalytics = [
         {
             id: 1,

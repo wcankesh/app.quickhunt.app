@@ -95,32 +95,6 @@ export class ApiService {
         return resData || response
     }
 
-    async patchData(url, data, isFormData) {
-        const config = {
-            headers: {
-                "Content-Type": isFormData ? 'multipart/form-data' : "application/json",
-                "Accept": "*/*"
-            }
-        }
-        let resData = '';
-        let response = '';
-        await instance.patch(url, data, config).then((res) => {
-            if (res.data.status === 200) {
-                response = res.data;
-            } else {
-                response = res.data
-            }
-        }).catch((e) => {
-            if (e.response.status === 403) {
-                logout();
-                removeProjectDetails()
-                window.location.replace(`${baseUrl}/login`)
-            }
-            resData = e.response.data;
-        })
-        return resData || response
-    }
-
     async deleteData(url) {
         const config = {
             headers: {
@@ -239,8 +213,9 @@ export class ApiService {
     async filterPost(payload) {
         return await this.postData(`${baseUrlApi}/search`, payload)
     }
-    async updatePosts (payload, id){
-        return await this.putData(`${baseUrlApi}/post/update-post?id=${id}`,payload, true)
+
+    async updatePosts(payload, id) {
+        return await this.putData(`${baseUrlApi}/post/update-post?id=${id}`, payload, true)
     }
 
     async deletePosts(id) {
@@ -303,7 +278,7 @@ export class ApiService {
     }
 
     /* ---------- Users api ---------- */
-    async getAllUsers (payload){
+    async getAllUsers(payload) {
         return await this.getData(`${baseUrlApi}/customer-auth/get-all?${qs.stringify(payload)}`)
     }
 
@@ -363,19 +338,22 @@ export class ApiService {
     }
 
     async roadmapSettingsStatusRank(payload) {
-        return await this.patchData(`${baseUrlApi}/road-map-status/update-rank`, payload)
+        return await this.putData(`${baseUrlApi}/road-map-status/update-rank`, payload)
     }
 
     /* ---------- Ideas api ---------- */
-    async getAllIdea (payload){
+    async getAllIdea(payload) {
         return await this.postData(`${baseUrlApi}/idea/getAll`, payload)
     }
+
     async getIdeaVote(payload) {
         return await this.postData(`${baseUrlApi}/vote/get-votes`, payload,)
     }
+
     async removeUserVote(payload) {
         return await this.postData(`${baseUrlApi}/vote/remove-vote`, payload,)
     }
+
     async getSingleIdea(id) {
         return await this.getData(`${baseUrlApi}/idea/getOne/${id}`)
     }
@@ -475,7 +453,8 @@ export class ApiService {
     async createSubCategory(payload) {
         return await this.postData(`${baseUrlApi}/article-subCategory/subCategories`, payload, true)
     }
-    async getAllCategory (payload){
+
+    async getAllCategory(payload) {
         return await this.getData(`${baseUrlApi}/article-category/get-all-categories?${qs.stringify(payload)}`,)
     }
 
@@ -500,24 +479,24 @@ export class ApiService {
     }
 
     /* ---------- Help Center Articles api ---------- */
-    async getAllArticles (payload){
-        return await this.getData(`${baseUrlApi}/artical/get-all-articles?${qs.stringify(payload)}`,)
+    async getAllArticles(payload) {
+        return await this.getData(`${baseUrlApi}/article/get-all-articles?${qs.stringify(payload)}`,)
     }
 
     async createArticles(payload) {
-        return await this.postData(`${baseUrlApi}/artical/articles`, payload)
+        return await this.postData(`${baseUrlApi}/article/articles`, payload)
     }
 
     async getSingleArticle(id) {
-        return await this.getData(`${baseUrlApi}/artical/get-single-articles?id=${id}`)
+        return await this.getData(`${baseUrlApi}/article/get-single-articles?id=${id}`)
     }
 
     async updateArticle(payload, id) {
-        return await this.putData(`${baseUrlApi}/artical/update-articles?id=${id}`, payload)
+        return await this.putData(`${baseUrlApi}/article/update-articles?id=${id}`, payload)
     }
 
     async deleteArticles(id) {
-        return await this.deleteData(`${baseUrlApi}/artical/delete-articles?id=${id}`)
+        return await this.deleteData(`${baseUrlApi}/article/delete-articles?id=${id}`)
     }
 
     async articleSearch(payload) {

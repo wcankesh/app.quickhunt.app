@@ -122,7 +122,7 @@ const BannerAnalyticsView = () => {
         if (data.success) {
             const payload = {
                 ...data.data.data,
-                bodyText: type === "1" ? JSON.parse(data.data.data.bodyText) : data.data.data.bodyText,
+                bodyText: data.data.data.bodyText,
             }
             const combinedData = {};
             data.data.analytics?.charts.forEach(({x, y}) => {

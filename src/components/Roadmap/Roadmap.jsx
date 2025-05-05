@@ -93,7 +93,7 @@ const Roadmap = () => {
         }));
         const data = await apiService.setRoadmapRank({ ranks: rankPayload });
         if (data.success) {
-           // toast({ description: data.message });
+           toast({ description: data.message });
         } else {
             toast({ variant: "destructive", description: data?.error?.message });
         }

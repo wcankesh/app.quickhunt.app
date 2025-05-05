@@ -1,4 +1,4 @@
-import React, {useState, Fragment} from 'react';
+import React, {Fragment} from 'react';
 import {Label} from "../ui/label";
 import {Select, SelectGroup, SelectValue} from "@radix-ui/react-select";
 import {SelectContent, SelectItem, SelectTrigger} from "../ui/select";
@@ -10,9 +10,8 @@ import {Popover, PopoverContent, PopoverTrigger} from "../ui/popover";
 import moment from "moment";
 import {Calendar} from "../ui/calendar";
 import {useSelector} from "react-redux";
-import {apiService, baseUrl} from "../../utils/constent";
+import {baseUrl} from "../../utils/constent";
 import {addDays} from "date-fns";
-import {useToast} from "../ui/use-toast";
 import {useNavigate} from "react-router-dom";
 import {Checkbox} from "../ui/checkbox";
 
@@ -25,15 +24,12 @@ const SidebarInAppMessage = ({
                                  formValidate,
                                  selectedStep,
                                  setSelectedStep,
-                                 createMessage ,
-                                 onUpdateMessage,
+                                 handleMessage ,saving,
                                  formError, setFormError
                              }) => {
-    const {toast} = useToast();
     const navigate = useNavigate();
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
-    const [isLoading, setIsLoading] = useState(false);
-    const [date, setDate] = useState([new Date(), addDays(new Date(), 4)]);
+    const date = [new Date(), addDays(new Date(), 4)];
 
     const onChange = (name, value) => {
         const update = {...inAppMsgSetting, [name]: value}
@@ -48,11 +44,14 @@ const SidebarInAppMessage = ({
     };
 
     const onChangeAddOption = (index, value) => {
-        const clone = [...selectedStep.options];
-        clone[index] = {...clone[index], title: value}
-        const obj = {...selectedStep, options: clone,}
-        setSelectedStep(obj);
-        updateStepRecord(obj)
+        const trimmedValue = value.trim();
+        if (trimmedValue !== '') {
+            const clone = [...selectedStep.options];
+            clone[index] = { ...clone[index], title: value };
+            const obj = { ...selectedStep, options: clone };
+            setSelectedStep(obj);
+            updateStepRecord(obj);
+        }
     };
 
     const addOption = () => {
@@ -295,10 +294,16 @@ const SidebarInAppMessage = ({
                                     </div>
 
                                     <div className="grid w-full items-center gap-1.5">
-                                        <Label htmlFor="actionUrl" className={"font-normal"}>Action URL</Label>
+                                        <Label htmlFor="actionUrl" className={"font-normal  after:ml-0.5 after:content-['*'] after:text-destructive"}>Action URL</Label>
                                         <Input className={"h-9"} id="actionUrl" placeholder="Enter URL address"
                                                value={selectedStep?.actionUrl}
-                                               onChange={(e) => onChangeChecklist("actionUrl", e.target.value)}/>
+                                               onChange={(e) => {
+                                                   onChangeChecklist("actionUrl", e.target.value)
+                                                   setFormError(prev => ({...prev, actionUrl: ""}));
+                                               }}/>
+                                        {formError?.actionUrl && (
+                                            <p className="text-red-500 text-sm">{formError.actionUrl}</p>
+                                        )}
                                     </div>
 
                                     <div className="grid w-full items-center gap-1.5">
@@ -325,10 +330,16 @@ const SidebarInAppMessage = ({
                             </div>
 
                             <div className="grid w-full items-center gap-1.5">
-                                <Label htmlFor="actionUrl" className={"font-normal"}>Action URL</Label>
+                                <Label htmlFor="actionUrl" className={"font-normal  after:ml-0.5 after:content-['*'] after:text-destructive"}>Action URL</Label>
                                 <Input className={"h-9"} id="actionUrl" placeholder="Enter URL address"
                                        value={inAppMsgSetting.actionUrl}
-                                       onChange={(e) => onChange("actionUrl", e.target.value)}/>
+                                       onChange={(e) => {
+                                           onChange("actionUrl", e.target.value)
+                                           setFormError(prev => ({...prev, actionUrl: ""}));
+                                       }}/>
+                                {formError?.actionUrl && (
+                                    <p className="text-red-500 text-sm">{formError.actionUrl}</p>
+                                )}
                             </div>
 
                             <div className="grid w-full items-center gap-1.5">
@@ -694,8 +705,8 @@ const SidebarInAppMessage = ({
             </div>
             <div className={"px-4 py-6 flex justify-between gap-2"}>
                 <Button className={`w-[111px] font-medium hover:bg-primary`}
-                        onClick={id === "new" ? createMessage : onUpdateMessage}>
-                    {isLoading ? <Loader2 className={"h-4 w-4 animate-spin"}/> : "Save Changes"}
+                        onClick={id === "new" ? () => handleMessage("create", 'createdByBottom') : () => handleMessage('update','updatedByBottom')}>
+                    {(saving === 'createdByBottom' || saving === 'updatedByBottom') ? <Loader2 className={"h-4 w-4 animate-spin"}/> : "Save Changes"}
                 </Button>
                 <Button variant={"ghost hover-none"} className={"font-medium border border-primary text-primary"}
                         onClick={handleCancel}>Cancel</Button>

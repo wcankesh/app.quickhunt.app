@@ -20,7 +20,7 @@ import Marker from "@editorjs/marker";
 import InlineCode from "@editorjs/inline-code";
 import {PopoverTrigger} from "@radix-ui/react-popover";
 import {Popover, PopoverContent} from "../ui/popover";
-import {BASE_URL_API, DO_SPACES_ENDPOINT} from "../../utils/constent";
+import {DO_SPACES_ENDPOINT, fileUploaderOnEditor} from "../../utils/constent";
 
 const Post = ({inAppMsgSetting, setInAppMsgSetting, isLoading}) => {
     const editorCore = useRef(null);
@@ -33,7 +33,7 @@ const Post = ({inAppMsgSetting, setInAppMsgSetting, isLoading}) => {
         const savedData = await editorCore.current.save();
         setInAppMsgSetting(prevState => ({
             ...prevState,
-            bodyText: JSON.stringify({blocks: savedData.blocks})
+            bodyText: {blocks: savedData.blocks}
         }));
     }, []);
 
@@ -58,12 +58,7 @@ const Post = ({inAppMsgSetting, setInAppMsgSetting, isLoading}) => {
             class: Image,
             inlineToolbar: true,
             config: {
-                endpoints: {
-                    byFile: `${BASE_URL_API}/upload`, // Your file upload endpoint
-                    byUrl: 'https://code.quickhunt.app/public/storage/post', // Your endpoint that provides image by URL
-                },
-                field: 'image',
-                types: 'image/*',
+                uploader: fileUploaderOnEditor({ uploadFolder: 'post', moduleName: 'post' })
             },
             // actions: [
             //     {
@@ -98,7 +93,6 @@ const Post = ({inAppMsgSetting, setInAppMsgSetting, isLoading}) => {
             ...prevState,
             reactions: clone
         }));
-
     }
 
     const onDeleteReaction = (record, index) => {
@@ -116,6 +110,32 @@ const Post = ({inAppMsgSetting, setInAppMsgSetting, isLoading}) => {
 
     useEffect(() => {
         if (!isLoading) {
+            let editorData = {
+                blocks: [{ type: "paragraph", data: { text: "Hey" } }]
+            };
+
+            if (inAppMsgSetting?.bodyText?.blocks) {
+                const parsedData = inAppMsgSetting.bodyText;
+                if (parsedData && parsedData.blocks) {
+                    editorData.blocks = parsedData.blocks.map(block => {
+                        if (block.type === 'image' && block.data?.file?.url) {
+                            const filename = block.data.file.url;
+                            return {
+                                ...block,
+                                data: {
+                                    ...block.data,
+                                    file: {
+                                        ...block.data.file,
+                                        url: `${DO_SPACES_ENDPOINT}/${filename}`
+                                    }
+                                }
+                            };
+                        }
+                        return block;
+                    });
+                }
+            }
+
             editorCore.current = new EditorJS({
                 holder: 'editorjs',
                 autofocus: true,
@@ -124,19 +144,19 @@ const Post = ({inAppMsgSetting, setInAppMsgSetting, isLoading}) => {
                 onChange: handleSave,
                 data: {
                     time: new Date().getTime(),
-                    blocks: inAppMsgSetting?.bodyText?.blocks || [{type: "paragraph", data: {text: "Hey"}}],
+                    blocks: editorData.blocks,
                     version: "2.12.4"
                 }
             });
 
             return () => {
                 if (editorCore.current && typeof editorCore.current.destroy === 'function') {
-                    editorCore.current.destroy(); // Destroy the editor instance
+                    editorCore.current.destroy();
                 }
             };
         }
-
     }, [isLoading]);
+
 
     return (
         <div
@@ -144,8 +164,7 @@ const Post = ({inAppMsgSetting, setInAppMsgSetting, isLoading}) => {
             <Card className={`rounded-[10px] p-0`}>
                 <CardHeader className={"flex px-4 pt-4 pb-0 flex-row justify-end"}>
                     <Button className={`h-4 w-4 p-0 ${theme === "dark" ? "" : "text-muted-foreground"}`}
-                            variant={"ghost hover:none"}><X size={16} stroke={inAppMsgSetting?.btnColor}
-                                                            className={"h-5 w-5"}/></Button>
+                            variant={"ghost hover:none"}><X size={16} stroke={inAppMsgSetting?.btnColor} className={"h-5 w-5"}/></Button>
                 </CardHeader>
                 <CardHeader className={"p-4 pt-0"}>
                     {

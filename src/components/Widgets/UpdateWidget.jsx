@@ -50,7 +50,7 @@ const initialState = {
     changelogTitle: "Announcement",
     changelogDisplay: 1,
     changelogReaction: false,
-    hideHeader: false,
+    hideHeader: true,
     announcementDescription: false,
     announcementImage: false,
     ideaDescription: false,
@@ -76,11 +76,11 @@ const UpdateWidget = () => {
         setSelectedToggle(value);
     };
 
-    useEffect(() => {
-        setTimeout(() => {
-            document.body.style.pointerEvents = 'auto';
-        }, 500)
-    }, []);
+    // useEffect(() => {
+    //     setTimeout(() => {
+    //         document.body.style.pointerEvents = 'auto';
+    //     }, 500)
+    // }, []);
 
     useEffect(() => {
         if (id !== "new") {
@@ -344,8 +344,8 @@ const UpdateWidget = () => {
                         <div className={"flex gap-2 items-center"}>
                             <Checkbox
                                 id={"hideHeader"}
-                                checked={widgetsSetting.hideHeader}
-                                onCheckedChange={(checked) => onChangeCheckBox("hideHeader", checked)}
+                                checked={widgetsSetting.hideHeader === false}
+                                onCheckedChange={(checked) => onChangeCheckBox("hideHeader", !checked)}
                             />
                             <label htmlFor="hideHeader" className="text-sm">Show header</label>
                         </div>
@@ -401,8 +401,7 @@ const UpdateWidget = () => {
                                     checked={widgetsSetting.changelogReaction}
                                     onCheckedChange={(checked) => onChangeCheckBox("changelogReaction", checked)}
                                 />
-                                <label htmlFor="changelogReaction" className="text-sm">Show
-                                    Reaction</label>
+                                <label htmlFor="changelogReaction" className="text-sm">Show Reaction</label>
                             </div>
                             <div className={"flex gap-2 items-center"}>
                                 <Checkbox
@@ -457,8 +456,7 @@ const UpdateWidget = () => {
                                     checked={widgetsSetting.roadmapImage}
                                     onCheckedChange={(checked) => onChangeCheckBox("roadmapImage", checked)}
                                 />
-                                <label htmlFor="roadmapImage" className="text-sm">Show
-                                    Image</label>
+                                <label htmlFor="roadmapImage" className="text-sm">Show Image</label>
                             </div>
                             <div className="space-y-2">
                                 <Label className={"font-normal"}>Title</Label>
@@ -503,8 +501,7 @@ const UpdateWidget = () => {
                                     checked={widgetsSetting.ideaDescription}
                                     onCheckedChange={(checked) => onChangeCheckBox("ideaDescription", checked)}
                                 />
-                                <label htmlFor="ideaDescription" className="text-sm">Show
-                                    Description</label>
+                                <label htmlFor="ideaDescription" className="text-sm">Show Description</label>
                             </div>
                             <div className="space-y-2">
                                 <Label className={"font-normal"}>Title</Label>
@@ -667,13 +664,10 @@ const UpdateWidget = () => {
                                 onClick={() => id === "new" ? createWidget('side') : onUpdateWidgets('side')}>
                             {
                                 loading === 'side' ?
-                                    <Loader2
-                                        className="h-4 w-4 animate-spin"/> : (id === "new" ? "Create Widget" : "Save Changes")
+                                    <Loader2 className="h-4 w-4 animate-spin"/> : (id === "new" ? "Create Widget" : "Save Changes")
                             }
                         </Button>
-                        <Button variant={"ghost hover-none"}
-                                className={"font-medium border border-primary text-primary"}
-                                onClick={handleCancel}>Cancel</Button>
+                        <Button variant={"ghost hover-none"} className={"font-medium border border-primary text-primary"} onClick={handleCancel}>Cancel</Button>
                     </div>
                 </div>
                 <div className={"bg-muted w-full h-[100vh] md:h-full overflow-y-auto relative"}>

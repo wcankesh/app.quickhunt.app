@@ -17,7 +17,7 @@ const initialState= {
     status: '',
 }
 
-const Setup = () => {
+const Invitation = () => {
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get('token');
     const navigate = useNavigate();
@@ -115,22 +115,25 @@ const Setup = () => {
                                         </div> : <p>This invitation has been revoked by admin.</p>
                                     }
                                 </div>
-                                <div className="flex gap-2">
-                                    {
-                                        invitationDetail?.status == 0 ?
-                                            <Fragment>
-                                                <Button onClick={forLoading === 2 ? null : () => joinInvite(1)} disabled={forLoading === 1}>
-                                                    {forLoading === 1 && <Loader2 className="mr-2 h-4 w-4 animate-spin"/>} Accept
-                                                </Button>
+                                {
+                                    (invitationDetail.firstName && invitationDetail.lastName) ?
+                                    <div className="flex gap-2">
+                                        {
+                                            invitationDetail?.status == 0 ?
+                                                <Fragment>
+                                                    <Button onClick={forLoading === 2 ? null : () => joinInvite(1)} disabled={forLoading === 1}>
+                                                        {forLoading === 1 && <Loader2 className="mr-2 h-4 w-4 animate-spin"/>} Accept
+                                                    </Button>
 
-                                                <Button variant={"destructive"} onClick={forLoading === 1 ? null : () => joinInvite(2)} disabled={forLoading === 2}>
-                                                    {forLoading === 2 && <Loader2 className="mr-2 h-4 w-4 animate-spin"/>} Reject
-                                                </Button>
-                                            </Fragment> : invitationDetail.status == 1 ?
-                                                <Button disabled={invitationDetail.status == 1}>Accepted</Button>
-                                                : invitationDetail.status == 2 ? <Button variant={"destructive"} disabled={invitationDetail.status == 2}>Rejected</Button> : ""
-                                    }
-                                </div>
+                                                    <Button variant={"destructive"} onClick={forLoading === 1 ? null : () => joinInvite(2)} disabled={forLoading === 2}>
+                                                        {forLoading === 2 && <Loader2 className="mr-2 h-4 w-4 animate-spin"/>} Reject
+                                                    </Button>
+                                                </Fragment> : invitationDetail.status == 1 ?
+                                                    <Button disabled={invitationDetail.status == 1}>Accepted</Button>
+                                                    : invitationDetail.status == 2 ? <Button variant={"destructive"} disabled={invitationDetail.status == 2}>Rejected</Button> : ""
+                                        }
+                                    </div> : ""
+                                }
                             </CardContent>
                         </Card>
                     )}
@@ -140,4 +143,4 @@ const Setup = () => {
     );
 };
 
-export default Setup;
+export default Invitation;

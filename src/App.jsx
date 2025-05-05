@@ -1,4 +1,5 @@
 import React from 'react';
+import 'quill/dist/quill.snow.css'
 import {ThemeProvider} from "./components/theme-provider";
 import DefaultLayout from "./components/DefaultLayout/DefaultLayout";
 import {BrowserRouter, Navigate, Route, Routes} from "react-router-dom";
@@ -10,8 +11,7 @@ import Register from "./components/Auth/Register";
 import Login from "./components/Auth/Login";
 import Forgot from "./components/Auth/Forgot";
 import RestPassword from "./components/Auth/RestPassword";
-import 'quill/dist/quill.snow.css'
-import Setup from "./components/Auth/Setup";
+import Invitation from "./components/Auth/Invitation";
 import Project from "./components/Auth/Project";
 import OnBoarding from "./components/OnBoarding/OnBoarding";
 
@@ -35,7 +35,7 @@ function App() {
                         <Route path={`${baseUrl}/`} element={<Navigate to={`${baseUrl}/dashboard`} replace/>}/>
                     </Route>
                     <Route path={`${baseUrl}/project`} element={<Project/>}/>
-                    <Route path={`${baseUrl}/invitation`} element={<Setup/>}/>
+                    <Route path={`${baseUrl}/invitation`} element={<Invitation/>}/>
                 </Route>
                 <Route element={<ThemeProvider defaultTheme="system" storageKey="vite-ui-theme"><PublicRoutes/></ThemeProvider>}>
                     <Route path={`${baseUrl}/register`} element={<Register/>}/>

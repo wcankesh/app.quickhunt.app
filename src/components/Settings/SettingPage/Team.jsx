@@ -194,14 +194,6 @@ const Team = () => {
         setFormError(formError => ({...formError, [event.target.name]: ""}));
     }
 
-    const onBlur = (event) => {
-        const {name, value} = event.target;
-        setFormError({
-            ...formError,
-            [name]: formValidate(name, value)
-        });
-    };
-
     const onDelete = async () => {
         setIsLoadingDelete(true);
         const payload = {
@@ -232,23 +224,17 @@ const Team = () => {
     }
 
     const removeMember = async (id) => {
-        const data = await apiService.removeMember({id: id})
+        const data = await apiService.removeMember(id)
         if (data.success) {
             const clone = [...memberList];
-            const index = clone.findIndex((x) => x.id === id)
+            const index = clone.findIndex((x) => x.id == id)
             if (index !== -1) {
                 clone.splice(index, 1)
                 setMemberList(clone)
             }
-            toast({
-                description: data.message,
-            });
-
+            toast({description: data.message,});
         } else {
-            toast({
-                variant: "destructive",
-                description: data?.error.message,
-            });
+            toast({variant: "destructive", description: data?.error.message,});
         }
     }
 
@@ -487,7 +473,6 @@ const Team = () => {
                                         onKeyDown={handleKeyDown}
                                         onChange={onChange}
                                         name={"email"}
-                                        // onBlur={onBlur}
                                     />
                                 </div>
                                 {formError.email && <p className="text-destructive text-sm">{formError.email}</p>}

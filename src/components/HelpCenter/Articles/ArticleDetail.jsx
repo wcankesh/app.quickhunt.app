@@ -1,11 +1,11 @@
-import React, {useState, Fragment, useEffect, useRef} from 'react';
-import {apiService, BASE_URL_API, baseUrl} from "../../../utils/constent";
-import { Button } from "../../ui/button";
+import React, {Fragment, useEffect, useRef, useState} from 'react';
+import {apiService, baseUrl, DO_SPACES_ENDPOINT, extractImageFilename, fileUploaderOnEditor} from "../../../utils/constent";
+import {Button} from "../../ui/button";
 import {Circle, Loader2, Play} from "lucide-react";
-import { useNavigate, useParams } from "react-router-dom";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "../../ui/select";
-import { Label } from "../../ui/label";
-import { Input } from "../../ui/input";
+import {useNavigate, useParams} from "react-router-dom";
+import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "../../ui/select";
+import {Label} from "../../ui/label";
+import {Input} from "../../ui/input";
 import {Card, CardHeader} from "../../ui/card";
 import {useSelector} from "react-redux";
 import {useToast} from "../../ui/use-toast";
@@ -24,21 +24,21 @@ import EditorJS from "@editorjs/editorjs";
 import CommonBreadCrumb from "../../Comman/CommonBreadCrumb";
 import {Skeleton} from "../../ui/skeleton";
 
-    const statusOptions = [
-        { name: "Publish", value: 1, fillColor: "#389E0D", strokeColor: "#389E0D" },
-        { name: "Draft", value: 0, fillColor: "#CF1322", strokeColor: "#CF1322" },
-    ];
+const statusOptions = [
+    {name: "Publish", value: 1, fillColor: "#389E0D", strokeColor: "#389E0D"},
+    {name: "Draft", value: 0, fillColor: "#CF1322", strokeColor: "#CF1322"},
+];
 
-    const initialState =
-        {
-            title: 'New Article',
-            categoryId: null,
-            subcategoryId: null,
-            description: "",
-            isActive: 1,
-        }
+const initialState =
+    {
+        title: 'New Article',
+        categoryId: null,
+        subcategoryId: null,
+        description: "",
+        isActive: 1,
+    }
 
-    const initialStateError =
+const initialStateError =
     {
         title: '',
         categoryId: null,
@@ -51,7 +51,7 @@ const ArticleDetail = () => {
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const {toast} = useToast();
     const navigate = useNavigate();
-    const { id } = useParams();
+    const {id} = useParams();
     const editorCore = useRef(null);
 
     const [articlesDetails, setArticlesDetails] = useState(initialState);
@@ -62,10 +62,12 @@ const ArticleDetail = () => {
     const [isLoadBreadCrumb, setIsLoadBreadCrumb] = useState(true);
 
     useEffect(() => {
-        if(id !== "new" && projectDetailsReducer.id){
+        if (id !== "new" && projectDetailsReducer.id) {
             getSingleArticle();
         }
+        if (projectDetailsReducer.id) {
             getAllCategory();
+        }
     }, [id, projectDetailsReducer.id])
 
     const getAllCategory = async () => {
@@ -96,7 +98,7 @@ const ArticleDetail = () => {
     };
 
     const handleOnChange = (name, value) => {
-        setArticlesDetails({ ...articlesDetails, [name]: value });
+        setArticlesDetails({...articlesDetails, [name]: value});
         setFormError(formError => ({
             ...formError,
             [name]: formValidate(name, value)
@@ -132,7 +134,7 @@ const ArticleDetail = () => {
     const selectedCategory = articleList?.find((category) => category.id === Number(articlesDetails?.categoryId));
     const subcategories = selectedCategory ? selectedCategory?.subCategories : [];
 
-    const createArticle = async (loader) => {
+    const handleArticle = async (type) => {
         let validationErrors = {};
         Object.keys(articlesDetails).forEach(name => {
             const error = formValidate(name, articlesDetails[name]);
@@ -144,76 +146,95 @@ const ArticleDetail = () => {
             setFormError(validationErrors);
             return;
         }
-        setLoad(loader);
-        const selectedCategory = articleList.find(item => item.id === articlesDetails.categoryId);
-        let selectedSubCategory = null;
-        if (selectedCategory && selectedCategory.subCategories.length > 0) {
-            selectedSubCategory = selectedCategory.subCategories.find(sub => sub.id === articlesDetails.subcategoryId);
-        }
 
-        const payload = {
-            projectId: projectDetailsReducer.id,
-            categoryId: articlesDetails.categoryId,
-            subcategoryId: selectedSubCategory ? selectedSubCategory.id : null,
-            title: articlesDetails.title,
-            description: articlesDetails.description,
-            // images: articlesDetails.image,
-            isActive: articlesDetails.isActive,
-        }
-        const data = await apiService.createArticles(payload);
-        if(data.success) {
-            setArticlesDetails(initialState);
-            navigate(`${baseUrl}/help/article`);
-            toast({description: data.message,});
-        } else {
-            toast({description: data?.error?.message, variant: "destructive",})
-        }
-        setLoad('');
-    };
-
-    const updateArticle = async (loader) => {
-        setLoad(loader);
         const selectedCategory = articleList.find(item => item.id === Number(articlesDetails.categoryId));
         let selectedSubCategory = null;
         if (selectedCategory && selectedCategory.subCategories.length > 0) {
             selectedSubCategory = selectedCategory.subCategories.find(sub => sub.id === Number(articlesDetails.subcategoryId));
         }
 
+        const cleanedBlocks = (articlesDetails.description?.blocks || []).map(block => {
+            if (block.type === 'image' && block.data?.file?.url) {
+                const fullUrl = block.data.file.url;
+                return {
+                    ...block,
+                    data: {
+                        ...block.data,
+                        file: {
+                            ...block.data.file,
+                            url: extractImageFilename(fullUrl)
+                        }
+                    }
+                };
+            }
+            return block;
+        });
+
+        setLoad(type);
+
         const payload = {
             projectId: projectDetailsReducer.id,
             categoryId: articlesDetails.categoryId,
             subcategoryId: selectedSubCategory ? selectedSubCategory.id : null,
             title: articlesDetails.title,
-            description: articlesDetails.description,
-            // images: articlesDetails.image,
+            description: {
+                ...articlesDetails.description,
+                blocks: cleanedBlocks
+            },
             isActive: articlesDetails.isActive,
-        }
-        const data = await apiService.updateArticle(payload, articlesDetails.id)
-        if (data.success) {
-            setArticleList(articleList)
-            toast({description: data.message,});
+        };
+
+        let data;
+        if (type === 'update') {
+            data = await apiService.updateArticle(payload, articlesDetails.id);
         } else {
-            toast({description: data.error.message, variant: "destructive",});
+            data = await apiService.createArticles(payload);
+        }
+
+        if (data?.success) {
+            if (type === 'update') {
+                setArticleList(articleList);
+            } else {
+                setArticlesDetails(initialState);
+                navigate(`${baseUrl}/help/article`);
+            }
+            toast({description: data.message});
+        } else {
+            toast({description: data?.error?.message, variant: "destructive"});
         }
         setLoad('');
-    }
+    };
 
     const handleSave = React.useCallback(async () => {
         const savedData = await editorCore.current.save();
         setArticlesDetails(prevState => ({
             ...prevState,
-            description: JSON.stringify({blocks: savedData.blocks})
+            description: {blocks: savedData.blocks}
         }));
     }, []);
 
     useEffect(() => {
         if (!isLoading) {
             let editorData = { blocks: [{ type: "paragraph", data: { text: "Hey" } }] };
-
             if (articlesDetails.description) {
-                const parsedData = JSON.parse(articlesDetails.description);
+                const parsedData = articlesDetails.description;
                 if (parsedData && parsedData.blocks) {
-                    editorData = parsedData;
+                    editorData.blocks = parsedData.blocks.map(block => {
+                        if (block.type === 'image' && block.data?.file?.url) {
+                            const filename = block.data.file.url;
+                            return {
+                                ...block,
+                                data: {
+                                    ...block.data,
+                                    file: {
+                                        ...block.data.file,
+                                        url: `${DO_SPACES_ENDPOINT}/${filename}`
+                                    }
+                                }
+                            };
+                        }
+                        return block;
+                    });
                 }
             }
 
@@ -222,10 +243,8 @@ const ArticleDetail = () => {
                 autofocus: true,
                 tools: editorConstants,
                 onChange: handleSave,
-                // data: editorData,
                 data: {
                     time: new Date().getTime(),
-                    // blocks: articlesDetails?.description?.blocks || [{type: "paragraph", data: {text: "Hey"}}],
                     blocks: editorData.blocks,
                     version: "2.12.4",
                 },
@@ -238,8 +257,7 @@ const ArticleDetail = () => {
                 }
             };
         }
-    // }, [isLoading]);
-    }, [isLoading, articlesDetails.description]);
+    }, [isLoading]);
 
     const editorConstants = {
         embed: Embed,
@@ -260,33 +278,27 @@ const ArticleDetail = () => {
         linkTool: LinkTool,
         image: {
             class: Image,
-
-            inlineToolbar : true,
-
+            inlineToolbar: true,
             config: {
-                endpoints: {
-                    byFile: `${BASE_URL_API}/artical/upload-image`, // Your file upload endpoint
-                    byUrl: 'https://code.quickhunt.app/public/storage/post', // Your endpoint that provides image by URL
-                },
-                field: 'image',
-                types: 'image/*',
-
+                uploader: fileUploaderOnEditor({ uploadFolder: 'post', moduleName: 'article' }),
             },
-            // actions: [
-            //     {
-            //         icon: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-trash-2">
-            //             <path d="M3 6h18"/>
-            //             <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
-            //             <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
-            //             <line x1="10" x2="10" y1="11" y2="17"/>
-            //             <line x1="14" x2="14" y1="11" y2="17"/>
-            //         </svg>,
-            //         title: 'Delete',
-            //         action: (block) => {
-            //             handleImageDelete(editorCore, block.id);
-            //         },
-            //     },
-            // ],
+            actions: [
+                {
+                    icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                               stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                               className="lucide lucide-trash-2">
+                        <path d="M3 6h18"/>
+                        <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
+                        <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+                        <line x1="10" x2="10" y1="11" y2="17"/>
+                        <line x1="14" x2="14" y1="11" y2="17"/>
+                    </svg>,
+                    title: 'Delete',
+                    action: (block) => {
+                        // handleImageDelete(editorCore, block.id);
+                    },
+                },
+            ],
         },
         quote: Quote,
         inlineCode: InlineCode,
@@ -310,12 +322,14 @@ const ArticleDetail = () => {
                     </div>
                     <div className={"space-y-2"}>
                         <Label className={"text-sm font-normal"}>Select Category</Label>
-                        <Select value={articlesDetails.categoryId} onValueChange={(value) => handleOnChange('categoryId', value)}>
+                        <Select value={articlesDetails.categoryId}
+                                onValueChange={(value) => handleOnChange('categoryId', value)}>
                             <SelectTrigger className="h-auto">
                                 {/*{articlesDetails.categoryId ? (*/}
-                                        <SelectValue>
-                                            {articleList?.find(item => item.id === articlesDetails.categoryId)?.title || <span className="text-muted-foreground">Select Category</span>}
-                                        </SelectValue>
+                                <SelectValue>
+                                    {articleList?.find(item => item.id === articlesDetails.categoryId)?.title ||
+                                    <span className="text-muted-foreground">Select Category</span>}
+                                </SelectValue>
                                 {/*) : (<span className="text-muted-foreground">Select Category</span>)}*/}
                             </SelectTrigger>
                             <SelectContent>
@@ -336,12 +350,14 @@ const ArticleDetail = () => {
                     </div>
                     <div className={"space-y-2"}>
                         <Label className={"text-sm font-normal"}>Select Sub Category</Label>
-                        <Select value={articlesDetails.subcategoryId} onValueChange={(value) => handleOnChange('subcategoryId', value)}>
+                        <Select value={articlesDetails.subcategoryId}
+                                onValueChange={(value) => handleOnChange('subcategoryId', value)}>
                             <SelectTrigger className="h-auto">
                                 {/*{articlesDetails.subcategoryId ? (*/}
-                                    <SelectValue>
-                                        {subcategories.find(item => item.id === articlesDetails.subcategoryId)?.title || <span className="text-muted-foreground">Select Sub Category</span>}
-                                    </SelectValue>
+                                <SelectValue>
+                                    {subcategories.find(item => item.id === articlesDetails.subcategoryId)?.title ||
+                                    <span className="text-muted-foreground">Select Sub Category</span>}
+                                </SelectValue>
                                 {/*) : (<span className="text-muted-foreground">Select Category</span>)}*/}
                             </SelectTrigger>
                             <SelectContent>
@@ -358,34 +374,38 @@ const ArticleDetail = () => {
                                 </SelectGroup>
                             </SelectContent>
                         </Select>
-                        {formError.subcategoryId && <span className="text-red-500 text-sm">{formError.subcategoryId}</span>}
+                        {formError.subcategoryId &&
+                        <span className="text-red-500 text-sm">{formError.subcategoryId}</span>}
                     </div>
                 </div>
             </div>
         );
     };
 
-    const links = [{ label: 'Article', path: `/help/article` }];
+    const links = [{label: 'Article', path: `/help/article`}];
 
     return (
         <Fragment>
             <div className={"p-4 md:py-6 md:px-4 border-b flex items-center justify-between flex-wrap gap-2"}>
                 <CommonBreadCrumb
-                    links={links}
+                    links={[{label: 'Article', path: `/help/article`}]}
                     currentPage={(isLoading || isLoadBreadCrumb) && id !== "new" ? null : articlesDetails?.title}
                     truncateLimit={30}
                 />
                 <div className={"flex gap-4 items-center"}>
-                    <Select value={articlesDetails.isActive} onValueChange={(value) => handleOnChange('isActive', Number(value))}>
+                    <Select value={articlesDetails.isActive}
+                            onValueChange={(value) => handleOnChange('isActive', Number(value))}>
                         <SelectTrigger className={"w-[120px] h-auto py-[6px]"}>
-                            <SelectValue placeholder={articlesDetails.isActive ? statusOptions.find(s => s.value == articlesDetails.isActive)?.name : "Publish"} />
+                            <SelectValue
+                                placeholder={articlesDetails.isActive ? statusOptions.find(s => s.value == articlesDetails.isActive)?.name : "Publish"}/>
                         </SelectTrigger>
                         <SelectContent>
                             <SelectGroup>
                                 {statusOptions.map((x, i) => (
                                     <SelectItem key={i} value={x.value}>
                                         <div className={"flex items-center gap-2"}>
-                                            <Circle fill={x.fillColor} stroke={x.strokeColor} className={`font-normal w-2 h-2`} />
+                                            <Circle fill={x.fillColor} stroke={x.strokeColor}
+                                                    className={`font-normal w-2 h-2`}/>
                                             {x.name}
                                         </div>
                                     </SelectItem>
@@ -393,9 +413,12 @@ const ArticleDetail = () => {
                             </SelectGroup>
                         </SelectContent>
                     </Select>
-                    <Button variant={"ghost hover:bg-none"} className={"px-3 py-[6px] border font-normal h-auto"}><Play size={16} className={"mr-3"} /> Preview</Button>
-                    <Button className={"w-[81px] py-[7px] font-medium h-8 hover:bg-primary"} onClick={() => articlesDetails.id ? updateArticle('update') : createArticle('create')}>
-                        {load ? <Loader2 className="h-4 w-4 animate-spin" /> : (articlesDetails.id ? "Update" : "Create")}
+                    <Button variant={"ghost hover:bg-none"} className={"px-3 py-[6px] border font-normal h-auto"}><Play
+                        size={16} className={"mr-3"}/> Preview</Button>
+                    <Button className={"w-[81px] py-[7px] font-medium h-8 hover:bg-primary"}
+                            onClick={() => articlesDetails.id ? handleArticle('update') : handleArticle('create')}>
+                        {load ?
+                            <Loader2 className="h-4 w-4 animate-spin"/> : (articlesDetails.id ? "Update" : "Create")}
                     </Button>
                 </div>
             </div>
@@ -404,8 +427,9 @@ const ArticleDetail = () => {
                     {renderSidebarItems()}
                 </div>
                 {/*<div className={"hidden md:block bg-muted w-full h-full px-16 flex flex-col gap-4 py-8 justify-start overflow-y-auto h-[calc(100%_-_94px)]"}>*/}
-                <div className={"bg-muted w-full p-4 md:px-16 md:py-8 flex flex-col md:gap-4 justify-start overflow-y-auto h-[calc(100vh_-_402px)] md:h-[calc(100vh_-_140px)]"}>
-                {/*<div className={"bg-muted w-full p-4 md:px-16 md:py-8 flex flex-col md:gap-4 justify-start overflow-y-auto h-[calc(100%_-_94px)]"}>*/}
+                <div
+                    className={"bg-muted w-full p-4 md:px-16 md:py-8 flex flex-col md:gap-4 justify-start overflow-y-auto h-[calc(100vh_-_402px)] md:h-[calc(100vh_-_140px)]"}>
+                    {/*<div className={"bg-muted w-full p-4 md:px-16 md:py-8 flex flex-col md:gap-4 justify-start overflow-y-auto h-[calc(100%_-_94px)]"}>*/}
                     {
                         (isLoading && id !== "new") ? <div className={"flex flex-col gap-4"}>
                             {
@@ -417,10 +441,11 @@ const ArticleDetail = () => {
                                     )
                                 })
                             }
-                        </div> : <Card className={`rounded-[10px] p-0 h-full overflow-auto`} >
+                        </div> : <Card className={`rounded-[10px] p-0 h-full overflow-auto`}>
                             <CardHeader className={"p-3 md:pt-0"}>
-                                {/*<div className={"md:pl-14 md:pt-6 m-0 w-full"}><CommonEditor setArticlesDetails={setArticlesDetails} value={articlesDetails.description} /></div>*/}
-                                <div className={"md:pl-14 md:pt-6 m-0 w-full"}><div id="editorjs"/></div>
+                                <div className={"md:pl-14 md:pt-6 m-0 w-full"}>
+                                    <div id="editorjs"/>
+                                </div>
                             </CardHeader>
                         </Card>
                     }

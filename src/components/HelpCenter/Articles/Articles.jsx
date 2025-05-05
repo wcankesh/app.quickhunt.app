@@ -52,7 +52,6 @@ const Articles = () => {
     const [isLoadingDelete, setIsLoadingDelete] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [openFilter, setOpenFilter] = useState(false);
-
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [selectedSubCategory, setSelectedSubCategory] = useState(null);
     const [emptyContentBlock, setEmptyContentBlock] = useState(true);
@@ -404,7 +403,7 @@ const Articles = () => {
                                         })
                                     ) : articles?.length > 0 ? <Fragment>
                                         {
-                                            (articles || [])?.map((x, index) => (<>
+                                            (articles || [])?.map((x, index) => (
                                                 <TableRow key={index}>
                                                     <TableCell onClick={() => onEdit(x.id)}
                                                         className={"px-2 py-[10px] md:px-3 font-normal cursor-pointer max-w-[270px] truncate text-ellipsis overflow-hidden whitespace-nowrap"}>{x.title}</TableCell>
@@ -457,7 +456,6 @@ const Articles = () => {
                                                         </DropdownMenu>
                                                     </TableCell>
                                                 </TableRow>
-                                                </>
                                             ))
                                         }
                                     </Fragment> : <TableRow>

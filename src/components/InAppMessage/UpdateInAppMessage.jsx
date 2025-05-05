@@ -2,7 +2,7 @@ import React, {useEffect, useState, Fragment} from 'react';
 import {useNavigate, useParams, useSearchParams} from "react-router-dom";
 import {Button} from "../ui/button";
 import {BarChart, Loader2} from "lucide-react";
-import {apiService, baseUrl} from "../../utils/constent";
+import {apiService, baseUrl, extractImageFilename, isEmpty} from "../../utils/constent";
 import {Card} from "../ui/card";
 import {useSelector} from "react-redux";
 import moment from "moment";
@@ -10,14 +10,7 @@ import Post from "./Post";
 import Banners from "./Banners";
 import Surveys from "./Surveys";
 import Checklist from "./Checklist";
-import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbPage,
-    BreadcrumbSeparator
-} from "../ui/breadcrumb";
+import {Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator} from "../ui/breadcrumb";
 import SidebarInAppMessage from "./SidebarInAppMessage";
 import {useToast} from "../ui/use-toast";
 import {Skeleton} from "../ui/skeleton";
@@ -136,6 +129,7 @@ const initialStateError = {
     startAt: undefined,
     endAt: undefined,
     from: "",
+    actionUrl: "",
 }
 
 const UpdateInAppMessage = () => {
@@ -150,7 +144,7 @@ const UpdateInAppMessage = () => {
     const [selectedStepIndex, setSelectedStepIndex] = useState(0);
     const [isLoading, setIsLoading] = useState(false);
     const [selectedStep, setSelectedStep] = useState(null);
-    const [isSave, setIsSave] = useState(false);
+    const [saving, setSaving] = useState('');
     const [formError, setFormError] = useState(initialStateError);
 
     const renderContent = (type) => {
@@ -222,11 +216,7 @@ const UpdateInAppMessage = () => {
                 ...prevState,
                 title: `${type === "1" ? "Post" : type === "2" ? "Banner" : type === "3" ? "Survey" : "Checklist"} in app message`,
                 reactions: type === "1" ? reactionPost : type === "2" ? reactionBanner : [],
-                bodyText: type === "1"
-                    ? JSON.stringify({
-                        blocks: [{type: "paragraph", data: {text: "Hey"}}]
-                    })
-                    : null,
+                bodyText: type === "1" ? {blocks: [{type: "paragraph", data: {text: "Hey"}}]} : null,
                 textColor: type === "4" ? "#FFFFFF" : "#000000",
                 steps: type === "3" ? [stepBoj] : [],
                 checklists: type === "4" ? [
@@ -250,7 +240,7 @@ const UpdateInAppMessage = () => {
         if (data.success) {
             const payload = {
                 ...data.data.data,
-                bodyText: type === "1" ? JSON.parse(data.data.data.bodyText) : data.data.data.bodyText,
+                bodyText: data.data.data.bodyText,
             }
             setInAppMsgSetting(payload);
             if (type === "3") {
@@ -274,12 +264,25 @@ const UpdateInAppMessage = () => {
                     return "Start Date is required.";
                 }
                 return "";
+            case "actionUrl":
+                if ((type === "2") && selectedStep?.actionType === 1) {
+                    if (isEmpty(value)) {
+                        return "Action URL is required.";
+                    }
+                    // if (trimmedValue) {
+                    //     const urlPattern = /^(https?:\/\/)?([\w-]+\.)+[\w-]+(\/[\w-./?%&=]*)?$/i;
+                    //     if (!urlPattern.test(trimmedValue)) {
+                    //         return "Please enter a valid URL.";
+                    //     }
+                    // }
+                }
+                return "";
             default:
                 return "";
         }
     };
 
-    const createMessage = async () => {
+    const handleMessage = async (typeFunc, load) => {
         if (type == "3") {
             const activeSteps = inAppMsgSetting.steps.filter((x) => x.isActive && x.questionType !== 8);
             if (activeSteps.length <= 0) {
@@ -301,6 +304,19 @@ const UpdateInAppMessage = () => {
             }
         }
 
+        if (type === "4") {
+            const activeChecklists = inAppMsgSetting.checklists.filter(x => x.isActive);
+            for (const checklist of activeChecklists) {
+                if (checklist.actionType === 1) {
+                    const error = formValidate("actionUrl", checklist.actionUrl);
+                    if (error) {
+                        toast({variant: "destructive", description: error});
+                        return;
+                    }
+                }
+            }
+        }
+
         let validationErrors = {};
         Object.keys(inAppMsgSetting).forEach(name => {
             const error = formValidate(name, inAppMsgSetting[name]);
@@ -314,6 +330,52 @@ const UpdateInAppMessage = () => {
             return;
         }
 
+        if (inAppMsgSetting?.bodyText?.blocks) {
+            inAppMsgSetting.bodyText.blocks = inAppMsgSetting.bodyText.blocks.map(block => {
+                if (block.type === 'image' && block.data?.file?.url) {
+                    return {
+                        ...block,
+                        data: {
+                            ...block.data,
+                            file: {
+                                ...block.data.file,
+                                url: extractImageFilename(block.data.file.url)
+                            }
+                        }
+                    };
+                }
+                return block;
+            });
+        }
+
+        if (Array.isArray(inAppMsgSetting.checklists)) {
+            inAppMsgSetting.checklists = inAppMsgSetting.checklists.map(cl => {
+                if (Array.isArray(cl?.description)) {
+                    const updatedDescription = cl.description.map(block => {
+                        if (block.type === 'image' && block.data?.file?.url) {
+                            return {
+                                ...block,
+                                data: {
+                                    ...block.data,
+                                    file: {
+                                        ...block.data.file,
+                                        url: extractImageFilename(block.data.file.url)
+                                    }
+                                }
+                            };
+                        }
+                        return block;
+                    });
+
+                    return {
+                        ...cl,
+                        description: updatedDescription
+                    };
+                }
+                return cl;
+            });
+        }
+
         const startAt = inAppMsgSetting?.startAt
             ? moment(inAppMsgSetting.startAt).format('YYYY-MM-DD HH:mm:ss')
             : null;
@@ -324,90 +386,39 @@ const UpdateInAppMessage = () => {
 
         const payload = {
             ...inAppMsgSetting,
-            startAt: startAt,
-            endAt: endAt,
+            startAt,
+            endAt,
+            type,
             projectId: projectDetailsReducer.id,
-            type: type
-        }
+        };
 
-        setIsSave(true)
-        const data = await apiService.createInAppMessage(payload);
-        setIsSave(false);
-        if (data.success) {
-            toast({description: data.message})
-            if (id === "new") {
-                navigate(`${baseUrl}/app-message`)
-            }
-        } else {
-            toast({variant: "destructive", description: data?.error?.message})
-        }
-    }
+        console.log(payload)
 
-    const onUpdateMessage = async () => {
-        if (type == "3") {
-            const activeSteps = inAppMsgSetting.steps.filter((x) => x.isActive && x.questionType !== 8);
-            if (activeSteps.length <= 0) {
-                toast({variant: "destructive", description: "Add minimum 1 step"});
-                return;
-            }
-            for (const step of activeSteps) {
-                if (step.questionType === 5) {
-                    if (!step.options || step.options.length === 0) {
-                        toast({variant: "destructive", description: "At least one option is required."});
-                        return;
-                    }
-                    const hasEmptyTitle = step.options.some(opt => !opt.title?.trim());
-                    if (hasEmptyTitle) {
-                        toast({variant: "destructive", description: "Option cannot be empty."});
-                        return;
-                    }
-                }
-            }
-        }
-
-        let validationErrors = {};
-        Object.keys(inAppMsgSetting).forEach(name => {
-            const error = formValidate(name, inAppMsgSetting[name]);
-            if (error && error.length > 0) {
-                validationErrors[name] = error;
-            }
-        });
-
-        if (Object.keys(validationErrors).length > 0) {
-            setFormError(validationErrors);
-            return;
-        }
-
-        setIsSave(true)
-        const startAt = inAppMsgSetting?.startAt
-            ? moment(inAppMsgSetting.startAt).format('YYYY-MM-DD HH:mm:ss')
-            : null;
-
-        const endAt = inAppMsgSetting?.endAt && moment(inAppMsgSetting.endAt).isValid()
-            ? moment(inAppMsgSetting.endAt).format('YYYY-MM-DD HH:mm:ss')
-            : null;
-        const payload = {
-            ...inAppMsgSetting,
-            startAt: startAt,
-            endAt: endAt,
-            type: type,
-            bodyText: type === "1" ? typeof (inAppMsgSetting.bodyText) === "string" ? inAppMsgSetting.bodyText : JSON.stringify(inAppMsgSetting.bodyText) : inAppMsgSetting.bodyText
-        }
-        const data = await apiService.updateInAppMessage(payload, inAppMsgSetting.id)
-        setIsSave(false)
-        if (data.success) {
-            toast({description: data.message})
-        } else {
-            toast({variant: "destructive", description: data?.error?.message})
-        }
-    }
+        // setSaving(load);
+        // let data;
+        // if (typeFunc === 'create') {
+        //     data = await apiService.createInAppMessage(payload);
+        // } else if (typeFunc === 'update') {
+        //     data = await apiService.updateInAppMessage(payload, inAppMsgSetting.id);
+        // }
+        //
+        // setSaving('');
+        // if (data?.success) {
+        //     toast({description: data.message});
+        //     if (typeFunc === 'create' && id === 'new') {
+        //         navigate(`${baseUrl}/app-message`);
+        //     }
+        // } else {
+        //     toast({variant: "destructive", description: data?.error?.message});
+        // }
+    };
 
     const handleCancel = () => {
         setInAppMsgSetting(inAppMsgSetting);
         if (id === "new") {
             navigate(`${baseUrl}/app-message/type`)
         } else {
-            navigate(`${baseUrl}/app-message`)
+            navigate(`${baseUrl}/app-message?pageNo=${getPageNo}`)
         }
     }
 
@@ -420,7 +431,7 @@ const UpdateInAppMessage = () => {
                             <BreadcrumbItem className={"cursor-pointer"}>
                                 <BreadcrumbLink>
                                     <span
-                                        onClick={id === 'new' ? () => navigate(`${baseUrl}/app-message/type`) : () => navigate(`${baseUrl}/app-message?pageNo=${getPageNo}`)}>
+                                        onClick={handleCancel}>
                                         {type === '1' && 'Post'}
                                         {type === '2' && 'Banners'}
                                         {type === '3' && 'Surveys'}
@@ -448,8 +459,8 @@ const UpdateInAppMessage = () => {
                             : ""
                     }
                     <Button className={`w-[111px] font-medium hover:bg-primary`}
-                            onClick={id === "new" ? createMessage : onUpdateMessage}>
-                        {isSave ? <Loader2 size={16} className={"animate-spin"}/> : "Save Changes"}
+                            onClick={id === "new" ? () => handleMessage("create", 'createdByTop') : () => handleMessage('update','updatedByTop')}>
+                        {(saving === 'createdByTop' || saving === 'updatedByTop') ? <Loader2 size={16} className={"animate-spin"}/> : "Save Changes"}
                     </Button>
                     <Button variant={"ghost hover-none"} className={"font-medium border border-primary text-primary"}
                             onClick={handleCancel}>Cancel</Button>
@@ -460,9 +471,9 @@ const UpdateInAppMessage = () => {
                     <SidebarInAppMessage id={id} type={type} inAppMsgSetting={inAppMsgSetting}
                                          setInAppMsgSetting={setInAppMsgSetting} selectedStepIndex={selectedStepIndex}
                                          setSelectedStepIndex={setSelectedStepIndex} selectedStep={selectedStep}
-                                         setSelectedStep={setSelectedStep} formValidate={formValidate}
-                                         formError={formError} setFormError={setFormError} createMessage={createMessage}
-                                         onUpdateMessage={onUpdateMessage}/>
+                                         setSelectedStep={setSelectedStep} formValidate={formValidate} saving={saving}
+                                         formError={formError} setFormError={setFormError} handleMessage={handleMessage}
+                    />
                 </div>
                 <div className={"bg-muted w-full h-[100vh] md:h-full overflow-y-auto"}>
                     <Card className={`my-6 mx-4 rounded-md px-4 pt-6 pb-8 h-[calc(100%_-_48px)] `}>

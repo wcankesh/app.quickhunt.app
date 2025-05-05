@@ -179,7 +179,6 @@ const checklists = ({
                                                         blocks={x.description}
                                                         onChange={(newData) => handleEditorChange(i, newData)}
                                                     />
-                                                    {/*<Editor id={`checklists-${i}`} blocks={x.description} onChange={(e) => onChangeChecklists("description", e, x)} />*/}
                                                     {selectedStep?.actionType === 1 && <Button style={{
                                                         backgroundColor: inAppMsgSetting.btnColor,
                                                         color: inAppMsgSetting.btnTextColor
