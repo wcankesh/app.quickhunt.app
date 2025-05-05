@@ -162,12 +162,21 @@ const InAppMessage = () => {
 
     const handleStatusChange = async (object, value) => {
         const payload = {status: value,}
-        setMessageList(messageList.map(x => x.id === object.id ? {...x, status: value,} : x));
+        if (object.status === 2 || object.status === 3) {
+            payload.startAt = new Date().toISOString();
+        }
+        setMessageList(messageList.map(x => x.id === object.id ? {...x, status: value, startAt: payload.startAt || x.startAt,} : x));
         const data = await apiService.updateInAppMessageStatus(payload, object.id);
         if (data.success) {
             toast({description: data.message,});
         } else {
             toast({variant: "destructive", description: data.error.message})
+            // Revert local changes if API call fails
+            // setMessageList(messageList.map(x => x.id === object.id ? {
+            //     ...x,
+            //     status: object.status,
+            //     startAt: object.startAt,
+            // } : x));
         }
     };
 

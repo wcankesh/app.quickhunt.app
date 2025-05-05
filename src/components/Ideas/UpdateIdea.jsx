@@ -925,6 +925,7 @@ const UpdateIdea = () => {
         newSubCommentText[index] = e.target.value;
         setSubCommentText(newSubCommentText);
     };
+    const userDetailsReducer = useSelector(state => state.userDetailsReducer);
 
     return (
         <Fragment>
@@ -1756,11 +1757,15 @@ const UpdateIdea = () => {
                                                                                     {
                                                                                         selectedCommentIndex === i && isEditComment ? "" :
                                                                                             x?.createdBy === 1 ?
-                                                                                                <ActionButtons
-                                                                                                    isEditable={x?.createdBy === 1}
-                                                                                                    onEdit={() => onEditComment(x, i)}
-                                                                                                    onDelete={() => deleteComment(x.id, i)}
-                                                                                                />
+                                                                                                (userDetailsReducer?.id == x.userId) ?
+                                                                                                    <Fragment>
+                                                                                                        <ActionButtons
+                                                                                                            isEditable={x?.createdBy === 1}
+                                                                                                            onEdit={() => onEditComment(x, i)}
+                                                                                                            onDelete={() => deleteComment(x.id, i)}
+                                                                                                        />
+                                                                                                    </Fragment>
+                                                                                                    : ""
                                                                                                 : ""
                                                                                     }
                                                                                 </div>
@@ -1854,11 +1859,13 @@ const UpdateIdea = () => {
                                                                                                                     {
                                                                                                                         selectedCommentIndex === i && selectedSubCommentIndex === j ? "" :
                                                                                                                             y.createdBy === 1 ?
+                                                                                                                                (userDetailsReducer?.id == x.userId) ?
                                                                                                                                 <ActionButtons
                                                                                                                                     isEditable={y?.createdBy === 1}
                                                                                                                                     onEdit={() => onEditSubComment(x, y, i, j)}
                                                                                                                                     onDelete={() => deleteSubComment(y.id, x, i, j)}
                                                                                                                                 />
+                                                                                                                                : ''
                                                                                                                                 : ''
                                                                                                                     }
                                                                                                                 </div>

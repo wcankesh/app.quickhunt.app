@@ -295,18 +295,28 @@ const Ideas = () => {
                 setIdeasList(clone);
             } else if (name === "roadmapStatusId") {
                 clone[index].roadmapStatusId = value;
-                let filteredClone = [];
-                if (filter.roadmapStatusId) {
-                    filteredClone = clone.filter(item =>
+                // let filteredClone = [];
+                // if (filter.roadmapStatusId) {
+                //     filteredClone = clone.filter(item => {
+                //             filter.roadmapStatusId.includes(item.roadmapStatusId)
+                //         }
+                //     );
+                // } else {
+                //     filteredClone = clone.filter(item =>
+                //         item.roadmapStatusId == filter.roadmapStatusId
+                //     );
+                // }
+                // setIdeasList(filteredClone);
+                // setTotalRecord(filteredClone.length);
+                if (filter.roadmapStatusId && filter.roadmapStatusId.length > 0) {
+                    const filteredClone = clone.filter(item =>
                         filter.roadmapStatusId.includes(item.roadmapStatusId)
                     );
+                    setIdeasList(filteredClone);
+                    setTotalRecord(filteredClone.length);
                 } else {
-                    filteredClone = clone.filter(item =>
-                        item.roadmapStatusId == filter.roadmapStatusId
-                    );
+                    setIdeasList(clone);
                 }
-                setIdeasList(filteredClone);
-                setTotalRecord(filteredClone.length);
             }
             toast({description: data.message});
         } else {

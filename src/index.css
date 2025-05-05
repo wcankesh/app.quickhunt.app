@@ -530,3 +530,6 @@ h6.ce-header {
 
 /*-------------- Survey Bar Chart -------------------*/
 path.recharts-rectangle.recharts-tooltip-cursor {display: none}
+
+/*-------------- In App Message post link add in editor error toast -------------------*/
+.cdx-notifies{left: 674px !important;}
