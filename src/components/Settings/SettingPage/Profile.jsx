@@ -7,7 +7,7 @@ import {CircleX, Eye, EyeOff, Loader2, Upload} from "lucide-react";
 import {useSelector, useDispatch} from "react-redux";
 import {userDetailsAction} from "../../../redux/action/UserDetailAction";
 import {toast} from "../../ui/use-toast";
-import {apiService, getProfile, isEmpty} from "../../../utils/constent";
+import {apiService, emailRegExp, getProfile, isEmpty} from "../../../utils/constent";
 
 const initialState = {
     id: "",
@@ -101,10 +101,8 @@ const Profile = () => {
             case "email":
                 if (!value || value.trim() === "") {
                     return "Email is required";
-                } else if (!value.match(/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/)) {
+                } else if (!value.match(emailRegExp)) {
                     return "Enter a valid email address";
-                } else if (!value.endsWith(".com")) {
-                    return "Email must end with .com";
                 } else {
                     return "";
                 }
@@ -118,13 +116,6 @@ const Profile = () => {
                 if (!value || value.trim() === "") {
                     return "Password is required";
                 }
-                // else if (
-                //     !value.match(
-                //         /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
-                //     )
-                // ) {
-                //     return "Password must be at least 8 characters with one uppercase letter, one lowercase letter, one number, and one special character";
-                // }
                 else {
                     return "";
                 }

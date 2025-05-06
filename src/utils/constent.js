@@ -27,6 +27,8 @@ export const getProfile = (profile) => {
     return profile ? profile?.includes('googleusercontent.com') ? profile?.replace('quickhunt/stage/user/', '') : `${DO_SPACES_ENDPOINT}/${profile}` : null;
 };
 
+export const emailRegExp = /^([a-zA-Z0-9_\.\+\-]+)@([a-zA-Z0-9\-]+\.)+([a-zA-Z]{2,})$/;
+
 export const token = () => {
     return localStorage.getItem(TOKEN_KEY);
 }
