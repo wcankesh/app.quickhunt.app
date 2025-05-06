@@ -322,7 +322,7 @@ const Team = () => {
                                                                                     alt={x && x?.firstName?.substring(0, 1)?.toUpperCase() && x?.lastName?.substring(0, 1)?.toUpperCase()}
                                                                                 />
                                                                                 <AvatarFallback
-                                                                                    className={"bg-primary/10 border-primary border text-sm text-primary font-medium"}>
+                                                                                    className={"bg-primary/10 border-primary border text-[11px] text-primary font-medium"}>
                                                                                     {x?.firstName?.substring(0, 1)?.toUpperCase()}{x?.lastName?.substring(0, 1)?.toUpperCase()}
                                                                                 </AvatarFallback>
                                                                             </Avatar>
@@ -338,19 +338,17 @@ const Team = () => {
                                                                                className={`h-[20px] py-0 px-2 text-xs rounded-[5px] ${x.role === 1 ? "text-[#63c8d9] border-[#63c8d9]" : "text-[#694949] border-[#694949]"}`}>{x?.role === 1 ? "Admin" : "Member"}</Badge>
 
                                                                     </TableCell>
-                                                                    {isAdmin && (
                                                                         <TableCell className="flex justify-end py-[10px] px-[12px]">
-                                                                            {x.role === 2 && (
-                                                                                <Button
-                                                                                    variant="outline hover:bg-transparent"
-                                                                                    className="p-1 border w-[30px] h-[30px]"
-                                                                                    onClick={() => removeMember(x.id)}
-                                                                                >
-                                                                                    <Trash2 size={16} />
-                                                                                </Button>
+                                                                            {(isAdmin && x.role === 2) && (
+                                                                                    <Button
+                                                                                        variant="outline hover:bg-transparent"
+                                                                                        className="p-1 border w-[30px] h-[30px]"
+                                                                                        onClick={() => removeMember(x.id)}
+                                                                                    >
+                                                                                        <Trash2 size={16}/>
+                                                                                    </Button>
                                                                             )}
                                                                         </TableCell>
-                                                                    )}
                                                                 </TableRow>
                                                             )
                                                         })

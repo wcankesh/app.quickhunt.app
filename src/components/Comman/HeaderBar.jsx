@@ -427,7 +427,7 @@ const HeaderBar = ({setIsMobile}) => {
                                             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50"/>
                                         </Button>
                                     </PopoverTrigger>
-                                    <PopoverContent className="w-[200px] p-0">
+                                    <PopoverContent className="min-w-[150px] md:w-[222px] p-0">
                                         <Command>
                                             <CommandInput placeholder="Search project"/>
                                             <CommandList>
@@ -440,7 +440,7 @@ const HeaderBar = ({setIsMobile}) => {
                                                                     className={`${projectDetailsReducer.id === x.id ? `${theme === "dark" ? "text-card-foreground  hov-primary-dark" : "text-card hov-primary"} bg-primary` : 'bg-card'} gap-0.5`}
                                                                     value={x.id}
                                                                 >
-                                                                <span
+                                                                <span title={x.name}
                                                                     className={"w-full text-sm font-medium cursor-pointer max-w-[159px] truncate text-ellipsis overflow-hidden whitespace-nowrap"}
                                                                     onClick={() => {
                                                                         onChangeProject(x.id);
