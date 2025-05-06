@@ -855,7 +855,7 @@ const UpdateIdea = () => {
             setIsEditIdea(false)
             toast({description: data.message})
         } else {
-            toast({description: data.message, variant: "destructive"})
+            toast({description: data?.error?.message, variant: "destructive"})
         }
         setIsLoadingCreateIdea(false)
     }
