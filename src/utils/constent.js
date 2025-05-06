@@ -24,7 +24,7 @@ export const logout = () => {
 }
 
 export const getProfile = (profile) => {
-    return profile ? profile?.includes('googleusercontent.com') ? profile?.replace('quickhunt/stage/user/', '') : `${DO_SPACES_ENDPOINT}/${profile}` : null;
+    return profile ? profile?.includes('googleusercontent.com') ? profile?.replace('quickhunt/stage/user/', '')?.replace('quickhunt/prod/user/', '') : `${DO_SPACES_ENDPOINT}/${profile}` : null;
 };
 
 export const emailRegExp = /^([a-zA-Z0-9_\.\+\-]+)@([a-zA-Z0-9\-]+\.)+([a-zA-Z]{2,})$/;
