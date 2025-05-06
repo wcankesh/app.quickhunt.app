@@ -371,7 +371,7 @@ const Profile = () => {
                                 />
                                 <Button variant={"ghost hover:none"}
                                         onClick={() => togglePasswordVisibility('userCurrentPassword')}
-                                        className={"absolute top-0 right-0"}>
+                                        className={"absolute top-0 right-0 h-full"}>
                                     {passwordVisibility.userCurrentPassword ? <Eye className={"w-[16px] h-[16px]"}/> :
                                         <EyeOff className={"w-[16px] h-[16px]"}/>}
                                 </Button>
@@ -398,7 +398,7 @@ const Profile = () => {
                                 />
                                 <Button variant={"ghost hover:none"}
                                         onClick={() => togglePasswordVisibility('userPassword')}
-                                        className={"absolute top-0 right-0"}>
+                                        className={"absolute top-0 right-0 h-full"}>
                                     {passwordVisibility.userPassword ? <Eye className={"w-[16px] h-[16px]"}/> :
                                         <EyeOff className={"w-[16px] h-[16px]"}/>}
                                 </Button>
@@ -424,7 +424,7 @@ const Profile = () => {
                                 />
                                 <Button variant={"ghost hover:none"}
                                         onClick={() => togglePasswordVisibility('userConfirmPassword')}
-                                        className={"absolute top-0 right-0"}>
+                                        className={"absolute top-0 right-0 h-full"}>
                                     {passwordVisibility.userConfirmPassword ? <Eye className={"w-[16px] h-[16px]"}/> :
                                         <EyeOff className={"w-[16px] h-[16px]"}/>}
                                 </Button>
