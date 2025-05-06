@@ -159,13 +159,6 @@ const SaidBarDesktop = ({isMobile, setIsMobile}) => {
     ];
 
     const footerMenuComponent = [
-        // {
-        //     title: 'Import / Export',
-        //     link: '/import-export',
-        //     icon: Icon.importExport,
-        //     selected: isActive(`${baseUrl}/import-export`, `${baseUrl}/import`),
-        //     isDisplay: true,
-        // },
         {
             title: `${userDetailsReducer.trialDays} days trial left`,
             link: '/pricing-plan',
@@ -180,20 +173,6 @@ const SaidBarDesktop = ({isMobile, setIsMobile}) => {
             selected: isActive(`${baseUrl}/notification`),
             isDisplay: true,
         },
-        {
-            title: 'Invite Team',
-            link: '/settings/team',
-            icon: <UsersRound size={15} />,
-            selected: isActive(`${baseUrl}/settings/team`),
-            isDisplay: true,
-        },
-        // {
-        //     title: 'Help & Support',
-        //     link: '/help-support',
-        //     icon: <CircleHelp size={15} />,
-        //     selected: isActive(`${baseUrl}/help-support`),
-        //     isDisplay: true,
-        // },
         {
             title: "Pricing & Plan",
             link: '/pricing-plan',

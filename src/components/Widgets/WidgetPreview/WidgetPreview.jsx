@@ -1,4 +1,4 @@
-import React,{Fragment, useState} from 'react';
+import React, {Fragment, useEffect, useState} from 'react';
 import {Icon} from "../../../utils/Icon";
 import {useSelector} from "react-redux";
 import WidgetHeader from "./WidgetHeader";
@@ -13,19 +13,36 @@ const WidgetPreview = ({widgetsSetting, type, toggle,onToggle }) => {
 
     const [selected, setSelected] = useState("ideas")
 
+    const getNextAvailableSection = () => {
+        if (widgetsSetting.isIdea) return "ideas";
+        if (widgetsSetting.isRoadmap) return "roadmap";
+        if (widgetsSetting.isAnnouncement) return "announcements";
+        return "ideas";
+    };
+
+    useEffect(() => {
+        if (!widgetsSetting.isIdea && selected === "ideas") {
+            setSelected(getNextAvailableSection());
+        } else if (!widgetsSetting.isRoadmap && selected === "roadmap") {
+            setSelected(getNextAvailableSection());
+        } else if (!widgetsSetting.isAnnouncement && selected === "announcements") {
+            setSelected(getNextAvailableSection());
+        }
+    }, [widgetsSetting.isIdea, widgetsSetting.isRoadmap, widgetsSetting.isAnnouncement]);
+
     const renderContent = () => {
         return(
             <div className="flex flex-col h-full w-full">
                 <WidgetHeader selected={selected} setSelected={setSelected} widgetsSetting={widgetsSetting}/>
                 <main className="flex-1 block bg-slate-50 py-4 overflow-hidden">
                     {
-                        selected === "ideas" && <IdeaWidgetPreview widgetsSetting={widgetsSetting}/>
+                        (selected === "ideas" && widgetsSetting.isIdea) && <IdeaWidgetPreview widgetsSetting={widgetsSetting}/>
                     }
                     {
-                        selected === "roadmap" && <RoadmapWidgetPreview widgetsSetting={widgetsSetting}/>
+                        (selected === "roadmap" && widgetsSetting.isRoadmap) && <RoadmapWidgetPreview widgetsSetting={widgetsSetting}/>
                     }
                     {
-                        selected === "announcements" && <AnnouncementWidgetPreview widgetsSetting={widgetsSetting}/>
+                        (selected === "announcements" && widgetsSetting.isAnnouncement) && <AnnouncementWidgetPreview widgetsSetting={widgetsSetting}/>
                     }
                     <ul className="flex gap-2 mt-4 items-center justify-center">
                         {Object.entries(allStatusAndTypes?.social || {}).map(([social, url]) => {
