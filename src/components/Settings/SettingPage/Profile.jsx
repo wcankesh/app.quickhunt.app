@@ -98,14 +98,14 @@ const Profile = () => {
                 } else {
                     return "";
                 }
-            case "email":
-                if (!value || value.trim() === "") {
-                    return "Email is required";
-                } else if (!value.match(emailRegExp)) {
-                    return "Enter a valid email address";
-                } else {
-                    return "";
-                }
+            // case "email":
+            //     if (!value || value.trim() === "") {
+            //         return "Email is required";
+            //     } else if (!value.match(emailRegExp)) {
+            //         return "Enter a valid email address";
+            //     } else {
+            //         return "";
+            //     }
             case "currentPassword":
                 if (!value || value.trim() === "") {
                     return "Current password is required";
