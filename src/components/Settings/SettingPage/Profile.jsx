@@ -7,7 +7,7 @@ import {CircleX, Eye, EyeOff, Loader2, Upload} from "lucide-react";
 import {useSelector, useDispatch} from "react-redux";
 import {userDetailsAction} from "../../../redux/action/UserDetailAction";
 import {toast} from "../../ui/use-toast";
-import {apiService, DO_SPACES_ENDPOINT} from "../../../utils/constent";
+import {apiService, getProfile, isEmpty} from "../../../utils/constent";
 
 const initialState = {
     id: "",
@@ -184,7 +184,6 @@ const Profile = () => {
             setFormError(validationErrors);
             return;
         }
-        setIsLoading(true)
         let formData = new FormData();
         const obj = {
             firstName: userDetails.firstName,
@@ -201,7 +200,7 @@ const Profile = () => {
                 formData.append(key, obj[key]);
             }
         });
-
+        setIsLoading(true)
         const data = await apiService.updateLoginUserDetails(formData, userDetailsReducer.id);
         setIsLoading(false);
         if (data.success) {
@@ -239,6 +238,8 @@ const Profile = () => {
         }
     }
 
+    const profileImg = userDetails?.profileImage?.name ? URL.createObjectURL(userDetails?.profileImage) : getProfile(userDetails?.profileImage);
+
     return (
         <div className={"flex flex-col gap-6"}>
             <Card>
@@ -251,11 +252,11 @@ const Profile = () => {
                     <div className={"flex gap-4 flex-wrap lg:flex-nowrap md:flex-nowrap sm:flex-wrap"}>
                         <div className="flex flex-col justify-center mt-2 relative">
                             {
-                                userDetails?.profileImage ?
+                                !isEmpty(profileImg) ?
                                     <div className="w-[80px] h-[80px] sm:w-[132px] sm:h-[128px] relative border">
                                         <img
                                             className="h-full w-full rounded-md object-cover"
-                                            src={userDetails?.profileImage?.name ? URL.createObjectURL(userDetails.profileImage) : `${DO_SPACES_ENDPOINT}/${userDetails.profileImage}`}
+                                            src={profileImg}
                                             alt="profile"
                                         />
                                         <CircleX

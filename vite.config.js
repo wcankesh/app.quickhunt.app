@@ -9,4 +9,12 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  server: {
+    port: 5173,
+    allowedHosts:  [
+      '.ngrok.io',
+      '.ngrok-free.app',
+      '.trycloudflare.com',
+    ],  // Allow all hosts
+  },
 })

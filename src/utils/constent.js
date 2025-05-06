@@ -2,17 +2,13 @@ import {ApiService} from "./ApiService";
 import moment from "moment"
 export const baseUrl = '';
 export const urlParams = new URLSearchParams(window.location.search);
-const TOKEN_KEY = 'token';
-const PROJECT_KEY = 'currentProject';
 
 export const GOOGLE_CLIENT_ID = import.meta.env.VITE_APP_GOOGLE_CLIENT_ID;
 export const BASE_URL_API = import.meta.env.VITE_APP_API_URL;
 export const WIDGET_DOMAIN = import.meta.env.VITE_APP_WIDGET_DOMAIN;
 export const DO_SPACES_ENDPOINT = import.meta.env.VITE_APP_DO_SPACES_ENDPOINT;
-
-export const login = () => {
-    localStorage.setItem(TOKEN_KEY, 'TestLogin');
-}
+export const TOKEN_KEY = import.meta.env.VITE_APP_TOKEN_KEY;
+export const PROJECT_KEY = import.meta.env.VITE_APP_PROJECT_KEY;
 
 export const getLSUserDetails = () => {
     const savedUser = localStorage.getItem('user-details');
@@ -24,8 +20,12 @@ export const getTokenVerify = () => {
 }
 
 export const logout = () => {
-    localStorage.removeItem(TOKEN_KEY);
+    localStorage.clear();
 }
+
+export const getProfile = (profile) => {
+    return profile ? profile?.includes('googleusercontent.com') ? profile?.replace('quickhunt/stage/user/', '') : `${DO_SPACES_ENDPOINT}/${profile}` : null;
+};
 
 export const token = () => {
     return localStorage.getItem(TOKEN_KEY);
@@ -34,6 +34,7 @@ export const token = () => {
 export const setProjectDetails = (projectDetails) => {
     return localStorage.setItem(PROJECT_KEY, JSON.stringify(projectDetails));
 }
+
 export const getProjectDetails = (key) => {
     let projectDetails = JSON.parse(localStorage.getItem(PROJECT_KEY));
     return key ? projectDetails && projectDetails[key] : projectDetails;

@@ -29,7 +29,7 @@ import {
 import {useTheme} from "../theme-provider";
 import {
     apiService,
-    baseUrl, DO_SPACES_ENDPOINT,
+    baseUrl, getProfile,
     getProjectDetails,
     logout,
     removeProjectDetails,
@@ -121,6 +121,7 @@ const HeaderBar = ({setIsMobile}) => {
             onProModal(false)
         }
     }
+
     const closeSheet = () => {
         setSheetOpen(false)
         setCreateProjectDetails(initialStateProject)
@@ -485,7 +486,7 @@ const HeaderBar = ({setIsMobile}) => {
                                     <Button variant="secondary" size="icon" className="rounded-full w-[30px] h-[30px]">
                                         <Avatar className={"w-[30px] h-[30px]"}>
                                             <AvatarImage
-                                                src={userDetails.profileImage ? `${DO_SPACES_ENDPOINT}/${userDetails.profileImage}` : null}
+                                                src={getProfile(userDetails?.profileImage)}
                                                 alt={`${userDetails && userDetails?.firstName?.substring(0, 1)?.toUpperCase()}${userDetails?.lastName?.substring(0, 1)?.toUpperCase()}`}/>
                                             <AvatarFallback>{userDetails?.firstName?.substring(0, 1)?.toUpperCase()}{userDetails?.lastName?.substring(0, 1)?.toUpperCase()}</AvatarFallback>
                                         </Avatar>

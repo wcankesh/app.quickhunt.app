@@ -1,7 +1,7 @@
 import React, {Fragment, useState} from 'react';
 import { Label } from "../../ui/label";
 import { Button } from "../../ui/button";
-import {apiService, setProjectDetails} from "../../../utils/constent";
+import {apiService, setProjectDetails, TOKEN_KEY} from "../../../utils/constent";
 import {Input} from "../../ui/input";
 import {projectDetailsAction} from "../../../redux/action/ProjectDetailsAction";
 import {useDispatch} from "react-redux";
@@ -113,7 +113,7 @@ const Step3 = ({setStep}) => {
             setCreateProjectDetails(initialStateProject)
             setIsCreateLoading(false);
             setStep(4);
-            localStorage.setItem("token", token);
+            localStorage.setItem(TOKEN_KEY, token);
             localStorage.removeItem('token-verify-onboard')
         } else {
             setIsCreateLoading(false);

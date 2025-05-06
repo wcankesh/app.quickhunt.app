@@ -612,7 +612,7 @@ export class ApiService {
     }
 
     async removeMember(id) {
-        return await this.deleteData(`${baseUrlApi}/invited-user/revoke-invitation?id=${id}`)
+        return await this.deleteData(`${baseUrlApi}/team/delete-team-member?id=${id}`)
     }
 
     /* ---------- Import Export api ---------- */

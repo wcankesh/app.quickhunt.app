@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {Button} from "../ui/button"
 import {useNavigate} from "react-router-dom"
-import {apiService, baseUrl, validateForm, validateField, onKeyFire} from "../../utils/constent";
+import {apiService, baseUrl, validateForm, validateField, onKeyFire, TOKEN_KEY} from "../../utils/constent";
 import {Loader2} from "lucide-react";
 import {useToast} from "../ui/use-toast";
 import WithGoogle from "./WithGoogle";
@@ -92,7 +92,7 @@ const Login = () => {
                     navigate(`${baseUrl}/on-boarding`);
                     localStorage.setItem("token-verify-onboard", data.data.token);
                 } else {
-                    localStorage.setItem("token", data?.data?.token);
+                    localStorage.setItem(TOKEN_KEY, data?.data?.token);
                     navigate(`${baseUrl}/dashboard`);
                 }
             }

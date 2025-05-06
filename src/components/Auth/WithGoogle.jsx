@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {useNavigate} from "react-router-dom";
 import {loadAuth2, loadGapiInsideDOM} from "gapi-script";
-import {apiService, baseUrl, GOOGLE_CLIENT_ID, token} from "../../utils/constent";
+import {apiService, baseUrl, GOOGLE_CLIENT_ID, token, TOKEN_KEY} from "../../utils/constent";
 import {Icon} from "../../utils/Icon";
 import {Button} from "../ui/button";
 import {useToast} from "../ui/use-toast";
@@ -61,7 +61,7 @@ const WithGoogle = ({title}) => {
                 navigate(`${baseUrl}/invitation?token=${token}`);
             } else {
                 urlParams.delete('token')
-                if(data?.onboarding == 0){
+                if(data?.data?.onboarding == 0){
                     const datas = await apiService.getLoginUserDetails({Authorization: `Bearer ${data.data?.token}`})
                     if(datas.success){
                         dispatch(userDetailsAction({...datas.data}))
@@ -72,7 +72,7 @@ const WithGoogle = ({title}) => {
                     navigate(`${baseUrl}/on-boarding`);
                     localStorage.setItem("token-verify-onboard", data.data?.token);
                 } else {
-                    localStorage.setItem("token", data.data?.token);
+                    localStorage.setItem(TOKEN_KEY, data.data?.token);
                     navigate(`${baseUrl}/dashboard`);
                 }
             }
