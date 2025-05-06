@@ -287,14 +287,23 @@ const SidebarInAppMessage = ({
                                 selectedStep?.actionType === 1 &&
                                 <Fragment>
                                     <div className="grid w-full items-center gap-1.5">
-                                        <Label htmlFor="actionText" className={"font-normal"}>Action Text</Label>
+                                        <Label htmlFor="actionText" className={"font-normal after:ml-0.5 after:content-['*'] after:text-destructive"}>Action Text</Label>
                                         <Input className={"h-9"} id="actionText" placeholder="Enter action text"
                                                value={selectedStep?.actionText}
-                                               onChange={(e) => onChangeChecklist("actionText", e.target.value)}/>
+                                               onChange={(e) => {
+                                                   onChangeChecklist("actionText", e.target.value);
+                                                   setFormError(prev => ({
+                                                       ...prev,
+                                                       actionText: ""
+                                                   }));
+                                               }}/>
+                                        {formError.actionText && (
+                                            <p className="text-red-500 text-sm">{formError.actionText}</p>
+                                        )}
                                     </div>
 
                                     <div className="grid w-full items-center gap-1.5">
-                                        <Label htmlFor="actionUrl" className={"font-normal  after:ml-0.5 after:content-['*'] after:text-destructive"}>Action URL</Label>
+                                        <Label htmlFor="actionUrl" className={"font-normal after:ml-0.5 after:content-['*'] after:text-destructive"}>Action URL</Label>
                                         <Input className={"h-9"} id="actionUrl" placeholder="Enter URL address"
                                                value={selectedStep?.actionUrl}
                                                onChange={(e) => {
@@ -323,20 +332,46 @@ const SidebarInAppMessage = ({
                     {
                         (type === "2" && inAppMsgSetting.actionType == 1) && <Fragment>
                             <div className="grid w-full items-center gap-1.5">
-                                <Label htmlFor="actionText" className={"font-normal"}>Action Text</Label>
+                                <Label htmlFor="actionText" className={"font-normal after:ml-0.5 after:content-['*'] after:text-destructive"}>Action Text</Label>
                                 <Input className={"h-9"} id="actionText" placeholder="Enter action text"
                                        value={inAppMsgSetting.actionText}
-                                       onChange={(e) => onChange("actionText", e.target.value)}/>
+                                       // onChange={(e) => {
+                                       //     onChangeChecklist("actionText", e.target.value);
+                                       //     setFormError(prev => ({
+                                       //         ...prev,
+                                       //         actionText: ""
+                                       //     }));
+                                       // }}
+                                       onChange={(e) => {
+                                           onChange("actionText", e.target.value);
+                                           setFormError(prev => ({
+                                               ...prev,
+                                               actionText: formValidate("actionText", e.target.value, { actionType: inAppMsgSetting.actionType })
+                                           }));
+                                       }}
+                                />
+                                {formError.actionText && (
+                                    <p className="text-red-500 text-sm">{formError.actionText}</p>
+                                )}
                             </div>
 
                             <div className="grid w-full items-center gap-1.5">
-                                <Label htmlFor="actionUrl" className={"font-normal  after:ml-0.5 after:content-['*'] after:text-destructive"}>Action URL</Label>
+                                <Label htmlFor="actionUrl" className={"font-normal after:ml-0.5 after:content-['*'] after:text-destructive"}>Action URL</Label>
                                 <Input className={"h-9"} id="actionUrl" placeholder="Enter URL address"
                                        value={inAppMsgSetting.actionUrl}
+                                       // onChange={(e) => {
+                                       //     onChange("actionUrl", e.target.value)
+                                       //     setFormError(prev => ({...prev, actionUrl: ""}));
+                                       // }}
                                        onChange={(e) => {
-                                           onChange("actionUrl", e.target.value)
-                                           setFormError(prev => ({...prev, actionUrl: ""}));
-                                       }}/>
+                                           onChange("actionUrl", e.target.value);
+                                           setFormError(prev => ({
+                                               ...prev,
+                                               actionUrl: formValidate("actionUrl", e.target.value, { actionType: inAppMsgSetting.actionType })
+                                           }));
+                                       }}
+
+                                />
                                 {formError?.actionUrl && (
                                     <p className="text-red-500 text-sm">{formError.actionUrl}</p>
                                 )}

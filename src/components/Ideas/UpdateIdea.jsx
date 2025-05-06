@@ -387,10 +387,9 @@ const UpdateIdea = () => {
         }
         setSelectedIdea({...selectedIdea, topic: clone});
     };
-
     const giveVote = async (type) => {
         if (selectedIdea.createdBy !== 1) {
-            if (selectedIdea.userVote === (type == 1)) {
+            if (selectedIdea.userVote === (type == 1) || selectedIdea.userVote == 1) {
 
             } else {
                 const payload = {

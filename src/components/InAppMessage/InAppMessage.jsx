@@ -162,8 +162,13 @@ const InAppMessage = () => {
 
     const handleStatusChange = async (object, value) => {
         const payload = {status: value,}
+        // if (object.status === 2 || object.status === 3) {
+        //     payload.startAt = new Date().toISOString();
+        // }
         if (object.status === 2 || object.status === 3) {
-            payload.startAt = new Date().toISOString();
+            const now = new Date();
+            const formattedDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} 00:00:00`;
+            payload.startAt = formattedDate;
         }
         setMessageList(messageList.map(x => x.id === object.id ? {...x, status: value, startAt: payload.startAt || x.startAt,} : x));
         const data = await apiService.updateInAppMessageStatus(payload, object.id);

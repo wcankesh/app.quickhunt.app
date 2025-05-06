@@ -130,6 +130,7 @@ const initialStateError = {
     endAt: undefined,
     from: "",
     actionUrl: "",
+    actionText: "",
 }
 
 const UpdateInAppMessage = () => {
@@ -219,9 +220,7 @@ const UpdateInAppMessage = () => {
                 bodyText: type === "1" ? {blocks: [{type: "paragraph", data: {text: "Hey"}}]} : null,
                 textColor: type === "4" ? "#FFFFFF" : "#000000",
                 steps: type === "3" ? [stepBoj] : [],
-                checklists: type === "4" ? [
-                    checkListObj
-                ] : [],
+                checklists: type === "4" ? [checkListObj] : [],
             }));
             setSelectedStep(type === "3" ? stepBoj : type === "4" ? checkListObj : {})
         }
@@ -251,11 +250,12 @@ const UpdateInAppMessage = () => {
         }
     }
 
-    const formValidate = (name, value) => {
+    const formValidate = (name, value, context = {}) => {
         const trimmedValue = typeof value === "string" ? value.trim() : String(value || "").trim();
         switch (name) {
             case "from":
-                if (inAppMsgSetting.showSender && !value) {
+                // if (inAppMsgSetting.showSender && !value) {
+                if (context.showSender && !trimmedValue) {
                     return "Sender is required.";
                 }
                 return "";
@@ -265,16 +265,30 @@ const UpdateInAppMessage = () => {
                 }
                 return "";
             case "actionUrl":
-                if ((type === "2") && selectedStep?.actionType === 1) {
-                    if (isEmpty(value)) {
+                // if ((type === "2") && selectedStep?.actionType === 1) {
+                //     if (isEmpty(value)) {
+                //         return "Action URL is required.";
+                //     }
+                //     // if (trimmedValue) {
+                //     //     const urlPattern = /^(https?:\/\/)?([\w-]+\.)+[\w-]+(\/[\w-./?%&=]*)?$/i;
+                //     //     if (!urlPattern.test(trimmedValue)) {
+                //     //         return "Please enter a valid URL.";
+                //     //     }
+                //     // }
+                // }
+                if (context.actionType === 1) {
+                    if (isEmpty(trimmedValue)) {
                         return "Action URL is required.";
                     }
-                    // if (trimmedValue) {
-                    //     const urlPattern = /^(https?:\/\/)?([\w-]+\.)+[\w-]+(\/[\w-./?%&=]*)?$/i;
-                    //     if (!urlPattern.test(trimmedValue)) {
-                    //         return "Please enter a valid URL.";
-                    //     }
-                    // }
+                    const urlPattern = /^(https?:\/\/)?([\w-]+\.)+[\w-]+(\/[\w-./?%&=]*)?$/i;
+                    if (!urlPattern.test(trimmedValue)) {
+                        return "Please enter a valid URL.";
+                    }
+                }
+                return "";
+            case "actionText":
+                if (context.actionType === 1 && isEmpty(trimmedValue)) {
+                    return "Action Text is required.";
                 }
                 return "";
             default:
@@ -282,7 +296,7 @@ const UpdateInAppMessage = () => {
         }
     };
 
-    const handleMessage = async (typeFunc, load) => {
+    const handleMessageqq = async (typeFunc, load) => {
         if (type == "3") {
             const activeSteps = inAppMsgSetting.steps.filter((x) => x.isActive && x.questionType !== 8);
             if (activeSteps.length <= 0) {
@@ -392,25 +406,194 @@ const UpdateInAppMessage = () => {
             projectId: projectDetailsReducer.id,
         };
 
-        console.log(payload)
+        setSaving(load);
+        let data;
+        if (typeFunc === 'create') {
+            data = await apiService.createInAppMessage(payload);
+        } else if (typeFunc === 'update') {
+            data = await apiService.updateInAppMessage(payload, inAppMsgSetting.id);
+        }
 
-        // setSaving(load);
-        // let data;
-        // if (typeFunc === 'create') {
-        //     data = await apiService.createInAppMessage(payload);
-        // } else if (typeFunc === 'update') {
-        //     data = await apiService.updateInAppMessage(payload, inAppMsgSetting.id);
-        // }
-        //
-        // setSaving('');
-        // if (data?.success) {
-        //     toast({description: data.message});
-        //     if (typeFunc === 'create' && id === 'new') {
-        //         navigate(`${baseUrl}/app-message`);
-        //     }
-        // } else {
-        //     toast({variant: "destructive", description: data?.error?.message});
-        // }
+        setSaving('');
+        if (data?.success) {
+            toast({description: data.message});
+            if (typeFunc === 'create' && id === 'new') {
+                navigate(`${baseUrl}/app-message`);
+            }
+        } else {
+            toast({variant: "destructive", description: data?.error?.message});
+        }
+    };
+
+    const handleMessage = async (typeFunc, load) => {
+        let validationErrors = {};
+
+        // Validate top-level fields
+        Object.keys(initialStateError).forEach(name => {
+            const context = {
+                showSender: inAppMsgSetting.showSender,
+                actionType: inAppMsgSetting.actionType
+            };
+            const error = formValidate(name, inAppMsgSetting[name], context);
+            if (error) {
+                validationErrors[name] = error;
+            }
+        });
+
+        // For Banner type (type="2")
+        if (type === "2") {
+            if (inAppMsgSetting.actionType === 1) {
+                const textError = formValidate("actionText", inAppMsgSetting.actionText, {
+                    actionType: inAppMsgSetting.actionType
+                });
+                if (textError) {
+                    validationErrors.actionText = textError;
+                }
+
+                const urlError = formValidate("actionUrl", inAppMsgSetting.actionUrl, {
+                    actionType: inAppMsgSetting.actionType
+                });
+                if (urlError) {
+                    validationErrors.actionUrl = urlError;
+                }
+            }
+        }
+
+        // Validate surveys (type === "3")
+        if (type === "3") {
+            const activeSteps = inAppMsgSetting.steps.filter((x) => x.isActive && x.questionType !== 8);
+            if (activeSteps.length <= 0) {
+                toast({ variant: "destructive", description: "Add minimum 1 step" });
+                return;
+            }
+            for (const step of activeSteps) {
+                if (step.questionType === 5) {
+                    if (!step.options || step.options.length === 0) {
+                        toast({ variant: "destructive", description: "At least one option is required." });
+                        return;
+                    }
+                    const hasEmptyTitle = step.options.some(opt => !opt.title?.trim());
+                    if (hasEmptyTitle) {
+                        toast({ variant: "destructive", description: "Option cannot be empty." });
+                        return;
+                    }
+                }
+                // Validate actionUrl for each step if actionType is 1
+                if (step.actionType === 1) {
+                    const error = formValidate("actionUrl", step.actionUrl, { actionType: step.actionType });
+                    if (error) {
+                        validationErrors[`step_${step.stepId}_actionUrl`] = error;
+                    }
+                }
+            }
+        }
+
+        // Validate checklists (type === "4")
+        if (type === "4") {
+            const activeChecklists = inAppMsgSetting.checklists.filter(x => x.isActive);
+            for (const checklist of activeChecklists) {
+                if (checklist.actionType === 1) {
+                    const textError = formValidate("actionText", checklist.actionText, { actionType: checklist.actionType });
+                    if (textError) {
+                        validationErrors[`checklist_${checklist.checklistId}_actionText`] = textError;
+                    }
+                    const error = formValidate("actionUrl", checklist.actionUrl, { actionType: checklist.actionType });
+                    if (error) {
+                        validationErrors[`checklist_${checklist.checklistId}_actionUrl`] = error;
+                    }
+                }
+            }
+        }
+
+        // Display all validation errors
+        if (Object.keys(validationErrors).length > 0) {
+            setFormError(validationErrors);
+            Object.values(validationErrors).forEach(error => {
+                toast({ variant: "destructive", description: error });
+            });
+            return;
+        }
+
+        // Process bodyText images
+        if (inAppMsgSetting?.bodyText?.blocks) {
+            inAppMsgSetting.bodyText.blocks = inAppMsgSetting.bodyText.blocks.map(block => {
+                if (block.type === 'image' && block.data?.file?.url) {
+                    return {
+                        ...block,
+                        data: {
+                            ...block.data,
+                            file: {
+                                ...block.data.file,
+                                url: extractImageFilename(block.data.file.url)
+                            }
+                        }
+                    };
+                }
+                return block;
+            });
+        }
+
+        // Process checklist description images
+        if (Array.isArray(inAppMsgSetting.checklists)) {
+            inAppMsgSetting.checklists = inAppMsgSetting.checklists.map(cl => {
+                if (Array.isArray(cl?.description)) {
+                    const updatedDescription = cl.description.map(block => {
+                        if (block.type === 'image' && block.data?.file?.url) {
+                            return {
+                                ...block,
+                                data: {
+                                    ...block.data,
+                                    file: {
+                                        ...block.data.file,
+                                        url: extractImageFilename(block.data.file.url)
+                                    }
+                                }
+                            };
+                        }
+                        return block;
+                    });
+                    return {
+                        ...cl,
+                        description: updatedDescription
+                    };
+                }
+                return cl;
+            });
+        }
+
+        const startAt = inAppMsgSetting?.startAt
+            ? moment(inAppMsgSetting.startAt).format('YYYY-MM-DD HH:mm:ss')
+            : null;
+
+        const endAt = inAppMsgSetting?.endAt && moment(inAppMsgSetting.endAt).isValid()
+            ? moment(inAppMsgSetting.endAt).format('YYYY-MM-DD HH:mm:ss')
+            : null;
+
+        const payload = {
+            ...inAppMsgSetting,
+            startAt,
+            endAt,
+            type,
+            projectId: projectDetailsReducer.id,
+        };
+
+        setSaving(load);
+        let data;
+        if (typeFunc === 'create') {
+            data = await apiService.createInAppMessage(payload);
+        } else if (typeFunc === 'update') {
+            data = await apiService.updateInAppMessage(payload, inAppMsgSetting.id);
+        }
+
+        setSaving('');
+        if (data?.success) {
+            toast({ description: data.message });
+            if (typeFunc === 'create' && id === 'new') {
+                navigate(`${baseUrl}/app-message`);
+            }
+        } else {
+            toast({ variant: "destructive", description: data?.error?.message });
+        }
     };
 
     const handleCancel = () => {
