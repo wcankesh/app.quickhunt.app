@@ -303,6 +303,7 @@ const Emoji = () => {
                                                                             variant="outline hover:bg-transparent"
                                                                             className="p-1 border w-[30px] h-[30px]"
                                                                             onClick={() => handleDeleteEmoji(x.id)}
+                                                                            disabled={emojiList.filter(moj => moj.id).length === 1}
                                                                         >
                                                                             <Trash2 size={16}/>
                                                                         </Button>

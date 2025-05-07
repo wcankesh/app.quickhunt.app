@@ -16,7 +16,7 @@ const CommonBreadCrumb = ({ links, currentPage, separator = '/', truncateLimit =
             <BreadcrumbList>
                 {links.map((link, index) => (
                     <React.Fragment key={index}>
-                        <BreadcrumbItem className={"cursor-pointer"}>
+                        <BreadcrumbItem className={"cursor-pointer font-[500]"}>
                             <BreadcrumbLink onClick={() => navigate(link.path)}>
                                 {link.label}
                             </BreadcrumbLink>
@@ -27,7 +27,7 @@ const CommonBreadCrumb = ({ links, currentPage, separator = '/', truncateLimit =
                 ))}
                 {currentPage && (
                     <BreadcrumbItem className={"cursor-pointer"}>
-                        <BreadcrumbPage className={`w-full ${currentPage.length > truncateLimit ? "max-w-[200px] truncate" : ""}`}>
+                        <BreadcrumbPage className={`w-full font-[500] ${currentPage.length > truncateLimit ? "max-w-[200px] truncate" : ""}`}>
                             {currentPage}
                         </BreadcrumbPage>
                     </BreadcrumbItem>

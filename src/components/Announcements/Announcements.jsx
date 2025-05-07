@@ -22,7 +22,7 @@ import {EmptyAnnounceContent} from "../Comman/EmptyContentForModule";
 
 const initialStateFilter = {labels: "", status: "", search:""}
 const perPageLimit = 10;
-const status = [{label: "Published", value: 1}, {label: "Scheduled", value: 2}, {label: "Draft", value: 4},];
+const status = [{label: "Published", value: 1}, {label: "Scheduled", value: 2}, {label: "Draft", value: 3},];
 
 const Announcements = () => {
     const location = useLocation();
@@ -66,7 +66,7 @@ const Announcements = () => {
         } else {
             navigate(`${baseUrl}/announcements?pageNo=${pageNo}`);
         }
-    }, [projectDetailsReducer.id, allStatusAndTypes, pageNo,]);
+    }, [projectDetailsReducer.id, pageNo,]);
 
     const getAllPosts = async (getFilter = filter) => {
         const payload = {
@@ -142,19 +142,23 @@ const Announcements = () => {
         getAllPosts(clone);
     };
 
-    const closeSheet = (record,addRecord) => {
+    const closeSheet = (record, addRecord, dontCallApi = true) => {
         if (record) {
             const updatedItems = announcementList.map((x) => x.id === record.id ? {...x, ...record, status: record.status} : x);
             setAnnouncementList(updatedItems);
             setSelectedRecord({});
-            getAllPosts(filter);
+            if (dontCallApi) {
+                getAllPosts(filter);
+            }
         } else if (addRecord) {
             const clone = [...announcementList];
             clone.unshift(addRecord);
             setAnnouncementList(clone);
             setSelectedRecord({});
             setPageNo(1);
-            getAllPosts(filter);
+            if (dontCallApi) {
+                getAllPosts(filter);
+            }
         }
         else {
             setSelectedRecord({});
@@ -204,6 +208,17 @@ const Announcements = () => {
     };
 
     const matchedObject = allStatusAndTypes.labels ? allStatusAndTypes.labels.find(x => x.id === filter.labels) : null;
+
+    const handleStatusChange = (updatedRecord) => {
+        setAnnouncementList((prev) => {
+            const matchesFilter = filter.status ? updatedRecord.status == filter.status : true;
+            if (!matchesFilter) {
+                setTotalRecord((prevTotal) => prevTotal - 1);
+                return prev.filter((x) => x.id !== updatedRecord.id);
+            }
+            return prev.map((x) => (x.id === updatedRecord.id ? updatedRecord : x));
+        });
+    };
 
     return (
         <div className={"container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-3 md:px-4"}>
@@ -320,7 +335,7 @@ const Announcements = () => {
                     filter.status &&
                     <Badge variant="outline" className="rounded p-0 font-medium">
                         <span
-                            className="px-3 py-1.5 border-r">{filter.status == 1 ? "Published" : filter.status === 2 ? "Scheduled" : filter.status == 4 ? "Draft" : ""}</span>
+                            className="px-3 py-1.5 border-r">{filter.status == 1 ? "Published" : filter.status === 2 ? "Scheduled" : filter.status == 3 ? "Draft" : ""}</span>
                         <span className="w-7 h-7 flex items-center justify-center cursor-pointer"
                               onClick={() => handleBadge({name: "status", value: "status"})}>
                             <X className='w-4 h-4'/>
@@ -345,6 +360,7 @@ const Announcements = () => {
                     isLoading={isLoading}
                     isLoadingDelete={isLoadingDelete}
                     getAllPosts={getAllPosts}
+                    onStatusChange={handleStatusChange}
                 />
                 {
                     announcementList?.length > 0 ?

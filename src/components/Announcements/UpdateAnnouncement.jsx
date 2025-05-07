@@ -21,7 +21,7 @@ import CommonBreadCrumb from "../Comman/CommonBreadCrumb";
 const initialStateError = {
     title: "",
     description: "",
-    slugUrl: "",
+    slug: "",
     categoryId: ""
 }
 
@@ -48,7 +48,7 @@ const UpdateAnnouncement = () => {
 
     useEffect(() => {
         if (projectDetailsReducer.id) {
-            // if (selectedRecord?.slugUrl) {
+            // if (selectedRecord?.slug) {
             //     getSinglePosts();
             // } else {
             //     setSelectedRecord({
@@ -119,7 +119,7 @@ const UpdateAnnouncement = () => {
                 } else {
                     return "";
                 }
-            case "slugUrl":
+            case "slug":
                 if (!value || value.trim() === "") {
                     return "Permalink / Slug is required.";
                 } else {
@@ -139,12 +139,12 @@ const UpdateAnnouncement = () => {
                 } else {
                     return "";
                 }
-            // case "categoryId":
-            //     if (!value || value.trim() === "" || value === "null") {
-            //         return "Category is required.";
-            //     } else {
-            //         return "";
-            //     }
+            case "categoryId":
+                if (!value || value === "null") {
+                    return "Category is required.";
+                } else {
+                    return "";
+                }
             default: {
                 return "";
             }
@@ -162,11 +162,11 @@ const UpdateAnnouncement = () => {
 
             if (updatedDetails.title.replace(/[^a-z0-9\s]/gi, '')
                 .replace(/\s+/g, '-')
-                .toLowerCase() === updatedDetails.slugUrl) {
+                .toLowerCase() === updatedDetails.slug) {
                 updatedDetails = {
                     ...updatedDetails,
                     title: value,
-                    slugUrl: slug
+                    slug: slug
                 };
             } else {
                 updatedDetails = {
@@ -175,7 +175,7 @@ const UpdateAnnouncement = () => {
                 };
             }
 
-        } else if (name === "slugUrl") {
+        } else if (name === "slug") {
             const slug = value
                 .replace(/[^a-z0-9\s-]/gi, '')
                 .replace(/\s+/g, '-')
@@ -183,7 +183,7 @@ const UpdateAnnouncement = () => {
 
             updatedDetails = {
                 ...updatedDetails,
-                slugUrl: slug
+                slug: slug
             };
         } else {
             updatedDetails[name] = value;
@@ -236,10 +236,10 @@ const UpdateAnnouncement = () => {
                 validationErrors[name] = error;
             }
         });
-        // const categoryError = formValidate("categoryId", selectedRecord.categoryId);
-        // if (categoryError) {
-        //     validationErrors.categoryId = categoryError;
-        // }
+        const categoryError = formValidate("categoryId", selectedRecord.categoryId);
+        if (categoryError) {
+            validationErrors.categoryId = categoryError;
+        }
         if (Object.keys(validationErrors).length > 0) {
             setFormError(validationErrors);
             return;
@@ -258,8 +258,8 @@ const UpdateAnnouncement = () => {
             if (x !== "labelId") {
                 if (x === "assignToId") {
                     formData.append(x, selectedRecord[x]);
-                } else if (x === "slugUrl") {
-                    formData.append("slugUrl", selectedRecord?.slugUrl ? selectedRecord?.slugUrl : selectedRecord?.title.replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-').replace(/\//g, "-").toLowerCase());
+                } else if (x === "slug") {
+                    formData.append("slug", selectedRecord?.slug ? selectedRecord?.slug : selectedRecord?.title.replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-').replace(/\//g, "-").toLowerCase());
                 } else if (x === "publishedAt") {
                     formData.append("publishedAt", moment(selectedRecord?.publishedAt).format("YYYY-MM-DD"));
                 } else if (x === "expiredAt") {
@@ -296,7 +296,7 @@ const UpdateAnnouncement = () => {
 
         } else {
             setIsLoad('')
-            toast({description: data.error.message, variant: "destructive"});
+            toast({description: data?.error?.message, variant: "destructive"});
         }
     }
 
@@ -378,26 +378,26 @@ const UpdateAnnouncement = () => {
                         <div className={"flex gap-4"}>
                             <div className="w-full flex flex-col gap-4">
                                 <div className="w-full flex flex-col gap-2">
-                                    <Label htmlFor="title" className={"font-normal after:ml-0.5 after:content-['*'] after:text-destructive"}>Title</Label>
+                                    <Label htmlFor="title" className={"font-medium after:ml-0.5 after:content-['*'] after:text-destructive"}>Title</Label>
                                     <Input type="text" id="title" className={"h-9"} name={"title"}
                                            value={selectedRecord.title} onChange={onChangeText}/>
                                     {formError.title &&
                                     <span className="text-sm text-red-500">{formError.title}</span>}
                                 </div>
                                 <div className="w-full flex flex-col gap-2">
-                                    <Label htmlFor="link" className={"font-normal after:ml-0.5 after:content-['*'] after:text-destructive"}>Permalink / Slug</Label>
-                                    <Input type="text" className={"h-9"} id="link" name={"slugUrl"}
-                                           value={selectedRecord.slugUrl} onChange={onChangeText}/>
+                                    <Label htmlFor="link" className={"font-medium after:ml-0.5 after:content-['*'] after:text-destructive"}>Permalink / Slug</Label>
+                                    <Input type="text" className={"h-9"} id="link" name={"slug"}
+                                           value={selectedRecord.slug} onChange={onChangeText}/>
                                     <p className={"text-sm font-normal text-muted-foreground break-words"}>This release will
                                         be available at {projectDetailsReducer.domain ? <a
-                                            href={`https://${projectDetailsReducer.domain?.toLowerCase()}/announcements/${selectedRecord.slugUrl?.toLowerCase()}`}
+                                            href={`https://${projectDetailsReducer.domain?.toLowerCase()}/announcements/${selectedRecord.slug?.toLowerCase()}`}
                                             target={"_blank"}
-                                            className={"text-primary max-w-[593px] w-full break-words text-sm"}>{`https://${projectDetailsReducer.domain?.toLowerCase()}/announcements/${selectedRecord.slugUrl?.toLowerCase()}`}</a> : ""}</p>
-                                    {formError?.slugUrl &&
-                                    <span className="text-sm text-red-500">{formError?.slugUrl}</span>}
+                                            className={"text-primary max-w-[593px] w-full break-words text-sm"}>{`https://${projectDetailsReducer.domain?.toLowerCase()}/announcements/${selectedRecord.slug?.toLowerCase()}`}</a> : ""}</p>
+                                    {formError?.slug &&
+                                    <span className="text-sm text-red-500">{formError?.slug}</span>}
                                 </div>
                                 <div className="w-full flex flex-col gap-2">
-                                    <Label htmlFor="description" className={"font-normal after:ml-0.5 after:content-['*'] after:text-destructive"}>Description</Label>
+                                    <Label htmlFor="description" className={"font-medium after:ml-0.5 after:content-['*'] after:text-destructive"}>Description</Label>
                                     <ReactQuillEditor className={"min-h-[145px] h-full"} value={selectedRecord.description} onChange={onChangeText}
                                                       name={"description"}/>
                                     {formError.description && <span className="text-sm text-red-500">{formError.description}</span>}
@@ -409,7 +409,7 @@ const UpdateAnnouncement = () => {
                         <div className={"flex flex-wrap md:flex-nowrap gap-4 items-start"}>
                             <div className="w-full flex flex-col gap-4">
                                 <div className={"w-full space-y-1.5"}>
-                                    <Label className={"font-normal"}>Label</Label>
+                                    <Label className={"font-medium"}>Label</Label>
                                     <Select value={[]} onValueChange={onChangeLabel}>
                                     {/*<Select value={selectedRecord?.labels?.length > 0 ? selectedRecord.labels[0] : undefined} onValueChange={onChangeLabel}>*/}
                                         <SelectTrigger className="h-9">
@@ -468,7 +468,7 @@ const UpdateAnnouncement = () => {
                                     </Select>
                                 </div>
                                 <div className={"w-full space-y-1.5"}>
-                                    <Label className={"font-normal"}>Assign to</Label>
+                                    <Label className={"font-medium"}>Assign to</Label>
                                     <Select onValueChange={handleValueChange} value={[]}>
                                     {/*<Select onValueChange={handleValueChange} value={selectedRecord?.assignToId?.length > 0 ? selectedRecord.assignToId[0] : undefined}>*/}
                                         <SelectTrigger className={"h-9"}>
@@ -515,9 +515,10 @@ const UpdateAnnouncement = () => {
                                     </Select>
                                 </div>
                                 <div className={"w-full space-y-1.5"}>
-                                    <Label className={"font-normal after:ml-0.5 after:content-['*'] after:text-destructive"}>Category</Label>
+                                    <Label className={"font-medium after:ml-0.5 after:content-['*'] after:text-destructive"}>Category</Label>
                                     <Select
                                         value={selectedRecord && selectedRecord?.categoryId && selectedRecord?.categoryId?.toString()}
+                                        // value={selectedRecord?.categoryId?.toString() || "null"}
                                         onValueChange={onChangeCategory}>
                                         <SelectTrigger className="h-9">
                                             {selectedRecord?.categoryId ? (
@@ -527,6 +528,16 @@ const UpdateAnnouncement = () => {
                                             ) : (
                                                 <span className="text-muted-foreground">Select a category</span>
                                             )}
+                                            {/*<SelectValue className={"text-muted-foreground text-sm"}>*/}
+                                            {/*    {selectedRecord?.categoryId === null || selectedRecord?.categoryId === "null"*/}
+                                            {/*        ? "None"*/}
+                                            {/*        : categoriesList.find(x => x.id.toString() === selectedRecord?.categoryId?.toString())?.name || "Select a category"}*/}
+                                            {/*</SelectValue>*/}
+                                            {/*<SelectValue className={"text-muted-foreground text-sm"}>*/}
+                                            {/*    {selectedRecord?.categoryId && selectedRecord?.categoryId !== "null"*/}
+                                            {/*        ? categoriesList.find((x) => x.id.toString() === selectedRecord?.categoryId?.toString())?.name || "Select a category"*/}
+                                            {/*        : "None"}*/}
+                                            {/*</SelectValue>*/}
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectGroup>
@@ -542,12 +553,12 @@ const UpdateAnnouncement = () => {
                                             </SelectGroup>
                                         </SelectContent>
                                     </Select>
-                                    {/*{formError.categoryId && <span className="text-sm text-red-500">{formError.categoryId}</span>}*/}
+                                    {formError.categoryId && <span className="text-sm text-red-500">{formError.categoryId}</span>}
                                 </div>
                             </div>
                             <div className="w-full flex flex-col gap-4 items-stretch h-full">
                                 <div className="space-y-1.5 h-full">
-                                    <Label className={"font-normal"}>Featured Image</Label>
+                                    <Label className={"font-medium"}>Featured Image</Label>
                                     <div className="w-[282px] h-[128px] flex gap-1 items-stretch">
                                         {selectedRecord?.image ? (
                                             <div className="h-full">
@@ -590,7 +601,7 @@ const UpdateAnnouncement = () => {
                                 </div>
                                 <div className="flex flex-col gap-[18px] w-full h-full">
                                     <div className="space-y-1.5 flex flex-col">
-                                        <Label htmlFor="date" className={"font-normal"}>Published at</Label>
+                                        <Label htmlFor="date" className={"font-medium"}>Published at</Label>
                                         <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
                                             <PopoverTrigger asChild>
                                                 <Button
@@ -630,7 +641,7 @@ const UpdateAnnouncement = () => {
                                                 checked={selectedRecord?.expiredBoolean === 1}
                                                 onCheckedChange={(checked) => commonToggle("expiredBoolean", checked ? 1 : 0)}
                                             />
-                                            <label htmlFor="expire_date" className="text-sm font-normal">Expire At</label>
+                                            <label htmlFor="expire_date" className="text-sm font-medium">Expire At</label>
                                         </div>
                                         {selectedRecord?.expiredBoolean === 1 && (
                                             <div className="grid w-full gap-2 basis-1/2">

@@ -100,15 +100,10 @@ const Labels = () => {
             setLabelList(clone);
             dispatch(allStatusAndTypesAction({...allStatusAndTypes, labels: clone}))
             setIsSave(false);
-            toast({
-                description: data.message
-            })
+            toast({description: data.message})
         } else {
             setIsSave(false);
-            toast({
-                description: (data?.error?.message),
-                variant: "destructive"
-            })
+            toast({description: (data?.error?.message), variant: "destructive"})
         }
         setIsEdit(null);
     };
@@ -389,6 +384,7 @@ const Labels = () => {
                                                                             variant="outline hover:bg-transparent"
                                                                             className="p-1 border w-[30px] h-[30px]"
                                                                             onClick={() => handleDeleteLabel(x.id, i)}
+                                                                            disabled={labelList.filter(label => label.id).length === 1}
                                                                         >
                                                                             <Trash2 size={16}/>
                                                                         </Button>

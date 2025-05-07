@@ -340,11 +340,11 @@ const Tags = () => {
                                                                                     </Button>
                                                                                 </div>
                                                                                 <div className="pl-2">
-                                                                                    <Button onClick={() => {
-                                                                                        handleDeleteStatus(x.id);
-                                                                                    }}
+                                                                                    <Button onClick={() => handleDeleteStatus(x.id)}
                                                                                             variant={"outline hover:bg-transparent"}
-                                                                                            className={`p-1 border w-[30px] h-[30px]`}>
+                                                                                            className={`p-1 border w-[30px] h-[30px]`}
+                                                                                            disabled={topicLists.filter(tag => tag.id).length === 1}
+                                                                                    >
                                                                                         <Trash2 size={16}/>
                                                                                     </Button>
                                                                                 </div>
