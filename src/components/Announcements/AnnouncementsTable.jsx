@@ -21,15 +21,15 @@ import {Avatar, AvatarFallback} from "../ui/avatar";
 
 const status = [
     {name: "Publish", value: 1, fillColor: "#389E0D", strokeColor: "#389E0D",},
-    {name: "Draft", value: 4, fillColor: "#CF1322", strokeColor: "#CF1322",},
+    {name: "Draft", value: 3, fillColor: "#CF1322", strokeColor: "#CF1322",},
 ];
 const status2 = [
     {name: "Publish", value: 1, fillColor: "#389E0D", strokeColor: "#389E0D",},
     {name: "Scheduled", value: 2, fillColor: "#63C8D9", strokeColor: "#63C8D9",},
-    {name: "Draft", value: 4, fillColor: "#CF1322", strokeColor: "#CF1322",},
+    {name: "Draft", value: 3, fillColor: "#CF1322", strokeColor: "#CF1322",},
 ]
 
-const AnnouncementsTable = ({data, isLoading, handleDelete, isLoadingDelete, getAllPosts}) => {
+const AnnouncementsTable = ({data, isLoading, handleDelete, isLoadingDelete, onStatusChange}) => {
     const location = useLocation();
     const UrlParams = new URLSearchParams(location.search);
     const getPageNo = UrlParams.get("pageNo");
@@ -79,6 +79,35 @@ const AnnouncementsTable = ({data, isLoading, handleDelete, isLoadingDelete, get
     };
 
     const handleStatusChange = async (object, value) => {
+        const updatedRecord = {
+            ...object,
+            status: value,
+            publishedAt: value === 1 ? moment(new Date()).format("YYYY-MM-DD") : object.publishedAt,
+        };
+        setAnnouncementData((prev) =>
+            prev.map((x) => (x.id === object.id ? updatedRecord : x))
+        );
+        onStatusChange(updatedRecord);
+        const labelIds = object.labels.map((label) => label.id);
+        const payload = {
+            ...object,
+            status: value,
+            publishedAt: value === 1 ? moment(new Date()).format("YYYY-MM-DD") : object.publishedAt,
+            labels: labelIds,
+        };
+        const data = await apiService.updatePosts(payload, object.id);
+        if (data.success) {
+            toast({ description: data.message });
+        } else {
+            toast({ description: data.error.message, variant: "destructive" });
+            setAnnouncementData((prev) =>
+                prev.map((x) => (x.id === object.id ? object : x))
+            );
+            onStatusChange(object);
+        }
+    };
+
+    const handleStatusChangeqq = async (object, value) => {
         setAnnouncementData(announcementData.map(x => x.id === object.id ? {
             ...x,
             status: value,

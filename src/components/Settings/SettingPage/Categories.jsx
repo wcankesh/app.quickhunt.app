@@ -321,11 +321,16 @@ const Categories = () => {
                                                                                             className={`p-1 border w-[30px] h-[30px] text-muted-foreground`}><Pencil
                                                                                         size={16}/></Button>
                                                                                 </div>
-                                                                                <div className="pl-2"><Button
-                                                                                    onClick={() => deleteCategory(x.id)}
-                                                                                    variant={"outline hover:bg-transparent"}
-                                                                                    className={`p-1 border w-[30px] h-[30px] text-muted-foreground`}><Trash2
-                                                                                    size={16}/></Button></div>
+                                                                                <div className="pl-2">
+                                                                                    <Button
+                                                                                        onClick={() => deleteCategory(x.id)}
+                                                                                        variant={"outline hover:bg-transparent"}
+                                                                                        className={`p-1 border w-[30px] h-[30px] text-muted-foreground`}
+                                                                                        disabled={categoriesList.filter(cat => cat.id).length === 1}
+                                                                                    >
+                                                                                        <Trash2 size={16}/>
+                                                                                    </Button>
+                                                                                </div>
                                                                             </div>
                                                                         </TableCell>
                                                                     </Fragment>

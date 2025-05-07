@@ -452,6 +452,7 @@ const Statuses = () => {
                                                                 variant="outline hover:bg-transparent"
                                                                 className="p-1 border w-[30px] h-[30px]"
                                                                 onClick={() => handleDeleteStatus(x.id, i)}
+                                                                disabled={statusList.filter(stat => stat.id).length === 1}
                                                             >
                                                                 <Trash2 size={16}/>
                                                             </Button>

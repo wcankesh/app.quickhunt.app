@@ -187,8 +187,7 @@ const AnalyticsViews = () => {
                     </Card>
                     <Card>
                         <CardContent className={"p-4"}>
-                            {/*<div className={"flex flex-col gap-4"}>*/}
-                            <div className={"space-y-4"}>
+                            <div className={"flex flex-col gap-4"}>
                                 <h5 className={"text-base font-medium leading-5"}>Feedback</h5>
                                 {
                                     isLoadingFeedBack ?
@@ -220,7 +219,7 @@ const AnalyticsViews = () => {
                                                                             <div className={"flex flex-col gap-1"}>
                                                                                 <div className={"flex gap-4 items-center"}>
                                                                                     <h5 className={"text-sm font-medium"}>{x?.user.name ? x?.user.name : x?.user.firstName + "" + x?.user.lastName}</h5>
-                                                                                    <p className={"text-muted-foreground text-[10px] font-normal"}>{x?.user.email}</p>
+                                                                                    <p className={"text-muted-foreground text-[12px] font-normal"}>{x?.user.email}</p>
                                                                                 </div>
                                                                                 <div className={"text-muted-foreground text-xs font-normal"}>
                                                                                     <ReadMoreText className={"text-xs"} html={x.feedback}/>
