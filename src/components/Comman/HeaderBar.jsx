@@ -333,7 +333,7 @@ const HeaderBar = ({setIsMobile}) => {
             setDeleteProjectId(null)
             toast({description: data.message});
         } else {
-            toast({variant: 'destructive', description: data.error?.message});
+            toast({variant: 'destructive', description: data?.error?.message});
         }
     };
 

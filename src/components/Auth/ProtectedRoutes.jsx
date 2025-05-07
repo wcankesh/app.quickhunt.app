@@ -32,17 +32,17 @@ const ProtectedRoutes = () => {
         try {
             const data = await apiService.getLoginUserDetails();
             if (data.success) {
-                window.quickhuntSettings = {
-                    name: `${data.data.firstName} ${data.data.lastName}`,
-                    email: data.data.email,
-                };
                 dispatch(userDetailsAction({ ...data.data }));
-                window.Quickhunt_In_App_Message_Config = window.Quickhunt_In_App_Message_Config || [];
-                window.Quickhunt_In_App_Message_Config = [
-                    { Quickhunt_In_App_Message_Key: "ZXhOK3JqVXFmZTJCS3gzRnI5MXJtZz09OjoxMjM0NTY3ODkxMDExMTIx" },
-                    { Quickhunt_In_App_Message_Key: "ckgvb1QrcTljaVdhNkhCOGFaUU1idz09OjoxMjM0NTY3ODkxMDExMTIx" },
-                ];
-                window.QuickhuntScriptLoad();
+                // window.quickhuntSettings = {
+                //     name: `${data.data.firstName} ${data.data.lastName}`,
+                //     email: data.data.email,
+                // };
+                // window.Quickhunt_In_App_Message_Config = window.Quickhunt_In_App_Message_Config || [];
+                // window.Quickhunt_In_App_Message_Config = [
+                //     { Quickhunt_In_App_Message_Key: "ZXhOK3JqVXFmZTJCS3gzRnI5MXJtZz09OjoxMjM0NTY3ODkxMDExMTIx" },
+                //     { Quickhunt_In_App_Message_Key: "ckgvb1QrcTljaVdhNkhCOGFaUU1idz09OjoxMjM0NTY3ODkxMDExMTIx" },
+                // ];
+                // window.QuickhuntScriptLoad();
             }
         } catch (error) {
             console.error("Failed to fetch user details:", error);
