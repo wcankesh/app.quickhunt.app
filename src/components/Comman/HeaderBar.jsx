@@ -6,7 +6,6 @@ import {
     ChevronsUpDown,
     CreditCard,
     Eye,
-    FileText,
     Loader2,
     LogOut,
     Menu,
@@ -101,26 +100,30 @@ const HeaderBar = ({setIsMobile}) => {
     const [deleteProjectId, setDeleteProjectId] = useState(null);
     const [isCreateLoading, setIsCreateLoading] = useState(false);
 
-    const userProjectCount = projectList?.filter(p => p.userId == userDetailsReducer?.id).length || 0;
+    const userProjects = projectList?.filter(p => p.userId == userDetailsReducer?.id) || [];
 
     const viewLink = () => {
         window.open(`https://${projectDetailsReducer.domain}/ideas`, "_blank")
     }
 
     const openSheet = () => {
-        let length = projectList?.length;
-        if (userDetailsReducer.plan === 0) {
-            if (length < 1) {
-                setSheetOpen(true);
-                onProModal(false)
-            } else {
-                onProModal(true)
-            }
-        } else if (userDetailsReducer.plan === 1) {
+        const PLAN_PROJECT_LIMITS = {
+            0: 1,       // Free
+            1: 3,       // Starter
+            2: 10,      // Growth
+            3: Infinity // Business
+        };
+        const userPlan = userDetailsReducer.plan;
+        const projectLimit = PLAN_PROJECT_LIMITS[userPlan];
+        const currentCount = userProjects.length;
+
+        if (currentCount < projectLimit) {
             setSheetOpen(true);
-            onProModal(false)
+            onProModal(false);
+        } else {
+            onProModal(true);
         }
-    }
+    };
 
     const closeSheet = () => {
         setSheetOpen(false)
@@ -349,9 +352,9 @@ const HeaderBar = ({setIsMobile}) => {
             icon: <CreditCard size={16}/>,
         },
         {
-            title: "Projects",
+            title: "Create Project",
             onClick: openSheet,
-            icon: <FileText size={16}/>,
+            icon: <Plus size={16}/>,
         },
         {
             title: "Logout",
@@ -437,7 +440,7 @@ const HeaderBar = ({setIsMobile}) => {
                                                         return (
                                                             <Fragment key={i}>
                                                                 <CommandItem
-                                                                    className={`${projectDetailsReducer.id === x.id ? `${theme === "dark" ? "text-card-foreground  hov-primary-dark" : "text-card hov-primary"} bg-primary` : 'bg-card'} gap-0.5`}
+                                                                    className={`${projectDetailsReducer.id === x.id ? `${theme === "dark" ? "text-card-foreground  hov-primary-dark" : "text-card hov-primary"} bg-primary` : 'bg-card'} justify-between gap-0.5`}
                                                                     value={x.id}
                                                                 >
                                                                 <span title={x.name}
@@ -449,7 +452,7 @@ const HeaderBar = ({setIsMobile}) => {
                                                                 >
                                                                     {x.name}
                                                                 </span>
-                                                                    {(userDetailsReducer?.id == x?.userId && userProjectCount > 1) && (
+                                                                    {(userDetailsReducer?.id == x?.userId && userProjects.length > 1) && (
                                                                         <Trash2 className={"cursor-pointer"} size={16}
                                                                                 onClick={() => deleteAlert(x.id)}/>
                                                                     )}
