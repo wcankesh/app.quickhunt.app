@@ -119,12 +119,12 @@ const UpdateAnnouncement = () => {
                 } else {
                     return "";
                 }
-            case "slug":
-                if (!value || value.trim() === "") {
-                    return "Permalink / Slug is required.";
-                } else {
-                    return "";
-                }
+            // case "slug":
+            //     if (!value || value.trim() === "") {
+            //         return "Permalink / Slug is required.";
+            //     } else {
+            //         return "";
+            //     }
             case "description":
                 const cleanValue = value.trim();
                 const emptyContent = /^(<p>\s*<\/p>|<p><br><\/p>|<\/?[^>]+>)*$/;
@@ -258,9 +258,11 @@ const UpdateAnnouncement = () => {
             if (x !== "labelId") {
                 if (x === "assignToId") {
                     formData.append(x, selectedRecord[x]);
-                } else if (x === "slug") {
-                    formData.append("slug", selectedRecord?.slug ? selectedRecord?.slug : selectedRecord?.title.replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-').replace(/\//g, "-").toLowerCase());
-                } else if (x === "publishedAt") {
+                }
+                // else if (x === "slug") {
+                //     formData.append("slug", selectedRecord?.slug ? selectedRecord?.slug : selectedRecord?.title.replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-').replace(/\//g, "-").toLowerCase());
+                // }
+                else if (x === "publishedAt") {
                     formData.append("publishedAt", moment(selectedRecord?.publishedAt).format("YYYY-MM-DD"));
                 } else if (x === "expiredAt") {
                     formData.append("expiredAt", selectedRecord?.expiredBoolean === 1 ? moment(selectedRecord?.expiredAt).format("YYYY-MM-DD") : "");
@@ -385,16 +387,16 @@ const UpdateAnnouncement = () => {
                                     <span className="text-sm text-red-500">{formError.title}</span>}
                                 </div>
                                 <div className="w-full flex flex-col gap-2">
-                                    <Label htmlFor="link" className={"font-medium after:ml-0.5 after:content-['*'] after:text-destructive"}>Permalink / Slug</Label>
+                                    <Label htmlFor="link" className={"font-medium"}>Permalink / Slug</Label>
                                     <Input type="text" className={"h-9"} id="link" name={"slug"}
-                                           value={selectedRecord.slug} onChange={onChangeText}/>
+                                           value={selectedRecord.slug} onChange={onChangeText} disabled/>
                                     <p className={"text-sm font-normal text-muted-foreground break-words"}>This release will
                                         be available at {projectDetailsReducer.domain ? <a
                                             href={`https://${projectDetailsReducer.domain?.toLowerCase()}/announcements/${selectedRecord.slug?.toLowerCase()}`}
                                             target={"_blank"}
                                             className={"text-primary max-w-[593px] w-full break-words text-sm"}>{`https://${projectDetailsReducer.domain?.toLowerCase()}/announcements/${selectedRecord.slug?.toLowerCase()}`}</a> : ""}</p>
-                                    {formError?.slug &&
-                                    <span className="text-sm text-red-500">{formError?.slug}</span>}
+                                    {/*{formError?.slug &&*/}
+                                    {/*<span className="text-sm text-red-500">{formError?.slug}</span>}*/}
                                 </div>
                                 <div className="w-full flex flex-col gap-2">
                                     <Label htmlFor="description" className={"font-medium after:ml-0.5 after:content-['*'] after:text-destructive"}>Description</Label>
@@ -641,7 +643,7 @@ const UpdateAnnouncement = () => {
                                                 checked={selectedRecord?.expiredBoolean === 1}
                                                 onCheckedChange={(checked) => commonToggle("expiredBoolean", checked ? 1 : 0)}
                                             />
-                                            <label htmlFor="expire_date" className="text-sm font-medium">Expire At</label>
+                                            <label htmlFor="expire_date" className={`text-sm font-medium ${selectedRecord?.expiredBoolean === 1 ? "after:ml-0.5 after:content-['*'] after:text-destructive" : ""}`}>Expire At</label>
                                         </div>
                                         {selectedRecord?.expiredBoolean === 1 && (
                                             <div className="grid w-full gap-2 basis-1/2">

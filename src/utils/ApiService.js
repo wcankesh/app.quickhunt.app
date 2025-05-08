@@ -303,7 +303,7 @@ export class ApiService {
     }
 
     async deleteUsers(id) {
-        return await this.deleteData(`${baseUrlApi}/customerAuth/delete/${id}`)
+        return await this.deleteData(`${baseUrlApi}/customer-auth/delete/${id}`)
     }
 
     /* ---------- Roadmap api ---------- */
@@ -356,6 +356,10 @@ export class ApiService {
 
     async getSingleIdea(id) {
         return await this.getData(`${baseUrlApi}/idea/getOne/${id}`)
+    }
+
+    async getIdeaComments(payload) {
+        return await this.getData(`${baseUrlApi}/idea/get-idea-comments?${qs.stringify(payload)}`)
     }
 
     /* ---------- Common Roadmap api and Ideas common api and Settings Statuses api ---------- */

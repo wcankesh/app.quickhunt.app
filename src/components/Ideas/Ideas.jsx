@@ -102,7 +102,7 @@ const Ideas = () => {
         if (projectDetailsReducer.id) {
             getAllIdea(filter);
         }
-    }, [projectDetailsReducer.id])
+    }, [projectDetailsReducer.id, pageNo])
 
     const getAllIdea = async (getFilter = {}) => {
         setLoad('list');
@@ -217,7 +217,7 @@ const Ideas = () => {
             }
         } else if (e.name === "status") {
             if (e.value === "isActive") {
-                payload.isActive = payload.isActive === false;
+                payload.isActive = payload.isActive === false ? "" : false;
                 payload.isArchive = '';
                 payload.all = "";
             } else if (e.value === "isArchive") {
@@ -265,12 +265,11 @@ const Ideas = () => {
 
     const totalPages = Math.ceil(totalRecord / perPageLimit);
 
-    const handlePaginationClick = async (newPage) => {
+    const handlePaginationClick = (newPage) => {
         if (newPage >= 1 && newPage <= totalPages) {
             setLoad('search');
             setLoad('list');
             setPageNo(newPage);
-        } else {
         }
     };
 
@@ -545,8 +544,7 @@ const Ideas = () => {
                                                             <CommandItem onSelect={() => {
                                                                 setOpenFilterType('status');
                                                             }}>
-                                                                <span
-                                                                    className={"text-sm font-normal cursor-pointer"}>Status</span>
+                                                                <span className={"text-sm font-normal cursor-pointer"}>Status</span>
                                                             </CommandItem> <CommandItem onSelect={() => {
                                                             setOpenFilterType('tagId');
                                                         }}>

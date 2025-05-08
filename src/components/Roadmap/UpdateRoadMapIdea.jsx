@@ -1,19 +1,7 @@
 import React, {Fragment, useEffect, useState} from 'react';
 import {Sheet, SheetContent, SheetHeader} from "../ui/sheet";
 import {Button} from "../ui/button";
-import {
-    ArrowBigUp,
-    Check,
-    Circle,
-    CircleX,
-    Dot,
-    Loader2,
-    MessageCircleMore,
-    Paperclip,
-    Pencil,
-    Trash2,
-    X
-} from "lucide-react";
+import {ArrowBigUp, Check, Circle, CircleX, Dot, Loader2, MessageCircleMore, Paperclip, Pencil, Trash2, X} from "lucide-react";
 import {RadioGroup, RadioGroupItem} from "../ui/radio-group";
 import {Label} from "../ui/label";
 import {Input} from "../ui/input";
@@ -99,7 +87,6 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                     ideaId: selectedIdea?.id,
                     type: type
                 }
-
                 const data = await apiService.giveVote(payload);
                 if (data.success) {
                     let cloneRoadmap = [...roadmapList.columns];
@@ -193,9 +180,24 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
         setSelectedIdea({ ...selectedIdea, comments: updatedComments });
         if (updatedComments[index].showReply) {
             setSubCommentTextEditIdx(index);
-            setSubCommentText("");
+            setSubCommentText((prev) => ({
+                ...prev,
+                [index]: "",
+            }));
+            setSubCommentFiles((prev) => ({
+                ...prev,
+                [index]: [],
+            }));
         } else {
             setSubCommentTextEditIdx(null);
+            setSubCommentText((prev) => ({
+                ...prev,
+                [index]: "",
+            }));
+            setSubCommentFiles((prev) => ({
+                ...prev,
+                [index]: [],
+            }));
         }
     };
 
@@ -235,8 +237,14 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                     setRoadmapList({ columns: cloneRoadmap });
                 }
             }
-            setSubCommentText('');
-            setSubCommentFiles([]);
+            setSubCommentText((prev) => ({
+                ...prev,
+                [index]: "",
+            }));
+            setSubCommentFiles((prev) => ({
+                ...prev,
+                [index]: [],
+            }));
             toast({ description: data.message });
         } else {
             toast({ variant: "destructive", description: data?.error?.message });
@@ -282,13 +290,11 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
         } else {
             setCommentFiles([...commentFiles, ...files]);
         }
-
         event.target.value = "";
     };
 
     const handleSubCommentUploadImg = (event) => {
         const { files } = event.target;
-
         if (selectedSubComment && selectedSubComment.id && selectedComment && selectedComment.id) {
             const images = Array.isArray(selectedSubComment.images) ? selectedSubComment.images : [];
             const newImages = [...images, ...Array.from(files)];
@@ -306,9 +312,12 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                 });
             }
         } else {
-            setSubCommentFiles([...subCommentFiles, files[0]]);
+            // setSubCommentFiles([...subCommentFiles, files[0]]);
+            setSubCommentFiles((prev) => ({
+                ...prev,
+                [subCommentTextEditIdx]: [...(prev[subCommentTextEditIdx] || []), ...Array.from(files)],
+            }));
         }
-
         event.target.value = "";
     };
 
@@ -408,22 +417,6 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
     }
 
     const onDeleteCommentImage = (index) => {
-        // const clone = [...selectedComment.images];
-        // if (isOld) {
-        //     clone.splice(index, 1);
-        //     if (selectedComment && selectedComment.newImage && selectedComment.newImage.length) {
-        //         const cloneNewImage = [...selectedComment.newImage];
-        //         cloneNewImage.splice(index, 1);
-        //         setSelectedComment({...selectedComment, newImage: cloneNewImage});
-        //     }
-        //     setSelectedComment({...selectedComment, images: clone});
-        // } else {
-        //     const cloneImage = [...deletedCommentImage];
-        //     cloneImage.push(clone[index]);
-        //     clone.splice(index, 1);
-        //     setSelectedComment({...selectedComment, images: clone});
-        //     setDeletedCommentImage(cloneImage);
-        // }
         const cloneImages = [...selectedComment.images];
         // const isServerImage = typeof cloneImages[index] === "string" && cloneImages[index].startsWith('https://code.quickhunt.app/public/');
         const isServerImage = typeof cloneImages[index] === "string";
@@ -708,9 +701,14 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
     }
 
     const onDeleteSubCommentImageOld = (index) => {
-        const clone = [...subCommentFiles];
-        clone.splice(index, 1)
-        setSubCommentFiles(clone)
+        setSubCommentFiles((prev) => {
+            const files = [...(prev[subCommentTextEditIdx] || [])];
+            files.splice(index, 1);
+            return {
+                ...prev,
+                [subCommentTextEditIdx]: files,
+            };
+        });
     }
 
     const onCloseBoth = () => {
@@ -744,7 +742,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                             className={`col-span-4 lg:block hidden ${theme === "dark" ? "" : "bg-muted"} border-r lg:overflow-auto idea-sheet-height`}>
                             <div className={"border-b py-4 pl-8 pr-6 flex flex-col gap-3"}>
                                 <div className={"flex flex-col gap-1"}>
-                                    <h3 className={"text-sm font-normal"}>Status</h3>
+                                    <h3 className={"text-sm font-medium"}>Status</h3>
                                     <p className={"text-muted-foreground text-xs font-normal"}>Apply a status to Manage this idea on roadmap.</p>
                                 </div>
                                 <div className={"flex flex-col "}>
@@ -769,7 +767,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                             </div>
                             <div className={"border-b"}>
                                 <div className="py-4 pl-8 pr-6 w-full space-y-1.5">
-                                    <Label htmlFor="picture" className={"font-normal capitalize"}>Featured image</Label>
+                                    <Label htmlFor="picture" className={"font-medium capitalize"}>Featured image</Label>
                                     <div className="w-[282px] h-[128px] flex gap-1">
                                         <ImageUploader
                                             image={selectedIdea?.coverImage}
@@ -789,7 +787,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                         <div
                                             className={"px-4 py-3 lg:py-6 lg:px-8 flex flex-col gap-4 ld:gap-6 border-b"}>
                                             <div className="space-y-2">
-                                                <Label htmlFor="text" className={"font-normal"}>Title</Label>
+                                                <Label htmlFor="text" className={"font-medium"}>Title</Label>
                                                 <Input type="text" id="text" placeholder="" value={selectedIdea?.title}
                                                        name={"title"} onChange={onChangeText}/>
                                                 {
@@ -798,12 +796,12 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                 }
                                             </div>
                                             <div className="space-y-2">
-                                                <Label htmlFor="message" className={"font-normal"}>Description</Label>
+                                                <Label htmlFor="message" className={"font-medium"}>Description</Label>
                                                 <ReactQuillEditor value={selectedIdea?.description} name={"description"}
                                                                   onChange={handleUpdate}/>
                                             </div>
                                             <div className={"space-y-2"}>
-                                                <Label className={"font-normal"}>Choose Board for this Idea</Label>
+                                                <Label className={"font-medium"}>Choose Board for this Idea</Label>
                                                 <Select
                                                     onValueChange={(value) => onChangeText({
                                                         target: {
@@ -836,7 +834,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                             </div>
                                         </div>
                                         <div className={"px-4 py-3 lg:py-6 lg:px-8 border-b space-y-2"}>
-                                            <Label className={"font-normal"}>Choose Topics for this Idea (optional)</Label>
+                                            <Label className={"font-medium"}>Choose Topics for this Idea (optional)</Label>
                                             <Select onValueChange={handleChangeTopic}
                                                     value={selectedIdea?.topic.map(x => x.id)}>
                                                 <SelectTrigger>
@@ -1080,7 +1078,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                 </div>
 
                                                 <div className="w-full space-y-1.5 lg:hidden">
-                                                    <Label htmlFor="picture" className={"font-normal capitalize"}>Featured image</Label>
+                                                    <Label htmlFor="picture" className={"font-medium capitalize"}>Featured image</Label>
                                                     <div className="w-[282px] h-[128px] flex gap-1">
 
                                                         <ImageUploader
@@ -1109,7 +1107,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                         <div className={"flex flex-col gap-2"}>
                                                             <div className="w-full flex flex-col gap-2">
                                                                 <Label htmlFor="message"
-                                                                       className={"font-normal capitalize"}>Add comment</Label>
+                                                                       className={"font-medium capitalize"}>Add comment</Label>
                                                                 <>
                                                                     <Textarea
                                                                         placeholder="Start writing..."
@@ -1163,7 +1161,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                 <div className={"px-4 lg:px-8"}>
                                                     <TabsList
                                                         className="bg-transparent border-b-2 border-b-primary rounded-none">
-                                                        <TabsTrigger value="comment" className={"font-normal"}>Comment</TabsTrigger>
+                                                        <TabsTrigger value="comment" className={"font-medium"}>Comment</TabsTrigger>
                                                     </TabsList>
                                                 </div>
 
@@ -1348,7 +1346,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                                                                                         value={subCommentText[i] || ""}
                                                                                                         onChange={(e) => handleSubCommentTextChange(e, i)}/>
                                                                                                     {
-                                                                                                        subCommentFiles && subCommentFiles.length ?
+                                                                                                        subCommentFiles[i] && subCommentFiles[i].length ?
                                                                                                             <div
                                                                                                                 className={"flex gap-2 flex-wrap"}>
                                                                                                                 {

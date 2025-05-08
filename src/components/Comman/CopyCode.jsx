@@ -98,16 +98,16 @@ const CopyCode = ({
                                         handleCopyCode={handleCopyCode}
                                         theme={theme}
                                     />
-                                    <SetupGuideFooter theme={theme} />
+                                    {/*<SetupGuideFooter theme={theme} />*/}
                                 </TabsContent>
 
                                 <TabsContent value="embedlink" className="space-y-2 m-0">
                                     <div className="space-y-2">
                                         <div className={`${theme === 'dark' ? 'text-muted-foreground' : 'text-muted-foreground'} text-sm`}>
                                             Follow these simple steps to embed the widget on any{' '}
-                                            <Button variant="ghost" className="p-0 h-auto text-xs text-primary font-medium">
+                                            {/*<Button variant="ghost" className="p-0 h-auto text-xs text-primary font-medium">*/}
                                                 supported website.
-                                            </Button>
+                                            {/*</Button>*/}
                                         </div>
                                         <div>
                                             <p className={`text-xs ${theme === 'dark' ? 'text-muted-foreground' : 'text-muted-foreground'} pb-1`}>
@@ -127,13 +127,13 @@ const CopyCode = ({
                                         handleCopyCode={handleCopyCode}
                                         theme={theme}
                                     />
-                                    <p className={`text-xs ${theme === 'dark' ? 'text-muted-foreground' : 'text-muted-foreground'}`}>
-                                        Read the{' '}
-                                        <Button variant="ghost" className="p-0 h-auto text-xs text-primary font-medium">
-                                            Setup Guide
-                                        </Button>{' '}
-                                        for more information.
-                                    </p>
+                                    {/*<p className={`text-xs ${theme === 'dark' ? 'text-muted-foreground' : 'text-muted-foreground'}`}>*/}
+                                    {/*    Read the{' '}*/}
+                                    {/*    <Button variant="ghost" className="p-0 h-auto text-xs text-primary font-medium">*/}
+                                    {/*        Setup Guide*/}
+                                    {/*    </Button>{' '}*/}
+                                    {/*    for more information.*/}
+                                    {/*</p>*/}
                                 </TabsContent>
 
                                 <TabsContent value="iframe" className="flex flex-col gap-2 m-0">
@@ -146,13 +146,13 @@ const CopyCode = ({
                                         handleCopyCode={handleCopyCode}
                                         theme={theme}
                                     />
-                                    <p className={`text-xs ${theme === 'dark' ? 'text-muted-foreground' : 'text-muted-foreground'}`}>
-                                        Read the{' '}
-                                        <Button variant="ghost" className="p-0 h-auto text-xs text-primary font-medium">
-                                            Setup Guide
-                                        </Button>{' '}
-                                        for more information.
-                                    </p>
+                                    {/*<p className={`text-xs ${theme === 'dark' ? 'text-muted-foreground' : 'text-muted-foreground'}`}>*/}
+                                    {/*    Read the{' '}*/}
+                                    {/*    <Button variant="ghost" className="p-0 h-auto text-xs text-primary font-medium">*/}
+                                    {/*        Setup Guide*/}
+                                    {/*    </Button>{' '}*/}
+                                    {/*    for more information.*/}
+                                    {/*</p>*/}
                                 </TabsContent>
 
                                 <TabsContent value="callback" className="flex flex-col gap-2 m-0">
@@ -165,7 +165,7 @@ const CopyCode = ({
                                         handleCopyCode={handleCopyCode}
                                         theme={theme}
                                     />
-                                    <SetupGuideFooter theme={theme} />
+                                    {/*<SetupGuideFooter theme={theme} />*/}
                                 </TabsContent>
                             </Tabs>
                         ) : (
@@ -179,7 +179,7 @@ const CopyCode = ({
                                     handleCopyCode={handleCopyCode}
                                     theme={theme}
                                 />
-                                <SetupGuideFooter theme={theme} />
+                                {/*<SetupGuideFooter theme={theme} />*/}
                             </div>
                         )}
                     </div>

@@ -244,10 +244,10 @@ const Users = () => {
         setOpenDelete(true);
     };
 
-    const handleDelete = async () =>{
+    const handleDelete = async () => {
         setIsLoadingDelete(true);
         const data = await apiService.deleteUsers(deleteId);
-        const clone = [...customerList];
+        const clone = [...customerList?.customers];
         const indexToDelete = clone.findIndex((x)=> x.id == deleteId);
         if(data.success) {
             clone.splice(indexToDelete,1);

@@ -309,7 +309,7 @@ const ArticleDetail = () => {
             <div>
                 <div className={"border-b px-4 py-6 space-y-6"}>
                     <div className={"space-y-2"}>
-                        <Label className={"text-sm font-normal"}>Title</Label>
+                        <Label className={"text-sm font-medium"}>Title</Label>
                         <Input
                             name="title"
                             placeholder={"Article title"}
@@ -321,7 +321,7 @@ const ArticleDetail = () => {
                         {formError?.title && <span className="text-red-500 text-sm">{formError?.title}</span>}
                     </div>
                     <div className={"space-y-2"}>
-                        <Label className={"text-sm font-normal"}>Select Category</Label>
+                        <Label className={"text-sm font-medium"}>Select Category</Label>
                         <Select value={articlesDetails.categoryId}
                                 onValueChange={(value) => handleOnChange('categoryId', value)}>
                             <SelectTrigger className="h-auto">
@@ -349,7 +349,7 @@ const ArticleDetail = () => {
                         {formError.categoryId && <span className="text-red-500 text-sm">{formError.categoryId}</span>}
                     </div>
                     <div className={"space-y-2"}>
-                        <Label className={"text-sm font-normal"}>Select Sub Category</Label>
+                        <Label className={"text-sm font-medium"}>Select Sub Category</Label>
                         <Select value={articlesDetails.subcategoryId}
                                 onValueChange={(value) => handleOnChange('subcategoryId', value)}>
                             <SelectTrigger className="h-auto">

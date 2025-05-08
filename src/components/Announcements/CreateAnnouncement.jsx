@@ -582,7 +582,7 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, getAllPosts, announcementL
                                 <Checkbox id={"expire_date"}
                                         checked={changeLogDetails.expiredBoolean === 1}
                                         onCheckedChange={(checked) => commonToggle("expiredBoolean",checked === true ? 1 : 0)}/>
-                                <label htmlFor={"expire_date"} className={"text-sm text-muted-foreground font-medium"}>Expire At</label>
+                                <label htmlFor={"expire_date"} className={`text-sm text-muted-foreground font-medium ${changeLogDetails.expiredBoolean === 1 ? "after:ml-0.5 after:content-['*'] after:text-destructive" : ""}`}>Expire At</label>
                             </div>
 
                             {

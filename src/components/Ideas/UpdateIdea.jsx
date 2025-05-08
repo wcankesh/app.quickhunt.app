@@ -72,6 +72,11 @@ const UpdateIdea = () => {
     const allStatusAndTypes = useSelector(state => state.allStatusAndTypes);
     const projectDetailsReducer = useSelector(state => state.projectDetailsReducer);
     const inboxMarkReadReducer = useSelector(state => state.inboxMarkRead);
+    const userDetailsReducer = useSelector(state => state.userDetailsReducer);
+
+    const [commentLimit, setCommentLimit] = useState(10);
+    const [hasMoreComments, setHasMoreComments] = useState(true);
+    const [isLoadingComments, setIsLoadingComments] = useState(false);
 
     const [pageNo, setPageNo] = useState(Number(getPageNo));
     const [totalRecord, setTotalRecord] = useState(0);
@@ -86,7 +91,7 @@ const UpdateIdea = () => {
     const [selectedIdea, setSelectedIdea] = useState({}); // update idea
     const [oldSelectedIdea, setOldSelectedIdea] = useState({});
     const [commentText, setCommentText] = useState("")
-    const [subCommentText, setSubCommentText] = useState("")
+    const [subCommentText, setSubCommentText] = useState([])
     const [subCommentTextEditIdx, setSubCommentTextEditIdx] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const [isLoadingIdeaVoteList, setIsLoadingIdeaVoteList] = useState(false);
@@ -99,6 +104,7 @@ const UpdateIdea = () => {
     const [selectedSubCommentIndex, setSelectedSubCommentIndex] = useState(null);
     const [isEditComment, setIsEditComment] = useState(false);
     const [isEditIdea, setIsEditIdea] = useState(false);
+    const [ideaComment, setIdeaComment] = useState([]);
     const [isSaveComment, setIsSaveComment] = useState(false);
     const [isSaveUpdateComment, setIsSaveUpdateComment] = useState(false);
     const [isSaveUpdateSubComment, setIsSaveUpdateSubComment] = useState(false);
@@ -114,6 +120,31 @@ const UpdateIdea = () => {
         setAddUserDialog(prev => ({...prev, [name]: value}));
         handlePopoverOpenChange();
     }
+
+    const getAllComments = async () => {
+        setIsLoadingComments(true);
+        const data = await apiService.getIdeaComments({ideaId: id, page: 1, limit: commentLimit })
+        if (data.success) {
+            const commentsWithShowReply = data.data.comments.map((comment) => ({
+                ...comment,
+                showReply: comment.showReply ?? false,
+                reply: comment.reply
+                    ? comment.reply.map((subComment) => ({
+                        ...subComment,
+                        isEdited: subComment.isEdited ?? false,
+                        images: Array.isArray(subComment.images) ? subComment.images : [],
+                    }))
+                    : [],
+            }));
+            setIdeaComment({ ...data.data, comments: commentsWithShowReply });
+            setHasMoreComments(data.data.comments.length < data.data.total);
+        }
+        setIsLoadingComments(false);
+    }
+
+    const loadMoreComments = () => {
+        setCommentLimit(prevLimit => prevLimit + 10);
+    };
 
     const handlePopoverOpenChange = (isOpen) => {
         if (!isOpen) {
@@ -143,6 +174,7 @@ const UpdateIdea = () => {
             setIsLoadingIdeaVoteList(false);
         }
     }
+
     useEffect(() => {
         if (addUserDialog.viewUpvote) {
             getIdeaVotes()
@@ -161,11 +193,22 @@ const UpdateIdea = () => {
 
     useEffect(() => {
         if (projectDetailsReducer.id) {
-            setTopicLists(allStatusAndTypes.topics)
-            setRoadmapStatus(allStatusAndTypes.roadmapStatus)
             getSingleIdea()
         }
-    }, [projectDetailsReducer.id, allStatusAndTypes, getPageNo]);
+    }, [projectDetailsReducer.id, getPageNo]);
+
+    useEffect(() => {
+        if (allStatusAndTypes.topics || allStatusAndTypes.roadmapStatus) {
+            setTopicLists(allStatusAndTypes.topics)
+            setRoadmapStatus(allStatusAndTypes.roadmapStatus)
+        }
+    }, [allStatusAndTypes]);
+
+    useEffect(() => {
+        if (projectDetailsReducer.id) {
+            getAllComments();
+        }
+    }, [projectDetailsReducer.id, commentLimit]);
 
     const getAllUsers = async (value, projectId) => {
         const payload = {
@@ -350,18 +393,7 @@ const UpdateIdea = () => {
         const data = await apiService.getSingleIdea(id);
         if (data.success) {
             setIsLoading(false)
-            const ideaData = {
-                ...data.data, isRead: 1,
-                comments: data.data.comments.map(comment => ({
-                    ...comment,
-                    isRead: 1,
-                    isEdited: false,
-                    reply: comment.reply ? comment.reply.map(subComment => ({
-                        ...subComment,
-                        isEdited: false
-                    })) : []
-                }))
-            }
+            const ideaData = {...data.data, isRead: 1,}
             setSelectedIdea(ideaData)
             setOldSelectedIdea(ideaData)
             const updateInbox = inboxMarkReadReducer.map(item => {
@@ -387,6 +419,7 @@ const UpdateIdea = () => {
         }
         setSelectedIdea({...selectedIdea, topic: clone});
     };
+
     const giveVote = async (type) => {
         if (selectedIdea.createdBy !== 1) {
             if (selectedIdea.userVote === (type == 1) || selectedIdea.userVote == 1) {
@@ -448,10 +481,24 @@ const UpdateIdea = () => {
         formData.append('parentId', '');
         const data = await apiService.createComment(formData)
         if (data.success) {
-            const clone = selectedIdea && selectedIdea.comments ? [...selectedIdea.comments] : [];
-            clone.unshift(data.data)
-            let obj = {...selectedIdea, comments: clone}
-            setSelectedIdea(obj)
+            const newComment = {
+                ...data.data,
+                createdAt: data.data.createdAt || new Date().toISOString(),
+                userId: data.data.userId || 1,
+                name: data.data.name || userDetailsReducer?.name || 'Anonymous',
+                profileImage: data.data.profileImage || null,
+                reply: [],
+                showReply: false,
+                isEdited: false,
+            };
+            setIdeaComment((prev) => ({
+                ...prev,
+                comments: [newComment, ...(prev.comments || [])],
+            }));
+            setSelectedIdea((prev) => ({
+                ...prev,
+                comments: [newComment, ...(prev.comments || [])],
+            }));
             toast({description: data.message})
             setCommentText('');
             setCommentFiles([])
@@ -463,17 +510,40 @@ const UpdateIdea = () => {
     }
 
     const onShowSubComment = (index) => {
-        const updatedComments = selectedIdea.comments.map((comment, i) => ({
-            ...comment,
-            showReply: i === index ? !comment.showReply : false,
-        }));
-        setSelectedIdea({...selectedIdea, comments: updatedComments});
-        if (updatedComments[index].showReply) {
-            setSubCommentTextEditIdx(index);
-            setSubCommentText("");
-        } else {
-            setSubCommentTextEditIdx(null);
-        }
+        setIdeaComment((prev) => {
+            const updatedComments = (prev.comments || []).map((comment, i) => ({
+                ...comment,
+                showReply: i === index ? !comment.showReply : false,
+                reply: comment.reply || [],
+            }));
+            return { ...prev, comments: updatedComments };
+        });
+        setIdeaComment((prev) => {
+            if (prev.comments[index]?.showReply) {
+                setSubCommentText((prevText) => {
+                    const newText = [...prevText];
+                    newText[index] = "";
+                    return newText;
+                });
+                setSubCommentTextEditIdx(index);
+            } else {
+                setSubCommentText((prevText) => {
+                    const newText = [...prevText];
+                    newText[index] = "";
+                    return newText;
+                });
+                setSubCommentTextEditIdx(null);
+            }
+            return prev;
+        });
+        setSelectedIdea((prev) => {
+            const updatedComments = (prev.comments || []).map((comment, i) => ({
+                ...comment,
+                showReply: i === index ? !comment.showReply : false,
+                reply: comment.reply || [],
+            }));
+            return { ...prev, comments: updatedComments };
+        });
     };
 
     const onCreateSubComment = async (record, index) => {
@@ -482,17 +552,53 @@ const UpdateIdea = () => {
         for (let i = 0; i < subCommentFiles.length; i++) {
             formData.append(`images`, subCommentFiles[i]);
         }
-        formData.append('comment', subCommentText);
+        const commentText = subCommentText[index] || "";
+        formData.append('comment', commentText);
         formData.append('ideaId', selectedIdea.id);
         formData.append('parentId', record.id);
         const data = await apiService.createComment(formData)
         setIsSaveSubComment(false)
         if (data.success) {
-            const clone = [...selectedIdea.comments];
-            clone[index]?.reply?.push(data.data)
-            let obj = {...selectedIdea, comments: clone};
-            setSelectedIdea(obj);
-            setSubCommentText('');
+            const newSubComment = {
+                ...data.data,
+                createdAt: data.data.createdAt || new Date().toISOString(),
+                userId: data.data.userId || userDetailsReducer?.id || 1,
+                name: data.data.name || userDetailsReducer?.name || "Anonymous",
+                profileImage: data.data.profileImage || null,
+                isEdited: false,
+                images: Array.isArray(data.data.images) ? data.data.images : [],
+            };
+            setIdeaComment((prev) => {
+                const comments = prev.comments || [];
+                if (!comments[index]) {
+                    return prev;
+                }
+                const updatedComments = [...comments];
+                updatedComments[index] = {
+                    ...updatedComments[index],
+                    reply: [...(updatedComments[index].reply || []), newSubComment],
+                    showReply: true,
+                };
+                return { ...prev, comments: updatedComments };
+            });
+            setSelectedIdea((prev) => {
+                const comments = prev.comments || [];
+                if (!comments[index]) {
+                    return prev;
+                }
+                const updatedComments = [...comments];
+                updatedComments[index] = {
+                    ...updatedComments[index],
+                    reply: [...(updatedComments[index].reply || []), newSubComment],
+                    showReply: true,
+                };
+                return { ...prev, comments: updatedComments };
+            });
+            setSubCommentText((prev) => {
+                const newText = [...prev];
+                newText[index] = "";
+                return newText;
+            });
             setSubCommentFiles([])
             toast({description: data.message})
         } else {
@@ -502,6 +608,15 @@ const UpdateIdea = () => {
 
     const handleFeatureImgUpload = async (event) => {
         const file = event.target?.files[0];
+        if (!file) return;
+        const MAX_SIZE = 5 * 1024 * 1024;
+        if (file.size > MAX_SIZE) {
+            setFormError(prev => ({ ...prev, coverImage: "Featured image must be less than 5MB" }));
+            // toast({ variant: "destructive", description: "Featured image must be less than 5MB" });
+            event.target.value = "";
+            return;
+        }
+        setFormError(prev => ({ ...prev, coverImage: "" }));
         setSelectedIdea({...selectedIdea, coverImage: file})
         let formData = new FormData();
         formData.append("coverImage", file);
@@ -515,6 +630,7 @@ const UpdateIdea = () => {
             setIsLoading(false)
             toast({variant: "destructive", description: data?.error?.message})
         }
+        // event.target.value = "";
     };
 
     const handleAddCommentImg = (event) => {
@@ -537,9 +653,13 @@ const UpdateIdea = () => {
 
     const handleSubCommentUploadImg = (event) => {
         const files = Array.from(event.target.files);
+        const validFiles = files.filter(file => file.size <= 5 * 1024 * 1024);
+        if (validFiles.length < files.length) {
+            toast({variant: "destructive", description: 'File exceeded the 5MB limit.'})
+        }
         if (selectedSubComment && selectedSubComment.id && selectedComment && selectedComment.id) {
             const currentImages = Array.isArray(selectedSubComment.images) ? selectedSubComment.images : [];
-            const clone = [...currentImages, ...files];
+            const clone = [...currentImages, ...validFiles];
             let selectedSubCommentObj = {...selectedSubComment, images: clone};
             setSelectedSubComment(selectedSubCommentObj);
             let index = ((selectedComment && selectedComment.reply) || []).findIndex((x) => x.id === selectedSubComment.id);
@@ -549,8 +669,9 @@ const UpdateIdea = () => {
                 setSelectedComment({...selectedComment, reply: cloneReplay});
             }
         } else {
-            setSubCommentFiles([...subCommentFiles, ...files]);
+            setSubCommentFiles([...subCommentFiles, ...validFiles]);
         }
+        event.target.value = "";
     };
 
     const onChangeStatus = async (name, value) => {
@@ -663,14 +784,13 @@ const UpdateIdea = () => {
         // for (let i = 0; i < deletedCommentImage.length; i++) {
         //     formData.append(`removeImages[${i}]`, deletedCommentImage[i]);
         // }
-        // Filter deletedCommentImage to only include images not present in current selectedComment.images
         const currentImageFilenames = selectedComment?.images.map(img => {
             if (typeof img === 'string') {
                 return img;
             } else if (img instanceof File) {
-                return img.name; // Use the filename of the File object
+                return img.name;
             }
-            return ''; // Default case
+            return '';
         });
 
         const validDeletedImages = deletedCommentImage.filter(deletedImg => {
@@ -685,12 +805,24 @@ const UpdateIdea = () => {
         const data = await apiService.updateComment(selectedComment.id, formData)
         setIsSaveUpdateComment(false)
         if (data.success) {
-            let updatedImages = Array.isArray(data.data.images) ? data.data.images : [];
-            let obj = {...selectedComment, images: updatedImages, isEdited: true};
-            const cloneComment = [...selectedIdea.comments];
-            cloneComment[selectedCommentIndex] = obj;
-            let selectedIdeaObj = {...selectedIdea, comments: cloneComment}
-            setSelectedIdea(selectedIdeaObj)
+            const updatedComment = {
+                ...selectedComment,
+                ...data.data,
+                images: Array.isArray(data.data.images) ? data.data.images : [],
+                isEdited: true,
+                showReply: selectedComment.showReply || false,
+                reply: selectedComment.reply || [],
+            };
+            setIdeaComment((prev) => {
+                const updatedComments = [...(prev.comments || [])];
+                updatedComments[selectedCommentIndex] = updatedComment;
+                return { ...prev, comments: updatedComments };
+            });
+            setSelectedIdea((prev) => {
+                const updatedComments = [...(prev.comments || [])];
+                updatedComments[selectedCommentIndex] = updatedComment;
+                return { ...prev, comments: updatedComments };
+            });
             setSelectedCommentIndex(null)
             setSelectedComment(null);
             setIsEditComment(false)
@@ -715,59 +847,146 @@ const UpdateIdea = () => {
         formData.append('comment', selectedSubComment.comment);
         const data = await apiService.updateComment(selectedSubComment.id, formData)
         if (data.success) {
-            const commentIndex = ((selectedIdea.comments) || []).findIndex((x) => x.id === selectedComment.id);
-            if (commentIndex !== -1) {
-                const cloneComment = [...selectedIdea.comments];
-                cloneComment[commentIndex].reply[selectedSubCommentIndex] = {...data.data, isEdited: true};
-                let selectedIdeaObj = {...selectedIdea, comments: cloneComment}
-                setSelectedIdea(selectedIdeaObj)
-            }
-            setSelectedCommentIndex(null)
+            setIdeaComment(prev => {
+                const updatedComments = [...(prev.comments || [])];
+                const parentCommentIndex = updatedComments.findIndex(
+                    comment => comment.id === selectedComment.id
+                );
+                if (parentCommentIndex !== -1) {
+                    const subCommentIndex = updatedComments[parentCommentIndex].reply.findIndex(
+                        reply => reply.id === selectedSubComment.id
+                    );
+                    if (subCommentIndex !== -1) {
+                        const updatedReplies = [...updatedComments[parentCommentIndex].reply];
+                        updatedReplies[subCommentIndex] = {
+                            ...updatedReplies[subCommentIndex],
+                            ...data.data,
+                            isEdited: true,
+                            images: Array.isArray(data.data.images) ? data.data.images : [],
+                        };
+                        updatedComments[parentCommentIndex] = {
+                            ...updatedComments[parentCommentIndex],
+                            reply: updatedReplies,
+                        };
+                    }
+                }
+                return { ...prev, comments: updatedComments };
+            });
+            setSelectedIdea(prev => {
+                const updatedComments = [...(prev.comments || [])];
+                const parentCommentIndex = updatedComments.findIndex(
+                    comment => comment.id === selectedComment.id
+                );
+                if (parentCommentIndex !== -1) {
+                    const subCommentIndex = updatedComments[parentCommentIndex].reply.findIndex(
+                        reply => reply.id === selectedSubComment.id
+                    );
+                    if (subCommentIndex !== -1) {
+                        const updatedReplies = [...updatedComments[parentCommentIndex].reply];
+                        updatedReplies[subCommentIndex] = {
+                            ...updatedReplies[subCommentIndex],
+                            ...data.data,
+                            isEdited: true,
+                            images: Array.isArray(data.data.images) ? data.data.images : [],
+                        };
+                        updatedComments[parentCommentIndex] = {
+                            ...updatedComments[parentCommentIndex],
+                            reply: updatedReplies,
+                        };
+                    }
+                }
+                return { ...prev, comments: updatedComments };
+            });
             setSelectedComment(null);
+            setSelectedCommentIndex(null);
             setSelectedSubComment(null);
             setSelectedSubCommentIndex(null);
             setDeletedSubCommentImage([]);
-            setIsSaveUpdateSubComment(false)
-            toast({description: data.message})
+            toast({ description: data.message });
         } else {
-            toast({variant: "destructive", description: data?.error?.message})
-            setIsSaveUpdateSubComment(false)
+            toast({ variant: "destructive", description: data?.error?.message });
         }
+        setIsSaveUpdateSubComment(false);
     }
 
     const deleteComment = async (id, indexs) => {
-        const data = await apiService.deleteComment(id)
+        const data = await apiService.deleteComment(id);
         if (data.success) {
-            const cloneComment = [...selectedIdea.comments];
-            cloneComment.splice(indexs, 1);
-            let selectedIdeaObj = {...selectedIdea, comments: cloneComment};
-            setSelectedIdea(selectedIdeaObj)
+            setIdeaComment((prev) => {
+                const updatedComments = [...(prev.comments || [])];
+                updatedComments.splice(indexs, 1);
+                const updatedIdeaComment = { ...prev, comments: updatedComments };
+                return updatedIdeaComment;
+            });
+            setSelectedIdea((prev) => {
+                const updatedComments = [...(prev.comments || [])];
+                updatedComments.splice(indexs, 1);
+                const updatedSelectedIdea = { ...prev, comments: updatedComments };
+                return updatedSelectedIdea;
+            });
 
-            toast({description: data.message})
+            toast({ description: data.message });
         } else {
-            toast({variant: "destructive", description: data?.error?.message})
+            toast({ variant: "destructive", description: data?.error?.message });
         }
-    }
+    };
 
     const deleteSubComment = async (id, record, index, subIndex) => {
-        const data = await apiService.deleteComment(id)
+        const data = await apiService.deleteComment(id);
         if (data.success) {
-            const cloneComment = [...selectedIdea.comments];
-            cloneComment[index].reply.splice(subIndex, 1);
-            let selectedIdeaObj = {...selectedIdea, comments: cloneComment};
-            setSelectedIdea(selectedIdeaObj)
-
-            toast({description: data.message})
+            setIdeaComment((prev) => {
+                const updatedComments = [...(prev.comments || [])];
+                if (!updatedComments[index]) {
+                    return prev;
+                }
+                const updatedReplies = [...(updatedComments[index].reply || [])];
+                if (!updatedReplies[subIndex]) {
+                    return prev;
+                }
+                updatedReplies.splice(subIndex, 1);
+                updatedComments[index] = {
+                    ...updatedComments[index],
+                    reply: updatedReplies,
+                    showReply: updatedReplies.length > 0 ? true : false,
+                };
+                const updatedIdeaComment = { ...prev, comments: updatedComments };
+                return updatedIdeaComment;
+            });
+            setSelectedIdea((prev) => {
+                const updatedComments = [...(prev.comments || [])];
+                if (!updatedComments[index]) {
+                    return prev;
+                }
+                const updatedReplies = [...(updatedComments[index].reply || [])];
+                if (!updatedReplies[subIndex]) {
+                    return prev;
+                }
+                updatedReplies.splice(subIndex, 1);
+                updatedComments[index] = {
+                    ...updatedComments[index],
+                    reply: updatedReplies,
+                    showReply: updatedReplies.length > 0 ? true : false,
+                };
+                const updatedSelectedIdea = { ...prev, comments: updatedComments };
+                return updatedSelectedIdea;
+            });
+            toast({ description: data.message });
         } else {
-            toast({variant: "destructive", description: data.message})
+            toast({ variant: "destructive", description: data?.error?.message});
         }
-    }
+    };
 
     const onEditSubComment = (record, subRecord, index, subIndex) => {
         setSelectedComment(record)
         setSelectedCommentIndex(index)
         setSelectedSubComment(subRecord)
         setSelectedSubCommentIndex(subIndex)
+
+        // setSelectedComment({...record});
+        // setSelectedCommentIndex(index);
+        // setSelectedSubComment({...subRecord});
+        // setSelectedSubCommentIndex(subIndex);
+        // setDeletedSubCommentImage([]);
     }
 
     const formValidate = (name, value, type) => {
@@ -805,19 +1024,29 @@ const UpdateIdea = () => {
     };
 
     const onChangeText = (event) => {
-        setSelectedIdea(selectedIdea => ({...selectedIdea, [event.target.name]: event.target.value}))
-        setUsersDetails({...usersDetails, [event.target.name]: event.target.value});
-        setFormError(formError => ({
-            ...formError,
-            [event.target.name]: formValidate(event.target.name, event.target.value)
+        const { name, value } = event.target;
+        const trimmedValue = name === "title" || name === "description" ? value.trimStart() : value;
+        setSelectedIdea(prev => ({ ...prev, [name]: trimmedValue }));
+        setUsersDetails(prev => ({ ...prev, [name]: trimmedValue }));
+        setFormError(prev => ({
+            ...prev,
+            [name]: formValidate(name, trimmedValue)
         }));
-        setUserDetailError(formError => ({
-            ...formError,
-            [event.target.name]: formValidate(event.target.name, event.target.value)
+        setUserDetailError(prev => ({
+            ...prev,
+            [name]: formValidate(name, trimmedValue, "addUser")
         }));
     }
 
     const onCreateIdea = async () => {
+        const trimmedTitle = selectedIdea.title ? selectedIdea.title.trim() : "";
+        const trimmedDescription = selectedIdea.description ? selectedIdea.description.trim() : "";
+        const updatedIdea = {
+            ...selectedIdea,
+            title: trimmedTitle,
+            description: trimmedDescription,
+        };
+        setSelectedIdea(updatedIdea);
         let validationErrors = {};
         Object.keys(selectedIdea).forEach(name => {
             const error = formValidate(name, selectedIdea[name]);
@@ -867,8 +1096,8 @@ const UpdateIdea = () => {
             img.onload = () => {
                 const canvas = document.createElement('canvas');
                 const ctx = canvas.getContext('2d');
-                const MAX_WIDTH = 800; // Set your desired max width
-                const MAX_HEIGHT = 800; // Set your desired max height
+                const MAX_WIDTH = 800;
+                const MAX_HEIGHT = 800;
                 let width = img.width;
                 let height = img.height;
 
@@ -889,7 +1118,7 @@ const UpdateIdea = () => {
                 ctx.drawImage(img, 0, 0, width, height);
                 canvas.toBlob((blob) => {
                     resolve(blob);
-                }, 'image/jpeg', 0.7); // Adjust quality as needed
+                }, 'image/jpeg', 0.7);
             };
             img.onerror = (err) => reject(err);
         });
@@ -920,11 +1149,12 @@ const UpdateIdea = () => {
     const links = [{label: 'Ideas', path: `/ideas?pageNo=${getPageNo}`}];
 
     const handleSubCommentTextChange = (e, index) => {
-        const newSubCommentText = [...subCommentText];
-        newSubCommentText[index] = e.target.value;
-        setSubCommentText(newSubCommentText);
+        setSubCommentText((prev) => {
+            const newSubCommentText = [...prev];
+            newSubCommentText[index] = e.target.value;
+            return newSubCommentText;
+        });
     };
-    const userDetailsReducer = useSelector(state => state.userDetailsReducer);
 
     return (
         <Fragment>
@@ -939,14 +1169,14 @@ const UpdateIdea = () => {
                         </DialogHeader>
                         <div className="space-y-2">
                             <div className="space-y-1">
-                                <Label htmlFor="name" className="font-normal">Email</Label>
+                                <Label htmlFor="name" className="font-medium">Email</Label>
                                 <Input id="name" value={usersDetails.email} name="email" onChange={onChangeText}
                                        placeholder="Enter upvoter email" className="col-span-3"/>
                                 {userDetailError.email &&
                                 <span className="text-red-500 text-sm">{userDetailError.email}</span>}
                             </div>
                             <div className="space-y-1">
-                                <Label htmlFor="userName" className="font-normal">Name</Label>
+                                <Label htmlFor="userName" className="font-medium">Name</Label>
                                 <Input id="userName" value={usersDetails.name} name="name" onChange={onChangeText}
                                        placeholder="Enter upvoter name" className="col-span-3"/>
                                 {userDetailError.name &&
@@ -1116,88 +1346,109 @@ const UpdateIdea = () => {
             </div>
             <div className={`flex h-[calc(100%_-_45px)] lg:h-[calc(100%_-_69px)] overflow-y-auto`}>
                 <div className={`max-w-[407px] w-full h-full border-r lg:block hidden lg:overflow-auto`}>
-                    <div className={"border-b py-4 px-6 flex flex-col gap-3"}>
-                        <div className={"flex flex-col gap-1"}>
-                            <h3 className={"text-sm font-normal"}>Status</h3>
-                            <p className={"text-muted-foreground text-xs font-normal"}>Apply a status to Manage this
-                                idea on roadmap.</p>
-                        </div>
-                        <div className={"flex flex-col "}>
-                            <RadioGroup
-                                onValueChange={(value) => onChangeStatus('roadmapStatusId', value)}
-                                value={selectedIdea?.roadmapStatusId}
-                            >
-                                {
-                                    (roadmapStatus || []).map((x, i) => {
-                                        return (
-                                            <div key={i} className="flex items-center space-x-2">
-                                                <RadioGroupItem value={x.id} id={x.id}/>
-                                                <Label
-                                                    className={"text-secondary-foreground text-sm font-normal"}
-                                                    htmlFor={x.id}>{x.title}</Label>
-                                            </div>
-                                        )
-                                    })
-                                }
-                            </RadioGroup>
-                        </div>
-                    </div>
-                    <div className={"border-b"}>
-                        <div className="py-4 px-6 w-full space-y-1.5">
-                            <Label htmlFor="picture" className={"font-normal capitalize"}>Featured image</Label>
-                            <div className="w-[282px] h-[128px] flex gap-1">
-                                <ImageUploader
-                                    image={selectedIdea?.coverImage}
-                                    onDelete={() => onChangeStatus('removeCoverImage', selectedIdea && selectedIdea?.coverImage && selectedIdea.coverImage?.name ? "" : [selectedIdea.coverImage])}
-                                    onUpload={handleFeatureImgUpload}
-                                    altText="Cover Image"
-                                />
+                    {
+                        isLoading ? (
+                                [...Array(22)].map((_, index) => {
+                                    return (
+                                        <Fragment key={index}>
+                                            {
+                                                [...Array(1)].map((_, i) => {
+                                                    return (
+                                                        <div key={i} className={"w-full px-2 py-[8px] md:px-3"}>
+                                                            <Skeleton className={"rounded-md w-full h-5"}/>
+                                                        </div>
+                                                    )
+                                                })
+                                            }
+                                        </Fragment>
+                                    )})
+                        ) : <Fragment>
+                            <div className={"border-b py-4 px-6 flex flex-col gap-3"}>
+                                <div className={"flex flex-col gap-1"}>
+                                    <h3 className={"text-sm font-medium"}>Status</h3>
+                                    <p className={"text-muted-foreground text-xs font-normal"}>Apply a status to Manage this idea on roadmap.</p>
+                                </div>
+                                <div className={"flex flex-col "}>
+                                    <RadioGroup
+                                        onValueChange={(value) => onChangeStatus('roadmapStatusId', value)}
+                                        value={selectedIdea?.roadmapStatusId}
+                                    >
+                                        {
+                                            (roadmapStatus || []).map((x, i) => {
+                                                return (
+                                                    <div key={i} className="flex items-center space-x-2">
+                                                        <RadioGroupItem value={x.id} id={x.id}/>
+                                                        <Label
+                                                            className={"text-secondary-foreground text-sm font-normal"}
+                                                            htmlFor={x.id}>{x.title}</Label>
+                                                    </div>
+                                                )
+                                            })
+                                        }
+                                    </RadioGroup>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                    <div className={"py-4 px-6 flex flex-col gap-[26px]"}>
-                        <div className={"flex gap-1 justify-between items-center"}>
-                            <div className={"flex flex-col gap-1"}>
-                                <h4 className={"text-sm font-normal capitalize"}>Mark as bug</h4>
-                                <p className={"text-muted-foreground text-xs font-normal"}>Hides Idea from your
-                                    users</p>
+                            <div className={"border-b"}>
+                                <div className="py-4 px-6 w-full space-y-1.5">
+                                    <Label htmlFor="picture" className={"font-medium capitalize"}>Featured image</Label>
+                                    <div className="w-[282px] h-[128px] flex gap-1">
+                                        <ImageUploader
+                                            image={selectedIdea?.coverImage}
+                                            onDelete={() => onChangeStatus('removeCoverImage', selectedIdea && selectedIdea?.coverImage && selectedIdea.coverImage?.name ? "" : [selectedIdea.coverImage])}
+                                            onUpload={handleFeatureImgUpload}
+                                            altText="Cover Image"
+                                        />
+                                    </div>
+                                    {formError.coverImage && (
+                                        <span className="text-red-500 text-sm">{formError.coverImage}</span>
+                                    )}
+                                </div>
                             </div>
-                            <Button
-                                variant={"outline"}
-                                className={`hover:bg-muted w-[125px] ${theme === "dark" ? "" : "border-muted-foreground text-muted-foreground"} capitalize text-sm font-medium`}
-                                onClick={() => onChangeStatus(
-                                    "isActive",
-                                    selectedIdea?.isActive === false
-                                )}
-                            >
-                                {
-                                    isLoadingBug ? <Loader2
-                                        className="h-4 w-4 animate-spin"/> : (selectedIdea?.isActive === false ? "Convert to Idea" : "Mark as bug")
-                                }
-                            </Button>
-                        </div>
-                        <div className={"flex gap-1 justify-between items-center"}>
-                            <div className={"flex flex-col gap-1"}>
-                                <h4 className={"text-sm font-normal"}>Archive</h4>
-                                <p className={"text-muted-foreground text-xs font-normal"}>Remove Idea from
-                                    Board
-                                    and Roadmap</p>
+                            <div className={"py-4 px-6 flex flex-col gap-[26px]"}>
+                                <div className={"flex gap-1 justify-between items-center"}>
+                                    <div className={"flex flex-col gap-1"}>
+                                        <h4 className={"text-sm font-medium capitalize"}>Mark as bug</h4>
+                                        <p className={"text-muted-foreground text-xs font-normal"}>Hides Idea from your
+                                            users</p>
+                                    </div>
+                                    <Button
+                                        variant={"outline"}
+                                        className={`hover:bg-muted w-[125px] ${theme === "dark" ? "" : "border-muted-foreground text-muted-foreground"} capitalize text-sm font-medium`}
+                                        onClick={() => onChangeStatus(
+                                            "isActive",
+                                            selectedIdea?.isActive === false
+                                        )}
+                                    >
+                                        {
+                                            isLoadingBug ? <Loader2
+                                                className="h-4 w-4 animate-spin"/> : (selectedIdea?.isActive === false ? "Convert to Idea" : "Mark as bug")
+                                        }
+                                    </Button>
+                                </div>
+                                <div className={"flex gap-1 justify-between items-center"}>
+                                    <div className={"flex flex-col gap-1"}>
+                                        <h4 className={"text-sm font-medium"}>Archive</h4>
+                                        <p className={"text-muted-foreground text-xs font-normal"}>Remove Idea from
+                                            Board
+                                            and Roadmap</p>
+                                    </div>
+                                    <Button
+                                        variant={"outline"}
+                                        className={`w-[89px] hover:bg-muted ${theme === "dark" ? "" : "border-muted-foreground text-muted-foreground"} text-sm font-medium`}
+                                        onClick={() => onChangeStatus(
+                                            "isArchive",
+                                            selectedIdea?.isArchive !== true
+                                        )}
+                                    >
+                                        {
+                                            isLoadingArchive ? <Loader2
+                                                className="h-4 w-4 animate-spin"/> : (selectedIdea?.isArchive ? "Unarchive" : "Archive")
+                                        }
+                                    </Button>
+                                </div>
                             </div>
-                            <Button
-                                variant={"outline"}
-                                className={`w-[89px] hover:bg-muted ${theme === "dark" ? "" : "border-muted-foreground text-muted-foreground"} text-sm font-medium`}
-                                onClick={() => onChangeStatus(
-                                    "isArchive",
-                                    selectedIdea?.isArchive !== true
-                                )}
-                            >
-                                {
-                                    isLoadingArchive ? <Loader2
-                                        className="h-4 w-4 animate-spin"/> : (selectedIdea?.isArchive ? "Unarchive" : "Archive")
-                                }
-                            </Button>
-                        </div>
-                    </div>
+                        </Fragment>
+                    }
                 </div>
                 <div className={"update-idea-right-side w-full h-full overflow-y-auto"}>
                     {
@@ -1206,7 +1457,7 @@ const UpdateIdea = () => {
                                 <div
                                     className={"px-4 py-3 lg:py-6 lg:px-8 flex flex-col gap-4 ld:gap-6 border-b"}>
                                     <div className="space-y-2">
-                                        <Label htmlFor="text" className={"font-normal"}>Title</Label>
+                                        <Label htmlFor="text" className={"font-medium"}>Title</Label>
                                         <Input type="text" id="text" placeholder="" value={selectedIdea.title}
                                                name={"title"} onChange={onChangeText}/>
                                         {
@@ -1215,14 +1466,14 @@ const UpdateIdea = () => {
                                         }
                                     </div>
                                     <div className="space-y-2">
-                                        <Label htmlFor="description" className={"font-normal"}>Description</Label>
+                                        <Label htmlFor="description" className={"font-medium"}>Description</Label>
                                         <ReactQuillEditor value={selectedIdea.description} name={"description"}
                                                           onChange={onChangeText}/>
                                         {formError.description &&
                                         <span className="text-red-500 text-sm">{formError.description}</span>}
                                     </div>
                                     <div className={"space-y-2"}>
-                                        <Label className={"font-normal"}>Choose Board for this Idea</Label>
+                                        <Label className={"font-medium"}>Choose Board for this Idea</Label>
                                         <Select
                                             onValueChange={(value) => onChangeText({
                                                 target: {
@@ -1255,7 +1506,7 @@ const UpdateIdea = () => {
                                     </div>
                                 </div>
                                 <div className={"px-4 py-3 lg:py-6 lg:px-8 border-b space-y-2"}>
-                                    <Label className={"font-normal"}>Choose Topics for this Idea (optional)</Label>
+                                    <Label className={"font-medium"}>Choose Topics for this Idea (optional)</Label>
                                     <Select onValueChange={handleChangeTopic} value={selectedIdea.topic.map(x => x.id)}>
                                         <SelectTrigger className="bg-card">
                                             <SelectValue className={"text-muted-foreground text-sm"}>
@@ -1313,17 +1564,28 @@ const UpdateIdea = () => {
                             </Fragment>
                             :
                             <Fragment>
-                                <div className={"px-4 py-3 lg:py-6 lg:px-8"}>
-                                    <div className={"flex flex-col gap-6"}>
-                                        <div
-                                            className={"flex justify-between items-center gap-4 md:flex-nowrap flex-wrap"}>
-                                            {
-                                                isLoading ?
-                                                    <div className={"flex gap-2 items-center"}>
-                                                        <Skeleton className="w-[30px] h-[30px] rounded-full"/>
-                                                        <Skeleton className="w-[30px] h-[30px] rounded-full"/>
-                                                    </div>
-                                                    :
+                                {
+                                    isLoading ? (
+                                        [...Array(22)].map((_, index) => {
+                                            return (
+                                                <Fragment key={index}>
+                                                    {
+                                                        [...Array(1)].map((_, i) => {
+                                                            return (
+                                                                <div key={i} className={"w-full px-2 py-[8px] md:px-3"}>
+                                                                    <Skeleton className={"rounded-md w-full h-5"}/>
+                                                                </div>
+                                                            )
+                                                        })
+                                                    }
+                                                </Fragment>
+                                            )
+                                        })
+                                    ) : <Fragment>
+                                        <div className={"px-4 py-3 lg:py-6 lg:px-8"}>
+                                            <div className={"flex flex-col gap-6"}>
+                                                <div className={"flex justify-between items-center gap-4 md:flex-nowrap flex-wrap"}>
+
                                                     <div className={"flex gap-2 items-center"}>
                                                         <Button
                                                             className={"p-[7px] bg-white shadow border hover:bg-white w-[30px] h-[30px]"}
@@ -1408,109 +1670,77 @@ const UpdateIdea = () => {
                                                                 : ""
                                                         }
                                                     </div>
-                                            }
 
-                                            <div className={"flex gap-2 items-center"}>
-                                                {
-                                                    isLoading ?
-                                                        <div className={"flex gap-2"}>
-                                                            {
-                                                                selectedIdea?.createdBy === 1 ?
-                                                                    <Skeleton
-                                                                        className="w-[30px] h-[30px] rounded-full"/> : ""
-                                                            }
-                                                            <Skeleton className="w-[30px] h-[30px] rounded-full"/>
+                                                    <div className={"flex gap-2 items-center"}>
+                                                        <div className={"hidden md:block"}>
+                                                            <ActionButtons
+                                                                isEditable={selectedIdea?.createdBy == 1}
+                                                                onEdit={() => setIsEditIdea(true)}
+                                                                onPinChange={(newPinState) => onChangeStatus("pinToTop", newPinState ? 1 : 0)}
+                                                                isPinned={selectedIdea?.pinToTop == 1}
+                                                            />
                                                         </div>
-                                                        :
-                                                        <Fragment>
-                                                            <div className={"hidden md:block"}>
-                                                                <ActionButtons
-                                                                    isEditable={selectedIdea?.createdBy == 1}
-                                                                    onEdit={() => setIsEditIdea(true)}
-                                                                    onPinChange={(newPinState) => onChangeStatus("pinToTop", newPinState ? 1 : 0)}
-                                                                    isPinned={selectedIdea?.pinToTop == 1}
-                                                                />
-                                                            </div>
 
-                                                            <div className={"md:hidden"}>
-                                                                <DropdownMenu>
-                                                                    <DropdownMenuTrigger>
-                                                                        <Ellipsis size={16}/>
-                                                                    </DropdownMenuTrigger>
-                                                                    <DropdownMenuContent align={"end"}>
-                                                                        <DropdownMenuItem className={"cursor-pointer"}
-                                                                                          onClick={() => setIsEditIdea(true)}>Edit</DropdownMenuItem>
-                                                                        <DropdownMenuItem className={"cursor-pointer"}
-                                                                                          onClick={() => onChangeStatus("pinToTop", selectedIdea?.pinToTop === 0 ? 1 : 0)}>
-                                                                            {selectedIdea?.pinToTop == 0 ? "Pinned" : "Unpinned"}
-                                                                        </DropdownMenuItem>
-                                                                        <DropdownMenuItem
-                                                                            className={"cursor-pointer capitalize"}
-                                                                            onClick={() => onChangeStatus(
-                                                                                "isActive",
-                                                                                selectedIdea?.isActive === false
-                                                                            )}>
-                                                                            {selectedIdea?.isActive === false ? "Convert to Idea" : "Mark as bug"}
-                                                                        </DropdownMenuItem>
-                                                                        <DropdownMenuItem className={"cursor-pointer"}
-                                                                                          onClick={() => onChangeStatus(
-                                                                                              "isArchive",
-                                                                                              selectedIdea?.isArchive !== true
-                                                                                          )}>
-                                                                            {selectedIdea?.isArchive ? "Unarchive" : "Archive"}
-                                                                        </DropdownMenuItem>
-                                                                    </DropdownMenuContent>
-                                                                </DropdownMenu>
-                                                            </div>
+                                                        <div className={"md:hidden"}>
+                                                            <DropdownMenu>
+                                                                <DropdownMenuTrigger>
+                                                                    <Ellipsis size={16}/>
+                                                                </DropdownMenuTrigger>
+                                                                <DropdownMenuContent align={"end"}>
+                                                                    <DropdownMenuItem className={"cursor-pointer"}
+                                                                                      onClick={() => setIsEditIdea(true)}>Edit</DropdownMenuItem>
+                                                                    <DropdownMenuItem className={"cursor-pointer"}
+                                                                                      onClick={() => onChangeStatus("pinToTop", selectedIdea?.pinToTop === 0 ? 1 : 0)}>
+                                                                        {selectedIdea?.pinToTop == 0 ? "Pinned" : "Unpinned"}
+                                                                    </DropdownMenuItem>
+                                                                    <DropdownMenuItem
+                                                                        className={"cursor-pointer capitalize"}
+                                                                        onClick={() => onChangeStatus(
+                                                                            "isActive",
+                                                                            selectedIdea?.isActive === false
+                                                                        )}>
+                                                                        {selectedIdea?.isActive === false ? "Convert to Idea" : "Mark as bug"}
+                                                                    </DropdownMenuItem>
+                                                                    <DropdownMenuItem className={"cursor-pointer"}
+                                                                                      onClick={() => onChangeStatus(
+                                                                                          "isArchive",
+                                                                                          selectedIdea?.isArchive !== true
+                                                                                      )}>
+                                                                        {selectedIdea?.isArchive ? "Unarchive" : "Archive"}
+                                                                    </DropdownMenuItem>
+                                                                </DropdownMenuContent>
+                                                            </DropdownMenu>
+                                                        </div>
 
-                                                            <div className={"lg:hidden md:block hidden"}>
-                                                                <StatusButtonGroup
-                                                                    onChangeStatus={(statusKey, statusValue) => onChangeStatus(statusKey, statusValue)}
-                                                                    statusButtons={[
-                                                                        {
-                                                                            statusKey: "isActive",
-                                                                            statusValue: selectedIdea?.isActive === false,
-                                                                            isLoading: isLoadingBug,
-                                                                            label: selectedIdea?.isActive === false ? "Convert to Idea" : "Mark as Bug",
-                                                                            width: "w-[110px]"
-                                                                        },
-                                                                        {
-                                                                            statusKey: "isArchive",
-                                                                            statusValue: selectedIdea?.isArchive !== true,
-                                                                            isLoading: isLoadingArchive,
-                                                                            label: selectedIdea?.isArchive ? "Unarchive" : "Archive",
-                                                                            width: "w-[80px]"
-                                                                        }
-                                                                    ]}
-                                                                />
-                                                            </div>
-                                                        </Fragment>
-                                                }
-                                            </div>
-                                        </div>
-                                        {
-                                            isLoading ?
-                                                <div className={"flex flex-col gap-4"}>
-                                                    <Skeleton className="h-4 "/>
-                                                    <div className={"space-y-1"}>
-                                                        <Skeleton className="h-4 "/>
-                                                        <Skeleton className="h-4 "/>
+                                                        <div className={"lg:hidden md:block hidden"}>
+                                                            <StatusButtonGroup
+                                                                onChangeStatus={(statusKey, statusValue) => onChangeStatus(statusKey, statusValue)}
+                                                                statusButtons={[
+                                                                    {
+                                                                        statusKey: "isActive",
+                                                                        statusValue: selectedIdea?.isActive === false,
+                                                                        isLoading: isLoadingBug,
+                                                                        label: selectedIdea?.isActive === false ? "Convert to Idea" : "Mark as Bug",
+                                                                        width: "w-[110px]"
+                                                                    },
+                                                                    {
+                                                                        statusKey: "isArchive",
+                                                                        statusValue: selectedIdea?.isArchive !== true,
+                                                                        isLoading: isLoadingArchive,
+                                                                        label: selectedIdea?.isArchive ? "Unarchive" : "Archive",
+                                                                        width: "w-[80px]"
+                                                                    }
+                                                                ]}
+                                                            />
+                                                        </div>
                                                     </div>
-                                                </div> :
+                                                </div>
                                                 <div className={"flex flex-col gap-4"}>
                                                     <div className={"flex items-center gap-2"}>
                                                         <h2 className={"text-xl font-normal"}>{selectedIdea?.title}</h2>
                                                     </div>
                                                     <DisplayReactQuill value={selectedIdea.description}/>
                                                 </div>
-                                        }
-                                        {
-                                            isLoading ?
-                                                <div className={"flex gap-2 flex-wrap"}>
-                                                    <Skeleton
-                                                        className="w-[50px] h-[50px] md:w-[100px] md:h-[100px] border p-[3px] relative"/>
-                                                </div>
-                                                :
                                                 <Fragment>
                                                     {
                                                         selectedIdea && selectedIdea?.images && selectedIdea?.images?.length > 0 ?
@@ -1540,39 +1770,24 @@ const UpdateIdea = () => {
                                                             </div> : ""
                                                     }
                                                 </Fragment>
-                                        }
-                                        <div className={"flex items-center"}>
-                                            <div className={"flex items-center gap-4 md:flex-nowrap flex-wrap"}>
-                                                <div className={"flex items-center gap-2"}>
-                                                    {
-                                                        isLoading ? (
-                                                            <Fragment>
-                                                                <Skeleton className="w-[20px] h-[20px] rounded-lg"/>
-                                                                <div className={"flex items-center"}><Skeleton
-                                                                    className="w-[50px] h-[20px]"/></div>
-                                                            </Fragment>
-                                                        ) : (
-                                                            <Fragment>
-                                                                <UserAvatar initialStyle={"text-sm"}
-                                                                            userPhoto={selectedIdea?.profileImage}
-                                                                            userName={selectedIdea?.name ? selectedIdea?.name : selectedIdea?.userName}
-                                                                />
-                                                                <div className={"flex items-center"}>
-                                                                    <Fragment>
-                                                                        <h4 className={"text-sm font-normal"}>{selectedIdea?.name ? selectedIdea?.name : selectedIdea?.userName}</h4>
-                                                                        <p className={"text-sm font-normal flex items-center text-muted-foreground"}>
-                                                                            <Dot size={20}
-                                                                                 className={"fill-text-card-foreground stroke-text-card-foreground"}/>
-                                                                            {moment(selectedIdea?.createdAt).format('D MMM')}
-                                                                        </p>
-                                                                    </Fragment>
-                                                                </div>
-                                                            </Fragment>
-                                                        )
-                                                    }
-                                                </div>
-                                                {
-                                                    isLoading ? <Skeleton className={"w-[224px] h-[24px] px-3 py-1"}/> :
+                                                <div className={"flex items-center"}>
+                                                    <div className={"flex items-center gap-4 md:flex-nowrap flex-wrap"}>
+                                                        <div className={"flex items-center gap-2"}>
+                                                            <UserAvatar initialStyle={"text-sm"}
+                                                                        userPhoto={selectedIdea?.profileImage}
+                                                                        userName={selectedIdea?.name ? selectedIdea?.name : selectedIdea?.userName}
+                                                            />
+                                                            <div className={"flex items-center"}>
+                                                                <Fragment>
+                                                                    <h4 className={"text-sm font-normal"}>{selectedIdea?.name ? selectedIdea?.name : selectedIdea?.userName}</h4>
+                                                                    <p className={"text-sm font-normal flex items-center text-muted-foreground"}>
+                                                                        <Dot size={20}
+                                                                             className={"fill-text-card-foreground stroke-text-card-foreground"}/>
+                                                                        {moment(selectedIdea?.createdAt).format('D MMM')}
+                                                                    </p>
+                                                                </Fragment>
+                                                            </div>
+                                                        </div>
                                                         <Select
                                                             onValueChange={(value) => onChangeStatus('roadmapStatusId', value)}
                                                             value={selectedIdea?.roadmapStatusId}
@@ -1605,39 +1820,28 @@ const UpdateIdea = () => {
                                                                 </SelectGroup>
                                                             </SelectContent>
                                                         </Select>
-                                                }
-                                            </div>
-                                        </div>
-
-                                        <div className="w-full space-y-1.5 lg:hidden">
-                                            <Label htmlFor="picture" className={"font-normal capitalize"}>Featured
-                                                image</Label>
-                                            <div className="w-[282px] h-[128px] flex gap-1">
-                                                <ImageUploader
-                                                    image={selectedIdea?.coverImage}
-                                                    onDelete={() => onChangeStatus('removeCoverImage', selectedIdea && selectedIdea?.coverImage && selectedIdea.coverImage?.name ? "" : [selectedIdea.coverImage])}
-                                                    onUpload={handleFeatureImgUpload}
-                                                    altText="Cover Image"
-                                                />
-                                            </div>
-                                        </div>
-
-                                        {
-                                            isLoading ?
-                                                <div className={"flex flex-col gap-2"}>
-                                                    <div className="w-full flex flex-col gap-2">
-                                                        <Skeleton className={"w-[100px] h-[20px]"}/>
-                                                        <Skeleton className={"w-full h-[80px]"}/>
-                                                    </div>
-                                                    <div className={"flex justify-end gap-2 items-center"}>
-                                                        <Skeleton className={"w-[36px] h-[36px]"}/>
-                                                        <Skeleton className={"w-[128px] h-[36px]"}/>
                                                     </div>
                                                 </div>
-                                                :
+
+                                                <div className="w-full space-y-1.5 lg:hidden">
+                                                    <Label htmlFor="picture" className={"font-medium capitalize"}>Featured
+                                                        image</Label>
+                                                    <div className="w-[282px] h-[128px] flex gap-1">
+                                                        <ImageUploader
+                                                            image={selectedIdea?.coverImage}
+                                                            onDelete={() => onChangeStatus('removeCoverImage', selectedIdea && selectedIdea?.coverImage && selectedIdea.coverImage?.name ? "" : [selectedIdea.coverImage])}
+                                                            onUpload={handleFeatureImgUpload}
+                                                            altText="Cover Image"
+                                                        />
+                                                        {formError.coverImage && (
+                                                            <span className="text-red-500 text-sm">{formError.coverImage}</span>
+                                                        )}
+                                                    </div>
+                                                </div>
+
                                                 <div className={"flex flex-col gap-2"}>
                                                     <div className="w-full flex flex-col gap-2">
-                                                        <Label htmlFor="message" className={"font-normal capitalize"}>Add
+                                                        <Label htmlFor="message" className={"font-medium capitalize"}>Add
                                                             comment</Label>
                                                         <Fragment>
                                                             <Textarea
@@ -1706,267 +1910,274 @@ const UpdateIdea = () => {
                                                         </div>
                                                     </div>
                                                 </div>
-                                        }
-                                    </div>
-                                </div>
-                                <div className={"tabs"}>
-                                    <Tabs defaultValue="comment">
-                                        <div className={"px-4 lg:px-8"}>
-                                            <TabsList
-                                                className={"bg-transparent border-b-2 border-b-primary rounded-none"}>
-                                                <TabsTrigger className={"ideas-tab-comm-bgCol"} value="comment">Comment</TabsTrigger>
-                                            </TabsList>
+                                            </div>
                                         </div>
+                                        <div className={"tabs"}>
+                                            <Tabs defaultValue="comment">
+                                                <div className={"px-4 lg:px-8 border-b"}>
+                                                    <TabsList
+                                                        className={"bg-transparent border-b-2 border-b-primary rounded-none"}>
+                                                        <TabsTrigger className={"ideas-tab-comm-bgCol"} value="comment">Comments</TabsTrigger>
+                                                    </TabsList>
+                                                </div>
 
-                                        {
-                                            selectedIdea?.comments?.length > 0 &&
-                                            <TabsContent value="comment"
-                                                         className={`${theme === "dark" ? "" : "bg-muted"} pb-5`}>
                                                 {
-                                                    selectedIdea && selectedIdea?.comments && selectedIdea?.comments.length > 0 ?
-                                                        (selectedIdea?.comments || []).map((x, i) => {
-                                                            return (
-                                                                <Fragment key={i}>
-                                                                    <div
-                                                                        className={"flex gap-2 p-4 lg:px-8 border-b last:border-b-0"}>
-                                                                        <div>
-                                                                            <div
-                                                                                className={"update-idea text-sm rounded-full text-center"}>
-                                                                                <UserAvatar
-                                                                                    userPhoto={x?.profileImage}
-                                                                                    userName={x?.name && x.name !== "null" ? x.name : x?.userName}
-                                                                                    initialStyle={"text-sm"}
-                                                                                />
-                                                                            </div>
-                                                                        </div>
-                                                                        <div
-                                                                            className={"w-full flex flex-col space-y-3"}>
-                                                                            <div
-                                                                                className={"flex gap-1 flex-wrap justify-between"}>
-                                                                                <div className={"flex items-start"}>
-                                                                                    <h4 className={"text-sm font-normal"}>{x?.name && x.name !== "null" ? x.name : x?.userName}</h4>
-                                                                                    <p className={"text-sm font-normal flex items-center text-muted-foreground"}>
-                                                                                        <Dot size={20}
-                                                                                             className={"fill-text-card-foreground stroke-text-card-foreground"}/>
-                                                                                        {moment.utc(x?.createdAt).local().startOf('seconds').fromNow()}
-                                                                                        {x.isEdited && <span className={"text-sm font-normal text-muted-foreground ml-1"}>(edited)</span>}
-                                                                                    </p>
-                                                                                </div>
-                                                                                <div className={"flex gap-2"}>
-                                                                                    {
-                                                                                        selectedCommentIndex === i && isEditComment ? "" :
-                                                                                            x?.createdBy === 1 ?
-                                                                                                (userDetailsReducer?.id == x.userId) ?
-                                                                                                    <Fragment>
-                                                                                                        <ActionButtons
-                                                                                                            isEditable={x?.createdBy === 1}
-                                                                                                            onEdit={() => onEditComment(x, i)}
-                                                                                                            onDelete={() => deleteComment(x.id, i)}
-                                                                                                        />
-                                                                                                    </Fragment>
-                                                                                                    : ""
-                                                                                                : ""
-                                                                                    }
-                                                                                </div>
-                                                                            </div>
-                                                                            <div>
-                                                                                <Fragment>
-                                                                                    {
-                                                                                        selectedCommentIndex === i && isEditComment ?
-                                                                                            <CommentEditor
-                                                                                                isEditMode={selectedCommentIndex === i && isEditComment}
-                                                                                                comment={selectedComment?.comment}
-                                                                                                images={selectedComment?.images}
-                                                                                                onUpdateComment={onUpdateComment}
-                                                                                                onCancelComment={onCancelComment}
-                                                                                                onDeleteImage={(i) => onDeleteCommentImage(i, true)}
-                                                                                                onImageUpload={handleAddCommentImg}
-                                                                                                onCommentChange={(e) => setSelectedComment({
-                                                                                                    ...selectedComment,
-                                                                                                    comment: e.target.value
-                                                                                                })}
-                                                                                                isSaving={isSaveUpdateComment}
-                                                                                                idImageUpload={"selectedCommentImg"}
-                                                                                            /> :
-                                                                                            <CommentEditor
-                                                                                                comment={x.comment}
-                                                                                                images={x.images}
-                                                                                                onImageClick={(img) => handleImageOpen(img)}
-                                                                                            />
-                                                                                    }
-                                                                                </Fragment>
-                                                                            </div>
+                                                    ideaComment?.comments?.length > 0 ?
+                                                        <TabsContent value="comment" className={`${theme === "dark" ? "" : "bg-muted"}`}>
+                                                            <Fragment>
+                                                                {
+                                                                    ideaComment && ideaComment?.comments && ideaComment?.comments.length > 0 ?
+                                                                        (ideaComment?.comments || []).map((x, i) => {
+                                                                            return (
+                                                                                <Fragment key={i}>
+                                                                                    <div className={"flex gap-2 p-4 lg:px-8 border-b last:border-b-0"}>
+                                                                                        <div>
+                                                                                            <div
+                                                                                                className={"update-idea text-sm rounded-full text-center"}>
+                                                                                                <UserAvatar
+                                                                                                    userPhoto={x?.profileImage}
+                                                                                                    userName={x?.name && x.name !== "null" ? x.name : x?.userName}
+                                                                                                    initialStyle={"text-sm"}
+                                                                                                />
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div className={"w-full flex flex-col space-y-3"}>
+                                                                                            <div className={"flex gap-1 flex-wrap justify-between"}>
+                                                                                                <div className={"flex items-start"}>
+                                                                                                    <h4 className={"text-sm font-normal"}>{x?.name && x.name !== "null" ? x.name : x?.userName}</h4>
+                                                                                                    <p className={"text-sm font-normal flex items-center text-muted-foreground"}>
+                                                                                                        <Dot size={20}
+                                                                                                             className={"fill-text-card-foreground stroke-text-card-foreground"}/>
+                                                                                                        {moment.utc(x?.createdAt).local().startOf('seconds').fromNow()}
+                                                                                                        {x.isEdited && <span className={"text-sm font-normal text-muted-foreground ml-1"}>(edited)</span>}
+                                                                                                    </p>
+                                                                                                </div>
+                                                                                                <div className={"flex gap-2"}>
+                                                                                                    {
+                                                                                                        selectedCommentIndex === i && isEditComment ? "" :
+                                                                                                            x?.createdBy === 1 ?
+                                                                                                                (userDetailsReducer?.id == x.userId) ?
+                                                                                                                    <Fragment>
+                                                                                                                        <ActionButtons
+                                                                                                                            isEditable={x?.createdBy === 1}
+                                                                                                                            onEdit={() => onEditComment(x, i)}
+                                                                                                                            onDelete={() => deleteComment(x.id, i)}
+                                                                                                                        />
+                                                                                                                    </Fragment>
+                                                                                                                    : ""
+                                                                                                                : ""
+                                                                                                    }
+                                                                                                </div>
+                                                                                            </div>
+                                                                                            <div>
+                                                                                                <Fragment>
+                                                                                                    {
+                                                                                                        selectedCommentIndex === i && isEditComment ?
+                                                                                                            <CommentEditor
+                                                                                                                isEditMode={selectedCommentIndex === i && isEditComment}
+                                                                                                                comment={selectedComment?.comment}
+                                                                                                                images={selectedComment?.images}
+                                                                                                                onUpdateComment={onUpdateComment}
+                                                                                                                onCancelComment={onCancelComment}
+                                                                                                                onDeleteImage={(i) => onDeleteCommentImage(i, true)}
+                                                                                                                onImageUpload={handleAddCommentImg}
+                                                                                                                onCommentChange={(e) => setSelectedComment({
+                                                                                                                    ...selectedComment,
+                                                                                                                    comment: e.target.value
+                                                                                                                })}
+                                                                                                                isSaving={isSaveUpdateComment}
+                                                                                                                idImageUpload={"selectedCommentImg"}
+                                                                                                            /> :
+                                                                                                            <CommentEditor
+                                                                                                                comment={x.comment}
+                                                                                                                images={x.images}
+                                                                                                                onImageClick={(img) => handleImageOpen(img)}
+                                                                                                            />
+                                                                                                    }
+                                                                                                </Fragment>
+                                                                                            </div>
 
-                                                                            {
-                                                                                selectedCommentIndex === i ? "" :
-                                                                                    <div
-                                                                                        className={"flex justify-between"}>
-                                                                                        <Button
-                                                                                            className="p-0 text-sm h-auto font-medium text-primary"
-                                                                                            variant={"ghost hover-none"}
-                                                                                            onClick={() => {onShowSubComment(i)}}
-                                                                                            key={`comment-nested-reply-to-${i}`}
-                                                                                        >
-                                                                                            Reply
-                                                                                        </Button>
-                                                                                        <div
-                                                                                            className={"flex items-center gap-2 cursor-pointer"}
-                                                                                            onClick={() => onShowSubComment(i)}
-                                                                                        >
+                                                                                            {
+                                                                                                selectedCommentIndex === i ? "" :
+                                                                                                    <div className={"flex justify-between"}>
+                                                                                                        <Button
+                                                                                                            className="p-0 text-sm h-auto font-medium text-primary"
+                                                                                                            variant={"ghost hover-none"}
+                                                                                                            onClick={() => {onShowSubComment(i)}}
+                                                                                                            key={`comment-nested-reply-to-${i}`}
+                                                                                                        >
+                                                                                                            Reply
+                                                                                                        </Button>
+                                                                                                        <div
+                                                                                                            className={"flex items-center gap-2 cursor-pointer"}
+                                                                                                            onClick={() => onShowSubComment(i)}
+                                                                                                        >
                                                                                                     <span>
                                                                                                         <MessageCircleMore className={"stroke-primary w-[16px] h-[16px]"}/>
                                                                                                     </span>
-                                                                                            <p className={"text-base font-normal"}>
-                                                                                                {x?.reply?.length}
-                                                                                            </p>
-                                                                                        </div>
-                                                                                    </div>
-                                                                            }
-                                                                            {
-                                                                                x.showReply ?
-                                                                                    <div
-                                                                                        className={"space-y-3"}>
-                                                                                        {
-                                                                                            (x?.reply || []).map((y, j) => {
-                                                                                                return (
-                                                                                                    <Fragment key={j}>
-                                                                                                        <div
-                                                                                                            className={"flex gap-2"}>
-                                                                                                            <div>
-                                                                                                                <div
-                                                                                                                    className={"update-idea text-sm rounded-full text-center"}>
-                                                                                                                    <UserAvatar
-                                                                                                                        userPhoto={y.profileImage} initialStyle={"text-sm"}
-                                                                                                                        userName={y?.name && y.name !== "null" ? y.name : y?.userName}/>
-                                                                                                                </div>
-                                                                                                            </div>
-                                                                                                            <div
-                                                                                                                className={"w-full space-y-2"}>
-                                                                                                                <div
-                                                                                                                    className={"flex justify-between"}>
-                                                                                                                    <div
-                                                                                                                        className={"flex items-start"}>
-                                                                                                                        <h4 className={"text-sm font-normal"}>{y?.name && y.name !== "null" ? y.name : y?.userName}</h4>
-                                                                                                                        <p className={"text-sm font-normal flex items-center text-muted-foreground"}>
-                                                                                                                            <Dot
-                                                                                                                                size={20}
-                                                                                                                                className={"fill-text-card-foreground stroke-text-card-foreground"}/>
-                                                                                                                            {moment.utc(y.createdAt).local().startOf('seconds').fromNow()}
-                                                                                                                            {y.isEdited && <span className={"text-sm font-normal text-muted-foreground ml-1"}>(edited)</span>}
-                                                                                                                        </p>
-                                                                                                                    </div>
-                                                                                                                    {
-                                                                                                                        selectedCommentIndex === i && selectedSubCommentIndex === j ? "" :
-                                                                                                                            y.createdBy === 1 ?
-                                                                                                                                (userDetailsReducer?.id == x.userId) ?
-                                                                                                                                <ActionButtons
-                                                                                                                                    isEditable={y?.createdBy === 1}
-                                                                                                                                    onEdit={() => onEditSubComment(x, y, i, j)}
-                                                                                                                                    onDelete={() => deleteSubComment(y.id, x, i, j)}
-                                                                                                                                />
-                                                                                                                                : ''
-                                                                                                                                : ''
-                                                                                                                    }
-                                                                                                                </div>
-                                                                                                                <div>
-
-                                                                                                                    {
-                                                                                                                        selectedCommentIndex === i && selectedSubCommentIndex === j ?
-                                                                                                                            <CommentEditor
-                                                                                                                                isEditMode={selectedCommentIndex === i && selectedSubCommentIndex === j}
-                                                                                                                                comment={selectedSubComment?.comment}
-                                                                                                                                images={selectedSubComment?.images}
-                                                                                                                                onUpdateComment={onUpdateSubComment}
-                                                                                                                                onCancelComment={onCancelSubComment}
-                                                                                                                                onDeleteImage={(i) => onDeleteSubCommentImage(i, true)}
-                                                                                                                                onImageUpload={handleSubCommentUploadImg}
-                                                                                                                                onCommentChange={(e) => onChangeTextSubComment(e)}
-                                                                                                                                isSaving={isSaveUpdateSubComment}
-                                                                                                                                idImageUpload={"commentFileInput"}
-                                                                                                                            /> :
-                                                                                                                            <CommentEditor
-                                                                                                                                comment={y.comment}
-                                                                                                                                images={y.images}
-                                                                                                                                onImageClick={(img) => handleImageOpen(img)}
-                                                                                                                            />
-                                                                                                                    }
-                                                                                                                </div>
-                                                                                                            </div>
+                                                                                                            <p className={"text-base font-normal"}>
+                                                                                                                {x?.reply?.length}
+                                                                                                            </p>
                                                                                                         </div>
-                                                                                                    </Fragment>
-                                                                                                )
-                                                                                            })
-                                                                                        }
-
-                                                                                        <div
-                                                                                            className={"space-y-2"}>
-                                                                                            {
-                                                                                                subCommentTextEditIdx === i &&
-                                                                                                <Textarea
-                                                                                                    value={subCommentText[i] || ""}
-                                                                                                    onChange={(e) => handleSubCommentTextChange(e, i)}/>
+                                                                                                    </div>
                                                                                             }
                                                                                             {
-                                                                                                subCommentFiles && subCommentFiles.length ?
-                                                                                                    <div
-                                                                                                        className={"flex gap-3 flex-wrap"}>
+                                                                                                x.showReply ?
+                                                                                                    <div className={"space-y-3"}>
                                                                                                         {
-                                                                                                            (subCommentFiles || []).map((z, i) => {
+                                                                                                            (x?.reply || []).map((y, j) => {
                                                                                                                 return (
-                                                                                                                    <div
-                                                                                                                        key={i}>
-                                                                                                                        {z && (
-                                                                                                                            <div
-                                                                                                                                className="w-[50px] h-[50px] md:w-[100px] md:h-[100px] relative border p-[3px]">
-                                                                                                                                <img
-                                                                                                                                    className="upload-img"
-                                                                                                                                    src={z.name ? URL.createObjectURL(z) : `${DO_SPACES_ENDPOINT}/${z}`}
-                                                                                                                                    alt={z.name || z}
-                                                                                                                                />
-                                                                                                                                <CircleX
-                                                                                                                                    size={20}
-                                                                                                                                    className="stroke-gray-500 dark:stroke-white cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10"
-                                                                                                                                    onClick={() => onDeleteSubCommentImageOld(i, false)}
-                                                                                                                                />
+                                                                                                                    <Fragment key={j}>
+                                                                                                                        <div className={"flex gap-2"}>
+                                                                                                                            <div>
+                                                                                                                                <div className={"update-idea text-sm rounded-full text-center"}>
+                                                                                                                                    <UserAvatar
+                                                                                                                                        userPhoto={y.profileImage} initialStyle={"text-sm"}
+                                                                                                                                        userName={y?.name && y.name !== "null" ? y.name : y?.userName}/>
+                                                                                                                                </div>
                                                                                                                             </div>
-                                                                                                                        )}
-                                                                                                                    </div>
+                                                                                                                            <div className={"w-full space-y-2"}>
+                                                                                                                                <div className={"flex justify-between"}>
+                                                                                                                                    <div className={"flex items-start"}>
+                                                                                                                                        <h4 className={"text-sm font-normal"}>{y?.name && y.name !== "null" ? y.name : y?.userName}</h4>
+                                                                                                                                        <p className={"text-sm font-normal flex items-center text-muted-foreground"}>
+                                                                                                                                            <Dot
+                                                                                                                                                size={20}
+                                                                                                                                                className={"fill-text-card-foreground stroke-text-card-foreground"}/>
+                                                                                                                                            {moment.utc(y.createdAt).local().startOf('seconds').fromNow()}
+                                                                                                                                            {y.isEdited && <span className={"text-sm font-normal text-muted-foreground ml-1"}>(edited)</span>}
+                                                                                                                                        </p>
+                                                                                                                                    </div>
+                                                                                                                                    {
+                                                                                                                                        selectedCommentIndex === i && selectedSubCommentIndex === j ? "" :
+                                                                                                                                            y.createdBy === 1 ?
+                                                                                                                                                (userDetailsReducer?.id == x.userId) ?
+                                                                                                                                                    <ActionButtons
+                                                                                                                                                        isEditable={y?.createdBy === 1}
+                                                                                                                                                        onEdit={() => onEditSubComment(x, y, i, j)}
+                                                                                                                                                        onDelete={() => deleteSubComment(y.id, x, i, j)}
+                                                                                                                                                    />
+                                                                                                                                                    : ''
+                                                                                                                                                : ''
+                                                                                                                                    }
+                                                                                                                                </div>
+                                                                                                                                <div>
+
+                                                                                                                                    {
+                                                                                                                                        selectedCommentIndex === i && selectedSubCommentIndex === j ?
+                                                                                                                                            <CommentEditor
+                                                                                                                                                isEditMode={selectedCommentIndex === i && selectedSubCommentIndex === j}
+                                                                                                                                                comment={selectedSubComment?.comment}
+                                                                                                                                                images={selectedSubComment?.images}
+                                                                                                                                                onUpdateComment={onUpdateSubComment}
+                                                                                                                                                onCancelComment={onCancelSubComment}
+                                                                                                                                                onDeleteImage={(i) => onDeleteSubCommentImage(i, true)}
+                                                                                                                                                onImageUpload={handleSubCommentUploadImg}
+                                                                                                                                                onCommentChange={(e) => onChangeTextSubComment(e)}
+                                                                                                                                                isSaving={isSaveUpdateSubComment}
+                                                                                                                                                idImageUpload={"commentFileInput"}
+                                                                                                                                            /> :
+                                                                                                                                            <CommentEditor
+                                                                                                                                                comment={y.comment}
+                                                                                                                                                images={y.images}
+                                                                                                                                                onImageClick={(img) => handleImageOpen(img)}
+                                                                                                                                            />
+                                                                                                                                    }
+                                                                                                                                </div>
+                                                                                                                            </div>
+                                                                                                                        </div>
+                                                                                                                    </Fragment>
                                                                                                                 )
                                                                                                             })
                                                                                                         }
+
+                                                                                                        <div className={"space-y-2"}>
+                                                                                                            {
+                                                                                                                subCommentTextEditIdx === i &&
+                                                                                                                <Textarea
+                                                                                                                    value={subCommentText[i] || ""}
+                                                                                                                    onChange={(e) => handleSubCommentTextChange(e, i)}/>
+                                                                                                            }
+                                                                                                            {
+                                                                                                                subCommentFiles && subCommentFiles.length ?
+                                                                                                                    <div className={"flex gap-3 flex-wrap"}>
+                                                                                                                        {
+                                                                                                                            (subCommentFiles || []).map((z, i) => {
+                                                                                                                                return (
+                                                                                                                                    <div key={i}>
+                                                                                                                                        {z && (
+                                                                                                                                            <div className="w-[50px] h-[50px] md:w-[100px] md:h-[100px] relative border p-[3px]">
+                                                                                                                                                <img
+                                                                                                                                                    className="upload-img"
+                                                                                                                                                    src={z.name ? URL.createObjectURL(z) : `${DO_SPACES_ENDPOINT}/${z}`}
+                                                                                                                                                    alt={z.name || z}
+                                                                                                                                                />
+                                                                                                                                                <CircleX
+                                                                                                                                                    size={20}
+                                                                                                                                                    className="stroke-gray-500 dark:stroke-white cursor-pointer absolute top-[0%] left-[100%] translate-x-[-50%] translate-y-[-50%] z-10"
+                                                                                                                                                    onClick={() => onDeleteSubCommentImageOld(i, false)}
+                                                                                                                                                />
+                                                                                                                                            </div>
+                                                                                                                                        )}
+                                                                                                                                    </div>
+                                                                                                                                )
+                                                                                                                            })
+                                                                                                                        }
+                                                                                                                    </div> : ""
+                                                                                                            }
+                                                                                                            {
+                                                                                                                subCommentTextEditIdx === i &&
+                                                                                                                <div className={"flex gap-2"}>
+                                                                                                                    <Button
+                                                                                                                        className={`${isSaveSubComment === true ? "py-2 px-6" : "py-2 px-6"} w-[86px] h-[30px] text-sm font-medium`}
+                                                                                                                        disabled={(!subCommentText[i] || subCommentText[i].trim() === "")}
+                                                                                                                        onClick={() => onCreateSubComment(x, i)}
+                                                                                                                    >
+                                                                                                                        {
+                                                                                                                            isSaveSubComment && subCommentTextEditIdx === i ?
+                                                                                                                                <Loader2 size={16} className="animate-spin"/> : "Reply"
+                                                                                                                        }
+                                                                                                                    </Button>
+                                                                                                                    <UploadButton onChange={handleSubCommentUploadImg}/>
+                                                                                                                </div>
+                                                                                                            }
+                                                                                                        </div>
                                                                                                     </div> : ""
                                                                                             }
-                                                                                            {
-                                                                                                subCommentTextEditIdx === i &&
-                                                                                                <div
-                                                                                                    className={"flex gap-2"}>
-                                                                                                    <Button
-                                                                                                        className={`${isSaveSubComment === true ? "py-2 px-6" : "py-2 px-6"} w-[86px] h-[30px] text-sm font-medium`}
-                                                                                                        disabled={(!subCommentText[i] || subCommentText[i].trim() === "")}
-                                                                                                        onClick={() => onCreateSubComment(x, i)}
-                                                                                                    >
-                                                                                                        {
-                                                                                                            isSaveSubComment && subCommentTextEditIdx === i ?
-                                                                                                                <Loader2 size={16} className="animate-spin"/> : "Reply"
-                                                                                                        }
-                                                                                                    </Button>
-                                                                                                    <UploadButton onChange={handleSubCommentUploadImg}/>
-                                                                                                </div>
-                                                                                            }
                                                                                         </div>
-                                                                                    </div> : ""
-                                                                            }
-                                                                        </div>
+                                                                                    </div>
+                                                                                </Fragment>
+                                                                            )
+                                                                        })
+                                                                        : ""
+                                                                }
+                                                                {ideaComment?.comments?.length > 0 && (
+                                                                    <div className="flex justify-center py-4">
+                                                                        {hasMoreComments ? (
+                                                                            <Button
+                                                                                onClick={loadMoreComments}
+                                                                                disabled={isLoadingComments}
+                                                                                className="font-medium"
+                                                                            >
+                                                                                {isLoadingComments ? (
+                                                                                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                                                                                ) : null}
+                                                                                Load More
+                                                                            </Button>
+                                                                        ) : (
+                                                                            <p className="text-muted-foreground text-sm">
+                                                                                No more comments to load
+                                                                            </p>
+                                                                        )}
                                                                     </div>
-                                                                </Fragment>
-                                                            )
-                                                        })
-                                                        : ""
+                                                                )}
+                                                            </Fragment>
+                                                        </TabsContent> : <p className={'py-10 text-center text-muted-foreground text-sm'}>No comments yet, be the first to share your thoughts!</p>
                                                 }
-                                            </TabsContent>
-                                        }
-                                    </Tabs>
-                                </div>
+                                            </Tabs>
+                                        </div>
+                                    </Fragment>
+                                }
                             </Fragment>
                     }
                 </div>

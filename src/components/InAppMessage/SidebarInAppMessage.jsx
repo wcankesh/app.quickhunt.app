@@ -294,11 +294,11 @@ const SidebarInAppMessage = ({
                                                    onChangeChecklist("actionText", e.target.value);
                                                    setFormError(prev => ({
                                                        ...prev,
-                                                       actionText: ""
+                                                       [`checklist_${selectedStep.checklistId}_actionText`]: formValidate("actionText", e.target.value, { actionType: selectedStep.actionType })
                                                    }));
                                                }}/>
-                                        {formError.actionText && (
-                                            <p className="text-red-500 text-sm">{formError.actionText}</p>
+                                        {formError[`checklist_${selectedStep.checklistId}_actionText`] && (
+                                            <p className="text-red-500 text-sm">{formError[`checklist_${selectedStep.checklistId}_actionText`]}</p>
                                         )}
                                     </div>
 
@@ -308,10 +308,13 @@ const SidebarInAppMessage = ({
                                                value={selectedStep?.actionUrl}
                                                onChange={(e) => {
                                                    onChangeChecklist("actionUrl", e.target.value)
-                                                   setFormError(prev => ({...prev, actionUrl: ""}));
+                                                   setFormError(prev => ({
+                                                       ...prev,
+                                                       [`checklist_${selectedStep.checklistId}_actionUrl`]: formValidate("actionUrl", e.target.value, { actionType: selectedStep.actionType })
+                                                   }));
                                                }}/>
-                                        {formError?.actionUrl && (
-                                            <p className="text-red-500 text-sm">{formError.actionUrl}</p>
+                                        {formError[`checklist_${selectedStep.checklistId}_actionUrl`] && (
+                                            <p className="text-red-500 text-sm">{formError[`checklist_${selectedStep.checklistId}_actionUrl`]}</p>
                                         )}
                                     </div>
 

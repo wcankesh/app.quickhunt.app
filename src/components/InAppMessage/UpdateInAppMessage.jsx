@@ -497,9 +497,9 @@ const UpdateInAppMessage = () => {
                     if (textError) {
                         validationErrors[`checklist_${checklist.checklistId}_actionText`] = textError;
                     }
-                    const error = formValidate("actionUrl", checklist.actionUrl, { actionType: checklist.actionType });
-                    if (error) {
-                        validationErrors[`checklist_${checklist.checklistId}_actionUrl`] = error;
+                    const urlError = formValidate("actionUrl", checklist.actionUrl, { actionType: checklist.actionType });
+                    if (urlError) {
+                        validationErrors[`checklist_${checklist.checklistId}_actionUrl`] = urlError;
                     }
                 }
             }
