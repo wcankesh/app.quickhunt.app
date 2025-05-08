@@ -1,12 +1,12 @@
 import React, {Fragment, useState} from 'react';
-import { Label } from "../../ui/label";
-import { Button } from "../../ui/button";
-import {apiService, setProjectDetails, TOKEN_KEY} from "../../../utils/constent";
-import {Input} from "../../ui/input";
-import {projectDetailsAction} from "../../../redux/action/ProjectDetailsAction";
+import { Label } from "../../../ui/label";
+import { Button } from "../../../ui/button";
+import {apiService, setProjectDetails, TOKEN_KEY} from "../../../../utils/constent";
+import {Input} from "../../../ui/input";
+import {projectDetailsAction} from "../../../../redux/action/ProjectDetailsAction";
 import {useDispatch} from "react-redux";
-import {useToast} from "../../ui/use-toast";
-import {useTheme} from "../../theme-provider";
+import {useToast} from "../../../ui/use-toast";
+import {useTheme} from "../../../theme-provider";
 import {Loader2} from "lucide-react";
 
 const initialStateProject = {

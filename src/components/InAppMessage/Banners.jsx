@@ -127,7 +127,7 @@ const Banners = ({inAppMsgSetting, setInAppMsgSetting}) => {
                     {
                         inAppMsgSetting.actionType == 3 &&
                         <div className={"relative"}>
-                            <Input placeholder={"you@company.com"} autofocus
+                            <Input placeholder={"you@company.com"} autofocus readOnly
                                    className={"w-auto h-9 py-1 px-3 focus-visible:ring-offset-0 focus-visible:ring-0"}
                                    style={{
                                        backgroundColor: inAppMsgSetting.bgColor,

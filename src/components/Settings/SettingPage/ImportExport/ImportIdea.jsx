@@ -1,15 +1,15 @@
 import React, {Fragment, useState} from "react";
 import Papa from "papaparse";
-import {Button} from "../ui/button";
-import {ScrollArea, ScrollBar} from "../ui/scroll-area";
-import {Card, CardDescription, CardHeader, CardContent} from "../ui/Card";
+import {Button} from "../../../ui/button";
+import {ScrollArea, ScrollBar} from "../../../ui/scroll-area";
+import {Card, CardDescription, CardHeader, CardContent} from "../../../ui/card";
 import {ArrowLeft, ChevronsUpDown, Circle, FileUp, Loader2} from "lucide-react";
-import {Popover, PopoverContent, PopoverTrigger} from "../ui/popover";
-import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList} from "../ui/command";
-import {useToast} from "../ui/use-toast";
-import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "../ui/select";
+import {Popover, PopoverContent, PopoverTrigger} from "../../../ui/popover";
+import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList} from "../../../ui/command";
+import {useToast} from "../../../ui/use-toast";
+import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "../../../ui/select";
 import {useSelector} from "react-redux";
-import {apiService, baseUrl} from "../../utils/constent";
+import {apiService, baseUrl} from "../../../../utils/constent";
 import {useNavigate} from "react-router-dom";
 
 const initialColumnList = [
@@ -129,7 +129,7 @@ const ImportIdea = () => {
             }
 
             if (findRoadmap.id) {
-                const roadmap = Array.from(new Set(tableData.map(item => item[findBoard.csvColumn]))).map(status => ({
+                const roadmap = Array.from(new Set(tableData.map(item => item[findRoadmap.csvColumn]))).map(status => ({
                     csvRoadmap: status,
                     roadmapId: null
                 }));

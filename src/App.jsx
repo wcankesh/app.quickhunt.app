@@ -13,7 +13,7 @@ import Forgot from "./components/Auth/Forgot";
 import RestPassword from "./components/Auth/RestPassword";
 import Invitation from "./components/Auth/Invitation";
 import Project from "./components/Auth/Project";
-import OnBoarding from "./components/OnBoarding/OnBoarding";
+import OnBoarding from "./components/Auth/OnBoarding/OnBoarding";
 
 function App() {
 

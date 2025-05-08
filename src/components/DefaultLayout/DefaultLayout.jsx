@@ -1,6 +1,6 @@
 import React, {Fragment, useState} from 'react';
-import SaidBarDesktop from "../Comman/SaidBarDesktop";
-import HeaderBar from "../Comman/HeaderBar";
+import SaidBarDesktop from "./SaidBarDesktop";
+import HeaderBar from "./HeaderBar";
 import {Outlet, useLocation, useParams} from "react-router-dom";
 import { TooltipProvider} from "@/components/ui/tooltip.jsx";
 

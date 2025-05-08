@@ -2,12 +2,12 @@ import React, {useEffect, useState} from 'react';
 import Step1 from './Steps/Step1';
 import Step2 from './Steps/Step2';
 import Step3 from './Steps/Step3';
-import {Icon} from "../../utils/Icon";
-import {Label} from "../ui/label";
-import {Progress} from "../ui/progress";
+import {Icon} from "../../../utils/Icon";
+import {Label} from "../../ui/label";
+import {Progress} from "../../ui/progress";
 import ThankYou from "./Steps/ThankYou";
 import {useLocation, useNavigate} from "react-router-dom";
-import {baseUrl} from "../../utils/constent";
+import {baseUrl} from "../../../utils/constent";
 
 const OnBoarding = () => {
     const navigate = useNavigate();

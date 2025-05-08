@@ -1,9 +1,9 @@
 import React, {Fragment, useEffect, useState} from 'react';
-import { Label } from "../../ui/label";
-import { Button } from "../../ui/button";
-import {apiService, baseUrl, getLSUserDetails} from "../../../utils/constent";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "../../ui/select";
-import {Input} from "../../ui/input";
+import { Label } from "../../../ui/label";
+import { Button } from "../../../ui/button";
+import {apiService, baseUrl, getLSUserDetails} from "../../../../utils/constent";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "../../../ui/select";
+import {Input} from "../../../ui/input";
 import {useSelector} from "react-redux";
 import {Loader2} from "lucide-react";
 

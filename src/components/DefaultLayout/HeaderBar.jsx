@@ -45,7 +45,7 @@ import {useToast} from "../ui/use-toast";
 import {projectDetailsAction} from "../../redux/action/ProjectDetailsAction";
 import {allProjectAction} from "../../redux/action/AllProjectAction";
 import {allStatusAndTypesAction} from "../../redux/action/AllStatusAndTypesAction";
-import DeleteDialog from "./DeleteDialog";
+import DeleteDialog from "../Comman/DeleteDialog";
 
 const initialState = {
     id: "",
@@ -293,6 +293,15 @@ const HeaderBar = ({setIsMobile}) => {
         navigate(`${baseUrl}/dashboard`);
     }
 
+    const onProjectClick = (x) => {
+        if(x.isAccessible){
+            onChangeProject(x.id);
+            setOpen(false)
+        } else {
+            alert("upgrade plan")
+        }
+    }
+
     const onCancel = () => {
         setCreateProjectDetails(initialStateProject);
         setFormError(initialStateErrorProject);
@@ -440,21 +449,19 @@ const HeaderBar = ({setIsMobile}) => {
                                                         return (
                                                             <Fragment key={i}>
                                                                 <CommandItem
-                                                                    className={`${projectDetailsReducer.id === x.id ? `${theme === "dark" ? "text-card-foreground  hov-primary-dark" : "text-card hov-primary"} bg-primary` : 'bg-card'} justify-between gap-0.5`}
+                                                                    className={`${projectDetailsReducer.id === x.id ? `${theme === "dark" ? "text-card-foreground hov-primary-dark" : "text-card hov-primary"} bg-primary` : 'bg-card'} justify-between gap-0.5`}
                                                                     value={x.id}
                                                                 >
                                                                 <span title={x.name}
-                                                                    className={"w-full text-sm font-medium cursor-pointer max-w-[159px] truncate text-ellipsis overflow-hidden whitespace-nowrap"}
-                                                                    onClick={() => {
-                                                                        onChangeProject(x.id);
-                                                                        setOpen(false)
-                                                                    }}
+                                                                    className={`w-full text-sm font-medium ${x.isAccessible ? "cursor-pointer" : "cursor-default"} max-w-[159px] truncate text-ellipsis overflow-hidden whitespace-nowrap`}
+                                                                    onClick={() => onProjectClick(x)}
                                                                 >
                                                                     {x.name}
                                                                 </span>
                                                                     {(userDetailsReducer?.id == x?.userId && userProjects.length > 1) && (
-                                                                        <Trash2 className={"cursor-pointer"} size={16}
-                                                                                onClick={() => deleteAlert(x.id)}/>
+                                                                        <Button variant={"plain"} className={'h-[20px] w-auto px-1'} onClick={() => deleteAlert(x.id)} disabled={x.isAccessible === false}>
+                                                                            <Trash2 className={"cursor-pointer"} size={16}/>
+                                                                        </Button>
                                                                     )}
                                                                 </CommandItem>
                                                             </Fragment>
@@ -523,8 +530,7 @@ const HeaderBar = ({setIsMobile}) => {
                                     <SheetTitle className={"text-xl font-normal flex justify-between items-center"}>
                                         Create New Project
                                     </SheetTitle>
-                                    <span className={"max-w-[24px]"}><X className={"cursor-pointer m-0"}
-                                                                        onClick={closeSheet}/></span>
+                                    <span className={"max-w-[24px]"}><X className={"cursor-pointer m-0"} onClick={closeSheet}/></span>
                                 </SheetHeader>
                                 <div className="overflow-auto h-[calc(100vh_-_69px)]">
                                     <div className="space-y-6 px-4 py-3 md:py-5 lg:px-8 lg:py-[20px]">

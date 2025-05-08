@@ -1,5 +1,5 @@
 import React, {Fragment} from 'react';;
-import {Button} from "../../ui/button";
+import {Button} from "../../../ui/button";
 
 const Step1 = ({setStep}) => {
 

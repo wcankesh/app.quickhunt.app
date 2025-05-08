@@ -17,7 +17,7 @@ import {FileText, Globe, Kanban, Menu, SmilePlus, UserRound, UsersRound, Setting
 import {Popover, PopoverContent, PopoverTrigger} from "../ui/popover";
 import Board from "./SettingPage/Board";
 import GeneralSettings from "./SettingPage/GeneralSettings";
-import ImportExport from "../ImportExport/ImportExport";
+import ImportExport from "./SettingPage/ImportExport/ImportExport";
 
 const Settings = () => {
     let navigate = useNavigate();

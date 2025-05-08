@@ -1,8 +1,8 @@
 import React, {Fragment} from 'react';
-import {Button} from "../../ui/button";
-import {Icon} from "../../../utils/Icon";
+import {Button} from "../../../ui/button";
+import {Icon} from "../../../../utils/Icon";
 import {useNavigate} from "react-router-dom";
-import {baseUrl} from "../../../utils/constent";
+import {baseUrl} from "../../../../utils/constent";
 
 const socialLinks = [
     {

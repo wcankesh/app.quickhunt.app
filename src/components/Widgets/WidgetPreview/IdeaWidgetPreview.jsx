@@ -90,7 +90,7 @@ const IdeaWidgetPreview = ({widgetsSetting}) => {
                                                             <h2
                                                                 className="text-xs cursor-pointer font-medium ">{idea.title}</h2>
                                                         </div>
-                                                        {widgetsSetting?.ideaDescription ?
+                                                        {widgetsSetting?.ideaDescription && !isEmpty(idea?.description) ?
                                                             <div className={'description-container-widget-preview inline-block w-full text-xs'}>
                                                                 {
                                                                     cleanQuillHtml(idea?.description) ? <ReadMoreText html={idea.description} isWidget={true}/> : null
@@ -101,8 +101,10 @@ const IdeaWidgetPreview = ({widgetsSetting}) => {
                                                             className=" w-full flex flex-wrap gap-3 items-center justify-between mt-1">
                                                             <div
                                                                 className="flex-initial w-auto flex items-center gap-2">
-                                                                <div
-                                                                    className="text-xs text-gray-600 font-normal">{!isEmpty(idea.name) ? idea.name : idea?.userName}</div>
+                                                                {
+                                                                    (!isEmpty(idea?.name) || !isEmpty(idea?.userName)) ?
+                                                                        <div className="text-xs text-gray-600 font-normal">{!isEmpty(idea.name) ? idea.name : idea?.userName}</div> : ""
+                                                                }
                                                                 <div
                                                                     className="text-xs text-muted-foreground">
                                                                     {getDateFormat(moment(idea.createdAt).format("YYYY-MM-DD HH:mm:ss"))}
