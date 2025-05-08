@@ -2,6 +2,7 @@ import React, {Fragment, useState} from 'react';
 import SaidBarDesktop from "../Comman/SaidBarDesktop";
 import HeaderBar from "../Comman/HeaderBar";
 import {Outlet, useLocation, useParams} from "react-router-dom";
+import { TooltipProvider} from "@/components/ui/tooltip.jsx";
 
 const DefaultLayout = () => {
     const location = useLocation();
@@ -17,7 +18,7 @@ const DefaultLayout = () => {
                     <div className={`ltr:xl:ml-[250px] rtl:xl:mr-[250px]`}>
                         <main className={`${location.pathname.includes(`/ideas/${id}`) ? "pb-3 md:pb-0" : ""}`}>
                             <div className={`bodyScreenHeight ${location.pathname.includes("/roadmap") ? "overflow-hidden" : "overflow-auto"}`}>
-                                <Outlet />
+                                <TooltipProvider><Outlet/></TooltipProvider>
                             </div>
                         </main>
                     </div>

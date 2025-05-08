@@ -87,13 +87,13 @@ const AnnouncementWidgetPreview = ({widgetsSetting}) => {
                                                             <div className="text-xs leading-5 text-muted-foreground">{getDateFormat(moment(x.publishedAt).format("YYYY-MM-DD HH:mm:ss"))}</div>
                                                         </div>
                                                         {
-                                                            (x?.labels.length || x?.categoryName) ?
+                                                            (x?.labels.length || x?.categoryTitle) ?
                                                                 <div className="flex gap-1">
-                                                                    {x?.categoryName && <Badge variant="outline" style={{borderColor: "#7c3aed", color: "#7c3aed"}} size={"small"} className="rounded">{x.categoryName}</Badge>}
+                                                                    {x?.categoryTitle && <Badge variant="outline" style={{borderColor: "#7c3aed", color: "#7c3aed"}} size={"small"} className="rounded">{x.categoryTitle}</Badge>}
                                                                     {
                                                                         (x?.labels || []).map((y, i) => {
                                                                             return (
-                                                                                <Badge key={`badge-${index}-${y.labelColorCode}`} style={{borderColor: y.labelColorCode, color: y.labelColorCode}} variant="outline" className="rounded">{y.labelName}</Badge>
+                                                                                <Badge key={`badge-${index}-${y.colorCode}`} style={{borderColor: y.colorCode, color: y.colorCode}} variant="outline" className="rounded">{y.name}</Badge>
                                                                             )
                                                                         })
                                                                     }
