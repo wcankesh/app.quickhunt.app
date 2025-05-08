@@ -42,7 +42,6 @@ const ImportIdea = () => {
         const [isLoading, setIsLoading] = useState(false);
         const [isDirectImport, setIsDirectImport] = useState(true);
 
-    console.log("allStatusAndTypes.roadmapStatus", allStatusAndTypes.roadmapStatus)
 
         const handleFileUpload = async (e) => {
             const file = e.target.files[0];
@@ -161,14 +160,14 @@ const ImportIdea = () => {
             }
             let isRoadmapNotMap = false;
             csvRoadmap.some((x) => {
-                if (x.roadmapId == null || x.roadmapId == "") {
+                if (x.roadmapId == null || x.roadmapId === "") {
                     isRoadmapNotMap = true;
                     return true;
                 }
             });
             let isBoardNotMap = false;
             csvBoard.some((x) => {
-                if (x.boardId == null || x.boardId == "") {
+                if (x.boardId == null || x.boardId === "") {
                     isBoardNotMap = true;
                     return true;
                 }
