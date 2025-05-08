@@ -5,7 +5,7 @@ import {Button} from "../../ui/button";
 import {Skeleton} from "../../ui/skeleton"
 import {Icon} from "../../../utils/Icon";
 import ReadMoreText from "../../Comman/ReadMoreText";
-import {apiService, cleanQuillHtml, getDateFormat} from "../../../utils/constent";
+import {apiService, cleanQuillHtml, getDateFormat, isEmpty} from "../../../utils/constent";
 import {useSelector} from "react-redux";
 import moment from "moment";
 
@@ -102,7 +102,7 @@ const IdeaWidgetPreview = ({widgetsSetting}) => {
                                                             <div
                                                                 className="flex-initial w-auto flex items-center gap-2">
                                                                 <div
-                                                                    className="text-xs text-gray-600 font-normal">{idea.name}</div>
+                                                                    className="text-xs text-gray-600 font-normal">{!isEmpty(idea.name) ? idea.name : idea?.userName}</div>
                                                                 <div
                                                                     className="text-xs text-muted-foreground">
                                                                     {getDateFormat(moment(idea.createdAt).format("YYYY-MM-DD HH:mm:ss"))}
