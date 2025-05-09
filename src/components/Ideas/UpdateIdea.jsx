@@ -2051,7 +2051,7 @@ const UpdateIdea = () => {
                                                                                                                                     {
                                                                                                                                         selectedCommentIndex === i && selectedSubCommentIndex === j ? "" :
                                                                                                                                             y.createdBy === 1 ?
-                                                                                                                                                (userDetailsReducer?.id == x.userId) ?
+                                                                                                                                                (userDetailsReducer?.id == y.userId) ?
                                                                                                                                                     <ActionButtons
                                                                                                                                                         isEditable={y?.createdBy === 1}
                                                                                                                                                         onEdit={() => onEditSubComment(x, y, i, j)}
@@ -2164,11 +2164,7 @@ const UpdateIdea = () => {
                                                                                 ) : null}
                                                                                 Load More
                                                                             </Button>
-                                                                        ) : (
-                                                                            <p className="text-muted-foreground text-sm">
-                                                                                No more comments to load
-                                                                            </p>
-                                                                        )}
+                                                                        ) : ''}
                                                                     </div>
                                                                 )}
                                                             </Fragment>

@@ -52,7 +52,7 @@ const CommCreateSheet = ({
             <SheetContent className={"lg:max-w-[800px] md:max-w-full sm:max-w-full p-0"}>
                 <SheetHeader className={"px-4 py-5 lg:px-8 lg:py-[20px] border-b"}>
                     <div className={"flex justify-between items-center w-full"}>
-                        <SheetTitle className={"text-xl font-normal capitalize"}>Tell us your Idea!</SheetTitle>
+                        <SheetTitle className={"text-xl font-medium capitalize"}>Tell us your Idea!</SheetTitle>
                         <span className={"max-w-[24px]"}><X onClick={onCancel} className={"cursor-pointer"} /></span>
                     </div>
                 </SheetHeader>
@@ -60,16 +60,16 @@ const CommCreateSheet = ({
                     <div className={"pb-[60px] sm:p-0"}>
                         <div className={"px-4 py-3 lg:py-6 lg:px-8 flex flex-col gap-6 border-b"}>
                             <div className="space-y-2">
-                                <Label htmlFor="title" className={"font-normal"}>Title</Label>
+                                <Label htmlFor="title" className={"font-medium after:ml-1 after:content-['*'] after:text-destructive"}>Title</Label>
                                 <Input type="text" id="title" value={ideaDetail.title} placeholder={"Enter your Idea"} name={"title"} onChange={onChangeText} />
                                 {formError.title && <span className="text-red-500 text-sm">{formError.title}</span>}
                             </div>
                             <div className="space-y-2">
-                                <Label htmlFor="description" className={"font-normal"}>Description</Label>
+                                <Label htmlFor="description" className={"font-medium"}>Description</Label>
                                 <ReactQuillEditor value={ideaDetail.description} name={"description"} onChange={onChangeText} />
                             </div>
                             <div className={"space-y-2"}>
-                                <Label className={"font-normal capitalize"}>Choose Board for this Idea</Label>
+                                <Label className={"font-medium capitalize"}>Choose Board for this Idea</Label>
                                 <Select onValueChange={onChangeBoard} value={ideaDetail.boardId || ""}>
                                     <SelectTrigger className={"bg-card"}>
                                         {ideaDetail.boardId ? (
@@ -100,7 +100,7 @@ const CommCreateSheet = ({
                             </div>
                         </div>
                         <div className={"px-4 py-3 lg:py-6 lg:px-8 border-b space-y-2"}>
-                            <Label className={"font-normal capitalize"}>Choose Topics for this Idea (optional)</Label>
+                            <Label className={"font-medium capitalize"}>Choose Topics for this Idea (optional)</Label>
                             <Select onValueChange={handleChange} value={ideaDetail.topicId || []}>
                                 <SelectTrigger className="bg-card">
                                     <SelectValue className={"text-muted-foreground text-sm"}>
