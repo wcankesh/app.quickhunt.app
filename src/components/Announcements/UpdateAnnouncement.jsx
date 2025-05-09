@@ -22,7 +22,7 @@ const initialStateError = {
     title: "",
     description: "",
     slug: "",
-    categoryId: ""
+    categoryId: "",
 }
 
 const UpdateAnnouncement = () => {
@@ -145,6 +145,12 @@ const UpdateAnnouncement = () => {
                 } else {
                     return "";
                 }
+            case "expiredAt":
+                if (selectedRecord.expiredBoolean === 1 && (!value || value === undefined)) {
+                    return "Please select an expiration date.";
+                } else {
+                    return "";
+                }
             default: {
                 return "";
             }
@@ -206,9 +212,36 @@ const UpdateAnnouncement = () => {
 
     const commonToggle = (name, value) => {
         setSelectedRecord({...selectedRecord, [name]: value})
+        if (name === "expiredBoolean") {
+            setFormError((formError) => ({
+                ...formError,
+                expiredAt: formValidate("expiredAt", selectedRecord.expiredAt)
+            }));
+        }
     }
 
     const onDateChange = (name, date) => {
+        if (date) {
+            const formattedDate = new Date(date);
+            let obj = { ...selectedRecord, [name]: formattedDate };
+            if (name === "publishedAt") {
+                if (formattedDate > new Date()) {
+                    obj = { ...obj, status: 2 };
+                } else {
+                    obj = { ...obj, status: 1 };
+                }
+            }
+            setSelectedRecord(obj);
+            setFormError((formError) => ({
+                ...formError,
+                expiredAt: formValidate("expiredAt", formattedDate)
+            }));
+            setPopoverOpen(false);
+            setPopoverOpenExpired(false);
+        }
+    };
+
+    const onDateChangeqq = (name, date) => {
         if (date) {
             let obj = {...selectedRecord, [name]: date};
             if (name === "publishedAt") {
@@ -239,6 +272,10 @@ const UpdateAnnouncement = () => {
         const categoryError = formValidate("categoryId", selectedRecord.categoryId);
         if (categoryError) {
             validationErrors.categoryId = categoryError;
+        }
+        const expiredAtError = formValidate("expiredAt", selectedRecord.expiredAt);
+        if (expiredAtError) {
+            validationErrors.expiredAt = expiredAtError;
         }
         if (Object.keys(validationErrors).length > 0) {
             setFormError(validationErrors);
@@ -615,6 +652,7 @@ const UpdateAnnouncement = () => {
                                                     {selectedRecord.publishedAt
                                                         ? moment(selectedRecord.publishedAt).format("LL")
                                                         : "Select Date"}
+                                                    <CalendarIcon className="mr-2 h-4 w-4" />
                                                 </Button>
                                             </PopoverTrigger>
                                             <PopoverContent className="w-auto p-0" align="start">
@@ -682,6 +720,7 @@ const UpdateAnnouncement = () => {
                                                         />
                                                     </PopoverContent>
                                                 </Popover>
+                                                {formError.expiredAt && <span className="text-sm text-destructive">{formError.expiredAt}</span>}
                                             </div>
                                         )}
                                     </div>
