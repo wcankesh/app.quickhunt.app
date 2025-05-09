@@ -62,7 +62,7 @@ const WidgetPreview = ({widgetsSetting, type, toggle,onToggle }) => {
                 {
                     (allStatusAndTypes?.setting?.isBranding === 1) &&
                     <section className={`py-4 ${theme == "dark" ? "bg-card-foreground text-card" : "bg-card"} `}>
-                        <h6 className="text-sm font-medium text-end mr-2">Powered by {" "}
+                        <h6 className="text-sm font-medium text-center mr-2">Powered by {" "}
                             <a className="text-primary" href="https://quickhunt.app" target="_blank">quickhunt</a>
                         </h6>
                     </section>

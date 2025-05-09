@@ -676,7 +676,7 @@ const UpdateInAppMessage = () => {
                         </Card>
                         {
                             (allStatusAndTypes?.setting?.isBranding === 1) &&
-                            <h6 className="text-sm font-medium text-end mt-1 mr-2">Powered by {" "}<a
+                            <h6 className="text-sm font-medium text-center mt-1 mr-2">Powered by {" "}<a
                                 className="text-primary" href="https://quickhunt.app" target="_blank">quickhunt</a></h6>
                         }
                     </Card>

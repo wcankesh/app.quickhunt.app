@@ -3,14 +3,12 @@ import ReactQuill from "react-quill";
 import {cn} from "../../lib/utils";
 import {cleanQuillHtml} from "../../utils/constent";
 
-const ReactQuillEditor = ({name, value, onChange, className, hideToolBar, setImageSizeError}) => {
+const ReactQuillEditor = ({name, value, onChange, className, hideToolBar, setImageSizeError = null}) => {
     const quillRef = useRef(null);
     const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
 
     const sanitizeHTML = (html) => {
-        // Remove all HTML tags and check if the result is empty
         const stripped = html.replace(/(<([^>]+)>)/gi, "").trim();
-        // Return an empty string if there's no actual content
         return stripped.length === 0 ? "" : html;
     };
 
@@ -27,24 +25,20 @@ const ReactQuillEditor = ({name, value, onChange, className, hideToolBar, setIma
             input.onchange = () => {
                 const file = input.files[0];
                 if (file) {
-                    // Check file size
                     if (file.size > MAX_IMAGE_SIZE) {
-                        setImageSizeError('Image size exceeds 5MB limit.');
+                        setImageSizeError?.('Image size exceeds 5MB limit.');
                         return;
                     }
 
-                    // Read file as data URL
                     const reader = new FileReader();
                     reader.onload = () => {
                         const base64 = reader.result;
-                        // Insert image into editor
-                        const range = quill.getSelection(true); // Ensure selection is valid
+                        const range = quill.getSelection(true);
                         if (range) {
                             quill.insertEmbed(range.index, 'image', base64);
-                            // Trigger onChange to update description
                             const newValue = quill.root.innerHTML;
                             onChange({ target: { name, value: sanitizeHTML(newValue) } });
-                            setImageSizeError(''); // Clear any existing error
+                            setImageSizeError?.('');
                         }
                     };
                     reader.readAsDataURL(file);
@@ -52,10 +46,7 @@ const ReactQuillEditor = ({name, value, onChange, className, hideToolBar, setIma
             };
         };
 
-        // Override default image handler
         quill.getModule('toolbar').addHandler('image', handleImage);
-
-        // Check existing content for images and validate size
         const parser = new DOMParser();
         const doc = parser.parseFromString(value, 'text/html');
         const images = doc.getElementsByTagName('img');
@@ -64,10 +55,10 @@ const ReactQuillEditor = ({name, value, onChange, className, hideToolBar, setIma
                 const base64String = img.src.split(',')[1];
                 const size = (base64String.length * 3) / 4; // Approximate byte size
                 if (size > MAX_IMAGE_SIZE) {
-                    setImageSizeError('Image size exceeds 5MB limit.');
+                    setImageSizeError?.('Image size exceeds 5MB limit.');
                     break;
                 } else {
-                    setImageSizeError('');
+                    setImageSizeError?.('');
                 }
             }
         }
@@ -109,7 +100,6 @@ const ReactQuillEditor = ({name, value, onChange, className, hideToolBar, setIma
                     if (source === 'user') {
                         const sanitizedValue = sanitizeHTML(newValue);
                         onChange({ target: { name: name, value: sanitizedValue } });
-                        // Check for images in the new content
                         const parser = new DOMParser();
                         const doc = parser.parseFromString(newValue, 'text/html');
                         const images = doc.getElementsByTagName('img');
@@ -117,14 +107,14 @@ const ReactQuillEditor = ({name, value, onChange, className, hideToolBar, setIma
                         for (let img of images) {
                             if (img.src.startsWith('data:image/')) {
                                 const base64String = img.src.split(',')[1];
-                                const size = (base64String.length * 3) / 4; // Approximate byte size
+                                const size = (base64String.length * 3) / 4;
                                 if (size > MAX_IMAGE_SIZE) {
                                     hasOversizedImage = true;
                                     break;
                                 }
                             }
                         }
-                        setImageSizeError(hasOversizedImage ? 'Image size exceeds 5MB limit.' : '');
+                        setImageSizeError?.(hasOversizedImage ? 'Image size exceeds 5MB limit.' : '');
                     }
                 }}
             />
