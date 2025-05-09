@@ -167,9 +167,9 @@ const Post = ({inAppMsgSetting, setInAppMsgSetting, isLoading}) => {
                             variant={"ghost hover:none"}><X size={16} stroke={inAppMsgSetting?.btnColor} className={"h-5 w-5"}/></Button>
                 </CardHeader>
                 <CardHeader className={"p-4 pt-0"}>
-                    {
-                        (inAppMsgSetting.showSender && inAppMsgSetting.from) ?
-                            <div className={"pt-0 flex flex-row gap-2 items-center"}>
+                        <div className={"pt-0 flex flex-row gap-2 items-center"}>
+                            {
+                                (inAppMsgSetting.showSender && inAppMsgSetting.from) ?
                                 <Avatar className={"w-[32px] h-[32px]"}>
                                     <AvatarImage src={userDetailsReducer?.profileImage ? `${DO_SPACES_ENDPOINT}/${userDetailsReducer?.profileImage}` : null}
                                                  alt={`${userDetailsReducer?.firstName}${userDetailsReducer?.lastName}`}/>
@@ -178,13 +178,13 @@ const Post = ({inAppMsgSetting, setInAppMsgSetting, isLoading}) => {
                                         {userDetailsReducer?.firstName?.substring(0, 1)}
                                         {userDetailsReducer?.lastName?.substring(0, 1)}
                                     </AvatarFallback>
-                                </Avatar>
-                                <div className={"flex flex-row gap-1"}>
-                                    <h5 className={"text-xs font-normal"}>{userDetailsReducer?.firstName} {userDetailsReducer?.lastName}</h5>
-                                    <h5 className={`text-xs font-normal ${theme === "dark" ? "" : "text-muted-foreground"}`}>from {projectDetailsReducer?.name}</h5>
-                                </div>
-                            </div> : ""
-                    }
+                                </Avatar> : ""
+                            }
+                            <div className={"flex flex-row gap-1"}>
+                                {(inAppMsgSetting.showSender && inAppMsgSetting.from) ? <h5 className={"text-sm font-medium"}>{userDetailsReducer?.firstName} {userDetailsReducer?.lastName} <span className={'text-muted-foreground font-normal'}>from</span></h5> : ""}
+                                <h5 className={`text-sm font-medium`}> {projectDetailsReducer?.name}</h5>
+                            </div>
+                        </div>
                     <div className={"pl-4 pt-4 md:pl-14 md:pt-6 m-0 w-full"}>{isLoading ? "" :
                         <div id="editorjs"></div>}</div>
                 </CardHeader>
