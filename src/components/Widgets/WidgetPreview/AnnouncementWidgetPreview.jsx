@@ -83,7 +83,7 @@ const AnnouncementWidgetPreview = ({widgetsSetting}) => {
                                                     </div>
                                                     <div className="flex-1 w-full flex flex-wrap gap-4 items-center justify-between">
                                                         <div className="flex-initial w-auto flex items-center gap-2">
-                                                            <div className="text-xs leading-5 text-gray-600 font-normal">{x?.contributors[0]?.firstName} {x?.contributors[0]?.lastName}</div>
+                                                            <div className="text-xs leading-5 text-gray-600 font-normal">{x?.contributors?.firstName} {x?.contributors?.lastName}</div>
                                                             <div className="text-xs leading-5 text-muted-foreground">{getDateFormat(moment(x.publishedAt).format("YYYY-MM-DD HH:mm:ss"))}</div>
                                                         </div>
                                                         {
