@@ -60,7 +60,7 @@ const WidgetsTypes = () => {
                         <Button className={"h-8 w-8"} variant={"outline"} size={"icon"} onClick={() => navigate(`${baseUrl}/widget`)}>
                             <ArrowLeft size={16} />
                         </Button>
-                        <h1 className="text-2xl font-normal">Create New Widget</h1>
+                        <h1 className="text-2xl font-medium">Create New Widget</h1>
                     </div>
                     <div className={"grid lg:grid-cols-4 md:grid-cols-2 gap-4"}>
                         {
@@ -76,7 +76,7 @@ const WidgetsTypes = () => {
                                                 </div>
                                             ) : (
                                                 <>
-                                                    <h2 className="text-base font-normal mb-2">{x.title}</h2>
+                                                    <h2 className="text-base font-medium mb-2">{x.title}</h2>
                                                     <p className="text-sm font-normal text-muted-foreground">{x.description}</p>
                                                 </>
                                             )}

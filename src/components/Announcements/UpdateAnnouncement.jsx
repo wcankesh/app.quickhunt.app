@@ -160,6 +160,44 @@ const UpdateAnnouncement = () => {
     const onChangeText = (event) => {
         const {name, value} = event.target;
         let updatedDetails = {...selectedRecord};
+
+        if (name === "title") {
+            const trimmedValue = value.trimStart();
+            const slug = trimmedValue
+                .replace(/[^a-z0-9\s]/gi, '')
+                .replace(/\s+/g, '-')
+                .toLowerCase();
+
+            updatedDetails = {
+                ...updatedDetails,
+                title: trimmedValue,
+                ...(updatedDetails.slug === updatedDetails.title.replace(/[^a-z0-9\s]/gi, '')
+                    .replace(/\s+/g, '-')
+                    .toLowerCase() && { slug: slug })
+            };
+        } else if (name === "slug") {
+            const slug = value
+                .replace(/[^a-z0-9\s-]/gi, '')
+                .replace(/\s+/g, '-')
+                .toLowerCase();
+            updatedDetails = {
+                ...updatedDetails,
+                slug: slug
+            };
+        } else {
+            updatedDetails[name] = value;
+        }
+
+        setSelectedRecord(updatedDetails);
+        setFormError(prev => ({
+            ...prev,
+            [name]: formValidate(name, updatedDetails[name])
+        }));
+    };
+
+    const onChangeTextqq = (event) => {
+        const {name, value} = event.target;
+        let updatedDetails = {...selectedRecord};
         if (name === "title") {
             const slug = value
                 .replace(/[^a-z0-9\s]/gi, '')

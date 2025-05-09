@@ -56,6 +56,7 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
     const [isSaveUpdateSubComment, setIsSaveUpdateSubComment] = useState(false);
     const [isSaveSubComment, setIsSaveSubComment] = useState(false);
     const [formError, setFormError] = useState(initialStateError);
+    const [imageSizeError, setImageSizeError] = useState('');
 
     useEffect(() => {
         if (projectDetailsReducer.id) {
@@ -623,13 +624,17 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
             }
         }
     };
-
     const onChangeText = (event) => {
-        setSelectedIdea(selectedIdea => ({...selectedIdea, [event.target.name]: event.target.value}))
-        setFormError(formError => ({
-            ...formError,
-            [event.target.name]: formValidate(event.target.name, event.target.value)
+        const { name, value } = event.target;
+        const trimmedValue = name === "title" || name === "description" ? value.trimStart() : value;
+        setSelectedIdea(prev => ({ ...prev, [name]: trimmedValue }));
+        setFormError(prev => ({
+            ...prev,
+            [name]: formValidate(name, trimmedValue)
         }));
+        if (name === "description" && imageSizeError) {
+            setImageSizeError('');
+        }
     }
 
     const handleUpdate = (event) => {
@@ -638,6 +643,14 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
     };
 
     const onUpdateIdea = async () => {
+        const trimmedTitle = selectedIdea.title ? selectedIdea.title.trim() : "";
+        const trimmedDescription = selectedIdea.description ? selectedIdea.description.trim() : "";
+        const updatedIdea = {
+            ...selectedIdea,
+            title: trimmedTitle,
+            description: trimmedDescription,
+        };
+        setSelectedIdea(updatedIdea);
         let validationErrors = {};
         Object.keys(selectedIdea).forEach(name => {
             const error = formValidate(name, selectedIdea[name]);
@@ -645,6 +658,9 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                 validationErrors[name] = error;
             }
         });
+        if (imageSizeError) {
+            validationErrors.imageSizeError = imageSizeError;
+        }
         if (Object.keys(validationErrors).length > 0) {
             setFormError(validationErrors);
             return;
@@ -798,7 +814,10 @@ const UpdateRoadMapIdea = ({isOpen, onOpen, onClose, selectedIdea, setSelectedId
                                             <div className="space-y-2">
                                                 <Label htmlFor="message" className={"font-medium"}>Description</Label>
                                                 <ReactQuillEditor value={selectedIdea?.description} name={"description"}
-                                                                  onChange={handleUpdate}/>
+                                                                  onChange={handleUpdate} setImageSizeError={setImageSizeError}/>
+                                                {(formError.imageSizeError || imageSizeError) && (
+                                                    <span className="text-red-500 text-sm">{formError.imageSizeError || imageSizeError}</span>
+                                                )}
                                             </div>
                                             <div className={"space-y-2"}>
                                                 <Label className={"font-medium"}>Choose Board for this Idea</Label>

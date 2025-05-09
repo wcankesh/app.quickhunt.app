@@ -143,6 +143,14 @@ const Category = () => {
     };
 
     const addCategory = async () => {
+        const trimmedTitle = selectedCategory.title ? selectedCategory.title.trim() : "";
+        const trimmedDescription = selectedCategory.description ? selectedCategory.description.trim() : "";
+        const updatedIdea = {
+            ...selectedCategory,
+            title: trimmedTitle,
+            description: trimmedDescription,
+        };
+        setSelectedCategory(updatedIdea);
         let validationErrors = {};
         Object.keys(selectedCategory).forEach(name => {
             const error = formValidate(name, selectedCategory[name]);
@@ -344,7 +352,6 @@ const Category = () => {
         setSelectedCategory(initialState);
         navigate(`${baseUrl}/help/category?pageNo=${pageNo}`);
         setFormError(initialStateError);
-        getAllCategory();
     };
 
     const closeSheetSubCategory = () => {

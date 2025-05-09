@@ -18,7 +18,8 @@ const initialState = {
 const initialStateError = {
     title: "",
     description: "",
-    boardId: ""
+    boardId: "",
+    imageError: ""
 }
 
 const CreateIdea = ({isOpen, onOpen, onClose, closeCreateIdea, setIdeasList, ideasList, getAllIdea, pageNo}) => {
@@ -33,6 +34,7 @@ const CreateIdea = ({isOpen, onOpen, onClose, closeCreateIdea, setIdeasList, ide
     const [formError, setFormError] = useState(initialStateError);
     const [topicLists, setTopicLists] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [imageSizeError, setImageSizeError] = useState('');
 
     useEffect(() => {
         if(projectDetailsReducer.id){
@@ -66,6 +68,9 @@ const CreateIdea = ({isOpen, onOpen, onClose, closeCreateIdea, setIdeasList, ide
                 validationErrors[name] = error;
             }
         });
+        if (imageSizeError) {
+            validationErrors.imageSizeError = imageSizeError;
+        }
         if (Object.keys(validationErrors).length > 0) {
             setFormError(validationErrors);
             return;
@@ -88,6 +93,7 @@ const CreateIdea = ({isOpen, onOpen, onClose, closeCreateIdea, setIdeasList, ide
             clone.push(data.data)
             setIdeasList(clone);
             setIdeaDetail(initialState)
+            setImageSizeError('');
             const cloneInbox = [...inboxMarkReadReducer];
             cloneInbox.push({...data.data, isRead: 1})
             dispatch(inboxMarkReadAction(cloneInbox));
@@ -123,6 +129,7 @@ const CreateIdea = ({isOpen, onOpen, onClose, closeCreateIdea, setIdeasList, ide
     const onCancel = () => {
         setIdeaDetail(initialState);
         setFormError(initialStateError);
+        setImageSizeError('');
         onClose();
         navigate(`${baseUrl}/ideas?pageNo=${pageNo}`);
     }
@@ -138,9 +145,13 @@ const CreateIdea = ({isOpen, onOpen, onClose, closeCreateIdea, setIdeasList, ide
                 handleChange={handleChange}
                 topicLists={topicLists}
                 allStatusAndTypes={allStatusAndTypes}
+                setImageSizeError={setImageSizeError}
+                imageSizeError={imageSizeError}
                 formError={formError}
                 isLoading={isLoading}
+                setFormError={setFormError}
                 onCreateIdea={onCreateIdea}
+                formValidate={formValidate}
             />
         </div>
     );

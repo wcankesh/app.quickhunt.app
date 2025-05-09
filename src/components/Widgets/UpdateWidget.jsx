@@ -58,6 +58,10 @@ const initialState = {
     isComment: false,
 }
 
+const initialStateError = {
+    name: "",
+}
+
 const UpdateWidget = () => {
     const [searchParams] = useSearchParams();
     const getPageNo = searchParams.get("pageNo") || 1;
@@ -71,6 +75,7 @@ const UpdateWidget = () => {
     const [selectedToggle, setSelectedToggle] = useState('ideas');
     const [index, setIndex] = useState(0);
     const [toggle, setToggle] = useState(true);
+    const [formError, setFormError] = useState(initialStateError);
 
     const handleToggle = (value) => {
         setSelectedToggle(value);
@@ -95,8 +100,23 @@ const UpdateWidget = () => {
         }
     }
 
+    const formValidate = (name, value) => {
+        switch (name) {
+            case "name":
+                if (!value || value.trim() === "") {
+                    return "Title is required";
+                } else {
+                    return "";
+                }
+            default: {
+                return "";
+            }
+        }
+    };
+
     const onChange = (name, value) => {
-        setWidgetsSetting({...widgetsSetting, [name]: value});
+        const trimmedValue = name === "name" ? value.trimStart() : value;
+        setWidgetsSetting(prev => ({ ...prev, [name]: trimmedValue }));
         if (
             ["type", "launcherIconBgColor", "launcherIcon", "launcherIconColor",
                 "modalHeight", "launcherPosition", "modalWidth", "sidebarWidth", "launcherRightSpacing", "launcherLeftSpacing",
@@ -108,6 +128,10 @@ const UpdateWidget = () => {
             let newIndex = index + 1;
             setIndex(newIndex);
         }
+        setFormError(prev => ({
+            ...prev,
+            [name]: formValidate(name, trimmedValue)
+        }));
     };
 
     const onChangeCheckBox = (name, value) => {
@@ -115,6 +139,23 @@ const UpdateWidget = () => {
     }
 
     const createWidget = async (loader) => {
+        const trimmedTitle = widgetsSetting.name ? widgetsSetting.name.trim() : "";
+        const updatedIdea = {
+            ...widgetsSetting,
+            name: trimmedTitle,
+        };
+        setWidgetsSetting(updatedIdea);
+        let validationErrors = {};
+        Object.keys(widgetsSetting).forEach(name => {
+            const error = formValidate(name, widgetsSetting[name]);
+            if (error && error.length > 0) {
+                validationErrors[name] = error;
+            }
+        });
+        if (Object.keys(validationErrors).length > 0) {
+            setFormError(validationErrors);
+            return;
+        }
         setLoading(loader)
         const payload = {
             ...widgetsSetting,
@@ -168,13 +209,14 @@ const UpdateWidget = () => {
                 <div className={"border-b px-4 py-6 space-y-6"}>
                     <div className={"space-y-4"}>
                         <div className={"space-y-2"}>
-                            <Label className={"text-sm font-normal"}>Title</Label>
+                            <Label className={"text-sm font-medium after:ml-1 after:content-['*'] after:text-destructive"}>Title</Label>
                             <Input
                                 value={widgetsSetting?.name}
                                 onChange={(e) => onChange("name", e.target.value)}
                                 className={"text-sm font-normal w-full h-auto"}
                                 autoFocus
                             />
+                            {formError.name && <span className="text-red-500 text-sm">{formError.name}</span>}
                         </div>
                         {
                             (type !== "embed") &&
@@ -183,7 +225,7 @@ const UpdateWidget = () => {
                                     (type !== "embed") &&
                                     <div className={"space-y-4 w-1/2"}>
                                         <div className={"space-y-2"}>
-                                            <Label className={"font-normal"}>Width</Label>
+                                            <Label className={"font-medium"}>Width</Label>
                                             {
                                                 type === "popover" &&
                                                 <Input type={"number"} value={widgetsSetting.popoverWidth} min={0}
@@ -208,7 +250,7 @@ const UpdateWidget = () => {
                                 {
                                     (type === "popover" || type === "modal") &&
                                     <div className={"space-y-2 w-1/2"}>
-                                        <Label className={"font-normal"}>Height</Label>
+                                        <Label className={"font-medium"}>Height</Label>
                                         {
                                             type === "modal" &&
                                             <Input type={"number"} value={widgetsSetting.modalHeight} min={0}
@@ -226,7 +268,7 @@ const UpdateWidget = () => {
                                 {
                                     (type === "sidebar") &&
                                     <div className={"space-y-2 w-1/2"}>
-                                        <Label className={"font-normal"}>Position</Label>
+                                        <Label className={"font-medium"}>Position</Label>
                                         <Select
                                             onValueChange={(value) => onChange("sidebarPosition", value)}
                                             value={widgetsSetting.sidebarPosition}
@@ -248,7 +290,7 @@ const UpdateWidget = () => {
                 {
                     type !== "embed" &&
                     <Fragment>
-                        <div className={"font-normal border-b px-4 py-3"}>Launcher Type</div>
+                        <div className={"font-medium border-b px-4 py-3"}>Launcher Type</div>
                         <div className={"px-4 py-3 border-b"}>
                             <div className={"flex flex-col gap-4"}>
                                 <div className={"flex gap-2 items-center"}>
@@ -257,11 +299,11 @@ const UpdateWidget = () => {
                                         checked={widgetsSetting.isLauncherIcon}
                                         onCheckedChange={(checked) => onChangeCheckBox("isLauncherIcon", checked)}
                                     />
-                                    <label htmlFor="isLauncherIcon" className="text-sm">Show Launcher Icon</label>
+                                    <label htmlFor="isLauncherIcon" className="text-sm font-medium">Show Launcher Icon</label>
                                 </div>
                                 <div className={"flex gap-2"}>
                                     <div className={"space-y-2 w-1/2"}>
-                                        <Label className={"font-normal"}>Icon</Label>
+                                        <Label className={"font-medium"}>Icon</Label>
                                         <Select
                                             onValueChange={(value) => onChange("launcherIcon", value)}
                                             value={widgetsSetting.launcherIcon}
@@ -278,7 +320,7 @@ const UpdateWidget = () => {
                                         </Select>
                                     </div>
                                     <div className={"space-y-2 w-1/2"}>
-                                        <Label className={"font-normal"}>Position</Label>
+                                        <Label className={"font-medium"}>Position</Label>
                                         <Select
                                             value={widgetsSetting.launcherPosition}
                                             onValueChange={(value) => onChange("launcherPosition", value)}
@@ -296,7 +338,7 @@ const UpdateWidget = () => {
                                 {
                                     widgetsSetting.launcherPosition === 1 &&
                                     <div className={"space-y-2"}>
-                                        <Label className={"font-normal"}>Left Spacing</Label>
+                                        <Label className={"font-medium"}>Left Spacing</Label>
                                         <Input value={widgetsSetting.launcherLeftSpacing}
                                                type="number" min={0}
                                                onChange={(e) => onChange("launcherLeftSpacing", e.target.value)}
@@ -306,7 +348,7 @@ const UpdateWidget = () => {
                                 {
                                     widgetsSetting.launcherPosition === 2 &&
                                     <div className={"space-y-2"}>
-                                        <Label className={"font-normal"}>Right Spacing</Label>
+                                        <Label className={"font-medium"}>Right Spacing</Label>
                                         <Input value={widgetsSetting.launcherRightSpacing}
                                                type="number" min={0}
                                                onChange={(e) => onChange("launcherRightSpacing", e.target.value)}
@@ -314,21 +356,21 @@ const UpdateWidget = () => {
                                     </div>
                                 }
                                 <div className={"space-y-2"}>
-                                    <Label className={"font-normal"}>Bottom Spacing</Label>
+                                    <Label className={"font-medium"}>Bottom Spacing</Label>
                                     <Input value={widgetsSetting.launcherBottomSpacing}
                                            type="number" min={0}
                                            onChange={(e) => onChange("launcherBottomSpacing", e.target.value)}
                                            placeholder="1 px"/>
                                 </div>
                                 <div className={"widget-color-picker space-y-2"}>
-                                    <Label className={"font-normal"}>Background Color</Label>
+                                    <Label className={"font-medium"}>Background Color</Label>
                                     <ColorInput
                                         value={widgetsSetting.launcherIconBgColor}
                                         onChange={(value) => onChange("launcherIconBgColor", value.clr)}
                                     />
                                 </div>
                                 <div className={"widget-color-picker space-y-2"}>
-                                    <Label className={"font-normal"}>Icon Color</Label>
+                                    <Label className={"font-medium"}>Icon Color</Label>
                                     <ColorInput
                                         value={widgetsSetting.launcherIconColor}
                                         onChange={(value) => onChange("launcherIconColor", value.clr)}
@@ -338,7 +380,7 @@ const UpdateWidget = () => {
                         </div>
                     </Fragment>
                 }
-                <div className={"font-normal border-b px-4 py-3"}>Sections</div>
+                <div className={"font-medium border-b px-4 py-3"}>Sections</div>
                 <div className={"px-4 py-3 space-y-4 border-b"}>
                     <div className={"space-y-2"}>
                         <div className={"flex gap-2 items-center"}>
@@ -347,7 +389,7 @@ const UpdateWidget = () => {
                                 checked={widgetsSetting.hideHeader === false}
                                 onCheckedChange={(checked) => onChangeCheckBox("hideHeader", !checked)}
                             />
-                            <label htmlFor="hideHeader" className="text-sm">Show header</label>
+                            <label htmlFor="hideHeader" className="text-sm font-medium">Show header</label>
                         </div>
                     </div>
 
@@ -371,7 +413,7 @@ const UpdateWidget = () => {
                                     checked={widgetsSetting.isAnnouncement}
                                     onCheckedChange={(checked) => onChangeCheckBox("isAnnouncement", checked)}
                                 />
-                                <label htmlFor="isAnnouncement" className="text-sm">Show
+                                <label htmlFor="isAnnouncement" className="text-sm font-medium">Show
                                     Announcement</label>
                             </div>
                             <div className={"flex gap-2 items-center"}>
@@ -381,7 +423,7 @@ const UpdateWidget = () => {
                                     checked={widgetsSetting.announcementDescription}
                                     onCheckedChange={(checked) => onChangeCheckBox("announcementDescription", checked)}
                                 />
-                                <label htmlFor="announcementDescription" className="text-sm">Show
+                                <label htmlFor="announcementDescription" className="text-sm font-medium">Show
                                     Description</label>
                             </div>
                             <div className={"flex gap-2 items-center"}>
@@ -391,7 +433,7 @@ const UpdateWidget = () => {
                                     checked={widgetsSetting.announcementImage}
                                     onCheckedChange={(checked) => onChangeCheckBox("announcementImage", checked)}
                                 />
-                                <label htmlFor="announcementImage" className="text-sm">Show
+                                <label htmlFor="announcementImage" className="text-sm font-medium">Show
                                     Image</label>
                             </div>
                             <div className={"flex gap-2 items-center"}>
@@ -401,7 +443,7 @@ const UpdateWidget = () => {
                                     checked={widgetsSetting.changelogReaction}
                                     onCheckedChange={(checked) => onChangeCheckBox("changelogReaction", checked)}
                                 />
-                                <label htmlFor="changelogReaction" className="text-sm">Show Reaction</label>
+                                <label htmlFor="changelogReaction" className="text-sm font-medium">Show Reaction</label>
                             </div>
                             <div className={"flex gap-2 items-center"}>
                                 <Checkbox
@@ -410,17 +452,17 @@ const UpdateWidget = () => {
                                     checked={widgetsSetting.isComment}
                                     onCheckedChange={(checked) => onChangeCheckBox("isComment", checked)}
                                 />
-                                <label htmlFor="isComment" className="text-sm">Show Comment</label>
+                                <label htmlFor="isComment" className="text-sm font-medium">Show Comment</label>
                             </div>
                             <div className="space-y-2">
-                                <Label className={"font-normal"}>Title</Label>
+                                <Label className={"font-medium"}>Title</Label>
                                 <Input value={widgetsSetting.changelogTitle}
                                        disabled={widgetsSetting.isAnnouncement !== true}
                                        onChange={(e) => onChange("changelogTitle", e.target.value)}
                                 />
                             </div>
                             <div className="flex flex-col gap-2">
-                                <Label className={"font-normal"}>Display</Label>
+                                <Label className={"font-medium"}>Display</Label>
                                 <Select value={widgetsSetting.changelogDisplay}
                                         disabled={widgetsSetting.isAnnouncement !== true}
                                         onValueChange={(value) => onChange("changelogDisplay", value)}>
@@ -447,7 +489,7 @@ const UpdateWidget = () => {
                                     checked={widgetsSetting.isRoadmap}
                                     onCheckedChange={(checked) => onChangeCheckBox("isRoadmap", checked)}
                                 />
-                                <label htmlFor="isRoadmap" className="text-sm">Show Roadmap</label>
+                                <label htmlFor="isRoadmap" className="text-sm font-medium">Show Roadmap</label>
                             </div>
                             <div className={"flex gap-2 items-center"}>
                                 <Checkbox
@@ -456,16 +498,16 @@ const UpdateWidget = () => {
                                     checked={widgetsSetting.roadmapImage}
                                     onCheckedChange={(checked) => onChangeCheckBox("roadmapImage", checked)}
                                 />
-                                <label htmlFor="roadmapImage" className="text-sm">Show Image</label>
+                                <label htmlFor="roadmapImage" className="text-sm font-medium">Show Image</label>
                             </div>
                             <div className="space-y-2">
-                                <Label className={"font-normal"}>Title</Label>
+                                <Label className={"font-medium"}>Title</Label>
                                 <Input value={widgetsSetting.roadmapTitle}
                                        disabled={widgetsSetting.isRoadmap !== true}
                                        onChange={(e) => onChange("roadmapTitle", e.target.value)}/>
                             </div>
                             <div className="flex flex-col gap-3">
-                                <Label className={"font-normal"}>Display</Label>
+                                <Label className={"font-medium"}>Display</Label>
                                 <Select value={widgetsSetting.roadmapDisplay}
                                         disabled={widgetsSetting.isRoadmap !== true}
                                         onValueChange={(value) => onChange("roadmapDisplay", value)}>
@@ -492,7 +534,7 @@ const UpdateWidget = () => {
                                     checked={widgetsSetting.isIdea}
                                     onCheckedChange={(checked) => onChangeCheckBox("isIdea", checked)}
                                 />
-                                <label htmlFor="isIdea" className="text-sm">Show Ideas</label>
+                                <label htmlFor="isIdea" className="text-sm font-medium">Show Ideas</label>
                             </div>
                             <div className={"flex gap-2 items-center"}>
                                 <Checkbox
@@ -501,15 +543,15 @@ const UpdateWidget = () => {
                                     checked={widgetsSetting.ideaDescription}
                                     onCheckedChange={(checked) => onChangeCheckBox("ideaDescription", checked)}
                                 />
-                                <label htmlFor="ideaDescription" className="text-sm">Show Description</label>
+                                <label htmlFor="ideaDescription" className="text-sm font-medium">Show Description</label>
                             </div>
                             <div className="space-y-2">
-                                <Label className={"font-normal"}>Title</Label>
+                                <Label className={"font-medium"}>Title</Label>
                                 <Input value={widgetsSetting.ideaTitle} disabled={widgetsSetting.isIdea !== true}
                                        onChange={(e) => onChange("ideaTitle", e.target.value)}/>
                             </div>
                             <div className="flex flex-col gap-3">
-                                <Label className={"font-normal"}>Display</Label>
+                                <Label className={"font-medium"}>Display</Label>
                                 <Select value={widgetsSetting.ideaDisplay}
                                         disabled={widgetsSetting.isIdea !== true}
                                         onValueChange={(value) => onChange("ideaDisplay", value)}>
@@ -525,7 +567,7 @@ const UpdateWidget = () => {
                                     Ideas be displayed?</p>
                             </div>
                             <div className="flex flex-col gap-3">
-                                <Label className={"font-normal"}>Button Label</Label>
+                                <Label className={"font-medium"}>Button Label</Label>
                                 <Input value={widgetsSetting.ideaButtonLabel} name="ideaButtonLabel"
                                        disabled={widgetsSetting.isIdea !== true}
                                        onChange={(e) => onChange("ideaButtonLabel", e.target.value)}/>
@@ -533,33 +575,33 @@ const UpdateWidget = () => {
                         </div>
                     )}
                 </div>
-                <div className={"hover:no-underline font-normal border-b px-4 py-3"}>Advanced</div>
+                <div className={"hover:no-underline font-medium border-b px-4 py-3"}>Advanced</div>
                 <div className={"p-0"}>
 
                     <div className={"px-4 py-3 space-y-4 border-b"}>
                         <div className={"widget-color-picker space-y-2"}>
-                            <Label className={"font-normal"}>Header Background Color</Label>
+                            <Label className={"font-medium"}>Header Background Color</Label>
                             <ColorInput
                                 onChange={(value) => onChange("headerBgColor", value.clr)}
                                 value={widgetsSetting.headerBgColor}
                             />
                         </div>
                         <div className={"widget-color-picker space-y-2"}>
-                            <Label className={"font-normal"}>Header Text Color</Label>
+                            <Label className={"font-medium"}>Header Text Color</Label>
                             <ColorInput
                                 onChange={(value) => onChange("headerTextColor", value.clr)}
                                 value={widgetsSetting.headerTextColor}
                             />
                         </div>
                         <div className={"widget-color-picker space-y-2"}>
-                            <Label className={"font-normal"}>Header Button Background Color</Label>
+                            <Label className={"font-medium"}>Header Button Background Color</Label>
                             <ColorInput
                                 onChange={(value) => onChange("headerBtnBackgroundColor", value.clr)}
                                 value={widgetsSetting.headerBtnBackgroundColor}
                             />
                         </div>
                         <div className={"widget-color-picker space-y-2"}>
-                            <Label className={"font-normal"}>Header Button Text Color</Label>
+                            <Label className={"font-medium"}>Header Button Text Color</Label>
                             <ColorInput
                                 onChange={(value) => onChange("headerBtnTextColor", value.clr)}
                                 value={widgetsSetting.headerBtnTextColor}
@@ -568,14 +610,14 @@ const UpdateWidget = () => {
                     </div>
                     <div className={"px-4 py-3 space-y-4"}>
                         <div className={"widget-color-picker space-y-2"}>
-                            <Label className={"font-normal"}>Button Background Color</Label>
+                            <Label className={"font-medium"}>Button Background Color</Label>
                             <ColorInput
                                 onChange={(value) => onChange("btnBackgroundColor", value.clr)}
                                 value={widgetsSetting.btnBackgroundColor}
                             />
                         </div>
                         <div className={"widget-color-picker space-y-2"}>
-                            <Label className={"font-normal"}>Button Text Color</Label>
+                            <Label className={"font-medium"}>Button Text Color</Label>
                             <ColorInput
                                 onChange={(value) => onChange("btnTextColor", value.clr)}
                                 value={widgetsSetting.btnTextColor}
@@ -627,7 +669,7 @@ const UpdateWidget = () => {
                         <BreadcrumbList>
                             <BreadcrumbItem className={"cursor-pointer"}>
                                 <BreadcrumbLink>
-                                        <span
+                                        <span className={"font-medium"}
                                             onClick={id === 'new' ? () => navigate(`${baseUrl}/widget/type`) : () => navigate(`${baseUrl}/widget?pageNo=${getPageNo}`)}>
                                         {type === 'embed' && 'Embed Widget'}
                                             {type === 'popover' && 'Popover Widget'}
@@ -638,7 +680,7 @@ const UpdateWidget = () => {
                             </BreadcrumbItem>
                             <BreadcrumbSeparator/>
                             <BreadcrumbItem className={"cursor-pointer"}>
-                                <BreadcrumbPage>{widgetsSetting.name}</BreadcrumbPage>
+                                <BreadcrumbPage className={"font-medium"}>{widgetsSetting.name}</BreadcrumbPage>
                             </BreadcrumbItem>
                         </BreadcrumbList>
                     </Breadcrumb>
@@ -671,6 +713,7 @@ const UpdateWidget = () => {
                     </div>
                 </div>
                 <div className={"bg-muted w-full h-[100vh] md:h-full overflow-y-auto relative"}>
+                    {console.log("widgetsSetting", widgetsSetting)}
                     {
                         (type !== "embed" && widgetsSetting?.isLauncherIcon) &&
                         <div className='QH-floating-trigger' onClick={onToggle} style={{

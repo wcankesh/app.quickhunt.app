@@ -168,15 +168,22 @@ const Users = () => {
     }
 
     const onChangeText = (event) => {
-        setCustomerDetails({...customerDetails, [event.target.name]: event.target.value});
-        setFormError(formError => ({...formError, [event.target.name]: ""}));
+        const { name, value } = event.target;
+        const trimmedValue = (name === "name" || name === "email") ? value.trimStart() : value;
+        setCustomerDetails(prev => ({ ...prev, [name]: trimmedValue }));
+        setFormError(prev => ({
+            ...prev,
+            [name]: formValidate(name, trimmedValue)
+        }));
     }
 
     const onBlur = (event) => {
         const { name, value } = event.target;
+        const trimmedValue = (name === "name" || name === "email") ? value.trim() : value;
+        setCustomerDetails(prev => ({ ...prev, [name]: trimmedValue }));
         setFormError({
             ...formError,
-            [name]: formValidate(name, value)
+            [name]: formValidate(name, trimmedValue)
         });
     }
 
@@ -270,6 +277,14 @@ const Users = () => {
     };
 
     const addCustomer = async () => {
+        const trimmedName = customerDetails.name ? customerDetails.name.trim() : "";
+        const trimmedEmail = customerDetails.email ? customerDetails.email.trim() : "";
+        const updatedIdea = {
+            ...customerDetails,
+            name: trimmedName,
+            email: trimmedEmail,
+        };
+        setCustomerDetails(updatedIdea);
         let validationErrors = {};
         Object.keys(customerDetails).forEach(name => {
             const error = formValidate(name, customerDetails[name]);
@@ -396,18 +411,18 @@ const Users = () => {
                 {/*<SheetOverlay className={"inset-0"}/>*/}
                 <SheetContent className={"sm:max-w-[662px] p-0"}>
                     <SheetHeader className={"px-3 py-4 lg:px-8 lg:py-[20px] flex flex-row justify-between items-center border-b space-y-0"}>
-                        <SheetTitle className={"text-lg md:text-xl font-normal"}>Add New User</SheetTitle>
+                        <SheetTitle className={"text-lg md:text-xl font-medium"}>Add New User</SheetTitle>
                         <span className={"max-w-[24px]"}><X onClick={closeSheet} className={"cursor-pointer m-0"}/></span>
                     </SheetHeader>
                     <div className={"sm:px-8 sm:py-6 px-3 py-4 border-b"}>
                         <div className="grid w-full gap-2">
-                            <Label htmlFor="name" className={"font-normal"}>Name</Label>
+                            <Label htmlFor="name" className={"font-medium after:ml-1 after:content-['*'] after:text-destructive"}>Name</Label>
                             <Input value={customerDetails.name} name="name" onChange={onChangeText} type="text" id="name" className={"h-9"} placeholder={"Enter the full name of user..."}/>
                             {formError.name && <span className="text-sm text-red-500">{formError.name}</span>}
                         </div>
 
                         <div className="grid w-full gap-2 mt-6">
-                            <Label htmlFor="email" className={"font-normal"}>E-mail</Label>
+                            <Label htmlFor="email" className={"font-medium after:ml-1 after:content-['*'] after:text-destructive"}>E-mail</Label>
                             <Input value={customerDetails.email} name="email" onChange={onChangeText} onBlur={onBlur} type="email" id="email" className={"h-9"} placeholder={"Enter the email of user"}/>
                             {formError.email && <span className="text-sm text-red-500">{formError.email}</span>}
                         </div>

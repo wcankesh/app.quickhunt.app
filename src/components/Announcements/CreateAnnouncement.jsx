@@ -143,6 +143,45 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, getAllPosts, announcementL
     const onChangeText = (event) => {
         const {name, value} = event.target;
         let updatedDetails = {...changeLogDetails};
+
+        if (name === "title") {
+            const trimmedValue = value.trimStart();
+            const slug = trimmedValue
+                .replace(/[^a-z0-9\s]/gi, '')
+                .replace(/\s+/g, '-')
+                .toLowerCase();
+
+            updatedDetails = {
+                ...updatedDetails,
+                title: trimmedValue,
+                // Only update slug if it matches the previous auto-generated slug
+                ...(updatedDetails.slug === updatedDetails.title.replace(/[^a-z0-9\s]/gi, '')
+                    .replace(/\s+/g, '-')
+                    .toLowerCase() && { slug: slug })
+            };
+        } else if (name === "slug") {
+            const slug = value
+                .replace(/[^a-z0-9\s-]/gi, '')
+                .replace(/\s+/g, '-')
+                .toLowerCase();
+            updatedDetails = {
+                ...updatedDetails,
+                slug: slug
+            };
+        } else {
+            updatedDetails[name] = value;
+        }
+
+        setChangeLogDetails(updatedDetails);
+        setFormError(prev => ({
+            ...prev,
+            [name]: formValidate(name, updatedDetails[name])
+        }));
+    };
+
+    const onChangeTextqq = (event) => {
+        const {name, value} = event.target;
+        let updatedDetails = {...changeLogDetails};
         if (name === "title") {
             const slug = value
                 .replace(/[^a-z0-9\s]/gi, '')
@@ -542,6 +581,7 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, getAllPosts, announcementL
                                             {changeLogDetails.publishedAt
                                                 ? moment(changeLogDetails.publishedAt).format("LL")
                                                 : "Select Date"}
+                                            <CalendarIcon className="mr-2 h-4 w-4"/>
                                         </Button>
                                     </PopoverTrigger>
                                     <PopoverContent className="w-auto p-0 pointer-events-auto" align="start">

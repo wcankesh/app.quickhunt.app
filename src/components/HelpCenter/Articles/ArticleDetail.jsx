@@ -98,10 +98,11 @@ const ArticleDetail = () => {
     };
 
     const handleOnChange = (name, value) => {
-        setArticlesDetails({...articlesDetails, [name]: value});
+        const trimmedValue = (name === "title") ? value.trimStart() : value;
+        setArticlesDetails(prev => ({ ...prev, [name]: trimmedValue }));
         setFormError(formError => ({
             ...formError,
-            [name]: formValidate(name, value)
+            [name]: formValidate(name, trimmedValue)
         }));
     };
 
@@ -135,6 +136,12 @@ const ArticleDetail = () => {
     const subcategories = selectedCategory ? selectedCategory?.subCategories : [];
 
     const handleArticle = async (type) => {
+        const trimmedTitle = articlesDetails.title ? articlesDetails.title.trim() : "";
+        const updatedIdea = {
+            ...articlesDetails,
+            title: trimmedTitle,
+        };
+        setArticlesDetails(updatedIdea);
         let validationErrors = {};
         Object.keys(articlesDetails).forEach(name => {
             const error = formValidate(name, articlesDetails[name]);
@@ -388,7 +395,7 @@ const ArticleDetail = () => {
         <Fragment>
             <div className={"p-4 md:py-6 md:px-4 border-b flex items-center justify-between flex-wrap gap-2"}>
                 <CommonBreadCrumb
-                    links={[{label: 'Article', path: `/help/article`}]}
+                    links={links}
                     currentPage={(isLoading || isLoadBreadCrumb) && id !== "new" ? null : articlesDetails?.title}
                     truncateLimit={30}
                 />

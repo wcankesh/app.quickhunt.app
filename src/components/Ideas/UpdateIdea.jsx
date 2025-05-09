@@ -114,6 +114,7 @@ const UpdateIdea = () => {
     const [ideasVoteList, setIdeasVoteList] = useState([]);
     const [getAllUsersList, setGetAllUsersList] = useState([]);
     const [addUserDialog, setAddUserDialog] = useState({addUser: false, viewUpvote: false});
+    const [imageSizeError, setImageSizeError] = useState('');
     const listRef = useRef(null);
 
     const openDialogs = (name, value) => {
@@ -1036,6 +1037,10 @@ const UpdateIdea = () => {
             ...prev,
             [name]: formValidate(name, trimmedValue, "addUser")
         }));
+        // Clear image size error if description changes
+        if (name === "description" && imageSizeError) {
+            setImageSizeError('');
+        }
     }
 
     const onCreateIdea = async () => {
@@ -1054,6 +1059,10 @@ const UpdateIdea = () => {
                 validationErrors[name] = error;
             }
         });
+        // Check for image size error
+        if (imageSizeError) {
+            validationErrors.imageSizeError = imageSizeError;
+        }
         if (Object.keys(validationErrors).length > 0) {
             setFormError(validationErrors);
             return;
@@ -1082,6 +1091,7 @@ const UpdateIdea = () => {
         if (data.success) {
             setOldSelectedIdea({...selectedIdea})
             setIsEditIdea(false)
+            setImageSizeError('');
             toast({description: data.message})
         } else {
             toast({description: data?.error?.message, variant: "destructive"})
@@ -1128,7 +1138,7 @@ const UpdateIdea = () => {
         setSelectedIdea(oldSelectedIdea);
         setFormError(initialStateError);
         setIsEditIdea(false);
-
+        setImageSizeError('');
         setSelectedComment(null);
         setDeletedCommentImage([]);
         setCommentFiles([]);
@@ -1468,9 +1478,12 @@ const UpdateIdea = () => {
                                     <div className="space-y-2">
                                         <Label htmlFor="description" className={"font-medium"}>Description</Label>
                                         <ReactQuillEditor value={selectedIdea.description} name={"description"}
-                                                          onChange={onChangeText}/>
-                                        {formError.description &&
-                                        <span className="text-red-500 text-sm">{formError.description}</span>}
+                                                          onChange={onChangeText} setImageSizeError={setImageSizeError}/>
+                                        {/*{formError.description &&*/}
+                                        {/*<span className="text-red-500 text-sm">{formError.description}</span>}*/}
+                                        {(formError.imageSizeError || imageSizeError) && (
+                                            <span className="text-red-500 text-sm">{formError.imageSizeError || imageSizeError}</span>
+                                        )}
                                     </div>
                                     <div className={"space-y-2"}>
                                         <Label className={"font-medium"}>Choose Board for this Idea</Label>
@@ -2164,7 +2177,7 @@ const UpdateIdea = () => {
                                                                                 ) : null}
                                                                                 Load More
                                                                             </Button>
-                                                                        ) : ''}
+                                                                        ) : ""}
                                                                     </div>
                                                                 )}
                                                             </Fragment>

@@ -138,6 +138,8 @@ const CreateRoadmapIdea = ({
                 formError={formError}
                 isLoading={isLoading}
                 onCreateIdea={onCreateIdea}
+                formValidate={formValidate}
+                setFormError={setFormError}
             />
         </div>
     );

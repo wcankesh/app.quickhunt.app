@@ -253,6 +253,12 @@ const UpdateInAppMessage = () => {
     const formValidate = (name, value, context = {}) => {
         const trimmedValue = typeof value === "string" ? value.trim() : String(value || "").trim();
         switch (name) {
+            case "title":
+                if (!trimmedValue) {
+                    return "Title is required";
+                } else {
+                    return "";
+                }
             case "from":
                 // if (inAppMsgSetting.showSender && !value) {
                 if (context.showSender && !trimmedValue) {
@@ -614,7 +620,7 @@ const UpdateInAppMessage = () => {
                             <BreadcrumbItem className={"cursor-pointer"}>
                                 <BreadcrumbLink>
                                     <span
-                                        onClick={handleCancel}>
+                                        onClick={handleCancel} className={"font-medium"}>
                                         {type === '1' && 'Post'}
                                         {type === '2' && 'Banners'}
                                         {type === '3' && 'Surveys'}
@@ -625,7 +631,7 @@ const UpdateInAppMessage = () => {
                             <BreadcrumbSeparator/>
                             <BreadcrumbItem className={"cursor-pointer"}>
                                 <BreadcrumbPage
-                                    className={`w-full ${inAppMsgSetting?.title?.length > 30 ? "max-w-[200px] truncate" : ""}`}>{isLoading && id !== 'new' ? null : inAppMsgSetting?.title}</BreadcrumbPage>
+                                    className={`w-full font-medium ${inAppMsgSetting?.title?.length > 30 ? "max-w-[200px] truncate" : ""}`}>{isLoading && id !== 'new' ? null : inAppMsgSetting?.title}</BreadcrumbPage>
                             </BreadcrumbItem>
                         </BreadcrumbList>
                     </Breadcrumb>

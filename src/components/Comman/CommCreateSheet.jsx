@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {Check, Loader2, X} from "lucide-react";
 import {Button} from "../ui/button";
 import {SelectContent, SelectItem, SelectTrigger, SelectValue, Select, SelectGroup} from "../ui/select";
@@ -21,22 +21,21 @@ const CommCreateSheet = ({
                              setIdeaDetail,
                              setFormError,
                              formValidate,
+                             setImageSizeError,
+                             imageSizeError,
                          }) => {
 
     const onChangeText = (e) => {
         const { name, value } = e.target;
-        let cleanedValue;
-        if (name === "description") {
-            cleanedValue = value.replace(/<p><br><\/p>|<[^>]+>|&nbsp;|\s/g, "").length > 0 ? value : "";
-        } else {
-            cleanedValue = value;
+        const trimmedValue = name === "title" ? value.trimStart() : value;
+        setIdeaDetail({ ...ideaDetail, [name]: trimmedValue });
+        setFormError(prev => ({
+            ...prev,
+            [name]: formValidate(name, trimmedValue)
+        }));
+        if (name === "description" && imageSizeError) {
+            setImageSizeError('');
         }
-
-        setIdeaDetail({ ...ideaDetail, [name]: cleanedValue });
-        // setFormError(formError => ({
-        //     ...formError,
-        //     [name]: formValidate(name, cleanedValue)
-        // }));
     };
 
     const onChangeBoard = (value) => {

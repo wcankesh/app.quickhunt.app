@@ -8,10 +8,11 @@ import {DO_SPACES_ENDPOINT} from "../../utils/constent";
 
 const CategoryForm = ({ selectedData, setSelectedData, formError, setFormError, handleImageUpload, handleSubmit, isLoading, closeSheet, saveTitle, className }) => {
     const handleOnChange = (name, value) => {
-        setSelectedData({ ...selectedData, [name]: value });
+        const trimmedValue = (name === "title" || name === "description") ? value.trimStart() : value;
+        setSelectedData(prev => ({ ...prev, [name]: trimmedValue }));
         setFormError(formError => ({
             ...formError,
-            [name]: formValidate(name, value)
+            [name]: formValidate(name, trimmedValue)
         }));
     };
 
