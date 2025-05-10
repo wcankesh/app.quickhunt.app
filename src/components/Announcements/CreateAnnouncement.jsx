@@ -588,7 +588,7 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, getAllPosts, announcementL
                             </div>
                         </div>
                         <div className={"flex flex-wrap md:flex-nowrap gap-4 items-start"}>
-                        <div className={"flex flex-col gap-[18px] w-full md:max-w-[288px]"}>
+                        <div className={"flex flex-col gap-2 w-full md:max-w-[288px]"}>
                             <div className={"flex items-center gap-3"}>
                                 <Checkbox id={"expire_date"}
                                           checked={changeLogDetails.expiredBoolean === 1}

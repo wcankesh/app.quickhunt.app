@@ -461,7 +461,7 @@ const Team = () => {
                         <div className="grid gap-6 px-3 py-4 sm:px-8 sm:py-6 border-b">
                             <div className="flex flex-col gap-2">
                                 <div className={"space-y-1"}>
-                                    <Label htmlFor="inviteEmail" className={"text-right font-medium"}>Add emails of users you want to invite to test, and click on Invite</Label>
+                                    <Label htmlFor="inviteEmail" className={"text-right font-medium after:ml-1 after:content-['*'] after:text-destructive"}>Add emails of users you want to invite to test, and click on Invite</Label>
                                     <Input
                                         type={"email"}
                                         id="inviteEmail"

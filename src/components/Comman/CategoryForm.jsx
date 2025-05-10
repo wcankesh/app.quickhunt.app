@@ -36,7 +36,7 @@ const CategoryForm = ({ selectedData, setSelectedData, formError, setFormError, 
     return (
         <div className={"sm:px-8 sm:py-6 px-3 py-4 border-b space-y-6"}>
             <div className="grid w-full gap-2">
-                <Label htmlFor="category-name" className={"font-medium"}>Name</Label>
+                <Label htmlFor="category-name" className={"font-medium after:ml-1 after:content-['*'] after:text-destructive"}>Name</Label>
                 <Input
                     value={selectedData?.title}
                     onChange={(e) => handleOnChange("title", e.target.value)}
@@ -48,7 +48,7 @@ const CategoryForm = ({ selectedData, setSelectedData, formError, setFormError, 
                 {formError?.title && <span className="text-red-500 text-sm">{formError?.title}</span>}
             </div>
             <div className="grid w-full gap-2">
-                <Label className={"font-medium"}>Description</Label>
+                <Label className={"font-medium after:ml-1 after:content-['*'] after:text-destructive"}>Description</Label>
                 <ReactQuillEditor
                     value={selectedData?.description}
                     onChange={(e) => handleOnChange("description", e.target.value)}

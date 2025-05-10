@@ -48,14 +48,6 @@ const UpdateAnnouncement = () => {
 
     useEffect(() => {
         if (projectDetailsReducer.id) {
-            // if (selectedRecord?.slug) {
-            //     getSinglePosts();
-            // } else {
-            //     setSelectedRecord({
-            //         ...selectedRecord,
-            //         assignToId: [userDetailsReducer.id.toString()],
-            //     });
-            // }
             getSinglePosts();
             setLabelList(allStatusAndTypes.labels);
             setMemberList(allStatusAndTypes.members);
@@ -119,12 +111,6 @@ const UpdateAnnouncement = () => {
                 } else {
                     return "";
                 }
-            // case "slug":
-            //     if (!value || value.trim() === "") {
-            //         return "Permalink / Slug is required.";
-            //     } else {
-            //         return "";
-            //     }
             case "description":
                 const cleanValue = value.trim();
                 const emptyContent = /^(<p>\s*<\/p>|<p><br><\/p>|<\/?[^>]+>)*$/;
@@ -157,24 +143,9 @@ const UpdateAnnouncement = () => {
 
         if (name === "title") {
             const trimmedValue = value.trimStart();
-            const slug = trimmedValue
-                .replace(/[^a-z0-9\s]/gi, '')
-                .replace(/\s+/g, '-')
-                .toLowerCase();
-
             updatedDetails = {
                 ...updatedDetails,
                 title: trimmedValue,
-                slug: slug
-            };
-        } else if (name === "slug") {
-            const slug = value
-                .replace(/[^a-z0-9\s-]/gi, '')
-                .replace(/\s+/g, '-')
-                .toLowerCase();
-            updatedDetails = {
-                ...updatedDetails,
-                slug: slug
             };
         } else {
             updatedDetails[name] = value;
@@ -184,50 +155,6 @@ const UpdateAnnouncement = () => {
         setFormError(prev => ({
             ...prev,
             [name]: formValidate(name, updatedDetails[name])
-        }));
-    };
-
-    const onChangeTextqq = (event) => {
-        const {name, value} = event.target;
-        let updatedDetails = {...selectedRecord};
-        if (name === "title") {
-            const slug = value
-                .replace(/[^a-z0-9\s]/gi, '')
-                .replace(/\s+/g, '-')
-                .toLowerCase();
-
-            if (updatedDetails.title.replace(/[^a-z0-9\s]/gi, '')
-                .replace(/\s+/g, '-')
-                .toLowerCase() === updatedDetails.slug) {
-                updatedDetails = {
-                    ...updatedDetails,
-                    title: value,
-                    slug: slug
-                };
-            } else {
-                updatedDetails = {
-                    ...updatedDetails,
-                    title: value,
-                };
-            }
-
-        } else if (name === "slug") {
-            const slug = value
-                .replace(/[^a-z0-9\s-]/gi, '')
-                .replace(/\s+/g, '-')
-                .toLowerCase();
-
-            updatedDetails = {
-                ...updatedDetails,
-                slug: slug
-            };
-        } else {
-            updatedDetails[name] = value;
-        }
-        setSelectedRecord(updatedDetails);
-        setFormError((formError) => ({
-            ...formError,
-            [name]: formValidate(name, value)
         }));
     };
 
@@ -304,12 +231,6 @@ const UpdateAnnouncement = () => {
             return;
         }
 
-        const isSlugTaken = (announcementList || []).some(x => x.slug === selectedRecord.slug);
-        if (isSlugTaken) {
-            toast({description: "The post slug url has already been taken.", variant: "destructive",});
-            return;
-        }
-
         if (
             selectedRecord.expiredBoolean === 1 &&
             !selectedRecord.expiredAt
@@ -324,9 +245,6 @@ const UpdateAnnouncement = () => {
                 if (x === "assignToId") {
                     formData.append(x, selectedRecord[x]);
                 }
-                // else if (x === "slug") {
-                //     formData.append("slug", selectedRecord?.slug ? selectedRecord?.slug : selectedRecord?.title.replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-').replace(/\//g, "-").toLowerCase());
-                // }
                 else if (x === "publishedAt") {
                     formData.append("publishedAt", moment(selectedRecord?.publishedAt).format("YYYY-MM-DD"));
                 } else if (x === "expiredAt") {
@@ -453,15 +371,12 @@ const UpdateAnnouncement = () => {
                                 </div>
                                 <div className="w-full flex flex-col gap-2">
                                     <Label htmlFor="link" className={"font-medium"}>Permalink / Slug</Label>
-                                    <Input type="text" className={"h-9"} id="link" name={"slug"}
-                                           value={selectedRecord.slug} onChange={onChangeText} disabled/>
+                                    <Input type="text" className={"h-9"} id="link" name={"slug"} value={selectedRecord.slug} disabled readOnly/>
                                     <p className={"text-sm font-normal text-muted-foreground break-words"}>This release will
                                         be available at {projectDetailsReducer.domain ? <a
                                             href={`https://${projectDetailsReducer.domain?.toLowerCase()}/announcements/${selectedRecord.slug?.toLowerCase()}`}
                                             target={"_blank"}
                                             className={"text-primary max-w-[593px] w-full break-words text-sm"}>{`https://${projectDetailsReducer.domain?.toLowerCase()}/announcements/${selectedRecord.slug?.toLowerCase()}`}</a> : ""}</p>
-                                    {/*{formError?.slug &&*/}
-                                    {/*<span className="text-sm text-red-500">{formError?.slug}</span>}*/}
                                 </div>
                                 <div className="w-full flex flex-col gap-2">
                                     <Label htmlFor="description" className={"font-medium after:ml-0.5 after:content-['*'] after:text-destructive"}>Description</Label>

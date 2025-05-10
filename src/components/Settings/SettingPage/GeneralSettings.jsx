@@ -77,23 +77,26 @@ const GeneralSettings = () => {
                 }
                 return "";
             case "announcementTitle":
-                if (!value || value.trim() === "") {
-                    return "Announcement title is required";
-                } else {
-                    return "";
+                if (generalSettingData?.isAnnouncement === 1) {
+                    if (!value || value.trim() === "") {
+                        return "Announcement title is required";
+                    }
                 }
+                return "";
             case "roadmapTitle":
-                if (!value || value.trim() === "") {
-                    return "Roadmap title is required";
-                } else {
-                    return "";
+                if (generalSettingData?.isRoadmap === 1) {
+                    if (!value || value.trim() === "") {
+                        return "Roadmap title is required";
+                    }
                 }
+                return "";
             case "ideaTitle":
-                if (!value || value.trim() === "") {
-                    return "Idea title is required";
-                } else {
-                    return "";
+                if (generalSettingData?.isIdea === 1) {
+                    if (!value || value.trim() === "") {
+                        return "Idea title is required";
+                    }
                 }
+                return "";
             default:
                 return "";
         }
@@ -113,6 +116,15 @@ const GeneralSettings = () => {
             updatedErrors[name] = "";
         } else {
             updatedErrors[name] = formValidate(name, value);
+        }
+        if (name === "isAnnouncement" && value === 0) {
+            updatedErrors.announcementTitle = "";
+        }
+        if (name === "isIdea" && value === 0) {
+            updatedErrors.ideaTitle = "";
+        }
+        if (name === "isRoadmap" && value === 0) {
+            updatedErrors.roadmapTitle = "";
         }
         setGeneralSettingData(updatedData);
         setFormError(updatedErrors);
@@ -310,7 +322,7 @@ const GeneralSettings = () => {
                                                                         y.field === "text" ?
                                                                             <div className={"space-y-1"}>
                                                                                 <Label
-                                                                                    className="text-sm font-medium">{y.label}</Label>
+                                                                                    className="text-sm font-medium after:ml-1 after:content-['*'] after:text-destructive">{y.label}</Label>
                                                                                 <Input
                                                                                     value={generalSettingData?.[y.name]}
                                                                                     onChange={(e) => onChange(y.name, e.target.value)}/>
