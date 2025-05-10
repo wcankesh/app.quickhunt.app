@@ -154,12 +154,13 @@ const Categories = () => {
 
     const handleInputChange = (event, index) => {
         const {name, value} = event.target;
+        const cleanedValue = name === "title" ? value.trimStart() : value;
         const updatedCategory = [...categoriesList];
-        updatedCategory[index] = {...updatedCategory[index], [name]: value, description: value};
+        updatedCategory[index] = {...updatedCategory[index], [name]: cleanedValue, description: cleanedValue};
         setCategoriesList(updatedCategory);
         setFormError({
             ...formError,
-            [name]: formValidate(name, value)
+            [name]: formValidate(name, cleanedValue)
         });
     }
 
@@ -218,7 +219,7 @@ const Categories = () => {
                 <CardHeader
                     className={"p-6 gap-1 border-b flex flex-row flex-wrap justify-between items-center p-4 sm:px-5 sm:py-4 gap-y-2"}>
                     <div>
-                        <CardTitle className={"text-xl lg:text-2xl font-normal"}>Categories</CardTitle>
+                        <CardTitle className={"text-xl lg:text-2xl font-medium"}>Categories</CardTitle>
                         <CardDescription className={"text-sm text-muted-foreground p-0 mt-1"}>Organize your changelog
                             with categories.</CardDescription>
                     </div>
@@ -236,7 +237,7 @@ const Categories = () => {
                                         ["Category Name", "Last Update", "Action"].map((x, i) => {
                                             return (
                                                 <TableHead
-                                                    className={`${i == 0 ? "w-2/5" : i == 1 ? "w-2/5" : ""} text-sm font-normal px-2 py-[10px] md:px-3 text-card-foreground dark:text-muted-foreground`}>{x}</TableHead>
+                                                    className={`${i == 0 ? "w-2/5" : i == 1 ? "w-2/5" : ""} text-sm font-medium px-2 py-[10px] md:px-3 text-card-foreground dark:text-muted-foreground`}>{x}</TableHead>
                                             )
                                         })
                                     }
@@ -272,7 +273,7 @@ const Categories = () => {
                                                                         </TableCell>
                                                                         <TableCell/>
                                                                         <TableCell
-                                                                            className={`px-2 py-[10px] pt-[13px] md:px-3 font-normal text-xs align-top ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                                                            className={`px-2 py-[10px] pt-[13px] md:px-3 font-medium text-xs align-top ${theme === "dark" ? "" : "text-muted-foreground"}`}>
                                                                             <div className={"flex items-center gap-2"}>
                                                                                 <Fragment>
                                                                                     {
@@ -307,11 +308,11 @@ const Categories = () => {
                                                                     :
                                                                     <Fragment>
                                                                         <TableCell
-                                                                            className={`px-2 py-[10px] md:px-3 font-normal text-xs max-w-[140px] truncate text-ellipsis overflow-hidden whitespace-nowrap ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                                                            className={`px-2 py-[10px] md:px-3 font-medium text-xs max-w-[140px] truncate text-ellipsis overflow-hidden whitespace-nowrap ${theme === "dark" ? "" : "text-muted-foreground"}`}>
                                                                             {x.title}
                                                                         </TableCell>
                                                                         <TableCell
-                                                                            className={`px-2 py-[10px] md:px-3 font-normal text-xs ${theme === "dark" ? "" : "text-muted-foreground"}`}>{moment.utc(x.updatedAt).local().startOf('seconds').fromNow()}</TableCell>
+                                                                            className={`px-2 py-[10px] md:px-3 font-medium text-xs ${theme === "dark" ? "" : "text-muted-foreground"}`}>{moment.utc(x.updatedAt).local().startOf('seconds').fromNow()}</TableCell>
                                                                         <TableCell
                                                                             className={`px-2 py-[10px] md:px-3  ${theme === "dark" ? "" : "text-muted-foreground"}} `}>
                                                                             <div className={"flex items-center"}>

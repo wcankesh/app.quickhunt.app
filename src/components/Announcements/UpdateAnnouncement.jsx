@@ -139,12 +139,6 @@ const UpdateAnnouncement = () => {
                 } else {
                     return "";
                 }
-            case "categoryId":
-                if (!value || value === "null") {
-                    return "Category is required.";
-                } else {
-                    return "";
-                }
             case "expiredAt":
                 if (selectedRecord.expiredBoolean === 1 && (!value || value === undefined)) {
                     return "Please select an expiration date.";
@@ -171,9 +165,7 @@ const UpdateAnnouncement = () => {
             updatedDetails = {
                 ...updatedDetails,
                 title: trimmedValue,
-                ...(updatedDetails.slug === updatedDetails.title.replace(/[^a-z0-9\s]/gi, '')
-                    .replace(/\s+/g, '-')
-                    .toLowerCase() && { slug: slug })
+                slug: slug
             };
         } else if (name === "slug") {
             const slug = value
@@ -242,10 +234,6 @@ const UpdateAnnouncement = () => {
     const onChangeCategory = (selectedItems) => {
         const categoryId = selectedItems === null ? "" : selectedItems;
         setSelectedRecord({...selectedRecord, categoryId});
-        setFormError((formError) => ({
-            ...formError,
-            categoryId: formValidate("categoryId", categoryId)
-        }));
     }
 
     const commonToggle = (name, value) => {
@@ -307,16 +295,18 @@ const UpdateAnnouncement = () => {
                 validationErrors[name] = error;
             }
         });
-        const categoryError = formValidate("categoryId", selectedRecord.categoryId);
-        if (categoryError) {
-            validationErrors.categoryId = categoryError;
-        }
         const expiredAtError = formValidate("expiredAt", selectedRecord.expiredAt);
         if (expiredAtError) {
             validationErrors.expiredAt = expiredAtError;
         }
         if (Object.keys(validationErrors).length > 0) {
             setFormError(validationErrors);
+            return;
+        }
+
+        const isSlugTaken = (announcementList || []).some(x => x.slug === selectedRecord.slug);
+        if (isSlugTaken) {
+            toast({description: "The post slug url has already been taken.", variant: "destructive",});
             return;
         }
 
@@ -343,7 +333,7 @@ const UpdateAnnouncement = () => {
                     formData.append("expiredAt", selectedRecord?.expiredBoolean === 1 ? moment(selectedRecord?.expiredAt).format("YYYY-MM-DD") : "");
                 } else if (x === "deleteImage" && selectedRecord?.image?.name) {
 
-                } else if (x === "categoryId" && (selectedRecord[x] === null || selectedRecord[x] === "null")) {
+                } else if (x === "categoryId") {
                     formData.append("categoryId", "");
                 } else {
                     formData.append(x, selectedRecord[x]);
@@ -592,10 +582,9 @@ const UpdateAnnouncement = () => {
                                     </Select>
                                 </div>
                                 <div className={"w-full space-y-1.5"}>
-                                    <Label className={"font-medium after:ml-0.5 after:content-['*'] after:text-destructive"}>Category</Label>
+                                    <Label className={"font-medium"}>Category</Label>
                                     <Select
                                         value={selectedRecord && selectedRecord?.categoryId && selectedRecord?.categoryId?.toString()}
-                                        // value={selectedRecord?.categoryId?.toString() || "null"}
                                         onValueChange={onChangeCategory}>
                                         <SelectTrigger className="h-9">
                                             {selectedRecord?.categoryId ? (
@@ -605,20 +594,9 @@ const UpdateAnnouncement = () => {
                                             ) : (
                                                 <span className="text-muted-foreground">Select a category</span>
                                             )}
-                                            {/*<SelectValue className={"text-muted-foreground text-sm"}>*/}
-                                            {/*    {selectedRecord?.categoryId === null || selectedRecord?.categoryId === "null"*/}
-                                            {/*        ? "None"*/}
-                                            {/*        : categoriesList.find(x => x.id.toString() === selectedRecord?.categoryId?.toString())?.name || "Select a category"}*/}
-                                            {/*</SelectValue>*/}
-                                            {/*<SelectValue className={"text-muted-foreground text-sm"}>*/}
-                                            {/*    {selectedRecord?.categoryId && selectedRecord?.categoryId !== "null"*/}
-                                            {/*        ? categoriesList.find((x) => x.id.toString() === selectedRecord?.categoryId?.toString())?.name || "Select a category"*/}
-                                            {/*        : "None"}*/}
-                                            {/*</SelectValue>*/}
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectGroup>
-                                                <SelectItem value={null}>None</SelectItem>
                                                 {
                                                     (categoriesList || []).map((x, i) => {
                                                         return (
@@ -630,7 +608,6 @@ const UpdateAnnouncement = () => {
                                             </SelectGroup>
                                         </SelectContent>
                                     </Select>
-                                    {formError.categoryId && <span className="text-sm text-red-500">{formError.categoryId}</span>}
                                 </div>
                             </div>
                             <div className="w-full flex flex-col gap-4 items-stretch h-full">

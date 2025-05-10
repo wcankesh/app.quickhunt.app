@@ -270,7 +270,7 @@ const GeneralSettings = () => {
     return (
         <Card className={"divide-y"}>
             <CardHeader className={"gap-1 p-4 sm:px-5 sm:py-4"}>
-                <CardTitle className={"text-xl lg:text-2xl font-normal capitalize"}>General Setting</CardTitle>
+                <CardTitle className={"text-xl lg:text-2xl font-medium capitalize"}>General Setting</CardTitle>
                 <CardDescription className={"text-sm text-muted-foreground p-0"}>Give title to your Announcement,
                     Roadmap, Ideas. Set header and global color.</CardDescription>
             </CardHeader>
@@ -280,7 +280,7 @@ const GeneralSettings = () => {
                         return (
                             <div className={"space-y-3 p-4 sm:px-5 sm:py-4"} key={i}>
                                 <div className={"flex justify-between items-center gap-2"}>
-                                    <h3 className={"font-normal"}>{x.title}</h3>
+                                    <h3 className={"font-medium"}>{x.title}</h3>
                                     {
                                         x.nameSwitch ? <div className="announce-create-switch flex gap-4">
                                             <Switch
@@ -310,7 +310,7 @@ const GeneralSettings = () => {
                                                                         y.field === "text" ?
                                                                             <div className={"space-y-1"}>
                                                                                 <Label
-                                                                                    className="text-sm font-normal">{y.label}</Label>
+                                                                                    className="text-sm font-medium">{y.label}</Label>
                                                                                 <Input
                                                                                     value={generalSettingData?.[y.name]}
                                                                                     onChange={(e) => onChange(y.name, e.target.value)}/>
@@ -332,7 +332,7 @@ const GeneralSettings = () => {
                                                                                     />
                                                                                     <label
                                                                                         htmlFor={y.name}
-                                                                                        className="text-sm text-muted-foreground font-normal"
+                                                                                        className="text-sm text-muted-foreground font-medium"
                                                                                     >
                                                                                         {y.label}
                                                                                     </label>
@@ -343,7 +343,7 @@ const GeneralSettings = () => {
                                                                                         <div
                                                                                             className={"widget-color-picker space-y-1 w-full"}>
                                                                                             <Label
-                                                                                                className={"text-sm font-normal"}>{y.label}</Label>
+                                                                                                className={"text-sm font-medium"}>{y.label}</Label>
                                                                                             <ColorInput name={y.name}
                                                                                                         value={generalSettingData?.[y.name]}
                                                                                                         onChange={(value) => onChange(y.name, value?.clr)}
@@ -386,13 +386,13 @@ const GeneralSettings = () => {
                                                                                                             disabled={y.name === "privateMode" ? "" : userDetailsReducer.plan === 0}
                                                                                                             onCheckedChange={(checked) => onChange(y.name, checked ? 1 : 0)}
                                                                                                         />
-                                                                                                        <p className="text-sm text-muted-foreground font-normal">{y.label}</p>
+                                                                                                        <p className="text-sm text-muted-foreground font-medium">{y.label}</p>
                                                                                                     </div>
                                                                                                     {y.name === "privateMode" && generalSettingData?.privateMode === 1 && (
                                                                                                         <div
                                                                                                             className={"w-3/4"}>
                                                                                                             <Label
-                                                                                                                className="text-sm font-normal after:ml-0.5 after:content-['*'] after:text-destructive">Password</Label>
+                                                                                                                className="text-sm font-medium after:ml-0.5 after:content-['*'] after:text-destructive">Password</Label>
                                                                                                             <div
                                                                                                                 className={"relative"}>
                                                                                                                 <Input

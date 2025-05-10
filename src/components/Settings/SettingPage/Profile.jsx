@@ -53,10 +53,12 @@ const Profile = () => {
     }, [userDetailsReducer]);
 
     const onChange = (event) => {
-        setUserDetails({...userDetails, [event.target.name]: event.target.value})
-        setFormError(formError => ({
-            ...formError,
-            [event.target.name]: formValidate(event.target.name, event.target.value)
+        const { name, value } = event.target;
+        const trimmedValue = (name === "firstName" || name === "lastName") ? value.trimStart() : value;
+        setUserDetails(prev => ({ ...prev, [name]: trimmedValue }));
+        setFormError(prev => ({
+            ...prev,
+            [name]: formValidate(name, trimmedValue)
         }));
     };
 
@@ -164,6 +166,14 @@ const Profile = () => {
     }
 
     const onUpdateUser = async () => {
+        const trimmedFirstName = userDetails.firstName ? userDetails.firstName.trim() : "";
+        const trimmedLastName = userDetails.lastName ? userDetails.lastName.trim() : "";
+        const updatedIdea = {
+            ...userDetails,
+            firstName: trimmedFirstName,
+            lastName: trimmedLastName,
+        };
+        setUserDetails(updatedIdea);
         let validationErrors = {};
         Object.keys(userDetails).forEach(name => {
             const error = formValidate(name, userDetails[name]);
@@ -235,7 +245,7 @@ const Profile = () => {
         <div className={"flex flex-col gap-6"}>
             <Card>
                 <CardHeader className={"gap-1 border-b p-4 sm:px-5 sm:py-4"}>
-                    <CardTitle className={"font-normal text-xl lg:text-2xl capitalize"}>Edit Profile</CardTitle>
+                    <CardTitle className={"font-medium text-xl lg:text-2xl capitalize"}>Edit Profile</CardTitle>
                     <CardDescription className={" text-sm text-muted-foreground p-0"}>Manage your account
                         settings.</CardDescription>
                 </CardHeader>
@@ -279,7 +289,7 @@ const Profile = () => {
                         <div className={"flex flex-col gap-4 w-full sm:w-full"}>
                             <div className={"flex gap-4 flex-wrap sm:flex-nowrap"}>
                                 <div className={"basis-full space-y-0.5"}>
-                                    <Label htmlFor="firstName" className={"font-normal"}>First Name</Label>
+                                    <Label htmlFor="firstName" className={"font-medium"}>First Name</Label>
                                     <Input
                                         id="firstName"
                                         placeholder="First Name"
@@ -297,7 +307,7 @@ const Profile = () => {
                                     </div>
                                 </div>
                                 <div className={"basis-full space-y-0.5"}>
-                                    <Label htmlFor="lastName" className={"font-normal"}>Last Name</Label>
+                                    <Label htmlFor="lastName" className={"font-medium"}>Last Name</Label>
                                     <Input
                                         id="lastName"
                                         placeholder="Last Name"
@@ -317,7 +327,7 @@ const Profile = () => {
                             </div>
                             <div className={"flex gap-4 lg:flex-nowrap md:flex-wrap"}>
                                 <div className={"w-full sm:w-[49%] space-y-0.5"}>
-                                    <Label htmlFor="email" className={"font-normal"}>Email</Label>
+                                    <Label htmlFor="email" className={"font-medium"}>Email</Label>
                                     <Input
                                         id="email"
                                         type="email"
@@ -343,12 +353,12 @@ const Profile = () => {
 
             <Card>
                 <CardHeader className={"gap-1 border-b p-4 sm:px-5 sm:py-4"}>
-                    <CardTitle className={"text-base font-normal"}>Change a password for your account</CardTitle>
+                    <CardTitle className={"text-base font-medium"}>Change a password for your account</CardTitle>
                 </CardHeader>
                 <CardContent className={"py-4 px-4 sm:px-5 sm:py-4"}>
                     <div className={"flex flex-col gap-4"}>
                         <div className={"space-y-1"}>
-                            <Label htmlFor="currentPassword" className={"font-normal"}>Current password</Label>
+                            <Label htmlFor="currentPassword" className={"font-medium"}>Current password</Label>
                             <div className={"relative"}>
                                 <Input
                                     id="currentPassword"
@@ -375,7 +385,7 @@ const Profile = () => {
                         </div>
 
                         <div>
-                            <Label htmlFor="password" className={"font-normal"}>Password</Label>
+                            <Label htmlFor="password" className={"font-medium"}>Password</Label>
                             <div className={"relative"}>
                                 <Input
                                     id="password"
@@ -401,7 +411,7 @@ const Profile = () => {
                         </div>
 
                         <div>
-                            <Label htmlFor="password_confirm" className={"font-normal"}>Password confirmation</Label>
+                            <Label htmlFor="password_confirm" className={"font-medium"}>Password confirmation</Label>
                             <div className={"relative"}>
                                 <Input
                                     id="password_confirm"

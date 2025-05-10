@@ -1685,14 +1685,20 @@ const UpdateIdea = () => {
                                                     </div>
 
                                                     <div className={"flex gap-2 items-center"}>
-                                                        <div className={"hidden md:block"}>
-                                                            <ActionButtons
-                                                                isEditable={selectedIdea?.createdBy == 1}
-                                                                onEdit={() => setIsEditIdea(true)}
-                                                                onPinChange={(newPinState) => onChangeStatus("pinToTop", newPinState ? 1 : 0)}
-                                                                isPinned={selectedIdea?.pinToTop == 1}
-                                                            />
-                                                        </div>
+                                                        {
+                                                            selectedIdea?.createdBy === 1 ?
+                                                                (userDetailsReducer?.id == selectedIdea?.userId) ?
+                                                                    <div className={"hidden md:block"}>
+                                                                        <ActionButtons
+                                                                            isEditable={selectedIdea?.createdBy == 1}
+                                                                            onEdit={() => setIsEditIdea(true)}
+                                                                            onPinChange={(newPinState) => onChangeStatus("pinToTop", newPinState ? 1 : 0)}
+                                                                            isPinned={selectedIdea?.pinToTop == 1}
+                                                                        />
+                                                                    </div>
+                                                                    : ""
+                                                                : ""
+                                                        }
 
                                                         <div className={"md:hidden"}>
                                                             <DropdownMenu>

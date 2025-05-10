@@ -223,7 +223,7 @@ export function Dashboard() {
                                                     className={"rounded-lg border bg-card text-card-foreground shadow-sm"}
                                                     x-chunk={"dashboard-05-chunk-0"} key={i}>
                                                     <CardHeader className={"p-6 gap-0.5"}>
-                                                        <CardTitle className={"text-sm font-normal"}>
+                                                        <CardTitle className={"text-sm font-medium"}>
                                                             {x.title}
                                                         </CardTitle>
                                                         <CardContent className={"p-0 flex flex-col gap-2 m-0"}>

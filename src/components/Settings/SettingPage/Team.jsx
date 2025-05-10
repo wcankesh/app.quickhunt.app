@@ -260,7 +260,7 @@ const Team = () => {
             <Card>
                 <CardHeader className={"flex flex-row flex-wrap md:flex-nowrap justify-between gap-2 items-center p-4 sm:px-5 sm:py-4"}>
                     <div>
-                        <CardTitle className={"text-xl lg:text-2xl font-normal capitalize"}>Invite Team</CardTitle>
+                        <CardTitle className={"text-xl lg:text-2xl font-medium capitalize"}>Invite Team</CardTitle>
                         <CardDescription className={"text-sm text-muted-foreground p-0"}>Add members to your project to collaborate on managing ideas.</CardDescription>
                     </div>
                     <Button className={"text-sm font-medium hover:bg-primary m-0"} onClick={openSheet}>Invite Team</Button>
@@ -283,7 +283,7 @@ const Team = () => {
                                                 {
                                                     ["Team", "Role" ,"Action"].map((x, i) => {
                                                         return (
-                                                           <TableHead key={x} className={`h-[22px] px-2 py-[10px] md:px-3 text-sm font-normal ${i === 2 ? "text-end" : ""} ${theme === "dark" ? "border-t" : "text-card-foreground"}`}>{x}</TableHead>
+                                                           <TableHead key={x} className={`h-[22px] px-2 py-[10px] md:px-3 text-sm font-medium ${i === 2 ? "text-end" : ""} ${theme === "dark" ? "border-t" : "text-card-foreground"}`}>{x}</TableHead>
                                                         )
                                                     })
                                                 }
@@ -371,7 +371,7 @@ const Team = () => {
                                             {
                                                 ["Email", "Status", "Invited", "Action"].map((x, i) => {
                                                     return (
-                                                        <TableHead key={i} className={`h-[22px] px-2 py-[10px] md:px-3 text-sm font-normal ${i === 0 ? "sm:pl-6" : i === 3 ? "text-right" : ""} ${theme === "dark" ? "border-t" : "text-card-foreground"}`}>{x}</TableHead>
+                                                        <TableHead key={i} className={`h-[22px] px-2 py-[10px] md:px-3 text-sm font-medium ${i === 0 ? "sm:pl-6" : i === 3 ? "text-right" : ""} ${theme === "dark" ? "border-t" : "text-card-foreground"}`}>{x}</TableHead>
                                                     )
                                                 })
                                             }
@@ -452,7 +452,7 @@ const Team = () => {
                     {/*<SheetOverlay className={"inset-0"} />*/}
                     <SheetContent className={"sm:max-w-[662px] p-0"}>
                         <SheetHeader className={"px-4 py-3 md:py-5 lg:px-8 lg:py-[20px] border-b flex flex-row justify-between items-center"}>
-                            <SheetTitle className={"text-base md:text-xl font-normal flex justify-between items-center"}>
+                            <SheetTitle className={"text-base md:text-xl font-medium flex justify-between items-center"}>
                                 Invite Users
                             </SheetTitle>
                             <X className={"cursor-pointer m-0"} onClick={closeSheet}/>
@@ -461,7 +461,7 @@ const Team = () => {
                         <div className="grid gap-6 px-3 py-4 sm:px-8 sm:py-6 border-b">
                             <div className="flex flex-col gap-2">
                                 <div className={"space-y-1"}>
-                                    <Label htmlFor="inviteEmail" className={"text-right font-normal"}>Add emails of users you want to invite to test, and click on Invite</Label>
+                                    <Label htmlFor="inviteEmail" className={"text-right font-medium"}>Add emails of users you want to invite to test, and click on Invite</Label>
                                     <Input
                                         type={"email"}
                                         id="inviteEmail"

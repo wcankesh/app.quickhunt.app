@@ -111,7 +111,7 @@ const Social = () => {
     return (
         <Card className={"divide-y"}>
             <CardHeader className={"p-4 sm:px-5 sm:py-4"}>
-                <CardTitle className={"text-xl lg:text-2xl font-normal capitalize"}>Social links</CardTitle>
+                <CardTitle className={"text-xl lg:text-2xl font-medium capitalize"}>Social links</CardTitle>
                 <CardDescription className={"text-sm text-muted-foreground p-0"}>Add your social media profiles below.</CardDescription>
             </CardHeader>
             <CardContent className={"p-0"}>
@@ -119,7 +119,7 @@ const Social = () => {
                     {
                         socialLinksConfig.map(({ id, label, placeholder }, index) => (
                             <div key={id} className={`grid w-full ${index !== 0 ? "mt-4" : ""} gap-1.5`}>
-                                <Label htmlFor={id} className="font-normal">{label}</Label>
+                                <Label htmlFor={id} className="font-medium">{label}</Label>
                                 <Input
                                     value={socialLink?.[id]}
                                     onChange={onChange}

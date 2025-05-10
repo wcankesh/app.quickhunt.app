@@ -321,7 +321,7 @@ const AnnouncementsTable = ({data, isLoading, handleDelete, isLoadingDelete, onS
                                                 <Button
                                                     disabled={x.status !== 1}
                                                     variant={"ghost"}
-                                                    onClick={() => shareFeedback(x.domain, x.slugUrl)}
+                                                    onClick={() => shareFeedback(x.domain, x.slug)}
                                                     className={"p-0 h-auto"}
                                                 >
                                                     <Eye size={18} className={`font-normal`}/>

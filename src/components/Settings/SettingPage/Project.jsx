@@ -90,10 +90,12 @@ const Project = () => {
     };
 
     const onChangeText = (event) => {
-        setCreateProjectDetails({...createProjectDetails, [event.target.name]: event.target.value})
-        setFormError(formError => ({
-            ...formError,
-            [event.target.name]: formValidate(event.target.name, event.target.value)
+        const { name, value } = event.target;
+        const trimmedValue = (name === "name" || name === "website") ? value.trimStart() : value;
+        setCreateProjectDetails(prev => ({ ...prev, [name]: trimmedValue }));
+        setFormError(prev => ({
+            ...prev,
+            [name]: formValidate(name, trimmedValue)
         }));
     };
 
@@ -138,6 +140,14 @@ const Project = () => {
     }
 
     const updateProjects = async (record) => {
+        const trimmedName = createProjectDetails.name ? createProjectDetails.name.trim() : "";
+        const trimmedWebsite = createProjectDetails.website ? createProjectDetails.website.trim() : "";
+        const updatedIdea = {
+            ...createProjectDetails,
+            name: trimmedName,
+            website: trimmedWebsite,
+        };
+        setCreateProjectDetails(updatedIdea);
         let validationErrors = {};
         Object.keys(createProjectDetails).forEach(name => {
             const error = formValidate(name, createProjectDetails[name]);
@@ -212,12 +222,12 @@ const Project = () => {
             }
 
             <CardHeader className={"p-6 gap-1 border-b p-4 sm:px-5 sm:py-4"}>
-                <CardTitle className={"text-xl lg:text-2xl font-normal capitalize"}>Project Setting</CardTitle>
+                <CardTitle className={"text-xl lg:text-2xl font-medium capitalize"}>Project Setting</CardTitle>
                 <CardDescription className={"text-sm text-muted-foreground p-0"}>Configure and manage your project
                     settings.</CardDescription>
             </CardHeader>
             <CardContent className={"p-4 sm:px-5 sm:py-4 border-b space-y-4"}>
-                <h3 className={"text-base font-normal"}>Edit Images</h3>
+                <h3 className={"text-base font-medium"}>Edit Images</h3>
                 <div className="w-full items-center ">
                     <div className={"flex flex-wrap sm:flex-nowrap gap-4 gap-x-[94px]"}>
                         <div className={"space-y-2"}>
@@ -263,7 +273,7 @@ const Project = () => {
 
                                 </div>
                                 <div className={"flex flex-col gap-1 "}>
-                                    <h4 className={"text-sm font-normal"}>Logo</h4>
+                                    <h4 className={"text-sm font-medium"}>Logo</h4>
                                     <p className={"text-xs font-normal text-muted-foreground"}>50px By 50px</p>
                                 </div>
                             </div>
@@ -307,7 +317,7 @@ const Project = () => {
                                         </div>
                                 }
                                 <div className={"flex flex-col gap-1"}>
-                                    <h4 className={"text-sm font-normal"}>Favicon</h4>
+                                    <h4 className={"text-sm font-medium"}>Favicon</h4>
                                     <p className={"text-xs font-normal text-muted-foreground"}>64px By 64px</p>
                                 </div>
                             </div>
@@ -319,7 +329,7 @@ const Project = () => {
             <CardContent className={"p-4 sm:px-5 sm:py-4 border-b"}>
                 <div className={"flex flex-wrap sm:flex-nowrap gap-4 w-full"}>
                     <div className="basis-full sm:basis-1/2 space-y-1">
-                        <Label htmlFor="name" className={"font-normal capitalize"}>Project Name</Label>
+                        <Label htmlFor="name" className={"font-medium capitalize"}>Project Name</Label>
                         <Input type="text" onChange={onChangeText} name={"name"} value={createProjectDetails.name}
                                id="name" placeholder="Project Name"/>
                         {
@@ -327,7 +337,7 @@ const Project = () => {
                         }
                     </div>
                     <div className="basis-full sm:basis-1/2 space-y-1">
-                        <Label htmlFor="website" className={"font-normal capitalize"}>Project website</Label>
+                        <Label htmlFor="website" className={"font-medium capitalize"}>Project website</Label>
                         <Input type="text" name={"website"} onChange={onChangeText} value={createProjectDetails.website}
                                id="website" placeholder="https://yourcompany.com"/>
                         {

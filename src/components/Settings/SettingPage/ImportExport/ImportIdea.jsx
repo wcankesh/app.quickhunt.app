@@ -224,7 +224,7 @@ const ImportIdea = () => {
                                 onClick={() => navigate(`${baseUrl}/settings/import-export`)}>
                             <ArrowLeft size={16}/>
                         </Button>
-                        <h4 className={"font-normal text-lg sm:text-2xl"}>Import Data</h4>
+                        <h4 className={"font-medium text-lg sm:text-2xl"}>Import Data</h4>
                     </div>
                     {
                         step >= 2 && <div className={"flex items-center gap-2"}>
@@ -270,7 +270,7 @@ const ImportIdea = () => {
                                 </Card>
                                 <Card>
                                     <CardHeader className={" border-b p-3"}>
-                                        <h3 className={"font-normal text-lg"}>Switching from another tool?</h3>
+                                        <h3 className={"font-medium text-lg"}>Switching from another tool?</h3>
                                         <CardDescription className={"text-sm text-muted-foreground p-0"}>Easily migrate your
                                             ideas to Quickhunt in just a few minutes!</CardDescription>
                                     </CardHeader>
@@ -333,7 +333,7 @@ const ImportIdea = () => {
                                                                                             onSelect={() => onSelectColumn(x, header, index)}
                                                                                         >
                                                                         <span
-                                                                            className={"flex justify-between items-center w-full text-sm font-normal cursor-pointer"}>
+                                                                            className={"flex justify-between items-center w-full text-sm font-medium cursor-pointer"}>
                                                                             {x.columnName}
                                                                         </span>
                                                                                         </CommandItem>
@@ -369,7 +369,7 @@ const ImportIdea = () => {
                                     <div className="grid xl:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 sm:grid-cols-1 gap-4">
                                         <Card>
                                             <CardHeader className={" border-b p-3"}>
-                                                <h3 className={"font-normal text-lg"}>Map statuses</h3>
+                                                <h3 className={"font-medium text-lg"}>Map statuses</h3>
                                             </CardHeader>
                                             <CardContent className={"p-0"}>
                                                 {
@@ -422,7 +422,7 @@ const ImportIdea = () => {
                                         </Card>
                                         <Card>
                                             <CardHeader className={" border-b p-3"}>
-                                                <h3 className={"font-normal text-lg"}>Map boards</h3>
+                                                <h3 className={"font-medium text-lg"}>Map boards</h3>
                                             </CardHeader>
                                             <CardContent className={"p-0"}>
                                                 {

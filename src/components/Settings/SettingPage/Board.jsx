@@ -67,12 +67,13 @@ const Board = () => {
 
     const handleInputChange = (event,index) => {
         const { name, value } = event.target;
+        const cleanedValue = name === "title" ? value.trimStart() : value;
         const updateBoard = [...boardList];
-        updateBoard[index] = { ...updateBoard[index], [name]: value };
+        updateBoard[index] = { ...updateBoard[index], [name]: cleanedValue };
         setBoardList(updateBoard);
         setFormError({
             ...formError,
-            [name]: formValidate(name, value)
+            [name]: formValidate(name, cleanedValue)
         });
     }
 
@@ -237,7 +238,7 @@ const Board = () => {
             <Card>
                 <CardHeader className={"flex flex-row flex-wrap md:flex-nowrap justify-between gap-x-6 items-center p-4 sm:px-5 sm:py-4 gap-y-2"}>
                     <div>
-                        <CardTitle className={"text-xl lg:text-2xl font-normal"}>Board</CardTitle>
+                        <CardTitle className={"text-xl lg:text-2xl font-medium"}>Board</CardTitle>
                         <CardDescription className={"text-sm text-muted-foreground p-0"}>Track ideas on your roadmap using boards.</CardDescription>
                     </div>
                     <Button
@@ -257,7 +258,7 @@ const Board = () => {
                                     {
                                         ["Board name","Last Update","Action"].map((x,i)=>{
                                             return(
-                                                <TableHead key={i} className={`px-2 py-[10px] md:px-3 font-normal text-card-foreground dark:text-muted-foreground ${i === 0 ? "w-2/5" : i === 1 ? "w-2/5" : ""}`}>{x}</TableHead>
+                                                <TableHead key={i} className={`px-2 py-[10px] md:px-3 font-medium text-card-foreground dark:text-muted-foreground ${i === 0 ? "w-2/5" : i === 1 ? "w-2/5" : ""}`}>{x}</TableHead>
                                             )
                                         })
                                     }
@@ -294,7 +295,7 @@ const Board = () => {
                                                                         }
                                                                     </TableCell>
                                                                     <TableCell className={"px-[12px] py-[10px]"}/>
-                                                                    <TableCell className={`px-2 py-[10px] md:px-3 font-normal align-top text-xs ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                                                    <TableCell className={`px-2 py-[10px] md:px-3 font-medium align-top text-xs ${theme === "dark" ? "" : "text-muted-foreground"}`}>
                                                                         <div className={"flex gap-2 items-center"}>
                                                                             <Fragment>
                                                                                 {
@@ -325,10 +326,10 @@ const Board = () => {
                                                                 </Fragment>
                                                                  :
                                                                 <Fragment>
-                                                                    <TableCell className={`px-2 py-[10px] md:px-3 font-normal text-xs max-w-[140px] truncate text-ellipsis overflow-hidden whitespace-nowrap ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                                                    <TableCell className={`px-2 py-[10px] md:px-3 font-medium text-xs max-w-[140px] truncate text-ellipsis overflow-hidden whitespace-nowrap ${theme === "dark" ? "" : "text-muted-foreground"}`}>
                                                                         {x.title}
                                                                     </TableCell>
-                                                                    <TableCell className={`px-2 py-[10px] md:px-3 font-normal text-xs ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                                                    <TableCell className={`px-2 py-[10px] md:px-3 font-medium text-xs ${theme === "dark" ? "" : "text-muted-foreground"}`}>
                                                                         {moment.utc(x?.updatedAt).local().startOf('seconds').fromNow()}
                                                                     </TableCell>
                                                                     <TableCell className={`flex px-2 py-[10px] md:px-3 ${theme === "dark" ? "" : "text-muted-foreground"} `}>

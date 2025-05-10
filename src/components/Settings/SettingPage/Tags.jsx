@@ -59,12 +59,13 @@ const Tags = () => {
 
     const handleInputChange = (event, index) => {
         const {name, value} = event.target;
+        const cleanedValue = name === "title" ? value.trimStart() : value;
         const updatedTopic = [...topicLists];
-        updatedTopic[index] = {...updatedTopic[index], [name]: value};
+        updatedTopic[index] = {...updatedTopic[index], [name]: cleanedValue};
         setTopicLists(updatedTopic);
         setFormError({
             ...formError,
-            [name]: formValidate(name, value)
+            [name]: formValidate(name, cleanedValue)
         });
     }
 
@@ -233,7 +234,7 @@ const Tags = () => {
                 <CardHeader
                     className={"p-4 sm:px-5 sm:py-4 gap-1 border-b flex flex-row flex-wrap justify-between items-center gap-y-2"}>
                     <div>
-                        <CardTitle className={"text-xl lg:text-2xl font-normal"}>Tags</CardTitle>
+                        <CardTitle className={"text-xl lg:text-2xl font-medium"}>Tags</CardTitle>
                         <CardDescription className={"text-sm text-muted-foreground p-0"}>Create tags for users to assign
                             when submitting ideas.</CardDescription>
                     </div>
@@ -250,7 +251,7 @@ const Tags = () => {
                                         ["Tag Name", "Last Update", "Action"].map((x, i) => {
                                             return (
                                                 <TableHead key={x}
-                                                           className={`px-2 py-[10px] md:px-3 font-normal text-card-foreground dark:text-muted-foreground ${i === 0 ? "w-2/5" : i === 1 ? "w-2/5" : ""}`}>{x}</TableHead>
+                                                           className={`px-2 py-[10px] md:px-3 font-medium text-card-foreground dark:text-muted-foreground ${i === 0 ? "w-2/5" : i === 1 ? "w-2/5" : ""}`}>{x}</TableHead>
                                             )
                                         })
                                     }
@@ -289,7 +290,7 @@ const Tags = () => {
                                                                         </TableCell>
                                                                         <TableCell className={"px-[12px] py-[10px]"}/>
                                                                         <TableCell
-                                                                            className={`px-2 py-[10px] md:px-3 font-normal align-top text-xs ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                                                            className={`px-2 py-[10px] md:px-3 font-medium align-top text-xs ${theme === "dark" ? "" : "text-muted-foreground"}`}>
                                                                             <div className={"flex gap-2 items-center"}>
                                                                                 <Fragment>
                                                                                     {
@@ -324,11 +325,11 @@ const Tags = () => {
                                                                     :
                                                                     <Fragment>
                                                                         <TableCell
-                                                                            className={`px-2 py-[10px] md:px-3 font-normal text-xs max-w-[140px] truncate text-ellipsis overflow-hidden whitespace-nowrap ${theme === "dark" ? "" : "text-muted-foreground"}`}>
+                                                                            className={`px-2 py-[10px] md:px-3 font-medium text-xs max-w-[140px] truncate text-ellipsis overflow-hidden whitespace-nowrap ${theme === "dark" ? "" : "text-muted-foreground"}`}>
                                                                             {x.title}
                                                                         </TableCell>
                                                                         <TableCell
-                                                                            className={`px-2 py-[10px] md:px-3 font-normal text-xs ${theme === "dark" ? "" : "text-muted-foreground"}`}>{moment.utc(x.updatedAt).local().startOf('seconds').fromNow()}</TableCell>
+                                                                            className={`px-2 py-[10px] md:px-3 font-medium text-xs ${theme === "dark" ? "" : "text-muted-foreground"}`}>{moment.utc(x.updatedAt).local().startOf('seconds').fromNow()}</TableCell>
                                                                         <TableCell
                                                                             className={`flex px-2 py-[10px] md:px-3 ${theme === "dark" ? "" : "text-muted-foreground"}`}>
                                                                             <Fragment>

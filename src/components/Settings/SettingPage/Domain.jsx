@@ -80,18 +80,18 @@ const Domain = () => {
     return (
         <Card className={"divide-y"}>
             <CardHeader className={"p-4 sm:px-5 sm:py-4 gap-1"}>
-                <CardTitle className={"text-xl lg:text-2xl font-normal capitalize"}>Domain Setting</CardTitle>
+                <CardTitle className={"text-xl lg:text-2xl font-medium capitalize"}>Domain Setting</CardTitle>
                 <CardDescription className={"text-sm text-muted-foreground p-0"}>Customize your project page with a
                     personalized domain.</CardDescription>
             </CardHeader>
             <CardContent className={"p-4 sm:px-5 sm:py-4 flex flex-col gap-3"}>
                 <div className="space-y-1 relative">
-                    <Label htmlFor="domain" className={"text-right font-normal capitalize"}>Subdomain</Label>
+                    <Label htmlFor="domain" className={"text-right font-medium capitalize"}>Subdomain</Label>
                     <Input disabled value={settingData?.domain?.replace('.quickhunt.io', '')} id="domain"
                            placeholder="example.com" className={"pr-[115px] bg-card mt-1"}/>
                 </div>
                 <div className="space-y-1">
-                    <Label htmlFor="text" className={"font-normal capitalize"}>Custom Domain</Label>
+                    <Label htmlFor="text" className={"font-medium capitalize"}>Custom Domain</Label>
                     <Input disabled={userDetailsReducer.plan === 0} value={settingData.customDomain}
                            name={"customDomain"} onChange={onChange} type="text" id="text" placeholder="example.com"/>
                 </div>

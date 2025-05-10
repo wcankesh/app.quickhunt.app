@@ -121,13 +121,6 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, getAllPosts, announcementL
                 } else {
                     return "";
                 }
-            case "categoryId":
-                // if (!value || value === "null") {
-                if (value === undefined || (value !== null && value !== "" && !categoriesList.some(x => x.id.toString() === value))) {
-                    return "Category is required.";
-                } else {
-                    return "";
-                }
             case "expiredAt":
                 if (changeLogDetails.expiredBoolean === 1 && (!value || value === undefined)) {
                     return "Please select an expiration date.";
@@ -239,10 +232,6 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, getAllPosts, announcementL
     const onChangeCategory = (selectedItems) => {
         const categoryId = selectedItems === "null" ? null : selectedItems;
         setChangeLogDetails({...changeLogDetails, categoryId});
-        setFormError((formError) => ({
-            ...formError,
-            categoryId: formValidate("categoryId", categoryId)
-        }));
     }
 
     const commonToggle = (name, value) => {
@@ -288,10 +277,6 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, getAllPosts, announcementL
         if (imageError) {
             validationErrors['image'] = imageError;
         }
-        const categoryError = formValidate("categoryId", changeLogDetails.categoryId);
-        if (categoryError) {
-            validationErrors.categoryId = categoryError;
-        }
         const expiredAtError = formValidate("expiredAt", changeLogDetails.expiredAt);
         if (expiredAtError) {
             validationErrors.expiredAt = expiredAtError;
@@ -332,7 +317,7 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, getAllPosts, announcementL
                     formData.append("expiredAt", changeLogDetails.expiredBoolean === 1 ? moment(changeLogDetails.expiredAt).format("YYYY-MM-DD") : "");
                 } else if (x === "deleteImage" && changeLogDetails?.image?.name) {
 
-                } else if (x === "categoryId" && (changeLogDetails[x] == null || changeLogDetails[x] === "null")) {
+                } else if (x === "categoryId") {
                     formData.append("categoryId", "");
                 } else {
                     formData.append(x, changeLogDetails[x]);
@@ -541,7 +526,7 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, getAllPosts, announcementL
                         </div>
                         <div className={"flex flex-wrap md:flex-nowrap gap-4 items-start"}>
                             <div className={"flex flex-col w-full gap-2 md:max-w-[288px]"}>
-                                <Label htmlFor="label" className={"font-medium after:ml-0.5 after:content-['*'] after:text-destructive"}>Category</Label>
+                                <Label htmlFor="label" className={"font-medium"}>Category</Label>
                                 <Select
                                     value={changeLogDetails && changeLogDetails.categoryId && changeLogDetails.categoryId.toString()}
                                     onValueChange={onChangeCategory}>
@@ -556,7 +541,6 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, getAllPosts, announcementL
                                     </SelectTrigger>
                                     <SelectContent>
                                         <SelectGroup>
-                                            <SelectItem value={"null"}>None</SelectItem>
                                             {
                                                 (categoriesList || []).map((x, i) => {
                                                     return (
@@ -567,7 +551,6 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, getAllPosts, announcementL
                                         </SelectGroup>
                                     </SelectContent>
                                 </Select>
-                                {formError.categoryId && <span className="text-sm text-red-500">{formError.categoryId}</span>}
                             </div>
                             <div className="flex flex-col w-full gap-2 md:max-w-[288px]">
                                 <Label htmlFor="date" className={"font-medium"}>Published at</Label>
@@ -604,25 +587,13 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, getAllPosts, announcementL
                                 </Popover>
                             </div>
                         </div>
-                    </div>
-                    <div className={"px-3 lg:px-8 flex flex-wrap items-center gap-4 md:flex-nowrap border-b py-6"}>
-                        <div className={"space-y-1.5"}>
-                            <Label className={"font-medium"}>Featured Image</Label>
-                            <div className="w-[282px] h-[128px] flex gap-1">
-                                <ImageUploader
-                                    stateDetails={changeLogDetails}
-                                    onDeleteImg={onDeleteImg}
-                                    handleFileChange={handleFileChange}
-                                />
-                            </div>
-                            {formError.image && <div className={"text-xs text-destructive"}>{formError.image}</div>}
-                        </div>
-                        <div className={"flex flex-col gap-[18px] w-full"}>
+                        <div className={"flex flex-wrap md:flex-nowrap gap-4 items-start"}>
+                        <div className={"flex flex-col gap-[18px] w-full md:max-w-[288px]"}>
                             <div className={"flex items-center gap-3"}>
                                 <Checkbox id={"expire_date"}
-                                        checked={changeLogDetails.expiredBoolean === 1}
-                                        onCheckedChange={(checked) => commonToggle("expiredBoolean",checked === true ? 1 : 0)}/>
-                                <label htmlFor={"expire_date"} className={`text-sm text-muted-foreground font-medium ${changeLogDetails.expiredBoolean === 1 ? "after:ml-0.5 after:content-['*'] after:text-destructive" : ""}`}>Expire At</label>
+                                          checked={changeLogDetails.expiredBoolean === 1}
+                                          onCheckedChange={(checked) => commonToggle("expiredBoolean",checked === true ? 1 : 0)}/>
+                                <label htmlFor={"expire_date"} className={`text-sm font-medium ${changeLogDetails.expiredBoolean === 1 ? "after:ml-0.5 after:content-['*'] after:text-destructive" : ""}`}>Expire At</label>
                             </div>
 
                             {
@@ -644,21 +615,35 @@ const CreateAnnouncement = ({isOpen, onOpen, onClose, getAllPosts, announcementL
                                             </PopoverTrigger>
                                             <PopoverContent className="w-auto p-0 pointer-events-auto" align="start">
                                                 <Calendar className={"pointer-events-auto"}
-                                                    mode="single"
-                                                    showOutsideDays={false}
-                                                    captionLayout="dropdown"
-                                                    selected={changeLogDetails?.expiredAt ? new Date(changeLogDetails.expiredAt) : null}
-                                                    onSelect={(date) => onDateChange("expiredAt", date)}
-                                                    endMonth={new Date(2050, 12)}
-                                                    startMonth={publishDate || new Date()}
-                                                    disabled={isDateDisabled}
-                                                    hideNavigation
+                                                          mode="single"
+                                                          showOutsideDays={false}
+                                                          captionLayout="dropdown"
+                                                          selected={changeLogDetails?.expiredAt ? new Date(changeLogDetails.expiredAt) : null}
+                                                          onSelect={(date) => onDateChange("expiredAt", date)}
+                                                          endMonth={new Date(2050, 12)}
+                                                          startMonth={publishDate || new Date()}
+                                                          disabled={isDateDisabled}
+                                                          hideNavigation
                                                 />
                                             </PopoverContent>
                                         </Popover>
                                         {formError.expiredAt && <span className="text-sm text-destructive">{formError.expiredAt}</span>}
                                     </div> : ""
                             }
+                        </div>
+                        </div>
+                    </div>
+                    <div className={"px-3 lg:px-8 flex flex-wrap items-center gap-4 md:flex-nowrap border-b py-6"}>
+                        <div className={"space-y-1.5"}>
+                            <Label className={"font-medium"}>Featured Image</Label>
+                            <div className="w-[282px] h-[128px] flex gap-1">
+                                <ImageUploader
+                                    stateDetails={changeLogDetails}
+                                    onDeleteImg={onDeleteImg}
+                                    handleFileChange={handleFileChange}
+                                />
+                            </div>
+                            {formError.image && <div className={"text-xs text-destructive"}>{formError.image}</div>}
                         </div>
                     </div>
                     <div className={"p-3 lg:p-8 sm:pb-0 flex flex-row gap-4"}>
