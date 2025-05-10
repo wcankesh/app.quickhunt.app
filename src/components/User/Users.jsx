@@ -68,12 +68,6 @@ const UserActionsList = ({ userActions, setCustomerList, sourceTitle, isLoadingU
         } else if (source === "post_feedbacks" || source === "post_reactions") {
             navigate(`/announcements/analytic-view?id=${id}`);
         }
-        // const response = await apiService.inboxMarkAllRead({ projectId: projectDetailsReducer.id, id });
-        // if (response.status === 200) {
-        //     const update = (userActions || []).map(action => action.id === id ? { ...action, isRead: 1 } : action);
-        //     setCustomerList(update);
-        //     dispatch(inboxMarkReadAction(update));
-        // }
     }
 
     return (
@@ -408,7 +402,6 @@ const Users = () => {
         <Fragment>
 
             {isSheetOpen && <Sheet open={isSheetOpen} onOpenChange={isSheetOpen ? closeSheet : openSheet}>
-                {/*<SheetOverlay className={"inset-0"}/>*/}
                 <SheetContent className={"sm:max-w-[662px] p-0"}>
                     <SheetHeader className={"px-3 py-4 lg:px-8 lg:py-[20px] flex flex-row justify-between items-center border-b space-y-0"}>
                         <SheetTitle className={"text-lg md:text-xl font-medium"}>Add New User</SheetTitle>
@@ -483,7 +476,6 @@ const Users = () => {
                                 {
                                     (tabs || []).map((y, i) => (
                                         <TabsContent key={i} value={y.value} className={"mt-0"}>
-                                            {/*<div className={"grid grid-cols-1 overflow-auto whitespace-nowrap h-[calc(100vh_-_245px)] md:h-[calc(100vh_-_193px)] lg:h-[calc(100vh_-_204px)]"}>*/}
                                             <div className={"grid grid-cols-1 overflow-auto whitespace-nowrap h-[calc(100vh_-_197px)] md:h-[calc(100vh_-_193px)] lg:h-[calc(100vh_-_204px)]"}>
                                                 {
                                                     y.value === "details" ? y.component :
@@ -509,7 +501,6 @@ const Users = () => {
             )}
 
             <div className={"container xl:max-w-[1200px] lg:max-w-[992px] md:max-w-[768px] sm:max-w-[639px] pt-8 pb-5 px-3 md:px-4"}>
-                {/*<NewCustomerSheet isOpen={isSheetOpen} onOpen={openSheet} callback={getAllUsers} onClose={closeSheet}/>*/}
 
                 {
                     openDelete &&
