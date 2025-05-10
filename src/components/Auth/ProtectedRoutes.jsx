@@ -39,8 +39,8 @@ const ProtectedRoutes = () => {
                 // };
                 // window.Quickhunt_In_App_Message_Config = window.Quickhunt_In_App_Message_Config || [];
                 // window.Quickhunt_In_App_Message_Config = [
-                //     { Quickhunt_In_App_Message_Key: "ZXhOK3JqVXFmZTJCS3gzRnI5MXJtZz09OjoxMjM0NTY3ODkxMDExMTIx" },
-                //     { Quickhunt_In_App_Message_Key: "ckgvb1QrcTljaVdhNkhCOGFaUU1idz09OjoxMjM0NTY3ODkxMDExMTIx" },
+                //     { Quickhunt_In_App_Message_Key: "NGQ2Z1VMQUNjUW9rbGJrMjZMMFZIQT09Ojpqdjd2dGxMWWFpY28wR1ptSVVtdmNnPT0=" },
+                //     { Quickhunt_In_App_Message_Key: "dytrQXZlT25JVW5DN2VkeWxZUXdhZz09OjptYkVYYjNjWFRObFUzanRhSXRRb3RnPT0=" },
                 // ];
                 // window.QuickhuntScriptLoad();
             }
