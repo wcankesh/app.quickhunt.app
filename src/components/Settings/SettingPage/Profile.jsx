@@ -289,7 +289,7 @@ const Profile = () => {
                         <div className={"flex flex-col gap-4 w-full sm:w-full"}>
                             <div className={"flex gap-4 flex-wrap sm:flex-nowrap"}>
                                 <div className={"basis-full space-y-0.5"}>
-                                    <Label htmlFor="firstName" className={"font-medium"}>First Name</Label>
+                                    <Label htmlFor="firstName" className={"font-medium after:ml-1 after:content-['*'] after:text-destructive"}>First Name</Label>
                                     <Input
                                         id="firstName"
                                         placeholder="First Name"
@@ -307,7 +307,7 @@ const Profile = () => {
                                     </div>
                                 </div>
                                 <div className={"basis-full space-y-0.5"}>
-                                    <Label htmlFor="lastName" className={"font-medium"}>Last Name</Label>
+                                    <Label htmlFor="lastName" className={"font-medium after:ml-1 after:content-['*'] after:text-destructive"}>Last Name</Label>
                                     <Input
                                         id="lastName"
                                         placeholder="Last Name"
@@ -358,7 +358,7 @@ const Profile = () => {
                 <CardContent className={"py-4 px-4 sm:px-5 sm:py-4"}>
                     <div className={"flex flex-col gap-4"}>
                         <div className={"space-y-1"}>
-                            <Label htmlFor="currentPassword" className={"font-medium"}>Current password</Label>
+                            <Label htmlFor="currentPassword" className={"font-medium after:ml-1 after:content-['*'] after:text-destructive"}>Current password</Label>
                             <div className={"relative"}>
                                 <Input
                                     id="currentPassword"
@@ -376,16 +376,16 @@ const Profile = () => {
                                     {passwordVisibility.userCurrentPassword ? <Eye className={"w-[16px] h-[16px]"}/> :
                                         <EyeOff className={"w-[16px] h-[16px]"}/>}
                                 </Button>
+                            </div>
                                 {
                                     formErrorPassword.currentPassword &&
                                     <span
                                         className="text-destructive text-sm">{formErrorPassword.currentPassword}</span>
                                 }
-                            </div>
                         </div>
 
                         <div>
-                            <Label htmlFor="password" className={"font-medium"}>Password</Label>
+                            <Label htmlFor="password" className={"font-medium after:ml-1 after:content-['*'] after:text-destructive"}>Password</Label>
                             <div className={"relative"}>
                                 <Input
                                     id="password"
@@ -403,15 +403,15 @@ const Profile = () => {
                                     {passwordVisibility.userPassword ? <Eye className={"w-[16px] h-[16px]"}/> :
                                         <EyeOff className={"w-[16px] h-[16px]"}/>}
                                 </Button>
+                            </div>
                                 {
                                     formErrorPassword.password &&
                                     <span className="text-destructive text-sm">{formErrorPassword.password}</span>
                                 }
-                            </div>
                         </div>
 
                         <div>
-                            <Label htmlFor="password_confirm" className={"font-medium"}>Password confirmation</Label>
+                            <Label htmlFor="password_confirm" className={"font-medium after:ml-1 after:content-['*'] after:text-destructive"}>Password confirmation</Label>
                             <div className={"relative"}>
                                 <Input
                                     id="password_confirm"
@@ -429,12 +429,12 @@ const Profile = () => {
                                     {passwordVisibility.userConfirmPassword ? <Eye className={"w-[16px] h-[16px]"}/> :
                                         <EyeOff className={"w-[16px] h-[16px]"}/>}
                                 </Button>
+                            </div>
                                 {
                                     formErrorPassword.passwordConfirmation &&
                                     <span
                                         className="text-destructive text-sm">{formErrorPassword.passwordConfirmation}</span>
                                 }
-                            </div>
                         </div>
 
                     </div>

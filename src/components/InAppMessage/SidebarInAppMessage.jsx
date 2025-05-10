@@ -430,7 +430,7 @@ const SidebarInAppMessage = ({
                             {
                                 selectedStep?.questionType === 5 &&
                                 <div className="grid w-full items-center gap-1.5">
-                                    <Label className={"font-medium text-sm"}>Answer Options</Label>
+                                    <Label className={"font-medium text-sm after:ml-1 after:content-['*'] after:text-destructive"}>Answer Options</Label>
                                     <div>
                                         <div className={"space-y-[6px]"}>
                                             {(selectedStep?.options || []).map((option, index) => (

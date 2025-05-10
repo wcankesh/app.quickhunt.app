@@ -1467,7 +1467,7 @@ const UpdateIdea = () => {
                                 <div
                                     className={"px-4 py-3 lg:py-6 lg:px-8 flex flex-col gap-4 ld:gap-6 border-b"}>
                                     <div className="space-y-2">
-                                        <Label htmlFor="text" className={"font-medium"}>Title</Label>
+                                        <Label htmlFor="text" className={"font-medium after:ml-1 after:content-['*'] after:text-destructive"}>Title</Label>
                                         <Input type="text" id="text" placeholder="" value={selectedIdea.title}
                                                name={"title"} onChange={onChangeText}/>
                                         {
@@ -2170,9 +2170,9 @@ const UpdateIdea = () => {
                                                                         })
                                                                         : ""
                                                                 }
-                                                                {ideaComment?.comments?.length > 0 && (
+                                                                {ideaComment?.comments?.length > 0 ? (
+                                                                        hasMoreComments ? (
                                                                     <div className="flex justify-center py-4">
-                                                                        {hasMoreComments ? (
                                                                             <Button
                                                                                 onClick={loadMoreComments}
                                                                                 disabled={isLoadingComments}
@@ -2183,9 +2183,9 @@ const UpdateIdea = () => {
                                                                                 ) : null}
                                                                                 Load More
                                                                             </Button>
-                                                                        ) : ""}
                                                                     </div>
-                                                                )}
+                                                                        ) : ""
+                                                                ) : ""}
                                                             </Fragment>
                                                         </TabsContent> : <p className={'py-10 text-center text-muted-foreground text-sm'}>No comments yet, be the first to share your thoughts!</p>
                                                 }

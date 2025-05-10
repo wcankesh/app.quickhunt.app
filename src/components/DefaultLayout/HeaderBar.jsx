@@ -204,18 +204,19 @@ const HeaderBar = ({setIsMobile}) => {
 
     const onChangeText = (event) => {
         const {name, value} = event.target;
+        const trimmedValue = (name === "name" || name === "website") ? value.trimStart() : value;
         if (name === "name" || name === 'domain') {
             const cleanDomain = (name) => name.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
             const sanitizedProjectName = cleanDomain(value);
             setCreateProjectDetails({
                 ...createProjectDetails,
-                [name]: value,
+                [name]: trimmedValue,
                 domain: sanitizedProjectName
             });
         } else {
             setCreateProjectDetails({
                 ...createProjectDetails,
-                [name]: value,
+                [name]: trimmedValue,
             });
         }
         setFormError(formError => ({
@@ -508,7 +509,7 @@ const HeaderBar = ({setIsMobile}) => {
                                     {
                                         dropDownItem.map((x, i) => (
                                             <DropdownMenuItem key={i}
-                                                              className={"text-sm font-normal flex gap-2 cursor-pointer"}
+                                                              className={"text-sm font-medium flex gap-2 cursor-pointer"}
                                                               onClick={x.onClick}
                                             >
                                                 <span
@@ -527,7 +528,7 @@ const HeaderBar = ({setIsMobile}) => {
                             <SheetContent className={"sm:max-w-[662px] p-0"}>
                                 <SheetHeader
                                     className={"px-4 py-3 md:py-5 lg:px-8 lg:py-[20px] border-b flex flex-row justify-between items-center space-y-0"}>
-                                    <SheetTitle className={"text-xl font-normal flex justify-between items-center"}>
+                                    <SheetTitle className={"text-xl font-medium flex justify-between items-center"}>
                                         Create New Project
                                     </SheetTitle>
                                     <span className={"max-w-[24px]"}><X className={"cursor-pointer m-0"} onClick={closeSheet}/></span>
@@ -538,7 +539,7 @@ const HeaderBar = ({setIsMobile}) => {
                                             sheetCommInput.map((x, i) => (
                                                 <div className="space-y-1" key={i}>
                                                     <Label htmlFor="name"
-                                                           className="text-right font-normal">{x.title}</Label>
+                                                           className={`text-right font-medium ${i === 0 ? "after:ml-1 after:content-['*'] after:text-destructive" : ""}`}>{x.title}</Label>
                                                     <Input
                                                         id={x.name}
                                                         placeholder={x.placeholder}

@@ -329,7 +329,7 @@ const Project = () => {
             <CardContent className={"p-4 sm:px-5 sm:py-4 border-b"}>
                 <div className={"flex flex-wrap sm:flex-nowrap gap-4 w-full"}>
                     <div className="basis-full sm:basis-1/2 space-y-1">
-                        <Label htmlFor="name" className={"font-medium capitalize"}>Project Name</Label>
+                        <Label htmlFor="name" className={"font-medium capitalize after:ml-1 after:content-['*'] after:text-destructive"}>Project Name</Label>
                         <Input type="text" onChange={onChangeText} name={"name"} value={createProjectDetails.name}
                                id="name" placeholder="Project Name"/>
                         {
@@ -337,7 +337,7 @@ const Project = () => {
                         }
                     </div>
                     <div className="basis-full sm:basis-1/2 space-y-1">
-                        <Label htmlFor="website" className={"font-medium capitalize"}>Project website</Label>
+                        <Label htmlFor="website" className={"font-medium capitalize after:ml-1 after:content-['*'] after:text-destructive"}>Project website</Label>
                         <Input type="text" name={"website"} onChange={onChangeText} value={createProjectDetails.website}
                                id="website" placeholder="https://yourcompany.com"/>
                         {
